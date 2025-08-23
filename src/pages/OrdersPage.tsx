@@ -50,12 +50,12 @@ export const OrdersPage: React.FC = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true)
-      
-      // Demo siparişleri için önce orders tablosundan veri çek
+
+      // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
-        .from('orders')
-        .select('*')
-        .or(`user_id.eq.${user?.id},is_demo.eq.true`) // Kullanıcının siparişleri veya demo siparişleri
+        .from('venthub_orders')
+        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, venthub_order_items ( id, product_name, quantity, price_at_time )')
+        .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
       if (ordersError) {
@@ -64,22 +64,29 @@ export const OrdersPage: React.FC = () => {
         return
       }
 
-      // Orders verilerini uyumlu formata çevir
-      const formattedOrders = (ordersData || []).map(order => ({
-        id: order.id,
-        total_amount: order.total_amount || 0,
-        status: order.status || 'pending',
-        created_at: order.created_at,
-        customer_name: order.demo_user_info?.firstName && order.demo_user_info?.lastName 
-          ? `${order.demo_user_info.firstName} ${order.demo_user_info.lastName}`
-          : user?.user_metadata?.full_name || user?.email || 'Demo Kullanıcı',
-        customer_email: order.demo_user_info?.email || user?.email || 'demo@test.com',
-        shipping_address: order.shipping_address || order.demo_user_info?.shippingAddress,
-        order_items: [], // Orders tablosunda item detayları farklı yapıda
-        order_number: order.order_number,
-        is_demo: order.is_demo || false,
-        payment_data: order.payment_data
-      }))
+      const formattedOrders: Order[] = (ordersData || []).map((order: any) => {
+        const items = (order.venthub_order_items || []).map((it: any) => ({
+          id: it.id,
+          product_name: it.product_name,
+          quantity: it.quantity,
+          unit_price: Number(it.price_at_time) || 0,
+          total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
+        }))
+
+        return {
+          id: order.id,
+          total_amount: Number(order.total_amount) || 0,
+          status: order.status || 'pending',
+          created_at: order.created_at,
+          customer_name: order.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_email: order.customer_email || user?.email || '-',
+          shipping_address: order.shipping_address,
+          order_items: items,
+          order_number: order.order_number,
+          is_demo: false,
+          payment_data: order.payment_data,
+        }
+      })
 
       setOrders(formattedOrders)
     } catch (error) {

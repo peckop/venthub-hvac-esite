@@ -7,11 +7,13 @@ const isProd = process.env.BUILD_MODE === 'prod'
 export default defineConfig({
   plugins: [
     react(), 
-    sourceIdentifierPlugin({
-      enabled: !isProd,
-      attributePrefix: 'data-matrix',
-      includeProps: true,
-    })
+    // Temporarily disabled to avoid React Fragment warnings
+    // sourceIdentifierPlugin({
+    //   enabled: !isProd,
+    //   attributePrefix: 'data-matrix',
+    //   includeProps: true,
+    //   excludeComponents: ['Fragment', 'React.Fragment']
+    // })
   ],
   resolve: {
     alias: {

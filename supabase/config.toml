@@ -1,0 +1,10 @@
+# Supabase project configuration
+# Edge Function settings
+
+[functions]
+
+[functions."iyzico-callback"]
+verify_jwt = false
+
+[functions."admin-update-order"]
+verify_jwt = false

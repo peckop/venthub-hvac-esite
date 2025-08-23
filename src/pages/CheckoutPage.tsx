@@ -134,55 +134,47 @@ export const CheckoutPage: React.FC = () => {
   }
 
   const initiatePayment = async () => {
+    console.log('=== İNITATE PAYMENT STARTED ===');
+    console.log('Cart items:', items);
+    console.log('Cart total:', getCartTotal());
+    console.log('Customer info:', customerInfo);
+    console.log('Shipping address:', shippingAddress);
+    
     setLoading(true)
     try {
-      const cartItems = items.map((item, index) => ({
-        id: item.product.id || `item_${index}`,
-        product_id: item.product.id,
-        name: item.product.name,
-        title: item.product.name,
-        product_name: item.product.name,
-        quantity: item.quantity,
-        price: parseFloat(item.product.price),
-        category: 'HVAC Equipment' // Default category
-      }))
-
-      // Edge function'ın beklediği formata göre request data hazırla
+      // Edge function'ın beklediği format
       const requestData = {
-        amount: getCartTotal() * 1.2, // Include VAT - edge function bunu bekliyor
-        cartItems: cartItems.map(item => ({
-          ...item,
-          product_name: item.name,
-          product_id: item.id
+        amount: getCartTotal() * 1.2, // Include VAT
+        cartItems: items.map(item => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          price: parseFloat(item.product.price),
+          product_name: item.product.name,
+          product_image_url: item.product.imageUrl || null
         })),
         customerInfo: {
-          firstName: customerInfo.name.split(' ')[0] || 'Test',
-          lastName: customerInfo.name.split(' ').slice(1).join(' ') || 'User',
           name: customerInfo.name,
           email: customerInfo.email,
-          phone: customerInfo.phone,
-          identityNumber: customerInfo.identityNumber || '74300864791',
-          address: shippingAddress.fullAddress,
+          phone: customerInfo.phone
+        },
+        shippingAddress: {
+          fullAddress: shippingAddress.fullAddress,
           city: shippingAddress.city,
-          zipCode: shippingAddress.postalCode,
-          shippingAddress: {
-            address: shippingAddress.fullAddress,
-            city: shippingAddress.city,
-            district: shippingAddress.district,
-            zipCode: shippingAddress.postalCode
-          },
-          billingAddress: sameAsShipping ? {
-            address: shippingAddress.fullAddress,
-            city: shippingAddress.city,
-            district: shippingAddress.district,
-            zipCode: shippingAddress.postalCode
-          } : {
-            address: billingAddress.fullAddress,
-            city: billingAddress.city,
-            district: billingAddress.district,
-            zipCode: billingAddress.postalCode
-          }
-        }
+          district: shippingAddress.district,
+          postalCode: shippingAddress.postalCode
+        },
+        billingAddress: sameAsShipping ? {
+          fullAddress: shippingAddress.fullAddress,
+          city: shippingAddress.city,
+          district: shippingAddress.district,
+          postalCode: shippingAddress.postalCode
+        } : {
+          fullAddress: billingAddress.fullAddress,
+          city: billingAddress.city,
+          district: billingAddress.district,
+          postalCode: billingAddress.postalCode
+        },
+        user_id: user?.id || null
       }
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
@@ -190,32 +182,27 @@ export const CheckoutPage: React.FC = () => {
       })
 
       if (error) {
-        throw error
+        console.error('İyzico payment error:', error);
+        throw error;
       }
 
       if (data && data.data) {
-        console.log('Payment response:', data.data);
+        console.log('İyzico payment response:', data.data);
         
-        // Check if this is real Iyzico payment with paymentPageUrl
-        if (data.data.paymentPageUrl && !data.data.demo) {
-          console.log('Real Iyzico payment - redirecting to payment page:', data.data.paymentPageUrl);
-          // Redirect to Iyzico payment page
+        // İyzico başarılı - ödeme sayfasına yönlendir
+        if (data.data.paymentPageUrl) {
+          console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
           window.location.href = data.data.paymentPageUrl;
           return;
         }
         
-        // Demo mode or fallback - complete immediately
-        if (data.data.demo || data.data.status === 'success') {
-          console.log('Demo payment successful, completing order immediately');
-          setOrderId(data.data.paymentId || data.data.conversationId || data.data.orderId || 'demo_order');
+        // Hemen tamamlanan ödeme (demo)
+        if (data.data.status === 'success') {
+          console.log('Payment completed immediately');
+          setOrderId(data.data.orderId || data.data.conversationId || 'completed_order');
           setOrderCompleted(true);
           clearCart();
-          
-          if (data.data.demo) {
-            toast.success('🎉 Demo ödeme başarıyla tamamlandı!');
-          } else {
-            toast.success('✅ Ödeme başarıyla tamamlandı!');
-          }
+          toast.success('✅ Ödeme başarıyla tamamlandı!');
         } else {
           throw new Error('Ödeme başlatma hatası: Geçersiz yanıt');
         }
@@ -224,7 +211,24 @@ export const CheckoutPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Payment initiation error:', error)
-      toast.error(error.message || 'Ödeme başlatma sırasında hata oluştu')
+      console.error('Full error details:', {
+        message: error.message,
+        details: error.details,
+        code: error.code,
+        stack: error.stack
+      })
+      
+      // More detailed error message
+      let errorMessage = 'Ödeme başlatma sırasında hata oluştu'
+      if (error.message && error.message.includes('VALIDATION_ERROR')) {
+        errorMessage = 'Form bilgilerinde eksiklik var. Lütfen kontrol edin.'
+      } else if (error.message && error.message.includes('DATABASE_ERROR')) {
+        errorMessage = 'Veritabanı hatası. Lütfen tekrar deneyin.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
       setStep(2) // Go back to address step
     } finally {
       setLoading(false)

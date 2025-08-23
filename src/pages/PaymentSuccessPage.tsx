@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { CheckCircle, AlertCircle, Loader } from 'lucide-react'
+import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
+import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
 export const PaymentSuccessPage: React.FC = () => {
@@ -11,53 +12,120 @@ export const PaymentSuccessPage: React.FC = () => {
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<any>(null)
+  const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
 
   useEffect(() => {
-    // Get payment info from URL parameters
-    const conversationId = searchParams.get('conversationId')
-    const token = searchParams.get('token')
-    const status = searchParams.get('status')
-    const errorMessage = searchParams.get('errorMessage')
-    
-    console.log('Payment success page loaded with params:', {
-      conversationId,
-      token,
-      status,
-      errorMessage
-    })
+    const conversationId = searchParams.get('conversationId') || undefined
+    const token = searchParams.get('token') || undefined
+    const errorMessage = searchParams.get('errorMessage') || undefined
+    const orderId = searchParams.get('orderId') || undefined
+    const statusParam = searchParams.get('status') || undefined
 
-    // Simulate payment verification (in real app, you'd verify with your backend)
-    setTimeout(() => {
-      if (status === 'success' || conversationId || token) {
-        setStatus('success')
-        setPaymentInfo({
-          conversationId: conversationId || 'demo_payment',
-          token: token || 'demo_token',
-          status: status || 'success'
-        })
-        
-        // Clear cart on successful payment
-        clearCart()
-        
-        // Show success message
-        toast.success('🎉 Ödeme başarıyla tamamlandı!')
-      } else if (errorMessage) {
+    console.log('Payment success page params:', { conversationId, token, orderId, errorMessage, statusParam })
+
+    async function fetchOrderDetails(oid?: string) {
+      try {
+        if (!oid) return
+        const { data, error } = await supabase
+          .from('venthub_orders')
+          .select('total_amount, created_at, venthub_order_items(quantity)')
+          .eq('id', oid)
+          .maybeSingle()
+        if (!error && data) {
+          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: any) => s + (Number(it?.quantity)||0), 0) : undefined
+          setOrderSummary({ amount: Number(data.total_amount)||undefined, createdAt: data.created_at, items: count })
+        }
+      } catch {}
+    }
+
+    async function verify() {
+      try {
+        // 1) Eğer callback status=success ile yönlendirdiyse, doğrudan başarı kabul et
+        if (statusParam === 'success') {
+          setStatus('success')
+          setPaymentInfo({ conversationId: conversationId || orderId, token })
+          clearCart()
+          if (orderId) await fetchOrderDetails(orderId)
+          toast.success('🎉 Ödeme başarıyla tamamlandı!')
+          return
+        }
+
+        // 2) Token varsa, Functions üzerinden doğrula
+        if (token) {
+          const { data, error } = await supabase.functions.invoke('iyzico-callback', {
+            body: { token, conversationId, orderId }
+          })
+
+          if (error) {
+            console.error('Callback verify error:', error)
+            setStatus('error')
+            setPaymentInfo({ errorMessage: error.message || 'Doğrulama hatası' })
+            toast.error('Ödeme doğrulama hatası')
+            return
+          }
+
+          if (data?.status === 'success') {
+            setStatus('success')
+            setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
+            clearCart()
+            await fetchOrderDetails(orderId)
+            toast.success('🎉 Ödeme başarıyla tamamlandı!')
+            return
+          }
+
+          setStatus('error')
+          const msg = data?.iyzico?.errorMessage || 'Ödeme başarısız'
+          setPaymentInfo({ errorMessage: msg })
+          toast.error('Ödeme başarısız: ' + msg)
+          return
+        }
+
+        // 3) Token yoksa ama orderId varsa, veritabanından durumu kontrol et
+        if (orderId) {
+          const { data, error } = await supabase
+            .from('venthub_orders')
+            .select('status')
+            .eq('id', orderId)
+            .maybeSingle()
+
+          if (error) {
+            console.error('Order fetch error:', error)
+            setStatus('error')
+            setPaymentInfo({ errorMessage: 'Sipariş doğrulama hatası' })
+            toast.error('Sipariş doğrulama hatası')
+            return
+          }
+
+          if (data?.status === 'paid') {
+            setStatus('success')
+            setPaymentInfo({ conversationId: conversationId || orderId, token })
+            clearCart()
+            await fetchOrderDetails(orderId)
+            toast.success('🎉 Ödeme başarıyla tamamlandı!')
+            return
+          }
+        }
+
+        // 4) Diğer durumlarda hatayı göster
+        if (errorMessage) {
+          setStatus('error')
+          setPaymentInfo({ errorMessage })
+          toast.error('Ödeme sırasında hata: ' + errorMessage)
+        } else {
+          setStatus('error')
+          setPaymentInfo({ errorMessage: 'Ödeme doğrulanamadı' })
+          toast.error('Ödeme doğrulanamadı')
+        }
+      } catch (e: any) {
+        console.error('Verify catch error:', e)
         setStatus('error')
-        setPaymentInfo({ errorMessage })
-        toast.error('Ödeme sırasında hata oluştu: ' + errorMessage)
-      } else {
-        // No clear success or error, assume success for demo
-        setStatus('success')
-        setPaymentInfo({
-          conversationId: 'demo_payment_' + Date.now(),
-          token: 'demo_token',
-          status: 'success'
-        })
-        clearCart()
-        toast.success('🎉 Demo ödeme tamamlandı!')
+        setPaymentInfo({ errorMessage: e?.message || 'Beklenmeyen hata' })
+        toast.error('Beklenmeyen hata')
       }
-    }, 2000) // 2 second delay to show loading
-  }, [searchParams, clearCart])
+    }
+
+    if (status === 'loading') verify()
+  }, [])
 
   if (status === 'loading') {
     return (
@@ -124,6 +192,32 @@ export const PaymentSuccessPage: React.FC = () => {
         <p className="text-steel-gray mb-8">
           Siparişiniz başarıyla alındı. E-posta adresinize sipariş detayları gönderilecektir.
         </p>
+        {/* Order summary */}
+        <div className="grid grid-cols-1 gap-3 mb-6 text-left">
+          {orderSummary.createdAt && (
+            <div className="flex justify-between text-sm text-steel-gray">
+              <span>Tarih</span>
+              <span>{new Date(orderSummary.createdAt).toLocaleString('tr-TR')}</span>
+            </div>
+          )}
+          {typeof orderSummary.items === 'number' && (
+            <div className="flex justify-between text-sm text-steel-gray">
+              <span>Ürün Adedi</span>
+              <span>{orderSummary.items}</span>
+            </div>
+          )}
+          {typeof orderSummary.amount === 'number' && (
+            <div className="flex justify-between text-sm font-semibold text-industrial-gray">
+              <span>Toplam Tutar</span>
+              <span>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(orderSummary.amount)}</span>
+            </div>
+          )}
+        </div>
+        {/* Trust badge */}
+        <div className="flex items-center justify-center space-x-2 text-success-green mb-4">
+          <ShieldCheck size={18} />
+          <span className="text-sm font-medium">3D Secure ile korundu</span>
+        </div>
         <div className="space-y-3">
           <Link
             to="/"
@@ -137,6 +231,14 @@ export const PaymentSuccessPage: React.FC = () => {
           >
             Siparişlerim
           </Link>
+          {paymentInfo?.conversationId && (
+            <Link
+              to={`/orders?open=${encodeURIComponent(searchParams.get('orderId') || '')}`}
+              className="w-full border-2 border-success-green text-success-green hover:bg-success-green hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
+            >
+              Siparişe Git
+            </Link>
+          )}
         </div>
       </div>
     </div>
