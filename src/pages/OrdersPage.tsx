@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -30,6 +30,7 @@ interface OrderItem {
 export const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -54,7 +55,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, venthub_order_items ( id, product_name, quantity, price_at_time )')
+        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, venthub_order_items ( id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -89,6 +90,13 @@ export const OrdersPage: React.FC = () => {
       })
 
       setOrders(formattedOrders)
+
+      // Auto-open behavior if URL contains ?open={orderId}
+      const openId = searchParams.get('open')
+      if (openId) {
+        const found = formattedOrders.find(o => o.id === openId)
+        if (found) setSelectedOrder(found)
+      }
     } catch (error) {
       console.error('Orders fetch error:', error)
       toast.error('Beklenmeyen hata oluştu')
@@ -148,6 +156,20 @@ export const OrdersPage: React.FC = () => {
     }
   }
 
+  const steps = ['pending','paid','shipped','delivered']
+  const stepLabel: Record<string,string> = { pending:'Ödeme Bekleniyor', paid:'Ödendi', shipped:'Kargoda', delivered:'Teslim Edildi' }
+
+  const handlePrintReceipt = (order: Order) => {
+    const w = window.open('', '_blank', 'width=720,height=900')
+    if (!w) return
+    const itemsHtml = (order.order_items || [])
+      .map(it => `<tr><td style="padding:6px 0">${it.product_name}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(it.unit_price)}</td><td style="text-align:right">${new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(it.total_price)}</td></tr>`) 
+      .join('')
+    const total = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(order.total_amount)
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Makbuz</title></head><body style="font-family:Arial,sans-serif;padding:24px"><h2>Venthub Sipariş Makbuzu</h2><p><strong>Sipariş ID:</strong> ${order.id}<br/><strong>Tarih:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th align="left">Ürün</th><th>Adet</th><th align="right">Birim</th><th align="right">Toplam</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan="3" align="right"><strong>Genel Toplam</strong></td><td align="right"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>3D Secure ile korunan ödeme işlemi.</p><script>window.print();</script></body></html>`)
+    w.document.close()
+  }
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-clean-white flex items-center justify-center">
@@ -192,6 +214,24 @@ export const OrdersPage: React.FC = () => {
               <div key={order.id} className="bg-white rounded-lg shadow-hvac-md overflow-hidden">
                 {/* Order Header */}
                 <div className="p-6 border-b border-light-gray">
+                  {/* Status Stepper */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2">
+                      {steps.map((s, idx) => {
+                        const activeIdx = Math.max(steps.indexOf(order.status.toLowerCase()), 0)
+                        const active = idx <= activeIdx
+                        return (
+                          <React.Fragment key={s}>
+                            <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center ${active ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx+1}</div>
+                            {idx < steps.length-1 && <div className={`h-1 w-10 ${activeIdx>idx ? 'bg-success-green' : 'bg-light-gray'}`}></div>}
+                          </React.Fragment>
+                        )
+                      })}
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-steel-gray">
+                      {steps.map(s => <span key={s}>{stepLabel[s]}</span>)}
+                    </div>
+                  </div>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-4">
                       <div className="bg-primary-navy text-white rounded-full w-12 h-12 flex items-center justify-center">
@@ -275,6 +315,7 @@ export const OrdersPage: React.FC = () => {
                             <thead className="bg-light-gray">
                               <tr>
                                 <th className="text-left p-4 text-sm font-medium text-industrial-gray">Ürün</th>
+                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">Görsel</th>
                                 <th className="text-center p-4 text-sm font-medium text-industrial-gray">Adet</th>
                                 <th className="text-right p-4 text-sm font-medium text-industrial-gray">Birim Fiyat</th>
                                 <th className="text-right p-4 text-sm font-medium text-industrial-gray">Toplam</th>
@@ -284,6 +325,14 @@ export const OrdersPage: React.FC = () => {
                               {order.order_items?.map((item, index) => (
                                 <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-air-blue/5'}>
                                   <td className="p-4 text-sm text-industrial-gray">{item.product_name}</td>
+                                  <td className="p-4 text-sm">
+                                    {/** eslint-disable-next-line @next/next/no-img-element */}
+                                    { (item as any).product_image_url ? (
+                                      <img src={(item as any).product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded" />
+                                    ) : (
+                                      <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">Yok</div>
+                                    )}
+                                  </td>
                                   <td className="p-4 text-sm text-center text-steel-gray">{item.quantity}</td>
                                   <td className="p-4 text-sm text-right text-steel-gray">{formatPrice(item.unit_price)}</td>
                                   <td className="p-4 text-sm text-right font-medium text-industrial-gray">{formatPrice(item.total_price)}</td>
@@ -292,7 +341,7 @@ export const OrdersPage: React.FC = () => {
                             </tbody>
                             <tfoot>
                               <tr className="bg-primary-navy text-white">
-                                <td colSpan={3} className="p-4 text-sm font-semibold text-right">Genel Toplam:</td>
+                                <td colSpan={4} className="p-4 text-sm font-semibold text-right">Genel Toplam:</td>
                                 <td className="p-4 text-sm font-bold text-right">{formatPrice(order.total_amount)}</td>
                               </tr>
                             </tfoot>
@@ -315,6 +364,11 @@ export const OrdersPage: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Receipt */}
+                    <div className="mt-4 flex justify-end">
+                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">Makbuzu Gör</button>
+                    </div>
                   </div>
                 )}
               </div>
