@@ -199,7 +199,10 @@ export const CheckoutPage: React.FC = () => {
           setPaymentUrl(data.data.paymentPageUrl || '')
           setOrderId(data.data.orderId || '')
           setConvId(data.data.conversationId || '')
-          try { localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId })) } catch {}
+          try {
+            localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
+            localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
+          } catch {}
           setStep(3)
           return
         }
@@ -216,7 +219,10 @@ export const CheckoutPage: React.FC = () => {
         // Fallback: ödeme sayfasına yönlendirme (aynı sekme)
         if (data.data.paymentPageUrl) {
           console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
-          try { localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId })) } catch {}
+          try {
+            localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
+            localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
+          } catch {}
           window.location.href = data.data.paymentPageUrl;
           return;
         }
@@ -302,7 +308,10 @@ export const CheckoutPage: React.FC = () => {
     const timeout = window.setTimeout(() => {
       const formIframe = document.querySelector('#iyzipay-checkout-form iframe')
       if (!formIframe && paymentUrl) {
-        try { localStorage.setItem('vh_pending_order', JSON.stringify({ orderId, conversationId: convId })) } catch {}
+        try {
+          localStorage.setItem('vh_pending_order', JSON.stringify({ orderId, conversationId: convId }))
+          localStorage.setItem('vh_last_order_id', String(orderId || ''))
+        } catch {}
         // Fallback: hosted ödeme sayfasına yönlendir (aynı sekme)
         window.location.href = paymentUrl
       }
