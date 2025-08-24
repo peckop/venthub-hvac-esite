@@ -6,6 +6,16 @@ import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshC
 import toast from 'react-hot-toast'
 import { useCart } from '../hooks/useCart'
 
+interface ShippingAddress {
+  fullAddress?: string
+  street?: string
+  city?: string
+  district?: string
+  state?: string
+  postalCode?: string
+  postal_code?: string
+}
+
 interface Order {
   id: string
   total_amount: number
@@ -429,16 +439,19 @@ export const OrdersPage: React.FC = () => {
                       <div>
                         <h4 className="font-semibold text-industrial-gray mb-3">Teslimat Adresi</h4>
                         <div className="text-sm text-steel-gray">
-                          {order.shipping_address && (
-                            <div>
-                              <p>{order.shipping_address?.fullAddress || order.shipping_address?.street}</p>
-                              <p>
-                                {order.shipping_address?.city}
-                                {order.shipping_address?.district ? `, ${order.shipping_address.district}` : (order.shipping_address?.state ? `, ${order.shipping_address.state}` : '')}
-                              </p>
-                              <p>{order.shipping_address?.postalCode || order.shipping_address?.postal_code}</p>
-                            </div>
-                          )}
+                          {order.shipping_address && (() => {
+                            const addr = order.shipping_address as ShippingAddress
+                            const line1 = addr.fullAddress || addr.street
+                            const line2 = [addr.city, addr.district || addr.state].filter(Boolean).join(', ')
+                            const line3 = addr.postalCode || addr.postal_code
+                            return (
+                              <div>
+                                {line1 && <p>{line1}</p>}
+                                {(line2 && line2.length > 0) && <p>{line2}</p>}
+                                {line3 && <p>{line3}</p>}
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
                       <div>
