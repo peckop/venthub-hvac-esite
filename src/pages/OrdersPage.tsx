@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { supabase, Product } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -41,6 +41,32 @@ interface OrderItem {
   product_image_url?: string
 }
 
+// Minimal Supabase row types used for mapping
+interface VenthubOrderItemRow {
+  id: string
+  product_id?: string | null
+  product_name: string
+  quantity: number
+  price_at_time: number | string
+  product_image_url?: string | null
+}
+
+interface VenthubOrderRow {
+  id: string
+  total_amount: number | string
+  status: string
+  created_at: string
+  customer_name?: string | null
+  customer_email?: string | null
+  shipping_address: unknown
+  order_number?: string | null
+  payment_data?: unknown
+  conversation_id?: string | null
+  venthub_order_items?: VenthubOrderItemRow[]
+}
+
+type StatusFilter = 'all'|'pending'|'paid'|'shipped'|'delivered'|'failed'
+
 export const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
@@ -50,7 +76,7 @@ export const OrdersPage: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   // Filters
-  const [statusFilter, setStatusFilter] = useState<'all'|'pending'|'paid'|'shipped'|'delivered'|'failed'>('all')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [dateFrom, setDateFrom] = useState<string>('')
   const [dateTo, setDateTo] = useState<string>('')
   const [searchCode, setSearchCode] = useState<string>('')
@@ -69,9 +95,9 @@ export const OrdersPage: React.FC = () => {
     if (user) {
       fetchOrders()
     }
-  }, [user, authLoading, navigate])
+  }, [user, authLoading, navigate, fetchOrders])
 
-  const fetchOrders = async () => {
+  const fetchOrders = React.useCallback(async () => {
     try {
       setLoading(true)
 
@@ -88,15 +114,15 @@ export const OrdersPage: React.FC = () => {
         return
       }
 
-      const formattedOrders: Order[] = (ordersData || []).map((order: any) => {
-        const items = (order.venthub_order_items || []).map((it: any) => ({
+      const formattedOrders: Order[] = (ordersData || []).map((order: VenthubOrderRow) => {
+        const items: OrderItem[] = (order.venthub_order_items || []).map((it: VenthubOrderItemRow) => ({
           id: it.id,
-          product_id: it.product_id || undefined,
+          product_id: it.product_id ?? undefined,
           product_name: it.product_name,
           quantity: it.quantity,
           unit_price: Number(it.price_at_time) || 0,
           total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
-          product_image_url: it.product_image_url || undefined,
+          product_image_url: it.product_image_url ?? undefined,
         }))
 
         return {
@@ -108,10 +134,10 @@ export const OrdersPage: React.FC = () => {
           customer_email: order.customer_email || user?.email || '-',
           shipping_address: order.shipping_address,
           order_items: items,
-          order_number: order.order_number,
+          order_number: order.order_number || undefined,
           is_demo: false,
           payment_data: order.payment_data,
-          conversation_id: order.conversation_id,
+          conversation_id: order.conversation_id || undefined,
         }
       })
 
@@ -133,7 +159,7 @@ export const OrdersPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, searchParams])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('tr-TR', {
@@ -249,23 +275,23 @@ export const OrdersPage: React.FC = () => {
       const ids = Array.from(new Set((order.order_items||[]).map(it=>it.product_id).filter(Boolean))) as string[]
       const names = Array.from(new Set((order.order_items||[]).filter(it=>!it.product_id && it.product_name).map(it=>it.product_name)))
 
-      const productMap: Record<string, any> = {}
+      const productMap: Record<string, Product> = {}
 
       if (ids.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('id', ids)
         if (error) throw error
-        ;(data||[]).forEach((p:any)=>{productMap[p.id]=p})
+        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.id] = p })
       }
 
       if (names.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('name', names)
         if (error) throw error
-        ;(data||[]).forEach((p:any)=>{productMap[p.name]=p})
+        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.name] = p })
       }
 
       let added = 0
       for (const it of order.order_items||[]) {
-        let prod: any
+        let prod: Product | undefined
         if (it.product_id) prod = productMap[it.product_id]
         if (!prod) prod = productMap[it.product_name]
         if (prod) {
@@ -279,7 +305,7 @@ export const OrdersPage: React.FC = () => {
 
       if (added>0) toast.success(`${added} adet ürün sepete eklendi`)
       else toast.error('Ürünler stokta bulunamadı')
-    } catch (e:any) {
+    } catch (e: unknown) {
       console.error('Reorder error', e)
       toast.error('Tekrar satın alma sırasında hata')
     }
@@ -303,7 +329,7 @@ export const OrdersPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
               <label className="text-xs text-steel-gray">Durum</label>
-              <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value as any)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
+              <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value as StatusFilter)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
                 <option value="all">Hepsi</option>
                 <option value="pending">Beklemede</option>
                 <option value="paid">Ödendi</option>

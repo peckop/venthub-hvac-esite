@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useEffect, useState, ReactNode } from 'react'
 import { Product } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
@@ -19,6 +19,8 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
+
+export { CartContext }
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
@@ -131,10 +133,3 @@ export function CartProvider({ children }: { children: ReactNode }) {
   )
 }
 
-export function useCart() {
-  const context = useContext(CartContext)
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider')
-  }
-  return context
-}

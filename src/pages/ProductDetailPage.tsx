@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsByCategory, Product } from '../lib/supabase'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
 import { 
@@ -14,7 +14,6 @@ import {
   Shield,
   Phone,
   Star,
-  ChevronDown,
   ChevronRight,
   FileText,
   Download,
@@ -360,7 +359,7 @@ export const ProductDetailPage: React.FC = () => {
 
       {/* Vertical Section Layout */}
       <div className="space-y-0">
-        {sections.map((section, index) => {
+        {sections.map((section, _index) => {
           const IconComponent = section.icon
           return (
             <section 

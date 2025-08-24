@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getCategories, getProductsByCategory, Category, Product } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
-import { getCategoryIcon } from '../components/HVACIcons'
+import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Filter, Grid, List } from 'lucide-react'
 
 export const CategoryPage: React.FC = () => {

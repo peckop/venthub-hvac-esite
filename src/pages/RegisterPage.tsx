@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -16,7 +16,6 @@ export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [registrationComplete, setRegistrationComplete] = useState(false)
   const { signUp } = useAuth()
-  const navigate = useNavigate()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

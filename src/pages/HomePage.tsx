@@ -49,11 +49,6 @@ export const HomePage: React.FC = () => {
     console.log('Quick view:', product)
   }
 
-  const handleCartToast = (product: Product) => {
-    setToastProduct(product)
-    setShowToast(true)
-  }
-
   const closeToast = () => {
     setShowToast(false)
     setToastProduct(null)

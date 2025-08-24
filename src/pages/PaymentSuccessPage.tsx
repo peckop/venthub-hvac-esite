@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
+
+type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
 export const PaymentSuccessPage: React.FC = () => {
   const [searchParams] = useSearchParams()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const [paymentInfo, setPaymentInfo] = useState<any>(null)
+  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export const PaymentSuccessPage: React.FC = () => {
           .eq('id', oid)
           .maybeSingle()
         if (!error && data) {
-          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: any) => s + (Number(it?.quantity)||0), 0) : undefined
+          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: { quantity?: number }) => s + (Number(it?.quantity)||0), 0) : undefined
           setOrderSummary({ amount: Number(data.total_amount)||undefined, createdAt: data.created_at, items: count })
         }
       } catch {}
@@ -118,16 +120,17 @@ export const PaymentSuccessPage: React.FC = () => {
           setPaymentInfo({ errorMessage: 'Ödeme doğrulanamadı' })
           toast.error('Ödeme doğrulanamadı')
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         console.error('Verify catch error:', e)
+        const err = e as { message?: string }
         setStatus('error')
-        setPaymentInfo({ errorMessage: e?.message || 'Beklenmeyen hata' })
+        setPaymentInfo({ errorMessage: err?.message || 'Beklenmeyen hata' })
         toast.error('Beklenmeyen hata')
       }
     }
 
     if (status === 'loading') verify()
-  }, [])
+  }, [searchParams, clearCart, status])
 
   if (status === 'loading') {
     return (

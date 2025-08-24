@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { User, Session } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
@@ -17,13 +17,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
-}
+export { AuthContext }
 
 interface AuthProviderProps {
   children: ReactNode

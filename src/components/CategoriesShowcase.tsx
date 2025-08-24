@@ -1,5 +1,5 @@
 import React from 'react'
-import { getCategoryIcon } from './HVACIcons'
+import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ArrowRight, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Category } from '../lib/supabase'

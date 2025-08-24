@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getCategories, Category } from '../lib/supabase'
-import { getCategoryIcon } from './HVACIcons'
+import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Menu, X, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 

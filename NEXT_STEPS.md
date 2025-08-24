@@ -4,6 +4,7 @@ This document tracks the current state, prioritized next tasks, and useful comma
 
 ## Current state (TL;DR)
 - Payments: iyzico flow works; legal consents (KVKK, Mesafeli Satış, Ön Bilgilendirme, sipariş onayı) collected and saved.
+- Payments (env): iyzico live (production) traffic has started. Keep sandbox vs live configurable; ensure live callback domain(s) are whitelisted in iyzico panel.
 - Legal pages: KVKK, Mesafeli Satış, Ön Bilgilendirme, Gizlilik ve Çerez Politikası sayfaları mevcut ve router’a bağlı.
 - Config: Şirket/kanuni alanlar src/config/legal.ts içinde placeholder olarak merkezi yönetiliyor.
 - CI: GitHub Actions build/test SUCCESS; lint non‑blocking (warnings allowed) — ci.yml updated accordingly.
@@ -25,7 +26,11 @@ This document tracks the current state, prioritized next tasks, and useful comma
 2) CI: Lint’i yeniden “blocking” yap
    - Lint uyarıları makul seviyeye indirildiğinde .github/workflows/ci.yml içindeki continue-on-error: true kaldırılacak.
 
-3) Performans: Büyük bundle uyarıları
+3) iyzico production hygiene
+   - Env toggle: sandbox ↔ live (script URL’leri, API uçları, callback URL’leri) — prod’da `static.iyzipay.com`, sandbox’ta `sandbox-static.iyzipay.com`.
+   - Live callback alan ad(lar)ını iyzico panelinde whitelist et ve loglamayı minimal PII ile tut.
+
+4) Performans: Büyük bundle uyarıları
    - Vite/Rollup manualChunks veya dynamic import ile code‑split.
 
 4) Sipariş/İdari işlevler

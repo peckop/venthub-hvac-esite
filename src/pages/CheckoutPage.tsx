@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { useCart } from '../hooks/useCart'
-import { useAuth } from '../contexts/AuthContext'
+import React, { useState, useEffect } from 'react'
+import { useCart } from '../hooks/useCartHook'
+import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
@@ -289,23 +289,24 @@ export const CheckoutPage: React.FC = () => {
       } else {
         throw new Error('Ödeme başlatma hatası: Boş yanıt');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Payment initiation error:', error)
+      const err = error as { message?: string; details?: unknown; code?: unknown; stack?: unknown }
       console.error('Full error details:', {
-        message: error.message,
-        details: error.details,
-        code: error.code,
-        stack: error.stack
+        message: err?.message,
+        details: err?.details,
+        code: err?.code,
+        stack: err?.stack
       })
       
       // More detailed error message
       let errorMessage = 'Ödeme başlatma sırasında hata oluştu'
-      if (error.message && error.message.includes('VALIDATION_ERROR')) {
+      if (err?.message && err.message.includes('VALIDATION_ERROR')) {
         errorMessage = 'Form bilgilerinde eksiklik var. Lütfen kontrol edin.'
-      } else if (error.message && error.message.includes('DATABASE_ERROR')) {
+      } else if (err?.message && err.message.includes('DATABASE_ERROR')) {
         errorMessage = 'Veritabanı hatası. Lütfen tekrar deneyin.'
-      } else if (error.message) {
-        errorMessage = error.message
+      } else if (err?.message) {
+        errorMessage = err.message
       }
       
       toast.error(errorMessage)
@@ -330,7 +331,7 @@ export const CheckoutPage: React.FC = () => {
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [])
+  }, [clearCart])
 
   // İyzico token ile script'i yükle ve formu çalıştır. 8 sn içinde iframe gelmezse paymentPageUrl'e yönlendir.
   useEffect(() => {
@@ -403,11 +404,11 @@ export const CheckoutPage: React.FC = () => {
       window.clearTimeout(check)
       window.clearTimeout(hardTimeout)
     }
-  }, [iyzToken, paymentUrl])
+  }, [iyzToken, paymentUrl, orderId, convId])
 
   // Ödeme başlatıldıktan sonra sipariş durumunu periyodik kontrol et
   useEffect(() => {
-    let timer: any
+    let timer: number | undefined
     if (step === 3 && orderId) {
       timer = setInterval(async () => {
         try {

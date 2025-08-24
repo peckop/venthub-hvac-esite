@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
@@ -10,7 +10,7 @@ export const PaymentWatcher: React.FC = () => {
   const timerRef = useRef<number | null>(null)
   const location = useLocation()
 
-  async function checkOnce() {
+  const checkOnce = useCallback(async () => {
     if (checkingRef.current) return
     checkingRef.current = true
     try {
@@ -36,9 +36,8 @@ export const PaymentWatcher: React.FC = () => {
     } finally {
       checkingRef.current = false
     }
-  }
+  }, [navigate])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const onFocus = () => { checkOnce() }
     const onVisibility = () => { if (document.visibilityState === 'visible') checkOnce() }
@@ -56,7 +55,7 @@ export const PaymentWatcher: React.FC = () => {
       document.removeEventListener('visibilitychange', onVisibility)
       if (timerRef.current) window.clearInterval(timerRef.current)
     }
-  }, [navigate, location.pathname])
+  }, [navigate, location.pathname, checkOnce])
 
   return null
 }
