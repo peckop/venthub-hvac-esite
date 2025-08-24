@@ -80,6 +80,7 @@ export const CheckoutPage: React.FC = () => {
   const [iyzToken, setIyzToken] = useState('')
   const [iyzScriptLoaded, setIyzScriptLoaded] = useState(false)
   const [paymentUrl, setPaymentUrl] = useState('')
+  const [showHelp, setShowHelp] = useState(false)
 
   // Validation functions
   const validateCustomerInfo = () => {
@@ -411,8 +412,27 @@ export const CheckoutPage: React.FC = () => {
   const vatAmount = Number((totalAmount - totalAmount / 1.2).toFixed(2))
   const finalAmount = totalAmount // Toplam zaten KDV dahil
 
+  // Overlay görünürlüğü ve adımları (1: başlatılıyor, 2: form yükleniyor, 3: banka 3D)
+  const overlayVisible = loading || (step === 3 && iyzToken && !iyzScriptLoaded)
+  const overlayStep = loading ? 1 : (step === 3 && iyzToken && !iyzScriptLoaded ? 2 : 3)
+
   return (
     <div className="min-h-screen bg-light-gray">
+      {overlayVisible && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-md text-center">
+            <div className="mb-4 text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
+            <div className="flex items-center justify-center gap-3 text-sm text-industrial-gray">
+              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 1 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+              <span>Başlatılıyor</span>
+              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 2 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+              <span>Güvenli form</span>
+              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 3 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+              <span>Banka 3D</span>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -460,18 +480,45 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <h2 className="text-xl font-semibold text-industrial-gray">Ödeme İşlemi</h2>
                   </div>
+                  <div className="rounded-lg border border-primary-navy/20 bg-air-blue/30 p-3 flex items-start gap-3">
+                    <div className="text-primary-navy">
+                      <Lock size={18} />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-industrial-gray">İyziCo ile Güvenli Ödeme</div>
+                      <p className="text-xs text-steel-gray">Bu alan bankanızın 3D Secure sayfasıdır. Telefonunuza gelen 6 haneli kodu girin.</p>
+                    </div>
+                  </div>
                   <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
                   <div className="mt-4">
                     {iyzToken ? (
-                      <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
+                      <div className="rounded-xl border border-light-gray shadow-sm bg-white p-4">
+                        <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
+                      </div>
                     ) : paymentFrameContent ? (
-                      <div dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
+                      <div className="rounded-xl border border-light-gray shadow-sm bg-white p-4" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
                     ) : (
                       <div className="flex items-center gap-3 text-steel-gray">
                         <CheckCircle className="animate-pulse" />
                         <span>Form hazırlanıyor...</span>
                       </div>
                     )}
+                    <div className="mt-3">
+                      <button
+                        onClick={() => setShowHelp(v => !v)}
+                        type="button"
+                        className="text-sm text-primary-navy hover:text-secondary-blue"
+                      >
+                        Kod gelmedi mi?
+                      </button>
+                      {showHelp && (
+                        <div className="mt-2 text-xs text-steel-gray space-y-1 bg-air-blue/20 rounded-lg p-3">
+                          <p>• 30–60 sn bekleyip tekrar deneyin (bankanız gecikmeli SMS gönderebilir).</p>
+                          <p>• Telefonunuzda uçak modu/sinyal sorunları yoksa farklı karta/cihaza deneyebilirsiniz.</p>
+                          <p>• Numara doğruluğunu kontrol edin ve bankanızla iletişime geçin.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
