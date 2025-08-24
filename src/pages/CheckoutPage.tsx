@@ -575,7 +575,7 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <div className="text-[11px] text-steel-gray">{overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}</div>
                   </div>
-                  <p className="text-steel-gray text-sm">
+                  <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
                   <div className="mt-4">
                     {iyzToken ? (
                       <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]">
