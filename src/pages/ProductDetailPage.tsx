@@ -843,13 +843,6 @@ export const ProductDetailPage: React.FC = () => {
         })}
       </div>
 
-      {/* Back to top button - appears when scrolling */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-all z-20"
-      >
-        <ChevronDown size={20} className="transform rotate-180" />
-      </button>
 
       <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

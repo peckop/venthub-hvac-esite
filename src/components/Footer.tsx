@@ -82,7 +82,27 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/support" className="text-steel-gray hover:text-white transition-colors">
-                  Destek
+                  Destek Merkezi
+                </Link>
+              </li>
+              <li>
+                <Link to="/support/sss" className="text-steel-gray hover:text-white transition-colors text-sm">
+                  • SSS
+                </Link>
+              </li>
+              <li>
+                <Link to="/support/iade-degisim" className="text-steel-gray hover:text-white transition-colors text-sm">
+                  • İade & Değişim
+                </Link>
+              </li>
+              <li>
+                <Link to="/support/teslimat-kargo" className="text-steel-gray hover:text-white transition-colors text-sm">
+                  • Teslimat & Kargo
+                </Link>
+              </li>
+              <li>
+                <Link to="/support/garanti-servis" className="text-steel-gray hover:text-white transition-colors text-sm">
+                  • Garanti & Servis
                 </Link>
               </li>
             </ul>
@@ -149,15 +169,24 @@ export const Footer: React.FC = () => {
             <div className="text-steel-gray text-sm">
               © 2025 VentHub HVAC. Tüm hakları saklıdır.
             </div>
-            <div className="flex space-x-6 text-sm">
-              <Link to="/privacy" className="text-steel-gray hover:text-white transition-colors">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
+              <Link to="/legal/kvkk" className="text-steel-gray hover:text-white transition-colors">
+                KVKK Aydınlatma Metni
+              </Link>
+              <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-steel-gray hover:text-white transition-colors">
+                Mesafeli Satış Sözleşmesi
+              </Link>
+              <Link to="/legal/on-bilgilendirme-formu" className="text-steel-gray hover:text-white transition-colors">
+                Ön Bilgilendirme Formu
+              </Link>
+              <Link to="/legal/cerez-politikasi" className="text-steel-gray hover:text-white transition-colors">
+                Çerez Politikası
+              </Link>
+              <Link to="/legal/gizlilik-politikasi" className="text-steel-gray hover:text-white transition-colors">
                 Gizlilik Politikası
               </Link>
-              <Link to="/terms" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/kullanim-kosullari" className="text-steel-gray hover:text-white transition-colors">
                 Kullanım Koşulları
-              </Link>
-              <Link to="/cookies" className="text-steel-gray hover:text-white transition-colors">
-                Çerez Politikası
               </Link>
             </div>
           </div>

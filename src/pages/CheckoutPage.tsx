@@ -73,6 +73,17 @@ export const CheckoutPage: React.FC = () => {
     postalCode: ''
   })
 
+  // Fatura ve yasal onaylar durumları
+  type InvoiceType = 'individual' | 'corporate'
+  interface InvoiceInfoIndividual { tckn: string }
+  interface InvoiceInfoCorporate { companyName: string; vkn: string; taxOffice: string; eInvoice?: boolean }
+  type InvoiceInfo = Partial<InvoiceInfoIndividual & InvoiceInfoCorporate> & { type?: InvoiceType }
+  interface LegalConsents { kvkk: boolean; distanceSales: boolean; preInfo: boolean; orderConfirm: boolean; marketing?: boolean }
+
+  const [invoiceType, setInvoiceType] = useState<InvoiceType>('individual')
+  const [invoiceInfo, setInvoiceInfo] = useState<InvoiceInfo>({ type: 'individual', tckn: '' })
+  const [legalConsents, setLegalConsents] = useState<LegalConsents>({ kvkk: false, distanceSales: false, preInfo: false, orderConfirm: false, marketing: false })
+
   const [sameAsShipping, setSameAsShipping] = useState(true)
   const [paymentFrameContent, setPaymentFrameContent] = useState('')
   const [orderCompleted, setOrderCompleted] = useState(false)
@@ -122,13 +133,38 @@ export const CheckoutPage: React.FC = () => {
     return true
   }
 
+  // Basit rakam ve uzunluk kontrollü doğrulamalar (saha gerçekleri nedeniyle aşırı kuralcı olmayan)
+  const isDigits = (s: string) => /^\d+$/.test(s)
+  const validateInvoiceAndConsents = () => {
+    if (invoiceType === 'individual') {
+      const t = (invoiceInfo.tckn || '').trim()
+      if (!t) { toast.error('Bireysel fatura için TCKN zorunludur'); return false }
+      if (!(isDigits(t) && t.length === 11)) { toast.error('TCKN 11 haneli olmalıdır'); return false }
+    } else {
+      const vkn = (invoiceInfo.vkn || '').trim()
+      const companyName = (invoiceInfo.companyName || '').trim()
+      const taxOffice = (invoiceInfo.taxOffice || '').trim()
+      if (!companyName) { toast.error('Ticari fatura için Şirket Ünvanı zorunludur'); return false }
+      if (!vkn) { toast.error('Ticari fatura için VKN zorunludur'); return false }
+      if (!(isDigits(vkn) && vkn.length === 10)) { toast.error('VKN 10 haneli olmalıdır'); return false }
+      if (!taxOffice) { toast.error('Ticari fatura için Vergi Dairesi zorunludur'); return false }
+    }
+
+    if (!legalConsents.kvkk) { toast.error('KVKK Aydınlatma Metni onayı zorunludur'); return false }
+    if (!legalConsents.distanceSales) { toast.error('Mesafeli Satış Sözleşmesi onayı zorunludur'); return false }
+    if (!legalConsents.preInfo) { toast.error('Ön Bilgilendirme Formu onayı zorunludur'); return false }
+    if (!legalConsents.orderConfirm) { toast.error('Siparişi onaylıyorum kutusunu işaretleyin'); return false }
+
+    return true
+  }
+
   const handleNextStep = () => {
     if (step === 1) {
       if (validateCustomerInfo()) {
         setStep(2)
       }
-    } else if (step === 2) {
-      if (validateAddress(shippingAddress) && (sameAsShipping || validateAddress(billingAddress))) {
+  } else if (step === 2) {
+      if (validateAddress(shippingAddress) && (sameAsShipping || validateAddress(billingAddress)) && validateInvoiceAndConsents()) {
         setStep(3)
         initiatePayment()
       }
@@ -182,7 +218,17 @@ export const CheckoutPage: React.FC = () => {
           district: billingAddress.district,
           postalCode: billingAddress.postalCode
         },
-        user_id: user?.id || null
+        user_id: user?.id || null,
+        // Yeni alanlar: fatura tipi/bilgileri ve yasal onaylar
+        invoiceType: invoiceType,
+        invoiceInfo: { ...invoiceInfo, type: invoiceType },
+        legalConsents: {
+          kvkk: { accepted: !!legalConsents.kvkk, ts: new Date().toISOString() },
+          distanceSales: { accepted: !!legalConsents.distanceSales, ts: new Date().toISOString() },
+          preInfo: { accepted: !!legalConsents.preInfo, ts: new Date().toISOString() },
+          orderConfirm: { accepted: !!legalConsents.orderConfirm, ts: new Date().toISOString() },
+          marketing: { accepted: !!legalConsents.marketing, ts: legalConsents.marketing ? new Date().toISOString() : null }
+        }
       }
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
@@ -817,9 +863,163 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Invoice Type & Info */}
+                  <div className="mt-10">
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-4">Fatura Tipi ve Bilgileri</h3>
+                    {/* Tip seçimi */}
+                    <div className="flex items-center gap-6 mb-4">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="invoiceType"
+                          value="individual"
+                          checked={invoiceType === 'individual'}
+                          onChange={() => { setInvoiceType('individual'); setInvoiceInfo({ type: 'individual', tckn: '' }) }}
+                          className="text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-industrial-gray">Bireysel</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="invoiceType"
+                          value="corporate"
+                          checked={invoiceType === 'corporate'}
+                          onChange={() => { setInvoiceType('corporate'); setInvoiceInfo({ type: 'corporate', companyName: '', vkn: '', taxOffice: '' }) }}
+                          className="text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-industrial-gray">Ticari</span>
+                      </label>
+                    </div>
+
+                    {/* Koşullu alanlar */}
+                    {invoiceType === 'individual' ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">T.C. Kimlik No *</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={invoiceInfo.tckn || ''}
+                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
+                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            placeholder="11 haneli TCKN"
+                            maxLength={11}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">Şirket Ünvanı *</label>
+                          <input
+                            type="text"
+                            value={invoiceInfo.companyName || ''}
+                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
+                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            placeholder="Ör: Venthub Mühendislik A.Ş."
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">VKN *</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={invoiceInfo.vkn || ''}
+                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            placeholder="10 haneli Vergi Kimlik No"
+                            maxLength={10}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">Vergi Dairesi *</label>
+                          <input
+                            type="text"
+                            value={invoiceInfo.taxOffice || ''}
+                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
+                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            placeholder="Ör: Kadıköy"
+                          />
+                        </div>
+                        <div className="flex items-center mt-2">
+                          <input
+                            id="einvoice"
+                            type="checkbox"
+                            checked={!!invoiceInfo.eInvoice}
+                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, eInvoice: e.target.checked })}
+                            className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                          />
+                          <label htmlFor="einvoice" className="ml-2 text-sm text-steel-gray">e-Fatura mükellefiyim</label>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Legal Consents */}
+                  <div className="mt-10">
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">Yasal Onaylar</h3>
+                    <div className="space-y-2">
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={legalConsents.kvkk}
+                          onChange={(e) => setLegalConsents({ ...legalConsents, kvkk: e.target.checked })}
+                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">
+                          <Link to="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">KVKK Aydınlatma Metni</Link>'ni okudum ve kabul ediyorum.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={legalConsents.distanceSales}
+                          onChange={(e) => setLegalConsents({ ...legalConsents, distanceSales: e.target.checked })}
+                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">
+                          <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">Mesafeli Satış Sözleşmesi</Link>'ni okudum ve kabul ediyorum.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={legalConsents.preInfo}
+                          onChange={(e) => setLegalConsents({ ...legalConsents, preInfo: e.target.checked })}
+                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">
+                          <Link to="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">Ön Bilgilendirme Formu</Link>'nu okudum ve kabul ediyorum.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={legalConsents.orderConfirm}
+                          onChange={(e) => setLegalConsents({ ...legalConsents, orderConfirm: e.target.checked })}
+                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">
+                          Siparişi onaylıyor, ürün ve teslimat bilgilerinin doğruluğunu kabul ediyorum.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={!!legalConsents.marketing}
+                          onChange={(e) => setLegalConsents({ ...legalConsents, marketing: e.target.checked })}
+                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">
+                          Kampanya ve fırsatlardan haberdar olmak için ticari ileti izni veriyorum. (Opsiyonel)
+                        </span>
+                      </label>
+                    </div>
+                  </div>
                 </div>
               )}
-
 
               {/* Navigation Buttons */}
               {step < 3 && (

@@ -20,6 +20,18 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import OrdersPage from './pages/OrdersPage'
 import Footer from './components/Footer'
 import PaymentWatcher from './components/PaymentWatcher'
+import BackToTopButton from './components/BackToTopButton'
+import KVKKPage from './pages/legal/KVKKPage'
+import DistanceSalesAgreementPage from './pages/legal/DistanceSalesAgreementPage'
+import PreInformationPage from './pages/legal/PreInformationPage'
+import CookiePolicyPage from './pages/legal/CookiePolicyPage'
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
+import TermsOfUsePage from './pages/legal/TermsOfUsePage'
+import SupportHomePage from './pages/support/SupportHomePage'
+import FAQPage from './pages/support/FAQPage'
+import ReturnsPage from './pages/support/ReturnsPage'
+import ShippingPage from './pages/support/ShippingPage'
+import WarrantyPage from './pages/support/WarrantyPage'
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -39,6 +51,7 @@ function App() {
             <StickyHeader isScrolled={isScrolled} />
             
             <main id="main-content" className={isScrolled ? 'pt-12' : ''}>
+              <BackToTopButton />
               <PaymentWatcher />
               <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -56,6 +69,21 @@ function App() {
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
+
+                {/* Support Routes */}
+                <Route path="/support" element={<SupportHomePage />} />
+                <Route path="/support/sss" element={<FAQPage />} />
+                <Route path="/support/iade-degisim" element={<ReturnsPage />} />
+                <Route path="/support/teslimat-kargo" element={<ShippingPage />} />
+                <Route path="/support/garanti-servis" element={<WarrantyPage />} />
+                
+                {/* Legal Routes */}
+                <Route path="/legal/kvkk" element={<KVKKPage />} />
+                <Route path="/legal/mesafeli-satis-sozlesmesi" element={<DistanceSalesAgreementPage />} />
+                <Route path="/legal/on-bilgilendirme-formu" element={<PreInformationPage />} />
+                <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
+                <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
+                <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
               </Routes>
             </main>
 
