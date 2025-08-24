@@ -215,7 +215,6 @@ Deno.serve(async (req) => {
         const target = new URL(finalSuccess);
         if (orderId) target.searchParams.set('orderId', orderId);
         if (conversationId) target.searchParams.set('conversationId', conversationId);
-        if (token) target.searchParams.set('token', token);
         target.searchParams.set('status', paid ? 'success' : 'failure');
         const t = target.toString();
         const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;

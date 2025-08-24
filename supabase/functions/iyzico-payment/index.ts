@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         // İyzico credentials (Environment)
         const iyzicoApiKey = Deno.env.get('IYZICO_API_KEY');
         const iyzicoSecretKey = Deno.env.get('IYZICO_SECRET_KEY');
-        const iyzicoBaseUrl = 'https://sandbox-api.iyzipay.com';
+        const iyzicoBaseUrl = Deno.env.get('IYZICO_BASE_URL') || 'https://sandbox-api.iyzipay.com';
 
         if (!iyzicoApiKey || !iyzicoSecretKey) {
             return new Response(JSON.stringify({
@@ -88,6 +88,10 @@ Deno.serve(async (req) => {
                 try { clientOrigin = new URL(envOrigin).origin; } catch { clientOrigin = envOrigin.replace(/\/$/, ''); }
             }
         }
+
+        // Resolve client IP from headers
+        const forwarded = req.headers.get('x-forwarded-for') || '';
+        const realIp = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '');
 
         console.log('Order ID:', orderId);
 
@@ -207,7 +211,7 @@ Deno.serve(async (req) => {
                 lastLoginDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
                 registrationDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
                 registrationAddress: shippingAddress.fullAddress,
-                ip: '85.34.78.112',
+                ip: realIp || undefined,
                 city: shippingAddress.city,
                 country: 'Turkey',
                 zipCode: shippingAddress.postalCode

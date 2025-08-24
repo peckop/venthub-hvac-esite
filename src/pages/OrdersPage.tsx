@@ -68,7 +68,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, venthub_order_items ( id, product_name, quantity, price_at_time, product_image_url )')
+        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -431,10 +431,12 @@ export const OrdersPage: React.FC = () => {
                         <div className="text-sm text-steel-gray">
                           {order.shipping_address && (
                             <div>
-                              <p>{order.shipping_address.street}</p>
-                              <p>{order.shipping_address.city}, {order.shipping_address.state}</p>
-                              <p>{order.shipping_address.postal_code}</p>
-                              <p>{order.shipping_address.country}</p>
+                              <p>{order.shipping_address?.fullAddress || order.shipping_address?.street}</p>
+                              <p>
+                                {order.shipping_address?.city}
+                                {order.shipping_address?.district ? `, ${order.shipping_address.district}` : (order.shipping_address?.state ? `, ${order.shipping_address.state}` : '')}
+                              </p>
+                              <p>{order.shipping_address?.postalCode || order.shipping_address?.postal_code}</p>
                             </div>
                           )}
                         </div>
