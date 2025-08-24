@@ -47,14 +47,29 @@ Deno.serve(async (req) => {
       successUrl = url.searchParams.get('successUrl');
     } catch (_) {}
 
+    // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
+    if (!successUrl) {
+      const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
+      if (base) {
+        try {
+          const origin = new URL(base).origin;
+          successUrl = origin + '/payment-success';
+        } catch {
+          successUrl = base.replace(/\/$/, '') + '/payment-success';
+        }
+      }
+    }
+
     if (!token) {
-      // Token yoksa bile, kullanıcıyı frontend başarı sayfasına yönlendirip doğrulamayı orada veritabanından yaptır.
+      // Token gelmediyse bile, kullanıcıyı frontend'e yönlendirip doğrulamayı orada yaptır.
       if (successUrl) {
         try {
           const target = new URL(successUrl);
           if (orderId) target.searchParams.set('orderId', orderId);
           if (conversationId) target.searchParams.set('conversationId', conversationId);
-          const html = `<!doctype html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body><script>try{window.top.location.replace(${JSON.stringify(target.toString())});}catch(e){location.href=${JSON.stringify(target.toString())}}</script>OK</body></html>`;
+          target.searchParams.set('status', 'pending');
+          const t = target.toString();
+          const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
           return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
         } catch (_) {}
       }
@@ -135,12 +150,21 @@ Deno.serve(async (req) => {
     try {
       const url = new URL(req.url);
       const successUrl = url.searchParams.get('successUrl');
-      if (successUrl) {
-        const target = new URL(successUrl);
+      let finalSuccess = successUrl;
+      if (!finalSuccess) {
+        const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
+        if (base) {
+          try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
+        }
+      }
+      if (finalSuccess) {
+        const target = new URL(finalSuccess);
         if (orderId) target.searchParams.set('orderId', orderId);
         if (conversationId) target.searchParams.set('conversationId', conversationId);
+        if (token) target.searchParams.set('token', token);
         target.searchParams.set('status', paid ? 'success' : 'failure');
-        const html = `<!doctype html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body><script>try{window.top.location.replace(${JSON.stringify(target.toString())});}catch(e){location.href=${JSON.stringify(target.toString())}}</script>OK</body></html>`;
+        const t = target.toString();
+        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
     } catch (_) {}
