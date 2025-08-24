@@ -278,19 +278,24 @@ export const CheckoutPage: React.FC = () => {
   // İyzico token ile script'i yükle ve formu çalıştır. 8 sn içinde iframe gelmezse paymentPageUrl'e yönlendir.
   useEffect(() => {
     if (!iyzToken) return
-    // Script'i bir kez ekle
-    const existing = document.querySelector('script[data-iyz-checkout="1"]') as HTMLScriptElement | null
-    let script: HTMLScriptElement | null = null
-    if (!existing) {
-      script = document.createElement('script')
-      script.src = 'https://sandbox-static.iyzipay.com/checkoutform/iyzipay-checkout-form.js'
-      script.async = true
-      script.setAttribute('data-iyz-checkout', '1')
-      script.onload = () => setIyzScriptLoaded(true)
-      document.body.appendChild(script)
-    } else {
-      setIyzScriptLoaded(true)
-    }
+
+    // Eski script ve iframe'i temizle
+    try {
+      const oldScript = document.querySelector('script[data-iyz-checkout="1"]') as HTMLScriptElement | null
+      if (oldScript && oldScript.parentElement) oldScript.parentElement.removeChild(oldScript)
+      const mount = document.getElementById('iyzipay-checkout-form')
+      if (mount) mount.innerHTML = ''
+    } catch {}
+
+    // Yeni scripti token ile ekle (İyzico beklentisi: token script tag'inde data olarak verilir)
+    const script = document.createElement('script')
+    script.src = 'https://sandbox-static.iyzipay.com/checkoutform/iyzipay-checkout-form.js'
+    script.async = true
+    script.setAttribute('data-iyz-checkout', '1')
+    script.setAttribute('data-pay-with-iyzico', 'true')
+    script.setAttribute('data-token', iyzToken)
+    script.onload = () => setIyzScriptLoaded(true)
+    document.body.appendChild(script)
 
     const timeout = window.setTimeout(() => {
       const formIframe = document.querySelector('#iyzipay-checkout-form iframe')
@@ -302,7 +307,6 @@ export const CheckoutPage: React.FC = () => {
 
     return () => {
       window.clearTimeout(timeout)
-      // script'i kaldırmıyoruz; sayfada kalabilir
     }
   }, [iyzToken, paymentUrl])
 
@@ -666,49 +670,6 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Step 3: Payment */}
-              {step === 3 && (
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="bg-primary-navy text-white p-2 rounded-lg">
-                      <CreditCard size={20} />
-                    </div>
-                    <h2 className="text-xl font-semibold text-industrial-gray">
-                      Ödeme Bilgileri
-                    </h2>
-                  </div>
-
-                  {loading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy mx-auto mb-4"></div>
-                      <p className="text-steel-gray">Ödeme ekranı hazırlanıyor...</p>
-                    </div>
-                  ) : paymentFrameContent ? (
-                    <div className="bg-light-gray rounded-lg p-4">
-                      <div 
-                        dangerouslySetInnerHTML={{ __html: paymentFrameContent }}
-                        className="min-h-[400px]"
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 text-steel-gray">
-                      Ödeme ekranı yüklenemedi. Lütfen tekrar deneyin.
-                    </div>
-                  )}
-
-                  <div className="bg-air-blue rounded-lg p-4">
-                    <div className="flex items-center space-x-2 text-primary-navy">
-                      <Lock size={16} />
-                      <span className="text-sm font-medium">
-                        Güvenli Ödeme
-                      </span>
-                    </div>
-                    <p className="text-sm text-steel-gray mt-1">
-                      Ödeme bilgileriniz SSL sertifikası ile korunmaktadır. Kart bilgileriniz hiçbir şekilde saklanmaz.
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {/* Navigation Buttons */}
               {step < 3 && (
