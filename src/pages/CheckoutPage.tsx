@@ -194,7 +194,7 @@ export const CheckoutPage: React.FC = () => {
           quantity: item.quantity,
           price: parseFloat(item.product.price),
           product_name: item.product.name,
-          product_image_url: (item.product as any).image_url || null
+          product_image_url: item.product.image_url || null
         })),
         customerInfo: {
           name: customerInfo.name,
