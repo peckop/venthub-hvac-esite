@@ -1,0 +1,25 @@
+Konu: Sandbox 3D Secure akışında mdStatus=0 / paymentStatus=FAILURE analizi talebi
+
+Merhaba İyziCo Destek Ekibi,
+
+Sandbox ortamında Hosted Checkout + 3D akışında birden fazla banka kartı ile test yaptık; işlemler 3D doğrulamada mdStatus=0, paymentStatus=FAILURE olarak sonuçlanıyor. Fraud tarafı düşük risk (fraudStatus=1) görünüyor. Aşağıda örnek işlem kimlikleri ve özetleri yer alıyor. Ham JSON’ları ayrıca support/iyzico_support_payload.json dosyasında paylaştık.
+
+Ortam ve entegrasyon:
+- Ortam: Sandbox
+- Base URL: https://sandbox-api.iyzipay.com
+- Entegrasyon: Hosted Checkout + 3D
+- callbackUrl: https://tnofewwkwlyjsqgwjjga.functions.supabase.co/iyzico-callback
+- SDK: iyzipay-node (checkoutFormInitialize -> callback -> checkoutForm.retrieve)
+
+Örnek işlemler (mdStatus=0):
+1) conversationId: CONV-1756054513816, paymentId: 25213703, BIN: 552608, last4: 0006, cardFamily: Axess, paidPrice: 3500, fraudStatus: 1
+2) conversationId: CONV-1756054408072, paymentId: 25213687, BIN: 476662, last4: 0001, cardFamily: Denizbank DC, paidPrice: 6200, fraudStatus: 1
+3) conversationId: CONV-1756054002728, paymentId: 25213690, BIN: 552879, last4: 0008, cardFamily: Paraf, paidPrice: 1100, fraudStatus: 1
+4) conversationId: CONV-1756052935214, paymentId: 25213640, BIN: 498749, last4: 0002 (önceki deneme)
+
+Beklentimiz ve sorular:
+1) Bu işlemlerde 3D doğrulama neden mdStatus=0 dönüyor?
+2) Hesabımız için “3D Başarılı” test senaryosu kart/OTP bilgisi nedir? (Hesap bazlı Test Data özelleşmesi var mı?)
+3) Hosted Checkout sandbox’ında başarı üretmek için ek ayar veya force 3DS benzeri bir parametre gerekiyor mu?
+
+Teşekkürler.

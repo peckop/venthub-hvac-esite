@@ -223,8 +223,9 @@ Deno.serve(async (req) => {
       }
     } catch (_) {}
 
-    // Yine de base yoksa son çare düz OK dön (görünümde OK görülebilir)
-    return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    // Yine de base yoksa düz metin yerine bilgilendirici HTML döndür (OK kaldırıldı)
+    const infoHtml = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Ödeme Sonucu</title></head><body style=\"font-family:system-ui,Arial,sans-serif;padding:16px;\"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
+    return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
   } catch (error: any) {
     console.error("iyzico-callback error:", error);
     // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'e 'pending' ile yönlendir
@@ -254,8 +255,9 @@ Deno.serve(async (req) => {
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
     } catch (_) {}
-    // Yine olmazsa OK döneriz (en son çare)
-    return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+    // Yine olmazsa bilgilendirici HTML döndür (OK kaldırıldı)
+    const infoHtml2 = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Ödeme Sonucu</title></head><body style=\"font-family:system-ui,Arial,sans-serif;padding:16px;\"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
+    return new Response(infoHtml2, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
   }
 });
 
