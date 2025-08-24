@@ -19,6 +19,7 @@ import AuthCallbackPage from './pages/AuthCallbackPage'
 import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import OrdersPage from './pages/OrdersPage'
 import Footer from './components/Footer'
+import PaymentWatcher from './components/PaymentWatcher'
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -38,6 +39,7 @@ function App() {
             <StickyHeader isScrolled={isScrolled} />
             
             <main id="main-content" className={isScrolled ? 'pt-12' : ''}>
+              <PaymentWatcher />
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />

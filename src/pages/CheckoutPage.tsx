@@ -212,10 +212,11 @@ export const CheckoutPage: React.FC = () => {
           return
         }
 
-        // Fallback: ödeme sayfasına yönlendirme
+        // Fallback: ödeme sayfasına yönlendirme (yeni sekme)
         if (data.data.paymentPageUrl) {
           console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
-          window.location.href = data.data.paymentPageUrl;
+          try { localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId })) } catch {}
+          window.open(data.data.paymentPageUrl, '_blank')
           return;
         }
         
@@ -300,8 +301,9 @@ export const CheckoutPage: React.FC = () => {
     const timeout = window.setTimeout(() => {
       const formIframe = document.querySelector('#iyzipay-checkout-form iframe')
       if (!formIframe && paymentUrl) {
-        // Fallback: hosted ödeme sayfasına yönlendir
-        window.location.href = paymentUrl
+        try { localStorage.setItem('vh_pending_order', JSON.stringify({ orderId, conversationId: convId })) } catch {}
+        // Fallback: hosted ödeme sayfasına yönlendir (yeni sekme)
+        window.open(paymentUrl, '_blank')
       }
     }, 8000)
 
