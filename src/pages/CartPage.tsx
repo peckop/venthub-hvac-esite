@@ -1,8 +1,9 @@
 import React from 'react'
 import { useCart } from '../hooks/useCart'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Lock } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BrandIcon } from '../components/HVACIcons'
+import SecurityRibbon from '../components/SecurityRibbon'
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
@@ -36,8 +37,11 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-light-gray">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mb-4">
+              <SecurityRibbon />
+            </div>
+          {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-industrial-gray mb-2">
             Alışveriş Sepeti

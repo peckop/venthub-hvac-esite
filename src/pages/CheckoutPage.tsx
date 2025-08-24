@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Phone, Mail, Lock, CheckCircle } from 'lucide-react'
+import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
 
 interface CustomerInfo {
@@ -528,6 +529,9 @@ export const CheckoutPage: React.FC = () => {
           </h1>
         </div>
 
+        <div className="mb-4">
+          <SecurityRibbon />
+        </div>
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center gap-2">
