@@ -415,6 +415,7 @@ export const CheckoutPage: React.FC = () => {
   // Overlay görünürlüğü ve adımları (1: başlatılıyor, 2: form yükleniyor, 3: banka 3D)
   const overlayVisible = loading || (step === 3 && iyzToken && !iyzScriptLoaded)
   const overlayStep = loading ? 1 : (step === 3 && iyzToken && !iyzScriptLoaded ? 2 : 3)
+  const overlayPercent = overlayStep === 1 ? 33 : overlayStep === 2 ? 66 : 90
 
   return (
     <div className="min-h-screen bg-light-gray">
@@ -424,37 +425,42 @@ export const CheckoutPage: React.FC = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Güvenli ödeme başlatılıyor"
-            className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-6 md:p-8 w-[92%] max-w-lg"
+            className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-0 w-[92%] max-w-xl overflow-hidden"
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="shrink-0 w-9 h-9 rounded-full bg-primary-navy/10 flex items-center justify-center">
-                <Lock className="text-primary-navy" size={18} />
-              </div>
-              <div>
-                <div className="text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
-                <div className="text-xs text-steel-gray" aria-live="polite">
-                  {overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}
+            {/* Header */}
+            <div className="px-6 md:px-8 py-5 border-b border-light-gray/60 bg-white/80 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="shrink-0 w-9 h-9 rounded-full bg-primary-navy/10 flex items-center justify-center">
+                  <Lock className="text-primary-navy" size={18} />
+                </div>
+                <div>
+                  <div className="text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
+                  <div className="text-xs text-steel-gray" aria-live="polite">
+                    {overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-2 text-sm text-industrial-gray">
-                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 1 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-                <span>Başlatılıyor</span>
-              </div>
-              <div className="w-10 h-[2px] bg-light-gray mx-2" />
-              <div className="flex items-center gap-2 text-sm text-industrial-gray">
-                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 2 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-                <span>Güvenli form</span>
-              </div>
-              <div className="w-10 h-[2px] bg-light-gray mx-2" />
-              <div className="flex items-center gap-2 text-sm text-industrial-gray">
-                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 3 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-                <span>Banka 3D</span>
+              <div className="text-right">
+                <div className="text-sm font-semibold text-primary-navy">Venthub HVAC</div>
+                <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
               </div>
             </div>
-            <div className="mt-4 text-xs text-steel-gray">
-              Bu işlem sırasında sayfayı kapatmayın veya geri tuşuna basmayın. İşlem birkaç saniye sürebilir.
+            {/* Body */}
+            <div className="px-6 md:px-8 py-6 bg-white/85">
+              <div className="flex items-center justify-center">
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-primary-navy border-t-transparent animate-spin" aria-hidden />
+              </div>
+              <div className="mt-4 grid grid-cols-3 text-xs text-industrial-gray">
+                <div className={`text-center ${overlayStep >= 1 ? 'font-medium text-primary-navy' : ''}`}>Başlatılıyor</div>
+                <div className={`text-center ${overlayStep >= 2 ? 'font-medium text-primary-navy' : ''}`}>Güvenli form</div>
+                <div className={`text-center ${overlayStep >= 3 ? 'font-medium text-primary-navy' : ''}`}>Banka 3D</div>
+              </div>
+              <div className="mt-3 w-full h-2 bg-light-gray/70 rounded-full overflow-hidden" aria-hidden>
+                <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-500" style={{ width: `${overlayPercent}%` }} />
+              </div>
+              <div className="mt-3 text-[11px] text-steel-gray">
+                Bu işlem sırasında sayfayı kapatmayın veya geri tuşuna basmayın. İşlem birkaç saniye sürebilir.
+              </div>
             </div>
           </div>
         </div>
