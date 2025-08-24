@@ -419,16 +419,42 @@ export const CheckoutPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-light-gray">
       {overlayVisible && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-md text-center">
-            <div className="mb-4 text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
-            <div className="flex items-center justify-center gap-3 text-sm text-industrial-gray">
-              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 1 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-              <span>Başlatılıyor</span>
-              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 2 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-              <span>Güvenli form</span>
-              <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 3 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
-              <span>Banka 3D</span>
+        <div className="fixed inset-0 z-50 bg-black/35 flex items-center justify-center">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Güvenli ödeme başlatılıyor"
+            className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-6 md:p-8 w-[92%] max-w-lg"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="shrink-0 w-9 h-9 rounded-full bg-primary-navy/10 flex items-center justify-center">
+                <Lock className="text-primary-navy" size={18} />
+              </div>
+              <div>
+                <div className="text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
+                <div className="text-xs text-steel-gray" aria-live="polite">
+                  {overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2 text-sm text-industrial-gray">
+                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 1 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+                <span>Başlatılıyor</span>
+              </div>
+              <div className="w-10 h-[2px] bg-light-gray mx-2" />
+              <div className="flex items-center gap-2 text-sm text-industrial-gray">
+                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 2 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+                <span>Güvenli form</span>
+              </div>
+              <div className="w-10 h-[2px] bg-light-gray mx-2" />
+              <div className="flex items-center gap-2 text-sm text-industrial-gray">
+                <div className={`w-2.5 h-2.5 rounded-full ${overlayStep >= 3 ? 'bg-primary-navy' : 'bg-light-gray'}`} />
+                <span>Banka 3D</span>
+              </div>
+            </div>
+            <div className="mt-4 text-xs text-steel-gray">
+              Bu işlem sırasında sayfayı kapatmayın veya geri tuşuna basmayın. İşlem birkaç saniye sürebilir.
             </div>
           </div>
         </div>
@@ -492,11 +518,11 @@ export const CheckoutPage: React.FC = () => {
                   <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
                   <div className="mt-4">
                     {iyzToken ? (
-                      <div className="rounded-xl border border-light-gray shadow-sm bg-white p-4">
+                      <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]">
                         <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
                       </div>
                     ) : paymentFrameContent ? (
-                      <div className="rounded-xl border border-light-gray shadow-sm bg-white p-4" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
+                      <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
                     ) : (
                       <div className="flex items-center gap-3 text-steel-gray">
                         <CheckCircle className="animate-pulse" />
