@@ -18,6 +18,7 @@ interface Order {
   order_number?: string
   is_demo?: boolean
   payment_data?: any
+  conversation_id?: string
 }
 
 interface OrderItem {
@@ -67,7 +68,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, venthub_order_items ( id, product_name, quantity, price_at_time, product_image_url )')
+        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, venthub_order_items ( id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -100,6 +101,7 @@ export const OrdersPage: React.FC = () => {
           order_number: order.order_number,
           is_demo: false,
           payment_data: order.payment_data,
+          conversation_id: order.conversation_id,
         }
       })
 
@@ -222,6 +224,16 @@ export const OrdersPage: React.FC = () => {
   }
 
   // Reorder handler
+  const handleCopy = async (text?: string) => {
+    try {
+      if (!text) return
+      await navigator.clipboard.writeText(text)
+      toast.success('Kopyalandı')
+    } catch {
+      toast.error('Kopyalanamadı')
+    }
+  }
+
   const handleReorder = async (order: Order) => {
     try {
       const ids = Array.from(new Set((order.order_items||[]).map(it=>it.product_id).filter(Boolean))) as string[]
@@ -405,8 +417,8 @@ export const OrdersPage: React.FC = () => {
                 {/* Order Details (Expandable) */}
                 {selectedOrder?.id === order.id && (
                   <div className="p-6 bg-air-blue/10">
-                    {/* Customer Info */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    {/* Customer + Order Info */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                       <div>
                         <h4 className="font-semibold text-industrial-gray mb-3">Müşteri Bilgileri</h4>
                         <div className="space-y-2 text-sm">
@@ -424,6 +436,25 @@ export const OrdersPage: React.FC = () => {
                               <p>{order.shipping_address.postal_code}</p>
                               <p>{order.shipping_address.country}</p>
                             </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-industrial-gray mb-3">Sipariş Bilgileri</h4>
+                        <div className="text-sm text-steel-gray space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium">Sipariş ID</span>
+                            <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">Kopyala</button>
+                          </div>
+                          <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
+                          {order.conversation_id && (
+                            <>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-medium">Conversation ID</span>
+                                <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">Kopyala</button>
+                              </div>
+                              <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
+                            </>
                           )}
                         </div>
                       </div>

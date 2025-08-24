@@ -168,19 +168,30 @@ Deno.serve(async (req) => {
             price: (Number(item.price) * Number(item.quantity)).toFixed(2)
         }));
         const itemsTotal = Number(basketItems.reduce((sum: number, it: any) => sum + Number(it.price), 0).toFixed(2));
+        // KDV dahil fiyatlar: iyzico'ya price ve paidPrice olarak toplamdaki brüt tutarı (amount) gönderiyoruz
         const requestedAmount = typeof amount === 'number' ? Number(amount) : Number((amount || 0));
-        const paidPriceNumber = !isNaN(requestedAmount) && requestedAmount >= itemsTotal 
-            ? Number(requestedAmount.toFixed(2)) 
-            : itemsTotal;
+        const paidPriceNumber = isNaN(requestedAmount) ? itemsTotal : Number(requestedAmount.toFixed(2));
 
-        const callbackBase = Deno.env.get('IYZICO_CALLBACK_URL') || 'https://example.com/iyzico-callback';
+        const callbackBase = Deno.env.get('IYZICO_CALLBACK_URL') || (() => {
+            const su = Deno.env.get('SUPABASE_URL') || ''
+            try {
+                const host = new URL(su).host // tnofewwkwlyjsqgwjjga.supabase.co
+                const projectRef = host.split('.')[0]
+                return `https://${projectRef}.functions.supabase.co/iyzico-callback`
+            } catch {
+                return ''
+            }
+        })();
+        if (!callbackBase) {
+            return new Response(JSON.stringify({ error: { code: 'CONFIG_ERROR', message: 'Callback URL çözümlenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        }
         const successUrl = clientOrigin ? `${clientOrigin}/payment-success` : '';
         const callbackUrlWithParams = `${callbackBase}?orderId=${encodeURIComponent(dbOrderId)}&conversationId=${encodeURIComponent(conversationId)}${successUrl ? `&successUrl=${encodeURIComponent(successUrl)}` : ''}`;
         const iyzicoRequest = {
             locale: 'tr',
             conversationId: conversationId,
-            price: itemsTotal.toFixed(2),
-            paidPrice: itemsTotal.toFixed(2),
+            price: paidPriceNumber.toFixed(2),
+            paidPrice: paidPriceNumber.toFixed(2),
             currency: 'TRY',
             basketId: orderId,
             paymentGroup: 'PRODUCT',
@@ -263,20 +274,22 @@ Deno.serve(async (req) => {
         if (iyzicoResult && iyzicoResult.status === 'success' && (iyzicoResult.checkoutFormContent || iyzicoResult.paymentPageUrl || iyzicoResult.token)) {
             console.log('✅ İyzico checkout form created successfully');
             
-            // Order'a token ve conversationId'yi yaz (callback'te token gelmezse fallback için)
+            // Minimal token saklama: reconcile için yeterli.
             try {
-                await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(dbOrderId)}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${serviceRoleKey}`,
-                        'apikey': serviceRoleKey,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify({ payment_data: { token: iyzicoResult.token || null, conversationId } })
-                })
+                if (iyzicoResult.token) {
+                    await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(dbOrderId)}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Authorization': `Bearer ${serviceRoleKey}`,
+                            'apikey': serviceRoleKey,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({ payment_token: iyzicoResult.token })
+                    })
+                }
             } catch (e) {
-                console.warn('payment_data patch skipped:', (e as any)?.message)
+                console.warn('payment_data token patch skipped:', (e as any)?.message)
             }
             
             return new Response(JSON.stringify({

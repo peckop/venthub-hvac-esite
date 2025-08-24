@@ -148,16 +148,16 @@ export const CartPage: React.FC = () => {
                   <span className="text-success-green font-medium">Bedava</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-steel-gray">KDV (%20)</span>
+                  <span className="text-steel-gray">KDV (%20, dahil)</span>
                   <span className="font-medium text-industrial-gray">
-                    ₺{(getCartTotal() * 0.2).toLocaleString('tr-TR')}
+                    ₺{(getCartTotal() - getCartTotal() / 1.2).toLocaleString('tr-TR')}
                   </span>
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg">
                   <span className="font-semibold text-industrial-gray">Toplam</span>
                   <span className="font-bold text-primary-navy">
-                    ₺{(getCartTotal() * 1.2).toLocaleString('tr-TR')}
+                    ₺{getCartTotal().toLocaleString('tr-TR')}
                   </span>
                 </div>
               </div>

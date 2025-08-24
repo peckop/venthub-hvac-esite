@@ -21,6 +21,10 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // İsteğin JSON bekleyip beklemediğini tespit et (uygulama içi çağrılarda JSON döneceğiz)
+    const accept = (req.headers.get('accept') || '').toLowerCase()
+    const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
+
     // İyzico callback'i çoğunlukla application/x-www-form-urlencoded (token=...) gönderir.
     const contentType = (req.headers.get("content-type") || "").toLowerCase();
     let token: string | undefined;
@@ -64,19 +68,21 @@ Deno.serve(async (req) => {
       // Fallback: orderId üzerinden payment_data.token'ı getir ve devam et
       if (orderId) {
         try {
-          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_data`, {
+          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_token,payment_data`, {
             headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, apikey: `${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }
           })
           const arr = await got.json().catch(()=>[])
-          const pd = Array.isArray(arr) && arr[0]?.payment_data ? arr[0].payment_data : null
-          if (pd?.token) {
-            token = pd.token
-          }
+          const row = Array.isArray(arr) ? arr[0] : null
+          const pd = row?.payment_data ? row.payment_data : null
+          if (row?.payment_token) token = row.payment_token
+          else if (pd?.token) token = pd.token
         } catch (_) {}
       }
       if (!token) {
-        // Token yine yoksa, kullanıcıyı frontend'e yönlendirip doğrulamayı orada yaptır.
-        if (successUrl) {
+        // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'e yönlendir (pending)
+        if (wantsJson) {
+          return new Response(JSON.stringify({ status: 'pending', reason: 'missing_token' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        } else if (successUrl) {
           try {
             const target = new URL(successUrl);
             if (orderId) target.searchParams.set('orderId', orderId);
@@ -84,11 +90,11 @@ Deno.serve(async (req) => {
             target.searchParams.set('status', 'pending');
             const t = target.toString();
             const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
-            return new Response(html, { status: 302, headers: { ...corsHeaders, 'Content-Type': 'text/html', 'Location': t } });
+            return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
           } catch (_) {}
         }
-        // İyzi tarafında genel hata göstermemek için 200 OK dön.
-        return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+        // Son çare
+        return new Response(JSON.stringify({ status: 'pending' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
 
@@ -116,19 +122,51 @@ Deno.serve(async (req) => {
     };
     if (conversationId) retrieveReq.conversationId = conversationId;
 
-    const result = await new Promise<any>((resolve, reject) => {
-      (sdk as any).checkoutFormRetrieve.retrieve(retrieveReq, (err: any, res: any) => {
-        if (err) return reject(err);
-        resolve(res);
+    // Token geldiyse hemen DB'ye yaz (denetim ve reconcile için)
+    try {
+      if (token && orderId) {
+        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ payment_token: token })
+        })
+      }
+    } catch (_) {}
+
+    let result: any | null = null;
+    try {
+      result = await new Promise<any>((resolve, reject) => {
+        (sdk as any).checkoutForm.retrieve(retrieveReq, (err: any, res: any) => {
+          if (err) return reject(err);
+          resolve(res);
+        });
       });
-    });
+    } catch (_e) {
+      // retrieve başarısızsa result=null olarak değerlendirilecek (pending)
+      result = null;
+    }
 
     // İyzico sonucu yorumla
-    const paid = result && result.paymentStatus === "SUCCESS";
-    const newStatus = paid ? "paid" : "failed";
+    let paid = !!(result && result.paymentStatus === "SUCCESS");
 
-    // Supabase: venthub_orders güncelle
-    async function updateOrderBy(filter: string) {
+    // Debug bilgisi hazırla
+    const debugInfo: any = result ? {
+      paymentStatus: result.paymentStatus ?? null,
+      mdStatus: result.mdStatus ?? null,
+      errorCode: result.errorCode ?? null,
+      errorMessage: result.errorMessage ?? null,
+      paymentId: result.paymentId ?? null,
+      cardFamily: result.cardFamily ?? null,
+      binNumber: result.binNumber ?? null,
+      lastFourDigits: result.lastFourDigits ?? null,
+    } : { paymentStatus: null }
+
+    // Supabase: venthub_orders güncelle (yalnızca kesin durumlarda yaz)
+    async function patchStatus(newStatus: 'paid' | 'failed') {
+      const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
+      const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
+      const filter = filterById || filterByConv;
+      if (!filter) return null;
       const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}`, {
         method: "PATCH",
         headers: {
@@ -137,31 +175,32 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ status: newStatus /*, payment_data: result */ }),
+        body: JSON.stringify({ status: newStatus, payment_debug: debugInfo }),
       });
       return resp;
     }
 
-    // Bazı durumlarda body'de conversationId gelmez; İyzico cevabındaki conversationId'yi kullan.
-    const convForUpdate = result?.conversationId || conversationId || undefined;
-
-    let updateResp: Response | null = null;
-    if (orderId) {
-      updateResp = await updateOrderBy(`id=eq.${encodeURIComponent(orderId)}`);
-    }
-    if ((!updateResp || !updateResp.ok) && convForUpdate) {
-      updateResp = await updateOrderBy(
-        `conversation_id=eq.${encodeURIComponent(convForUpdate)}`
-      );
+    let updateOk = false;
+    if (paid) {
+      const r = await patchStatus('paid');
+      updateOk = !!(r && r.ok);
+    } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
+      const r = await patchStatus('failed');
+      updateOk = !!(r && r.ok);
     }
 
     const responseBody = {
-      status: paid ? "success" : "failure",
+      status: paid ? "success" : (result ? "failure" : "pending"),
       iyzico: result,
-      updated: updateResp ? updateResp.ok : false,
+      updated: updateOk,
     };
 
-    // Redirect back to frontend success page if provided
+    // İstek JSON bekliyorsa JSON dön, değilse HTML ile yönlendir
+    if (wantsJson) {
+      return new Response(JSON.stringify(responseBody), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // Her durumda frontende yönlendiren HTML dön (IyziCo bazı durumlarda 302'yi takip etmiyor olabilir)
     try {
       const url = new URL(req.url);
       const successUrl = url.searchParams.get('successUrl');
@@ -179,20 +218,44 @@ Deno.serve(async (req) => {
         if (token) target.searchParams.set('token', token);
         target.searchParams.set('status', paid ? 'success' : 'failure');
         const t = target.toString();
-        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
-        return new Response(html, { status: 302, headers: { ...corsHeaders, 'Content-Type': 'text/html', 'Location': t } });
+        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
     } catch (_) {}
 
-    return new Response("OK", {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "text/plain" },
-    });
+    // Yine de base yoksa son çare düz OK dön (görünümde OK görülebilir)
+    return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   } catch (error: any) {
     console.error("iyzico-callback error:", error);
-    // Her koşulda 200 OK ve basit bir sayfa dön.
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>OK</title></head><body>OK</body></html>`;
-    return new Response(html, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
+    // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'e 'pending' ile yönlendir
+    const accept = (req.headers.get('accept') || '').toLowerCase()
+    const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
+    if (wantsJson) {
+      return new Response(JSON.stringify({ status: 'pending', error: String(error?.message || error) }), { status: 200, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" } });
+    }
+    try {
+      const url = new URL(req.url);
+      const orderId = url.searchParams.get('orderId') || undefined;
+      const conversationId = url.searchParams.get('conversationId') || undefined;
+      let finalSuccess = url.searchParams.get('successUrl');
+      if (!finalSuccess) {
+        const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
+        if (base) {
+          try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
+        }
+      }
+      if (finalSuccess) {
+        const target = new URL(finalSuccess);
+        if (orderId) target.searchParams.set('orderId', orderId);
+        if (conversationId) target.searchParams.set('conversationId', conversationId);
+        target.searchParams.set('status', 'failure');
+        const t = target.toString();
+        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+      }
+    } catch (_) {}
+    // Yine olmazsa OK döneriz (en son çare)
+    return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
   }
 });
 

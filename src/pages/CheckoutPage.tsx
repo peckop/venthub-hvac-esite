@@ -148,7 +148,7 @@ export const CheckoutPage: React.FC = () => {
     try {
       // Edge function'ın beklediği format
       const requestData = {
-        amount: getCartTotal() * 1.2, // Include VAT
+        amount: getCartTotal(), // KDV zaten ürün fiyatlarına dahil (brüt) kabul edilir
         cartItems: items.map(item => ({
           product_id: item.product.id,
           quantity: item.quantity,
@@ -407,8 +407,9 @@ export const CheckoutPage: React.FC = () => {
   }
 
   const totalAmount = getCartTotal()
-  const vatAmount = totalAmount * 0.2
-  const finalAmount = totalAmount + vatAmount
+  // KDV dahil fiyat varsayımı: brüt = net * 1.20 => KDV payı = brüt - (brüt / 1.20)
+  const vatAmount = Number((totalAmount - totalAmount / 1.2).toFixed(2))
+  const finalAmount = totalAmount // Toplam zaten KDV dahil
 
   return (
     <div className="min-h-screen bg-light-gray">
@@ -751,7 +752,7 @@ export const CheckoutPage: React.FC = () => {
                   <span>₺{totalAmount.toLocaleString('tr-TR')}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
-                  <span>KDV (%20)</span>
+                  <span>KDV (%20, dahil)</span>
                   <span>₺{vatAmount.toLocaleString('tr-TR')}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
