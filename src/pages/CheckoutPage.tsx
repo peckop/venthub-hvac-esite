@@ -81,6 +81,8 @@ export const CheckoutPage: React.FC = () => {
   const [iyzScriptLoaded, setIyzScriptLoaded] = useState(false)
   const [paymentUrl, setPaymentUrl] = useState('')
   const [showHelp, setShowHelp] = useState(false)
+  const [formReady, setFormReady] = useState(false)
+  const [progressPct, setProgressPct] = useState(20)
 
   // Validation functions
   const validateCustomerInfo = () => {
@@ -288,6 +290,10 @@ export const CheckoutPage: React.FC = () => {
   useEffect(() => {
     if (!iyzToken) return
 
+    // Step 3 başlangıcında formReady/progress resetle
+    setFormReady(false)
+    setProgressPct(20)
+
     // Eski script ve iframe'i temizle
     try {
       const oldScript = document.querySelector('script[data-iyz-checkout="1"]') as HTMLScriptElement | null
@@ -318,8 +324,38 @@ export const CheckoutPage: React.FC = () => {
       }
     }, 8000)
 
+    // İframe yüklendiğinde formReady=true yap
+    const observeMount = () => {
+      const mount = document.getElementById('iyzipay-checkout-form')
+      if (!mount) return
+      // Mevcut iframe var mı?
+      const iframe = mount.querySelector('iframe') as HTMLIFrameElement | null
+      if (iframe) {
+        try {
+          iframe.addEventListener('load', () => setFormReady(true), { once: true } as any)
+        } catch {}
+        return
+      }
+      // Yoksa değişiklikleri izle
+      const obs = new MutationObserver((mut) => {
+        const ifr = mount.querySelector('iframe') as HTMLIFrameElement | null
+        if (ifr) {
+          try { ifr.addEventListener('load', () => setFormReady(true), { once: true } as any) } catch {}
+          obs.disconnect()
+        }
+      })
+      obs.observe(mount, { childList: true, subtree: true })
+    }
+    // Biraz gecikmeyle mount'u kontrol et
+    const check = window.setTimeout(observeMount, 150)
+
+    // En fazla 20 saniye sonra yine de devam
+    const hardTimeout = window.setTimeout(() => setFormReady(true), 20000)
+
     return () => {
       window.clearTimeout(timeout)
+      window.clearTimeout(check)
+      window.clearTimeout(hardTimeout)
     }
   }, [iyzToken, paymentUrl])
 
@@ -349,6 +385,18 @@ export const CheckoutPage: React.FC = () => {
     }
     return () => { if (timer) clearInterval(timer) }
   }, [step, orderId, convId, clearCart, navigate])
+
+  // Görsel ilerleme (yumuşak dolma) — formReady olana kadar %95'e kadar artar
+  useEffect(() => {
+    if (step !== 3 || formReady) return
+    const t = window.setInterval(() => {
+      setProgressPct((p) => {
+        const next = p + 2
+        return next >= 95 ? 95 : next
+      })
+    }, 250)
+    return () => window.clearInterval(t)
+  }, [step, formReady])
 
   if (items.length === 0 && !orderCompleted) {
     return (
@@ -413,9 +461,9 @@ export const CheckoutPage: React.FC = () => {
   const finalAmount = totalAmount // Toplam zaten KDV dahil
 
   // Overlay görünürlüğü ve adımları (1: başlatılıyor, 2: form yükleniyor, 3: banka 3D)
-  const overlayVisible = loading || (step === 3 && iyzToken && !iyzScriptLoaded)
-  const overlayStep = loading ? 1 : (step === 3 && iyzToken && !iyzScriptLoaded ? 2 : 3)
-  const overlayPercent = overlayStep === 1 ? 33 : overlayStep === 2 ? 66 : 90
+  const overlayVisible = step === 3 && !formReady
+  const overlayStep = loading ? 1 : (step === 3 && iyzToken && !formReady ? (iyzScriptLoaded ? 3 : 2) : 3)
+  const overlayPercent = overlayStep === 1 ? 33 : overlayStep === 2 ? 66 : (formReady ? 100 : 90)
 
   return (
     <div className="min-h-screen bg-light-gray">
@@ -512,7 +560,21 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <h2 className="text-xl font-semibold text-industrial-gray">Ödeme İşlemi</h2>
                   </div>
-                  <div className="rounded-lg border border-primary-navy/20 bg-air-blue/30 p-3 flex items-start gap-3">
+                  {/* Güvenli ödeme üst barı (her zaman görünür) */}
+                  <div className="rounded-lg border border-primary-navy/30 bg-white/90 p-3 flex flex-col gap-2 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-primary-navy">
+                        <Lock size={18} />
+                        <div className="text-sm font-semibold">Güvenli ödeme • Venthub HVAC</div>
+                      </div>
+                      <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
+                    </div>
+                    {/* İlerleme barı */}
+                    <div className="w-full h-2 bg-light-gray/80 rounded-full overflow-hidden" aria-hidden>
+                      <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all" style={{ width: `${progressPct}%` }} />
+                    </div>
+                    <div className="text-[11px] text-steel-gray">{overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}</div>
+                  </div>
                     <div className="text-primary-navy">
                       <Lock size={18} />
                     </div>
