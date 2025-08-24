@@ -199,6 +199,7 @@ Deno.serve(async (req) => {
             currency: 'TRY',
             basketId: orderId,
             paymentGroup: 'PRODUCT',
+            paymentChannel: 'WEB',
             callbackUrl: callbackUrlWithParams,
             enabledInstallments: [1, 2, 3, 6, 9, 12],
             buyer: {
@@ -211,7 +212,7 @@ Deno.serve(async (req) => {
                 lastLoginDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
                 registrationDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
                 registrationAddress: shippingAddress.fullAddress,
-                ip: realIp || undefined,
+                ip: realIp || '85.34.78.112',
                 city: shippingAddress.city,
                 country: 'Turkey',
                 zipCode: shippingAddress.postalCode
@@ -252,6 +253,7 @@ Deno.serve(async (req) => {
             currency: iyzicoRequest.currency,
             basketId: iyzicoRequest.basketId,
             paymentGroup: iyzicoRequest.paymentGroup,
+            paymentChannel: (Iyzipay as any).PAYMENT_CHANNEL ? (Iyzipay as any).PAYMENT_CHANNEL.WEB : 'WEB',
             callbackUrl: iyzicoRequest.callbackUrl,
             enabledInstallments: iyzicoRequest.enabledInstallments,
             buyer: iyzicoRequest.buyer,

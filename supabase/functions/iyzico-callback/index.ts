@@ -159,6 +159,7 @@ Deno.serve(async (req) => {
       cardFamily: result.cardFamily ?? null,
       binNumber: result.binNumber ?? null,
       lastFourDigits: result.lastFourDigits ?? null,
+      raw: result,
     } : { paymentStatus: null }
 
     // Supabase: venthub_orders güncelle (yalnızca kesin durumlarda yaz)
