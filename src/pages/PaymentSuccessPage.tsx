@@ -220,25 +220,11 @@ export const PaymentSuccessPage: React.FC = () => {
         </div>
         <div className="space-y-3">
           <Link
-            to="/"
-            className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
+            to={`/orders?open=${encodeURIComponent(searchParams.get('orderId') || '')}`}
+            className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
-            Ana Sayfaya Dön
+            Sipariş Detayım
           </Link>
-          <Link
-            to="/orders"
-            className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
-          >
-            Siparişlerim
-          </Link>
-          {paymentInfo?.conversationId && (
-            <Link
-              to={`/orders?open=${encodeURIComponent(searchParams.get('orderId') || '')}`}
-              className="w-full border-2 border-success-green text-success-green hover:bg-success-green hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
-            >
-              Siparişe Git
-            </Link>
-          )}
         </div>
       </div>
     </div>
