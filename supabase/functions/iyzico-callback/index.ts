@@ -61,20 +61,35 @@ Deno.serve(async (req) => {
     }
 
     if (!token) {
-      // Token gelmediyse bile, kullanıcıyı frontend'e yönlendirip doğrulamayı orada yaptır.
-      if (successUrl) {
+      // Fallback: orderId üzerinden payment_data.token'ı getir ve devam et
+      if (orderId) {
         try {
-          const target = new URL(successUrl);
-          if (orderId) target.searchParams.set('orderId', orderId);
-          if (conversationId) target.searchParams.set('conversationId', conversationId);
-          target.searchParams.set('status', 'pending');
-          const t = target.toString();
-          const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
-          return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_data`, {
+            headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, apikey: `${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }
+          })
+          const arr = await got.json().catch(()=>[])
+          const pd = Array.isArray(arr) && arr[0]?.payment_data ? arr[0].payment_data : null
+          if (pd?.token) {
+            token = pd.token
+          }
         } catch (_) {}
       }
-      // İyzi tarafında genel hata göstermemek için 200 OK dön.
-      return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+      if (!token) {
+        // Token yine yoksa, kullanıcıyı frontend'e yönlendirip doğrulamayı orada yaptır.
+        if (successUrl) {
+          try {
+            const target = new URL(successUrl);
+            if (orderId) target.searchParams.set('orderId', orderId);
+            if (conversationId) target.searchParams.set('conversationId', conversationId);
+            target.searchParams.set('status', 'pending');
+            const t = target.toString();
+            const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
+            return new Response(html, { status: 302, headers: { ...corsHeaders, 'Content-Type': 'text/html', 'Location': t } });
+          } catch (_) {}
+        }
+        // İyzi tarafında genel hata göstermemek için 200 OK dön.
+        return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
+      }
     }
 
     const apiKey = Deno.env.get("IYZICO_API_KEY");
@@ -165,7 +180,7 @@ Deno.serve(async (req) => {
         target.searchParams.set('status', paid ? 'success' : 'failure');
         const t = target.toString();
         const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
-        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+        return new Response(html, { status: 302, headers: { ...corsHeaders, 'Content-Type': 'text/html', 'Location': t } });
       }
     } catch (_) {}
 

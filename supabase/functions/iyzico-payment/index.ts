@@ -263,6 +263,22 @@ Deno.serve(async (req) => {
         if (iyzicoResult && iyzicoResult.status === 'success' && (iyzicoResult.checkoutFormContent || iyzicoResult.paymentPageUrl || iyzicoResult.token)) {
             console.log('✅ İyzico checkout form created successfully');
             
+            // Order'a token ve conversationId'yi yaz (callback'te token gelmezse fallback için)
+            try {
+                await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(dbOrderId)}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${serviceRoleKey}`,
+                        'apikey': serviceRoleKey,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ payment_data: { token: iyzicoResult.token || null, conversationId } })
+                })
+            } catch (e) {
+                console.warn('payment_data patch skipped:', (e as any)?.message)
+            }
+            
             return new Response(JSON.stringify({
                 data: {
                     status: 'success',
