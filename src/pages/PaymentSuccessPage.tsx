@@ -80,8 +80,12 @@ export const PaymentSuccessPage: React.FC = () => {
           return
         }
 
-        // 3) Token yoksa ama orderId varsa, veritabanından durumu kontrol et
+        // 3) Token yoksa ama orderId varsa: callback'i orderId ile tetikle (token fallback), ardından veritabanından durumu kontrol et
         if (orderId) {
+          try {
+            await supabase.functions.invoke('iyzico-callback', { body: { orderId, conversationId } })
+          } catch {}
+
           const { data, error } = await supabase
             .from('venthub_orders')
             .select('status')
