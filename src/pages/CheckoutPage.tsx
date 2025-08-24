@@ -76,6 +76,7 @@ export const CheckoutPage: React.FC = () => {
   const [paymentFrameContent, setPaymentFrameContent] = useState('')
   const [orderCompleted, setOrderCompleted] = useState(false)
   const [orderId, setOrderId] = useState('')
+  const [convId, setConvId] = useState('')
 
   // Validation functions
   const validateCustomerInfo = () => {
@@ -189,7 +190,16 @@ export const CheckoutPage: React.FC = () => {
       if (data && data.data) {
         console.log('İyzico payment response:', data.data);
         
-        // İyzico başarılı - ödeme sayfasına yönlendir
+        // Öncelik: checkoutFormContent varsa sayfaya gömerek ilerleyelim (redirect'e gerek kalmaz)
+        if (data.data.checkoutFormContent) {
+          setPaymentFrameContent(data.data.checkoutFormContent)
+          setOrderId(data.data.orderId || '')
+          setConvId(data.data.conversationId || '')
+          setStep(3)
+          return
+        }
+
+        // Fallback: ödeme sayfasına yönlendirme
         if (data.data.paymentPageUrl) {
           console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
           window.location.href = data.data.paymentPageUrl;
@@ -235,7 +245,7 @@ export const CheckoutPage: React.FC = () => {
     }
   }
 
-  // Handle payment frame messages
+  // Handle payment frame messages (bazı entegrasyonlar postMessage kullanabilir)
   React.useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.event === 'payment_success') {
@@ -251,6 +261,33 @@ export const CheckoutPage: React.FC = () => {
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
   }, [])
+
+  // Ödeme başlatıldıktan sonra (checkoutFormContent gömülü iken) sipariş durumunu periyodik kontrol et
+  useEffect(() => {
+    let timer: any
+    if (step === 3 && orderId) {
+      timer = setInterval(async () => {
+        try {
+          const { data, error } = await supabase
+            .from('venthub_orders')
+            .select('status')
+            .eq('id', orderId)
+            .maybeSingle()
+          if (!error && data?.status) {
+            if (data.status === 'paid') {
+              clearInterval(timer)
+              clearCart()
+              navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=success`)
+            } else if (data.status === 'failed') {
+              clearInterval(timer)
+              navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=failure`)
+            }
+          }
+        } catch {}
+      }, 3000)
+    }
+    return () => { if (timer) clearInterval(timer) }
+  }, [step, orderId, convId, clearCart, navigate])
 
   if (items.length === 0 && !orderCompleted) {
     return (
@@ -367,6 +404,29 @@ export const CheckoutPage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
+              {/* Step 3: Payment - İyzico Checkout Form gömme */}
+              {step === 3 && (
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="bg-primary-navy text-white p-2 rounded-lg">
+                      <CreditCard size={20} />
+                    </div>
+                    <h2 className="text-xl font-semibold text-industrial-gray">Ödeme İşlemi</h2>
+                  </div>
+                  <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
+                  <div className="mt-4">
+                    {paymentFrameContent ? (
+                      <div dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
+                    ) : (
+                      <div className="flex items-center gap-3 text-steel-gray">
+                        <CheckCircle className="animate-pulse" />
+                        <span>Form hazırlanıyor...</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Step 1: Customer Information */}
               {step === 1 && (
                 <div className="space-y-6">
