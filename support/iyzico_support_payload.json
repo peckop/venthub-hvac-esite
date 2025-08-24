@@ -49,6 +49,18 @@
         "lastFourDigits": "0001",
         "raw_summary": { "cardFamily": "Denizbank DC", "fraudStatus": 1, "paidPrice": 6200 }
       }
+    },
+    {
+      "orderId": "bc7ed5be-af37-44f9-8d99-7cd007710d3c",
+      "conversationId": "CONV-1756055066221",
+      "payment_debug": {
+        "paymentStatus": "FAILURE",
+        "mdStatus": 0,
+        "paymentId": "25213721",
+        "binNumber": "540036",
+        "lastFourDigits": "0003",
+        "raw_summary": { "cardFamily": "Bonus", "fraudStatus": 1, "paidPrice": 1890 }
+      }
     }
   ]
 }
