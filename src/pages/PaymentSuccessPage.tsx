@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 
 export const PaymentSuccessPage: React.FC = () => {
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')

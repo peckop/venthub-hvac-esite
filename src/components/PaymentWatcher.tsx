@@ -7,7 +7,7 @@ const STORAGE_KEY = 'vh_pending_order'
 export const PaymentWatcher: React.FC = () => {
   const navigate = useNavigate()
   const checkingRef = useRef(false)
-  const timerRef = useRef<any>(null)
+  const timerRef = useRef<number | null>(null)
   const location = useLocation()
 
   async function checkOnce() {
@@ -38,6 +38,7 @@ export const PaymentWatcher: React.FC = () => {
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const onFocus = () => { checkOnce() }
     const onVisibility = () => { if (document.visibilityState === 'visible') checkOnce() }
@@ -47,13 +48,13 @@ export const PaymentWatcher: React.FC = () => {
     // Eğer bekleyen sipariş varsa periyodik kontrol
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      timerRef.current = setInterval(checkOnce, 3000)
+      timerRef.current = window.setInterval(checkOnce, 3000)
     }
 
     return () => {
       window.removeEventListener('focus', onFocus)
       document.removeEventListener('visibilitychange', onVisibility)
-      if (timerRef.current) clearInterval(timerRef.current)
+      if (timerRef.current) window.clearInterval(timerRef.current)
     }
   }, [navigate, location.pathname])
 

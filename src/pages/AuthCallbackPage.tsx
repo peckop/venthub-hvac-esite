@@ -48,7 +48,7 @@ export const AuthCallbackPage: React.FC = () => {
         setTimeout(() => {
           navigate('/auth/login?error=No session found')
         }, 3000)
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Auth callback error:', error)
         setStatus('error')
         setMessage('Beklenmeyen bir hata oluştu')
@@ -59,7 +59,7 @@ export const AuthCallbackPage: React.FC = () => {
     }
 
     handleAuthCallback()
-  }, [])
+  }, [navigate])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray flex items-center justify-center">

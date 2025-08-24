@@ -3,14 +3,16 @@ import { supabase } from '../lib/supabase'
 import { User, Session } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 
+interface AuthError { message: string }
+
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<{ error?: any }>
-  signUp: (email: string, password: string, name: string) => Promise<{ error?: any }>
+  signIn: (email: string, password: string) => Promise<{ error?: AuthError }>
+  signUp: (email: string, password: string, name: string) => Promise<{ error?: AuthError }>
   signOut: () => Promise<void>
-  resetPassword: (email: string) => Promise<{ error?: any }>
+  resetPassword: (email: string) => Promise<{ error?: AuthError }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -134,7 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       return { data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign in catch error:', error);
       const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu';
       toast.error(errorMessage);
@@ -186,7 +188,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       return { data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Sign up catch error:', error);
       const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu';
       toast.error(errorMessage);
@@ -203,7 +205,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.error('Sign out error:', error);
         toast.error('Çıkış sırasında hata oluştu');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Sign out catch error:', error);
       toast.error('Çıkış sırasında beklenmeyen hata oluştu');
     }
@@ -231,7 +233,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       toast.success('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi');
       return { data };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Reset password catch error:', error);
       const errorMessage = 'Şifre sıfırlama sırasında beklenmeyen hata oluştu';
       toast.error(errorMessage);

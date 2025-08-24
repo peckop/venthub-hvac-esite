@@ -26,7 +26,7 @@ export interface Product {
   status: 'active' | 'inactive' | 'out_of_stock'
   is_featured: boolean
   description?: string
-  technical_specs?: any
+  technical_specs?: unknown
   image_url?: string
 }
 

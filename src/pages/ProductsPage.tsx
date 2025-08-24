@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllProducts, getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
-import { Filter, Grid, List, Search, ChevronDown } from 'lucide-react'
+import { Filter, Grid, List, Search } from 'lucide-react'
 
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])

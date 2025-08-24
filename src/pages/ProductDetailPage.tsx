@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsByCategory, Product } from '../lib/supabase'
 import { useCart } from '../hooks/useCart'
-import { BrandIcon, getCategoryIcon } from '../components/HVACIcons'
+import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
 import { 
   ArrowLeft, 

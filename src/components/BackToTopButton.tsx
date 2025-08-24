@@ -6,13 +6,13 @@ const BackToTopButton: React.FC = () => {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => {
+    const onScroll = (_e: Event) => {
       const y = window.scrollY || document.documentElement.scrollTop
       setVisible(y > 400)
     }
-    onScroll()
+    onScroll(new Event('scroll'))
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll as any)
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   if (!visible) return null

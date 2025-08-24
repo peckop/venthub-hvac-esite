@@ -3,7 +3,7 @@ import { useCart } from '../hooks/useCart'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { ArrowLeft, CreditCard, MapPin, User, Phone, Mail, Lock, CheckCircle } from 'lucide-react'
+import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
 
@@ -27,7 +27,6 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Payment
-  const paymentFrameRef = useRef<HTMLIFrameElement>(null)
 
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
@@ -379,15 +378,15 @@ export const CheckoutPage: React.FC = () => {
       const iframe = mount.querySelector('iframe') as HTMLIFrameElement | null
       if (iframe) {
         try {
-          iframe.addEventListener('load', () => setFormReady(true), { once: true } as any)
+          iframe.addEventListener('load', () => setFormReady(true), { once: true } as AddEventListenerOptions)
         } catch {}
         return
       }
       // Yoksa değişiklikleri izle
-      const obs = new MutationObserver((mut) => {
+      const obs = new MutationObserver((_mut) => {
         const ifr = mount.querySelector('iframe') as HTMLIFrameElement | null
         if (ifr) {
-          try { ifr.addEventListener('load', () => setFormReady(true), { once: true } as any) } catch {}
+          try { ifr.addEventListener('load', () => setFormReady(true), { once: true } as AddEventListenerOptions) } catch {}
           obs.disconnect()
         }
       })

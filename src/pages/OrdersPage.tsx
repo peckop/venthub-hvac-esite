@@ -13,11 +13,11 @@ interface Order {
   created_at: string
   customer_name: string
   customer_email: string
-  shipping_address: any
+  shipping_address: unknown
   order_items: OrderItem[]
   order_number?: string
   is_demo?: boolean
-  payment_data?: any
+  payment_data?: unknown
   conversation_id?: string
 }
 

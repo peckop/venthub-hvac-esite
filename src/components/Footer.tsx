@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'
-import { getCategoryIcon } from './HVACIcons'
 
 export const Footer: React.FC = () => {
   const mainCategories = [

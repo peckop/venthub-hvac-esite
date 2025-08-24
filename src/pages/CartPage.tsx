@@ -1,6 +1,6 @@
 import React from 'react'
 import { useCart } from '../hooks/useCart'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Lock } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getCategories, getProductsByCategory, Category, Product } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../components/HVACIcons'
-import { ChevronRight, Filter, Grid, List, SortAsc } from 'lucide-react'
+import { ChevronRight, Filter, Grid, List } from 'lucide-react'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
