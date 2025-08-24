@@ -1,5 +1,10 @@
 name: CI
 
+# Cancel older in-progress runs only for pull_request events
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   push:
     branches: [master]
