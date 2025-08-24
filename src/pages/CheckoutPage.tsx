@@ -77,6 +77,9 @@ export const CheckoutPage: React.FC = () => {
   const [orderCompleted, setOrderCompleted] = useState(false)
   const [orderId, setOrderId] = useState('')
   const [convId, setConvId] = useState('')
+  const [iyzToken, setIyzToken] = useState('')
+  const [iyzScriptLoaded, setIyzScriptLoaded] = useState(false)
+  const [paymentUrl, setPaymentUrl] = useState('')
 
   // Validation functions
   const validateCustomerInfo = () => {
@@ -190,7 +193,17 @@ export const CheckoutPage: React.FC = () => {
       if (data && data.data) {
         console.log('İyzico payment response:', data.data);
         
-        // Öncelik: checkoutFormContent varsa sayfaya gömerek ilerleyelim (redirect'e gerek kalmaz)
+        // En güvenilir yol: token ile gömme (React, innerHTML içindeki <script> etiketlerini çalıştırmaz)
+        if (data.data.token) {
+          setIyzToken(data.data.token || '')
+          setPaymentUrl(data.data.paymentPageUrl || '')
+          setOrderId(data.data.orderId || '')
+          setConvId(data.data.conversationId || '')
+          setStep(3)
+          return
+        }
+
+        // İkinci tercih: checkoutFormContent (script yürütme garantisi olmayabilir)
         if (data.data.checkoutFormContent) {
           setPaymentFrameContent(data.data.checkoutFormContent)
           setOrderId(data.data.orderId || '')
@@ -262,7 +275,38 @@ export const CheckoutPage: React.FC = () => {
     return () => window.removeEventListener('message', handleMessage)
   }, [])
 
-  // Ödeme başlatıldıktan sonra (checkoutFormContent gömülü iken) sipariş durumunu periyodik kontrol et
+  // İyzico token ile script'i yükle ve formu çalıştır. 8 sn içinde iframe gelmezse paymentPageUrl'e yönlendir.
+  useEffect(() => {
+    if (!iyzToken) return
+    // Script'i bir kez ekle
+    const existing = document.querySelector('script[data-iyz-checkout="1"]') as HTMLScriptElement | null
+    let script: HTMLScriptElement | null = null
+    if (!existing) {
+      script = document.createElement('script')
+      script.src = 'https://sandbox-static.iyzipay.com/checkoutform/iyzipay-checkout-form.js'
+      script.async = true
+      script.setAttribute('data-iyz-checkout', '1')
+      script.onload = () => setIyzScriptLoaded(true)
+      document.body.appendChild(script)
+    } else {
+      setIyzScriptLoaded(true)
+    }
+
+    const timeout = window.setTimeout(() => {
+      const formIframe = document.querySelector('#iyzipay-checkout-form iframe')
+      if (!formIframe && paymentUrl) {
+        // Fallback: hosted ödeme sayfasına yönlendir
+        window.location.href = paymentUrl
+      }
+    }, 8000)
+
+    return () => {
+      window.clearTimeout(timeout)
+      // script'i kaldırmıyoruz; sayfada kalabilir
+    }
+  }, [iyzToken, paymentUrl])
+
+  // Ödeme başlatıldıktan sonra sipariş durumunu periyodik kontrol et
   useEffect(() => {
     let timer: any
     if (step === 3 && orderId) {
@@ -369,34 +413,20 @@ export const CheckoutPage: React.FC = () => {
 
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="flex items-center">
-            {[1, 2, 3].map((stepNum) => (
-              <React.Fragment key={stepNum}>
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
-                  step >= stepNum 
-                    ? 'bg-primary-navy text-white' 
-                    : 'bg-light-gray text-steel-gray border-2 border-light-gray'
-                }`}>
-                  {stepNum}
+          <div className="flex items-center gap-2">
+            {[1,2,3].map((n, idx) => (
+              <React.Fragment key={n}>
+                <div className="flex flex-col items-center min-w-[110px]">
+                  <div className={`w-8 h-8 rounded-full font-semibold text-sm flex items-center justify-center ${step >= n ? 'bg-primary-navy text-white' : 'bg-light-gray text-steel-gray border-2 border-light-gray'}`}>{n}</div>
+                  <span className={`mt-1 text-sm ${step >= n ? 'text-primary-navy font-medium' : 'text-steel-gray'}`}>
+                    {n===1 ? 'Kişisel Bilgiler' : n===2 ? 'Adres Bilgileri' : 'Ödeme'}
+                  </span>
                 </div>
-                {stepNum < 3 && (
-                  <div className={`h-1 w-16 mx-2 ${
-                    step > stepNum ? 'bg-primary-navy' : 'bg-light-gray'
-                  }`} />
+                {idx < 2 && (
+                  <div className={`flex-1 h-1 ${step > n ? 'bg-primary-navy' : 'bg-light-gray'}`}></div>
                 )}
               </React.Fragment>
             ))}
-          </div>
-          <div className="flex justify-between mt-2 text-sm">
-            <span className={step >= 1 ? 'text-primary-navy font-medium' : 'text-steel-gray'}>
-              Kişisel Bilgiler
-            </span>
-            <span className={step >= 2 ? 'text-primary-navy font-medium' : 'text-steel-gray'}>
-              Adres Bilgileri
-            </span>
-            <span className={step >= 3 ? 'text-primary-navy font-medium' : 'text-steel-gray'}>
-              Ödeme
-            </span>
           </div>
         </div>
 
@@ -415,7 +445,9 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                   <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
                   <div className="mt-4">
-                    {paymentFrameContent ? (
+                    {iyzToken ? (
+                      <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
+                    ) : paymentFrameContent ? (
                       <div dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
                     ) : (
                       <div className="flex items-center gap-3 text-steel-gray">
