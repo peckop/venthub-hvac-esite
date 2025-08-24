@@ -82,6 +82,12 @@ Deno.serve(async (req) => {
             const ref = req.headers.get('referer') || '';
             try { clientOrigin = ref ? new URL(ref).origin : ''; } catch (_) { clientOrigin = ''; }
         }
+        if (!clientOrigin) {
+            const envOrigin = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
+            if (envOrigin) {
+                try { clientOrigin = new URL(envOrigin).origin; } catch { clientOrigin = envOrigin.replace(/\/$/, ''); }
+            }
+        }
 
         console.log('Order ID:', orderId);
 

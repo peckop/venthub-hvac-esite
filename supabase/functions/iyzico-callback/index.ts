@@ -39,13 +39,25 @@ Deno.serve(async (req) => {
       orderId = body?.orderId;
     }
     // URL query'den de parametre al (callbackUrl'e eklendi)
+    let successUrl: string | null = null;
     try {
       const url = new URL(req.url);
       if (!orderId) orderId = url.searchParams.get('orderId') || undefined;
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
+      successUrl = url.searchParams.get('successUrl');
     } catch (_) {}
 
     if (!token) {
+      // Token yoksa bile, kullanıcıyı frontend başarı sayfasına yönlendirip doğrulamayı orada veritabanından yaptır.
+      if (successUrl) {
+        try {
+          const target = new URL(successUrl);
+          if (orderId) target.searchParams.set('orderId', orderId);
+          if (conversationId) target.searchParams.set('conversationId', conversationId);
+          const html = `<!doctype html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body><script>try{window.top.location.replace(${JSON.stringify(target.toString())});}catch(e){location.href=${JSON.stringify(target.toString())}}</script>OK</body></html>`;
+          return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+        } catch (_) {}
+      }
       // İyzi tarafında genel hata göstermemek için 200 OK dön.
       return new Response("OK", { status: 200, headers: { ...corsHeaders, "Content-Type": "text/plain" } });
     }
