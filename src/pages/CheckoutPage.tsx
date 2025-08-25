@@ -582,7 +582,7 @@ export const CheckoutPage: React.FC = () => {
         </div>
         {/* Progress Steps */}
         <div className="mb-8">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {[1,2,3].map((n, idx) => (
               <React.Fragment key={n}>
                 <div className="flex flex-col items-center min-w-[110px]">
@@ -592,7 +592,7 @@ export const CheckoutPage: React.FC = () => {
                   </span>
                 </div>
                 {idx < 2 && (
-                  <div className={`flex-1 h-1 ${step > n ? 'bg-primary-navy' : 'bg-light-gray'}`}></div>
+                  <div className={`hidden sm:flex flex-1 h-1 ${step > n ? 'bg-primary-navy' : 'bg-light-gray'}`}></div>
                 )}
               </React.Fragment>
             ))}

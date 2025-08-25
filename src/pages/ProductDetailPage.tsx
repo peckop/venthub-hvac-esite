@@ -326,32 +326,32 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex space-x-2 sm:space-x-4">
                 <button
                   onClick={handleAddToCart}
                   disabled={product.status !== 'active'}
-                  className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ShoppingCart size={20} />
+                  <ShoppingCart size={18} />
                   <span>{t('pdp.addToCart')}</span>
                 </button>
                 
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
-                  className={`p-4 border-2 rounded-lg transition-colors ${
+                  className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${
                     isWishlisted 
                       ? 'border-red-500 text-red-500 bg-red-50' 
                       : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
                   }`}
                 >
-                  <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
+                  <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
                 </button>
                 
                 <button
                   onClick={handleShare}
-                  className="p-4 border-2 border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-lg transition-colors"
+                  className="p-2 sm:p-4 border-2 border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-lg transition-colors"
                 >
-                  <Share2 size={20} />
+                  <Share2 size={18} />
                 </button>
               </div>
 

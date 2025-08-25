@@ -59,7 +59,7 @@ export const CartPage: React.FC = () => {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-                <div className="flex items-start space-x-4">
+                <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                   {/* Product Image Placeholder */}
                   <div className="w-20 h-20 bg-gradient-to-br from-air-blue to-light-gray rounded-lg flex items-center justify-center flex-shrink-0">
                     <BrandIcon brand={item.product.brand} />
@@ -91,7 +91,7 @@ export const CartPage: React.FC = () => {
                   </div>
 
                   {/* Quantity Controls */}
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 mt-4 sm:mt-0 w-full sm:w-auto justify-between sm:justify-start">
                     <div className="flex items-center border border-light-gray rounded-lg">
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
