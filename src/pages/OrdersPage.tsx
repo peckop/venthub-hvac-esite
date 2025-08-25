@@ -84,19 +84,6 @@ export const OrdersPage: React.FC = () => {
 
   const { addToCart } = useCart()
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth/login', { 
-        state: { from: { pathname: '/orders' } }
-      })
-      return
-    }
-
-    if (user) {
-      fetchOrders()
-    }
-  }, [user, authLoading, navigate, fetchOrders])
-
   const fetchOrders = React.useCallback(async () => {
     try {
       setLoading(true)
@@ -160,6 +147,19 @@ export const OrdersPage: React.FC = () => {
       setLoading(false)
     }
   }, [user, searchParams])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth/login', { 
+        state: { from: { pathname: '/orders' } }
+      })
+      return
+    }
+
+    if (user) {
+      fetchOrders()
+    }
+  }, [user, authLoading, navigate, fetchOrders])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('tr-TR', {

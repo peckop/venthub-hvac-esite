@@ -5,6 +5,7 @@ import HeroSection from '../components/HeroSection'
 import CategoriesShowcase from '../components/CategoriesShowcase'
 import BrandsShowcase from '../components/BrandsShowcase'
 import CartToast from '../components/CartToast'
+import QuickViewModal from '../components/QuickViewModal'
 import { Star, TrendingUp, Clock } from 'lucide-react'
 
 export const HomePage: React.FC = () => {
@@ -14,6 +15,8 @@ export const HomePage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [toastProduct, setToastProduct] = useState<Product | null>(null)
   const [showToast, setShowToast] = useState(false)
+  const [quickViewOpen, setQuickViewOpen] = useState(false)
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     async function fetchData() {
@@ -45,8 +48,8 @@ export const HomePage: React.FC = () => {
   }, [])
 
   const handleQuickView = (product: Product) => {
-    // TODO: Implement quick view modal
-    console.log('Quick view:', product)
+    setQuickViewProduct(product)
+    setQuickViewOpen(true)
   }
 
   const closeToast = () => {
@@ -90,6 +93,7 @@ export const HomePage: React.FC = () => {
                   key={product.id}
                   product={product}
                   onQuickView={handleQuickView}
+                  highlightFeatured
                 />
               ))}
             </div>
@@ -179,6 +183,11 @@ export const HomePage: React.FC = () => {
         isVisible={showToast}
         product={toastProduct}
         onClose={closeToast}
+      />
+      <QuickViewModal
+        product={quickViewProduct}
+        open={quickViewOpen}
+        onClose={() => { setQuickViewOpen(false); setQuickViewProduct(null) }}
       />
     </div>
   )

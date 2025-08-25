@@ -8,9 +8,10 @@ import { useCart } from '../hooks/useCartHook'
 interface ProductCardProps {
   product: Product
   onQuickView?: (product: Product) => void
+  highlightFeatured?: boolean
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false }) => {
   const { addToCart } = useCart()
   const price = parseFloat(product.price)
 
@@ -31,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
   return (
     <Link to={`/product/${product.id}`}>
       <div className={`group relative bg-white rounded-xl shadow-sm hover:shadow-hvac transition-all duration-200 overflow-hidden border ${
-        product.is_featured ? 'border-gold-accent border-2' : 'border-light-gray'
+        highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-light-gray'
       }`}>
         {/* Featured Badge */}
         {product.is_featured && (
@@ -100,6 +101,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }
             
             {onQuickView && (
               <button
+                type="button"
                 onClick={handleQuickView}
                 className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors"
               >

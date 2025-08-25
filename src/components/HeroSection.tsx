@@ -6,10 +6,10 @@ export const HeroSection: React.FC = () => {
   return (
     <div className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
       {/* Background Image */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <img
           src="/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg"
-          alt="Modern HVAC Facility"
+          alt=""
           className="w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
@@ -106,7 +106,7 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Bottom Wave */}
-      <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
         <svg viewBox="0 0 1200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M0 120L50 110C100 100 200 80 300 70C400 60 500 60 600 65C700 70 800 80 900 85C1000 90 1100 90 1150 90L1200 90V120H1150C1100 120 1000 120 900 120C800 120 700 120 600 120C500 120 400 120 300 120C200 120 100 120 50 120H0Z"

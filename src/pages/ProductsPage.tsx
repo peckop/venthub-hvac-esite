@@ -265,6 +265,7 @@ const ProductsPage: React.FC = () => {
                 <ProductCard 
                   key={product.id} 
                   product={product}
+                  highlightFeatured={false}
                 />
               ))}
             </div>
