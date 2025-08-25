@@ -22,6 +22,7 @@ import OrdersPage from './pages/OrdersPage'
 import Footer from './components/Footer'
 import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
+import AddToCartToast from './components/AddToCartToast'
 import KVKKPage from './pages/legal/KVKKPage'
 import DistanceSalesAgreementPage from './pages/legal/DistanceSalesAgreementPage'
 import PreInformationPage from './pages/legal/PreInformationPage'
@@ -94,6 +95,9 @@ function App() {
               </main>
 
               <Footer />
+              
+              {/* Global cart toast */}
+              <AddToCartToast />
               
               {/* Toast Container */}
               <Toaster
