@@ -32,9 +32,9 @@ export const AddToCartToast: React.FC = () => {
   if (!visible || !product) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[60]">
-      <div className="w-[360px] max-w-[92vw] rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">
-        <div className="p-4 flex items-start gap-3">
+    <div className="fixed z-[60] inset-x-3 bottom-3 md:inset-auto md:bottom-6 md:right-6">
+      <div className="w-full md:w-[360px] max-w-[92vw] rounded-2xl shadow-2xl border border-light-gray bg-white ring-1 ring-black/5 overflow-hidden animate-slide-up">
+        <div className="p-3 md:p-4 flex items-start gap-3">
           <div className="bg-success-green/10 p-2 rounded-lg">
             <CheckCircle className="text-success-green" size={20} />
           </div>
@@ -44,17 +44,17 @@ export const AddToCartToast: React.FC = () => {
           </div>
           <button onClick={() => setVisible(false)} className="text-steel-gray hover:text-industrial-gray">×</button>
         </div>
-        <div className="px-4 pb-4 pt-0">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="px-3 md:px-4 pb-3 md:pb-4 pt-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
             <button
               onClick={() => setVisible(false)}
-              className="inline-flex items-center justify-center gap-2 px-3 py-2 border rounded-lg text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition"
+              className="inline-flex items-center justify-center gap-2 px-3 py-3 md:py-2 border rounded-lg text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition"
             >
               <ShoppingBag size={16} />
               <span className="text-sm font-medium">{t('cartToast.continue')}</span>
             </button>
             <Link to="/cart" onClick={() => setVisible(false)} className="inline-flex items-center justify-center">
-              <span className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition text-sm font-medium w-full">
+              <span className="inline-flex items-center justify-center gap-2 px-3 py-3 md:py-2 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition text-sm font-medium w-full">
                 <ArrowRight size={16} /> {t('cartToast.goToCart')}
               </span>
             </Link>
