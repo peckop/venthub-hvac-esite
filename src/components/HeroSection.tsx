@@ -66,12 +66,6 @@ export const HeroSection: React.FC = () => {
               >
                 {t('common.getQuote')}
               </button>
-              <a
-                href="/products#by-application"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white/70 hover:bg-white text-primary-navy font-semibold rounded-lg transition-colors"
-              >
-                {t('common.byApplication')}
-              </a>
             </div>
           </div>
 

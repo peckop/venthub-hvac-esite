@@ -82,7 +82,7 @@ export const HomePage: React.FC = () => {
       <HeroSection />
 
       {/* Uygulamaya Göre Çözümler */}
-      <section className="py-12 bg-white">
+      <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('common.byApplication')}</h2>
@@ -92,11 +92,11 @@ export const HomePage: React.FC = () => {
             const appCards = getActiveApplicationCards()
             return (
               <div className={`${gridColsClass(appCards.length)}`}>
-{appCards.map(card => (
+                {appCards.map(card => (
                   <Link
                     key={card.key}
                     to={card.href}
-                    className="group relative overflow-hidden rounded-xl border border-light-gray bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition"
+                    className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
                     onClick={() => {
                       trackEvent('application_click', { key: card.key, source: 'home' })
                     }}
