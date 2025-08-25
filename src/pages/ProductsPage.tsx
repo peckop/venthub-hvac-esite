@@ -101,8 +101,8 @@ const ProductsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Seo
-        title={noindex ? `Search: ${searchQuery} | VentHub` : `${t('common.discover')} | VentHub`}
-        description={noindex ? `"${searchQuery}" search results` : 'VentHub Discover: featured, new products and popular categories'}
+        title={noindex ? `${t('products.searchSeoTitle', { q: searchQuery })} | VentHub` : `${t('common.discover')} | VentHub`}
+        description={noindex ? t('products.searchSeoDesc', { q: searchQuery }) : t('products.discoverSeoDesc')}
         canonical={canonicalUrl}
         noindex={noindex}
       />
@@ -126,7 +126,7 @@ const ProductsPage: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-              {isAll ? t('common.allProducts') : 'Search Results'}
+              {isAll ? t('common.allProducts') : t('products.searchResultsTitle')}
             </h1>
             <p className="text-steel-gray">
               {isAll ? `${allProducts.length} ${t('products.itemsListed')}` : `${searchResults.length} ${t('products.resultsFound')}`}

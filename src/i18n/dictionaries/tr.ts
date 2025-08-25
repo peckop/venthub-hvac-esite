@@ -75,6 +75,10 @@ export const tr = {
     applicationTitle: "Uygulamaya Göre Çözümler",
     popularCategories: "Popüler Kategoriler",
     discoverVisual: 'Keşfet görsel alanı',
+    searchResultsTitle: 'Arama Sonuçları',
+    searchSeoTitle: 'Arama: {{q}}',
+    searchSeoDesc: '"{{q}}" arama sonuçları',
+    discoverSeoDesc: 'VentHub keşfet: ürünleri, öne çıkanları ve popüler kategorileri görüntüleyin.'
   },
   applications: {
     parking: {
@@ -522,6 +526,14 @@ export const tr = {
     addToCart: 'Sepete Ekle',
     viewProduct: 'Ürünü Gör',
     descFallback: 'Ürün açıklaması yakında eklenecektir.'
+  },
+  support: {
+    links: { faq: 'SSS', returns: 'İade & Değişim', shipping: 'Teslimat & Kargo', warranty: 'Garanti & Servis' },
+    returns: {
+      title: 'İade & Değişim',
+      desc1: '14 gün içinde cayma hakkınızı kullanabilirsiniz. Ürün, faturası ve tüm aksesuarları ile birlikte, kullanılmamış ve yeniden satılabilir durumda olmalıdır.',
+      desc2: 'İade talebinizi sipariş numarası ile destek ekibimize iletin. Onay sonrasında kargo yönlendirmesi sağlanacaktır.'
+    }
   },
   lead: {
     message: 'Mesaj',

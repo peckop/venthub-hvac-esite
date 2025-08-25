@@ -77,6 +77,10 @@ export const en = {
     helpCtaTitle: "Not sure? Let's choose the right product by application.",
     helpCtaSubtitle: "Share your project details; our engineering team will respond quickly.",
     discoverVisual: 'Discover visual area',
+    searchResultsTitle: 'Search Results',
+    searchSeoTitle: 'Search: {{q}}',
+    searchSeoDesc: 'Search results for "{{q}}"',
+    discoverSeoDesc: 'Discover products, featured items and popular categories on VentHub.'
   },
   applications: {
     parking: {
@@ -524,6 +528,14 @@ export const en = {
     addToCart: 'Add to Cart',
     viewProduct: 'View Product',
     descFallback: 'Product description will be added soon.'
+  },
+  support: {
+    links: { faq: 'FAQ', returns: 'Returns & Exchanges', shipping: 'Shipping & Delivery', warranty: 'Warranty & Service' },
+    returns: {
+      title: 'Returns & Exchanges',
+      desc1: 'You may use your right of withdrawal within 14 days. The product must be unused and resalable with invoice and all accessories included.',
+      desc2: 'Please contact our support team with your order number for a return request. After approval, shipping instructions will be provided.'
+    }
   },
   lead: {
     message: 'Message',

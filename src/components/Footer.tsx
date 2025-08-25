@@ -87,22 +87,22 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/support/sss" className="text-steel-gray hover:text-white transition-colors text-sm">
-                  • SSS
+                  • {t('support.links.faq')}
                 </Link>
               </li>
               <li>
                 <Link to="/support/iade-degisim" className="text-steel-gray hover:text-white transition-colors text-sm">
-                  • İade & Değişim
+                  • {t('support.links.returns')}
                 </Link>
               </li>
               <li>
                 <Link to="/support/teslimat-kargo" className="text-steel-gray hover:text-white transition-colors text-sm">
-                  • Teslimat & Kargo
+                  • {t('support.links.shipping')}
                 </Link>
               </li>
               <li>
                 <Link to="/support/garanti-servis" className="text-steel-gray hover:text-white transition-colors text-sm">
-                  • Garanti & Servis
+                  • {t('support.links.warranty')}
                 </Link>
               </li>
             </ul>
