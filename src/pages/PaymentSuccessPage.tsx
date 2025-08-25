@@ -132,7 +132,7 @@ export const PaymentSuccessPage: React.FC = () => {
     }
 
     if (status === 'loading') verify()
-  }, [searchParams, clearCart, status])
+  }, [searchParams, clearCart, status, t])
 
   if (status === 'loading') {
     return (

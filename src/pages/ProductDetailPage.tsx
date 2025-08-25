@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getProductById, getProductsByCategory, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
+import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
 import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
@@ -32,7 +32,6 @@ export const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const [allCategories, setAllCategories] = useState<Category[]>([])
   const [mainCategory, setMainCategory] = useState<Category | null>(null)
   const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [quantity, setQuantity] = useState(1)
@@ -59,7 +58,6 @@ export const ProductDetailPage: React.FC = () => {
 
         // Fetch categories for breadcrumb
         const cats = await getCategories()
-        setAllCategories(cats)
         if (productData.category_id) {
           const mc = cats.find(c => c.id === productData.category_id) || null
           setMainCategory(mc)

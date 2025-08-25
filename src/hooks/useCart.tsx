@@ -66,7 +66,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Dispatch a global event so UI can present a rich toast/modal
     try {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
-    } catch (e) {
+    } catch {
       // Fallback toast if CustomEvent fails in some environments
       try {
         toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })

@@ -16,7 +16,7 @@ export const ForgotPasswordPage: React.FC = () => {
     e.preventDefault()
     
     if (!email) {
-      toast.error(t('auth.email') + ' ' + t('auth.required' as any) || 'Required')
+toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
       return
     }
 
@@ -142,7 +142,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   {t('auth.submitting') || 'Gönderiliyor...'}
                 </div>
               ) : (
-t('auth.sendResetLink' as any) || 'Şifre Sıfırlama Linki Gönder'
+t('auth.sendResetLink') || 'Şifre Sıfırlama Linki Gönder'
               )}
             </button>
           </form>

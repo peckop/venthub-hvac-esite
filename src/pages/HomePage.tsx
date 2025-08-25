@@ -63,7 +63,7 @@ export const HomePage: React.FC = () => {
   }
 
   // Global lead modal trigger for HeroSection button
-  ;(window as any).openLeadModal = () => setLeadOpen(true)
+  ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
   if (loading) {
     return (
@@ -229,7 +229,7 @@ export const HomePage: React.FC = () => {
                 {t('common.exploreProducts')}
               </a>
               <button
-                onClick={() => (window as any).openLeadModal?.()}
+                onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
                 className="inline-flex items-center justify-center rounded-lg border border-primary-navy text-primary-navy px-5 py-2.5 font-semibold hover:bg-primary-navy hover:text-white transition"
               >
                 {t('common.getQuote')}

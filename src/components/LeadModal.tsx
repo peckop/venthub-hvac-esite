@@ -56,7 +56,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
     if (Object.keys(v).length > 0) return
 
     // payload örneği (ileride API'ye post edilebilir)
-    const payload = {
+    const _payload = {
       name,
       company,
       email,
@@ -102,7 +102,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
     // Yeni sekmeye açmayı deneyebiliriz; olmazsa mevcut sayfada
     try {
       window.location.href = mailto
-    } catch (_) {
+    } catch {
       // yedek
       window.open(mailto, '_blank')
     }

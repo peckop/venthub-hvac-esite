@@ -23,7 +23,7 @@ const ProductsPage: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [sortBy, setSortBy] = useState('name')
+  const [sortBy] = useState('name')
   const [searchQuery, setSearchQuery] = useState(q)
 
   useEffect(() => {
@@ -349,7 +349,7 @@ onClick={() => {
                 <p className="text-steel-gray mt-1">{t('products.helpCtaSubtitle')}</p>
               </div>
               <button
-                onClick={() => (window as any).openLeadModal?.()}
+                onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
                 className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
               >
                 {t('common.getQuote')}

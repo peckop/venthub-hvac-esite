@@ -333,7 +333,7 @@ export const CheckoutPage: React.FC = () => {
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [clearCart])
+  }, [clearCart, t])
 
   // İyzico token ile script'i yükle ve formu çalıştır. 8 sn içinde iframe gelmezse paymentPageUrl'e yönlendir.
   useEffect(() => {

@@ -61,7 +61,7 @@ export const HeroSection: React.FC = () => {
               </a>
               <button
                 type="button"
-                onClick={() => (window as any).openLeadModal && (window as any).openLeadModal()}
+                onClick={() => { const w = (window as unknown) as { openLeadModal?: () => void }; if (w.openLeadModal) w.openLeadModal() }}
                 className="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
               >
                 {t('common.getQuote')}

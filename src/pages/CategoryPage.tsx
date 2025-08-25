@@ -461,7 +461,7 @@ export const CategoryPage: React.FC = () => {
                   {[
                     {label: t('category.labelBrand'), key:'brand'},
                     {label: t('category.labelModel'), key:'sku'},
-                    {label: t('category.labelPrice'), key:'price', render:(v: any)=> `₺${parseFloat(v||'0').toLocaleString('tr-TR')}`},
+{label: t('category.labelPrice'), key:'price', render:(v: unknown)=> `₺${parseFloat(String(v ?? '0')).toLocaleString('tr-TR')}`},
                     {label: t('category.airflow'), key:'airflow_capacity'},
                     {label: t('category.pressure'), key:'pressure_rating'},
                     {label: t('category.noise'), key:'noise_level'},
@@ -470,7 +470,7 @@ export const CategoryPage: React.FC = () => {
                       <td className="py-2 pr-4 font-medium text-industrial-gray">{row.label}</td>
                       {filteredProducts.filter(p=>compareIds.includes(p.id)).map(p=> (
                         <td key={p.id+String(row.key)} className="py-2 pr-4">
-                          {row.render ? row.render((p as any)[row.key]) : String((p as any)[row.key] ?? '-')}
+{row.render ? row.render((p as unknown as Record<string, unknown>)[row.key]) : String((p as unknown as Record<string, unknown>)[row.key] ?? '-')}
                         </td>
                       ))}
                     </tr>

@@ -148,7 +148,7 @@ export const OrdersPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [user, searchParams])
+  }, [user, searchParams, t])
 
   useEffect(() => {
     if (!authLoading && !user) {

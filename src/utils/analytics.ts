@@ -3,13 +3,13 @@
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void
-    dataLayer?: any[]
+    gtag?: (...args: unknown[]) => void
+    dataLayer?: unknown[]
     DEBUG_ANALYTICS?: boolean
   }
 }
 
-export function trackEvent(name: string, params: Record<string, any> = {}) {
+export function trackEvent(name: string, params: Record<string, unknown> = {}) {
   try {
     if (typeof window === 'undefined') return
     let delivered = false
@@ -22,15 +22,13 @@ export function trackEvent(name: string, params: Record<string, any> = {}) {
     }
     // Fallback / debug log (visible when in dev OR when explicitly enabled)
     if (!delivered && (process.env.NODE_ENV !== 'production' || window.DEBUG_ANALYTICS)) {
-      // eslint-disable-next-line no-console
       console.log('[analytics]', name, params)
     }
     // Optional: when DEBUG_ANALYTICS is enabled, always mirror to console
     if (window.DEBUG_ANALYTICS) {
-      // eslint-disable-next-line no-console
       console.log('[analytics->mirror]', name, params)
     }
-  } catch (_) {
+} catch {
     // swallow
   }
 }
