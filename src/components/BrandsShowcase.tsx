@@ -2,19 +2,20 @@ import React from 'react'
 import { HVAC_BRANDS } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nProvider'
 
 export const BrandsShowcase: React.FC = () => {
+  const { t } = useI18n()
   return (
     <section className="py-16 bg-light-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-industrial-gray mb-4">
-            Premium HVAC Markaları
+            {t('brands.sectionTitle')}
           </h2>
           <p className="text-xl text-steel-gray max-w-3xl mx-auto">
-            Dünya'nın önde gelen HVAC markalarının Türkiye distributörü olarak, 
-            en kaliteli havalandırma çözümlerini sunuyoruz.
+            {t('brands.sectionSubtitle')}
           </p>
         </div>
 
@@ -51,7 +52,7 @@ export const BrandsShowcase: React.FC = () => {
             to="/brands"
             className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
           >
-            Tüm Markaları Gör
+            {t('brands.viewAll')}
           </Link>
         </div>
       </div>

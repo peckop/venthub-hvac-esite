@@ -1,5 +1,6 @@
 import React from 'react'
 import { Lock, ShieldCheck, CreditCard } from 'lucide-react'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface SecurityRibbonProps {
   brandName?: string
@@ -12,6 +13,7 @@ export const SecurityRibbon: React.FC<SecurityRibbonProps> = ({
   providerName = 'iyzico',
   variant = 'banner',
 }) => {
+  const { t } = useI18n()
   const base =
     'rounded-xl border border-primary-navy/30 bg-white shadow-sm ' +
     (variant === 'banner' ? 'p-4 md:p-5' : 'p-3')
@@ -26,8 +28,8 @@ export const SecurityRibbon: React.FC<SecurityRibbonProps> = ({
             <Lock size={16} className="text-primary-navy" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-industrial-gray">Güvenli ödeme • {brandName}</div>
-            <div className="text-[11px] text-steel-gray">{providerName} altyapısı ile 256‑bit SSL şifreleme</div>
+            <div className="text-sm font-semibold text-industrial-gray">{t('checkout.securePaymentBrand', { brand: brandName })}</div>
+            <div className="text-[11px] text-steel-gray">{t('checkout.securePaymentProvider', { provider: providerName })}</div>
           </div>
         </div>
         <div className="flex items-center gap-2">

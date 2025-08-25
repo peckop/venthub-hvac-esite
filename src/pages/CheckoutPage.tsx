@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface CustomerInfo {
   name: string
@@ -27,6 +28,7 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Payment
+  const { t } = useI18n()
 
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
@@ -98,15 +100,15 @@ export const CheckoutPage: React.FC = () => {
   // Validation functions
   const validateCustomerInfo = () => {
     if (!customerInfo.name.trim()) {
-      toast.error('Ad Soyad alanı zorunludur')
+      toast.error(t('checkout.errors.nameRequired'))
       return false
     }
     if (!customerInfo.email.trim() || !customerInfo.email.includes('@')) {
-      toast.error('Geçerli bir e-posta adresi giriniz')
+      toast.error(t('checkout.errors.emailInvalid'))
       return false
     }
     if (!customerInfo.phone.trim()) {
-      toast.error('Telefon numarası zorunludur')
+      toast.error(t('checkout.errors.phoneRequired'))
       return false
     }
     return true
@@ -114,19 +116,19 @@ export const CheckoutPage: React.FC = () => {
 
   const validateAddress = (address: Address) => {
     if (!address.fullAddress.trim()) {
-      toast.error('Adres alanı zorunludur')
+      toast.error(t('checkout.errors.addressRequired'))
       return false
     }
     if (!address.city.trim()) {
-      toast.error('Şehir alanı zorunludur')
+      toast.error(t('checkout.errors.cityRequired'))
       return false
     }
     if (!address.district.trim()) {
-      toast.error('İlçe alanı zorunludur')
+      toast.error(t('checkout.errors.districtRequired'))
       return false
     }
     if (!address.postalCode.trim()) {
-      toast.error('Posta kodu zorunludur')
+      toast.error(t('checkout.errors.postalRequired'))
       return false
     }
     return true
@@ -137,22 +139,22 @@ export const CheckoutPage: React.FC = () => {
   const validateInvoiceAndConsents = () => {
     if (invoiceType === 'individual') {
       const t = (invoiceInfo.tckn || '').trim()
-      if (!t) { toast.error('Bireysel fatura için TCKN zorunludur'); return false }
-      if (!(isDigits(t) && t.length === 11)) { toast.error('TCKN 11 haneli olmalıdır'); return false }
+      if (!t) { toast.error(t('checkout.errors.tcknRequired')); return false }
+      if (!(isDigits(t) && t.length === 11)) { toast.error(t('checkout.errors.tcknFormat')); return false }
     } else {
       const vkn = (invoiceInfo.vkn || '').trim()
       const companyName = (invoiceInfo.companyName || '').trim()
       const taxOffice = (invoiceInfo.taxOffice || '').trim()
-      if (!companyName) { toast.error('Ticari fatura için Şirket Ünvanı zorunludur'); return false }
-      if (!vkn) { toast.error('Ticari fatura için VKN zorunludur'); return false }
-      if (!(isDigits(vkn) && vkn.length === 10)) { toast.error('VKN 10 haneli olmalıdır'); return false }
-      if (!taxOffice) { toast.error('Ticari fatura için Vergi Dairesi zorunludur'); return false }
+      if (!companyName) { toast.error(t('checkout.errors.companyRequired')); return false }
+      if (!vkn) { toast.error(t('checkout.errors.vknRequired')); return false }
+      if (!(isDigits(vkn) && vkn.length === 10)) { toast.error(t('checkout.errors.vknFormat')); return false }
+      if (!taxOffice) { toast.error(t('checkout.errors.taxOfficeRequired')); return false }
     }
 
-    if (!legalConsents.kvkk) { toast.error('KVKK Aydınlatma Metni onayı zorunludur'); return false }
-    if (!legalConsents.distanceSales) { toast.error('Mesafeli Satış Sözleşmesi onayı zorunludur'); return false }
-    if (!legalConsents.preInfo) { toast.error('Ön Bilgilendirme Formu onayı zorunludur'); return false }
-    if (!legalConsents.orderConfirm) { toast.error('Siparişi onaylıyorum kutusunu işaretleyin'); return false }
+    if (!legalConsents.kvkk) { toast.error(t('checkout.errors.kvkkRequired')); return false }
+    if (!legalConsents.distanceSales) { toast.error(t('checkout.errors.distanceSalesRequired')); return false }
+    if (!legalConsents.preInfo) { toast.error(t('checkout.errors.preInfoRequired')); return false }
+    if (!legalConsents.orderConfirm) { toast.error(t('checkout.errors.orderConfirmRequired')); return false }
 
     return true
   }
@@ -282,7 +284,7 @@ export const CheckoutPage: React.FC = () => {
           setOrderId(data.data.orderId || data.data.conversationId || 'completed_order');
           setOrderCompleted(true);
           clearCart();
-          toast.success('✅ Ödeme başarıyla tamamlandı!');
+          toast.success(t('checkout.paymentSuccess'));
         } else {
           throw new Error('Ödeme başlatma hatası: Geçersiz yanıt');
         }
@@ -300,11 +302,11 @@ export const CheckoutPage: React.FC = () => {
       })
       
       // More detailed error message
-      let errorMessage = 'Ödeme başlatma sırasında hata oluştu'
+      let errorMessage = t('checkout.errors.paymentInit')
       if (err?.message && err.message.includes('VALIDATION_ERROR')) {
-        errorMessage = 'Form bilgilerinde eksiklik var. Lütfen kontrol edin.'
+        errorMessage = t('checkout.errors.validation')
       } else if (err?.message && err.message.includes('DATABASE_ERROR')) {
-        errorMessage = 'Veritabanı hatası. Lütfen tekrar deneyin.'
+        errorMessage = t('checkout.errors.database')
       } else if (err?.message) {
         errorMessage = err.message
       }
@@ -322,9 +324,9 @@ export const CheckoutPage: React.FC = () => {
       if (event.data.event === 'payment_success') {
         setOrderCompleted(true)
         clearCart()
-        toast.success('Ödeme başarıyla tamamlandı!')
+        toast.success(t('checkout.paymentSuccess'))
       } else if (event.data.event === 'payment_error') {
-        toast.error(event.data.error || 'Ödeme sırasında hata oluştu')
+        toast.error(event.data.error || t('checkout.paymentError'))
         setStep(2)
       }
     }
@@ -450,17 +452,17 @@ export const CheckoutPage: React.FC = () => {
       <div className="min-h-screen bg-light-gray flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            Sepetiniz Boş
+            {t('checkout.emptyCart.title')}
           </h2>
           <p className="text-steel-gray mb-6">
-            Ödeme sayfasına erişmek için sepetinizde ürün bulunması gerekir.
+            {t('checkout.emptyCart.desc')}
           </p>
           <Link
             to="/"
             className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
           >
             <ArrowLeft size={20} className="mr-2" />
-            Alışverişe Başla
+            {t('checkout.emptyCart.startShopping')}
           </Link>
         </div>
       </div>
@@ -519,7 +521,7 @@ export const CheckoutPage: React.FC = () => {
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Güvenli ödeme başlatılıyor"
+            aria-label={t('checkout.overlay.dialogLabel')}
             className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-0 w-[92%] max-w-xl overflow-hidden"
           >
             {/* Header */}
@@ -529,9 +531,9 @@ export const CheckoutPage: React.FC = () => {
                   <Lock className="text-primary-navy" size={18} />
                 </div>
                 <div>
-                  <div className="text-industrial-gray font-semibold">Güvenli ödeme başlatılıyor…</div>
+                  <div className="text-industrial-gray font-semibold">{t('checkout.overlay.header')}</div>
                   <div className="text-xs text-steel-gray" aria-live="polite">
-                    {overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}
+                    {overlayStep === 1 ? t('checkout.overlay.starting') : overlayStep === 2 ? t('checkout.overlay.secureForm') : t('checkout.overlay.bank3d')}
                   </div>
                 </div>
               </div>
@@ -546,15 +548,15 @@ export const CheckoutPage: React.FC = () => {
                 <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-primary-navy border-t-transparent animate-spin" aria-hidden />
               </div>
               <div className="mt-4 grid grid-cols-3 text-xs text-industrial-gray">
-                <div className={`text-center ${overlayStep >= 1 ? 'font-medium text-primary-navy' : ''}`}>Başlatılıyor</div>
-                <div className={`text-center ${overlayStep >= 2 ? 'font-medium text-primary-navy' : ''}`}>Güvenli form</div>
-                <div className={`text-center ${overlayStep >= 3 ? 'font-medium text-primary-navy' : ''}`}>Banka 3D</div>
+                <div className={`text-center ${overlayStep >= 1 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageInit')}</div>
+                <div className={`text-center ${overlayStep >= 2 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageForm')}</div>
+                <div className={`text-center ${overlayStep >= 3 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageBank')}</div>
               </div>
               <div className="mt-3 w-full h-2 bg-light-gray/70 rounded-full overflow-hidden" aria-hidden>
                 <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-500" style={{ width: `${overlayPercent}%` }} />
               </div>
               <div className="mt-3 text-[11px] text-steel-gray">
-                Bu işlem sırasında sayfayı kapatmayın veya geri tuşuna basmayın. İşlem birkaç saniye sürebilir.
+                {t('checkout.overlay.dontClose')}
               </div>
             </div>
           </div>
@@ -568,10 +570,10 @@ export const CheckoutPage: React.FC = () => {
             className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
-            <span>Sepete Dön</span>
+            <span>{t('checkout.backToCart')}</span>
           </button>
           <h1 className="text-3xl font-bold text-industrial-gray">
-            Ödeme
+            {t('checkout.title')}
           </h1>
         </div>
 
@@ -586,7 +588,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="flex flex-col items-center min-w-[110px]">
                   <div className={`w-8 h-8 rounded-full font-semibold text-sm flex items-center justify-center ${step >= n ? 'bg-primary-navy text-white' : 'bg-light-gray text-steel-gray border-2 border-light-gray'}`}>{n}</div>
                   <span className={`mt-1 text-sm ${step >= n ? 'text-primary-navy font-medium' : 'text-steel-gray'}`}>
-                    {n===1 ? 'Kişisel Bilgiler' : n===2 ? 'Adres Bilgileri' : 'Ödeme'}
+                    {n===1 ? t('checkout.steps.step1') : n===2 ? t('checkout.steps.step2') : t('checkout.steps.step3')}
                   </span>
                 </div>
                 {idx < 2 && (
@@ -608,24 +610,24 @@ export const CheckoutPage: React.FC = () => {
                     <div className="bg-primary-navy text-white p-2 rounded-lg">
                       <CreditCard size={20} />
                     </div>
-                    <h2 className="text-xl font-semibold text-industrial-gray">Ödeme İşlemi</h2>
+                    <h2 className="text-xl font-semibold text-industrial-gray">{t('checkout.paymentSectionTitle')}</h2>
                   </div>
                   {/* Güvenli ödeme üst barı (her zaman görünür) */}
                   <div className="rounded-lg border border-primary-navy/30 bg-white/90 p-3 flex flex-col gap-2 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-primary-navy">
                         <Lock size={18} />
-                        <div className="text-sm font-semibold">Güvenli ödeme • Venthub HVAC</div>
+                        <div className="text-sm font-semibold">{t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })}</div>
                       </div>
-                      <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
+                      <div className="text-[11px] text-steel-gray">{t('checkout.securePaymentProvider', { provider: 'iyzico' })}</div>
                     </div>
                     {/* İlerleme barı */}
                     <div className="w-full h-2 bg-light-gray/80 rounded-full overflow-hidden" aria-hidden>
                       <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all" style={{ width: `${progressPct}%` }} />
                     </div>
-                    <div className="text-[11px] text-steel-gray">{overlayStep === 1 ? 'Ödeme başlatılıyor' : overlayStep === 2 ? 'Güvenli form yükleniyor' : 'Banka 3D doğrulaması'}</div>
+                    <div className="text-[11px] text-steel-gray">{overlayStep === 1 ? t('checkout.overlay.starting') : overlayStep === 2 ? t('checkout.overlay.secureForm') : t('checkout.overlay.bank3d')}</div>
                   </div>
-                  <p className="text-steel-gray text-sm">Ödeme formu yükleniyor. Lütfen 3D doğrulamayı tamamlayın. İşlem bittiğinde bu sayfa otomatik olarak güncellenecektir.</p>
+                  <p className="text-steel-gray text-sm">{t('checkout.paymentLoading')}</p>
                   <div className="mt-4">
                     {iyzToken ? (
                       <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]">
@@ -636,7 +638,7 @@ export const CheckoutPage: React.FC = () => {
                     ) : (
                       <div className="flex items-center gap-3 text-steel-gray">
                         <CheckCircle className="animate-pulse" />
-                        <span>Form hazırlanıyor...</span>
+                        <span>{t('checkout.formPreparing')}</span>
                       </div>
                     )}
                     <div className="mt-3">
@@ -645,13 +647,13 @@ export const CheckoutPage: React.FC = () => {
                         type="button"
                         className="text-sm text-primary-navy hover:text-secondary-blue"
                       >
-                        Kod gelmedi mi?
+                        {t('checkout.help.smsTitle')}
                       </button>
                       {showHelp && (
                         <div className="mt-2 text-xs text-steel-gray space-y-1 bg-air-blue/20 rounded-lg p-3">
-                          <p>• 30–60 sn bekleyip tekrar deneyin (bankanız gecikmeli SMS gönderebilir).</p>
-                          <p>• Telefonunuzda uçak modu/sinyal sorunları yoksa farklı karta/cihaza deneyebilirsiniz.</p>
-                          <p>• Numara doğruluğunu kontrol edin ve bankanızla iletişime geçin.</p>
+                          <p>• {t('checkout.help.tip1')}</p>
+                          <p>• {t('checkout.help.tip2')}</p>
+                          <p>• {t('checkout.help.tip3')}</p>
                         </div>
                       )}
                     </div>
@@ -667,57 +669,57 @@ export const CheckoutPage: React.FC = () => {
                       <User size={20} />
                     </div>
                     <h2 className="text-xl font-semibold text-industrial-gray">
-                      Kişisel Bilgileriniz
+                      {t('checkout.personal.title')}
                     </h2>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        Ad Soyad *
+                        {t('checkout.personal.nameLabel')}
                       </label>
                       <input
                         type="text"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                        placeholder="Adınız ve soyadınız"
+                        placeholder={t('checkout.personal.namePlaceholder')}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        E-posta Adresi *
+                        {t('checkout.personal.emailLabel')}
                       </label>
                       <input
                         type="email"
                         value={customerInfo.email}
                         onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                        placeholder="ornek@email.com"
+                        placeholder={t('checkout.personal.emailPlaceholder')}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        Telefon Numarası *
+                        {t('checkout.personal.phoneLabel')}
                       </label>
                       <input
                         type="tel"
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                        placeholder="+90 (5xx) xxx xx xx"
+                        placeholder={t('checkout.personal.phonePlaceholder')}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        T.C. Kimlik No (Opsiyonel)
+                        {t('checkout.personal.idLabel')}
                       </label>
                       <input
                         type="text"
                         value={customerInfo.identityNumber}
                         onChange={(e) => setCustomerInfo({...customerInfo, identityNumber: e.target.value})}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                        placeholder="12345678901"
+                        placeholder={t('checkout.personal.idPlaceholder')}
                         maxLength={11}
                       />
                     </div>
@@ -735,57 +737,57 @@ export const CheckoutPage: React.FC = () => {
                         <MapPin size={20} />
                       </div>
                       <h2 className="text-xl font-semibold text-industrial-gray">
-                        Teslimat Adresi
+                        {t('checkout.shipping.title')}
                       </h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          Adres *
+                          {t('checkout.shipping.addressLabel')}
                         </label>
                         <textarea
                           value={shippingAddress.fullAddress}
                           onChange={(e) => setShippingAddress({...shippingAddress, fullAddress: e.target.value})}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           rows={3}
-                          placeholder="Mahalle, sokak, apartman/site adı, kapı no, daire no"
+                          placeholder={t('checkout.shipping.addressPlaceholder')}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          Şehir *
+                          {t('checkout.shipping.cityLabel')}
                         </label>
                         <input
                           type="text"
                           value={shippingAddress.city}
                           onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                          placeholder="İstanbul"
+                          placeholder={t('checkout.shipping.cityPlaceholder')}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          İlçe *
+                          {t('checkout.shipping.districtLabel')}
                         </label>
                         <input
                           type="text"
                           value={shippingAddress.district}
                           onChange={(e) => setShippingAddress({...shippingAddress, district: e.target.value})}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                          placeholder="Pendik"
+                          placeholder={t('checkout.shipping.districtPlaceholder')}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          Posta Kodu *
+                          {t('checkout.shipping.postalLabel')}
                         </label>
                         <input
                           type="text"
                           value={shippingAddress.postalCode}
                           onChange={(e) => setShippingAddress({...shippingAddress, postalCode: e.target.value})}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                          placeholder="34890"
+                          placeholder={t('checkout.shipping.postalPlaceholder')}
                         />
                       </div>
                     </div>
@@ -795,7 +797,7 @@ export const CheckoutPage: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-industrial-gray">
-                        Fatura Adresi
+                        {t('checkout.billing.title')}
                       </h3>
                       <label className="flex items-center space-x-2 cursor-pointer">
                         <input
@@ -805,7 +807,7 @@ export const CheckoutPage: React.FC = () => {
                           className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          Teslimat adresi ile aynı
+                          {t('checkout.billing.sameAsShipping')}
                         </span>
                       </label>
                     </div>
@@ -814,50 +816,50 @@ export const CheckoutPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            Fatura Adresi *
+                            {t('checkout.billing.addressLabel')}
                           </label>
                           <textarea
                             value={billingAddress.fullAddress}
                             onChange={(e) => setBillingAddress({...billingAddress, fullAddress: e.target.value})}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             rows={3}
-                            placeholder="Fatura adresi"
+                            placeholder={t('checkout.billing.addressPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            Şehir *
+                            {t('checkout.billing.cityLabel')}
                           </label>
                           <input
                             type="text"
                             value={billingAddress.city}
                             onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="Şehir"
+                            placeholder={t('checkout.billing.cityPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            İlçe *
+                            {t('checkout.billing.districtLabel')}
                           </label>
                           <input
                             type="text"
                             value={billingAddress.district}
                             onChange={(e) => setBillingAddress({...billingAddress, district: e.target.value})}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="İlçe"
+                            placeholder={t('checkout.billing.districtPlaceholder')}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            Posta Kodu *
+                            {t('checkout.billing.postalLabel')}
                           </label>
                           <input
                             type="text"
                             value={billingAddress.postalCode}
                             onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="Posta kodu"
+                            placeholder={t('checkout.billing.postalPlaceholder')}
                           />
                         </div>
                       </div>
@@ -866,7 +868,7 @@ export const CheckoutPage: React.FC = () => {
 
                   {/* Invoice Type & Info */}
                   <div className="mt-10">
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-4">Fatura Tipi ve Bilgileri</h3>
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-4">{t('checkout.invoice.title')}</h3>
                     {/* Tip seçimi */}
                     <div className="flex items-center gap-6 mb-4">
                       <label className="flex items-center gap-2">
@@ -878,7 +880,7 @@ export const CheckoutPage: React.FC = () => {
                           onChange={() => { setInvoiceType('individual'); setInvoiceInfo({ type: 'individual', tckn: '' }) }}
                           className="text-primary-navy focus:ring-primary-navy"
                         />
-                        <span className="text-sm text-industrial-gray">Bireysel</span>
+                        <span className="text-sm text-industrial-gray">{t('checkout.invoice.individual')}</span>
                       </label>
                       <label className="flex items-center gap-2">
                         <input
@@ -889,7 +891,7 @@ export const CheckoutPage: React.FC = () => {
                           onChange={() => { setInvoiceType('corporate'); setInvoiceInfo({ type: 'corporate', companyName: '', vkn: '', taxOffice: '' }) }}
                           className="text-primary-navy focus:ring-primary-navy"
                         />
-                        <span className="text-sm text-industrial-gray">Ticari</span>
+                        <span className="text-sm text-industrial-gray">{t('checkout.invoice.corporate')}</span>
                       </label>
                     </div>
 
@@ -897,14 +899,14 @@ export const CheckoutPage: React.FC = () => {
                     {invoiceType === 'individual' ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">T.C. Kimlik No *</label>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.tcknLabel')}</label>
                           <input
                             type="text"
                             inputMode="numeric"
                             value={invoiceInfo.tckn || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="11 haneli TCKN"
+                            placeholder={t('checkout.invoice.tcknPlaceholder')}
                             maxLength={11}
                           />
                         </div>
@@ -912,35 +914,35 @@ export const CheckoutPage: React.FC = () => {
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">Şirket Ünvanı *</label>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.companyLabel')}</label>
                           <input
                             type="text"
                             value={invoiceInfo.companyName || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="Ör: Venthub Mühendislik A.Ş."
+                            placeholder={t('checkout.invoice.companyPlaceholder')}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">VKN *</label>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.vknLabel')}</label>
                           <input
                             type="text"
                             inputMode="numeric"
                             value={invoiceInfo.vkn || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="10 haneli Vergi Kimlik No"
+                            placeholder={t('checkout.invoice.vknPlaceholder')}
                             maxLength={10}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">Vergi Dairesi *</label>
+                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.taxOfficeLabel')}</label>
                           <input
                             type="text"
                             value={invoiceInfo.taxOffice || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                            placeholder="Ör: Kadıköy"
+                            placeholder={t('checkout.invoice.taxOfficePlaceholder')}
                           />
                         </div>
                         <div className="flex items-center mt-2">
@@ -951,7 +953,7 @@ export const CheckoutPage: React.FC = () => {
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, eInvoice: e.target.checked })}
                             className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                           />
-                          <label htmlFor="einvoice" className="ml-2 text-sm text-steel-gray">e-Fatura mükellefiyim</label>
+                          <label htmlFor="einvoice" className="ml-2 text-sm text-steel-gray">{t('checkout.invoice.eInvoice')}</label>
                         </div>
                       </div>
                     )}
@@ -959,7 +961,7 @@ export const CheckoutPage: React.FC = () => {
 
                   {/* Legal Consents */}
                   <div className="mt-10">
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">Yasal Onaylar</h3>
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('checkout.consents.title')}</h3>
                     <div className="space-y-2">
                       <label className="flex items-start gap-3">
                         <input
@@ -969,7 +971,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          <Link to="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">KVKK Aydınlatma Metni</Link>'ni okudum ve kabul ediyorum.
+                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -980,7 +982,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">Mesafeli Satış Sözleşmesi</Link>'ni okudum ve kabul ediyorum.
+                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -991,7 +993,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          <Link to="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">Ön Bilgilendirme Formu</Link>'nu okudum ve kabul ediyorum.
+                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -1002,7 +1004,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          Siparişi onaylıyor, ürün ve teslimat bilgilerinin doğruluğunu kabul ediyorum.
+                          {t('checkout.consents.orderConfirmText')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -1013,7 +1015,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          Kampanya ve fırsatlardan haberdar olmak için ticari ileti izni veriyorum. (Opsiyonel)
+                          {t('checkout.consents.marketingText')}
                         </span>
                       </label>
                     </div>
@@ -1029,13 +1031,13 @@ export const CheckoutPage: React.FC = () => {
                     disabled={step === 1}
                     className="px-6 py-3 border-2 border-light-gray text-steel-gray rounded-lg hover:border-primary-navy hover:text-primary-navy transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Geri
+                    {t('checkout.nav.back')}
                   </button>
                   <button
                     onClick={handleNextStep}
                     className="px-8 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
                   >
-                    {step === 2 ? 'Ödemeye Geç' : 'Devam Et'}
+                    {step === 2 ? t('checkout.nav.proceedPayment') : t('checkout.nav.next')}
                   </button>
                 </div>
               )}
@@ -1046,7 +1048,7 @@ export const CheckoutPage: React.FC = () => {
                     onClick={handlePrevStep}
                     className="px-6 py-3 border-2 border-light-gray text-steel-gray rounded-lg hover:border-primary-navy hover:text-primary-navy transition-colors"
                   >
-                    Adres Bilgilerine Dön
+                    {t('checkout.nav.backToAddress')}
                   </button>
                 </div>
               )}
@@ -1057,7 +1059,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 sticky top-8">
               <h3 className="text-lg font-semibold text-industrial-gray mb-4">
-                Sipariş Özeti
+                {t('checkout.summaryTitle')}
               </h3>
 
               {/* Items */}
@@ -1065,14 +1067,14 @@ export const CheckoutPage: React.FC = () => {
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-light-gray rounded-lg flex items-center justify-center">
-                      <span className="text-xs text-steel-gray">Ürün</span>
+                      <span className="text-xs text-steel-gray">{t('checkout.summaryThumb')}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-industrial-gray text-sm truncate">
                         {item.product.name}
                       </p>
                       <p className="text-xs text-steel-gray">
-                        {item.quantity} adet x ₺{parseFloat(item.product.price).toLocaleString('tr-TR')}
+                        {item.quantity} {t('orders.qtyCol')} x ₺{parseFloat(item.product.price).toLocaleString('tr-TR')}
                       </p>
                     </div>
                     <div className="text-sm font-medium text-industrial-gray">
@@ -1085,20 +1087,20 @@ export const CheckoutPage: React.FC = () => {
               {/* Totals */}
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-steel-gray">
-                  <span>Ara Toplam</span>
+                  <span>{t('cart.subtotal')}</span>
                   <span>₺{totalAmount.toLocaleString('tr-TR')}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
-                  <span>KDV (%20, dahil)</span>
+                  <span>{t('cart.vatIncluded')}</span>
                   <span>₺{vatAmount.toLocaleString('tr-TR')}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
-                  <span>Kargo</span>
-                  <span className="text-success-green">Bedava</span>
+                  <span>{t('cart.shipping')}</span>
+                  <span className="text-success-green">{t('cart.free')}</span>
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg font-semibold text-industrial-gray">
-                  <span>Toplam</span>
+                  <span>{t('cart.total')}</span>
                   <span className="text-primary-navy">
                     ₺{finalAmount.toLocaleString('tr-TR')}
                   </span>
@@ -1112,7 +1114,7 @@ export const CheckoutPage: React.FC = () => {
                   <span className="text-sm font-medium">256-bit SSL</span>
                 </div>
                 <p className="text-xs text-steel-gray">
-                  Ödeme bilgileriniz güvenli bir şekilde şifrelenmektedir
+                  {t('checkout.security.secureNote')}
                 </p>
               </div>
             </div>

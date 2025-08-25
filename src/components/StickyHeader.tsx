@@ -5,6 +5,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import { searchProducts, Product } from '../lib/supabase'
 import MegaMenu from './MegaMenu'
+import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
 
 interface StickyHeaderProps {
@@ -12,6 +13,7 @@ interface StickyHeaderProps {
 }
 
 export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
+  const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Product[]>([])
@@ -68,7 +70,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
       setIsSearchOpen(false)
     }
@@ -84,7 +86,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     <>
       {/* Skip to main content link for accessibility */}
       <a href="#main-content" className="skip-link">
-        Ana içeriğe geç
+        {t('common.skipToContent')}
       </a>
       
       {/* Main Header */}
@@ -113,34 +115,34 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30"
               >
                 <Menu size={18} className="group-hover:rotate-180 transition-transform duration-300" />
-                <span className="font-medium">Kategoriler</span>
+                <span className="font-medium">{t('common.categories')}</span>
               </button>
               <Link
-                to="/products"
+                to="/products?all=1"
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
               >
-                Ürünler
+                {t('common.products')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/brands"
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
               >
-                Markalar
+                {t('common.brands')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/about"
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
               >
-                Hakkımızda
+                {t('common.about')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/contact"
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
               >
-                İletişim
+                {t('common.contact')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
             </nav>
@@ -152,7 +154,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors duration-200" size={18} />
                   <input
                     type="text"
-                    placeholder="Ürün, marka veya model ara..."
+                    placeholder={t('common.searchHeaderPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-300 shadow-sm hover:shadow-md"
@@ -228,7 +230,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                         <div className="p-1">
                           <div className="px-4 py-3 border-b border-gray-100">
                             <div className="text-sm font-medium text-industrial-gray">
-                              {user.user_metadata?.full_name || 'Kullanıcı'}
+                              {user.user_metadata?.full_name || 'User'}
                             </div>
                             <div className="text-xs text-steel-gray">
                               {user.email}
@@ -240,14 +242,14 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
                           >
                             <Package size={16} />
-                            <span>Siparişlerim</span>
+                            <span>{t('common.myOrders')}</span>
                           </Link>
                           <button
                             onClick={handleSignOut}
                             className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-steel-gray hover:text-red-600 hover:bg-red-50/50 transition-all duration-200 rounded-lg m-1"
                           >
                             <LogOut size={16} />
-                            <span>Çıkış Yap</span>
+                            <span>{t('common.signOut')}</span>
                           </button>
                         </div>
                       </div>
@@ -259,13 +261,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       to="/auth/login"
                       className="hidden lg:block text-sm text-steel-gray hover:text-primary-navy font-medium transition-colors px-3 py-2"
                     >
-                      Giriş Yap
+                      {t('common.signIn')}
                     </Link>
                     <Link
                       to="/auth/register"
                       className="bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy text-white text-sm font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                     >
-                      Kayıt Ol
+                      {t('common.signUp')}
                     </Link>
                     <Link
                       to="/auth/login"

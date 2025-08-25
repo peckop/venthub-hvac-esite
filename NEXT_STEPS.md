@@ -49,6 +49,23 @@ This document tracks the current state, prioritized next tasks, and useful comma
 - Erişilebilirlik ve Lighthouse turu.
 - Basit e2e happy‑path (Playwright) ve smoke testleri.
 
+## Content ops: Uygulama kartları yönetimi
+- Konfig dosyası: src/config/applications.ts
+  - ApplicationCard alanları: key, title, subtitle, href, icon, accent, active
+  - Aktif kartlar: APPLICATION_CARDS.filter(c => c.active)
+  - “Endüstriyel Mutfak” kartı şimdilik active:false; açmak için true yapmanız yeterli.
+- UI yardımcıları: src/utils/applicationUi.tsx
+  - iconFor(icon, size): Lucide ikon mappingi
+  - accentOverlayClass(accent): gradient overlay sınıfı
+  - gridColsClass(count): bilinen Tailwind sınıflarına map (dynamic class yok)
+- Kullanım yerleri:
+  - HomePage.tsx: Hero altındaki “Uygulamaya Göre Çözümler”
+  - ProductsPage.tsx: Keşfet modundaki “Uygulamaya Göre Çözümler” (id=by-application)
+- Notlar:
+  - Tailwind purge için dinamik sınıflar kullanılmadı; gridColsClass sayıyı bilinen sınıflara çevirir.
+  - Kartları yeniden sıralamak için APPLICATION_CARDS dizisindeki sıralamayı değiştirin.
+  - İleride i18n yapılırsa title/subtitle sözlüğe taşınabilir; konfig anahtarları sabit kalır.
+
 ## Commands cheat‑sheet
 - Recent work and diffs
 ```bash path=null start=null

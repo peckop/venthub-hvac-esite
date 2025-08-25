@@ -1,31 +1,47 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { getAllProducts, getCategories, Product, Category } from '../lib/supabase'
+import { Link, useLocation } from 'react-router-dom'
+import { getProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
-import { Filter, Grid, List, Search } from 'lucide-react'
+import BrandsShowcase from '../components/BrandsShowcase'
+import { Grid, List, Search, Star, Clock, BadgeCheck, ShieldCheck, Layers } from 'lucide-react'
+import { getActiveApplicationCards } from '../config/applications'
+import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
+import { trackEvent } from '../utils/analytics'
+import Seo from '../components/Seo'
+import { useI18n } from '../i18n/I18nProvider'
 
 const ProductsPage: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([])
+  const location = useLocation()
+  const params = new URLSearchParams(location.search)
+  const q = params.get('q')?.trim() || ''
+  const { t } = useI18n()
+
+  const [featured, setFeatured] = useState<Product[]>([])
+  const [newProducts, setNewProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [searchResults, setSearchResults] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState('name')
-  const [filterCategory, setFilterCategory] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' })
+  const [searchQuery, setSearchQuery] = useState(q)
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true)
-        const [productsData, categoriesData] = await Promise.all([
-          getAllProducts(),
-          getCategories()
+        const [featuredData, productsData, categoriesData] = await Promise.all([
+          getFeaturedProducts(),
+          getProducts(),
+          getCategories(),
         ])
-        setProducts(productsData)
+        setFeatured(featuredData)
+        // Tüm ürünler (aktif)
+        setAllProducts(productsData)
+        // Yeni ürünleri basitçe featured olmayan ilk 12 ürün olarak seçelim
+        const newItems = productsData.filter(p => !p.is_featured).slice(0, 12)
+        setNewProducts(newItems)
         setCategories(categoriesData)
-        setFilteredProducts(productsData)
       } catch (error) {
         console.error('Error fetching products:', error)
       } finally {
@@ -36,56 +52,32 @@ const ProductsPage: React.FC = () => {
     fetchData()
   }, [])
 
-  // Filter and sort products
+  // Arama sonuçlarını (varsa) yükle
   useEffect(() => {
-    let filtered = [...products]
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }
-
-    // Category filter
-    if (filterCategory) {
-      filtered = filtered.filter(product => product.category_id === filterCategory)
-    }
-
-    // Price range filter
-    if (priceRange.min) {
-      filtered = filtered.filter(product => parseFloat(product.price) >= parseFloat(priceRange.min))
-    }
-    if (priceRange.max) {
-      filtered = filtered.filter(product => parseFloat(product.price) <= parseFloat(priceRange.max))
-    }
-
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'price-low':
-          return parseFloat(a.price) - parseFloat(b.price)
-        case 'price-high':
-          return parseFloat(b.price) - parseFloat(a.price)
-        case 'name':
-        default:
-          return a.name.localeCompare(b.name, 'tr')
+    let active = true
+    async function run() {
+      if (!searchQuery) {
+        setSearchResults([])
+        return
       }
-    })
+      try {
+        const results = await searchProducts(searchQuery)
+        if (active) setSearchResults(results)
+      } catch (e) {
+        console.error('Search error:', e)
+        if (active) setSearchResults([])
+      }
+    }
+    run()
+    return () => { active = false }
+  }, [searchQuery])
 
-    setFilteredProducts(filtered)
-  }, [products, searchQuery, filterCategory, priceRange, sortBy])
-
-  const clearFilters = () => {
+  const clearSearch = () => {
     setSearchQuery('')
-    setFilterCategory('')
-    setPriceRange({ min: '', max: '' })
-    setSortBy('name')
   }
 
   const mainCategories = categories.filter(cat => cat.level === 0)
+  const applicationCards = getActiveApplicationCards()
 
   if (loading) {
     return (
@@ -102,178 +94,273 @@ const ProductsPage: React.FC = () => {
     )
   }
 
+  const isAll = params.get('all') === '1'
+  const canonicalUrl = `${window.location.origin}/products`
+  const noindex = Boolean(searchQuery) || isAll
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Seo
+        title={noindex ? `Search: ${searchQuery} | VentHub` : `${t('common.discover')} | VentHub`}
+        description={noindex ? `"${searchQuery}" search results` : 'VentHub Discover: featured, new products and popular categories'}
+        canonical={canonicalUrl}
+        noindex={noindex}
+      />
       {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-steel-gray mb-6">
-        <Link to="/" className="hover:text-primary-navy">Ana Sayfa</Link>
+      <div className="flex items-center text-sm text-steel-gray mb-4">
+        <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
         <span className="mx-2">/</span>
-        <span className="text-industrial-gray font-medium">Ürünler</span>
+        <span className="text-industrial-gray font-medium">{t('common.discoverPage')}</span>
       </div>
 
-      {/* Page Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-            Tüm Ürünler
-          </h1>
-          <p className="text-steel-gray">
-            {filteredProducts.length} ürün listeleniyor
-          </p>
+      {/* Keşfet / Tüm Ürünler toggle */}
+      <div className="mb-6">
+        <div className="inline-flex rounded-lg bg-light-gray p-1">
+          <Link to="/products" className={`px-4 py-2 rounded-md text-sm font-medium transition ${!isAll && !searchQuery ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.discover')}</Link>
+          <Link to="/products?all=1" className={`px-4 py-2 rounded-md text-sm font-medium transition ${isAll ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.allProducts')}</Link>
         </div>
+      </div>
 
-        {/* View Toggle & Sort */}
-        <div className="flex items-center space-x-4 mt-4 lg:mt-0">
-          <div className="flex bg-light-gray rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-white text-primary-navy shadow-sm'
-                  : 'text-steel-gray hover:text-primary-navy'
-              }`}
-            >
-              <Grid size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-white text-primary-navy shadow-sm'
-                  : 'text-steel-gray hover:text-primary-navy'
-              }`}
-            >
-              <List size={16} />
-            </button>
+      {/* Header + Search (yalnızca All veya Search modunda) */}
+      {(isAll || searchQuery) && (
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-industrial-gray mb-2">
+              {isAll ? t('common.allProducts') : 'Search Results'}
+            </h1>
+            <p className="text-steel-gray">
+              {isAll ? `${allProducts.length} ${t('products.itemsListed')}` : `${searchResults.length} ${t('products.resultsFound')}`}
+            </p>
           </div>
 
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-          >
-            <option value="name">İsme Göre (A-Z)</option>
-            <option value="price-low">Fiyat (Düşük-Yüksek)</option>
-            <option value="price-high">Fiyat (Yüksek-Düşük)</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Filters Sidebar */}
-        <div className="lg:w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg border border-light-gray p-6 sticky top-20">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-industrial-gray flex items-center">
-                <Filter size={18} className="mr-2" />
-                Filtreler
-              </h3>
+          <div className="flex items-center space-x-4 mt-4 lg:mt-0">
+            <div className="flex bg-light-gray rounded-lg p-1">
               <button
-                onClick={clearFilters}
-                className="text-sm text-steel-gray hover:text-primary-navy"
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-primary-navy shadow-sm'
+                    : 'text-steel-gray hover:text-primary-navy'
+                }`}
               >
-                Temizle
+                <Grid size={16} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-primary-navy shadow-sm'
+                    : 'text-steel-gray hover:text-primary-navy'
+                }`}
+              >
+                <List size={16} />
               </button>
             </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
+              <input
+                type="text"
+                placeholder={t('common.searchPlaceholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-72 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
-            {/* Search */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Ürün Ara
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
+      {/* Keşfet hero (yalnızca Keşfet modunda) */}
+      {!isAll && !searchQuery && (
+        <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
+          <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold leading-tight">{t('products.heroTitle')}</h1>
+              <p className="mt-3 text-white/90">{t('products.heroSubtitle')}</p>
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <Link to="/products?all=1" className="inline-flex items-center justify-center rounded-lg bg-white text-primary-navy px-5 py-2.5 font-semibold shadow-sm hover:bg-gray-100 transition">
+                  {t('common.seeAllProducts')}
+                </Link>
+                <a href="#by-application" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
+                  {t('common.selectByNeed')}
+                </a>
+              </div>
+              <div className="relative mt-6 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
                 <input
                   type="text"
-                  placeholder="Ürün adı, marka..."
+                  placeholder={t('common.searchPlaceholderLong')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+                  className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
                 />
               </div>
             </div>
-
-            {/* Category Filter */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Kategori
-              </label>
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-              >
-                <option value="">Tüm Kategoriler</option>
-                {mainCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Price Range */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Fiyat Aralığı
-              </label>
-              <div className="grid grid-cols-2 gap-2 min-w-0">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
-                  className="w-full min-w-0 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
-                  className="w-full min-w-0 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-                />
+            <div className="hidden lg:block">
+              <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
+                <span className="text-white/80">{t('products.discoverVisual')}</span>
               </div>
             </div>
           </div>
-        </div>
+          {/* Value props strip */}
+          <div className="bg-white/10 border-t border-white/20">
+            <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="flex items-center gap-3">
+                <BadgeCheck size={18} />
+                <span className="text-sm">{t('products.heroValue1')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <ShieldCheck size={18} />
+                <span className="text-sm">{t('products.heroValue2')}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Clock size={18} />
+                <span className="text-sm">{t('products.heroValue3')}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-        {/* Products Grid/List */}
-        <div className="flex-1">
-          <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl text-light-gray mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-                  Ürün Bulunamadı
-                </h3>
-                <p className="text-steel-gray mb-4">
-                  Aradığınız kriterlere uygun ürün bulunamadı.
-                </p>
-                <button
-                  onClick={clearFilters}
-                  className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors"
+      {/* All products modu */}
+      {isAll ? (
+        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
+          <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+            {([...allProducts].sort((a,b)=>{
+              switch (sortBy) {
+                case 'price-low': return parseFloat(a.price)-parseFloat(b.price)
+                case 'price-high': return parseFloat(b.price)-parseFloat(a.price)
+                case 'name':
+                default: return a.name.localeCompare(b.name, 'tr')
+              }
+            })).map((product) => (
+              <ProductCard key={product.id} product={product} layout={viewMode} />
+            ))}
+          </div>
+        </div>
+      ) : searchQuery ? (
+        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
+          {searchResults.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl text-light-gray mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
+                {t('common.notFound')}
+              </h3>
+              <button onClick={clearSearch} className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors">
+                {t('common.clearSearch')}
+              </button>
+            </div>
+          ) : (
+            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {searchResults.map((product) => (
+                <ProductCard key={product.id} product={product} layout={viewMode} />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Uygulama alanına göre keşfet - öne alındı */}
+          <section id="by-application" className="mb-12">
+            <div className="flex items-center mb-4">
+              <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.applicationTitle')}</h2>
+            </div>
+            <div className={`${gridColsClass(applicationCards.length)}`}>
+              {applicationCards.map((card) => (
+                <Link
+                  key={card.key}
+                  to={card.href}
+                  className="group relative overflow-hidden rounded-xl border border-light-gray bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition"
+onClick={() => {
+                    trackEvent('application_click', { key: card.key, source: 'products' })
+                  }}
                 >
-                  Filtreleri Temizle
-                </button>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
+                  <div className="p-5 relative z-10">
+                    <div className="flex items-center gap-2 text-primary-navy">
+                      {iconFor(card.icon, 18)}
+                      <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                    </div>
+                    <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
+                    <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Popüler kategoriler - daha belirgin görsel */}
+          {mainCategories.length > 0 && (
+            <section className="mb-12">
+              <div className="flex items-center mb-4">
+              <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.popularCategories')}</h2>
               </div>
-            ) : (
-              <div className={`grid gap-3 ${
-                viewMode === 'grid'
-                  ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                  : 'grid-cols-1'
-              }`}>
-                {filteredProducts.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product}
-                    highlightFeatured={false}
-                  />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {mainCategories.slice(0, 6).map((cat) => (
+                  <Link key={cat.id} to={`/category/${cat.slug}`} className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition">
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 text-primary-navy">
+                        <Layers size={16} />
+                        <div className="font-medium text-industrial-gray group-hover:text-primary-navy">{cat.name}</div>
+                      </div>
+                      <div className="text-xs text-steel-gray mt-1">{t('common.gotoCategory')} →</div>
+                    </div>
+                  </Link>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </section>
+          )}
+
+          {/* Öne çıkanlar */}
+          {featured.length > 0 && (
+            <section className="mb-12">
+              <div className="flex items-center mb-4">
+                <Star className="text-gold-accent mr-2" size={20} fill="currentColor" />
+                <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.featured')}</h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {featured.slice(0, 9).map((product) => (
+                  <ProductCard key={product.id} product={product} highlightFeatured layout={viewMode} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Yeni ürünler */}
+          {newProducts.length > 0 && (
+            <section className="mb-12">
+              <div className="flex items-center mb-4">
+                <Clock className="text-secondary-blue mr-2" size={20} />
+                <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.newProducts')}</h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {newProducts.slice(0, 9).map((product) => (
+                  <ProductCard key={product.id} product={product} layout={viewMode} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Yardım CTA */}
+          <section className="mb-12">
+            <div className="rounded-2xl border border-light-gray bg-gradient-to-r from-gray-50 to-white p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-industrial-gray">{t('products.helpCtaTitle')}</h3>
+                <p className="text-steel-gray mt-1">{t('products.helpCtaSubtitle')}</p>
+              </div>
+              <button
+                onClick={() => (window as any).openLeadModal?.()}
+                className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
+              >
+                {t('common.getQuote')}
+              </button>
+            </div>
+          </section>
+
+          {/* Markalar vitrin */}
+          <BrandsShowcase />
+        </>
+      )}
     </div>
   )
 }

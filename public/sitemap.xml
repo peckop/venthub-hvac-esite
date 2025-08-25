@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Ana sayfa -->
+  <url>
+    <loc>https://your-domain.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Keşfet (noindex modunda arama kullanır, ancak sayfa kendisi listelenebilir) -->
+  <url>
+    <loc>https://your-domain.com/products</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Markalar dizini -->
+  <url>
+    <loc>https://your-domain.com/brands</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Not: Temiz kategori ve ürün URL'lerini veri hazır olduğunda buraya ekleyin
+       Örnekler:
+       <url>
+         <loc>https://your-domain.com/category/fanlar</loc>
+         <changefreq>weekly</changefreq>
+         <priority>0.8</priority>
+       </url>
+       <url>
+         <loc>https://your-domain.com/product/PRODUCT_ID</loc>
+         <changefreq>weekly</changefreq>
+         <priority>0.6</priority>
+       </url>
+  -->
+</urlset>

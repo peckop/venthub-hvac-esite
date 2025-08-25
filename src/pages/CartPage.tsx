@@ -4,9 +4,12 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
+import { useI18n } from '../i18n/I18nProvider'
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
+
+  const { t } = useI18n()
 
   if (items.length === 0) {
     return (
@@ -16,18 +19,18 @@ export const CartPage: React.FC = () => {
             <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-sm">
               <ShoppingBag size={48} className="text-steel-gray" />
             </div>
-            <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-              Sepetiniz Boş
+              <h2 className="text-2xl font-bold text-industrial-gray mb-4">
+              {t('cart.emptyTitle')}
             </h2>
             <p className="text-steel-gray mb-8">
-              Henüz sepetinize ürün eklemediniz. Alışverişe başlamak için ürünlerimizi inceleyin.
+              {t('cart.emptyDesc')}
             </p>
             <Link
               to="/"
               className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
             >
               <ArrowLeft size={20} className="mr-2" />
-              Alışverişe Başla
+              {t('cart.startShopping')}
             </Link>
           </div>
         </div>
@@ -44,10 +47,10 @@ export const CartPage: React.FC = () => {
           {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-            Alışveriş Sepeti
+            {t('cart.title')}
           </h1>
           <p className="text-steel-gray">
-            {getCartCount()} ürün sepetinizde
+            {t('cart.countLabel', { count: getCartCount() })}
           </p>
         </div>
 
@@ -112,7 +115,7 @@ export const CartPage: React.FC = () => {
                     <button
                       onClick={() => removeFromCart(item.product.id)}
                       className="p-2 text-steel-gray hover:text-red-500 transition-colors"
-                      title="Ürünü Kaldır"
+                      title={t('cart.removeItem')}
                     >
                       <Trash2 size={20} />
                     </button>
@@ -127,7 +130,7 @@ export const CartPage: React.FC = () => {
                 onClick={clearCart}
                 className="text-steel-gray hover:text-red-500 text-sm transition-colors"
               >
-                Sepeti Temizle
+                {t('cart.clearCart')}
               </button>
             </div>
           </div>
@@ -136,30 +139,30 @@ export const CartPage: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 sticky top-8">
               <h2 className="text-xl font-semibold text-industrial-gray mb-6">
-                Sipariş Özeti
+                {t('cart.summary')}
               </h2>
 
               {/* Order Details */}
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-steel-gray">Ara Toplam</span>
+                  <span className="text-steel-gray">{t('cart.subtotal')}</span>
                   <span className="font-medium text-industrial-gray">
                     ₺{getCartTotal().toLocaleString('tr-TR')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-steel-gray">Kargo</span>
-                  <span className="text-success-green font-medium">Bedava</span>
+                  <span className="text-steel-gray">{t('cart.shipping')}</span>
+                  <span className="text-success-green font-medium">{t('cart.free')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-steel-gray">KDV (%20, dahil)</span>
+                  <span className="text-steel-gray">{t('cart.vatIncluded')}</span>
                   <span className="font-medium text-industrial-gray">
                     ₺{(getCartTotal() - getCartTotal() / 1.2).toLocaleString('tr-TR')}
                   </span>
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg">
-                  <span className="font-semibold text-industrial-gray">Toplam</span>
+                  <span className="font-semibold text-industrial-gray">{t('cart.total')}</span>
                   <span className="font-bold text-primary-navy">
                     ₺{getCartTotal().toLocaleString('tr-TR')}
                   </span>
@@ -171,7 +174,7 @@ export const CartPage: React.FC = () => {
                 to="/checkout"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
-                Siparişi Tamamla
+                {t('cart.checkout')}
               </Link>
 
               {/* Continue Shopping */}
@@ -179,13 +182,13 @@ export const CartPage: React.FC = () => {
                 to="/"
                 className="w-full mt-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
-                Alışverişe Devam Et
+                {t('cart.continueShopping')}
               </Link>
 
               {/* Security Info */}
               <div className="mt-6 p-4 bg-air-blue rounded-lg">
                 <p className="text-sm text-steel-gray text-center">
-                  🔒 Güvenli ödeme sistemi ile korunmaktadır
+                  {t('cart.securePayment')}
                 </p>
               </div>
             </div>

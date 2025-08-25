@@ -3,6 +3,7 @@ import { getCategories, Category } from '../lib/supabase'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Menu, X, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface MegaMenuProps {
   isOpen: boolean
@@ -10,6 +11,7 @@ interface MegaMenuProps {
 }
 
 export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
+  const { t } = useI18n()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -55,7 +57,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               <Menu size={20} className="text-white" />
             </div>
             <h3 className="text-xl font-bold text-industrial-gray">
-              Navigasyon Menüsü
+              {t('megamenu.navigation')}
             </h3>
           </div>
           <button
@@ -70,16 +72,16 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
         <div className="p-6 border-b border-gray-200/30">
           <div className="mb-4">
             <h4 className="text-sm font-bold text-steel-gray uppercase tracking-wider mb-3">
-              Hızlı Erişim
+              {t('megamenu.quickAccess')}
             </h4>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <Link
-              to="/products"
+              to="/products?all=1"
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-xl hover:from-secondary-blue hover:to-primary-navy transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <span className="font-bold">Ürünler</span>
+              <span className="font-bold">{t('common.products')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
@@ -87,7 +89,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-primary-navy/20 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
             >
-              <span className="font-bold">Markalar</span>
+              <span className="font-bold">{t('common.brands')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
@@ -95,7 +97,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
             >
-              <span className="font-bold">Hakkımızda</span>
+              <span className="font-bold">{t('common.about')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
@@ -103,7 +105,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
             >
-              <span className="font-bold">İletişim</span>
+              <span className="font-bold">{t('common.contact')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             <Link
@@ -111,7 +113,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <span className="font-bold">Sepetim</span>
+              <span className="font-bold">{t('megamenu.myCart')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </div>
@@ -120,7 +122,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
         {loading ? (
           <div className="p-12 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 border-4 border-primary-navy/20 border-t-primary-navy rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-steel-gray font-medium">Kategoriler yükleniyor...</p>
+            <p className="mt-4 text-steel-gray font-medium">{t('megamenu.loadingCategories')}</p>
           </div>
         ) : (
           <>
@@ -129,11 +131,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               <div className="flex items-center space-x-2">
                 <div className="w-1 h-6 bg-gradient-to-b from-primary-navy to-secondary-blue rounded-full"></div>
                 <h4 className="text-lg font-bold text-industrial-gray">
-                  Ürün Kategorileri
+                  {t('megamenu.productCategories')}
                 </h4>
               </div>
               <p className="text-sm text-steel-gray mt-1">
-                Premium HVAC çözümleri için kategori seçiminizi yapın
+                {t('megamenu.pickCategory')}
               </p>
             </div>
 
@@ -164,7 +166,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                             {category.name}
                           </h5>
                           <p className="text-sm text-steel-gray">
-                            {subs.length} alt kategori mevcut
+                            {subs.length} {t('megamenu.subcategories')}
                           </p>
                         </div>
                         <ChevronRight size={16} className="text-steel-gray group-hover/item:text-primary-navy group-hover/item:translate-x-1 transition-all duration-300" />
@@ -191,7 +193,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                             onClick={onClose}
                             className="flex items-center justify-center px-3 py-2 text-sm text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-all duration-200 font-medium"
                           >
-                            +{subs.length - 4} daha fazla gör
++{subs.length - 4} {t('megamenu.more')}
                           </Link>
                         )}
                       </div>

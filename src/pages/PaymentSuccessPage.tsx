@@ -4,11 +4,13 @@ import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
 import { useCart } from '../hooks/useCartHook'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useI18n } from '../i18n/I18nProvider'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
 export const PaymentSuccessPage: React.FC = () => {
   const [searchParams] = useSearchParams()
+  const { t } = useI18n()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
@@ -46,7 +48,7 @@ export const PaymentSuccessPage: React.FC = () => {
           setPaymentInfo({ conversationId: conversationId || orderId, token })
           clearCart()
           if (orderId) await fetchOrderDetails(orderId)
-          toast.success('🎉 Ödeme başarıyla tamamlandı!')
+          toast.success(t('checkout.paymentSuccess'))
           return
         }
 
@@ -59,8 +61,8 @@ export const PaymentSuccessPage: React.FC = () => {
           if (error) {
             console.error('Callback verify error:', error)
             setStatus('error')
-            setPaymentInfo({ errorMessage: error.message || 'Doğrulama hatası' })
-            toast.error('Ödeme doğrulama hatası')
+            setPaymentInfo({ errorMessage: error.message || t('payment.verifyError') })
+            toast.error(t('payment.verifyError'))
             return
           }
 
@@ -69,14 +71,14 @@ export const PaymentSuccessPage: React.FC = () => {
             setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
             clearCart()
             await fetchOrderDetails(orderId)
-            toast.success('🎉 Ödeme başarıyla tamamlandı!')
+            toast.success(t('checkout.paymentSuccess'))
             return
           }
 
           setStatus('error')
-          const msg = data?.iyzico?.errorMessage || 'Ödeme başarısız'
+          const msg = data?.iyzico?.errorMessage || t('payment.failedGeneric')
           setPaymentInfo({ errorMessage: msg })
-          toast.error('Ödeme başarısız: ' + msg)
+          toast.error(t('payment.failedToast', { msg }))
           return
         }
 
@@ -114,18 +116,18 @@ export const PaymentSuccessPage: React.FC = () => {
         if (errorMessage) {
           setStatus('error')
           setPaymentInfo({ errorMessage })
-          toast.error('Ödeme sırasında hata: ' + errorMessage)
+          toast.error(t('payment.errorDuring', { msg: errorMessage }))
         } else {
           setStatus('error')
-          setPaymentInfo({ errorMessage: 'Ödeme doğrulanamadı' })
-          toast.error('Ödeme doğrulanamadı')
+          setPaymentInfo({ errorMessage: t('payment.unverified') })
+          toast.error(t('payment.unverified'))
         }
       } catch (e: unknown) {
         console.error('Verify catch error:', e)
         const err = e as { message?: string }
         setStatus('error')
-        setPaymentInfo({ errorMessage: err?.message || 'Beklenmeyen hata' })
-        toast.error('Beklenmeyen hata')
+        setPaymentInfo({ errorMessage: err?.message || t('payment.unexpected') })
+        toast.error(t('payment.unexpected'))
       }
     }
 
@@ -140,10 +142,10 @@ export const PaymentSuccessPage: React.FC = () => {
             <Loader size={32} className="text-primary-navy animate-spin" />
           </div>
           <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            Ödeme Doğrulanıyor...
+            {t('payment.verifyingTitle')}
           </h2>
           <p className="text-steel-gray">
-            Lütfen bekleyin, ödemeniz kontrol ediliyor.
+            {t('payment.verifyingDesc')}
           </p>
         </div>
       </div>
@@ -158,7 +160,7 @@ export const PaymentSuccessPage: React.FC = () => {
             <AlertCircle size={32} className="text-red-600" />
           </div>
           <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            Ödeme Başarısız
+            {t('payment.failedTitle')}
           </h2>
           <p className="text-steel-gray mb-6">
             {paymentInfo?.errorMessage || 'Ödeme sırasında bir hata oluştu.'}
@@ -168,13 +170,13 @@ export const PaymentSuccessPage: React.FC = () => {
               to="/checkout"
               className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
-              Tekrar Dene
+              {t('payment.retry')}
             </Link>
             <Link
               to="/cart"
               className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
-              Sepete Dön
+              {t('checkout.backToCart')}
             </Link>
           </div>
         </div>
@@ -189,31 +191,31 @@ export const PaymentSuccessPage: React.FC = () => {
           <CheckCircle size={32} className="text-success-green" />
         </div>
         <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-          Siparişiniz Tamamlandı!
+          {t('payment.orderCompletedTitle')}
         </h2>
         <p className="text-steel-gray mb-6">
-          Sipariş No: <strong>{paymentInfo?.conversationId || 'DEMO-ORDER'}</strong>
+          {t('payment.orderNoLabel')}: <strong>{paymentInfo?.conversationId || 'DEMO-ORDER'}</strong>
         </p>
         <p className="text-steel-gray mb-8">
-          Siparişiniz başarıyla alındı. E-posta adresinize sipariş detayları gönderilecektir.
+          {t('payment.orderCompletedDesc')}
         </p>
         {/* Order summary */}
         <div className="grid grid-cols-1 gap-3 mb-6 text-left">
           {orderSummary.createdAt && (
             <div className="flex justify-between text-sm text-steel-gray">
-              <span>Tarih</span>
+              <span>{t('payment.dateLabel')}</span>
               <span>{new Date(orderSummary.createdAt).toLocaleString('tr-TR')}</span>
             </div>
           )}
           {typeof orderSummary.items === 'number' && (
             <div className="flex justify-between text-sm text-steel-gray">
-              <span>Ürün Adedi</span>
+              <span>{t('payment.itemsCountLabel')}</span>
               <span>{orderSummary.items}</span>
             </div>
           )}
           {typeof orderSummary.amount === 'number' && (
             <div className="flex justify-between text-sm font-semibold text-industrial-gray">
-              <span>Toplam Tutar</span>
+              <span>{t('orders.totalAmount')}</span>
               <span>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(orderSummary.amount)}</span>
             </div>
           )}
@@ -221,14 +223,14 @@ export const PaymentSuccessPage: React.FC = () => {
         {/* Trust badge */}
         <div className="flex items-center justify-center space-x-2 text-success-green mb-4">
           <ShieldCheck size={18} />
-          <span className="text-sm font-medium">3D Secure ile korundu</span>
+          <span className="text-sm font-medium">{t('payment.securedBy3d')}</span>
         </div>
         <div className="space-y-3">
           <Link
             to={`/orders?open=${encodeURIComponent(searchParams.get('orderId') || '')}`}
             className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
-            Sipariş Detayım
+            {t('payment.viewOrderDetails')}
           </Link>
         </div>
       </div>

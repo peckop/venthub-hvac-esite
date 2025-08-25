@@ -1,8 +1,9 @@
 import React from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
-import { Link } from 'react-router-dom'
 
 export const HeroSection: React.FC = () => {
+  const { t } = useI18n()
   return (
     <div className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
       {/* Background Image */}
@@ -22,13 +23,10 @@ export const HeroSection: React.FC = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-industrial-gray leading-tight">
-                Temiz Hava,
-                <span className="text-primary-navy block">
-                  Temiz Gelecek
-                </span>
+                {t('home.heroTitle')}
               </h1>
               <p className="text-xl text-steel-gray max-w-lg">
-                Türkiye'nin en güvenilir HVAC distributörü. 6 premium marka, 50+ ürün çeşidi ile profesyonel havalandırma çözümleri.
+                {t('home.heroSubtitle')}
               </p>
             </div>
 
@@ -36,37 +34,44 @@ export const HeroSection: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
                 <CheckCircle className="text-success-green flex-shrink-0" size={20} />
-                <span className="text-steel-gray">Avrupa kalite standartları</span>
+                <span className="text-steel-gray">{t('home.features.euQuality')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Truck className="text-success-green flex-shrink-0" size={20} />
-                <span className="text-steel-gray">Hızlı teslimat</span>
+                <span className="text-steel-gray">{t('home.features.fastDelivery')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Shield className="text-success-green flex-shrink-0" size={20} />
-                <span className="text-steel-gray">2 yıl garanti</span>
+                <span className="text-steel-gray">{t('home.features.warranty')}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="text-success-green flex-shrink-0" size={20} />
-                <span className="text-steel-gray">7/24 teknik destek</span>
+                <span className="text-steel-gray">{t('home.features.support')}</span>
               </div>
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/products"
+              <a
+                href="/products"
                 className="inline-flex items-center justify-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
               >
-                <span>Ürünleri Keşfet</span>
+                <span>{t('common.exploreProducts')}</span>
                 <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/contact"
+              </a>
+              <button
+                type="button"
+                onClick={() => (window as any).openLeadModal && (window as any).openLeadModal()}
                 className="inline-flex items-center justify-center px-8 py-4 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
               >
-                Teklif Al
-              </Link>
+                {t('common.getQuote')}
+              </button>
+              <a
+                href="/products#by-application"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white/70 hover:bg-white text-primary-navy font-semibold rounded-lg transition-colors"
+              >
+                {t('common.byApplication')}
+              </a>
             </div>
           </div>
 
@@ -76,19 +81,19 @@ export const HeroSection: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
                 <div className="text-3xl font-bold text-primary-navy">6</div>
-                <div className="text-steel-gray">Premium Marka</div>
+                <div className="text-steel-gray">{t('home.stats.premiumBrands')}</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
                 <div className="text-3xl font-bold text-primary-navy">50+</div>
-                <div className="text-steel-gray">Ürün Çeşidi</div>
+                <div className="text-steel-gray">{t('home.stats.productTypes')}</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
                 <div className="text-3xl font-bold text-primary-navy">15+</div>
-                <div className="text-steel-gray">Yıl Deneyim</div>
+                <div className="text-steel-gray">{t('home.stats.yearsExperience')}</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
                 <div className="text-3xl font-bold text-primary-navy">1000+</div>
-                <div className="text-steel-gray">Mutlu Müşteri</div>
+                <div className="text-steel-gray">{t('home.stats.happyCustomers')}</div>
               </div>
             </div>
 

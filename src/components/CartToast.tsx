@@ -3,6 +3,7 @@ import { X, CheckCircle, ShoppingBag, ArrowRight } from 'lucide-react'
 import { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface CartToastProps {
   isVisible: boolean
@@ -11,6 +12,7 @@ interface CartToastProps {
 }
 
 export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClose }) => {
+  const { t } = useI18n()
   const [showChoiceModal, setShowChoiceModal] = useState(false)
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
             <CheckCircle className="text-success-green flex-shrink-0 mt-0.5" size={20} />
             <div className="flex-1">
               <p className="font-medium text-industrial-gray">
-                Ürün sepete eklendi!
+                {t('cartToast.added')}
               </p>
               <p className="text-sm text-steel-gray truncate">
                 {product.name}
@@ -83,10 +85,10 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 </div>
                 <div>
                   <h3 className="font-semibold text-industrial-gray">
-                    Ürün Başarıyla Eklendi!
+                    {t('cartToast.added')}
                   </h3>
                   <p className="text-sm text-steel-gray">
-                    Ne yapmak istiyorsunuz?
+                    {t('cartToast.whatNext')}
                   </p>
                 </div>
                 <button 
@@ -119,20 +121,20 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
                 >
                   <ShoppingBag size={20} />
-                  <span>Alışverişe Devam Et</span>
+                  <span>{t('cartToast.continue')}</span>
                 </button>
                 
                 <Link to="/cart" onClick={handleGoToCart}>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors">
                     <ArrowRight size={20} />
-                    <span>Sepete Git</span>
+                    <span>{t('cartToast.goToCart')}</span>
                   </button>
                 </Link>
               </div>
 
               {/* Auto-close indicator */}
               <p className="text-center text-xs text-steel-gray mt-4">
-                Bu pencere 5 saniye sonra otomatik kapanacak
+                {t('cartToast.autoClose')}
               </p>
             </div>
           </div>

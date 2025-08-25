@@ -8,6 +8,8 @@ import StickyHeader from './components/StickyHeader'
 import ScrollToTop from './components/ScrollToTop'
 import HomePage from './pages/HomePage'
 import ProductsPage from './pages/ProductsPage'
+import { I18nProvider } from './i18n/I18nProvider'
+import LanguageSwitcher from './components/LanguageSwitcher'
 import CartPage from './pages/CartPage'
 import ProductDetailPage from './pages/ProductDetailPage'
 import CategoryPage from './pages/CategoryPage'
@@ -32,6 +34,8 @@ import FAQPage from './pages/support/FAQPage'
 import ReturnsPage from './pages/support/ReturnsPage'
 import ShippingPage from './pages/support/ShippingPage'
 import WarrantyPage from './pages/support/WarrantyPage'
+import BrandsPage from './pages/BrandsPage'
+import BrandDetailPage from './pages/BrandDetailPage'
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -44,16 +48,18 @@ function App() {
           v7_startTransition: true,
           v7_relativeSplatPath: true
         }}>
-          <div className="min-h-screen bg-white">
-            {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
-            <ScrollToTop />
-            
-            <StickyHeader isScrolled={isScrolled} />
-            
-            <main id="main-content" className={isScrolled ? 'pt-12' : ''}>
-              <BackToTopButton />
-              <PaymentWatcher />
-              <Routes>
+          <I18nProvider>
+            <div className="min-h-screen bg-white">
+              {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
+              <ScrollToTop />
+              
+              <StickyHeader isScrolled={isScrolled} />
+              
+              <main id="main-content" className={isScrolled ? 'pt-12' : ''}>
+                <BackToTopButton />
+                <PaymentWatcher />
+                <LanguageSwitcher />
+                <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/cart" element={<CartPage />} />
@@ -61,6 +67,8 @@ function App() {
                 <Route path="/product/:id" element={<ProductDetailPage />} />
                 <Route path="/category/:slug" element={<CategoryPage />} />
                 <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
+                <Route path="/brands" element={<BrandsPage />} />
+                <Route path="/brands/:slug" element={<BrandDetailPage />} />
                 
                 {/* Auth Routes */}
                 <Route path="/auth/login" element={<LoginPage />} />
@@ -84,13 +92,13 @@ function App() {
                 <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
                 <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
                 <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
-              </Routes>
-            </main>
+                </Routes>
+              </main>
 
-            <Footer />
-            
-            {/* Toast Container */}
-            <Toaster
+              <Footer />
+              
+              {/* Toast Container */}
+              <Toaster
               position="top-right"
               toastOptions={{
                 duration: 3000,
@@ -115,7 +123,8 @@ function App() {
                 },
               }}
             />
-          </div>
+            </div>
+          </I18nProvider>
         </Router>
       </CartProvider>
     </AuthProvider>

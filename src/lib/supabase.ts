@@ -28,6 +28,10 @@ export interface Product {
   description?: string
   technical_specs?: unknown
   image_url?: string
+  // Teknik alanlar (varsa Supabase'ten gelir)
+  airflow_capacity?: number | null
+  noise_level?: number | null
+  pressure_rating?: number | null
 }
 
 export interface CartItem {
@@ -132,6 +136,19 @@ export async function getProductsByCategory(categoryId: string) {
     .from('products')
     .select('*')
     .or(`category_id.eq.${categoryId},subcategory_id.eq.${categoryId}`)
+    .eq('status', 'active')
+    .order('is_featured', { ascending: false })
+    .order('name', { ascending: true })
+
+  if (error) throw error
+  return data as Product[]
+}
+
+export async function getProductsBySubcategory(subcategoryId: string) {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('subcategory_id', subcategoryId)
     .eq('status', 'active')
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })

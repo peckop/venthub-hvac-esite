@@ -5,6 +5,7 @@ import { supabase, Product } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useCart } from '../hooks/useCartHook'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -83,6 +84,7 @@ export const OrdersPage: React.FC = () => {
   const [productFilter, setProductFilter] = useState<string>('')
 
   const { addToCart } = useCart()
+  const { t } = useI18n()
 
   const fetchOrders = React.useCallback(async () => {
     try {
@@ -97,7 +99,7 @@ export const OrdersPage: React.FC = () => {
 
       if (ordersError) {
         console.error('Error fetching orders:', ordersError)
-        toast.error('Siparişler yüklenirken hata oluştu')
+        toast.error(t('orders.fetchError'))
         return
       }
 
@@ -142,7 +144,7 @@ export const OrdersPage: React.FC = () => {
       if (productQ) setProductFilter(productQ)
     } catch (error) {
       console.error('Orders fetch error:', error)
-      toast.error('Beklenmeyen hata oluştu')
+      toast.error(t('orders.unexpectedError'))
     } finally {
       setLoading(false)
     }
@@ -200,33 +202,40 @@ export const OrdersPage: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'Beklemede'
+        return t('orders.pending')
       case 'paid':
       case 'confirmed':
-        return 'Ödendi'
+        return t('orders.paid')
       case 'shipped':
-        return 'Kargoya Verildi'
+        return t('orders.shipped')
       case 'delivered':
-        return 'Teslim Edildi'
+        return t('orders.delivered')
       case 'failed':
       case 'cancelled':
-        return 'Başarısız'
+        return t('orders.failed')
       default:
         return status
     }
   }
 
-  const steps = ['pending','paid','shipped','delivered']
-  const stepLabel: Record<string,string> = { pending:'Ödeme Bekleniyor', paid:'Ödendi', shipped:'Kargoda', delivered:'Teslim Edildi' }
+  const steps = ['pending','paid','shipped','delivered'] as const
+  const stepLabel: Record<string,string> = { 
+    pending: t('orders.pending'), 
+    paid: t('orders.paid'), 
+    shipped: t('orders.shipped'), 
+    delivered: t('orders.delivered') 
+  }
 
   const handlePrintReceipt = (order: Order) => {
     const w = window.open('', '_blank', 'width=720,height=900')
     if (!w) return
+    const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
     const itemsHtml = (order.order_items || [])
-      .map(it => `<tr><td style="padding:6px 0">${it.product_name}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(it.unit_price)}</td><td style="text-align:right">${new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(it.total_price)}</td></tr>`) 
+      .map(it => `<tr><td style="padding:6px 0">${it.product_name}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${nf.format(it.unit_price)}</td><td style="text-align:right">${nf.format(it.total_price)}</td></tr>`) 
       .join('')
-    const total = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(order.total_amount)
-    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Makbuz</title></head><body style="font-family:Arial,sans-serif;padding:24px"><h2>Venthub Sipariş Makbuzu</h2><p><strong>Sipariş ID:</strong> ${order.id}<br/><strong>Tarih:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th align="left">Ürün</th><th>Adet</th><th align="right">Birim</th><th align="right">Toplam</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan="3" align="right"><strong>Genel Toplam</strong></td><td align="right"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>3D Secure ile korunan ödeme işlemi.</p><script>window.print();</script></body></html>`)
+    const total = nf.format(order.total_amount)
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${t('orders.receiptTitle')}</title></head><body style="font-family:Arial,sans-serif;padding:24px"><h2>${t('orders.receiptHeading')}</h2><p><strong>${t('orders.orderId')}:</strong> ${order.id}<br/><strong>${t('orders.date')}:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th align="left">${t('orders.productCol')}</th><th>${t('orders.qtyCol')}</th><th align="right">${t('orders.unitPriceCol')}</th><th align="right">${t('orders.totalCol')}</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan="3" align="right"><strong>${t('orders.grandTotal')}</strong></td><td align="right"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>${t('orders.securePaymentNote')}</p><script>window.print();</script></body></html>`
+    w.document.write(html)
     w.document.close()
   }
 
@@ -264,9 +273,9 @@ export const OrdersPage: React.FC = () => {
     try {
       if (!text) return
       await navigator.clipboard.writeText(text)
-      toast.success('Kopyalandı')
+      toast.success(t('orders.copied'))
     } catch {
-      toast.error('Kopyalanamadı')
+      toast.error(t('orders.copyFailed'))
     }
   }
 
@@ -303,60 +312,60 @@ export const OrdersPage: React.FC = () => {
         }
       }
 
-      if (added>0) toast.success(`${added} adet ürün sepete eklendi`)
-      else toast.error('Ürünler stokta bulunamadı')
+      if (added>0) toast.success(t('orders.reorderedToast', { count: added }))
+      else toast.error(t('orders.reorderNotFound'))
     } catch (e: unknown) {
       console.error('Reorder error', e)
-      toast.error('Tekrar satın alma sırasında hata')
+      toast.error(t('orders.reorderError'))
     }
   }
 
   return (
-    <div className="min-h-screen bg-clean-white py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-            Siparişlerim
-          </h1>
-          <p className="text-steel-gray">
-            Geçmiş siparişlerinizi görüntüleyin ve takip edin
-          </p>
-        </div>
+      <div className="min-h-screen bg-clean-white py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-industrial-gray mb-2">
+              {t('orders.title')}
+            </h1>
+            <p className="text-steel-gray">
+              {t('orders.subtitle')}
+            </p>
+          </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-hvac-md p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
-              <label className="text-xs text-steel-gray">Durum</label>
+              <label className="text-xs text-steel-gray">{t('orders.status')}</label>
               <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value as StatusFilter)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
-                <option value="all">Hepsi</option>
-                <option value="pending">Beklemede</option>
-                <option value="paid">Ödendi</option>
-                <option value="shipped">Kargoda</option>
-                <option value="delivered">Teslim Edildi</option>
-                <option value="failed">Başarısız</option>
+                <option value="all">{t('orders.all')}</option>
+                <option value="pending">{t('orders.pending')}</option>
+                <option value="paid">{t('orders.paid')}</option>
+                <option value="shipped">{t('orders.shipped')}</option>
+                <option value="delivered">{t('orders.delivered')}</option>
+                <option value="failed">{t('orders.failed')}</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-steel-gray">Başlangıç</label>
+              <label className="text-xs text-steel-gray">{t('orders.startDate')}</label>
               <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
-              <label className="text-xs text-steel-gray">Bitiş</label>
+              <label className="text-xs text-steel-gray">{t('orders.endDate')}</label>
               <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
-              <label className="text-xs text-steel-gray">Sipariş Kodu (son 8)</label>
-              <input type="text" placeholder="örn. 7016DD05" value={searchCode} onChange={e=>setSearchCode(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <label className="text-xs text-steel-gray">{t('orders.orderCode')}</label>
+              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e=>setSearchCode(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
-              <label className="text-xs text-steel-gray">Ürün</label>
-              <input type="text" placeholder="Ürün adına göre ara" value={productFilter} onChange={e=>setProductFilter(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <label className="text-xs text-steel-gray">{t('orders.product')}</label>
+              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e=>setProductFilter(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
           </div>
           <div className="flex justify-end mt-3">
-            <button onClick={()=>{setStatusFilter('all');setDateFrom('');setDateTo('');setSearchCode('');setProductFilter('')}} className="text-sm text-steel-gray hover:text-primary-navy">Filtreleri Temizle</button>
+            <button onClick={()=>{setStatusFilter('all');setDateFrom('');setDateTo('');setSearchCode('');setProductFilter('')}} className="text-sm text-steel-gray hover:text-primary-navy">{t('orders.clearFilters')}</button>
           </div>
         </div>
 
@@ -365,16 +374,16 @@ export const OrdersPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-hvac-md p-12 text-center">
             <ShoppingBag size={64} className="mx-auto text-steel-gray mb-4" />
             <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-              Henüz siparişiniz yok
+              {t('orders.noOrdersTitle')}
             </h3>
             <p className="text-steel-gray mb-6">
-              İlk siparişinizi vermek için ürünleri keşfedin
+              {t('orders.noOrdersDesc')}
             </p>
             <button
               onClick={() => navigate('/')}
               className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
-              Ürünleri Keşfet
+              {t('orders.exploreProducts')}
             </button>
           </div>
         ) : (
@@ -438,7 +447,7 @@ export const OrdersPage: React.FC = () => {
                         className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
                       >
                         <Eye size={20} />
-                        <span className="text-sm font-medium">Detaylar</span>
+                        <span className="text-sm font-medium">{t('orders.details')}</span>
                         <ChevronRight 
                           size={16} 
                           className={`transform transition-transform ${
@@ -456,14 +465,14 @@ export const OrdersPage: React.FC = () => {
                     {/* Customer + Order Info */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                       <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">Müşteri Bilgileri</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
                         <div className="space-y-2 text-sm">
-                          <p><span className="font-medium">Ad:</span> {order.customer_name}</p>
-                          <p><span className="font-medium">E-posta:</span> {order.customer_email}</p>
+                          <p><span className="font-medium">{t('orders.name')}:</span> {order.customer_name}</p>
+                          <p><span className="font-medium">{t('orders.email')}:</span> {order.customer_email}</p>
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">Teslimat Adresi</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
                         <div className="text-sm text-steel-gray">
                           {order.shipping_address && (() => {
                             const addr = order.shipping_address as ShippingAddress
@@ -481,18 +490,18 @@ export const OrdersPage: React.FC = () => {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">Sipariş Bilgileri</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderInfo')}</h4>
                         <div className="text-sm text-steel-gray space-y-2">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium">Sipariş ID</span>
-                            <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">Kopyala</button>
+                            <span className="font-medium">{t('orders.orderId')}</span>
+                            <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
                           </div>
                           <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
                           {order.conversation_id && (
                             <>
                               <div className="flex items-center justify-between gap-2">
-                                <span className="font-medium">Conversation ID</span>
-                                <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">Kopyala</button>
+                                <span className="font-medium">{t('orders.conversationId')}</span>
+                                <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
                               </div>
                               <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
                             </>
@@ -504,16 +513,16 @@ export const OrdersPage: React.FC = () => {
                     {/* Order Items */}
                     {order.order_items && order.order_items.length > 0 ? (
                       <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">Sipariş Detayları</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
                         <div className="bg-white rounded-lg overflow-hidden">
                           <table className="w-full">
                             <thead className="bg-light-gray">
                               <tr>
-                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">Ürün</th>
-                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">Görsel</th>
-                                <th className="text-center p-4 text-sm font-medium text-industrial-gray">Adet</th>
-                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">Birim Fiyat</th>
-                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">Toplam</th>
+                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.productCol')}</th>
+                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.imageCol')}</th>
+                                <th className="text-center p-4 text-sm font-medium text-industrial-gray">{t('orders.qtyCol')}</th>
+                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.unitPriceCol')}</th>
+                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.totalCol')}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -525,7 +534,7 @@ export const OrdersPage: React.FC = () => {
                                     { item.product_image_url ? (
                                       <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded" />
                                     ) : (
-                                      <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">Yok</div>
+                                      <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">{t('orders.noImage')}</div>
                                     )}
                                   </td>
                                   <td className="p-4 text-sm text-center text-steel-gray">{item.quantity}</td>
@@ -536,7 +545,7 @@ export const OrdersPage: React.FC = () => {
                             </tbody>
                             <tfoot>
                               <tr className="bg-primary-navy text-white">
-                                <td colSpan={4} className="p-4 text-sm font-semibold text-right">Genel Toplam:</td>
+                                <td colSpan={4} className="p-4 text-sm font-semibold text-right">{t('orders.grandTotal')}:</td>
                                 <td className="p-4 text-sm font-bold text-right">{formatPrice(order.total_amount)}</td>
                               </tr>
                             </tfoot>
@@ -545,16 +554,16 @@ export const OrdersPage: React.FC = () => {
                       </div>
                     ) : (
                       <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">Sipariş Detayları</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
                         <div className="bg-white rounded-lg p-6 text-center">
-                          <p className="text-steel-gray mb-2">Ürün detayları bulunamadı</p>
+                          <p className="text-steel-gray mb-2">{t('orders.noItems')}</p>
                           {order.is_demo && (
                             <p className="text-sm text-orange-600">
-                              Bu demo siparişi test amaçlıdır
+                              {t('orders.demoNote')}
                             </p>
                           )}
                           <div className="mt-4 p-4 bg-primary-navy text-white rounded-lg">
-                            <p className="font-semibold">Toplam Tutar: {formatPrice(order.total_amount)}</p>
+                            <p className="font-semibold">{t('orders.totalAmount')}: {formatPrice(order.total_amount)}</p>
                           </div>
                         </div>
                       </div>
@@ -562,8 +571,8 @@ export const OrdersPage: React.FC = () => {
 
                     {/* Actions */}
                     <div className="mt-4 flex justify-end gap-2">
-                      <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>Tekrar Satın Al</button>
-                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">Makbuzu Gör</button>
+                      <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
+                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
                     </div>
                   </div>
                 )}

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Mutlaka alan adınızı buraya ekleyin (ör. https://venthub.com.tr/sitemap.xml)
+Sitemap: /sitemap.xml

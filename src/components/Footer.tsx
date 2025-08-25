@@ -1,8 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n/I18nProvider'
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'
 
 export const Footer: React.FC = () => {
+  const { t } = useI18n()
   const mainCategories = [
     { name: 'FANLAR', slug: 'fanlar' },
     { name: 'ISI GERİ KAZANIM CİHAZLARI', slug: 'isi-geri-kazanim-cihazlari' },
@@ -31,8 +33,7 @@ export const Footer: React.FC = () => {
               </div>
             </Link>
             <p className="text-steel-gray leading-relaxed">
-              Türkiye'nin en güvenilir HVAC distributörü. Premium markalardan 
-              kaliteli havalandırma çözümleri sunuyoruz.
+              {t('home.heroSubtitle')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-steel-gray hover:text-secondary-blue transition-colors">
@@ -52,36 +53,36 @@ export const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold mb-4">Hızlı Bağlantılar</h3>
+            <h3 className="font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-steel-gray hover:text-white transition-colors">
-                  Ana Sayfa
+                  {t('common.home')}
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="text-steel-gray hover:text-white transition-colors">
-                  Ürünler
+                <Link to="/products?all=1" className="text-steel-gray hover:text-white transition-colors">
+                  {t('common.products')}
                 </Link>
               </li>
               <li>
                 <Link to="/brands" className="text-steel-gray hover:text-white transition-colors">
-                  Markalar
+                  {t('common.brands')}
                 </Link>
               </li>
               <li>
                 <Link to="/about" className="text-steel-gray hover:text-white transition-colors">
-                  Hakkımızda
+                  {t('common.about')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-steel-gray hover:text-white transition-colors">
-                  İletişim
+                  {t('common.contact')}
                 </Link>
               </li>
               <li>
                 <Link to="/support" className="text-steel-gray hover:text-white transition-colors">
-                  Destek Merkezi
+                  {t('common.supportCenter')}
                 </Link>
               </li>
               <li>
@@ -109,7 +110,7 @@ export const Footer: React.FC = () => {
 
           {/* Categories */}
           <div>
-            <h3 className="font-semibold mb-4">Kategoriler</h3>
+            <h3 className="font-semibold mb-4">{t('footer.categories')}</h3>
             <ul className="space-y-2">
               {mainCategories.slice(0, 6).map((category) => (
                 <li key={category.slug}>
@@ -126,7 +127,7 @@ export const Footer: React.FC = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-semibold mb-4">İletişim</h3>
+            <h3 className="font-semibold mb-4">{t('footer.contact')}</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin size={16} className="text-secondary-blue mt-1 flex-shrink-0" />
@@ -151,10 +152,10 @@ export const Footer: React.FC = () => {
 
             {/* Working Hours */}
             <div className="mt-4 p-3 bg-white/5 rounded-lg">
-              <h4 className="font-medium text-sm mb-2">Mesāi Saatleri</h4>
+              <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
               <p className="text-steel-gray text-xs">
-                Pazartesi - Cuma: 09:00 - 18:00<br />
-                Cumartesi: 09:00 - 14:00
+                {t('footer.weekdays')}: 09:00 - 18:00<br />
+                {t('footer.saturday')}: 09:00 - 14:00
               </p>
             </div>
           </div>
@@ -166,26 +167,26 @@ export const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-steel-gray text-sm">
-              © 2025 VentHub HVAC. Tüm hakları saklıdır.
+              © 2025 VentHub HVAC. {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               <Link to="/legal/kvkk" className="text-steel-gray hover:text-white transition-colors">
-                KVKK Aydınlatma Metni
+                {t('legalLinks.kvkk')}
               </Link>
               <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-steel-gray hover:text-white transition-colors">
-                Mesafeli Satış Sözleşmesi
+                {t('legalLinks.distanceSales')}
               </Link>
               <Link to="/legal/on-bilgilendirme-formu" className="text-steel-gray hover:text-white transition-colors">
-                Ön Bilgilendirme Formu
+                {t('legalLinks.preInformation')}
               </Link>
               <Link to="/legal/cerez-politikasi" className="text-steel-gray hover:text-white transition-colors">
-                Çerez Politikası
+                {t('legalLinks.cookies')}
               </Link>
               <Link to="/legal/gizlilik-politikasi" className="text-steel-gray hover:text-white transition-colors">
-                Gizlilik Politikası
+                {t('legalLinks.privacy')}
               </Link>
               <Link to="/legal/kullanim-kosullari" className="text-steel-gray hover:text-white transition-colors">
-                Kullanım Koşulları
+                {t('legalLinks.terms')}
               </Link>
             </div>
           </div>

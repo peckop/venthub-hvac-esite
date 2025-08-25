@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getProductById, getProductsByCategory, Product } from '../lib/supabase'
+import { getProductById, getProductsByCategory, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
 import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
+import Seo from '../components/Seo'
+import { useI18n } from '../i18n/I18nProvider'
+import LeadModal from '../components/LeadModal'
 import { 
   ArrowLeft, 
   ShoppingCart, 
@@ -29,9 +32,13 @@ export const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [allCategories, setAllCategories] = useState<Category[]>([])
+  const [mainCategory, setMainCategory] = useState<Category | null>(null)
+  const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
+  const [leadOpen, setLeadOpen] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
 
@@ -44,20 +51,32 @@ export const ProductDetailPage: React.FC = () => {
         const productData = await getProductById(id)
         
         if (!productData) {
-          navigate('/404')
+          setProduct(null)
           return
         }
 
         setProduct(productData)
 
-        // Fetch related products from same subcategory
+        // Fetch categories for breadcrumb
+        const cats = await getCategories()
+        setAllCategories(cats)
+        if (productData.category_id) {
+          const mc = cats.find(c => c.id === productData.category_id) || null
+          setMainCategory(mc)
+        }
         if (productData.subcategory_id) {
-          const related = await getProductsByCategory(productData.subcategory_id)
+          const sc = cats.find(c => c.id === productData.subcategory_id) || null
+          setSubCategory(sc)
+        }
+
+        // Fetch related products from same subcategory (exact match)
+        if (productData.subcategory_id) {
+          const related = await getProductsBySubcategory(productData.subcategory_id)
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
         console.error('Error fetching product:', error)
-        navigate('/404')
+        setProduct(null)
       } finally {
         setLoading(false)
       }
@@ -127,14 +146,16 @@ export const ProductDetailPage: React.FC = () => {
     }
   }
 
+  const { t } = useI18n()
+
   const sections = [
-    { id: 'genel', title: 'Genel Bilgiler', icon: FileText, bgClass: 'bg-white' },
-    { id: 'modeller', title: 'Modeller', icon: Settings, bgClass: 'bg-light-gray' },
-    { id: 'olcuiler', title: 'Ölçüler', icon: Ruler, bgClass: 'bg-white' },
-    { id: 'diyagramlar', title: 'Diyagramlar', icon: FileText, bgClass: 'bg-air-blue' },
-    { id: 'dokumanlar', title: 'Dökümanlar', icon: FileText, bgClass: 'bg-white' },
-    { id: 'pdf', title: 'Ürün PDF', icon: Download, bgClass: 'bg-light-gray' },
-    { id: 'sertifikalar', title: 'Sertifikalar', icon: Award, bgClass: 'bg-white' }
+    { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
+    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-light-gray' },
+    { id: 'olcuiler', title: t('pdp.sections.dimensions'), icon: Ruler, bgClass: 'bg-white' },
+    { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-air-blue' },
+    { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
+    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-light-gray' },
+    { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' }
   ]
 
   if (loading) {
@@ -142,7 +163,7 @@ export const ProductDetailPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy mx-auto mb-4"></div>
-          <p className="text-steel-gray">Ürün yükleniyor...</p>
+          <p className="text-steel-gray">{t('pdp.loading')}</p>
         </div>
       </div>
     )
@@ -152,29 +173,46 @@ export const ProductDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-industrial-gray mb-4">Ürün Bulunamadı</h1>
+          <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
           <Link to="/" className="text-primary-navy hover:text-secondary-blue">
-            Ana sayfaya dön
+            {t('pdp.backHome')}
           </Link>
         </div>
       </div>
     )
   }
 
+  // SEO values for PDP
+  const canonicalUrl = `${window.location.origin}/product/${product.id}`
+  const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
+
   return (
     <div className="min-h-screen bg-white">
+      <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       {/* Breadcrumb */}
       <div className="bg-light-gray border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
             <Link to="/" className="text-steel-gray hover:text-primary-navy">
-              Ana Sayfa
+              {t('category.breadcrumbHome')}
             </Link>
             <ChevronRight size={16} className="text-steel-gray" />
-            <Link to="/products" className="text-steel-gray hover:text-primary-navy">
-              Ürünler
-            </Link>
-            <ChevronRight size={16} className="text-steel-gray" />
+            {mainCategory && (
+              <>
+                <Link to={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                  {mainCategory.name}
+                </Link>
+                {subCategory && (
+                  <>
+                    <ChevronRight size={16} className="text-steel-gray" />
+                    <Link to={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                      {subCategory.name}
+                    </Link>
+                  </>
+                )}
+                <ChevronRight size={16} className="text-steel-gray" />
+              </>
+            )}
             <span className="text-industrial-gray font-medium">
               {product.name}
             </span>
@@ -189,7 +227,7 @@ export const ProductDetailPage: React.FC = () => {
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>Geri Dön</span>
+          <span>{t('pdp.back')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -224,7 +262,7 @@ export const ProductDetailPage: React.FC = () => {
               {product.is_featured && (
                 <div className="bg-gold-accent text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
                   <Star size={14} fill="currentColor" />
-                  <span>Öne Çıkan</span>
+                  <span>{t('pdp.featured')}</span>
                 </div>
               )}
             </div>
@@ -234,17 +272,23 @@ export const ProductDetailPage: React.FC = () => {
               {product.name}
             </h1>
 
+            {/* Quick technical chips (varsa) */}
+            <div className="flex flex-wrap gap-2 pt-2">
+              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.brand')}: {product.brand}</span>
+              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.model')}: {product.sku}</span>
+            </div>
+
             {/* SKU & Status */}
             <div className="flex items-center space-x-4">
               <span className="text-steel-gray">
-                Model: <span className="font-medium">{product.sku}</span>
+                {t('pdp.model')}: <span className="font-medium">{product.sku}</span>
               </span>
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                 product.status === 'active' 
                   ? 'bg-success-green/10 text-success-green' 
                   : 'bg-warning-orange/10 text-warning-orange'
               }`}>
-                {product.status === 'active' ? 'Stokta Var' : 'Stokta Yok'}
+                {product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}
               </div>
             </div>
 
@@ -252,19 +296,19 @@ export const ProductDetailPage: React.FC = () => {
             <div className="text-4xl font-bold text-primary-navy">
               ₺{parseFloat(product.price).toLocaleString('tr-TR')}
               <span className="text-sm text-steel-gray font-normal ml-2">
-                (KDV Dahil)
+                {t('pdp.vatIncluded')}
               </span>
             </div>
 
             {/* Description */}
             <p className="text-steel-gray leading-relaxed">
-              {product.description || 'Bu ürün için detaylı açıklama yakında eklenecektir.'}
+              {product.description || t('pdp.descFallback')}
             </p>
 
             {/* Quantity & Add to Cart */}
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
-                <span className="text-steel-gray">Miktar:</span>
+                <span className="text-steel-gray">{t('pdp.qty')}</span>
                 <div className="flex items-center border-2 border-light-gray rounded-lg">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -289,7 +333,7 @@ export const ProductDetailPage: React.FC = () => {
                   className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingCart size={20} />
-                  <span>Sepete Ekle</span>
+                  <span>{t('pdp.addToCart')}</span>
                 </button>
                 
                 <button
@@ -310,21 +354,31 @@ export const ProductDetailPage: React.FC = () => {
                   <Share2 size={20} />
                 </button>
               </div>
+
+              {/* Lead CTA */}
+              <div>
+                <button
+                  onClick={() => setLeadOpen(true)}
+                  className="w-full md:w-auto mt-2 bg-success-green hover:bg-success-green/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  {t('pdp.techQuote')}
+                </button>
+              </div>
             </div>
 
             {/* Features */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-light-gray">
               <div className="text-center">
                 <Truck className="text-success-green mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">Bedava Kargo</p>
+                <p className="text-sm text-steel-gray">{t('pdp.freeShipping')}</p>
               </div>
               <div className="text-center">
                 <Shield className="text-success-green mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">2 Yıl Garanti</p>
+                <p className="text-sm text-steel-gray">{t('pdp.warranty2y')}</p>
               </div>
               <div className="text-center">
                 <Phone className="text-success-green mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">7/24 Destek</p>
+                <p className="text-sm text-steel-gray">{t('pdp.support247')}</p>
               </div>
             </div>
           </div>
@@ -356,6 +410,29 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
+
+      {/* JSON-LD Product Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.name,
+            brand: product.brand,
+            sku: product.sku,
+            image: product.image_url ? [product.image_url] : [],
+            description: product.description || undefined,
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'TRY',
+              price: parseFloat(product.price || '0') || 0,
+              availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+              url: canonicalUrl,
+            },
+          }),
+        }}
+      />
 
       {/* Vertical Section Layout */}
       <div className="space-y-0">
@@ -393,66 +470,66 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                           <h4 className="font-semibold text-industrial-gray mb-4 flex items-center">
                             <Check className="text-success-green mr-2" size={20} />
-                            Ürün Özellikleri
+                            {t('pdp.labels.productFeatures')}
                           </h4>
                           <ul className="space-y-3 text-steel-gray">
                             <li className="flex items-center">
                               <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
-                              Premium kalite malzeme ve üretim
+                              {t('pdp.features.materialQuality')}
                             </li>
                             <li className="flex items-center">
                               <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
-                              Enerji verimli tasarım ve düşük tüketim
+                              {t('pdp.features.energyEfficient')}
                             </li>
                             <li className="flex items-center">
                               <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
-                              Sessiz çalışma ve minimum titreşim
+                              {t('pdp.features.quietOperation')}
                             </li>
                             <li className="flex items-center">
                               <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
-                              Kolay montaj ve bakım
+                              {t('pdp.features.easyMaintenance')}
                             </li>
                             <li className="flex items-center">
                               <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
-                              Uzun ömürlü ve dayanıklı
+                              {t('pdp.features.durable')}
                             </li>
                           </ul>
                         </div>
                         
                         <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                          <h4 className="font-semibold text-industrial-gray mb-4">Ürün Açıklaması</h4>
+                          <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.productDescription')}</h4>
                           <p className="text-steel-gray leading-relaxed">
-                            {product.description || `${product.brand} ${product.name} modeli, endüstriyel HVAC uygulamaları için tasarlanmış yüksek performanslı bir çözümdür. Avrupa standartlarında üretilen bu ürün, uzun yıllar güvenilir hizmet verecek şekilde tasarlanmıştır.`}
+                            {product.description || t('pdp.descFallback')}
                           </p>
                         </div>
                       </div>
 
                       {/* Technical Specifications */}
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">Teknik Özellikler</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.technicalSpecs')}</h4>
                         <div className="space-y-3">
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Marka</span>
+                            <span className="text-steel-gray">{t('pdp.brand')}</span>
                             <span className="font-medium text-industrial-gray">{product.brand}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Model</span>
+                            <span className="text-steel-gray">{t('pdp.model')}</span>
                             <span className="font-medium text-industrial-gray">{product.sku}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Durum</span>
+                            <span className="text-steel-gray">{t('pdp.statusLabel')}</span>
                             <span className={`font-medium ${
                               product.status === 'active' ? 'text-success-green' : 'text-warning-orange'
                             }`}>
-                              {product.status === 'active' ? 'Stokta Mevcut' : 'Stokta Yok'}
+                              {product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}
                             </span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Kategori</span>
-                            <span className="font-medium text-industrial-gray">HVAC Sistemi</span>
+                            <span className="text-steel-gray">{t('pdp.labels.category')}</span>
+                            <span className="font-medium text-industrial-gray">{mainCategory?.name || '-'}</span>
                           </div>
                           <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">Fiyat</span>
+                            <span className="text-steel-gray">{t('pdp.labels.price')}</span>
                             <span className="font-bold text-primary-navy">
                               ₺{parseFloat(product.price).toLocaleString('tr-TR')}
                             </span>
@@ -476,7 +553,7 @@ export const ProductDetailPage: React.FC = () => {
                                 {product.sku}-{variant}
                               </h4>
                               <p className="text-steel-gray text-sm mb-3">
-                                Model {variant} varyantı - özel teknik özellikler
+                                {t('pdp.variantDetails')}
                               </p>
                               <div className="text-primary-navy font-semibold">
                                 ₺{(parseFloat(product.price) + (variant - 1) * 200).toLocaleString('tr-TR')}
@@ -491,44 +568,44 @@ export const ProductDetailPage: React.FC = () => {
                   {section.id === 'olcuiler' && (
                     <>
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">Fiziksel Ölçüler</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.physicalDimensions')}</h4>
                         <div className="space-y-3">
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Genişlik</span>
+                            <span className="text-steel-gray">{t('pdp.labels.width')}</span>
                             <span className="font-medium text-industrial-gray">450 mm</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Yükseklik</span>
+                            <span className="text-steel-gray">{t('pdp.labels.height')}</span>
                             <span className="font-medium text-industrial-gray">350 mm</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Derinlik</span>
+                            <span className="text-steel-gray">{t('pdp.labels.depth')}</span>
                             <span className="font-medium text-industrial-gray">200 mm</span>
                           </div>
                           <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">Ağırlık</span>
+                            <span className="text-steel-gray">{t('pdp.labels.weight')}</span>
                             <span className="font-medium text-industrial-gray">15.5 kg</span>
                           </div>
                         </div>
                       </div>
                       
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">Performans Ölçüleri</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.performanceMetrics')}</h4>
                         <div className="space-y-3">
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Hava Debisi</span>
+                            <span className="text-steel-gray">{t('pdp.labels.airflow')}</span>
                             <span className="font-medium text-industrial-gray">2.850 m³/h</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Basınç</span>
+                            <span className="text-steel-gray">{t('pdp.labels.pressure')}</span>
                             <span className="font-medium text-industrial-gray">245 Pa</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">Güç</span>
+                            <span className="text-steel-gray">{t('pdp.labels.power')}</span>
                             <span className="font-medium text-industrial-gray">180 W</span>
                           </div>
                           <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">Gürültü Seviyesi</span>
+                            <span className="text-steel-gray">{t('pdp.labels.noise')}</span>
                             <span className="font-medium text-industrial-gray">45 dB(A)</span>
                           </div>
                         </div>
@@ -542,19 +619,19 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           {/* Technical Diagrams */}
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-4">Teknik Şemalar</h4>
+                            <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
                             <div className="space-y-4">
                               <div className="aspect-video bg-gradient-to-br from-primary-navy/10 to-secondary-blue/10 rounded-lg flex items-center justify-center">
                                 <div className="text-center">
                                   <FileText size={32} className="text-primary-navy mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">Montaj Şeması</p>
+                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.mounting')}</p>
                                   <p className="text-sm text-steel-gray">PDF - 2.4 MB</p>
                                 </div>
                               </div>
                               <div className="aspect-video bg-gradient-to-br from-secondary-blue/10 to-air-blue/20 rounded-lg flex items-center justify-center">
                                 <div className="text-center">
                                   <FileText size={32} className="text-secondary-blue mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">Elektrik Şeması</p>
+                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.electrical')}</p>
                                   <p className="text-sm text-steel-gray">PDF - 1.8 MB</p>
                                 </div>
                               </div>
@@ -562,20 +639,20 @@ export const ProductDetailPage: React.FC = () => {
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-4">3D Görünümler</h4>
+                            <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.diagramsExtra.threeDViews')}</h4>
                             <div className="space-y-4">
                               <div className="aspect-video bg-gradient-to-br from-air-blue/20 to-light-gray rounded-lg flex items-center justify-center">
                                 <div className="text-center">
                                   <Settings size={32} className="text-primary-navy mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">3D Model Görünümü</p>
-                                  <p className="text-sm text-steel-gray">Interaktif Model</p>
+                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.view3DModel')}</p>
+                                  <p className="text-sm text-steel-gray">{t('pdp.diagramsExtra.interactiveModel')}</p>
                                 </div>
                               </div>
                               <div className="aspect-video bg-gradient-to-br from-success-green/10 to-light-gray rounded-lg flex items-center justify-center">
                                 <div className="text-center">
                                   <Ruler size={32} className="text-success-green mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">Ölçülü Çizim</p>
-                                  <p className="text-sm text-steel-gray">CAD - DWG Format</p>
+                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.dimensionedDrawing')}</p>
+                                  <p className="text-sm text-steel-gray">{t('pdp.diagramsExtra.cadDwg')}</p>
                                 </div>
                               </div>
                             </div>
@@ -593,43 +670,43 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-primary-navy mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Kurulum Kılavuzu</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.installationGuide')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 3.2 MB</p>
                             </div>
                             <button className="w-full bg-primary-navy hover:bg-secondary-blue text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={16} />
-                              <span>İndir</span>
+                              <span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-secondary-blue mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Kullanım Kılavuzu</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.userManual')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 2.8 MB</p>
                             </div>
                             <button className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={16} />
-                              <span>İndir</span>
+<span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-success-green mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Bakım Kılavuzu</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.maintenanceManual')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 1.9 MB</p>
                             </div>
                             <button className="w-full bg-success-green hover:bg-success-green/80 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={16} />
-                              <span>İndir</span>
+                              <span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-warning-orange mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Güvenlik Bilgileri</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.safetyInfo')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 1.5 MB</p>
                             </div>
                             <button className="w-full bg-warning-orange hover:bg-warning-orange/80 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
@@ -641,7 +718,7 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-steel-gray mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Garanti Koşulları</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.warrantyTerms')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 900 KB</p>
                             </div>
                             <button className="w-full bg-steel-gray hover:bg-industrial-gray text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
@@ -653,7 +730,7 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-air-blue mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Teknik Özellikler</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.technicalSpecsDoc')}</h4>
                               <p className="text-sm text-steel-gray">PDF - 1.2 MB</p>
                             </div>
                             <button className="w-full bg-air-blue hover:bg-air-blue/80 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
@@ -672,32 +749,32 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           {/* Product Catalogs */}
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-6">Ürün Kataloğu</h4>
+                            <h4 className="font-semibold text-industrial-gray mb-6">{t('pdp.docs.productCatalog')}</h4>
                             <div className="aspect-[3/4] bg-gradient-to-br from-primary-navy/10 to-secondary-blue/10 rounded-lg mb-4 flex items-center justify-center">
                               <div className="text-center">
                                 <Download size={48} className="text-primary-navy mx-auto mb-3" />
-                                <p className="text-steel-gray font-medium">Ürün Kataloğu 2024</p>
+                                <p className="text-steel-gray font-medium">{t('pdp.docs.productCatalog')} 2024</p>
                                 <p className="text-sm text-steel-gray">PDF - 8.5 MB</p>
                               </div>
                             </div>
                             <button className="w-full bg-primary-navy hover:bg-secondary-blue text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={20} />
-                              <span>Kataloğu İndir</span>
+                              <span>{t('pdp.actions.downloadCatalog')}</span>
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-6">Teknik Broşür</h4>
+                            <h4 className="font-semibold text-industrial-gray mb-6">{t('pdp.docs.technicalBrochure')}</h4>
                             <div className="aspect-[3/4] bg-gradient-to-br from-secondary-blue/10 to-air-blue/20 rounded-lg mb-4 flex items-center justify-center">
                               <div className="text-center">
                                 <Download size={48} className="text-secondary-blue mx-auto mb-3" />
-                                <p className="text-steel-gray font-medium">Teknik Broşür</p>
+                                <p className="text-steel-gray font-medium">{t('pdp.docs.technicalBrochure')}</p>
                                 <p className="text-sm text-steel-gray">PDF - 4.2 MB</p>
                               </div>
                             </div>
                             <button className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={20} />
-                              <span>Broşürü İndir</span>
+                              <span>{t('pdp.actions.downloadBrochure')}</span>
                             </button>
                           </div>
                         </div>
@@ -706,28 +783,28 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
                             <FileText size={32} className="text-success-green mx-auto mb-2" />
-                            <h5 className="font-medium text-industrial-gray mb-1">Ürün Güncelleme Notları</h5>
+                            <h5 className="font-medium text-industrial-gray mb-1">{t('pdp.docs.productReleaseNotes')}</h5>
                             <p className="text-xs text-steel-gray mb-3">PDF - 800 KB</p>
                             <button className="text-success-green hover:bg-success-green hover:text-white py-1 px-3 rounded border border-success-green transition-colors text-sm">
-                              İndir
+                              {t('pdp.actions.download')}
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
                             <FileText size={32} className="text-warning-orange mx-auto mb-2" />
-                            <h5 className="font-medium text-industrial-gray mb-1">Sorun Giderme Rehberi</h5>
+                            <h5 className="font-medium text-industrial-gray mb-1">{t('pdp.docs.troubleshootingGuide')}</h5>
                             <p className="text-xs text-steel-gray mb-3">PDF - 1.1 MB</p>
                             <button className="text-warning-orange hover:bg-warning-orange hover:text-white py-1 px-3 rounded border border-warning-orange transition-colors text-sm">
-                              İndir
+                              {t('pdp.actions.download')}
                             </button>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
                             <FileText size={32} className="text-air-blue mx-auto mb-2" />
-                            <h5 className="font-medium text-industrial-gray mb-1">Yedek Parça Listesi</h5>
+                            <h5 className="font-medium text-industrial-gray mb-1">{t('pdp.docs.sparePartsList')}</h5>
                             <p className="text-xs text-steel-gray mb-3">PDF - 600 KB</p>
                             <button className="text-air-blue hover:bg-air-blue hover:text-white py-1 px-3 rounded border border-air-blue transition-colors text-sm">
-                              İndir
+                              {t('pdp.actions.download')}
                             </button>
                           </div>
                         </div>
@@ -743,92 +820,92 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-success-green/10 to-success-green/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-success-green mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">CE Sertifikası</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.ceCertificate')}</h4>
                               <p className="text-sm text-steel-gray">Avrupa Uygunluk Belgesi</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> CE-2024-{product.sku}</p>
-                              <p><strong>Geçerlilik:</strong> 2027'ye kadar</p>
-                              <p><strong>Standart:</strong> EN 12101-3:2013</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> CE-2024-{product.sku}</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> 2027</p>
+                              <p><strong>{t('pdp.certLabels.standard')}:</strong> EN 12101-3:2013</p>
                             </div>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-primary-navy/10 to-primary-navy/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-primary-navy mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">ISO 9001</h4>
-                              <p className="text-sm text-steel-gray">Kalite Yönetim Sistemi</p>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.iso9001')}</h4>
+                              <p className="text-sm text-steel-gray">Quality Management System</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> ISO-9001-{product.brand}</p>
-                              <p><strong>Geçerlilik:</strong> 2026'ya kadar</p>
-                              <p><strong>Standart:</strong> ISO 9001:2015</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> ISO-9001-{product.brand}</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> 2026</p>
+                              <p><strong>{t('pdp.certLabels.standard')}:</strong> ISO 9001:2015</p>
                             </div>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-secondary-blue/10 to-secondary-blue/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-secondary-blue mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">TSE Belgesi</h4>
-                              <p className="text-sm text-steel-gray">Türk Standartları Enstitüsü</p>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.tseCertificate')}</h4>
+                              <p className="text-sm text-steel-gray">Turkish Standards Institute</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> TSE-2024-{product.sku.substring(0, 3)}</p>
-                              <p><strong>Geçerlilik:</strong> 2025'ye kadar</p>
-                              <p><strong>Standart:</strong> TS EN 12101-3</p>
+<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> TSE-2024-{product.sku.substring(0, 3)}</p>
+<p><strong>{t('pdp.certLabels.validity')}:</strong> 2025</p>
+                              <p><strong>{t('pdp.certLabels.standard')}:</strong> TS EN 12101-3</p>
                             </div>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-air-blue/20 to-air-blue/10 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-air-blue mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Energy Star</h4>
-                              <p className="text-sm text-steel-gray">Enerji Verimliliği</p>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.energyStar')}</h4>
+                              <p className="text-sm text-steel-gray">{t('pdp.certLabels.efficiency')}</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> ES-2024-{product.id.substring(0, 8)}</p>
-                              <p><strong>Geçerlilik:</strong> 2027'ye kadar</p>
-                              <p><strong>Verimlilik:</strong> A++ Sınıfı</p>
+<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> ES-2024-{product.id.substring(0, 8)}</p>
+<p><strong>{t('pdp.certLabels.validity')}:</strong> 2027</p>
+<p><strong>{t('pdp.certLabels.efficiency')}:</strong> A++</p>
                             </div>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-warning-orange/10 to-warning-orange/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-warning-orange mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">UL Belgesi</h4>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.ulCertificate')}</h4>
                               <p className="text-sm text-steel-gray">Underwriters Laboratories</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> UL-{product.sku}-2024</p>
-                              <p><strong>Geçerlilik:</strong> 2026'ya kadar</p>
-                              <p><strong>Standart:</strong> UL 555S</p>
+<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> UL-{product.sku}-2024</p>
+<p><strong>{t('pdp.certLabels.validity')}:</strong> 2026</p>
+<p><strong>{t('pdp.certLabels.standard')}:</strong> UL 555S</p>
                             </div>
                           </div>
                           
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-success-green/20 to-success-green/10 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-success-green mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">Çevre Dostu</h4>
-                              <p className="text-sm text-steel-gray">RoHS Uyumlu</p>
+                              <h4 className="font-semibold text-industrial-gray">{t('pdp.cert.ecoFriendly')}</h4>
+                              <p className="text-sm text-steel-gray">{t('pdp.cert.rohsCompliant')}</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-                              <p><strong>Sertifika No:</strong> RoHS-{product.brand}-2024</p>
-                              <p><strong>Geçerlilik:</strong> Sürekli</p>
-                              <p><strong>Standart:</strong> EU 2011/65</p>
+<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> RoHS-{product.brand}-2024</p>
+<p><strong>{t('pdp.certLabels.validity')}:</strong> Continuous</p>
+<p><strong>{t('pdp.certLabels.standard')}:</strong> EU 2011/65</p>
                             </div>
                           </div>
                         </div>
                         
                         <div className="mt-8 bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                          <h4 className="font-semibold text-industrial-gray mb-4 text-center">Sertifika İndirme Merkezi</h4>
+                          <h4 className="font-semibold text-industrial-gray mb-4 text-center">{t('pdp.cert.downloadCenter')}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button className="bg-primary-navy hover:bg-secondary-blue text-white py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={20} />
-                              <span>Tüm Sertifikaları İndir (ZIP)</span>
+                              <span>{t('pdp.cert.downloadAllZip')}</span>
                             </button>
                             <button className="bg-secondary-blue hover:bg-primary-navy text-white py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <FileText size={20} />
-                              <span>Sertifika Doğrulama</span>
+                              <span>{t('pdp.cert.verify')}</span>
                             </button>
                           </div>
                         </div>
@@ -850,7 +927,7 @@ export const ProductDetailPage: React.FC = () => {
           {relatedProducts.length > 0 && (
             <div className="mt-16">
               <h2 className="text-2xl font-bold text-industrial-gray mb-8 text-center">
-                Benzer Ürünler
+                {t('pdp.relatedProducts')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((relatedProduct) => (
@@ -861,6 +938,7 @@ export const ProductDetailPage: React.FC = () => {
           )}
         </div>
       </div>
+      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} productId={product.id} />
     </div>
   )
 }
