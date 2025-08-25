@@ -529,10 +529,33 @@ export const tr = {
   },
   support: {
     links: { faq: 'SSS', returns: 'İade & Değişim', shipping: 'Teslimat & Kargo', warranty: 'Garanti & Servis' },
+    home: {
+      subtitle: 'İhtiyacınız olan bilgiyi hızlıca bulun.',
+      faqDesc: 'Sipariş, ödeme, kurulum ve daha fazlası',
+      returnsDesc: 'Cayma hakkı, iade süreçleri ve koşullar',
+      shippingDesc: 'Kargo süresi, ücretler, takip bilgileri',
+      warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgiler'
+    },
     returns: {
       title: 'İade & Değişim',
       desc1: '14 gün içinde cayma hakkınızı kullanabilirsiniz. Ürün, faturası ve tüm aksesuarları ile birlikte, kullanılmamış ve yeniden satılabilir durumda olmalıdır.',
       desc2: 'İade talebinizi sipariş numarası ile destek ekibimize iletin. Onay sonrasında kargo yönlendirmesi sağlanacaktır.'
+    },
+    shipping: {
+      desc1: 'Kargo süreci genellikle 1–5 iş günü sürer; kampanyalara ve stok durumuna göre değişebilir.',
+      desc2: 'Kargo ücreti ve sağlayıcı bilgileri ödeme adımında gösterilir. Takip numarası e‑posta ile iletilir.'
+    },
+    warranty: {
+      desc1: 'Garanti kapsamı üretici/ithalatçı şartlarına göre değişebilir. Garanti belgesi ve kullanım kılavuzunu saklayınız.',
+      desc2: 'Yetkili servis bilgisi ve arıza kaydı için destek ekibimizle iletişime geçebilirsiniz.'
+    },
+    faq: {
+      q1: 'Siparişim ne zaman kargoya verilir?',
+      a1: 'Genellikle ödeme onayından itibaren 1–5 iş günü içinde kargoya verilir.',
+      q2: 'Ödeme yöntemleri nelerdir?',
+      a2: 'Kredi/Banka kartıyla iyzico altyapısı üzerinden güvenli ödeme yapabilirsiniz.',
+      q3: 'Kurulum hizmeti sağlıyor musunuz?',
+      a3: 'Ürün bazında değişebilir. Destek ekibimizle iletişime geçin.'
     }
   },
   lead: {

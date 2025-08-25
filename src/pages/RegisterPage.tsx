@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useI18n } from '../i18n/I18nProvider'
 
 export const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [registrationComplete, setRegistrationComplete] = useState(false)
   const { signUp } = useAuth()
+  const { t } = useI18n()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,22 +28,22 @@ export const RegisterPage: React.FC = () => {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      toast.error('Ad Soyad alanı zorunludur')
+      toast.error(t('auth.errors.nameRequired') || t('auth.name'))
       return false
     }
     
     if (!formData.email || !formData.email.includes('@')) {
-      toast.error('Geçerli bir e-posta adresi giriniz')
+      toast.error(t('auth.emailInvalid') || t('auth.validEmailPassRequired'))
       return false
     }
     
     if (formData.password.length < 6) {
-      toast.error('Şifre en az 6 karakter olmalıdır')
+      toast.error(t('auth.passwordMin'))
       return false
     }
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Şifreler eşleşmiyor')
+      toast.error(t('auth.passwordsDontMatch'))
       return false
     }
     
@@ -60,18 +62,18 @@ export const RegisterPage: React.FC = () => {
       
       if (error) {
         if (error.message?.includes('already registered')) {
-          toast.error('Bu e-posta adresi zaten kayıtlı')
+          toast.error(t('auth.emailAlready') || 'Already registered')
         } else if (error.message?.includes('Password should be at least')) {
-          toast.error('Şifre en az 6 karakter olmalıdır')
+          toast.error(t('auth.passwordMin'))
         } else {
-          toast.error(error.message || 'Kayıt sırasında hata oluştu')
+          toast.error(error.message || t('auth.genericLoginError'))
         }
       } else {
         setRegistrationComplete(true)
-        toast.success('Kayıt başarılı! E-posta adresinizi kontrol edin.')
+        toast.success(t('auth.registrationEmailSent'))
       }
     } catch (error) {
-      toast.error('Beklenmeyen bir hata oluştu')
+      toast.error(t('auth.unexpectedError'))
       console.error('Registration error:', error)
     } finally {
       setLoading(false)
@@ -127,7 +129,7 @@ export const RegisterPage: React.FC = () => {
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>Geri Dön</span>
+          <span>{t('auth.back')}</span>
         </Link>
 
         {/* Register Card */}
@@ -138,10 +140,10 @@ export const RegisterPage: React.FC = () => {
               <User size={28} />
             </div>
             <h1 className="text-2xl font-bold text-industrial-gray mb-2">
-              Kayıt Ol
+              {t('auth.registerTitle')}
             </h1>
             <p className="text-steel-gray">
-              VentHub'a katılın ve özel avantajlardan yararlanın
+              {t('auth.registerSubtitle')}
             </p>
           </div>
 
@@ -150,7 +152,7 @@ export const RegisterPage: React.FC = () => {
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Ad Soyad *
+                {t('auth.name')} *
               </label>
               <div className="relative">
                 <User size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -160,7 +162,7 @@ export const RegisterPage: React.FC = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                  placeholder="Adınız ve soyadınız"
+                  placeholder={t('checkout.personal.namePlaceholder')}
                   required
                 />
               </div>
@@ -169,7 +171,7 @@ export const RegisterPage: React.FC = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                E-posta Adresi *
+                {t('auth.email')} *
               </label>
               <div className="relative">
                 <Mail size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -179,7 +181,7 @@ export const RegisterPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                  placeholder="ornek@email.com"
+                  placeholder={t('checkout.personal.emailPlaceholder')}
                   required
                 />
               </div>
@@ -188,7 +190,7 @@ export const RegisterPage: React.FC = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Şifre *
+                {t('auth.password')} *
               </label>
               <div className="relative">
                 <Lock size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -198,7 +200,7 @@ export const RegisterPage: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                  placeholder="En az 6 karakter"
+                  placeholder={t('auth.passwordMin')}
                   required
                 />
                 <button
@@ -214,7 +216,7 @@ export const RegisterPage: React.FC = () => {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Şifre Tekrarı *
+                {t('auth.confirmPassword')} *
               </label>
               <div className="relative">
                 <Lock size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -224,7 +226,7 @@ export const RegisterPage: React.FC = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="w-full pl-10 pr-12 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                  placeholder="Şifrenizi tekrar girin"
+                  placeholder={t('auth.confirmPassword')}
                   required
                 />
                 <button
@@ -246,10 +248,10 @@ export const RegisterPage: React.FC = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  Kayıt Yapılıyor...
+                  {t('auth.registering')}
                 </div>
               ) : (
-                'Kayıt Ol'
+t('auth.register')
               )}
             </button>
           </form>
@@ -257,12 +259,12 @@ export const RegisterPage: React.FC = () => {
           {/* Login Link */}
           <div className="mt-8 text-center">
             <p className="text-steel-gray">
-              Zaten hesabınız var mı?{' '}
+              {t('auth.alreadyHave')} {' '}
               <Link
                 to="/auth/login"
                 className="text-primary-navy hover:text-secondary-blue font-medium"
               >
-                Giriş Yap
+                {t('auth.login')}
               </Link>
             </p>
           </div>

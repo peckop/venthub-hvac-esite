@@ -1,13 +1,15 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const SupportHomePage: React.FC = () => {
+  const { t } = useI18n()
   const cards = [
-    { title: 'Sıkça Sorulan Sorular', desc: 'Sipariş, ödeme, kurulum ve daha fazlası', to: '/support/sss', icon: HelpCircle },
-    { title: 'İade & Değişim', desc: 'Cayma hakkı, iade süreçleri ve koşullar', to: '/support/iade-degisim', icon: Package },
-    { title: 'Teslimat & Kargo', desc: 'Kargo süresi, ücretler, takip bilgileri', to: '/support/teslimat-kargo', icon: Truck },
-    { title: 'Garanti & Servis', desc: 'Garanti kapsamı ve yetkili servis bilgileri', to: '/support/garanti-servis', icon: ShieldCheck },
+    { title: t('support.links.faq'), desc: t('support.home.faqDesc'), to: '/support/sss', icon: HelpCircle },
+    { title: t('support.links.returns'), desc: t('support.home.returnsDesc'), to: '/support/iade-degisim', icon: Package },
+    { title: t('support.links.shipping'), desc: t('support.home.shippingDesc'), to: '/support/teslimat-kargo', icon: Truck },
+    { title: t('support.links.warranty'), desc: t('support.home.warrantyDesc'), to: '/support/garanti-servis', icon: ShieldCheck },
   ]
 
   const navigate = useNavigate()
@@ -16,11 +18,11 @@ const SupportHomePage: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-4">
         <button onClick={() => navigate(-1)} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
-          <ArrowLeft size={18} className="mr-1" /> Geri
+          <ArrowLeft size={18} className="mr-1" /> {t('auth.back')}
         </button>
       </div>
-      <h1 className="text-3xl font-bold text-industrial-gray mb-2">Destek Merkezi</h1>
-      <p className="text-steel-gray mb-8">İhtiyacınız olan bilgiyi hızlıca bulun.</p>
+      <h1 className="text-3xl font-bold text-industrial-gray mb-2">{t('common.supportCenter')}</h1>
+      <p className="text-steel-gray mb-8">{t('support.home.subtitle')}</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map(({ title, desc, to, icon: Icon }) => (

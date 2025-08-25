@@ -3,18 +3,20 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useI18n } from '../i18n/I18nProvider'
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const { resetPassword } = useAuth()
+  const { t } = useI18n()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!email) {
-      toast.error('E-posta adresi zorunludur')
+      toast.error(t('auth.email') + ' ' + t('auth.required' as any) || 'Required')
       return
     }
 
@@ -25,16 +27,16 @@ export const ForgotPasswordPage: React.FC = () => {
       
       if (error) {
         if (error.message?.includes('User not found')) {
-          toast.error('Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı')
+          toast.error(t('auth.userNotFound') || 'User not found')
         } else {
-          toast.error(error.message || 'Şifre sıfırlama sırasında hata oluştu')
+          toast.error(error.message || t('auth.resetError') || 'Reset error')
         }
       } else {
         setEmailSent(true)
-        toast.success('Şifre sıfırlama e-postası gönderildi!')
+        toast.success(t('auth.resetEmailSent') || 'Email sent')
       }
     } catch (error) {
-      toast.error('Beklenmeyen bir hata oluştu')
+      toast.error(t('auth.unexpectedError'))
       console.error('Reset password error:', error)
     } finally {
       setLoading(false)
@@ -90,7 +92,7 @@ export const ForgotPasswordPage: React.FC = () => {
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>Giriş Sayfasına Dön</span>
+          <span>{t('auth.back')}</span>
         </Link>
 
         {/* Forgot Password Card */}
@@ -101,10 +103,10 @@ export const ForgotPasswordPage: React.FC = () => {
               <Mail size={28} />
             </div>
             <h1 className="text-2xl font-bold text-industrial-gray mb-2">
-              Şifremi Unuttum
+              {t('auth.forgotPassword')}
             </h1>
             <p className="text-steel-gray">
-              E-posta adresinizi girin, size şifre sıfırlama linki gönderelim
+              {t('auth.resetSubtitle')}
             </p>
           </div>
 
@@ -113,7 +115,7 @@ export const ForgotPasswordPage: React.FC = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                E-posta Adresi
+                {t('auth.email')}
               </label>
               <div className="relative">
                 <Mail size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -137,10 +139,10 @@ export const ForgotPasswordPage: React.FC = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  Gönderiliyor...
+                  {t('auth.submitting') || 'Gönderiliyor...'}
                 </div>
               ) : (
-                'Şifre Sıfırlama Linki Gönder'
+t('auth.sendResetLink' as any) || 'Şifre Sıfırlama Linki Gönder'
               )}
             </button>
           </form>

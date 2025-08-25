@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useI18n } from '../i18n/I18nProvider'
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -12,6 +13,7 @@ export const LoginPage: React.FC = () => {
   const { signIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useI18n()
 
   const state = (location.state ?? null) as { from?: { pathname?: string } } | null
   const from = state?.from?.pathname || '/'
@@ -20,7 +22,7 @@ export const LoginPage: React.FC = () => {
     e.preventDefault()
     
     if (!email || !password) {
-      toast.error('E-posta ve şifre alanları zorunludur')
+      toast.error(t('auth.validEmailPassRequired'))
       return
     }
 
@@ -31,18 +33,18 @@ export const LoginPage: React.FC = () => {
       
       if (error) {
         if (error.message?.includes('Invalid login credentials')) {
-          toast.error('E-posta veya şifre hatalı')
+          toast.error(t('auth.invalidCreds'))
         } else if (error.message?.includes('Email not confirmed')) {
-          toast.error('E-posta adresinizi doğrulamanız gerekiyor')
+          toast.error(t('auth.emailNotConfirmed'))
         } else {
-          toast.error(error.message || 'Giriş sırasında hata oluştu')
+          toast.error(error.message || t('auth.genericLoginError'))
         }
       } else {
         // Success - navigate to intended page
         navigate(from, { replace: true })
       }
     } catch (error) {
-      toast.error('Beklenmeyen bir hata oluştu')
+      toast.error(t('auth.unexpectedError'))
       console.error('Login error:', error)
     } finally {
       setLoading(false)
@@ -63,7 +65,7 @@ export const LoginPage: React.FC = () => {
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>Geri Dön</span>
+          <span>{t('auth.back')}</span>
         </Link>
 
         {/* Login Card */}
@@ -74,10 +76,10 @@ export const LoginPage: React.FC = () => {
               <Lock size={28} />
             </div>
             <h1 className="text-2xl font-bold text-industrial-gray mb-2">
-              Giriş Yap
+              {t('auth.loginTitle')}
             </h1>
             <p className="text-steel-gray">
-              VentHub hesabınıza giriş yapın
+              {t('auth.loginSubtitle')}
             </p>
           </div>
 
@@ -86,7 +88,7 @@ export const LoginPage: React.FC = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                E-posta Adresi
+                {t('auth.email')}
               </label>
               <div className="relative">
                 <Mail size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -104,7 +106,7 @@ export const LoginPage: React.FC = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
-                Şifre
+                {t('auth.password')}
               </label>
               <div className="relative">
                 <Lock size={20} className="absolute left-3 top-3.5 text-steel-gray" />
@@ -132,7 +134,7 @@ export const LoginPage: React.FC = () => {
                 to="/auth/forgot-password"
                 className="text-sm text-primary-navy hover:text-secondary-blue"
               >
-                Şifremi Unuttum
+                {t('auth.forgotPassword')}
               </Link>
             </div>
 
@@ -145,10 +147,10 @@ export const LoginPage: React.FC = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  Giriş Yapılıyor...
+                  {t('auth.loggingIn')}
                 </div>
               ) : (
-                'Giriş Yap'
+t('auth.login')
               )}
             </button>
           </form>
@@ -156,12 +158,12 @@ export const LoginPage: React.FC = () => {
           {/* Sign Up Link */}
           <div className="mt-8 text-center">
             <p className="text-steel-gray">
-              Hesabınız yok mu?{' '}
+              {t('auth.noAccount')} {' '}
               <Link
                 to="/auth/register"
                 className="text-primary-navy hover:text-secondary-blue font-medium"
               >
-                Kayıt Ol
+                {t('auth.register')}
               </Link>
             </p>
           </div>

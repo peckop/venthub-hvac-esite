@@ -531,10 +531,33 @@ export const en = {
   },
   support: {
     links: { faq: 'FAQ', returns: 'Returns & Exchanges', shipping: 'Shipping & Delivery', warranty: 'Warranty & Service' },
+    home: {
+      subtitle: 'Quickly find the information you need.',
+      faqDesc: 'Orders, payment, installation and more',
+      returnsDesc: 'Right of withdrawal, return process and conditions',
+      shippingDesc: 'Delivery time, fees, tracking info',
+      warrantyDesc: 'Warranty coverage and authorized service'
+    },
     returns: {
       title: 'Returns & Exchanges',
       desc1: 'You may use your right of withdrawal within 14 days. The product must be unused and resalable with invoice and all accessories included.',
       desc2: 'Please contact our support team with your order number for a return request. After approval, shipping instructions will be provided.'
+    },
+    shipping: {
+      desc1: 'Delivery usually takes 1–5 business days and may vary depending on campaigns and stock.',
+      desc2: 'Shipping fee/provider is shown at checkout. Tracking number will be sent via email.'
+    },
+    warranty: {
+      desc1: 'Warranty coverage may vary by manufacturer/importer. Please keep the warranty card and user manual.',
+      desc2: 'For service info or malfunction records, contact our support team.'
+    },
+    faq: {
+      q1: 'When will my order be shipped?',
+      a1: 'Usually within 1–5 business days after payment approval.',
+      q2: 'What are the payment methods?',
+      a2: 'You can pay securely with credit/debit cards via iyzico.',
+      q3: 'Do you provide installation service?',
+      a3: 'It may vary by product. Please contact our support team.'
     }
   },
   lead: {
