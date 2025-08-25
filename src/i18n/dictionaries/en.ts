@@ -480,6 +480,26 @@ export const en = {
       database: 'Database error. Please try again.'
     }
   },
+  payment: {
+    verifyingTitle: 'Verifying payment...',
+    verifyingDesc: 'We are confirming the transaction with your bank. Please wait a moment.',
+    failedTitle: 'Payment Failed',
+    retry: 'Try Again',
+    orderCompletedTitle: 'Your Order is Complete!',
+    orderNoLabel: 'Order No',
+    orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',
+    dateLabel: 'Date',
+    itemsCountLabel: 'Items',
+    securedBy3d: 'Secured by 3D',
+    viewOrderDetails: 'View Order Details',
+
+    failedGeneric: 'Payment could not be completed',
+    failedToast: 'Payment failed: {{msg}}',
+    verifyError: 'Verification error',
+    errorDuring: 'Error: {{msg}}',
+    unverified: 'Payment could not be verified',
+    unexpected: 'An unexpected error occurred'
+  },
   brands: {
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: "As Turkey's distributor of leading HVAC brands, we offer top-quality ventilation solutions.",

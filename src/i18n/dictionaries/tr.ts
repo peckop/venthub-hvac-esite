@@ -478,6 +478,26 @@ export const tr = {
       database: 'Veritabanı hatası. Lütfen tekrar deneyin.'
     }
   },
+  payment: {
+    verifyingTitle: 'Ödeme doğrulanıyor...',
+    verifyingDesc: 'İşleminiz bankanızla doğrulanıyor. Lütfen bekleyin.',
+    failedTitle: 'Ödeme Başarısız',
+    retry: 'Tekrar Dene',
+    orderCompletedTitle: 'Siparişiniz Tamamlandı!',
+    orderNoLabel: 'Sipariş No',
+    orderCompletedDesc: 'Siparişiniz başarıyla alındı. Kısa süre içinde e‑posta ile bilgilendirme yapılacaktır.',
+    dateLabel: 'Tarih',
+    itemsCountLabel: 'Ürün Adedi',
+    securedBy3d: '3D ile Güvenli',
+    viewOrderDetails: 'Sipariş Detaylarını Gör',
+
+    failedGeneric: 'Ödeme tamamlanamadı',
+    failedToast: 'Ödeme başarısız: {{msg}}',
+    verifyError: 'Doğrulama hatası',
+    errorDuring: 'Hata: {{msg}}',
+    unverified: 'Ödeme doğrulanamadı',
+    unexpected: 'Beklenmeyen bir hata oluştu'
+  },
   brands: {
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının Türkiye distribütörü olarak en kaliteli havalandırma çözümlerini sunuyoruz.',
