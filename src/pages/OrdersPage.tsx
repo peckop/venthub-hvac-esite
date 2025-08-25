@@ -396,7 +396,7 @@ export const OrdersPage: React.FC = () => {
                   <div className="mb-4">
                     <div className="flex items-center gap-2">
                       {steps.map((s, idx) => {
-                        const activeIdx = Math.max(steps.indexOf(order.status.toLowerCase()), 0)
+                        const activeIdx = Math.max(steps.indexOf(order.status.toLowerCase() as 'paid' | 'pending' | 'shipped' | 'delivered'), 0)
                         const active = idx <= activeIdx
                         return (
                           <React.Fragment key={s}>

@@ -25,7 +25,6 @@ export const tr = {
     featured: "Öne Çıkan Ürünler",
     newProducts: "Yeni Ürünler",
     whyUs: "Neden VentHub?",
-    brands: "Markalar",
     home: "Ana Sayfa",
     discoverPage: "Keşfet",
     notFound: "Sonuç bulunamadı",

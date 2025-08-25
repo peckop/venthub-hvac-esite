@@ -138,9 +138,9 @@ export const CheckoutPage: React.FC = () => {
   const isDigits = (s: string) => /^\d+$/.test(s)
   const validateInvoiceAndConsents = () => {
     if (invoiceType === 'individual') {
-      const t = (invoiceInfo.tckn || '').trim()
-      if (!t) { toast.error(t('checkout.errors.tcknRequired')); return false }
-      if (!(isDigits(t) && t.length === 11)) { toast.error(t('checkout.errors.tcknFormat')); return false }
+      const tcknVal = (invoiceInfo.tckn || '').trim()
+      if (!tcknVal) { toast.error(t('checkout.errors.tcknRequired')); return false }
+      if (!(isDigits(tcknVal) && tcknVal.length === 11)) { toast.error(t('checkout.errors.tcknFormat')); return false }
     } else {
       const vkn = (invoiceInfo.vkn || '').trim()
       const companyName = (invoiceInfo.companyName || '').trim()
@@ -412,7 +412,7 @@ export const CheckoutPage: React.FC = () => {
   useEffect(() => {
     let timer: number | undefined
     if (step === 3 && orderId) {
-      timer = setInterval(async () => {
+      timer = window.setInterval(async () => {
         try {
           const { data, error } = await supabase
             .from('venthub_orders')

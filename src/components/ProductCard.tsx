@@ -104,7 +104,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  onToggleCompare && onToggleCompare(product.id)
+                  if (onToggleCompare) {
+                    onToggleCompare(product.id)
+                  }
                 }}
               >
                 <input
@@ -132,18 +134,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <ShoppingCart size={16} />
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>
-            
-            {onQuickView && (
+            {onQuickView ? (
               <button
                 type="button"
                 onClick={handleQuickView}
                 className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors"
               >
-                  <span className="text-sm text-steel-gray hover:text-secondary-blue">
+                <span className="text-sm text-steel-gray hover:text-secondary-blue">
                   {t('quickView.title')}
                 </span>
               </button>
-            )}
+            ) : null}
           </div>
         </div>
 

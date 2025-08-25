@@ -25,7 +25,6 @@ export const en = {
     featured: "Featured Products",
     newProducts: "New Products",
     whyUs: "Why VentHub?",
-    brands: "Brands",
     home: "Home",
     discoverPage: "Discover",
     notFound: "No results found",
