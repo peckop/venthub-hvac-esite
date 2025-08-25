@@ -291,42 +291,44 @@ export const CategoryPage: React.FC = () => {
             </div>
 
             {/* Products */}
-            {filteredProducts.length > 0 ? (
-              <div className={viewMode === 'grid' 
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                : 'space-y-4'
-              }>
-                {filteredProducts.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    highlightFeatured={false}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-semibold text-industrial-gray mb-4">
-                  Ürün Bulunamadı
-                </h3>
-                <p className="text-steel-gray mb-6">
-                  Seçtiğiniz filtrelere uygun ürün bulunamadı.
-                </p>
-                <button
-                  onClick={() => {
-                    setPriceRange([0, 10000])
-                    setSelectedBrands([])
-                  }}
-                  className="text-primary-navy hover:text-secondary-blue transition-colors"
-                >
-                  Filtreleri Temizle
-                </button>
-              </div>
-            )}
-          </div>
+            <div className="bg-white rounded-xl p-2 sm:p-3">
+              {filteredProducts.length > 0 ? (
+                <div className={viewMode === 'grid' 
+                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
+                  : 'space-y-4'
+                }>
+                  {filteredProducts.map((product) => (
+                    <ProductCard 
+                      key={product.id} 
+                      product={product} 
+                      highlightFeatured={false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-semibold text-industrial-gray mb-4">
+                    Ürün Bulunamadı
+                  </h3>
+                  <p className="text-steel-gray mb-6">
+                    Seçtiğiniz filtrelere uygun ürün bulunamadı.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setPriceRange([0, 10000])
+                      setSelectedBrands([])
+                    }}
+                    className="text-primary-navy hover:text-secondary-blue transition-colors"
+                  >
+                    Filtreleri Temizle
+                  </button>
+                </div>
+              )}
+            </div>
         </div>
       </div>
     </div>
+  </div>
   )
 }
 

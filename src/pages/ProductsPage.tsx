@@ -217,20 +217,20 @@ const ProductsPage: React.FC = () => {
               <label className="block text-sm font-medium text-industrial-gray mb-2">
                 Fiyat Aralığı
               </label>
-              <div className="flex space-x-2">
+              <div className="grid grid-cols-2 gap-2 min-w-0">
                 <input
                   type="number"
                   placeholder="Min"
                   value={priceRange.min}
                   onChange={(e) => setPriceRange({...priceRange, min: e.target.value})}
-                  className="flex-1 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+                  className="w-full min-w-0 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
                 />
                 <input
                   type="number"
                   placeholder="Max"
                   value={priceRange.max}
                   onChange={(e) => setPriceRange({...priceRange, max: e.target.value})}
-                  className="flex-1 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+                  className="w-full min-w-0 border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
                 />
               </div>
             </div>
@@ -239,37 +239,39 @@ const ProductsPage: React.FC = () => {
 
         {/* Products Grid/List */}
         <div className="flex-1">
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl text-light-gray mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-                Ürün Bulunamadı
-              </h3>
-              <p className="text-steel-gray mb-4">
-                Aradığınız kriterlere uygun ürün bulunamadı.
-              </p>
-              <button
-                onClick={clearFilters}
-                className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors"
-              >
-                Filtreleri Temizle
-              </button>
-            </div>
-          ) : (
-            <div className={`grid gap-6 ${
-              viewMode === 'grid'
-                ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
-                : 'grid-cols-1'
-            }`}>
-              {filteredProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product}
-                  highlightFeatured={false}
-                />
-              ))}
-            </div>
-          )}
+          <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl text-light-gray mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-industrial-gray mb-2">
+                  Ürün Bulunamadı
+                </h3>
+                <p className="text-steel-gray mb-4">
+                  Aradığınız kriterlere uygun ürün bulunamadı.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Filtreleri Temizle
+                </button>
+              </div>
+            ) : (
+              <div className={`grid gap-3 ${
+                viewMode === 'grid'
+                  ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
+                  : 'grid-cols-1'
+              }`}>
+                {filteredProducts.map((product) => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product}
+                    highlightFeatured={false}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

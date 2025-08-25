@@ -31,8 +31,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
   return (
     <Link to={`/product/${product.id}`}>
-      <div className={`group relative bg-white rounded-xl shadow-sm hover:shadow-hvac transition-all duration-200 overflow-hidden border ${
-        highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-light-gray'
+      <div className={`group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 transition-all duration-200 overflow-hidden border ${
+        highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
       }`}>
         {/* Featured Badge */}
         {product.is_featured && (
