@@ -8,7 +8,6 @@ import StickyHeader from './components/StickyHeader'
 import ScrollToTop from './components/ScrollToTop'
 import HomePage from './pages/HomePage'
 import ProductsPage from './pages/ProductsPage'
-import { I18nProvider } from './i18n/I18nProvider'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import CartPage from './pages/CartPage'
 import ProductDetailPage from './pages/ProductDetailPage'
@@ -48,7 +47,6 @@ function App() {
           v7_startTransition: true,
           v7_relativeSplatPath: true
         }}>
-          <I18nProvider>
             <div className="min-h-screen bg-white">
               {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
               <ScrollToTop />
@@ -124,7 +122,6 @@ function App() {
               }}
             />
             </div>
-          </I18nProvider>
         </Router>
       </CartProvider>
     </AuthProvider>
