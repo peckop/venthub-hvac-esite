@@ -4,15 +4,7 @@ import { describe, it, expect, vi, afterEach, type Mock } from 'vitest'
 import { render, screen, within, fireEvent, cleanup, configure } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-// Component under test
-import CheckoutPage from '@/pages/CheckoutPage'
-
-// I18n Provider
-import { I18nProvider } from '@/i18n/I18nProvider'
-import { tr } from '@/i18n/dictionaries/tr'
-
-// Mocks
-// lucide iconlarını ve SecurityRibbon'u hafiflet
+// Mocks (define BEFORE importing modules)
 vi.mock('lucide-react', () => ({
   ArrowLeft: () => null,
   CreditCard: () => null,
@@ -22,8 +14,6 @@ vi.mock('lucide-react', () => ({
   CheckCircle: () => null,
 }))
 vi.mock('@/components/SecurityRibbon', () => ({ default: () => null }))
-
-// react-hot-toast mock (zamanlayıcı sızıntılarını önlemek için)
 vi.mock('react-hot-toast', () => {
   const fn = (..._args: unknown[]) => {}
   const t = fn as unknown as { success: Mock; error: Mock; dismiss: Mock }
@@ -32,8 +22,6 @@ vi.mock('react-hot-toast', () => {
   t.dismiss = vi.fn()
   return { default: fn }
 })
-
-// i18n TR sözlüğünü minimal mock'la hafiflet (Provider tr dilini kullanıyor)
 vi.mock('@/i18n/dictionaries/tr', () => ({
   tr: {
     checkout: {
@@ -51,11 +39,9 @@ vi.mock('@/i18n/dictionaries/tr', () => ({
     orders: { qtyCol: 'Adet' },
   }
 }))
-
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1', email: 'u@u.com', user_metadata: { full_name: 'Test User', phone: '+905551112233' } }, loading: false })
 }))
-
 vi.mock('@/hooks/useCartHook', () => ({
   useCart: () => ({
     items: [
@@ -65,7 +51,6 @@ vi.mock('@/hooks/useCartHook', () => ({
     clearCart: vi.fn(),
   })
 }))
-
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     functions: { invoke: vi.fn().mockResolvedValue({ data: { data: { token: 'tok', orderId: 'o1', conversationId: 'cvid' } } }) },
@@ -75,7 +60,6 @@ vi.mock('@/lib/supabase', () => ({
   updateAddress: vi.fn(),
   deleteAddress: vi.fn(),
 }))
-
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
     functions: { invoke: vi.fn().mockResolvedValue({ data: { data: { token: 'tok', orderId: 'o1', conversationId: 'cvid' } } }) },
@@ -85,6 +69,12 @@ vi.mock('../../../lib/supabase', () => ({
   updateAddress: vi.fn(),
   deleteAddress: vi.fn(),
 }))
+
+// I18n Provider (import AFTER mocks so mocked tr is used)
+import { I18nProvider } from '@/i18n/I18nProvider'
+import { tr } from '@/i18n/dictionaries/tr'
+// Component under test (import AFTER mocks)
+import CheckoutPage from '@/pages/CheckoutPage'
 
 // RTL findBy/waitFor timeout'u kısa tutarak beklemeyi sınırla
 configure({ asyncUtilTimeout: 1200 })
