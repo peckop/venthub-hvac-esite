@@ -353,7 +353,14 @@ export async function listInvoiceProfiles() {
     .select('*')
     .order('is_default', { ascending: false })
     .order('created_at', { ascending: false })
-  if (error) throw error
+  if (error) {
+    const e = error as unknown as { code?: string; message?: string }
+    if (e?.code === 'PGRST205' || (e?.message || '').includes("Could not find the table 'public.user_invoice_profiles'")) {
+      // Table not yet migrated on the target — return empty list gracefully
+      return [] as InvoiceProfile[]
+    }
+    throw error
+  }
   return data as InvoiceProfile[]
 }
 
