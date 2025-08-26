@@ -36,6 +36,10 @@ import ShippingPage from './pages/support/ShippingPage'
 import WarrantyPage from './pages/support/WarrantyPage'
 import BrandsPage from './pages/BrandsPage'
 import BrandDetailPage from './pages/BrandDetailPage'
+import AccountLayout from './pages/account/AccountLayout'
+import AccountOverviewPage from './pages/account/AccountOverviewPage'
+import AccountAddressesPage from './pages/account/AccountAddressesPage'
+import AccountSecurityPage from './pages/account/AccountSecurityPage'
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -68,6 +72,14 @@ function App() {
                 <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
                 <Route path="/brands" element={<BrandsPage />} />
                 <Route path="/brands/:slug" element={<BrandDetailPage />} />
+                
+                {/* Account Routes */}
+                <Route path="/account" element={<AccountLayout />}>
+                  <Route index element={<AccountOverviewPage />} />
+                  <Route path="orders" element={<OrdersPage />} />
+                  <Route path="addresses" element={<AccountAddressesPage />} />
+                  <Route path="security" element={<AccountSecurityPage />} />
+                </Route>
                 
                 {/* Auth Routes */}
                 <Route path="/auth/login" element={<LoginPage />} />

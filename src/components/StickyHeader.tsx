@@ -237,6 +237,14 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             </div>
                           </div>
                           <Link
+                            to="/account"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
+                          >
+                            <User size={16} />
+                            <span>Hesabım</span>
+                          </Link>
+                          <Link
                             to="/orders"
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
@@ -265,7 +273,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     </Link>
                     <Link
                       to="/auth/register"
-                      className="bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy text-white text-sm font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                      className="hidden lg:block bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy text-white text-sm font-bold px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                     >
                       {t('common.signUp')}
                     </Link>
@@ -324,12 +332,20 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   )}
                 </Link>
                 {user && (
-                  <Link
-                    to="/orders"
-                    className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
-                  >
-                    <Package size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
-                  </Link>
+                  <>
+                    <Link
+                      to="/account"
+                      className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
+                    >
+                      <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
+                    >
+                      <Package size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

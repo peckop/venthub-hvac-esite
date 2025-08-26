@@ -3,6 +3,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { listAddresses, UserAddress } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
@@ -50,6 +51,50 @@ export const CheckoutPage: React.FC = () => {
         identityNumber: ''
       })
     }
+  }, [user])
+
+  // Prefill addresses from address book (defaults)
+  useEffect(() => {
+    let mounted = true
+    async function prefillAddresses() {
+      if (!user) return
+      try {
+        const rows: UserAddress[] = await listAddresses()
+        if (!mounted) return
+        const defShip = rows.find(r => r.is_default_shipping)
+        const defBill = rows.find(r => r.is_default_billing)
+        if (defShip) {
+          setShippingAddress({
+            fullAddress: defShip.full_address || '',
+            city: defShip.city || '',
+            district: defShip.district || '',
+            postalCode: defShip.postal_code || ''
+          })
+        }
+        if (defBill) {
+          setBillingAddress({
+            fullAddress: defBill.full_address || '',
+            city: defBill.city || '',
+            district: defBill.district || '',
+            postalCode: defBill.postal_code || ''
+          })
+          setSameAsShipping(false)
+        } else if (defShip) {
+          // If billing default is missing, mirror shipping by default
+          setBillingAddress({
+            fullAddress: defShip.full_address || '',
+            city: defShip.city || '',
+            district: defShip.district || '',
+            postalCode: defShip.postal_code || ''
+          })
+          setSameAsShipping(true)
+        }
+      } catch {
+        // no-op
+      }
+    }
+    prefillAddresses()
+    return () => { mounted = false }
   }, [user])
 
   // Form states

@@ -185,6 +185,12 @@ textarea:focus-visible {
     --sidebar-ring: 217.2 91.2% 59.8%
   }
 
+  html, body {
+    width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
   .dark {
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

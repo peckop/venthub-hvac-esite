@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   return (
-    <div className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
+    <div className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <img

@@ -191,3 +191,122 @@ export async function searchProducts(query: string) {
   if (error) throw error
   return data as Product[]
 }
+
+// ========== Account: Address Book ==========
+export interface UserAddress {
+  id: string
+  user_id: string
+  label?: string | null
+  full_name?: string | null
+  phone?: string | null
+  full_address: string
+  city: string
+  district: string
+  postal_code?: string | null
+  country?: string | null
+  is_default_shipping: boolean
+  is_default_billing: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateAddressInput {
+  label?: string
+  full_name?: string
+  phone?: string
+  full_address: string
+  city: string
+  district: string
+  postal_code?: string
+  country?: string
+  is_default_shipping?: boolean
+  is_default_billing?: boolean
+}
+
+export type UpdateAddressInput = Partial<CreateAddressInput>
+
+export async function listAddresses() {
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .select('*')
+    .order('is_default_shipping', { ascending: false })
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data as UserAddress[]
+}
+
+export async function createAddress(payload: CreateAddressInput) {
+  const { data: authData, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .insert({ user_id: user.id, ...payload })
+    .select('*')
+    .single()
+
+  if (error) throw error
+
+  if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id)
+  if (payload.is_default_billing) await setDefaultAddress('billing', data.id)
+
+  return data as UserAddress
+}
+
+export async function updateAddress(id: string, payload: UpdateAddressInput) {
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .update(payload)
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+
+  if (payload.is_default_shipping) await setDefaultAddress('shipping', id)
+  if (payload.is_default_billing) await setDefaultAddress('billing', id)
+
+  return data as UserAddress
+}
+
+export async function deleteAddress(id: string) {
+  const { error } = await supabase
+    .from('user_addresses')
+    .delete()
+    .eq('id', id)
+
+  if (error) throw error
+  return true
+}
+
+export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string) {
+  const { data: authData, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
+  const flag: 'is_default_shipping' | 'is_default_billing' = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
+
+  // Clear others
+  const clearPatch = { [flag]: false } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const clear = await supabase
+    .from('user_addresses')
+    .update(clearPatch)
+    .eq('user_id', user.id)
+
+  if (clear.error) throw clear.error
+
+  const setPatch = { [flag]: true } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const { data, error } = await supabase
+    .from('user_addresses')
+    .update(setPatch)
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return data as UserAddress
+}
