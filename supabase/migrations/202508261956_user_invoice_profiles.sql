@@ -30,18 +30,26 @@ create unique index if not exists uniq_user_invoice_profiles_default_per_type
 
 alter table public.user_invoice_profiles enable row level security;
 
--- RLS: owner-only access
-create policy if not exists user_invoice_profiles_select on public.user_invoice_profiles
-  for select using (auth.uid() = user_id);
+-- RLS: owner-only access (CREATE POLICY IF NOT EXISTS workaround)
+DO $$ BEGIN
+  CREATE POLICY user_invoice_profiles_select ON public.user_invoice_profiles
+    FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-create policy if not exists user_invoice_profiles_insert on public.user_invoice_profiles
-  for insert with check (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY user_invoice_profiles_insert ON public.user_invoice_profiles
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-create policy if not exists user_invoice_profiles_update on public.user_invoice_profiles
-  for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY user_invoice_profiles_update ON public.user_invoice_profiles
+    FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-create policy if not exists user_invoice_profiles_delete on public.user_invoice_profiles
-  for delete using (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY user_invoice_profiles_delete ON public.user_invoice_profiles
+    FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- updated_at trigger
 create or replace function public.set_updated_at()
