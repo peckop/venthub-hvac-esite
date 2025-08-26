@@ -40,6 +40,7 @@ import AccountLayout from './pages/account/AccountLayout'
 import AccountOverviewPage from './pages/account/AccountOverviewPage'
 import AccountAddressesPage from './pages/account/AccountAddressesPage'
 import AccountSecurityPage from './pages/account/AccountSecurityPage'
+import AccountInvoicesPage from './pages/account/AccountInvoicesPage'
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -78,6 +79,7 @@ function App() {
                   <Route index element={<AccountOverviewPage />} />
                   <Route path="orders" element={<OrdersPage />} />
                   <Route path="addresses" element={<AccountAddressesPage />} />
+                  <Route path="invoices" element={<AccountInvoicesPage />} />
                   <Route path="security" element={<AccountSecurityPage />} />
                 </Route>
                 

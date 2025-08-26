@@ -315,3 +315,90 @@ export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string
   if (error) throw error
   return data as UserAddress
 }
+
+// ========== Account: Invoice Profiles ==========
+export type InvoiceProfileType = 'individual' | 'corporate'
+export interface InvoiceProfile {
+  id: string
+  user_id: string
+  type: InvoiceProfileType
+  title?: string | null
+  tckn?: string | null
+  company_name?: string | null
+  vkn?: string | null
+  tax_office?: string | null
+  e_invoice?: boolean | null
+  is_default: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateInvoiceProfileInput {
+  type: InvoiceProfileType
+  title?: string
+  // individual
+  tckn?: string
+  // corporate
+  company_name?: string
+  vkn?: string
+  tax_office?: string
+  e_invoice?: boolean
+  is_default?: boolean
+}
+export type UpdateInvoiceProfileInput = Partial<CreateInvoiceProfileInput>
+
+export async function listInvoiceProfiles() {
+  const { data, error } = await supabase
+    .from('user_invoice_profiles')
+    .select('*')
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data as InvoiceProfile[]
+}
+
+export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
+  const { data: authData, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
+  const { data, error } = await supabase
+    .from('user_invoice_profiles')
+    .insert({ user_id: user.id, ...payload })
+    .select('*')
+    .single()
+  if (error) throw error
+  return data as InvoiceProfile
+}
+
+export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
+  const { data, error } = await supabase
+    .from('user_invoice_profiles')
+    .update(payload)
+    .eq('id', id)
+    .select('*')
+    .single()
+  if (error) throw error
+  return data as InvoiceProfile
+}
+
+export async function deleteInvoiceProfile(id: string) {
+  const { error } = await supabase
+    .from('user_invoice_profiles')
+    .delete()
+    .eq('id', id)
+  if (error) throw error
+  return true
+}
+
+export async function setDefaultInvoiceProfile(id: string) {
+  const { data, error } = await supabase
+    .from('user_invoice_profiles')
+    .update({ is_default: true })
+    .eq('id', id)
+    .select('*')
+    .single()
+  if (error) throw error
+  return data as InvoiceProfile
+}

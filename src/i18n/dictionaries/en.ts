@@ -587,6 +587,30 @@ export const en = {
     }
   },
   account: {
+    invoices: {
+      title: 'Invoice Profiles',
+      addNew: 'Add New Profile',
+      type: 'Type',
+      individual: 'Individual',
+      corporate: 'Corporate',
+      titleLabel: 'Title (Optional)',
+      tcknLabel: 'National ID',
+      companyLabel: 'Company Name',
+      vknLabel: 'Tax ID (VKN)',
+      taxOfficeLabel: 'Tax Office',
+      eInvoice: 'I am an e‑Invoice taxpayer',
+      setDefault: 'Make Default',
+      default: 'Default',
+      save: 'Save',
+      delete: 'Delete',
+      cancel: 'Cancel',
+      confirmDelete: 'Are you sure you want to delete this invoice profile?',
+      created: 'Invoice profile created',
+      updated: 'Invoice profile updated',
+      deleted: 'Invoice profile deleted',
+      setDefaultSuccess: 'Default profile updated',
+      noProfiles: 'No saved invoice profiles'
+    },
     security: {
       title: 'Change Password',
       currentLabel: 'Current password',

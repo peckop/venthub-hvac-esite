@@ -585,6 +585,30 @@ export const tr = {
     }
   },
   account: {
+    invoices: {
+      title: 'Fatura Profilleri',
+      addNew: 'Yeni Profil Ekle',
+      type: 'Tip',
+      individual: 'Bireysel',
+      corporate: 'Ticari',
+      titleLabel: 'Başlık (Opsiyonel)',
+      tcknLabel: 'TCKN',
+      companyLabel: 'Şirket Ünvanı',
+      vknLabel: 'VKN',
+      taxOfficeLabel: 'Vergi Dairesi',
+      eInvoice: 'e‑Fatura mükellefiyim',
+      setDefault: 'Varsayılan Yap',
+      default: 'Varsayılan',
+      save: 'Kaydet',
+      delete: 'Sil',
+      cancel: 'İptal',
+      confirmDelete: 'Bu fatura profilini silmek istediğinize emin misiniz?',
+      created: 'Fatura profili oluşturuldu',
+      updated: 'Fatura profili güncellendi',
+      deleted: 'Fatura profili silindi',
+      setDefaultSuccess: 'Varsayılan profil güncellendi',
+      noProfiles: 'Kayıtlı fatura profili bulunmuyor'
+    },
     security: {
       title: 'Parola Değiştir',
       currentLabel: 'Mevcut şifre',
