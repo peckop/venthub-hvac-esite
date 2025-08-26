@@ -29,13 +29,8 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --prefer-offline
-
-      - name: Approve native builds (esbuild)
-        run: |
-          pnpm approve-builds -y || echo "approve-builds not available, continuing"
-          pnpm rebuild esbuild || echo "esbuild rebuild skipped"
+      - name: Install dependencies (allow scripts for native deps)
+        run: pnpm install --prefer-offline --config.allow-scripts true
 
       - name: Type check
         run: pnpm exec tsc -b tsconfig.build.json
