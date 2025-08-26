@@ -67,6 +67,10 @@ end $$;
 -- RLS
 alter table public.user_addresses enable row level security;
 
+-- Grants: allow authenticated role to use and operate on the table (RLS still applies)
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on table public.user_addresses to authenticated;
+
 -- Only the owner can select/insert/update/delete (create if missing)
 do $$
 begin
