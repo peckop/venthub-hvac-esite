@@ -3,7 +3,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { listAddresses, UserAddress, updateAddress, deleteAddress } from '../lib/supabase'
+import { listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, type InvoiceProfile } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
@@ -60,6 +60,8 @@ export const CheckoutPage: React.FC = () => {
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([])
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [addressPickTarget, setAddressPickTarget] = useState<'shipping' | 'billing'>('shipping')
+  const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<InvoiceProfile[]>([])
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
   const [savingEdit, setSavingEdit] = useState(false)
   const [editForm, setEditForm] = useState<{ label?: string; full_name?: string; phone?: string; full_address: string; city: string; district: string; postal_code?: string; is_default_shipping?: boolean; is_default_billing?: boolean }>({ full_address: '', city: '', district: '', postal_code: '', is_default_shipping: false, is_default_billing: false })
@@ -68,6 +70,7 @@ export const CheckoutPage: React.FC = () => {
     async function prefillAddresses() {
       if (!user) return
       try {
+        // Load addresses
         const rows: UserAddress[] = await listAddresses()
         if (!mounted) return
         setSavedAddresses(rows)
@@ -99,6 +102,11 @@ export const CheckoutPage: React.FC = () => {
           })
           // sameAsShipping başlangıçta true kalsın
         }
+        // Load invoice profiles
+        try {
+          const inv = await listInvoiceProfiles()
+          if (mounted) setSavedInvoiceProfiles(inv)
+        } catch {}
       } catch {
         // no-op
       }
@@ -573,6 +581,49 @@ export const CheckoutPage: React.FC = () => {
                   <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
                   <div className="mt-2 flex justify-end">
                     <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(a)}>
+                      {t('checkout.saved.use')}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  const InvoiceProfileModal: React.FC<{ title: string; profiles: InvoiceProfile[]; onClose: () => void; onPick: (p: InvoiceProfile) => void }>
+    = ({ title, profiles, onClose, onPick }) => (
+    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
+      <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
+        <div className="px-5 py-4 border-b flex items-center justify-between">
+          <div className="text-industrial-gray font-semibold">{title}</div>
+          <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
+        </div>
+        <div className="p-5 overflow-y-auto">
+          {profiles.length === 0 ? (
+            <div className="text-sm text-steel-gray">—</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {profiles.map((p) => (
+                <div key={p.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
+                  <div className="text-sm text-industrial-gray font-medium">
+                    {(p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate')))} {p.is_default && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+                  </div>
+                  <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
+                    {p.type === 'individual' ? (
+                      <div>TCKN: {p.tckn || '-'}</div>
+                    ) : (
+                      <div>
+                        <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
+                        <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
+                        <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 flex justify-end">
+                    <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(p)}>
                       {t('checkout.saved.use')}
                     </button>
                   </div>
@@ -1092,7 +1143,14 @@ export const CheckoutPage: React.FC = () => {
 
                   {/* Invoice Type & Info */}
                   <div className="mt-10">
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-4">{t('checkout.invoice.title')}</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-industrial-gray">{t('checkout.invoice.title')}</h3>
+                      {savedInvoiceProfiles.length > 0 && (
+                        <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => setShowInvoiceModal(true)}>
+                          {t('checkout.saved.seeAll')}
+                        </button>
+                      )}
+                    </div>
                     {/* Tip seçimi */}
                     <div className="flex items-center gap-6 mb-4">
                       <label className="flex items-center gap-2">
@@ -1245,6 +1303,24 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {showInvoiceModal && step === 2 && (
+                <InvoiceProfileModal
+                  title={t('account.invoices.title')}
+                  profiles={savedInvoiceProfiles}
+                  onClose={() => setShowInvoiceModal(false)}
+                  onPick={(p) => {
+                    if (p.type === 'individual') {
+                      setInvoiceType('individual')
+                      setInvoiceInfo({ type: 'individual', tckn: p.tckn || '' })
+                    } else {
+                      setInvoiceType('corporate')
+                      setInvoiceInfo({ type: 'corporate', companyName: p.company_name || '', vkn: p.vkn || '', taxOffice: p.tax_office || '', eInvoice: !!p.e_invoice })
+                    }
+                    setShowInvoiceModal(false)
+                  }}
+                />
               )}
 
               {/* Step 3: Review */}
