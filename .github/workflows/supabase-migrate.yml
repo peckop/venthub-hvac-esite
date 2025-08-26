@@ -20,18 +20,38 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Apply SQL migrations to Supabase
+      - name: Apply migrations via psql (when SUPABASE_DB_URL is provided)
+        if: ${{ secrets.SUPABASE_DB_URL != '' }}
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          if [ -z "$SUPABASE_DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL secret is not set. Please add it in repo Settings > Secrets and variables > Actions."
-            exit 1
-          fi
           set -e
           for f in supabase/migrations/*.sql; do
             echo "Applying $f"
             psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$f"
           done
-          echo "Migrations applied successfully."
+          echo "Migrations applied successfully via psql."
+
+      - name: Setup Supabase CLI (fallback)
+        if: ${{ secrets.SUPABASE_DB_URL == '' && secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply migrations via Supabase CLI (fallback)
+        if: ${{ secrets.SUPABASE_DB_URL == '' && secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -e
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push
+          echo "Migrations applied successfully via Supabase CLI."
+
+      - name: Fail if no credentials provided
+        if: ${{ secrets.SUPABASE_DB_URL == '' && (secrets.SUPABASE_ACCESS_TOKEN == '' || secrets.SUPABASE_PROJECT_REF == '') }}
+        run: |
+          echo "::error::Provide SUPABASE_DB_URL or (SUPABASE_ACCESS_TOKEN and SUPABASE_PROJECT_REF) in repo secrets."
+          exit 1
 

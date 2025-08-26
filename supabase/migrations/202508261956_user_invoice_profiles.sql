@@ -1,6 +1,9 @@
 -- user_invoice_profiles table for saved invoice profiles per user
 -- Creates table, RLS policies, updated_at trigger and single-default enforcement per (user_id,type)
 
+-- Ensure pgcrypto for gen_random_uuid()
+create extension if not exists pgcrypto;
+
 create table if not exists public.user_invoice_profiles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
