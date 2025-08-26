@@ -118,15 +118,21 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-xl w-full max-w-2xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="px-6 py-4 border-b">
-          <h3 className="text-xl font-bold text-industrial-gray">{t('lead.title')}</h3>
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 overflow-y-auto" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lead-modal-title"
+        className="bg-white rounded-xl w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col mx-auto my-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b sticky top-0 bg-white z-10">
+          <h3 id="lead-modal-title" className="text-lg sm:text-xl font-bold text-industrial-gray">{t('lead.title')}</h3>
           {productName && (
             <p className="text-sm text-steel-gray mt-1">{t('lead.product')}: <span className="font-medium text-industrial-gray">{productName}</span></p>
           )}
         </div>
-        <form onSubmit={submit} className="p-6 space-y-5">
+        <form onSubmit={submit} className="p-4 sm:p-6 space-y-5 overflow-y-auto">
           {/* İletişim Bilgileri */}
           <div>
             <h4 className="text-industrial-gray font-semibold mb-3">{t('lead.contactInfo')}</h4>
