@@ -362,6 +362,27 @@ export const tr = {
     autoClose: 'Bu pencere 5 saniye sonra otomatik kapanacak'
   },
   checkout: {
+    saved: {
+      title: 'Kayıtlı Adresler',
+      address: 'Adres',
+      default: 'Varsayılan',
+      use: 'Bu adresi kullan',
+      manage: 'Adresleri yönet',
+      seeAll: 'Tüm adresleri gör',
+      select: 'Adres seçimi',
+      close: 'Kapat',
+      edit: 'Düzenle',
+      delete: 'Sil',
+      save: 'Kaydet',
+      cancel: 'İptal',
+      defaultShipping: 'Kargoda varsayılan',
+      defaultBilling: 'Faturada varsayılan',
+      updated: 'Adres güncellendi',
+      deleted: 'Adres silindi',
+      updateError: 'Güncelleme sırasında hata',
+      deleteError: 'Silme sırasında hata',
+      confirmDelete: 'Bu adresi silmek istediğinize emin misiniz?'
+    },
     title: 'Ödeme',
     backToCart: 'Sepete Dön',
     securePaymentBrand: 'Güvenli ödeme • {{brand}}',
@@ -373,7 +394,7 @@ export const tr = {
     formPreparing: 'Form hazırlanıyor...',
     paymentSuccess: '🎉 Ödeme başarıyla tamamlandı!',
     paymentError: 'Ödeme sırasında hata oluştu',
-    steps: { step1: 'Kişisel Bilgiler', step2: 'Adres Bilgileri', step3: 'Ödeme' },
+    steps: { step1: 'Kişisel Bilgiler', step2: 'Adres Bilgileri', step3: 'Gözden Geçir', step4: 'Ödeme' },
     overlay: {
       dialogLabel: 'Güvenli ödeme başlatılıyor',
       header: 'Güvenli ödeme başlatılıyor…',
@@ -445,6 +466,10 @@ export const tr = {
       readAcceptSuffix: "'ni okudum ve kabul ediyorum.",
       orderConfirmText: 'Siparişi onaylıyor, ürün ve teslimat bilgilerinin doğruluğunu kabul ediyorum.',
       marketingText: 'Kampanya ve fırsatlardan haberdar olmak için ticari ileti izni veriyorum. (Opsiyonel)'
+    },
+    review: {
+      title: 'Siparişi Gözden Geçir',
+      edit: 'Düzenle'
     },
     nav: {
       back: 'Geri',
@@ -557,6 +582,21 @@ export const tr = {
       a2: 'Kredi/Banka kartıyla iyzico altyapısı üzerinden güvenli ödeme yapabilirsiniz.',
       q3: 'Kurulum hizmeti sağlıyor musunuz?',
       a3: 'Ürün bazında değişebilir. Destek ekibimizle iletişime geçin.'
+    }
+  },
+  account: {
+    security: {
+      title: 'Parola Değiştir',
+      currentLabel: 'Mevcut şifre',
+      newLabel: 'Yeni şifre',
+      confirmLabel: 'Yeni şifre (tekrar)',
+      save: 'Kaydet',
+      currentRequired: 'Mevcut şifrenizi girin',
+      minLength: 'Şifre en az 6 karakter olmalı',
+      mismatch: 'Şifreler eşleşmiyor',
+      wrongCurrent: 'Mevcut şifre hatalı',
+      updated: 'Şifreniz güncellendi',
+      updateError: 'Şifre güncelleme sırasında hata'
     }
   },
   lead: {

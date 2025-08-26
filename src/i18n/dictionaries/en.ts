@@ -364,6 +364,27 @@ export const en = {
     autoClose: 'This window will close automatically in 5 seconds'
   },
   checkout: {
+    saved: {
+      title: 'Saved Addresses',
+      address: 'Address',
+      default: 'Default',
+      use: 'Use this address',
+      manage: 'Manage addresses',
+      seeAll: 'See all addresses',
+      select: 'Select address',
+      close: 'Close',
+      edit: 'Edit',
+      delete: 'Delete',
+      save: 'Save',
+      cancel: 'Cancel',
+      defaultShipping: 'Default for shipping',
+      defaultBilling: 'Default for billing',
+      updated: 'Address updated',
+      deleted: 'Address deleted',
+      updateError: 'Error during update',
+      deleteError: 'Error during delete',
+      confirmDelete: 'Are you sure you want to delete this address?'
+    },
     title: 'Checkout',
     backToCart: 'Back to Cart',
     securePaymentBrand: 'Secure payment • {{brand}}',
@@ -375,7 +396,7 @@ export const en = {
     formPreparing: 'Preparing form...',
     paymentSuccess: '🎉 Payment completed successfully!',
     paymentError: 'An error occurred during payment',
-    steps: { step1: 'Personal Info', step2: 'Address Info', step3: 'Payment' },
+    steps: { step1: 'Personal Info', step2: 'Address Info', step3: 'Review', step4: 'Payment' },
     overlay: {
       dialogLabel: 'Starting secure payment',
       header: 'Starting secure payment…',
@@ -447,6 +468,10 @@ export const en = {
       readAcceptSuffix: '',
       orderConfirmText: 'I confirm the order and accept the accuracy of product and delivery information.',
       marketingText: 'I consent to receive commercial communications (optional).'
+    },
+    review: {
+      title: 'Review your order',
+      edit: 'Edit'
     },
     nav: {
       back: 'Back',
@@ -559,6 +584,21 @@ export const en = {
       a2: 'You can pay securely with credit/debit cards via iyzico.',
       q3: 'Do you provide installation service?',
       a3: 'It may vary by product. Please contact our support team.'
+    }
+  },
+  account: {
+    security: {
+      title: 'Change Password',
+      currentLabel: 'Current password',
+      newLabel: 'New password',
+      confirmLabel: 'New password (confirm)',
+      save: 'Save',
+      currentRequired: 'Please enter your current password',
+      minLength: 'Password must be at least 6 characters',
+      mismatch: 'Passwords do not match',
+      wrongCurrent: 'Current password is incorrect',
+      updated: 'Your password has been updated',
+      updateError: 'An error occurred while updating password'
     }
   },
   lead: {

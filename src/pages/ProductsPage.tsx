@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { getProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
+import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import { Grid, List, Search, Star, Clock, BadgeCheck, ShieldCheck, Layers } from 'lucide-react'
@@ -25,32 +25,71 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy] = useState('name')
   const [searchQuery, setSearchQuery] = useState(q)
+  const [hasLoadedAll, setHasLoadedAll] = useState(false)
 
   useEffect(() => {
-    async function fetchData() {
+    const searchParams = new URLSearchParams(location.search)
+    const isAllNow = searchParams.get('all') === '1'
+    const hasQuery = (searchQuery ?? '').length > 0
+
+    async function fetchDiscoverLight() {
       try {
         setLoading(true)
-        const [featuredData, productsData, categoriesData] = await Promise.all([
+        // Fetch only what we need for Discover: featured, categories, and a small slice of products
+        const [featuredData, categoriesData, limitedProducts] = await Promise.all([
           getFeaturedProducts(),
-          getProducts(),
           getCategories(),
+          getProducts(24),
         ])
         setFeatured(featuredData)
-        // Tüm ürünler (aktif)
-        setAllProducts(productsData)
-        // Yeni ürünleri basitçe featured olmayan ilk 12 ürün olarak seçelim
-        const newItems = productsData.filter(p => !p.is_featured).slice(0, 12)
+        // Derive "new" products from non-featured items in the limited list
+        const newItems = limitedProducts.filter((p) => !p.is_featured).slice(0, 12)
         setNewProducts(newItems)
         setCategories(categoriesData)
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching discover data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchData()
-  }, [])
+    async function fetchAllIfNeeded() {
+      try {
+        if (hasLoadedAll) return
+        // For All Products mode, fetch the complete list only when needed
+        const productsData = await getAllProducts()
+        setAllProducts(productsData)
+        setHasLoadedAll(true)
+      } catch (error) {
+        console.error('Error fetching all products:', error)
+      }
+    }
+
+    // Decide what to fetch based on URL and query
+    if (isAllNow) {
+      // When entering All Products view directly, fetch the full list.
+      // We intentionally avoid fetching featured/categories here to reduce payload.
+      // Keep existing discover data if any for quick toggle back.
+      if (!hasLoadedAll) {
+        fetchAllIfNeeded()
+      }
+      // Do not block the entire page with a global skeleton on toggle.
+      // Only show global skeleton on first mount when no data at all exists.
+      if (loading && featured.length > 0) {
+        setLoading(false)
+      }
+    } else if (!hasQuery) {
+      // Discover view without a search query: fetch the light set
+      if (featured.length === 0 || categories.length === 0 || newProducts.length === 0) {
+        fetchDiscoverLight()
+      } else if (loading) {
+        setLoading(false)
+      }
+    } else {
+      // Search mode: search effect will handle results; ensure we don't show global skeleton unnecessarily
+      if (loading) setLoading(false)
+    }
+  }, [location.search, hasLoadedAll, featured.length, categories.length, newProducts.length, searchQuery, loading])
 
   // Arama sonuçlarını (varsa) yükle
   useEffect(() => {
@@ -225,18 +264,26 @@ const ProductsPage: React.FC = () => {
       {/* All products modu */}
       {isAll ? (
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-            {([...allProducts].sort((a,b)=>{
-              switch (sortBy) {
-                case 'price-low': return parseFloat(a.price)-parseFloat(b.price)
-                case 'price-high': return parseFloat(b.price)-parseFloat(a.price)
-                case 'name':
-                default: return a.name.localeCompare(b.name, 'tr')
-              }
-            })).map((product) => (
-              <ProductCard key={product.id} product={product} layout={viewMode} />
-            ))}
-          </div>
+          {allProducts.length === 0 ? (
+            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {[1,2,3,4,5,6,7,8,9].map((i) => (
+                <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
+              ))}
+            </div>
+          ) : (
+            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {([...allProducts].sort((a,b)=>{
+                switch (sortBy) {
+                  case 'price-low': return parseFloat(a.price)-parseFloat(b.price)
+                  case 'price-high': return parseFloat(b.price)-parseFloat(a.price)
+                  case 'name':
+                  default: return a.name.localeCompare(b.name, 'tr')
+                }
+              })).map((product) => (
+                <ProductCard key={product.id} product={product} layout={viewMode} />
+              ))}
+            </div>
+          )}
         </div>
       ) : searchQuery ? (
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
