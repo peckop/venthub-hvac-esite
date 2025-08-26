@@ -31,6 +31,8 @@ jobs:
             psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$f"
           done
           echo "Migrations applied successfully via psql."
+          echo "Verifying user_invoice_profiles exists..."
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -c "select to_regclass('public.user_invoice_profiles');"
 
       - name: Setup Supabase CLI (fallback)
         if: ${{ secrets.SUPABASE_DB_URL == '' && secrets.SUPABASE_ACCESS_TOKEN != '' && secrets.SUPABASE_PROJECT_REF != '' }}
@@ -48,6 +50,8 @@ jobs:
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
           supabase db push
           echo "Migrations applied successfully via Supabase CLI."
+          echo "Verifying user_invoice_profiles exists..."
+          supabase db remote commit --dry-run || true
 
       - name: Fail if no credentials provided
         if: ${{ secrets.SUPABASE_DB_URL == '' && (secrets.SUPABASE_ACCESS_TOKEN == '' || secrets.SUPABASE_PROJECT_REF == '') }}
