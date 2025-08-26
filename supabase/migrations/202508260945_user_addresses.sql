@@ -67,22 +67,45 @@ end $$;
 -- RLS
 alter table public.user_addresses enable row level security;
 
--- Only the owner can select/insert/update/delete
-create policy if not exists user_addresses_select
-  on public.user_addresses for select
-  using (auth.uid() = user_id);
+-- Only the owner can select/insert/update/delete (create if missing)
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_select'
+  ) then
+    create policy user_addresses_select
+      on public.user_addresses for select
+      using (auth.uid() = user_id);
+  end if;
 
-create policy if not exists user_addresses_insert
-  on public.user_addresses for insert
-  with check (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_insert'
+  ) then
+    create policy user_addresses_insert
+      on public.user_addresses for insert
+      with check (auth.uid() = user_id);
+  end if;
 
-create policy if not exists user_addresses_update
-  on public.user_addresses for update
-  using (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_update'
+  ) then
+    create policy user_addresses_update
+      on public.user_addresses for update
+      using (auth.uid() = user_id);
+  end if;
 
-create policy if not exists user_addresses_delete
-  on public.user_addresses for delete
-  using (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_addresses' and policyname = 'user_addresses_delete'
+  ) then
+    create policy user_addresses_delete
+      on public.user_addresses for delete
+      using (auth.uid() = user_id);
+  end if;
+end $$;
 
 commit;
 
