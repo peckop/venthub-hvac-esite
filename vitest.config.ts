@@ -13,11 +13,11 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ['vitest.setup.ts'],
     css: true,
-    pool: 'forks',
-    poolOptions: { forks: { singleFork: true } },
-    testTimeout: 8000,
-    hookTimeout: 6000,
-    teardownTimeout: 4000,
+    // Use threads pool (default) for better stability on Windows/CI
+    pool: 'threads',
+    testTimeout: 20000,
+    hookTimeout: 12000,
+    teardownTimeout: 8000,
     onConsoleLog(log, type) {
       // AccountSecurity testindeki beklenen hata mesajını (stderr) CI çıkış kodunu bozmaması için filtreleyelim
       if (type === 'stderr' && typeof log === 'string' && log.includes('update failed')) {

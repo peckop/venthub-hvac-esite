@@ -1,3 +1,66 @@
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { I18nProvider } from '@/i18n/I18nProvider'
+import ReviewSummary from '../ReviewSummary'
+
+// Basit mock data
+const mockCustomer = {
+  name: 'Test User',
+  email: 'test@example.com',
+  phone: '+905551112233'
+}
+
+const mockAddress = {
+  fullAddress: 'Test Mahallesi Test Sokak No:1',
+  city: 'İstanbul',
+  district: 'Kadıköy',
+  postalCode: '34000'
+}
+
+const mockProps = {
+  customer: mockCustomer,
+  shipping: mockAddress,
+  billing: mockAddress,
+  sameAsShipping: true,
+  invoiceType: 'individual' as const,
+  invoiceInfo: { tckn: '12345678901' },
+  onEditPersonal: vi.fn(),
+  onEditShipping: vi.fn(),
+  onEditBilling: vi.fn(),
+  onEditInvoice: vi.fn()
+}
+
+function renderWithI18n(ui: React.ReactElement) {
+  return render(
+    <I18nProvider>
+      {ui}
+    </I18nProvider>
+  )
+}
+
+describe('ReviewSummary', () => {
+  it('Müşteri bilgilerini gösterir', () => {
+    renderWithI18n(<ReviewSummary {...mockProps} />)
+    
+    expect(screen.getByText(mockCustomer.name)).toBeInTheDocument()
+    expect(screen.getByText(mockCustomer.email)).toBeInTheDocument()
+    expect(screen.getByText(mockCustomer.phone)).toBeInTheDocument()
+  })
+
+  it('Teslimat adresini gösterir', () => {
+    renderWithI18n(<ReviewSummary {...mockProps} />)
+    
+    // Sadece "Teslimat Adresi" kartı içinde arayalım
+    const shipHeading = screen.getByText(/Shipping Address|Teslimat Adresi/i)
+    const card = shipHeading.closest('div')!.parentElement!.parentElement as HTMLElement // kart kapları (border rounded...)
+    
+    const matches = screen.getAllByText((_, node) => !!node && node.textContent?.includes(mockAddress.fullAddress))
+    expect(matches.length).toBeGreaterThan(0)
+    expect(within(card).getByText(new RegExp(mockAddress.city))).toBeInTheDocument()
+    expect(within(card).getByText(new RegExp(mockAddress.district))).toBeInTheDocument()
+  })
+})
+
 // @vitest-environment happy-dom
 import React from 'react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
