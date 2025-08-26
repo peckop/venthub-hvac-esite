@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<{ error?: AuthError }>
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error?: AuthError }>
   signUp: (email: string, password: string, name: string) => Promise<{ error?: AuthError }>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<{ error?: AuthError }>
@@ -99,7 +99,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   // Enhanced auth methods with better error handling
-  async function signIn(email: string, password: string) {
+  function removePersistedSessions() {
+    try {
+      const keys: string[] = []
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i)
+        if (k) keys.push(k)
+      }
+      keys.forEach((k) => {
+        if (/^sb-.*-auth-token$/.test(k)) {
+          window.localStorage.removeItem(k)
+        }
+      })
+    } catch {}
+  }
+
+  async function signIn(email: string, password: string, rememberMe = true) {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -127,6 +142,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         toast.error(errorMessage);
         return { error: { message: errorMessage } };
+      }
+
+      // If user does not want persistence, remove localStorage tokens
+      if (!rememberMe) {
+        removePersistedSessions()
       }
 
       return { data };

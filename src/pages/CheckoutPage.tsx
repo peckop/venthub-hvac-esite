@@ -53,7 +53,8 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [user])
 
-  // Prefill addresses from address book (defaults)
+  // Prefill addresses from address book (defaults) and keep list for quick selection
+  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([])
   useEffect(() => {
     let mounted = true
     async function prefillAddresses() {
@@ -61,6 +62,7 @@ export const CheckoutPage: React.FC = () => {
       try {
         const rows: UserAddress[] = await listAddresses()
         if (!mounted) return
+        setSavedAddresses(rows)
         const defShip = rows.find(r => r.is_default_shipping)
         const defBill = rows.find(r => r.is_default_billing)
         if (defShip) {
@@ -786,7 +788,35 @@ export const CheckoutPage: React.FC = () => {
                       </h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Saved addresses quick pick */}
+                  {savedAddresses.length > 0 && (
+                    <div className="mb-4">
+                      <div className="text-sm text-industrial-gray font-medium mb-2">Kayıtlı Adresler</div>
+                      <div className="flex gap-3 overflow-x-auto no-scrollbar">
+                        {savedAddresses.map((a) => (
+                          <div key={a.id} className="min-w-[260px] border rounded-lg p-3 bg-white/90">
+                            <div className="text-sm text-industrial-gray font-medium">
+                              {a.label || 'Adres'} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">(Varsayılan)</span>}
+                            </div>
+                            <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
+                              {a.full_address}
+                            </div>
+                            <div className="mt-2">
+                              <button
+                                type="button"
+                                className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50"
+                                onClick={() => setShippingAddress({ fullAddress: a.full_address || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' })}
+                              >
+                                Bu adresi kullan
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
                           {t('checkout.shipping.addressLabel')}
@@ -829,8 +859,12 @@ export const CheckoutPage: React.FC = () => {
                         </label>
                         <input
                           type="text"
+                          inputMode="numeric"
                           value={shippingAddress.postalCode}
-                          onChange={(e) => setShippingAddress({...shippingAddress, postalCode: e.target.value})}
+                          onChange={(e) => {
+                            const v = e.target.value.replace(/\D/g, '').slice(0, 10)
+                            setShippingAddress({...shippingAddress, postalCode: v})
+                          }}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           placeholder={t('checkout.shipping.postalPlaceholder')}
                         />
@@ -901,8 +935,12 @@ export const CheckoutPage: React.FC = () => {
                           </label>
                           <input
                             type="text"
+                            inputMode="numeric"
                             value={billingAddress.postalCode}
-                            onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(/\D/g, '').slice(0, 10)
+                              setBillingAddress({...billingAddress, postalCode: v})
+                            }}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             placeholder={t('checkout.billing.postalPlaceholder')}
                           />

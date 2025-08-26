@@ -9,6 +9,7 @@ export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
   const navigate = useNavigate()
@@ -29,7 +30,7 @@ export const LoginPage: React.FC = () => {
     setLoading(true)
     
     try {
-      const { error } = await signIn(email, password)
+      const { error } = await signIn(email, password, rememberMe)
       
       if (error) {
         if (error.message?.includes('Invalid login credentials')) {
@@ -128,8 +129,16 @@ export const LoginPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="text-right">
+            {/* Remember Me + Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="inline-flex items-center gap-2 text-sm text-steel-gray">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <span>{t('auth.rememberMe')}</span>
+              </label>
               <Link
                 to="/auth/forgot-password"
                 className="text-sm text-primary-navy hover:text-secondary-blue"

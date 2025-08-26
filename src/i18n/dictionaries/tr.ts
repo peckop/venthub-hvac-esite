@@ -333,6 +333,7 @@ export const tr = {
     forgotPassword: 'Şifremi Unuttum',
     loggingIn: 'Giriş Yapılıyor...',
     login: 'Giriş Yap',
+    rememberMe: 'Beni hatırla',
     noAccount: 'Hesabınız yok mu?',
     register: 'Kayıt Ol',
     validEmailPassRequired: 'E-posta ve şifre alanları zorunludur',

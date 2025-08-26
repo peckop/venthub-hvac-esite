@@ -335,6 +335,7 @@ export const en = {
     forgotPassword: 'Forgot Password',
     loggingIn: 'Signing in...',
     login: 'Sign In',
+    rememberMe: 'Remember me',
     noAccount: "Don't have an account?",
     register: 'Sign Up',
     validEmailPassRequired: 'Email and password are required',
