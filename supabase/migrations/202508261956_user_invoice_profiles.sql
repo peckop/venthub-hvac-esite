@@ -72,3 +72,5 @@ create trigger trg_user_invoice_profiles_single_default
   before insert or update on public.user_invoice_profiles
   for each row execute function public.user_invoice_profiles_ensure_single_default();
 
+-- EOF
+
