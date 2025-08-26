@@ -1,5 +1,3 @@
-import type { PostgrestSingleResponse } from '@supabase/supabase-js'
-
 export interface CartItemInput {
   id: string
   quantity: number

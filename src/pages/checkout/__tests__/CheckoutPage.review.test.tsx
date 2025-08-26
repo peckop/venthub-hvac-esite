@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import React from 'react'
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, type Mock } from 'vitest'
 import { render, screen, within, fireEvent, cleanup, configure } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -25,10 +25,11 @@ vi.mock('@/components/SecurityRibbon', () => ({ default: () => null }))
 
 // react-hot-toast mock (zamanlayıcı sızıntılarını önlemek için)
 vi.mock('react-hot-toast', () => {
-  const fn = (..._args: any[]) => {}
-  ;(fn as any).success = vi.fn()
-  ;(fn as any).error = vi.fn()
-  ;(fn as any).dismiss = vi.fn()
+  const fn = (..._args: unknown[]) => {}
+  const t = fn as unknown as { success: Mock; error: Mock; dismiss: Mock }
+  t.success = vi.fn()
+  t.error = vi.fn()
+  t.dismiss = vi.fn()
   return { default: fn }
 })
 
@@ -125,7 +126,6 @@ async function goToReview() {
   fireEvent.change(tcknInput, { target: { value: '12345678901' } })
 
   // KVKK, Mesafeli, Ön Bilgi, Siparişi onaylıyorum
-  const checkboxes = screen.getAllByRole('checkbox')
   // sameAsShipping dahil toplam 5 checkbox var; son 4'ünü işaretleyelim (yasal onaylar)
   // safer: locate by text
   fireEvent.click(screen.getByText(tr.legalLinks.kvkk, { selector: 'a' }).closest('label')!.querySelector('input')!)

@@ -1,14 +1,17 @@
 import React from 'react'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest'
 
 // Mock toast (default export function with .error/.success methods)
 vi.mock('react-hot-toast', () => {
-  const fn: any = vi.fn()
-  fn.error = vi.fn()
-  fn.success = vi.fn()
-  return { default: fn }
+  const toastFn = vi.fn() as unknown as ((...args: unknown[]) => void) & {
+    error: (...args: unknown[]) => void
+    success: (...args: unknown[]) => void
+  }
+  toastFn.error = vi.fn()
+  toastFn.success = vi.fn()
+  return { default: toastFn }
 })
 
 // Mock supabase auth API used by AccountSecurityPage
@@ -30,7 +33,7 @@ import toast from 'react-hot-toast'
 
 function renderWithProviders(ui: React.ReactElement, { userEmail = 'u@example.com' } = {}) {
   const authValue = {
-    user: { email: userEmail } as any,
+    user: { email: userEmail },
     session: null,
     loading: false,
     signIn: vi.fn(),
@@ -40,7 +43,7 @@ function renderWithProviders(ui: React.ReactElement, { userEmail = 'u@example.co
   }
   return render(
     <I18nProvider>
-      <AuthContext.Provider value={authValue as any}>{ui}</AuthContext.Provider>
+      <AuthContext.Provider value={authValue as unknown as React.ContextType<typeof AuthContext>}>{ui}</AuthContext.Provider>
     </I18nProvider>
   )
 }
@@ -106,7 +109,7 @@ describe('AccountSecurityPage', () => {
   it('handles wrong current password (re-auth failure)', async () => {
     const { getByPlaceholderText, getByRole } = renderWithProviders(<AccountSecurityPage />)
 
-    ;(supabase.auth.signInWithPassword as any).mockResolvedValueOnce({ data: null, error: { message: 'Invalid login credentials' } })
+;(supabase.auth.signInWithPassword as unknown as Mock).mockResolvedValueOnce({ data: null, error: { message: 'Invalid login credentials' } })
 
     const currentInput = (screen.getAllByPlaceholderText('Current password')[0] as HTMLInputElement)
     const newInput = getByPlaceholderText('New password')
@@ -126,8 +129,8 @@ describe('AccountSecurityPage', () => {
   it('updates password successfully', async () => {
     const { getByPlaceholderText, getByRole } = renderWithProviders(<AccountSecurityPage />)
 
-    ;(supabase.auth.signInWithPassword as any).mockResolvedValueOnce({ data: { user: {} }, error: null })
-    ;(supabase.auth.updateUser as any).mockResolvedValueOnce({ data: {}, error: null })
+;(supabase.auth.signInWithPassword as unknown as Mock).mockResolvedValueOnce({ data: { user: {} }, error: null })
+;(supabase.auth.updateUser as unknown as Mock).mockResolvedValueOnce({ data: {}, error: null })
 
     const currentInput = (screen.getAllByPlaceholderText('Current password')[0] as HTMLInputElement)
     const newInput = getByPlaceholderText('New password')
@@ -147,8 +150,8 @@ describe('AccountSecurityPage', () => {
   it('shows error when update fails', async () => {
     const { getByPlaceholderText, getByRole } = renderWithProviders(<AccountSecurityPage />)
 
-    ;(supabase.auth.signInWithPassword as any).mockResolvedValueOnce({ data: { user: {} }, error: null })
-    ;(supabase.auth.updateUser as any).mockResolvedValueOnce({ data: null, error: { message: 'update failed' } })
+;(supabase.auth.signInWithPassword as unknown as Mock).mockResolvedValueOnce({ data: { user: {} }, error: null })
+;(supabase.auth.updateUser as unknown as Mock).mockResolvedValueOnce({ data: null, error: { message: 'update failed' } })
 
     const currentInput = (screen.getAllByPlaceholderText('Current password')[0] as HTMLInputElement)
     const newInput = getByPlaceholderText('New password')

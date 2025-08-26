@@ -435,7 +435,7 @@ export const CheckoutPage: React.FC = () => {
       window.clearTimeout(check)
       window.clearTimeout(hardTimeout)
     }
-  }, [iyzToken, paymentUrl, orderId, convId])
+  }, [iyzToken, paymentUrl, orderId, convId, isTest])
 
   // Ödeme başlatıldıktan sonra sipariş durumunu periyodik kontrol et
   useEffect(() => {
@@ -463,7 +463,7 @@ export const CheckoutPage: React.FC = () => {
       }, 3000)
     }
     return () => { if (timer) clearInterval(timer) }
-  }, [step, orderId, convId, clearCart, navigate])
+  }, [step, orderId, convId, clearCart, navigate, isTest])
 
   // Görsel ilerleme (yumuşak dolma) — formReady olana kadar %95'e kadar artar
   useEffect(() => {
@@ -476,7 +476,7 @@ export const CheckoutPage: React.FC = () => {
       })
     }, 250)
     return () => window.clearInterval(t)
-  }, [step, formReady])
+  }, [step, formReady, isTest])
 
   if (items.length === 0 && !orderCompleted) {
     return (
