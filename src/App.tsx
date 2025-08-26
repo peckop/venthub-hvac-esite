@@ -86,7 +86,6 @@ function App() {
                 <Route path="/auth/register" element={<RegisterPage />} />
                 <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
 
                 {/* Support Routes */}
