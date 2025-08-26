@@ -12,6 +12,7 @@ alter table public.user_addresses
   add column if not exists full_name text,
   add column if not exists phone text,
   add column if not exists full_address text,
+  add column if not exists street_address text,
   add column if not exists city text,
   add column if not exists district text,
   add column if not exists postal_code text,
@@ -20,6 +21,20 @@ alter table public.user_addresses
   add column if not exists is_default_billing boolean default false,
   add column if not exists created_at timestamptz default now(),
   add column if not exists updated_at timestamptz default now();
+
+-- If street_address exists and is NOT NULL, drop NOT NULL to allow compatibility
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='user_addresses' AND column_name='street_address' AND is_nullable='NO'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.user_addresses ALTER COLUMN street_address DROP NOT NULL';
+  END IF;
+END $$;
+
+-- Backfill street_address from full_address when null
+update public.user_addresses set street_address = full_address where street_address is null and full_address is not null;
 
 -- Ensure FK constraint on user_id
 do $$

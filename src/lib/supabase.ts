@@ -244,7 +244,7 @@ export async function createAddress(payload: CreateAddressInput) {
 
   const { data, error } = await supabase
     .from('user_addresses')
-    .insert({ user_id: user.id, ...payload })
+    .insert({ user_id: user.id, street_address: payload.full_address, ...payload })
     .select('*')
     .single()
 
@@ -257,9 +257,14 @@ export async function createAddress(payload: CreateAddressInput) {
 }
 
 export async function updateAddress(id: string, payload: UpdateAddressInput) {
+  const updatePatch = { ...payload } as Record<string, unknown>
+  if (payload.full_address) {
+    (updatePatch as Record<string, unknown>).street_address = payload.full_address
+  }
+
   const { data, error } = await supabase
     .from('user_addresses')
-    .update(payload)
+    .update(updatePatch)
     .eq('id', id)
     .select('*')
     .single()
