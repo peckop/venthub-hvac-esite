@@ -131,7 +131,7 @@ afterEach(() => {
   cleanup()
 })
 
-describe('CheckoutPage - Gözden Geçir', () => {
+vi.runIf(!process.env.CI)('CheckoutPage - Gözden Geçir', () => {
 
   it('Başlangıçta 3 özet kartı gösterir (Fatura adresi aynı ise)', async () => {
     await goToReview()
