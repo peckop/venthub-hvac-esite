@@ -1,22 +1,39 @@
 begin;
 
--- Address book for users
+-- Address book for users (create if table missing)
 create table if not exists public.user_addresses (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  label text,
-  full_name text,
-  phone text,
-  full_address text not null,
-  city text not null,
-  district text not null,
-  postal_code text,
-  country text default 'TR',
-  is_default_shipping boolean default false,
-  is_default_billing boolean default false,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  id uuid primary key default gen_random_uuid()
 );
+
+-- Ensure required columns exist (safe for partially created tables)
+alter table public.user_addresses
+  add column if not exists user_id uuid,
+  add column if not exists label text,
+  add column if not exists full_name text,
+  add column if not exists phone text,
+  add column if not exists full_address text,
+  add column if not exists city text,
+  add column if not exists district text,
+  add column if not exists postal_code text,
+  add column if not exists country text default 'TR',
+  add column if not exists is_default_shipping boolean default false,
+  add column if not exists is_default_billing boolean default false,
+  add column if not exists created_at timestamptz default now(),
+  add column if not exists updated_at timestamptz default now();
+
+-- Ensure FK constraint on user_id
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.table_constraints
+    where constraint_schema = 'public'
+      and table_name = 'user_addresses'
+      and constraint_name = 'user_addresses_user_id_fkey'
+  ) then
+    alter table public.user_addresses
+      add constraint user_addresses_user_id_fkey foreign key (user_id) references auth.users(id) on delete cascade;
+  end if;
+end $$;
 
 -- Helpful indexes
 create index if not exists idx_user_addresses_user_id on public.user_addresses(user_id);
@@ -25,7 +42,7 @@ create unique index if not exists user_addresses_one_default_shipping
 create unique index if not exists user_addresses_one_default_billing
   on public.user_addresses(user_id) where is_default_billing;
 
--- updated_at trigger
+-- updated_at trigger function
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql as $$
@@ -34,9 +51,18 @@ begin
   return new;
 end;$$;
 
-create trigger set_timestamp
-before update on public.user_addresses
-for each row execute function public.set_updated_at();
+-- Create trigger only if missing
+do $$
+begin
+  if not exists (
+    select 1 from pg_trigger
+    where tgname = 'user_addresses_set_timestamp'
+  ) then
+    create trigger user_addresses_set_timestamp
+    before update on public.user_addresses
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
 
 -- RLS
 alter table public.user_addresses enable row level security;
