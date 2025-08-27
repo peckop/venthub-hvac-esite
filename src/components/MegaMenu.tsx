@@ -77,7 +77,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <Link
-              to="/products?all=1"
+              to="/products"
               onClick={onClose}
               className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-xl hover:from-secondary-blue hover:to-primary-navy transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >

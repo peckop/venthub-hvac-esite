@@ -118,7 +118,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 <span className="font-medium">{t('common.categories')}</span>
               </button>
               <Link
-                to="/products?all=1"
+                to="/products"
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
               >
                 {t('common.products')}
