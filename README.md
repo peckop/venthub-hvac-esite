@@ -1,50 +1,42 @@
-# React + TypeScript + Vite
+# Venthub HVAC E‑Site
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![Supabase Migrate](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml)
 
-Currently, two official plugins are available:
+React + TypeScript + Vite tabanlı e‑ticaret uygulaması.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Ortam Değişkenleri (Vite)
 
-## Expanding the ESLint configuration
+Aşağıdaki değişkenler build sırasında gereklidir:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
 
-- Configure the top-level `parserOptions` property like this:
+Örnek dosya: `.env.example`. Üretime secret koymayın; dağıtım ortamınızın (Vercel/Netlify/Render/Actions) env yönetimini kullanın.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Vercel
+- Project Settings → Environment Variables
+- Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
+- Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
+- Environments: Production + Preview
+- Redeploy
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Netlify
+- Site settings → Environment variables → Add variable
+- Names: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+- Production + Deploy Previews için ekleyip yeniden yayınlayın
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### GitHub Actions ile Build
+Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets ekleyin:
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Supabase Migrations (Otomatik)
+- `supabase/migrations/*.sql` push edildiğinde CI, Supabase CLI (v2.39.2) ile otomatik uygular.
+- Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` zorunludur.
+
+## Geliştirme
+- pnpm install
+- pnpm dev
+- pnpm lint
+- pnpm test
+- pnpm run build:ci
