@@ -3,7 +3,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, type InvoiceProfile } from '../lib/supabase'
+import { listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, fetchDefaultInvoiceProfile, type InvoiceProfile } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
@@ -62,6 +62,7 @@ export const CheckoutPage: React.FC = () => {
   const [addressPickTarget, setAddressPickTarget] = useState<'shipping' | 'billing'>('shipping')
   const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<InvoiceProfile[]>([])
   const [showInvoiceModal, setShowInvoiceModal] = useState(false)
+  const [defaultInvoiceApplied, setDefaultInvoiceApplied] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
   const [savingEdit, setSavingEdit] = useState(false)
   const [editForm, setEditForm] = useState<{ label?: string; full_name?: string; phone?: string; full_address: string; city: string; district: string; postal_code?: string; is_default_shipping?: boolean; is_default_billing?: boolean }>({ full_address: '', city: '', district: '', postal_code: '', is_default_shipping: false, is_default_billing: false })
@@ -102,11 +103,6 @@ export const CheckoutPage: React.FC = () => {
           })
           // sameAsShipping başlangıçta true kalsın
         }
-        // Load invoice profiles
-        try {
-          const inv = await listInvoiceProfiles()
-          if (mounted) setSavedInvoiceProfiles(inv)
-        } catch {}
       } catch {
         // no-op
       }
@@ -478,6 +474,33 @@ export const CheckoutPage: React.FC = () => {
     }
     return () => { if (timer) clearInterval(timer) }
   }, [step, orderId, convId, clearCart, navigate, isTest])
+
+  // Varsayılan fatura profilini, 2. adıma girildiğinde ve alanlar boşsa bir defa uygula
+  useEffect(() => {
+    const tryApplyDefault = async () => {
+      if (step !== 2 || defaultInvoiceApplied) return
+      // Alanlar anlamlı biçimde doluysa kullanıcıyı ezme
+      if (invoiceType === 'individual') {
+        if ((invoiceInfo.tckn || '').trim().length > 0) { setDefaultInvoiceApplied(true); return }
+      } else {
+        if ((invoiceInfo.companyName || '').trim().length > 0 || (invoiceInfo.vkn || '').trim().length > 0 || (invoiceInfo.taxOffice || '').trim().length > 0) { setDefaultInvoiceApplied(true); return }
+      }
+      try {
+        const def = await fetchDefaultInvoiceProfile()
+        if (def) {
+          if (def.type === 'individual') {
+            setInvoiceType('individual')
+            setInvoiceInfo({ type: 'individual', tckn: def.tckn || '' })
+          } else {
+            setInvoiceType('corporate')
+            setInvoiceInfo({ type: 'corporate', companyName: def.company_name || '', vkn: def.vkn || '', taxOffice: def.tax_office || '', eInvoice: !!def.e_invoice })
+          }
+        }
+      } catch {}
+      setDefaultInvoiceApplied(true)
+    }
+    tryApplyDefault()
+  }, [step, defaultInvoiceApplied, invoiceInfo, invoiceType])
 
   // Görsel ilerleme (yumuşak dolma) — formReady olana kadar %95'e kadar artar
   useEffect(() => {
@@ -1145,11 +1168,9 @@ export const CheckoutPage: React.FC = () => {
                   <div className="mt-10">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-industrial-gray">{t('checkout.invoice.title')}</h3>
-                      {savedInvoiceProfiles.length > 0 && (
-                        <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => setShowInvoiceModal(true)}>
-                          {t('checkout.saved.seeAll')}
-                        </button>
-                      )}
+                      <button type="button" className="text-xs text-primary-navy hover:underline" onClick={async () => { try { const rows = await listInvoiceProfiles(); setSavedInvoiceProfiles(rows) } catch {} finally { setShowInvoiceModal(true) } }}>
+                        {t('checkout.saved.seeAll')}
+                      </button>
                     </div>
                     {/* Tip seçimi */}
                     <div className="flex items-center gap-6 mb-4">

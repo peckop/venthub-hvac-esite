@@ -409,3 +409,21 @@ export async function setDefaultInvoiceProfile(id: string) {
   if (error) throw error
   return data as InvoiceProfile
 }
+
+export async function fetchDefaultInvoiceProfile() {
+  const { data, error } = await supabase
+    .from('user_invoice_profiles')
+    .select('*')
+    .eq('is_default', true)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+  if (error) {
+    const e = error as unknown as { code?: string; message?: string }
+    if (e?.code === 'PGRST205' || (e?.message || '').includes("Could not find the table 'public.user_invoice_profiles'")) {
+      return null
+    }
+    throw error
+  }
+  const row = Array.isArray(data) && data.length > 0 ? (data[0] as InvoiceProfile) : null
+  return row
+}

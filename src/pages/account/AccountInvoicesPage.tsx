@@ -1,6 +1,6 @@
 import React from 'react'
 import { useI18n } from '@/i18n/I18nProvider'
-import { createInvoiceProfile, deleteInvoiceProfile, listInvoiceProfiles, setDefaultInvoiceProfile, type InvoiceProfile, type InvoiceProfileType } from '@/lib/supabase'
+import { createInvoiceProfile, deleteInvoiceProfile, listInvoiceProfiles, setDefaultInvoiceProfile, updateInvoiceProfile, type InvoiceProfile, type InvoiceProfileType } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
 export default function AccountInvoicesPage() {
@@ -17,6 +17,8 @@ export default function AccountInvoicesPage() {
   const [eInvoice, setEInvoice] = React.useState(false)
   const [isDefault, setIsDefault] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
+  const [editingId, setEditingId] = React.useState<string | null>(null)
+  const [edit, setEdit] = React.useState<{ title?: string; tckn?: string; company_name?: string; vkn?: string; tax_office?: string; e_invoice?: boolean }>({})
 
   const load = React.useCallback(async () => {
     try {
@@ -140,25 +142,81 @@ export default function AccountInvoicesPage() {
                     {p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate'))}
                     {p.is_default && <span className="ml-2 text-xs text-primary-navy">({t('account.invoices.default')})</span>}
                   </div>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                     {!p.is_default && (
                       <button onClick={async ()=>{ try { await setDefaultInvoiceProfile(p.id); toast.success(t('account.invoices.setDefaultSuccess')); await load() } catch(e){ console.error(e); toast.error(t('checkout.errors.database')) } }} className="text-xs px-3 py-1.5 rounded border hover:bg-gray-50">{t('account.invoices.setDefault')}</button>
                     )}
+                    <button onClick={() => { setEditingId(p.id); setEdit({ title: p.title || '', tckn: p.tckn || '', company_name: p.company_name || '', vkn: p.vkn || '', tax_office: p.tax_office || '', e_invoice: !!p.e_invoice }) }} className="text-xs px-3 py-1.5 rounded border hover:bg-gray-50">{t('checkout.saved.edit')}</button>
                     <button onClick={async ()=>{ if (!confirm(t('account.invoices.confirmDelete'))) return; try { await deleteInvoiceProfile(p.id); toast.success(t('account.invoices.deleted')); await load() } catch(e){ console.error(e); toast.error(t('checkout.errors.database')) } }} className="text-xs px-3 py-1.5 rounded border text-red-600 hover:bg-gray-50">{t('account.invoices.delete')}</button>
                   </div>
                 </div>
-                <div className="text-xs text-steel-gray mt-2">
-                  {p.type === 'individual' ? (
-                    <div>TCKN: {p.tckn || '-'}</div>
-                  ) : (
-                    <div className="space-y-1">
-                      <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
-                      <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
-                      <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
-                      <div>e‑Fatura: {p.e_invoice ? 'Evet' : 'Hayır'}</div>
+                {editingId === p.id ? (
+                  <div className="mt-3 border-t pt-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <label className="block text-xs text-steel-gray mb-1">{t('account.invoices.titleLabel')}</label>
+                        <input value={edit.title || ''} onChange={e=>setEdit(s=>({ ...s, title: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                      </div>
+                      {p.type === 'individual' ? (
+                        <div>
+                          <label className="block text-xs text-steel-gray mb-1">{t('account.invoices.tcknLabel')}</label>
+                          <input value={edit.tckn || ''} onChange={e=>setEdit(s=>({ ...s, tckn: e.target.value.replace(/\D/g,'').slice(0,11) }))} className="w-full px-3 py-2 border rounded" />
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <label className="block text-xs text-steel-gray mb-1">{t('account.invoices.companyLabel')}</label>
+                            <input value={edit.company_name || ''} onChange={e=>setEdit(s=>({ ...s, company_name: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-steel-gray mb-1">{t('account.invoices.vknLabel')}</label>
+                            <input value={edit.vkn || ''} onChange={e=>setEdit(s=>({ ...s, vkn: e.target.value.replace(/\D/g,'').slice(0,10) }))} className="w-full px-3 py-2 border rounded" />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-steel-gray mb-1">{t('account.invoices.taxOfficeLabel')}</label>
+                            <input value={edit.tax_office || ''} onChange={e=>setEdit(s=>({ ...s, tax_office: e.target.value }))} className="w-full px-3 py-2 border rounded" />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input type="checkbox" checked={!!edit.e_invoice} onChange={e=>setEdit(s=>({ ...s, e_invoice: e.target.checked }))} />
+                            <span className="text-xs text-steel-gray">{t('account.invoices.eInvoice')}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  )}
-                </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button className="text-xs px-3 py-1.5 rounded bg-primary-navy text-white" onClick={async ()=>{
+                        try {
+                          if (p.type === 'individual') {
+                            const tt = (edit.tckn || '').trim(); if (tt.length !== 11) { toast.error(t('checkout.errors.tcknFormat')); return }
+                          } else {
+                            const cc = (edit.company_name || '').trim(); const vv = (edit.vkn || '').trim(); const oo = (edit.tax_office || '').trim();
+                            if (!cc) { toast.error(t('checkout.errors.companyRequired')); return }
+                            if (vv.length !== 10) { toast.error(t('checkout.errors.vknFormat')); return }
+                            if (!oo) { toast.error(t('checkout.errors.taxOfficeRequired')); return }
+                          }
+                          await updateInvoiceProfile(p.id, edit)
+                          toast.success(t('account.invoices.updated'))
+                          setEditingId(null)
+                          await load()
+                        } catch (e) { console.error(e); toast.error(t('checkout.errors.database')) }
+                      }}>{t('account.invoices.save')}</button>
+                      <button className="text-xs px-3 py-1.5 rounded border" onClick={()=>{ setEditingId(null) }}>{t('account.invoices.cancel')}</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-steel-gray mt-2">
+                    {p.type === 'individual' ? (
+                      <div>TCKN: {p.tckn || '-'}</div>
+                    ) : (
+                      <div className="space-y-1">
+                        <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
+                        <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
+                        <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
+                        <div>e‑Fatura: {p.e_invoice ? 'Evet' : 'Hayır'}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
