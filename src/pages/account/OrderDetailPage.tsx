@@ -71,22 +71,35 @@ export default function OrderDetailPage() {
     async function load() {
       try {
         setLoading(true)
-        const { data, error } = await supabase
+        const baseSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+        let { data, error } = await supabase
           .from('venthub_orders')
-          .select('id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, payment_data, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
+          .select(baseSelect)
           .eq('id', id)
           .limit(1)
           .single()
+        if (error && (((error as any).code === '42703') || ((error as any).status === 400))) {
+          // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
+          const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+          const fb = await supabase
+            .from('venthub_orders')
+            .select(fallbackSelect)
+            .eq('id', id)
+            .limit(1)
+            .single()
+          data = fb.data as any
+          error = fb.error as any
+        }
         if (error) throw error
         const mapped: Order = {
-          id: data.id,
-          total_amount: Number(data.total_amount) || 0,
-          status: data.status || 'pending',
-          created_at: data.created_at,
-          customer_name: data.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
-          customer_email: data.customer_email || user?.email || '-',
-          shipping_address: data.shipping_address,
-          order_items: (data.venthub_order_items || []).map((it: any) => ({
+          id: (data as any).id,
+          total_amount: Number((data as any).total_amount) || 0,
+          status: (data as any).status || 'pending',
+          created_at: (data as any).created_at,
+          customer_name: (data as any).customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_email: (data as any).customer_email || user?.email || '-',
+          shipping_address: (data as any).shipping_address,
+          order_items: (((data as any).venthub_order_items) || []).map((it: any) => ({
             id: it.id,
             product_id: it.product_id ?? undefined,
             product_name: it.product_name,
@@ -95,15 +108,15 @@ export default function OrderDetailPage() {
             total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
             product_image_url: it.product_image_url ?? undefined,
           })),
-          order_number: data.order_number || undefined,
+          order_number: (data as any).order_number || undefined,
           is_demo: false,
-          payment_data: data.payment_data,
-          conversation_id: data.conversation_id || undefined,
-          carrier: data.carrier || undefined,
-          tracking_number: data.tracking_number || undefined,
-          tracking_url: data.tracking_url || undefined,
-          shipped_at: data.shipped_at || undefined,
-          delivered_at: data.delivered_at || undefined,
+          payment_data: undefined,
+          conversation_id: (data as any).conversation_id || undefined,
+          carrier: (data as any).carrier || undefined,
+          tracking_number: (data as any).tracking_number || undefined,
+          tracking_url: (data as any).tracking_url || undefined,
+          shipped_at: (data as any).shipped_at || undefined,
+          delivered_at: (data as any).delivered_at || undefined,
         }
         setOrder(mapped)
       } catch (e) {
