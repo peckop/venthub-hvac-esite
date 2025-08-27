@@ -273,9 +273,9 @@ export const OrdersPage: React.FC = () => {
 
       // Header
       doc.setFont('helvetica','bold'); doc.setFontSize(16)
-      doc.text('FATURA', 40, 40)
+      doc.text('PROFORMA', 40, 40)
       doc.setFont('helvetica','normal'); doc.setFontSize(10)
-      doc.text(`Fatura No: ${orderNo}`, 40, 58)
+      doc.text(`Proforma No: ${orderNo}`, 40, 58)
       doc.text(`Tarih: ${new Date(order.created_at).toLocaleString('tr-TR')}`, 40, 72)
 
       // Customer box
@@ -311,10 +311,10 @@ export const OrdersPage: React.FC = () => {
       // Footer note
       doc.setFont('helvetica','normal'); doc.setFontSize(9)
       doc.setTextColor(100)
-      doc.text('Bu belge, müşteri bilgilendirme amaçlıdır.', 40, afterTableY + 42)
+      doc.text('Bu belge resmî fatura değildir; bilgilendirme amaçlıdır.', 40, afterTableY + 42)
 
       // Save
-      doc.save(`Fatura-${orderNo}.pdf`)
+      doc.save(`Proforma-${orderNo}.pdf`)
     } catch (e) {
       console.error('PDF error', e)
       toast.error('PDF oluşturulamadı')

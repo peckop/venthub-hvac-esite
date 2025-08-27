@@ -338,7 +338,7 @@ export const tr = {
     shippedAt: 'Kargoya Verildi',
     deliveredAt: 'Teslim Edildi',
     noShippingInfo: 'Kargo bilgisi bulunmuyor.',
-    invoicePdf: 'Fatura (PDF)'
+    invoicePdf: 'Proforma (PDF)'
   },
   auth: {
     back: 'Geri Dön',

@@ -340,7 +340,7 @@ export const en = {
     shippedAt: 'Shipped At',
     deliveredAt: 'Delivered At',
     noShippingInfo: 'No shipping info available.',
-    invoicePdf: 'Invoice (PDF)'
+    invoicePdf: 'Proforma (PDF)'
   },
   auth: {
     back: 'Go Back',
