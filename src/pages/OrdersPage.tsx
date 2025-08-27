@@ -715,8 +715,11 @@ export const OrdersPage: React.FC = () => {
                     )}
 
                     {/* Actions */}
-                    <div className="mt-6 flex flex-wrap justify-end gap-2">
-                      <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
+                    <div className="mt-6 flex flex-wrap justify-between gap-2">
+                      <button onClick={() => navigate(`/account/returns?new=${order.id}`)} className="text-sm px-4 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50 transition-colors">{t('returns.requestReturn') || 'İade Talebi'}</button>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
+                      </div>
                     </div>
                   </div>
                 )}

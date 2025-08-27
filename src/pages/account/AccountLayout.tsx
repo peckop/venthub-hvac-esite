@@ -8,6 +8,7 @@ const tabs = [
   { to: '/account/shipments', label: 'Kargo Takibi' },
   { to: '/account/addresses', label: 'Adresler' },
   { to: '/account/invoices', label: 'Faturalar' },
+  { to: '/account/returns', label: 'İadeler' },
   { to: '/account/profile', label: 'Profil' },
   { to: '/account/security', label: 'Güvenlik' },
 ]

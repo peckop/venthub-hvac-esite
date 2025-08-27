@@ -639,6 +639,26 @@ export const tr = {
       updateError: 'Şifre güncelleme sırasında hata'
     }
   },
+  returns: {
+    title: 'İade Talepleri',
+    new: 'Yeni İade Talebi',
+    empty: 'Henüz iade talebiniz yok.',
+    order: 'Sipariş',
+    reason: 'Sebep',
+    status: 'Durum',
+    created: 'Oluşturulma',
+    selectOrder: 'Sipariş seçin',
+    selectReason: 'Sebep seçin',
+    description: 'Açıklama (opsiyonel)',
+    descriptionPh: 'Sorunu kısaca açıklayın (opsiyonel)',
+    submit: 'Talep Oluştur',
+    required: 'Lütfen sipariş ve sebep seçin',
+    createdToast: 'İade talebiniz oluşturuldu',
+    createError: 'İade talebi oluşturulamadı',
+    fetchError: 'İade kayıtları yüklenemedi',
+    requestReturn: 'İade Talebi'
+  },
+
   lead: {
     message: 'Mesaj',
     title: 'Teknik Teklif Talebi',

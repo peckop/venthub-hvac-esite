@@ -641,6 +641,26 @@ export const en = {
       updateError: 'An error occurred while updating password'
     }
   },
+  returns: {
+    title: 'Return Requests',
+    new: 'New Return Request',
+    empty: 'You have no return requests yet.',
+    order: 'Order',
+    reason: 'Reason',
+    status: 'Status',
+    created: 'Created',
+    selectOrder: 'Select order',
+    selectReason: 'Select reason',
+    description: 'Description (optional)',
+    descriptionPh: 'Briefly describe the issue (optional)',
+    submit: 'Create Request',
+    required: 'Please select order and reason',
+    createdToast: 'Return request created',
+    createError: 'Could not create return request',
+    fetchError: 'Could not load return records',
+    requestReturn: 'Request Return'
+  },
+
   lead: {
     message: 'Message',
     title: 'Technical Offer Request',
