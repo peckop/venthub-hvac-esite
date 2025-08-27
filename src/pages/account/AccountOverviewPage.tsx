@@ -20,12 +20,23 @@ export default function AccountOverviewPage() {
         // noop (liste boş olabilir)
       }
       try {
-        const { data: orders } = await supabase
+        let { data: orders, error } = await supabase
           .from('venthub_orders')
           .select('id, created_at, total_amount, status, order_number')
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
           .limit(3)
+        if (error && ((error as any).code === '42703' || (error as any).status === 400)) {
+          const fb = await supabase
+            .from('venthub_orders')
+            .select('id, created_at, total_amount, status')
+            .eq('user_id', user?.id || '')
+            .order('created_at', { ascending: false })
+            .limit(3)
+          orders = fb.data as any
+          error = fb.error as any
+        }
+        if (error) throw error
         if (mounted) setLastOrders((orders || []).map(o => ({
           id: o.id,
           created_at: o.created_at as string,
@@ -33,8 +44,8 @@ export default function AccountOverviewPage() {
           status: (o as any).status || 'pending',
           order_number: (o as any).order_number || null,
         })))
-      } catch {
-        // ignore
+      } catch (e) {
+        console.warn('Last orders load error', e)
       }
     }
     if (user) load()

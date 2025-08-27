@@ -37,9 +37,18 @@ export default function AccountReturnsPage() {
           .from('venthub_returns')
           .select('id, order_id, reason, description, status, created_at')
           .order('created_at', { ascending: false })
-        if (error) throw error
-        if (mounted) setRows((list || []) as ReturnRow[])
+        if (error) {
+          // Table yoksa (404) boş liste göster, toast yapma
+          if ((error as any).status === 404) {
+            if (mounted) setRows([])
+          } else {
+            throw error
+          }
+        } else {
+          if (mounted) setRows((list || []) as ReturnRow[])
+        }
       } catch (e) {
+        console.warn('Returns load error', e)
         toast.error(t('returns.fetchError'))
       } finally {
         if (mounted) setLoading(false)
@@ -53,14 +62,25 @@ export default function AccountReturnsPage() {
     let mounted = true
     async function loadOrders() {
       try {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('venthub_orders')
           .select('id, order_number, created_at')
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
+        if (error && ((error as any).code === '42703' || (error as any).status === 400)) {
+          const fb = await supabase
+            .from('venthub_orders')
+            .select('id, created_at')
+            .eq('user_id', user?.id || '')
+            .order('created_at', { ascending: false })
+          data = fb.data as any
+          error = fb.error as any
+        }
         if (error) throw error
         if (mounted) setOrders((data || []) as OrderLite[])
-      } catch {}
+      } catch (e) {
+        console.warn('Orders for returns load error', e)
+      }
     }
     if (user) loadOrders()
     return () => { mounted = false }
