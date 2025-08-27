@@ -29,13 +29,19 @@ jobs:
         with:
           version: v2.39.2
 
-      - name: Link project
+      - name: Show CLI version and project ref
         run: |
-          set -e
-          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase --version
+          echo "Project ref: $SUPABASE_PROJECT_REF"
+          echo "Migrations in repo:" && ls -la supabase/migrations || true
 
-      - name: Apply migrations via Supabase CLI
+      - name: Link project (debug)
         run: |
           set -e
-          supabase db push
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --debug
+
+      - name: Apply migrations via Supabase CLI (debug)
+        run: |
+          set -e
+          supabase db push --debug
           echo "Migrations applied successfully via Supabase CLI."
