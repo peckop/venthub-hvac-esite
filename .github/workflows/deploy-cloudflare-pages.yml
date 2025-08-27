@@ -16,6 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate required Cloudflare secrets
+        run: |
+          if [ -z "${{ secrets.CF_API_TOKEN }}" ] || [ -z "${{ secrets.CF_ACCOUNT_ID }}" ] || [ -z "${{ secrets.CF_PAGES_PROJECT_NAME }}" ]; then
+            echo "::error::Missing Cloudflare secrets. Please set CF_API_TOKEN, CF_ACCOUNT_ID, CF_PAGES_PROJECT_NAME."
+            exit 1
+          fi
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -33,6 +40,21 @@ jobs:
       - name: Build
         run: pnpm run build:ci
 
+      - name: Ensure Cloudflare Pages project exists (idempotent)
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          set -e
+          # Try to create project; ignore error if it already exists
+          RESP=$(curl -s -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"name\":\"$CF_PAGES_PROJECT_NAME\",\"production_branch\":\"master\"}" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects" || true)
+          echo "Create project response: $RESP"
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
@@ -40,4 +62,4 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           projectName: ${{ secrets.CF_PAGES_PROJECT_NAME }}
           directory: dist
-          # Optional: custom branch mapping; default maps master to production
+          branch: master
