@@ -6,6 +6,8 @@ import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshC
 import toast from 'react-hot-toast'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -264,50 +266,59 @@ export const OrdersPage: React.FC = () => {
   }
 
   const handleInvoicePdf = (order: Order) => {
-    const w = window.open('', '_blank', 'width=820,height=1100')
-    if (!w) return
-    const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
-    const itemsHtml = (order.order_items || [])
-      .map(it => `<tr><td>${it.product_name}</td><td style=\"text-align:center\">${it.quantity}</td><td style=\"text-align:right\">${nf.format(it.unit_price)}</td><td style=\"text-align:right\">${nf.format(it.total_price)}</td></tr>`) 
-      .join('')
-    const total = nf.format(order.total_amount)
-    const orderNo = order.order_number ? order.order_number : order.id
-    const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Fatura - ${orderNo}</title>
-      <style>
-        body{font-family:Arial, sans-serif; margin:24px;}
-        .row{display:flex; justify-content:space-between; align-items:flex-start;}
-        .box{padding:12px; border:1px solid #e5e7eb; border-radius:8px;}
-        table{width:100%; border-collapse:collapse; margin-top:16px}
-        th,td{padding:8px; border-bottom:1px solid #e5e7eb; font-size:13px}
-        thead th{background:#f5f7fa; text-align:left}
-        tfoot td{font-weight:bold}
-        .totals{background:#0b2c3d; color:#fff}
-        .muted{color:#6b7280}
-      </style>
-    </head><body>
-      <div class=\"row\">
-        <div>
-          <h2>FATURA</h2>
-          <div class=\"muted\">Fatura No: ${orderNo}</div>
-          <div class=\"muted\">Tarih: ${new Date(order.created_at).toLocaleString('tr-TR')}</div>
-        </div>
-        <div class=\"box\">
-          <div><strong>Müşteri:</strong> ${order.customer_name}</div>
-          <div class=\"muted\">${order.customer_email}</div>
-        </div>
-      </div>
-      <table>
-        <thead><tr><th>Ürün</th><th>Adet</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
-        <tbody>${itemsHtml}</tbody>
-        <tfoot>
-          <tr class=\"totals\"><td colspan=\"3\" style=\"text-align:right; padding:10px\">Genel Toplam</td><td style=\"text-align:right; padding:10px\">${total}</td></tr>
-        </tfoot>
-      </table>
-      <p class=\"muted\" style=\"margin-top:12px\">Bu belge, müşteri bilgilendirme amaçlıdır.</p>
-      <script>window.print();</script>
-    </body></html>`
-    w.document.write(html)
-    w.document.close()
+    try {
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+      const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
+      const orderNo = order.order_number ? order.order_number.split('-')[1] : order.id.slice(-8).toUpperCase()
+
+      // Header
+      doc.setFont('helvetica','bold'); doc.setFontSize(16)
+      doc.text('FATURA', 40, 40)
+      doc.setFont('helvetica','normal'); doc.setFontSize(10)
+      doc.text(`Fatura No: ${orderNo}`, 40, 58)
+      doc.text(`Tarih: ${new Date(order.created_at).toLocaleString('tr-TR')}`, 40, 72)
+
+      // Customer box
+      doc.setFont('helvetica','bold')
+      doc.text('Müşteri', 350, 40)
+      doc.setFont('helvetica','normal')
+      doc.text(`${order.customer_name}`, 350, 58)
+      if (order.customer_email) doc.text(`${order.customer_email}`, 350, 72)
+
+      // Items table
+      const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
+      const body = (order.order_items || []).map(it => [
+        it.product_name || '-',
+        String(it.quantity ?? 0),
+        nf.format(Number(it.unit_price) || 0),
+        nf.format(Number(it.total_price) || 0)
+      ])
+
+      autoTable(doc, {
+        startY: 100,
+        head,
+        body,
+        styles: { font: 'helvetica', fontSize: 10 },
+        headStyles: { fillColor: [245,247,250], textColor: 20 },
+        columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
+      })
+
+      // Totals
+      const afterTableY = (doc as any).lastAutoTable?.finalY || 100
+      doc.setFont('helvetica','bold'); doc.setFontSize(12)
+      doc.text(`${t('orders.grandTotal')}: ${nf.format(order.total_amount)}`, 40, afterTableY + 24)
+
+      // Footer note
+      doc.setFont('helvetica','normal'); doc.setFontSize(9)
+      doc.setTextColor(100)
+      doc.text('Bu belge, müşteri bilgilendirme amaçlıdır.', 40, afterTableY + 42)
+
+      // Save
+      doc.save(`Fatura-${orderNo}.pdf`)
+    } catch (e) {
+      console.error('PDF error', e)
+      toast.error('PDF oluşturulamadı')
+    }
   }
 
   // Derived filtered list
