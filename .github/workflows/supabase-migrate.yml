@@ -7,6 +7,10 @@ on:
       - 'supabase/migrations/**.sql'
   workflow_dispatch:
 
+concurrency:
+  group: supabase-migrate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   migrate:
     runs-on: ubuntu-latest
