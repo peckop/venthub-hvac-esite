@@ -40,3 +40,27 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 - pnpm lint
 - pnpm test
 - pnpm run build:ci
+
+## Lokal migration (psql)
+GitHub Actions yerine yerelde migration uygulamak için PowerShell scripti eklenmiştir.
+
+1) Supabase panelinden Database > Connection string (URI) kopyalayın (postgresql:// ile başlar).
+2) Aşağıdaki komutu çalıştırın (Windows PowerShell):
+
+```powershell path=null start=null
+# Seçenek A: URI'yi env'den okuyarak
+$env:SUPABASE_DB_URL="postgresql://postgres:PAROLA@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres"
+powershell -ExecutionPolicy Bypass -File .scripts/migrate.ps1
+
+# Seçenek B: Çalıştırınca URI'yi sizden ister
+powershell -ExecutionPolicy Bypass -File .scripts/migrate.ps1
+```
+
+Notlar:
+- psql kurulu olmalıdır (Windows: winget install PostgreSQL.Client).
+- URI'yi paneldeki "Copy" ile alın; özel karakter varsa URL-encode gerekebilir.
+- pnpm install
+- pnpm dev
+- pnpm lint
+- pnpm test
+- pnpm run build:ci

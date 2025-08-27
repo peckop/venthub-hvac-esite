@@ -1,0 +1,62 @@
+param(
+  [string]$DbUrl = $env:SUPABASE_DB_URL,
+  [switch]$WhatIf
+)
+
+Write-Host "=== Venthub: Local DB Migration (psql) ===" -ForegroundColor Cyan
+
+# Ensure we're running from repo root (script works from anywhere)
+$repoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+Set-Location $repoRoot
+
+if (-not (Test-Path "supabase/migrations")) {
+  Write-Error "supabase/migrations klasörü bulunamadı. Bu scripti repo kökünde çalıştırın."
+  exit 1
+}
+
+# Ask for DB URL if not provided
+if (-not $DbUrl -or [string]::IsNullOrWhiteSpace($DbUrl)) {
+  Write-Host "SUPABASE_DB_URL bulunamadı. Lütfen bağlantı URI'sini girin:" -ForegroundColor Yellow
+  $DbUrl = Read-Host "postgresql://postgres:PAROLA@db.<ref>.supabase.co:5432/postgres"
+}
+
+# Quick validation
+if ($DbUrl -notmatch "^postgres(ql)?://.+@db\.[a-z0-9]+\.supabase\.co:5432/.+") {
+  Write-Warning "DB URL beklenen formata benzemiyor. Devam ediliyor..."
+}
+
+# Check psql
+try {
+  $psqlVersion = (& psql --version) 2>$null
+  if (-not $psqlVersion) { throw "no-psql" }
+  Write-Host "psql bulundu: $psqlVersion" -ForegroundColor Green
+} catch {
+  Write-Error "psql bulunamadı. Lütfen PostgreSQL client kurun. Windows için: winget install PostgreSQL.Client --source winget veya https://www.postgresql.org/download/"
+  exit 1
+}
+
+# Collect migrations
+$files = Get-ChildItem -Path "supabase/migrations" -Filter *.sql -File | Sort-Object Name
+if (-not $files -or $files.Count -eq 0) {
+  Write-Host "Uygulanacak migration yok." -ForegroundColor Yellow
+  exit 0
+}
+
+Write-Host "Hedef host: $(("$DbUrl") -replace '.*@([^:/]+).*','$1')" -ForegroundColor DarkCyan
+if ($WhatIf) { Write-Host "Dry-run modunda çalışıyor (WhatIf) — SQL uygulanmayacak." -ForegroundColor Yellow }
+
+$ErrorActionPreference = 'Stop'
+try {
+  foreach ($f in $files) {
+    Write-Host ("Applying {0}" -f $f.Name) -ForegroundColor Magenta
+    if (-not $WhatIf) {
+      & psql "$DbUrl" -v ON_ERROR_STOP=1 -f "$($f.FullName)"
+      if ($LASTEXITCODE -ne 0) { throw "psql exited with code $LASTEXITCODE for $($f.Name)" }
+    }
+  }
+  Write-Host "Migration(lar) başarıyla uygulandı." -ForegroundColor Green
+  exit 0
+} catch {
+  Write-Error $_
+  exit 1
+}
