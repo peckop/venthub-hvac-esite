@@ -65,17 +65,15 @@ Deno.serve(async (req) => {
     }
 
     if (!token) {
-      // Fallback: orderId üzerinden payment_data.token'ı getir ve devam et
+      // Fallback: orderId üzerinden payment_token'ı getir ve devam et
       if (orderId) {
         try {
-          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_token,payment_data`, {
+          const got = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=payment_token`, {
             headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, apikey: `${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}` }
           })
           const arr = await got.json().catch(()=>[])
           const row = Array.isArray(arr) ? arr[0] : null
-          const pd = row?.payment_data ? row.payment_data : null
           if (row?.payment_token) token = row.payment_token
-          else if (pd?.token) token = pd.token
         } catch (_) {}
       }
       if (!token) {

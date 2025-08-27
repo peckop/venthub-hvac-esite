@@ -74,7 +74,7 @@ export default function AccountOverviewPage() {
                 </div>
                 <div className="text-right">
                   <div className="text-industrial-gray font-medium">{new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(o.total_amount)}</div>
-                  <Link to={`/account/orders?open=${o.id}`} className="text-primary-navy hover:underline">{t('orders.details') || 'Detay'}</Link>
+                  <Link to={`/account/orders/${o.id}`} className="text-primary-navy hover:underline">{t('orders.details') || 'Detay'}</Link>
                 </div>
               </li>
             ))}
