@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
 
     const results: any[] = []
     for (const o of orders) {
-      const token = o?.payment_token || o?.payment_data?.token || null
+      const token = o?.payment_token || null
       if (!token) {
         results.push({ id:o.id, conversation_id:o.conversation_id, skipped:'no_token' })
         continue
