@@ -201,6 +201,34 @@ export default function OrderDetailPage() {
 
   const prettyNo = order.order_number ? `#${order.order_number.split('-')[1]}` : `#${order.id.slice(-8).toUpperCase()}`
 
+  // Status helpers
+  const getStatusColor = (status: string) => {
+    switch ((status || '').toLowerCase()) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800'
+      case 'paid':
+      case 'confirmed': return 'bg-blue-100 text-blue-800'
+      case 'shipped': return 'bg-purple-100 text-purple-800'
+      case 'delivered': return 'bg-green-100 text-green-800'
+      case 'failed':
+      case 'cancelled': return 'bg-red-100 text-red-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+  const getStatusText = (status: string) => {
+    switch ((status || '').toLowerCase()) {
+      case 'pending': return t('orders.pending')
+      case 'paid':
+      case 'confirmed': return t('orders.paid')
+      case 'shipped': return t('orders.shipped')
+      case 'delivered': return t('orders.delivered')
+      case 'failed':
+      case 'cancelled': return t('orders.failed')
+      default: return status
+    }
+  }
+  const steps = ['pending','paid','shipped','delivered'] as const
+  const activeIdx = Math.max(steps.indexOf((order.status || 'pending').toLowerCase() as any), 0)
+
   return (
     <div className="min-h-screen bg-clean-white py-8">
       <div className="max-w-5xl mx-auto px-4">
@@ -218,9 +246,26 @@ export default function OrderDetailPage() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
               <button onClick={()=>navigate(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
               <button onClick={()=>handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
+            </div>
+          </div>
+          {/* Compact stepper */}
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              {steps.map((s, idx) => (
+                <React.Fragment key={s}>
+                  <div className="flex flex-col items-center min-w-[60px]">
+                    <div className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center ${idx <= activeIdx ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx+1}</div>
+                    <span className="mt-1 text-[10px] text-steel-gray">{getStatusText(s)}</span>
+                  </div>
+                  {idx < steps.length-1 && (
+                    <div className={`flex-1 h-0.5 ${activeIdx >= idx+1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
+                  )}
+                </React.Fragment>
+              ))}
             </div>
           </div>
         </div>

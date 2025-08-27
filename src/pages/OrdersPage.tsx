@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase, Product } from '../lib/supabase'
-import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshCcw } from 'lucide-react'
+import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshCcw, Link as LinkIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
@@ -634,7 +634,7 @@ export const OrdersPage: React.FC = () => {
                             <div>
                               <div className="text-steel-gray">{t('orders.trackingLink') || 'Takip Linki'}</div>
                               {order.tracking_url ? (
-                                <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all">{t('orders.openLink') || 'Bağlantıyı aç'}</a>
+                                <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14}/>{t('orders.openLink') || 'Bağlantıyı aç'}</a>
                               ) : (
                                 <div className="text-industrial-gray">-</div>
                               )}

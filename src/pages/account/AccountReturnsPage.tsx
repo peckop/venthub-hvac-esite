@@ -134,6 +134,14 @@ export default function AccountReturnsPage() {
     }
   }
 
+  const statusClass = (s: string) => {
+    const v = (s || '').toLowerCase()
+    if (v==='requested') return 'bg-yellow-100 text-yellow-800'
+    if (v==='approved' || v==='in_transit' || v==='received' || v==='refunded') return 'bg-blue-100 text-blue-800'
+    if (v==='rejected' || v==='cancelled') return 'bg-red-100 text-red-800'
+    return 'bg-air-blue/10 text-primary-navy'
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -170,7 +178,7 @@ export default function AccountReturnsPage() {
                   </td>
                   <td className="p-3 text-sm text-industrial-gray">{r.reason}</td>
                   <td className="p-3 text-sm">
-                    <span className="px-2 py-1 rounded bg-air-blue/10 text-primary-navy text-xs font-medium">{r.status}</span>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusClass(r.status)}`}>{r.status}</span>
                   </td>
                   <td className="p-3 text-sm text-steel-gray">{new Date(r.created_at).toLocaleString('tr-TR')}</td>
                 </tr>
