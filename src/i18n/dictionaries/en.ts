@@ -35,6 +35,7 @@ export const en = {
     seeAllProducts: "See all products",
     backToTop: "Back to top",
     gotoCategory: "Go to category",
+    cancel: "Cancel",
   },
   home: {
     features: {

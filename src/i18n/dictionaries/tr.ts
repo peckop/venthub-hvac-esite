@@ -33,6 +33,7 @@ export const tr = {
     selectByNeed: "İhtiyacına Göre Seç",
     seeAllProducts: "Tüm Ürünleri Gör",
     backToTop: "Başa dön",
+    cancel: "İptal",
   },
   home: {
     features: {
