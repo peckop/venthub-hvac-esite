@@ -30,6 +30,11 @@ interface Order {
   is_demo?: boolean
   payment_data?: unknown
   conversation_id?: string
+  carrier?: string
+  tracking_number?: string
+  tracking_url?: string
+  shipped_at?: string
+  delivered_at?: string
 }
 
 interface OrderItem {
@@ -63,6 +68,11 @@ interface VenthubOrderRow {
   order_number?: string | null
   payment_data?: unknown
   conversation_id?: string | null
+  carrier?: string | null
+  tracking_number?: string | null
+  tracking_url?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
   venthub_order_items?: VenthubOrderItemRow[]
 }
 
@@ -93,7 +103,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
+        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -127,6 +137,11 @@ export const OrdersPage: React.FC = () => {
           is_demo: false,
           payment_data: order.payment_data,
           conversation_id: order.conversation_id || undefined,
+          carrier: order.carrier || undefined,
+          tracking_number: order.tracking_number || undefined,
+          tracking_url: order.tracking_url || undefined,
+          shipped_at: order.shipped_at || undefined,
+          delivered_at: order.delivered_at || undefined,
         }
       })
 
@@ -312,8 +327,13 @@ export const OrdersPage: React.FC = () => {
         }
       }
 
-      if (added>0) toast.success(t('orders.reorderedToast', { count: added }))
-      else toast.error(t('orders.reorderNotFound'))
+      if (added>0) {
+        toast.success(t('orders.reorderedToast', { count: added }))
+        // Sepete yönlendir
+        navigate('/cart')
+      } else {
+        toast.error(t('orders.reorderNotFound'))
+      }
     } catch (e: unknown) {
       console.error('Reorder error', e)
       toast.error(t('orders.reorderError'))
@@ -510,6 +530,46 @@ export const OrdersPage: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Shipping (Tracking) */}
+                    <div className="mb-6">
+                      <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.shippingInfo') || 'Kargo Takibi'}</h4>
+                      {order.carrier || order.tracking_number || order.tracking_url || order.shipped_at || order.delivered_at ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <div className="text-steel-gray">{t('orders.carrier') || 'Kargo Firması'}</div>
+                            <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
+                          </div>
+                          <div>
+                            <div className="text-steel-gray">{t('orders.trackingNumber') || 'Takip Numarası'}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
+                              {order.tracking_number && (
+                                <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline">{t('orders.copy') || 'Kopyala'}</button>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="text-steel-gray">{t('orders.trackingLink') || 'Takip Linki'}</div>
+                            {order.tracking_url ? (
+                              <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all">{t('orders.openLink') || 'Bağlantıyı aç'}</a>
+                            ) : (
+                              <div className="text-industrial-gray">-</div>
+                            )}
+                          </div>
+                          <div>
+                            <div className="text-steel-gray">{t('orders.shippedAt') || 'Kargoya Verildi'}</div>
+                            <div className="font-medium text-industrial-gray">{order.shipped_at ? formatDate(order.shipped_at) : '-'}</div>
+                          </div>
+                          <div>
+                            <div className="text-steel-gray">{t('orders.deliveredAt') || 'Teslim Edildi'}</div>
+                            <div className="font-medium text-industrial-gray">{order.delivered_at ? formatDate(order.delivered_at) : '-'}</div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-steel-gray">{t('orders.noShippingInfo') || 'Kargo bilgisi bulunmuyor.'}</div>
+                      )}
+                    </div>
+
                     {/* Order Items */}
                     {order.order_items && order.order_items.length > 0 ? (
                       <div>
@@ -570,9 +630,10 @@ export const OrdersPage: React.FC = () => {
                     )}
 
                     {/* Actions */}
-                    <div className="mt-4 flex justify-end gap-2">
+                    <div className="mt-4 flex flex-wrap justify-end gap-2">
                       <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
                       <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
+                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'}</button>
                     </div>
                   </div>
                 )}

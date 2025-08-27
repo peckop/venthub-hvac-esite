@@ -3,7 +3,18 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.config.*'
+      - 'tsconfig.*'
   workflow_dispatch:
+
+concurrency:
+  group: deploy-pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
