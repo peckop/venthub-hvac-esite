@@ -281,6 +281,7 @@ export const en = {
   orders: {
     title: 'My Orders',
     subtitle: 'View and track your past orders',
+    viewAll: 'View all',
     filters: 'Filters',
     status: 'Status',
     all: 'All',
@@ -325,6 +326,15 @@ export const en = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
+    shippingInfo: 'Shipping / Tracking',
+    carrier: 'Carrier',
+    trackingNumber: 'Tracking Number',
+    trackingLink: 'Tracking Link',
+    openLink: 'Open link',
+    shippedAt: 'Shipped At',
+    deliveredAt: 'Delivered At',
+    noShippingInfo: 'No shipping info available.',
+    invoicePdf: 'Invoice (PDF)'
   },
   auth: {
     back: 'Go Back',

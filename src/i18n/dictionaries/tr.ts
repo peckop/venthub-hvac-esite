@@ -279,6 +279,7 @@ export const tr = {
   orders: {
     title: 'Siparişlerim',
     subtitle: 'Geçmiş siparişlerinizi görüntüleyin ve takip edin',
+    viewAll: 'Tümünü gör',
     filters: 'Filtreler',
     status: 'Durum',
     all: 'Hepsi',
@@ -323,6 +324,15 @@ export const tr = {
     reorderedToast: '{{count}} adet ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar satın alma sırasında hata',
+    shippingInfo: 'Kargo Takibi',
+    carrier: 'Kargo Firması',
+    trackingNumber: 'Takip Numarası',
+    trackingLink: 'Takip Linki',
+    openLink: 'Bağlantıyı aç',
+    shippedAt: 'Kargoya Verildi',
+    deliveredAt: 'Teslim Edildi',
+    noShippingInfo: 'Kargo bilgisi bulunmuyor.',
+    invoicePdf: 'Fatura (PDF)'
   },
   auth: {
     back: 'Geri Dön',

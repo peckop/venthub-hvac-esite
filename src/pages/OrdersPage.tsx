@@ -680,7 +680,7 @@ export const OrdersPage: React.FC = () => {
                     <div className="mt-4 flex flex-wrap justify-end gap-2">
                       <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
                       <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
-                      <button onClick={() => handleInvoicePdf(order)} className=\"text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors\">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
+                      <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
                     </div>
                   </div>
                 )}
