@@ -18,6 +18,7 @@ jobs:
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +40,20 @@ jobs:
           echo "Project ref: $SUPABASE_PROJECT_REF"
           echo "Migrations in repo:" && ls -la supabase/migrations || true
 
+      - name: Diagnose Supabase project visibility
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -e
+          echo "Listing projects via API to verify visibility..."
+          curl -s -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" https://api.supabase.com/v1/projects | tee projects.json || true
+          echo "Does the ref appear?"
+          if jq -e '.[] | select(.ref=="'$SUPABASE_PROJECT_REF'")' projects.json >/dev/null 2>&1; then
+            echo "OK: Project ref $SUPABASE_PROJECT_REF is visible to this token."
+          else
+            echo "::warning::Project ref $SUPABASE_PROJECT_REF not found in token's project list. Check token account/org."
+          fi
+
       - name: Link project (debug)
         run: |
           set -e
@@ -49,3 +64,19 @@ jobs:
           set -e
           supabase db push --debug
           echo "Migrations applied successfully via Supabase CLI."
+
+      - name: Install PostgreSQL client (fallback)
+        if: ${{ failure() && env.SUPABASE_DB_URL != '' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Apply migrations via psql (fallback)
+        if: ${{ failure() && env.SUPABASE_DB_URL != '' }}
+        run: |
+          set -e
+          for f in supabase/migrations/*.sql; do
+            echo "Applying $f"
+            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+          echo "Migrations applied via psql fallback."
