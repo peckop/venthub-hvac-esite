@@ -246,10 +246,57 @@ export const OrdersPage: React.FC = () => {
     if (!w) return
     const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
     const itemsHtml = (order.order_items || [])
-      .map(it => `<tr><td style="padding:6px 0">${it.product_name}</td><td style="text-align:center">${it.quantity}</td><td style="text-align:right">${nf.format(it.unit_price)}</td><td style="text-align:right">${nf.format(it.total_price)}</td></tr>`) 
+      .map(it => `<tr><td style=\"padding:6px 0\">${it.product_name}</td><td style=\"text-align:center\">${it.quantity}</td><td style=\"text-align:right\">${nf.format(it.unit_price)}</td><td style=\"text-align:right\">${nf.format(it.total_price)}</td></tr>`) 
       .join('')
     const total = nf.format(order.total_amount)
-    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${t('orders.receiptTitle')}</title></head><body style="font-family:Arial,sans-serif;padding:24px"><h2>${t('orders.receiptHeading')}</h2><p><strong>${t('orders.orderId')}:</strong> ${order.id}<br/><strong>${t('orders.date')}:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th align="left">${t('orders.productCol')}</th><th>${t('orders.qtyCol')}</th><th align="right">${t('orders.unitPriceCol')}</th><th align="right">${t('orders.totalCol')}</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan="3" align="right"><strong>${t('orders.grandTotal')}</strong></td><td align="right"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>${t('orders.securePaymentNote')}</p><script>window.print();</script></body></html>`
+    const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>${t('orders.receiptTitle')}</title></head><body style=\"font-family:Arial,sans-serif;padding:24px\"><h2>${t('orders.receiptHeading')}</h2><p><strong>${t('orders.orderId')}:</strong> ${order.id}<br/><strong>${t('orders.date')}:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style=\"width:100%;border-collapse:collapse\"><thead><tr><th align=\"left\">${t('orders.productCol')}</th><th>${t('orders.qtyCol')}</th><th align=\"right\">${t('orders.unitPriceCol')}</th><th align=\"right\">${t('orders.totalCol')}</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan=\"3\" align=\"right\"><strong>${t('orders.grandTotal')}</strong></td><td align=\"right\"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>${t('orders.securePaymentNote')}</p><script>window.print();</script></body></html>`
+    w.document.write(html)
+    w.document.close()
+  }
+
+  const handleInvoicePdf = (order: Order) => {
+    const w = window.open('', '_blank', 'width=820,height=1100')
+    if (!w) return
+    const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
+    const itemsHtml = (order.order_items || [])
+      .map(it => `<tr><td>${it.product_name}</td><td style=\"text-align:center\">${it.quantity}</td><td style=\"text-align:right\">${nf.format(it.unit_price)}</td><td style=\"text-align:right\">${nf.format(it.total_price)}</td></tr>`) 
+      .join('')
+    const total = nf.format(order.total_amount)
+    const orderNo = order.order_number ? order.order_number : order.id
+    const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Fatura - ${orderNo}</title>
+      <style>
+        body{font-family:Arial, sans-serif; margin:24px;}
+        .row{display:flex; justify-content:space-between; align-items:flex-start;}
+        .box{padding:12px; border:1px solid #e5e7eb; border-radius:8px;}
+        table{width:100%; border-collapse:collapse; margin-top:16px}
+        th,td{padding:8px; border-bottom:1px solid #e5e7eb; font-size:13px}
+        thead th{background:#f5f7fa; text-align:left}
+        tfoot td{font-weight:bold}
+        .totals{background:#0b2c3d; color:#fff}
+        .muted{color:#6b7280}
+      </style>
+    </head><body>
+      <div class=\"row\">
+        <div>
+          <h2>FATURA</h2>
+          <div class=\"muted\">Fatura No: ${orderNo}</div>
+          <div class=\"muted\">Tarih: ${new Date(order.created_at).toLocaleString('tr-TR')}</div>
+        </div>
+        <div class=\"box\">
+          <div><strong>Müşteri:</strong> ${order.customer_name}</div>
+          <div class=\"muted\">${order.customer_email}</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Ürün</th><th>Adet</th><th>Birim Fiyat</th><th>Toplam</th></tr></thead>
+        <tbody>${itemsHtml}</tbody>
+        <tfoot>
+          <tr class=\"totals\"><td colspan=\"3\" style=\"text-align:right; padding:10px\">Genel Toplam</td><td style=\"text-align:right; padding:10px\">${total}</td></tr>
+        </tfoot>
+      </table>
+      <p class=\"muted\" style=\"margin-top:12px\">Bu belge, müşteri bilgilendirme amaçlıdır.</p>
+      <script>window.print();</script>
+    </body></html>`
     w.document.write(html)
     w.document.close()
   }
@@ -633,7 +680,7 @@ export const OrdersPage: React.FC = () => {
                     <div className="mt-4 flex flex-wrap justify-end gap-2">
                       <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
                       <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
-                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'}</button>
+                      <button onClick={() => handleInvoicePdf(order)} className=\"text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors\">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
                     </div>
                   </div>
                 )}
