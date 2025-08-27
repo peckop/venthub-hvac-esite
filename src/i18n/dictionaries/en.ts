@@ -282,6 +282,12 @@ export const en = {
     title: 'My Orders',
     subtitle: 'View and track your past orders',
     viewAll: 'View all',
+    tabs: {
+      overview: 'Overview',
+      items: 'Items',
+      shipping: 'Shipping',
+      invoice: 'Invoice'
+    },
     filters: 'Filters',
     status: 'Status',
     all: 'All',

@@ -244,14 +244,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             <User size={16} />
                             <span>Hesabım</span>
                           </Link>
-                          <Link
-                            to="/orders"
-                            onClick={() => setIsUserMenuOpen(false)}
-                            className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
-                          >
-                            <Package size={16} />
-                            <span>{t('common.myOrders')}</span>
-                          </Link>
                           <button
                             onClick={handleSignOut}
                             className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-steel-gray hover:text-red-600 hover:bg-red-50/50 transition-all duration-200 rounded-lg m-1"
@@ -338,12 +330,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
                     >
                       <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
-                    >
-                      <Package size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
                     </Link>
                   </>
                 )}

@@ -280,6 +280,12 @@ export const tr = {
     title: 'Siparişlerim',
     subtitle: 'Geçmiş siparişlerinizi görüntüleyin ve takip edin',
     viewAll: 'Tümünü gör',
+    tabs: {
+      overview: 'Özet',
+      items: 'Ürünler',
+      shipping: 'Kargo Takibi',
+      invoice: 'Fatura'
+    },
     filters: 'Filtreler',
     status: 'Durum',
     all: 'Hepsi',

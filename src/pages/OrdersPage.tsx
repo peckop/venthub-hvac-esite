@@ -85,6 +85,7 @@ export const OrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [detailTab, setDetailTab] = useState<'overview'|'items'|'shipping'|'invoice'>('overview')
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -151,7 +152,15 @@ export const OrdersPage: React.FC = () => {
       const openId = searchParams.get('open')
       if (openId) {
         const found = formattedOrders.find(o => o.id === openId)
-        if (found) setSelectedOrder(found)
+        if (found) {
+          setSelectedOrder(found)
+          const tabParam = (searchParams.get('tab') || '').toLowerCase()
+          if (tabParam === 'items' || tabParam === 'shipping' || tabParam === 'invoice') {
+            setDetailTab(tabParam as 'items'|'shipping'|'invoice')
+          } else {
+            setDetailTab('overview')
+          }
+        }
       }
 
       // Apply product filter from URL (?product=...)
@@ -529,96 +538,118 @@ export const OrdersPage: React.FC = () => {
                 {/* Order Details (Expandable) */}
                 {selectedOrder?.id === order.id && (
                   <div className="p-6 bg-air-blue/10">
-                    {/* Customer + Order Info */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                      <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
-                        <div className="space-y-2 text-sm">
-                          <p><span className="font-medium">{t('orders.name')}:</span> {order.customer_name}</p>
-                          <p><span className="font-medium">{t('orders.email')}:</span> {order.customer_email}</p>
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
-                        <div className="text-sm text-steel-gray">
-                          {order.shipping_address && (() => {
-                            const addr = order.shipping_address as ShippingAddress
-                            const line1 = addr.fullAddress || addr.street
-                            const line2 = [addr.city, addr.district || addr.state].filter(Boolean).join(', ')
-                            const line3 = addr.postalCode || addr.postal_code
-                            return (
-                              <div>
-                                {line1 && <p>{line1}</p>}
-                                {(line2 && line2.length > 0) && <p>{line2}</p>}
-                                {line3 && <p>{line3}</p>}
-                              </div>
-                            )
-                          })()}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderInfo')}</h4>
-                        <div className="text-sm text-steel-gray space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium">{t('orders.orderId')}</span>
-                            <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
-                          </div>
-                          <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
-                          {order.conversation_id && (
-                            <>
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="font-medium">{t('orders.conversationId')}</span>
-                                <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
-                              </div>
-                              <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
-                            </>
-                          )}
-                        </div>
-                      </div>
+                    {/* Detail Tabs */}
+                    <div className="border-b border-light-gray mb-4">
+                      <nav className="flex flex-wrap gap-2">
+                        {(['overview','items','shipping','invoice'] as const).map(tab => (
+                          <button
+                            key={tab}
+                            onClick={() => setDetailTab(tab)}
+                            className={`px-3 py-2 text-sm rounded-t ${detailTab===tab ? 'bg-white border border-light-gray border-b-transparent text-primary-navy' : 'text-steel-gray hover:text-primary-navy'}`}
+                          >
+                            {tab==='overview' && (t('orders.tabs.overview') || 'Özet')}
+                            {tab==='items' && (t('orders.tabs.items') || 'Ürünler')}
+                            {tab==='shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
+                            {tab==='invoice' && (t('orders.tabs.invoice') || 'Fatura')}
+                          </button>
+                        ))}
+                      </nav>
                     </div>
 
-                    {/* Shipping (Tracking) */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.shippingInfo') || 'Kargo Takibi'}</h4>
-                      {order.carrier || order.tracking_number || order.tracking_url || order.shipped_at || order.delivered_at ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <div className="text-steel-gray">{t('orders.carrier') || 'Kargo Firması'}</div>
-                            <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
+                    {/* Overview Tab: Customer + Order Info */}
+                    {detailTab === 'overview' && (
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div>
+                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
+                          <div className="space-y-2 text-sm">
+                            <p><span className="font-medium">{t('orders.name')}:</span> {order.customer_name}</p>
+                            <p><span className="font-medium">{t('orders.email')}:</span> {order.customer_email}</p>
                           </div>
-                          <div>
-                            <div className="text-steel-gray">{t('orders.trackingNumber') || 'Takip Numarası'}</div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
-                              {order.tracking_number && (
-                                <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline">{t('orders.copy') || 'Kopyala'}</button>
-                              )}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
+                          <div className="text-sm text-steel-gray">
+                            {order.shipping_address && (() => {
+                              const addr = order.shipping_address as ShippingAddress
+                              const line1 = addr.fullAddress || addr.street
+                              const line2 = [addr.city, addr.district || addr.state].filter(Boolean).join(', ')
+                              const line3 = addr.postalCode || addr.postal_code
+                              return (
+                                <div>
+                                  {line1 && <p>{line1}</p>}
+                                  {(line2 && line2.length > 0) && <p>{line2}</p>}
+                                  {line3 && <p>{line3}</p>}
+                                </div>
+                              )
+                            })()}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderInfo')}</h4>
+                          <div className="text-sm text-steel-gray space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-medium">{t('orders.orderId')}</span>
+                              <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
                             </div>
-                          </div>
-                          <div>
-                            <div className="text-steel-gray">{t('orders.trackingLink') || 'Takip Linki'}</div>
-                            {order.tracking_url ? (
-                              <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all">{t('orders.openLink') || 'Bağlantıyı aç'}</a>
-                            ) : (
-                              <div className="text-industrial-gray">-</div>
+                            <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
+                            {order.conversation_id && (
+                              <>
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-medium">{t('orders.conversationId')}</span>
+                                  <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
+                                </div>
+                                <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
+                              </>
                             )}
                           </div>
-                          <div>
-                            <div className="text-steel-gray">{t('orders.shippedAt') || 'Kargoya Verildi'}</div>
-                            <div className="font-medium text-industrial-gray">{order.shipped_at ? formatDate(order.shipped_at) : '-'}</div>
-                          </div>
-                          <div>
-                            <div className="text-steel-gray">{t('orders.deliveredAt') || 'Teslim Edildi'}</div>
-                            <div className="font-medium text-industrial-gray">{order.delivered_at ? formatDate(order.delivered_at) : '-'}</div>
-                          </div>
                         </div>
-                      ) : (
-                        <div className="text-sm text-steel-gray">{t('orders.noShippingInfo') || 'Kargo bilgisi bulunmuyor.'}</div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
-                    {/* Order Items */}
-                    {order.order_items && order.order_items.length > 0 ? (
+                    {/* Shipping Tab */}
+                    {detailTab === 'shipping' && (
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.shippingInfo') || 'Kargo Takibi'}</h4>
+                        {order.carrier || order.tracking_number || order.tracking_url || order.shipped_at || order.delivered_at ? (
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <div className="text-steel-gray">{t('orders.carrier') || 'Kargo Firması'}</div>
+                              <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
+                            </div>
+                            <div>
+                              <div className="text-steel-gray">{t('orders.trackingNumber') || 'Takip Numarası'}</div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
+                                {order.tracking_number && (
+                                  <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline">{t('orders.copy') || 'Kopyala'}</button>
+                                )}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-steel-gray">{t('orders.trackingLink') || 'Takip Linki'}</div>
+                              {order.tracking_url ? (
+                                <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all">{t('orders.openLink') || 'Bağlantıyı aç'}</a>
+                              ) : (
+                                <div className="text-industrial-gray">-</div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="text-steel-gray">{t('orders.shippedAt') || 'Kargoya Verildi'}</div>
+                              <div className="font-medium text-industrial-gray">{order.shipped_at ? formatDate(order.shipped_at) : '-'}</div>
+                            </div>
+                            <div>
+                              <div className="text-steel-gray">{t('orders.deliveredAt') || 'Teslim Edildi'}</div>
+                              <div className="font-medium text-industrial-gray">{order.delivered_at ? formatDate(order.delivered_at) : '-'}</div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-steel-gray">{t('orders.noShippingInfo') || 'Kargo bilgisi bulunmuyor.'}</div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Items Tab */}
+                    {detailTab === 'items' && (
                       <div>
                         <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
                         <div className="bg-white rounded-lg overflow-hidden">
@@ -659,28 +690,22 @@ export const OrdersPage: React.FC = () => {
                           </table>
                         </div>
                       </div>
-                    ) : (
-                      <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
-                        <div className="bg-white rounded-lg p-6 text-center">
-                          <p className="text-steel-gray mb-2">{t('orders.noItems')}</p>
-                          {order.is_demo && (
-                            <p className="text-sm text-orange-600">
-                              {t('orders.demoNote')}
-                            </p>
-                          )}
-                          <div className="mt-4 p-4 bg-primary-navy text-white rounded-lg">
-                            <p className="font-semibold">{t('orders.totalAmount')}: {formatPrice(order.total_amount)}</p>
-                          </div>
+                    )}
+
+                    {/* Invoice Tab */}
+                    {detailTab === 'invoice' && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-industrial-gray">{t('orders.tabs.invoice') || 'Fatura'}</h4>
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
+                          <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
                         </div>
                       </div>
                     )}
 
                     {/* Actions */}
-                    <div className="mt-4 flex flex-wrap justify-end gap-2">
+                    <div className="mt-6 flex flex-wrap justify-end gap-2">
                       <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
-                      <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
-                      <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
                     </div>
                   </div>
                 )}
