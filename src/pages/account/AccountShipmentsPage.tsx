@@ -31,17 +31,29 @@ export default function AccountShipmentsPage() {
     async function load() {
       try {
         setLoading(true)
-        const { data, error } = await supabase
+        const baseSelect = 'id, created_at, total_amount, status, order_number, carrier, tracking_number, tracking_url, shipped_at, delivered_at'
+        let { data, error } = await supabase
           .from('venthub_orders')
-          .select('id, created_at, total_amount, status, order_number, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
+          .select(baseSelect)
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
+        // Fallback: prod DB henüz shipping kolonları yoksa 400 dönebilir
+        if (error && (error as any).code === 'PGRST100' || (error as any).status === 400) {
+          const fallback = await supabase
+            .from('venthub_orders')
+            .select('id, created_at, total_amount, status, order_number')
+            .eq('user_id', user?.id || '')
+            .order('created_at', { ascending: false })
+          data = fallback.data as any
+          error = fallback.error as any
+        }
         if (error) throw error
         const items = (data || []) as ShipmentRow[]
         // Only ones with any shipping info
         const filtered = items.filter(it => it.carrier || it.tracking_number || it.tracking_url || it.shipped_at || it.delivered_at)
         if (mounted) setRows(filtered)
       } catch (e) {
+        console.error('Shipments load error:', e)
         toast.error(t('orders.unexpectedError'))
       } finally {
         if (mounted) setLoading(false)
