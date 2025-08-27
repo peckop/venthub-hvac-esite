@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 const tabs = [
   { to: '/account', label: 'Özet', end: true },
   { to: '/account/orders', label: 'Siparişler' },
+  { to: '/account/shipments', label: 'Kargo Takibi' },
   { to: '/account/addresses', label: 'Adresler' },
   { to: '/account/invoices', label: 'Faturalar' },
   { to: '/account/profile', label: 'Profil' },
