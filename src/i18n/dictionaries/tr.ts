@@ -297,7 +297,7 @@ export const tr = {
     failed: 'Başarısız',
     startDate: 'Başlangıç',
     endDate: 'Bitiş',
-    orderCode: 'Sipariş Kodu (son 8)',
+    orderCode: 'Sipariş No (son 8)',
     orderCodePlaceholder: 'örn. 7016DD05',
     product: 'Ürün',
     productSearchPlaceholder: 'Ürün adına göre ara',

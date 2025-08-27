@@ -530,17 +530,12 @@ export const OrdersPage: React.FC = () => {
                         {getStatusText(order.status)}
                       </span>
                       <button
-                        onClick={() => setSelectedOrder(selectedOrder?.id === order.id ? null : order)}
+                        onClick={() => navigate(`/account/orders/${order.id}`)}
                         className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
                       >
                         <Eye size={20} />
                         <span className="text-sm font-medium">{t('orders.details')}</span>
-                        <ChevronRight 
-                          size={16} 
-                          className={`transform transition-transform ${
-                            selectedOrder?.id === order.id ? 'rotate-90' : ''
-                          }`} 
-                        />
+                        <ChevronRight size={16} />
                       </button>
                     </div>
                   </div>

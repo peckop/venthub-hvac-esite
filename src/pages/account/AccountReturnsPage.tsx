@@ -87,6 +87,13 @@ export default function AccountReturnsPage() {
   }, [user])
 
   const [form, setForm] = useState({ order_id: prefillOrderId, reason: '', description: '' })
+  
+  // Açılışta ?new=<order_id> varsa modalı otomatik aç
+  useEffect(() => {
+    if (prefillOrderId) {
+      setOpenModal(true)
+    }
+  }, [prefillOrderId])
   const reasonOptions = useMemo(() => (
     [
       'Yanlış ürün/eksik parça',
@@ -174,8 +181,8 @@ export default function AccountReturnsPage() {
       )}
 
       {openModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-md p-5">
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={()=>setOpenModal(false)}>
+          <div className="bg-white rounded-xl w-full max-w-md p-5" onClick={(e)=>e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('returns.new')}</h3>
 
             <div className="space-y-3">
