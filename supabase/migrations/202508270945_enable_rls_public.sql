@@ -12,19 +12,19 @@ end; $$;
 
 -- Helper: create SELECT policy if not exists
 create or replace function public._create_select_policy_if_absent(
-  schemaname text,
-  tablename text,
-  policyname text,
-  using_sql text
+  p_schemaname text,
+  p_tablename text,
+  p_policyname text,
+  p_using_sql text
 ) returns void language plpgsql as $$
 begin
   if not exists (
     select 1 from pg_policies
-    where schemaname = schemaname
-      and tablename  = tablename
-      and policyname = policyname
+    where pg_policies.schemaname = p_schemaname
+      and pg_policies.tablename  = p_tablename
+      and pg_policies.policyname = p_policyname
   ) then
-    execute format('create policy %I on %I.%I for select using (%s)', policyname, schemaname, tablename, using_sql);
+    execute format('create policy %I on %I.%I for select using (%s)', p_policyname, p_schemaname, p_tablename, p_using_sql);
   end if;
 end; $$;
 

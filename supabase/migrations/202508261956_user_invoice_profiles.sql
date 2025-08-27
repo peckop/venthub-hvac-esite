@@ -60,9 +60,20 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger trg_user_invoice_profiles_updated_at
-  before update on public.user_invoice_profiles
-  for each row execute function public.set_updated_at();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger
+    WHERE tgname = 'trg_user_invoice_profiles_updated_at'
+      AND tgrelid = 'public.user_invoice_profiles'::regclass
+  ) THEN
+    CREATE TRIGGER trg_user_invoice_profiles_updated_at
+      BEFORE UPDATE ON public.user_invoice_profiles
+      FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+  END IF;
+END;
+$$;
 
 -- Ensure only one default per user and type
 create or replace function public.user_invoice_profiles_ensure_single_default()
@@ -79,9 +90,23 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger trg_user_invoice_profiles_single_default
-  before insert or update on public.user_invoice_profiles
-  for each row execute function public.user_invoice_profiles_ensure_single_default();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger t
+    JOIN pg_class c ON c.oid = t.tgrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE t.tgname = 'trg_user_invoice_profiles_single_default'
+      AND n.nspname = 'public'
+      AND c.relname = 'user_invoice_profiles'
+  ) THEN
+    CREATE TRIGGER trg_user_invoice_profiles_single_default
+      BEFORE INSERT OR UPDATE ON public.user_invoice_profiles
+      FOR EACH ROW EXECUTE FUNCTION public.user_invoice_profiles_ensure_single_default();
+  END IF;
+END;
+$$;
 
 -- EOF
 

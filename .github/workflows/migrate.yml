@@ -1,0 +1,40 @@
+name: Migrate DB
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-prod
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Sanity check (psql version)
+        run: psql --version
+
+      - name: Run migrations
+        shell: pwsh
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $db = $env:SUPABASE_DB_URL
+          ./\.scripts/migrate.ps1 -DbUrl $db
+
