@@ -2,7 +2,7 @@
 create table if not exists public.venthub_returns (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  order_id uuid not null references public.venthub_orders(id) on delete cascade,
+  order_id text not null references public.venthub_orders(id) on delete cascade,
   reason text not null,
   description text,
   status text not null default 'requested' check (status in ('requested','approved','rejected','in_transit','received','refunded','cancelled')),
@@ -31,12 +31,14 @@ for each row execute function public.set_updated_at();
 alter table public.venthub_returns enable row level security;
 
 -- Policies: user can select own returns
-create policy if not exists returns_select_own
+drop policy if exists returns_select_own on public.venthub_returns;
+create policy returns_select_own
   on public.venthub_returns for select
   using (user_id = auth.uid());
 
 -- User can insert a return only for their own order
-create policy if not exists returns_insert_own_order
+drop policy if exists returns_insert_own_order on public.venthub_returns;
+create policy returns_insert_own_order
   on public.venthub_returns for insert
   with check (
     user_id = auth.uid()
@@ -47,11 +49,13 @@ create policy if not exists returns_insert_own_order
   );
 
 -- Updates and deletes restricted to service role for now (admin/backoffice)
-create policy if not exists returns_update_service
+drop policy if exists returns_update_service on public.venthub_returns;
+create policy returns_update_service
   on public.venthub_returns for update
   using (auth.role() = 'service_role')
   with check (auth.role() = 'service_role');
 
-create policy if not exists returns_delete_service
+drop policy if exists returns_delete_service on public.venthub_returns;
+create policy returns_delete_service
   on public.venthub_returns for delete
   using (auth.role() = 'service_role');
