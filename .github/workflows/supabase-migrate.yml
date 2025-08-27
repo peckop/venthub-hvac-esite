@@ -46,9 +46,11 @@ jobs:
         run: |
           set -e
           echo "Listing projects via API to verify visibility..."
-          curl -s -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" https://api.supabase.com/v1/projects | tee projects.json || true
-          echo "Does the ref appear?"
-          if jq -e '.[] | select(.ref=="'$SUPABASE_PROJECT_REF'")' projects.json >/dev/null 2>&1; then
+          RESP=$(curl -s -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" https://api.supabase.com/v1/projects || true)
+          echo "$RESP" > projects.json
+          echo "Projects JSON fetched (length): $(wc -c < projects.json || echo 0)"
+          echo "Does the ref appear? ($SUPABASE_PROJECT_REF)"
+          if echo "$RESP" | grep -q '"ref":"'$SUPABASE_PROJECT_REF'"'; then
             echo "OK: Project ref $SUPABASE_PROJECT_REF is visible to this token."
           else
             echo "::warning::Project ref $SUPABASE_PROJECT_REF not found in token's project list. Check token account/org."
