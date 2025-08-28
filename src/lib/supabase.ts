@@ -447,6 +447,27 @@ export interface CartDbItem {
   updated_at?: string
 }
 
+async function ensureUserProfile(userId: string): Promise<boolean> {
+  try {
+    const { data: prof, error: selErr } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle()
+    if (!selErr && prof) return true
+    const { error: insErr } = await supabase
+      .from('user_profiles')
+      .insert({ id: userId })
+    if (insErr) {
+      // Ignore if conflict or RLS prevents it; caller may still succeed if profile appears by trigger
+      return false
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function getOrCreateShoppingCart(userId: string) {
   // Try existing
   const { data: existing, error: selErr } = await supabase
@@ -457,12 +478,18 @@ export async function getOrCreateShoppingCart(userId: string) {
   if (!selErr && Array.isArray(existing) && existing.length > 0) {
     return existing[0] as ShoppingCart
   }
-  // Create new
-  const { data, error } = await supabase
+  // Create new (with FK-safe retry if profile missing)
+  const attemptInsert = async () => supabase
     .from('shopping_carts')
     .insert({ user_id: userId })
     .select('*')
     .single()
+
+  let { data, error } = await attemptInsert()
+  if (error && (String((error as any).code) === '23503' || /user_profiles/i.test(String((error as any).message || '')))) {
+    await ensureUserProfile(userId)
+    ;({ data, error } = await attemptInsert())
+  }
   if (error) throw error
   return data as ShoppingCart
 }
