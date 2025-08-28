@@ -1,6 +1,7 @@
-import React, { createContext, useEffect, useState, ReactNode } from 'react'
-import { Product } from '../lib/supabase'
+import React, { createContext, useEffect, useState, ReactNode, useRef } from 'react'
+import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts } from '../lib/supabase'
 import toast from 'react-hot-toast'
+import { useAuth } from '../hooks/useAuth'
 
 interface CartItem {
   id: string
@@ -24,6 +25,9 @@ export { CartContext }
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const { user } = useAuth()
+  const [serverCartId, setServerCartId] = useState<string | null>(null)
+  const mergingRef = useRef(false)
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -46,28 +50,88 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items])
 
+  // Helper: merge two cart item arrays by product.id (sum quantities)
+  function mergeItems(a: CartItem[], b: CartItem[]) {
+    const map = new Map<string, CartItem>()
+    for (const it of [...a, ...b]) {
+      const key = it.product.id
+      const prev = map.get(key)
+      if (prev) {
+        map.set(key, { ...prev, quantity: prev.quantity + it.quantity })
+      } else {
+        map.set(key, it)
+      }
+    }
+    return Array.from(map.values())
+  }
+
+  // When user logs in, sync/merge guest cart with server cart and keep them in sync
+  useEffect(() => {
+    let cancelled = false
+    async function syncWithServer() {
+      if (!user || mergingRef.current) return
+      mergingRef.current = true
+      try {
+        const cart = await getOrCreateShoppingCart(user.id)
+        if (cancelled) return
+        setServerCartId(cart.id)
+
+        // Fetch server items
+        const serverRows = await listCartItemsWithProducts(cart.id)
+        const serverItems: CartItem[] = serverRows.map(({ item, product }) => ({ id: item.product_id, product, quantity: item.quantity }))
+
+        // Merge local guest items with server items
+        const merged = mergeItems(items, serverItems)
+        setItems(merged)
+
+        // Upsert all merged items to server (idempotent)
+        for (const it of merged) {
+          try {
+            await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: parseFloat(it.product.price || '0') || 0 })
+          } catch (e) {
+            console.error('cart upsert error', e)
+          }
+        }
+
+        // Clear guest cart to avoid double-merge next time
+        try { localStorage.removeItem('venthub-cart') } catch {}
+      } catch (e) {
+        console.error('cart sync error', e)
+      } finally {
+        mergingRef.current = false
+      }
+    }
+    syncWithServer()
+    return () => { cancelled = true }
+    // only run when user changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
   const addToCart = (product: Product, quantity = 1) => {
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.product.id === product.id)
       
       if (existingItem) {
-        // Update quantity if item exists
         return currentItems.map(item =>
           item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         )
       } else {
-        // Add new item
         return [...currentItems, { id: product.id, product, quantity }]
       }
     })
+
+    // If logged in, also sync to server (optimistic)
+    if (user && serverCartId) {
+      upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: parseFloat(product.price || '0') || 0 })
+        .catch(err => console.error('server addToCart error', err))
+    }
 
     // Dispatch a global event so UI can present a rich toast/modal
     try {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
     } catch {
-      // Fallback toast if CustomEvent fails in some environments
       try {
         toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })
       } catch {}
@@ -78,13 +142,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(currentItems => {
       const item = currentItems.find(item => item.product.id === productId)
       if (item) {
-        toast.success(`${item.product.name} sepetten çıkarıldı`, {
-          duration: 2000,
-          position: 'top-right',
-        })
+        toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })
       }
       return currentItems.filter(item => item.product.id !== productId)
     })
+
+    if (user && serverCartId) {
+      removeDbCartItem(serverCartId, productId).catch(err => console.error('server removeFromCart error', err))
+    }
   }
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -100,20 +165,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
           : item
       )
     )
+
+    if (user && serverCartId) {
+      const product = items.find(i => i.product.id === productId)?.product
+      if (product) {
+        upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: parseFloat(product.price || '0') || 0 })
+          .catch(err => console.error('server updateQuantity error', err))
+      }
+    }
   }
 
   const clearCart = () => {
     setItems([])
-    toast.success('Sepet temizlendi', {
-      duration: 2000,
-      position: 'top-right',
-    })
+    toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
+    if (user && serverCartId) {
+      clearDbCartItems(serverCartId).catch(err => console.error('server clearCart error', err))
+    }
   }
 
   const getCartTotal = () => {
-    return items.reduce((total, item) => {
-      return total + (parseFloat(item.product.price) * item.quantity)
-    }, 0)
+    return items.reduce((total, item) => total + (parseFloat(item.product.price) * item.quantity), 0)
   }
 
   const getCartCount = () => {

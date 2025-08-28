@@ -427,3 +427,96 @@ export async function fetchDefaultInvoiceProfile() {
   const row = Array.isArray(data) && data.length > 0 ? (data[0] as InvoiceProfile) : null
   return row
 }
+
+// ========== Shopping Cart (Server-side sync) ==========
+export interface ShoppingCart {
+  id: string
+  user_id: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CartDbItem {
+  id: string
+  cart_id: string
+  product_id: string
+  quantity: number
+  unit_price?: number | null
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getOrCreateShoppingCart(userId: string) {
+  // Try existing
+  const { data: existing, error: selErr } = await supabase
+    .from('shopping_carts')
+    .select('*')
+    .eq('user_id', userId)
+    .limit(1)
+  if (!selErr && Array.isArray(existing) && existing.length > 0) {
+    return existing[0] as ShoppingCart
+  }
+  // Create new
+  const { data, error } = await supabase
+    .from('shopping_carts')
+    .insert({ user_id: userId })
+    .select('*')
+    .single()
+  if (error) throw error
+  return data as ShoppingCart
+}
+
+export async function listCartItems(cartId: string) {
+  const { data, error } = await supabase
+    .from('cart_items')
+    .select('*')
+    .eq('cart_id', cartId)
+  if (error) throw error
+  return (data || []) as CartDbItem[]
+}
+
+export async function listCartItemsWithProducts(cartId: string) {
+  const items = await listCartItems(cartId)
+  if (items.length === 0) return [] as { item: CartDbItem; product: Product }[]
+  const productIds = Array.from(new Set(items.map(i => i.product_id)))
+  const { data: products, error: pErr } = await supabase
+    .from('products')
+    .select('*')
+    .in('id', productIds)
+  if (pErr) throw pErr
+  const map = new Map<string, Product>()
+  for (const p of (products || []) as Product[]) map.set(p.id, p)
+  return items
+    .map(i => ({ item: i, product: map.get(i.product_id)! }))
+    .filter(x => !!x.product)
+}
+
+export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null }) {
+  const { cartId, productId, quantity, unitPrice } = params
+  const payload = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null }
+  const { data, error } = await supabase
+    .from('cart_items')
+    .upsert(payload, { onConflict: 'cart_id,product_id' })
+    .select('*')
+  if (error) throw error
+  return data as CartDbItem[]
+}
+
+export async function removeCartItem(cartId: string, productId: string) {
+  const { error } = await supabase
+    .from('cart_items')
+    .delete()
+    .eq('cart_id', cartId)
+    .eq('product_id', productId)
+  if (error) throw error
+  return true
+}
+
+export async function clearCartItems(cartId: string) {
+  const { error } = await supabase
+    .from('cart_items')
+    .delete()
+    .eq('cart_id', cartId)
+  if (error) throw error
+  return true
+}
