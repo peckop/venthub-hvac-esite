@@ -66,7 +66,13 @@ jobs:
             const { data, error } = await query;
             if (error) throw error;
             const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id }));
-            console.log(JSON.stringify({ count: rows.length, rows }, null, 2));
+            const nullPrices = rows.filter(r => r.unit_price == null).length;
+            const summary = { count: rows.length, null_unit_price: nullPrices, rows };
+            console.log(JSON.stringify(summary, null, 2));
+            if (rows.length > 0 && nullPrices > 0) {
+              console.error(`Found ${nullPrices} rows with null unit_price`);
+              process.exit(2);
+            }
           })().catch(e => { console.error(e); process.exit(1); });
           "
 
