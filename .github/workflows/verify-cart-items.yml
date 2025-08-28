@@ -1,0 +1,76 @@
+name: Verify Cart Items (unit_price + price_list_id)
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Look back window in minutes"
+        required: false
+        default: "30"
+      email:
+        description: "Optional user email to filter"
+        required: false
+        default: ""
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install supabase-js
+        run: |
+          npm -v
+          npm init -y >/dev/null 2>&1
+          npm i @supabase/supabase-js@2 >/dev/null 2>&1
+
+      - name: Query recent cart_items
+        env:
+          MINUTES: ${{ github.event.inputs.minutes }}
+          EMAIL: ${{ github.event.inputs.email }}
+        run: |
+          node -e "
+          const { createClient } = require('@supabase/supabase-js');
+          const url = process.env.SUPABASE_URL;
+          const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          if (!url || !key) { console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'); process.exit(1); }
+          const supabase = createClient(url, key);
+          (async () => {
+            const mins = parseInt(process.env.MINUTES || '30', 10);
+            const since = new Date(Date.now() - mins*60*1000).toISOString();
+            let query = supabase.from('cart_items')
+              .select('id, cart_id, product_id, quantity, unit_price, price_list_id, updated_at, created_at')
+              .or(`updated_at.gte.${since},and(updated_at.is.null,created_at.gte.${since})`)
+              .order('updated_at', { ascending: false, nullsFirst: false })
+              .limit(100);
+            if (process.env.EMAIL) {
+              // Filter by user email via shopping_carts join using RPC fallback (two-step)
+              const { data: users, error: uerr } = await supabase.from('auth.users').select('id, email').eq('email', process.env.EMAIL).limit(1);
+              if (uerr) throw uerr; if (!users || users.length === 0) { console.log('[]'); return; }
+              const uid = users[0].id;
+              const { data: carts, error: cerr } = await supabase.from('shopping_carts').select('id').eq('user_id', uid).limit(10);
+              if (cerr) throw cerr; const cartIds = (carts||[]).map(c => c.id);
+              if (cartIds.length === 0) { console.log('[]'); return; }
+              query = query.in('cart_id', cartIds);
+            }
+            const { data, error } = await query;
+            if (error) throw error;
+            const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id, ts:r.updated_at||r.created_at }));
+            console.log(JSON.stringify({ count: rows.length, rows }, null, 2));
+          })().catch(e => { console.error(e); process.exit(1); });
+          "
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "Verification finished. Check the step logs above for JSON output (count + rows)."
