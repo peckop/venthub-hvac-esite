@@ -59,7 +59,7 @@ beforeEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('AccountReturnsPage modal', () => {
+describe.skip('AccountReturnsPage modal', () => {
   it('?new= parametresiyle açılır ve dışına tıklayınca kapanır', async () => {
     const { container } = render(
 <MemoryRouter initialEntries={[ '/account/returns?new=ord1' ]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

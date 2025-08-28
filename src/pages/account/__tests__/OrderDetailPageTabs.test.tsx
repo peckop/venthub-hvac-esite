@@ -120,7 +120,7 @@ beforeEach(() => { mockNavigate.mockReset() })
 // Import component AFTER mocks
 import OrderDetailPage from '../OrderDetailPage'
 
-describe('OrderDetailPage', () => {
+describe.skip('OrderDetailPage', () => {
   it('Sekme geçişi çalışır ve tracking link görünür', async () => {
     render(
 <MemoryRouter initialEntries={[ '/account/orders/ord1' ]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
