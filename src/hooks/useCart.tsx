@@ -10,6 +10,8 @@ interface CartItem {
   id: string
   product: Product
   quantity: number
+  // Snapshot unit price (role/tier-based) if available
+  unitPrice?: number
 }
 
 interface CartContextType {
@@ -98,20 +100,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // Merge local guest items with server items
         const merged = mergeItems(items, serverItems)
-        setItems(merged)
+        // Compute unit prices for merged items and upsert server
+        const priceInfoList = await Promise.all(
+          merged.map(async (it) => {
+            try {
+              const info = await getEffectivePriceInfo(it.product)
+              await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+              return { productId: it.product.id, unitPrice: info.unitPrice }
+            } catch (e) {
+              console.error('cart upsert error', e)
+              return { productId: it.product.id, unitPrice: undefined as number | undefined }
+            }
+          })
+        )
+        const unitMap = new Map<string, number | undefined>(priceInfoList.map(p => [p.productId, p.unitPrice]))
+        const mergedWithPrices = merged.map(it => ({ ...it, unitPrice: unitMap.get(it.product.id) ?? it.unitPrice }))
+        setItems(mergedWithPrices)
 
-        // Upsert all merged items to server (idempotent)
-        for (const it of merged) {
-          try {
-            const info = await getEffectivePriceInfo(it.product)
-            await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
-          } catch (e) {
-            console.error('cart upsert error', e)
-          }
-        }
-
-        // Persist merged cart for instant hydration on next load and mark owner
-        try {
+        // Clear guest cart to avoid double-merge next time
+        try { localStorage.removeItem('venthub-cart') } catch {}
           localStorage.setItem('venthub-cart', JSON.stringify(merged))
           localStorage.setItem('venthub-cart-owner', user.id)
           const v = Date.now()
@@ -171,9 +178,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // If logged in, also sync to server (optimistic)
     if (CART_SERVER_SYNC && user && serverCartId) {
-      // compute effective price and upsert optimistically
+      // compute effective price and upsert optimistically, also reflect locally
       getEffectivePriceInfo(product)
-        .then(info => upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId }))
+        .then(info => {
+          upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+            .catch(err => console.error('server addToCart error', err))
+          // Update local snapshot unit price
+          setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
+        })
         .catch(err => console.error('server addToCart error', err))
     }
 
@@ -219,7 +231,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const product = items.find(i => i.product.id === productId)?.product
       if (product) {
         getEffectivePriceInfo(product)
-          .then(info => upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId }))
+          .then(info => {
+            upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+              .catch(err => console.error('server updateQuantity error', err))
+            // Ensure local snapshot unit price is present
+            setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
+          })
           .catch(err => console.error('server updateQuantity error', err))
       }
     }
@@ -234,7 +251,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   const getCartTotal = () => {
-    return items.reduce((total, item) => total + (parseFloat(item.product.price) * item.quantity), 0)
+    return items.reduce((total, item) => {
+      const unit = typeof item.unitPrice === 'number' ? item.unitPrice : parseFloat(item.product.price)
+      return total + unit * item.quantity
+    }, 0)
   }
 
   const getCartCount = () => {

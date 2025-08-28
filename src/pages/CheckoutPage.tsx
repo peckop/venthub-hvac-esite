@@ -1411,11 +1411,11 @@ export const CheckoutPage: React.FC = () => {
                         {item.product.name}
                       </p>
                       <p className="text-xs text-steel-gray">
-                        {item.quantity} {t('orders.qtyCol')} x ₺{parseFloat(item.product.price).toLocaleString('tr-TR')}
+                        {item.quantity} {t('orders.qtyCol')} x ₺{Number((item as any).unitPrice ?? parseFloat(item.product.price)).toLocaleString('tr-TR')}
                       </p>
                     </div>
                     <div className="text-sm font-medium text-industrial-gray">
-                      ₺{(parseFloat(item.product.price) * item.quantity).toLocaleString('tr-TR')}
+                      ₺{(Number((item as any).unitPrice ?? parseFloat(item.product.price)) * item.quantity).toLocaleString('tr-TR')}
                     </div>
                   </div>
                 ))}
