@@ -530,7 +530,7 @@ export async function listCartItemsWithProducts(cartId: string) {
 }
 
 export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
-  const { cartId, productId, quantity } = params
+  const { cartId, productId, quantity, unitPrice, priceListId } = params
   // Manual UPSERT to avoid relying on on_conflict and optional columns
   const sel = await supabase
     .from('cart_items')
@@ -538,10 +538,14 @@ export async function upsertCartItem(params: { cartId: string; productId: string
     .eq('cart_id', cartId)
     .eq('product_id', productId)
     .limit(1)
+  const common: Record<string, unknown> = { quantity }
+  if (unitPrice !== undefined) common.unit_price = unitPrice
+  if (priceListId !== undefined) common.price_list_id = priceListId
+
   if (!sel.error && Array.isArray(sel.data) && sel.data.length > 0) {
     const upd = await supabase
       .from('cart_items')
-      .update({ quantity })
+      .update(common)
       .eq('cart_id', cartId)
       .eq('product_id', productId)
       .select('*')
@@ -550,7 +554,7 @@ export async function upsertCartItem(params: { cartId: string; productId: string
   }
   const ins = await supabase
     .from('cart_items')
-    .insert({ cart_id: cartId, product_id: productId, quantity })
+    .insert({ cart_id: cartId, product_id: productId, ...common })
     .select('*')
   if (ins.error) throw ins.error
   return (ins.data || []) as CartDbItem[]
