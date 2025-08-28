@@ -54,19 +54,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items])
 
   // Helper: merge two cart item arrays by product.id (sum quantities)
-  function mergeItems(a: CartItem[], b: CartItem[]) {
-    // Idempotent merge: for the same product, take the maximum quantity instead of summing.
-    // This prevents quantities from growing if sync runs multiple times due to auth event flaps.
+  function mergeItems(local: CartItem[], server: CartItem[]) {
+    // Server wins: take server quantities as source of truth, add only missing local products.
     const map = new Map<string, CartItem>()
-    for (const it of [...a, ...b]) {
-      const key = it.product.id
-      const prev = map.get(key)
-      if (prev) {
-        const qty = Math.max(prev.quantity, it.quantity)
-        map.set(key, { ...prev, quantity: qty })
-      } else {
-        map.set(key, it)
+    for (const it of server) {
+      map.set(it.product.id, it)
+    }
+    for (const it of local) {
+      if (!map.has(it.product.id)) {
+        map.set(it.product.id, it)
       }
+      // if exists on server, keep server quantity
     }
     return Array.from(map.values())
   }
@@ -100,8 +98,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // Clear guest cart to avoid double-merge next time
-        try { localStorage.removeItem('venthub-cart') } catch {}
+        // Persist merged cart for instant hydration on next load and mark owner
+        try {
+          localStorage.setItem('venthub-cart', JSON.stringify(merged))
+          localStorage.setItem('venthub-cart-owner', user.id)
+        } catch {}
       } catch (e) {
         console.error('cart sync error', e)
       } finally {
