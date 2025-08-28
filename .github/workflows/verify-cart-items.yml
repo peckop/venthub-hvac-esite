@@ -1,6 +1,8 @@
 name: Verify Cart Items (unit_price + price_list_id)
 
 on:
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       minutes:
