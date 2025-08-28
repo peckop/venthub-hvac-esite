@@ -544,8 +544,44 @@ export async function upsertCartItem(params: { cartId: string; productId: string
       .from('cart_items')
       .upsert(payloadBasic, { onConflict: 'cart_id,product_id' })
       .select('*')
-    if (res2.error) throw res2.error
-    return res2.data as CartDbItem[]
+    if (res2.error) {
+      // Fall through to manual UPSERT below
+      error = res2.error
+    } else {
+      return res2.data as CartDbItem[]
+    }
+  }
+
+  // If still failing (e.g., missing unique constraint causing 400), do manual upsert
+  if (error) {
+    // Try select existing
+    const sel = await supabase
+      .from('cart_items')
+      .select('id')
+      .eq('cart_id', cartId)
+      .eq('product_id', productId)
+      .limit(1)
+    if (!sel.error && Array.isArray(sel.data)) {
+      if (sel.data.length > 0) {
+        // Update existing row
+        const upd = await supabase
+          .from('cart_items')
+          .update({ quantity })
+          .eq('cart_id', cartId)
+          .eq('product_id', productId)
+          .select('*')
+        if (upd.error) throw upd.error
+        return (upd.data || []) as CartDbItem[]
+      } else {
+        // Insert new row (minimal columns)
+        const ins = await supabase
+          .from('cart_items')
+          .insert({ cart_id: cartId, product_id: productId, quantity })
+          .select('*')
+        if (ins.error) throw ins.error
+        return (ins.data || []) as CartDbItem[]
+      }
+    }
   }
 
   if (error) throw error
