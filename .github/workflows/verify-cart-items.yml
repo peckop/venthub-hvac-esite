@@ -46,12 +46,8 @@ jobs:
           if (!url || !key) { console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY'); process.exit(1); }
           const supabase = createClient(url, key);
           (async () => {
-            const mins = parseInt(process.env.MINUTES || '30', 10);
-            const since = new Date(Date.now() - mins*60*1000).toISOString();
             let query = supabase.from('cart_items')
-              .select('id, cart_id, product_id, quantity, unit_price, price_list_id, created_at')
-              .gte('created_at', since)
-              .order('created_at', { ascending: false })
+              .select('id, cart_id, product_id, quantity, unit_price, price_list_id')
               .limit(100);
             if (process.env.EMAIL) {
               // Filter by user email via auth schema + carts
@@ -65,7 +61,7 @@ jobs:
             }
             const { data, error } = await query;
             if (error) throw error;
-            const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id, ts:r.created_at }));
+            const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id }));
             console.log(JSON.stringify({ count: rows.length, rows }, null, 2));
           })().catch(e => { console.error(e); process.exit(1); });
           "
