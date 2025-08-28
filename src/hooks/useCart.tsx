@@ -3,6 +3,9 @@ import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as rem
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
+// Feature flag: server-side cart sync
+const CART_SERVER_SYNC = ((import.meta as any).env?.VITE_CART_SERVER_SYNC ?? 'true') === 'true'
+
 interface CartItem {
   id: string
   product: Product
@@ -69,7 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     async function syncWithServer() {
-      if (!user || mergingRef.current) return
+      if (!CART_SERVER_SYNC || !user || mergingRef.current) return
       mergingRef.current = true
       try {
         const cart = await getOrCreateShoppingCart(user.id)
@@ -123,7 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
 
     // If logged in, also sync to server (optimistic)
-    if (user && serverCartId) {
+    if (CART_SERVER_SYNC && user && serverCartId) {
       upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: parseFloat(product.price || '0') || 0 })
         .catch(err => console.error('server addToCart error', err))
     }
@@ -147,7 +150,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return currentItems.filter(item => item.product.id !== productId)
     })
 
-    if (user && serverCartId) {
+    if (CART_SERVER_SYNC && user && serverCartId) {
       removeDbCartItem(serverCartId, productId).catch(err => console.error('server removeFromCart error', err))
     }
   }
@@ -166,7 +169,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
     )
 
-    if (user && serverCartId) {
+    if (CART_SERVER_SYNC && user && serverCartId) {
       const product = items.find(i => i.product.id === productId)?.product
       if (product) {
         upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: parseFloat(product.price || '0') || 0 })
@@ -178,7 +181,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = () => {
     setItems([])
     toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
-    if (user && serverCartId) {
+    if (CART_SERVER_SYNC && user && serverCartId) {
       clearDbCartItems(serverCartId).catch(err => console.error('server clearCart error', err))
     }
   }
