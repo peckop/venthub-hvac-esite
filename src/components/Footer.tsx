@@ -170,6 +170,16 @@ export const Footer: React.FC = () => {
               © 2025 VentHub HVAC. {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
+              {/* Build meta tag */}
+              {/* eslint-disable-next-line @typescript-eslint/no-var-requires */}
+              {(() => {
+                try {
+                  const BuildTag = require('./BuildTag').default
+                  return <BuildTag />
+                } catch {
+                  return null
+                }
+              })()}
               <Link to="/legal/kvkk" className="text-steel-gray hover:text-white transition-colors">
                 {t('legalLinks.kvkk')}
               </Link>
