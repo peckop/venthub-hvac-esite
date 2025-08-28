@@ -55,12 +55,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Helper: merge two cart item arrays by product.id (sum quantities)
   function mergeItems(a: CartItem[], b: CartItem[]) {
+    // Idempotent merge: for the same product, take the maximum quantity instead of summing.
+    // This prevents quantities from growing if sync runs multiple times due to auth event flaps.
     const map = new Map<string, CartItem>()
     for (const it of [...a, ...b]) {
       const key = it.product.id
       const prev = map.get(key)
       if (prev) {
-        map.set(key, { ...prev, quantity: prev.quantity + it.quantity })
+        const qty = Math.max(prev.quantity, it.quantity)
+        map.set(key, { ...prev, quantity: qty })
       } else {
         map.set(key, it)
       }
