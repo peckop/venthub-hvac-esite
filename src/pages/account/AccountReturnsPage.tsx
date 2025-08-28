@@ -173,7 +173,7 @@ export default function AccountReturnsPage() {
                     {(() => {
                       const o = orders.find(x => x.id === r.order_id)
                       const code = o?.order_number ? `#${o.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
-                      return <button onClick={() => navigate(`/account/orders?open=${r.order_id}`)} className="text-primary-navy hover:underline">{code}</button>
+                      return <button onClick={() => navigate(`/account/orders/${r.order_id}`)} className="text-primary-navy hover:underline">{code}</button>
                     })()}
                   </td>
                   <td className="p-3 text-sm text-industrial-gray">{r.reason}</td>

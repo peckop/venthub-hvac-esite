@@ -1,6 +1,6 @@
-# NEXT_STEPS
+# NEXT_STEPS (Taşındı)
 
-This document tracks the current state, prioritized next tasks, and useful commands so future sessions can quickly resume work from the repo history alone.
+Bu belge ROADMAP'e taşındı. Güncel tek kaynak için bkz. `docs/ROADMAP.md`.
 
 ## Current state (TL;DR)
 - Payments: iyzico flow works; legal consents (KVKK, Mesafeli Satış, Ön Bilgilendirme, sipariş onayı) collected and saved.

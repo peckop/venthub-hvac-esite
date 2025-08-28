@@ -657,7 +657,16 @@ export const tr = {
     createdToast: 'İade talebiniz oluşturuldu',
     createError: 'İade talebi oluşturulamadı',
     fetchError: 'İade kayıtları yüklenemedi',
-    requestReturn: 'İade Talebi'
+    requestReturn: 'İade Talebi',
+    statusLabels: {
+      requested: 'Talep Alındı',
+      approved: 'Onaylandı',
+      rejected: 'Reddedildi',
+      in_transit: 'Kargoda',
+      received: 'İade Teslim Alındı',
+      refunded: 'İade Ücreti Ödendi',
+      cancelled: 'İptal Edildi'
+    }
   },
 
   lead: {

@@ -659,7 +659,16 @@ export const en = {
     createdToast: 'Return request created',
     createError: 'Could not create return request',
     fetchError: 'Could not load return records',
-    requestReturn: 'Request Return'
+    requestReturn: 'Request Return',
+    statusLabels: {
+      requested: 'Requested',
+      approved: 'Approved',
+      rejected: 'Rejected',
+      in_transit: 'In transit',
+      received: 'Received',
+      refunded: 'Refunded',
+      cancelled: 'Cancelled'
+    }
   },
 
   lead: {

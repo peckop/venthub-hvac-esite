@@ -1,0 +1,160 @@
+# ROADMAP — VentHub HVAC (Single Source of Truth)
+
+Last updated: 2025-08-28
+
+Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
+
+## 1) Durum Özeti (TL;DR)
+- Router & Navigasyon: Sipariş Detay sayfası eklendi, Orders listesi detay sayfasına yönlendiriyor, inline panel kaldırıldı.
+- Kargo: Detay sayfasında kargo alanları ve timeline var; link olduğunda dış bağlantı ikonu gösteriliyor (UI hazır).
+- İadeler: Returns listesinde sipariş kodu yeni detay rotasına gidiyor.
+- Fatura: Proforma PDF indirme mevcut (OrderDetailPage). Kurumsal bilgiler ve numaralandırma/şablon iyileştirmeleri TODO.
+- Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
+- Lint: Warnings mevcut; fonksiyonelliği engellemiyor (Phase 1 cleanup planlandı).
+
+## 2) Sprint Planı
+
+> Not: Şirket kuruluşu ve kendi sunucu (self‑host) konuları şimdilik ertelendi. Aşağıdaki "Parked/Deferred" bölümünde listelendi. Mevcut sprint, bunlara bağlı olmayan işlerle devam edecek.
+
+### Sprint 1 — Tamamlandı
+- [x] Sipariş detay sayfası (kargo/teslim bilgileri, compact timeline)
+- [x] AccountOverview’da son sipariş bağlama
+- [x] Profil düzenleme (ad/telefon)
+- [x] Router ve sekme/navigasyon iyileştirmeleri
+- [x] Reorder UX (sepete yönlendirme, eksik ürün uyarısı)
+- [x] Proforma PDF butonu (ilk adım)
+- [x] QA/erişilebilirlik iyileştirmeleri
+- [x] “Kargo Takibi” sekmesi (UI)
+- [x] Header’daki işlevsiz “Siparişlerim” butonlarının kaldırılması
+
+### Sprint 2 — Devam ediyor (Şirket/Server bağımsız işler)
+- Test/kalite
+  - [ ] Skip’li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)
+  - [ ] Lint cleanup (Phase 1) → ardından CI’da lint’i tekrar blocking yap
+- Performans
+  - [ ] Code‑split (dynamic import / manualChunks) — account, checkout, product-detail gibi chunk’lar
+- Kargo takip entegrasyonu (Sandbox/Backend)
+  - [ ] Taşıyıcı API/webhook veya periyodik polling (sandbox)
+  - [ ] Status senkronizasyonu (pending→paid→shipped→delivered)
+- Returns akışı
+  - [ ] Durum yönetimi (requested/approved/rejected/in_transit/received/refunded)
+  - [ ] Bildirimler (opsiyonel)
+- Fatura (Proforma PDF mevcut)
+  - [x] İndir/Paylaş (Proforma PDF mevcut)
+  - (Kurumsal bilgiler ve resmi numaralandırma "Parked" bölümünde)
+
+### Sprint 3 — Planlı
+- Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
+- Kargo 3PL/API entegrasyonları ve otomatik status güncellemeleri
+- Bildirimler: kargoya verildi/teslim edildi e‑posta/SMS
+- KVKK/GDPR self‑service (veri indirme, silme talebi vb.)
+- Performans: dynamic import / manualChunks ile code‑split ve bundle küçültme
+
+## 3) Operasyonel “Next Steps” (Öncelikli)
+- Test stabilizasyonu
+  - [ ] Skip’li 3 UI testini aktive et (Orders nav, OrderDetail sekme/track link, Returns modal)
+- Lint/CI
+  - [ ] Lint cleanup (Phase 1): any→unknown, unused fix’leri
+  - [ ] Lint’i tekrar blocking yap (CI)
+- Performans
+  - [ ] Code‑split planını uygula (manualChunks / dynamic import)
+- Kargo (sandbox)
+  - [ ] Statü senk ve basit taşıyıcı webhook/polling prototipi
+- Orders detay (opsiyonel)
+  - [ ] Yasal onay alanlarını görünür kıl (mevcut kayıt varsa)
+
+## 4) Kurumsal/PLP Planı (Özet)
+- Kaynak: docs/plan-and-tasklist.md (detay korunuyor), ancak güncel kaynak ROADMAP.
+- Faz 0: [x] Tamamlandı
+- Faz 1–3 ve QA kontrol listeleri: [ ] Beklemede (kurumsal/PLP odaklı). E‑ticaret sprintleriyle çakışma yok; uygun zamanda ele alınacak.
+
+## 5) QA (Örnek Kontrol Başlıkları)
+- [ ] Orders→Detay: kargo alanları, timeline, dış link (varsa)
+- [ ] Returns→Sipariş linki: /account/orders/:id rotasına gider
+- [ ] Proforma PDF: dosya indirir, içerik alanları doğru
+- [ ] Router: Orders listesi inline panel açmaz, detay sayfasına yönlendirir
+- [ ] Build, test: yeşil
+
+## 6) Komutlar
+- Build: `pnpm run build:ci`
+- Test: `pnpm test -- --run`
+- Lint: `pnpm exec eslint .`
+
+## 7) Notlar
+- Bu belge tek ve güncel kaynak (Single Source of Truth). Eski NEXT_STEPS ve plan-and-tasklist korunur; fakat her değişiklik önce ROADMAP’e işlenecektir.
+
+## Parked / Deferred (Şirket ve Server hazır olunca)
+- Kurumsal bilgiler: `src/config/legal.ts` doldurma (ünvan, adres, vergi dairesi/no, MERSİS, KVKK e‑posta)
+- Fatura numaralandırma ve resmi şablon (company header, logo, vergi alanları)
+- Self‑host go‑live (Coolify): deploy/Dockerfile ile canlıya alma, domain/DNS/SSL
+- iyzico live hygiene (panel whitelist ve canlı toggle) — şirket/alan adı netleşince
+
+## Ek: Kurumsal/PLP Planı Checklist (Arşivden taşınan)
+
+### Faz 0 (Tamamlandı)
+- [x] Uygulama kartlarını merkezi konfige taşı
+- [x] Home ve Keşfet sayfalarını bu konfig ile render et
+- [x] Tailwind dynamic class riskini kaldır (gridColsClass)
+- [x] Docs: NEXT_STEPS’e içerik‑operasyon notu
+
+### Faz 1 — Ana Sayfa Kurumsal Güçlendirme
+1) Vaka çalışması (Case Study) blokları (1–2 adet)
+   - [ ] Bileşen: görsel/başlık/kısa özet/sonuç metrikleri
+   - [ ] Yerleşim: Güven şeridi sonrası, ürün teaser’dan önce
+   - [ ] Placeholder içerikle başla; gerçek içerik gelince güncelle
+2) Kaynaklar/Kılavuzlar mini alanı
+   - [ ] Başlık + 2–3 link kartı (örn. “Otopark Jet Fan seçimi”, “Hava perdesi seçimi”)
+   - [ ] PDF linkleri veya blog/knowledge sayfalarına yönlendirme
+3) Ürün teaser düzeni (teyit)
+   - [x] En fazla 4 kart; “Tümünü Keşfet” CTA’yı vurgula
+4) Alt CTA (mevcut)
+   - [ ] Metin/copy gözden geçir; lead modal tetikleme teyidi
+
+### Faz 1 — Keşfet (PLP) Netleştirme
+1) Keşfet hero ve şerit
+   - [x] Kısa kopye gözden geçir; “İhtiyacına Göre Seç” anchor bağlantısı test
+2) Uygulamaya Göre / Popüler Kategoriler
+   - [x] İkonografi ve micro‑copy temel kurulum (ince ayar TBD)
+   - [ ] Kart hover, focus, a11y teyit
+3) Vitrinler
+   - [x] “Öne Çıkanlar” ve “Yeni Ürünler” dengesi; grid/list modlarıyla uyum
+
+### Faz 2 — Navigasyon ve IA
+1) “Çözümler” menüsü (ileride)
+   - [ ] “Endüstriyel Mutfak” hazır olunca dropdown ekle
+   - [ ] URL: `/solutions/kitchen-ventilation` (landing)
+2) Site haritası güncellemesi
+   - [ ] Çözümler sayfası canlı olduğunda sitemap’a ekle
+
+### Faz 2 — Analytics (opsiyonel)
+1) Data‑attribute tabanlı delegasyon (tek listener)
+   - [ ] data-analytics-event + data-analytics-props ile tıklama/event standardı
+2) Olaylar
+   - [ ] hero_cta_click, nav_click, application_click, category_click
+   - [ ] search_submit, filter_change, sort_change, compare_add/remove
+   - [ ] lead_open, lead_submit
+
+### Faz 3 — “Endüstriyel Mutfak” Çözüm Sayfası (gelecek)
+1) Landing yapısı
+   - [ ] Sorun/standartlar çerçevesi, bileşenler, önerilen ürün aileleri
+   - [ ] Basit hesaplayıcılar (hava debisi/kanal hızı/basınç kaybı — başlangıç)
+   - [ ] Case study + dokümanlar (CAD/BIM/PDF)
+   - [ ] CTA: proje yükle/teklif iste
+2) SEO ve içerik
+   - [ ] İçerik başlıkları hiyerarşisi, schema (FAQ/HowTo/Article uygun olanlar)
+
+### QA Kontrol Listesi
+- Genel
+  - [ ] Ana Sayfa ve Keşfet görev ayrımı net; tekrar içerik yok
+  - [ ] Uygulama kartları sayısı değiştiğinde grid ve görünüm sağlıklı
+  - [ ] “Endüstriyel Mutfak” kartı gizli (active:false)
+- Ana Sayfa
+  - [ ] Case Study ve Kaynaklar blokları responsive, erişilebilir
+  - [ ] Hero ve Alt CTA butonları hatasız
+- Keşfet
+  - [ ] Keşfet ↔ Tüm Ürünler modları doğru davranıyor
+  - [ ] Breadcrumb, canonical/noindex kuralları doğru
+- Performans/A11y
+  - [ ] Görseller lazy; kontrast/focus durumları uygun
+- Konsol
+  - [ ] Hata/warn yok (dev uyarıları hariç)

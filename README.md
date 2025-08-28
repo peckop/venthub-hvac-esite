@@ -4,6 +4,9 @@
 
 React + TypeScript + Vite tabanlı e‑ticaret uygulaması.
 
+- Yol Haritası ve durum takibi: bkz. docs/ROADMAP.md
+- CI/CD ve dağıtım rehberi: bkz. docs/DEPLOYMENT.md
+
 ## Ortam Değişkenleri (Vite)
 
 Aşağıdaki değişkenler build sırasında gereklidir:
@@ -25,6 +28,16 @@ Aşağıdaki değişkenler build sırasında gereklidir:
 - Names: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
 - Production + Deploy Previews için ekleyip yeniden yayınlayın
 
+### Cloudflare Pages
+- Project → Settings → Environment Variables
+- Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
+- Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
+- Node version: 18+ (Pages defaults uygundur)
+- Package manager: pnpm (Pages “Enable pnpm” veya corepack)
+- Build command: pnpm run build:ci
+- Output directory: dist
+- Preview ve Production ortamlarına aynı değişkenleri ekleyin
+
 ### GitHub Actions ile Build
 Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets ekleyin:
 - VITE_SUPABASE_URL
@@ -33,6 +46,7 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Supabase Migrations (Otomatik)
 - `supabase/migrations/*.sql` push edildiğinde CI, Supabase CLI (v2.39.2) ile otomatik uygular.
 - Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` zorunludur.
+- GitHub Actions: `.github/workflows/supabase-migrate.yml` tetikleyicileri ve job’ları sizin policy’nize göre düzenlenebilir.
 
 ## Geliştirme
 - pnpm install

@@ -23,6 +23,10 @@ export default defineConfig({
       if (type === 'stderr' && typeof log === 'string' && log.includes('update failed')) {
         return false
       }
+      // React Router future flag uyarılarını test çıktısından filtrele
+      if (type === 'stderr' && typeof log === 'string' && log.includes('React Router Future Flag Warning')) {
+        return false
+      }
     },
   },
 })

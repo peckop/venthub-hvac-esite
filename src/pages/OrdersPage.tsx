@@ -2,22 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase, Product } from '../lib/supabase'
-import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag, RefreshCcw, Link as LinkIcon } from 'lucide-react'
+import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 
-interface ShippingAddress {
-  fullAddress?: string
-  street?: string
-  city?: string
-  district?: string
-  state?: string
-  postalCode?: string
-  postal_code?: string
-}
 
 interface Order {
   id: string
@@ -86,8 +75,6 @@ export const OrdersPage: React.FC = () => {
   const [searchParams] = useSearchParams()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [detailTab, setDetailTab] = useState<'overview'|'items'|'shipping'|'invoice'>('overview')
 
   // Filters
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -149,21 +136,6 @@ export const OrdersPage: React.FC = () => {
       })
 
       setOrders(formattedOrders)
-
-      // Auto-open behavior if URL contains ?open={orderId}
-      const openId = searchParams.get('open')
-      if (openId) {
-        const found = formattedOrders.find(o => o.id === openId)
-        if (found) {
-          setSelectedOrder(found)
-          const tabParam = (searchParams.get('tab') || '').toLowerCase()
-          if (tabParam === 'items' || tabParam === 'shipping' || tabParam === 'invoice') {
-            setDetailTab(tabParam as 'items'|'shipping'|'invoice')
-          } else {
-            setDetailTab('overview')
-          }
-        }
-      }
 
       // Apply product filter from URL (?product=...)
       const productQ = searchParams.get('product')
@@ -252,74 +224,6 @@ export const OrdersPage: React.FC = () => {
     delivered: t('orders.delivered') 
   }
 
-  const handlePrintReceipt = (order: Order) => {
-    const w = window.open('', '_blank', 'width=720,height=900')
-    if (!w) return
-    const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
-    const itemsHtml = (order.order_items || [])
-      .map(it => `<tr><td style=\"padding:6px 0\">${it.product_name}</td><td style=\"text-align:center\">${it.quantity}</td><td style=\"text-align:right\">${nf.format(it.unit_price)}</td><td style=\"text-align:right\">${nf.format(it.total_price)}</td></tr>`) 
-      .join('')
-    const total = nf.format(order.total_amount)
-    const html = `<!doctype html><html><head><meta charset=\"utf-8\"><title>${t('orders.receiptTitle')}</title></head><body style=\"font-family:Arial,sans-serif;padding:24px\"><h2>${t('orders.receiptHeading')}</h2><p><strong>${t('orders.orderId')}:</strong> ${order.id}<br/><strong>${t('orders.date')}:</strong> ${new Date(order.created_at).toLocaleString('tr-TR')}</p><table style=\"width:100%;border-collapse:collapse\"><thead><tr><th align=\"left\">${t('orders.productCol')}</th><th>${t('orders.qtyCol')}</th><th align=\"right\">${t('orders.unitPriceCol')}</th><th align=\"right\">${t('orders.totalCol')}</th></tr></thead><tbody>${itemsHtml}</tbody><tfoot><tr><td colspan=\"3\" align=\"right\"><strong>${t('orders.grandTotal')}</strong></td><td align=\"right\"><strong>${total}</strong></td></tr></tfoot></table><hr/><p>${t('orders.securePaymentNote')}</p><script>window.print();</script></body></html>`
-    w.document.write(html)
-    w.document.close()
-  }
-
-  const handleInvoicePdf = (order: Order) => {
-    try {
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-      const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
-      const orderNo = order.order_number ? order.order_number.split('-')[1] : order.id.slice(-8).toUpperCase()
-
-      // Header
-      doc.setFont('helvetica','bold'); doc.setFontSize(16)
-      doc.text('PROFORMA', 40, 40)
-      doc.setFont('helvetica','normal'); doc.setFontSize(10)
-      doc.text(`Proforma No: ${orderNo}`, 40, 58)
-      doc.text(`Tarih: ${new Date(order.created_at).toLocaleString('tr-TR')}`, 40, 72)
-
-      // Customer box
-      doc.setFont('helvetica','bold')
-      doc.text('Müşteri', 350, 40)
-      doc.setFont('helvetica','normal')
-      doc.text(`${order.customer_name}`, 350, 58)
-      if (order.customer_email) doc.text(`${order.customer_email}`, 350, 72)
-
-      // Items table
-      const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
-      const body = (order.order_items || []).map(it => [
-        it.product_name || '-',
-        String(it.quantity ?? 0),
-        nf.format(Number(it.unit_price) || 0),
-        nf.format(Number(it.total_price) || 0)
-      ])
-
-      autoTable(doc, {
-        startY: 100,
-        head,
-        body,
-        styles: { font: 'helvetica', fontSize: 10 },
-        headStyles: { fillColor: [245,247,250], textColor: 20 },
-        columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
-      })
-
-      // Totals
-      const afterTableY = (doc as any).lastAutoTable?.finalY || 100
-      doc.setFont('helvetica','bold'); doc.setFontSize(12)
-      doc.text(`${t('orders.grandTotal')}: ${nf.format(order.total_amount)}`, 40, afterTableY + 24)
-
-      // Footer note
-      doc.setFont('helvetica','normal'); doc.setFontSize(9)
-      doc.setTextColor(100)
-      doc.text('Bu belge resmî fatura değildir; bilgilendirme amaçlıdır.', 40, afterTableY + 42)
-
-      // Save
-      doc.save(`Proforma-${orderNo}.pdf`)
-    } catch (e) {
-      console.error('PDF error', e)
-      toast.error('PDF oluşturulamadı')
-    }
-  }
 
   // Derived filtered list
   const filtered = orders.filter(o => {
@@ -350,62 +254,6 @@ export const OrdersPage: React.FC = () => {
     )
   }
 
-  // Reorder handler
-  const handleCopy = async (text?: string) => {
-    try {
-      if (!text) return
-      await navigator.clipboard.writeText(text)
-      toast.success(t('orders.copied'))
-    } catch {
-      toast.error(t('orders.copyFailed'))
-    }
-  }
-
-  const handleReorder = async (order: Order) => {
-    try {
-      const ids = Array.from(new Set((order.order_items||[]).map(it=>it.product_id).filter(Boolean))) as string[]
-      const names = Array.from(new Set((order.order_items||[]).filter(it=>!it.product_id && it.product_name).map(it=>it.product_name)))
-
-      const productMap: Record<string, Product> = {}
-
-      if (ids.length > 0) {
-        const { data, error } = await supabase.from('products').select('*').in('id', ids)
-        if (error) throw error
-        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.id] = p })
-      }
-
-      if (names.length > 0) {
-        const { data, error } = await supabase.from('products').select('*').in('name', names)
-        if (error) throw error
-        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.name] = p })
-      }
-
-      let added = 0
-      for (const it of order.order_items||[]) {
-        let prod: Product | undefined
-        if (it.product_id) prod = productMap[it.product_id]
-        if (!prod) prod = productMap[it.product_name]
-        if (prod) {
-          addToCart({
-            ...prod,
-            price: String(prod.price)
-          }, it.quantity)
-          added += it.quantity
-        }
-      }
-
-      if (added>0) {
-        toast.success(t('orders.reorderedToast', { count: added }))
-        // Sepete yönlendir
-        navigate('/cart')
-      } else {
-        toast.error(t('orders.reorderNotFound'))
-      }
-    } catch (e: unknown) {
-      console.error('Reorder error', e)
-      toast.error(t('orders.reorderError'))
-    }
-  }
 
   return (
       <div className="min-h-screen bg-clean-white py-8">
@@ -541,183 +389,7 @@ export const OrdersPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Order Details (Expandable) */}
-                {selectedOrder?.id === order.id && (
-                  <div className="p-6 bg-air-blue/10">
-                    {/* Detail Tabs */}
-                    <div className="border-b border-light-gray mb-4">
-                      <nav className="flex flex-wrap gap-2">
-                        {(['overview','items','shipping','invoice'] as const).map(tab => (
-                          <button
-                            key={tab}
-                            onClick={() => setDetailTab(tab)}
-                            className={`px-3 py-2 text-sm rounded-t ${detailTab===tab ? 'bg-white border border-light-gray border-b-transparent text-primary-navy' : 'text-steel-gray hover:text-primary-navy'}`}
-                          >
-                            {tab==='overview' && (t('orders.tabs.overview') || 'Özet')}
-                            {tab==='items' && (t('orders.tabs.items') || 'Ürünler')}
-                            {tab==='shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
-                            {tab==='invoice' && (t('orders.tabs.invoice') || 'Fatura')}
-                          </button>
-                        ))}
-                      </nav>
-                    </div>
-
-                    {/* Overview Tab: Customer + Order Info */}
-                    {detailTab === 'overview' && (
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                        <div>
-                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
-                          <div className="space-y-2 text-sm">
-                            <p><span className="font-medium">{t('orders.name')}:</span> {order.customer_name}</p>
-                            <p><span className="font-medium">{t('orders.email')}:</span> {order.customer_email}</p>
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
-                          <div className="text-sm text-steel-gray">
-                            {order.shipping_address && (() => {
-                              const addr = order.shipping_address as ShippingAddress
-                              const line1 = addr.fullAddress || addr.street
-                              const line2 = [addr.city, addr.district || addr.state].filter(Boolean).join(', ')
-                              const line3 = addr.postalCode || addr.postal_code
-                              return (
-                                <div>
-                                  {line1 && <p>{line1}</p>}
-                                  {(line2 && line2.length > 0) && <p>{line2}</p>}
-                                  {line3 && <p>{line3}</p>}
-                                </div>
-                              )
-                            })()}
-                          </div>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderInfo')}</h4>
-                          <div className="text-sm text-steel-gray space-y-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="font-medium">{t('orders.orderId')}</span>
-                              <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
-                            </div>
-                            <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
-                            {order.conversation_id && (
-                              <>
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="font-medium">{t('orders.conversationId')}</span>
-                                  <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
-                                </div>
-                                <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Shipping Tab */}
-                    {detailTab === 'shipping' && (
-                      <div className="mb-6">
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.shippingInfo') || 'Kargo Takibi'}</h4>
-                        {order.carrier || order.tracking_number || order.tracking_url || order.shipped_at || order.delivered_at ? (
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <div className="text-steel-gray">{t('orders.carrier') || 'Kargo Firması'}</div>
-                              <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
-                            </div>
-                            <div>
-                              <div className="text-steel-gray">{t('orders.trackingNumber') || 'Takip Numarası'}</div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
-                                {order.tracking_number && (
-                                  <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline">{t('orders.copy') || 'Kopyala'}</button>
-                                )}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="text-steel-gray">{t('orders.trackingLink') || 'Takip Linki'}</div>
-                              {order.tracking_url ? (
-                                <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14}/>{t('orders.openLink') || 'Bağlantıyı aç'}</a>
-                              ) : (
-                                <div className="text-industrial-gray">-</div>
-                              )}
-                            </div>
-                            <div>
-                              <div className="text-steel-gray">{t('orders.shippedAt') || 'Kargoya Verildi'}</div>
-                              <div className="font-medium text-industrial-gray">{order.shipped_at ? formatDate(order.shipped_at) : '-'}</div>
-                            </div>
-                            <div>
-                              <div className="text-steel-gray">{t('orders.deliveredAt') || 'Teslim Edildi'}</div>
-                              <div className="font-medium text-industrial-gray">{order.delivered_at ? formatDate(order.delivered_at) : '-'}</div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="text-sm text-steel-gray">{t('orders.noShippingInfo') || 'Kargo bilgisi bulunmuyor.'}</div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Items Tab */}
-                    {detailTab === 'items' && (
-                      <div>
-                        <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
-                        <div className="bg-white rounded-lg overflow-hidden">
-                          <table className="w-full">
-                            <thead className="bg-light-gray">
-                              <tr>
-                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.productCol')}</th>
-                                <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.imageCol')}</th>
-                                <th className="text-center p-4 text-sm font-medium text-industrial-gray">{t('orders.qtyCol')}</th>
-                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.unitPriceCol')}</th>
-                                <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.totalCol')}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {order.order_items?.map((item, index) => (
-                                <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-air-blue/5'}>
-                                  <td className="p-4 text-sm text-industrial-gray">{item.product_name}</td>
-                                  <td className="p-4 text-sm">
-                                    {/** eslint-disable-next-line @next/next/no-img-element */}
-                                    { item.product_image_url ? (
-                                      <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded" />
-                                    ) : (
-                                      <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">{t('orders.noImage')}</div>
-                                    )}
-                                  </td>
-                                  <td className="p-4 text-sm text-center text-steel-gray">{item.quantity}</td>
-                                  <td className="p-4 text-sm text-right text-steel-gray">{formatPrice(item.unit_price)}</td>
-                                  <td className="p-4 text-sm text-right font-medium text-industrial-gray">{formatPrice(item.total_price)}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                            <tfoot>
-                              <tr className="bg-primary-navy text-white">
-                                <td colSpan={4} className="p-4 text-sm font-semibold text-right">{t('orders.grandTotal')}:</td>
-                                <td className="p-4 text-sm font-bold text-right">{formatPrice(order.total_amount)}</td>
-                              </tr>
-                            </tfoot>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Invoice Tab */}
-                    {detailTab === 'invoice' && (
-                      <div className="space-y-3">
-                        <h4 className="font-semibold text-industrial-gray">{t('orders.tabs.invoice') || 'Fatura'}</h4>
-                        <div className="flex flex-wrap gap-2">
-                          <button onClick={() => handlePrintReceipt(order)} className="text-sm px-4 py-2 border rounded text-primary-navy border-primary-navy hover:bg-primary-navy hover:text-white transition-colors">{t('orders.viewReceipt')}</button>
-                          <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50 transition-colors">{t('orders.invoicePdf') || 'Fatura (PDF)'} </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="mt-6 flex flex-wrap justify-between gap-2">
-                      <button onClick={() => navigate(`/account/returns?new=${order.id}`)} className="text-sm px-4 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50 transition-colors">{t('returns.requestReturn') || 'İade Talebi'}</button>
-                      <div className="flex flex-wrap gap-2">
-                        <button onClick={() => handleReorder(order)} className="text-sm px-4 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white transition-colors flex items-center gap-2"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* No inline details - navigate to detail page */}
               </div>
             ))}
           </div>

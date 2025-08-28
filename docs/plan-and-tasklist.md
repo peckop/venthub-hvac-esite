@@ -1,6 +1,8 @@
-# VentHub — Ana Sayfa (Kurumsal) ve Keşfet (Ürün Keşfi) Uyumlu Plan ve Görev Listesi
+# VentHub — Plan ve Görev Listesi (Taşındı)
 
-Bu belge, Ana Sayfa ve Keşfet sayfalarının görev ayrımını, kurumsal çerçeveyi ve uygulanacak adımları pratik bir şekilde toplar. Amaç: kurumsal güven ve çözüm odaklı bir Ana Sayfa ile, keşif/filtreleme/karşılaştırma odaklı bir Keşfet (PLP) deneyimi sunmak; tekrar içeriği önlemek, SEO ve dönüşüm hedeflerini desteklemek.
+Bu belge ROADMAP'e taşınmıştır. Güncel tek kaynak: `docs/ROADMAP.md`.
+
+Arşivlenmiş kopya: `docs/archive/plan-and-tasklist.md`.
 
 ---
 
@@ -95,18 +97,18 @@ Aşağıdaki görevler, kurumsal‑keşif ayrımını güçlendirmek ve sürdür
    - [ ] Başlık + 2–3 link kartı (örn. “Otopark Jet Fan seçimi”, “Hava perdesi seçimi”)
    - [ ] PDF linkleri veya blog/knowledge sayfalarına yönlendirme
 3) Ürün teaser düzeni (teyit)
-   - [ ] En fazla 4 kart; “Tümünü Keşfet” CTA’yı vurgula
+   - [x] En fazla 4 kart; “Tümünü Keşfet” CTA’yı vurgula
 4) Alt CTA (mevcut)
    - [ ] Metin/copy gözden geçir; lead modal tetikleme teyidi
 
 ### Faz 1 — Keşfet (PLP) Netleştirme
 1) Keşfet hero ve şerit
-   - [ ] Kısa kopye gözden geçir; “İhtiyacına Göre Seç” anchor bağlantısı test
+   - [x] Kısa kopye gözden geçir; “İhtiyacına Göre Seç” anchor bağlantısı test
 2) Uygulamaya Göre / Popüler Kategoriler
-   - [ ] İkonografi ve micro‑copy ince ayar
+   - [x] İkonografi ve micro‑copy temel kurulum (ince ayar TBD)
    - [ ] Kart hover, focus, a11y teyit
 3) Vitrinler
-   - [ ] “Öne Çıkanlar” ve “Yeni Ürünler” dengesi; grid/list modlarıyla uyum
+   - [x] “Öne Çıkanlar” ve “Yeni Ürünler” dengesi; grid/list modlarıyla uyum
 
 ### Faz 2 — Navigasyon ve IA
 1) “Çözümler” menüsü (ileride)
