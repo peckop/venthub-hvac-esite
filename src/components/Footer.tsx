@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react'
+import BuildTag from './BuildTag'
 
 export const Footer: React.FC = () => {
   const { t } = useI18n()
@@ -171,15 +172,7 @@ export const Footer: React.FC = () => {
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}
-              {/* eslint-disable-next-line @typescript-eslint/no-var-requires */}
-              {(() => {
-                try {
-                  const BuildTag = require('./BuildTag').default
-                  return <BuildTag />
-                } catch {
-                  return null
-                }
-              })()}
+              <BuildTag />
               <Link to="/legal/kvkk" className="text-steel-gray hover:text-white transition-colors">
                 {t('legalLinks.kvkk')}
               </Link>
