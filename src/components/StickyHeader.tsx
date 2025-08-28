@@ -19,7 +19,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const { getCartCount } = useCart()
+  const { getCartCount, syncing } = useCart()
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const searchRef = useRef<HTMLDivElement>(null)
@@ -198,8 +198,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
               >
                 <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
+                {syncing && (
+                  <span title="Senkronize ediliyor" className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
+                )}
                 {getCartCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg">
                     {getCartCount()}
                   </span>
                 )}

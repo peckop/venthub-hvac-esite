@@ -14,6 +14,7 @@ interface CartItem {
 
 interface CartContextType {
   items: CartItem[]
+  syncing: boolean
   addToCart: (product: Product, quantity?: number) => void
   removeFromCart: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
@@ -30,6 +31,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const { user } = useAuth()
   const [serverCartId, setServerCartId] = useState<string | null>(null)
+  const [syncing, setSyncing] = useState(false)
   const mergingRef = useRef(false)
   const localVersionRef = useRef<number>(0)
 
@@ -84,6 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async function syncWithServer() {
       if (!CART_SERVER_SYNC || !user || mergingRef.current) return
       mergingRef.current = true
+      setSyncing(true)
       try {
         const cart = await getOrCreateShoppingCart(user.id)
         if (cancelled) return
@@ -119,6 +122,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error('cart sync error', e)
       } finally {
         mergingRef.current = false
+        setSyncing(false)
       }
     }
     syncWithServer()
@@ -239,6 +243,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = {
     items,
+    syncing,
     addToCart,
     removeFromCart,
     updateQuantity,
