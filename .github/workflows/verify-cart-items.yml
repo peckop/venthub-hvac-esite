@@ -49,13 +49,13 @@ jobs:
             const mins = parseInt(process.env.MINUTES || '30', 10);
             const since = new Date(Date.now() - mins*60*1000).toISOString();
             let query = supabase.from('cart_items')
-              .select('id, cart_id, product_id, quantity, unit_price, price_list_id, updated_at, created_at')
-              .or(`updated_at.gte.${since},and(updated_at.is.null,created_at.gte.${since})`)
-              .order('updated_at', { ascending: false, nullsFirst: false })
+              .select('id, cart_id, product_id, quantity, unit_price, price_list_id, created_at')
+              .gte('created_at', since)
+              .order('created_at', { ascending: false })
               .limit(100);
             if (process.env.EMAIL) {
-              // Filter by user email via shopping_carts join using RPC fallback (two-step)
-              const { data: users, error: uerr } = await supabase.from('auth.users').select('id, email').eq('email', process.env.EMAIL).limit(1);
+              // Filter by user email via auth schema + carts
+              const { data: users, error: uerr } = await supabase.schema('auth').from('users').select('id, email').eq('email', process.env.EMAIL).limit(1);
               if (uerr) throw uerr; if (!users || users.length === 0) { console.log('[]'); return; }
               const uid = users[0].id;
               const { data: carts, error: cerr } = await supabase.from('shopping_carts').select('id').eq('user_id', uid).limit(10);
@@ -65,7 +65,7 @@ jobs:
             }
             const { data, error } = await query;
             if (error) throw error;
-            const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id, ts:r.updated_at||r.created_at }));
+            const rows = (data||[]).map(r => ({ id:r.id, cart_id:r.cart_id, product_id:r.product_id, qty:r.quantity, unit_price:r.unit_price, price_list_id:r.price_list_id, ts:r.created_at }));
             console.log(JSON.stringify({ count: rows.length, rows }, null, 2));
           })().catch(e => { console.error(e); process.exit(1); });
           "
