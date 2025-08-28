@@ -569,7 +569,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       .eq('id', user.id)
       .maybeSingle()
 
-    if (profErr) return fallback
+    if (profErr) return { unitPrice: fallback, priceListId: null }
 
     const profile = (prof || {}) as UserProfileLight
     const role = (profile.role || 'individual') as UserRole
