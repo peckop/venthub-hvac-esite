@@ -530,62 +530,30 @@ export async function listCartItemsWithProducts(cartId: string) {
 }
 
 export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
-  const { cartId, productId, quantity, unitPrice, priceListId } = params
-  const payloadFull = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null, price_list_id: priceListId ?? null }
-  let { data, error } = await supabase
+  const { cartId, productId, quantity } = params
+  // Manual UPSERT to avoid relying on on_conflict and optional columns
+  const sel = await supabase
     .from('cart_items')
-    .upsert(payloadFull, { onConflict: 'cart_id,product_id' })
-    .select('*')
-
-  // Backward-compatible fallback: if schema lacks unit_price/price_list_id (PGRST204), retry with minimal payload
-  if (error && (String((error as any).code) === 'PGRST204' || /unit_price|price_list/i.test(String((error as any).message || '')))) {
-    const payloadBasic = { cart_id: cartId, product_id: productId, quantity }
-    const res2 = await supabase
+    .select('id')
+    .eq('cart_id', cartId)
+    .eq('product_id', productId)
+    .limit(1)
+  if (!sel.error && Array.isArray(sel.data) && sel.data.length > 0) {
+    const upd = await supabase
       .from('cart_items')
-      .upsert(payloadBasic, { onConflict: 'cart_id,product_id' })
-      .select('*')
-    if (res2.error) {
-      // Fall through to manual UPSERT below
-      error = res2.error
-    } else {
-      return res2.data as CartDbItem[]
-    }
-  }
-
-  // If still failing (e.g., missing unique constraint causing 400), do manual upsert
-  if (error) {
-    // Try select existing
-    const sel = await supabase
-      .from('cart_items')
-      .select('id')
+      .update({ quantity })
       .eq('cart_id', cartId)
       .eq('product_id', productId)
-      .limit(1)
-    if (!sel.error && Array.isArray(sel.data)) {
-      if (sel.data.length > 0) {
-        // Update existing row
-        const upd = await supabase
-          .from('cart_items')
-          .update({ quantity })
-          .eq('cart_id', cartId)
-          .eq('product_id', productId)
-          .select('*')
-        if (upd.error) throw upd.error
-        return (upd.data || []) as CartDbItem[]
-      } else {
-        // Insert new row (minimal columns)
-        const ins = await supabase
-          .from('cart_items')
-          .insert({ cart_id: cartId, product_id: productId, quantity })
-          .select('*')
-        if (ins.error) throw ins.error
-        return (ins.data || []) as CartDbItem[]
-      }
-    }
+      .select('*')
+    if (upd.error) throw upd.error
+    return (upd.data || []) as CartDbItem[]
   }
-
-  if (error) throw error
-  return data as CartDbItem[]
+  const ins = await supabase
+    .from('cart_items')
+    .insert({ cart_id: cartId, product_id: productId, quantity })
+    .select('*')
+  if (ins.error) throw ins.error
+  return (ins.data || []) as CartDbItem[]
 }
 
 export async function removeCartItem(cartId: string, productId: string) {
