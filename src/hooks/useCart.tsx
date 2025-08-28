@@ -31,11 +31,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const [serverCartId, setServerCartId] = useState<string | null>(null)
   const mergingRef = useRef(false)
+  const localVersionRef = useRef<number>(0)
 
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem('venthub-cart')
+      const savedVer = localStorage.getItem('venthub-cart-version')
+      if (savedVer) {
+        const v = parseInt(savedVer, 10)
+        if (Number.isFinite(v)) localVersionRef.current = v
+      }
       if (savedCart) {
         setItems(JSON.parse(savedCart))
       }
@@ -44,10 +50,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Save cart to localStorage whenever items change
+  // Save cart to localStorage whenever items change (and bump version)
   useEffect(() => {
     try {
       localStorage.setItem('venthub-cart', JSON.stringify(items))
+      const v = Date.now()
+      localVersionRef.current = v
+      localStorage.setItem('venthub-cart-version', String(v))
     } catch (error) {
       console.error('Error saving cart to localStorage:', error)
     }
@@ -102,6 +111,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         try {
           localStorage.setItem('venthub-cart', JSON.stringify(merged))
           localStorage.setItem('venthub-cart-owner', user.id)
+          const v = Date.now()
+          localVersionRef.current = v
+          localStorage.setItem('venthub-cart-version', String(v))
         } catch {}
       } catch (e) {
         console.error('cart sync error', e)
@@ -113,6 +125,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true }
     // only run when user changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+
+  // Cross-tab sync via storage events (newer version wins)
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (!e.key || (e.key !== 'venthub-cart' && e.key !== 'venthub-cart-version')) return
+      try {
+        const owner = localStorage.getItem('venthub-cart-owner')
+        if (user && owner && owner !== user.id) return
+        const vStr = localStorage.getItem('venthub-cart-version') || '0'
+        const v = parseInt(vStr, 10) || 0
+        if (v > localVersionRef.current) {
+          const raw = localStorage.getItem('venthub-cart')
+          if (raw) {
+            const next = JSON.parse(raw)
+            setItems(next)
+            localVersionRef.current = v
+          }
+        }
+      } catch {}
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [user])
 
   const addToCart = (product: Product, quantity = 1) => {
