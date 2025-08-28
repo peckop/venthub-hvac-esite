@@ -442,6 +442,7 @@ export interface CartDbItem {
   product_id: string
   quantity: number
   unit_price?: number | null
+  price_list_id?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -491,9 +492,9 @@ export async function listCartItemsWithProducts(cartId: string) {
     .filter(x => !!x.product)
 }
 
-export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null }) {
-  const { cartId, productId, quantity, unitPrice } = params
-  const payload = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null }
+export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
+  const { cartId, productId, quantity, unitPrice, priceListId } = params
+  const payload = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null, price_list_id: priceListId ?? null }
   const { data, error } = await supabase
     .from('cart_items')
     .upsert(payload, { onConflict: 'cart_id,product_id' })
@@ -542,6 +543,11 @@ function nowIso() {
 // Compute effective unit price for a product based on user's role/tier and active price lists.
 // Fallbacks safely to product.price numeric parse on any error or if no matching price found.
 export async function getEffectiveUnitPrice(product: Product): Promise<number> {
+  const info = await getEffectivePriceInfo(product)
+  return info.unitPrice
+}
+
+export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
   // Fallback: product.price numeric
   const fallback = (() => {
     const v = parseFloat(product.price || '0')
@@ -554,7 +560,7 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
     const user = userErr ? null : authData?.user
 
     // If not authenticated, return public price immediately
-    if (!user) return fallback
+    if (!user) return { unitPrice: fallback, priceListId: null }
 
     // Fetch user profile (role, organization)
     const { data: prof, error: profErr } = await supabase
@@ -590,7 +596,7 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
       .lte('effective_from', now)
       .or('effective_to.is.null,effective_to.gte.' + now)
 
-    if (listErr || !Array.isArray(lists)) return fallback
+    if (listErr || !Array.isArray(lists)) return { unitPrice: fallback, priceListId: null }
 
     // Filter lists by role and tier (client-side contains checks)
     type AnyList = { id: string; is_default?: boolean | null; allowed_user_roles?: UserRole[] | null; organization_tiers?: number[] | null; effective_from?: string | null }
@@ -612,7 +618,7 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
     })[0]
 
     // Try product_prices with chosen list, otherwise global (price_list_id is null)
-    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: chosen.id }, { price_list_id: null }] : [{ price_list_id: null }]
+    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: (chosen as any).id }, { price_list_id: null }] : [{ price_list_id: null }]
 
     for (const pq of priceQueries) {
       let query = supabase
@@ -641,20 +647,20 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
       const sale = pick.sale_price != null ? Number(pick.sale_price) : null
       const disc = Number(pick.discount_percentage || 0)
 
-      if (sale != null && Number.isFinite(sale) && sale > 0) return sale
+      if (sale != null && Number.isFinite(sale) && sale > 0) return { unitPrice: sale, priceListId: pq.price_list_id }
       if (Number.isFinite(base) && base > 0) {
         if (disc > 0) {
           const val = base * (1 - disc / 100)
-          return Math.max(0, Number(val.toFixed(2)))
+          return { unitPrice: Math.max(0, Number(val.toFixed(2))), priceListId: pq.price_list_id }
         }
-        return base
+        return { unitPrice: base, priceListId: pq.price_list_id }
       }
     }
 
     // No special price found -> fallback
-    return fallback
+    return { unitPrice: fallback, priceListId: chosen ? (chosen as any).id : null }
   } catch (e) {
     console.error('getEffectiveUnitPrice error', e)
-    return fallback
+    return { unitPrice: fallback, priceListId: null }
   }
 }
