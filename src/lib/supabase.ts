@@ -486,9 +486,19 @@ export async function getOrCreateShoppingCart(userId: string) {
     .single()
 
   let { data, error } = await attemptInsert()
+  // If FK to user_profiles missing, create profile then retry once
   if (error && (String((error as any).code) === '23503' || /user_profiles/i.test(String((error as any).message || '')))) {
     await ensureUserProfile(userId)
     ;({ data, error } = await attemptInsert())
+  }
+  // If unique conflict (cart already exists), select and return it
+  if (error && (String((error as any).code) === '23505' || String((error as any).code) === '409' || /conflict|duplicate key/i.test(String((error as any).message || '')))) {
+    const { data: again, error: sel2 } = await supabase
+      .from('shopping_carts')
+      .select('*')
+      .eq('user_id', userId)
+      .limit(1)
+    if (!sel2 && Array.isArray(again) && again.length > 0) return again[0] as ShoppingCart
   }
   if (error) throw error
   return data as ShoppingCart
