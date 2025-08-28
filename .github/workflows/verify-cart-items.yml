@@ -50,14 +50,18 @@ jobs:
               .select('id, cart_id, product_id, quantity, unit_price, price_list_id')
               .limit(100);
             if (process.env.EMAIL) {
-              // Filter by user email via auth schema + carts
-              const { data: users, error: uerr } = await supabase.schema('auth').from('users').select('id, email').eq('email', process.env.EMAIL).limit(1);
-              if (uerr) throw uerr; if (!users || users.length === 0) { console.log('[]'); return; }
-              const uid = users[0].id;
-              const { data: carts, error: cerr } = await supabase.from('shopping_carts').select('id').eq('user_id', uid).limit(10);
-              if (cerr) throw cerr; const cartIds = (carts||[]).map(c => c.id);
-              if (cartIds.length === 0) { console.log('[]'); return; }
-              query = query.in('cart_id', cartIds);
+              // Filter by user email via user_profiles + carts (fallback to just list all if not found)
+              const { data: profiles, error: perr } = await supabase.from('user_profiles').select('id, email').eq('email', process.env.EMAIL).limit(1);
+              if (perr) { console.log('Email filter failed, showing all'); } else if (!profiles || profiles.length === 0) { console.log('[]'); return; }
+              else {
+                const uid = profiles[0].id;
+                const { data: carts, error: cerr } = await supabase.from('shopping_carts').select('id').eq('user_id', uid).limit(10);
+                if (cerr) { console.log('Cart lookup failed, showing all'); } else {
+                  const cartIds = (carts||[]).map(c => c.id);
+                  if (cartIds.length === 0) { console.log('[]'); return; }
+                  query = query.in('cart_id', cartIds);
+                }
+              }
             }
             const { data, error } = await query;
             if (error) throw error;
