@@ -531,11 +531,23 @@ export async function listCartItemsWithProducts(cartId: string) {
 
 export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
   const { cartId, productId, quantity, unitPrice, priceListId } = params
-  const payload = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null, price_list_id: priceListId ?? null }
-  const { data, error } = await supabase
+  const payloadFull = { cart_id: cartId, product_id: productId, quantity, unit_price: unitPrice ?? null, price_list_id: priceListId ?? null }
+  let { data, error } = await supabase
     .from('cart_items')
-    .upsert(payload, { onConflict: 'cart_id,product_id' })
+    .upsert(payloadFull, { onConflict: 'cart_id,product_id' })
     .select('*')
+
+  // Backward-compatible fallback: if schema lacks unit_price/price_list_id (PGRST204), retry with minimal payload
+  if (error && (String((error as any).code) === 'PGRST204' || /unit_price|price_list/i.test(String((error as any).message || '')))) {
+    const payloadBasic = { cart_id: cartId, product_id: productId, quantity }
+    const res2 = await supabase
+      .from('cart_items')
+      .upsert(payloadBasic, { onConflict: 'cart_id,product_id' })
+      .select('*')
+    if (res2.error) throw res2.error
+    return res2.data as CartDbItem[]
+  }
+
   if (error) throw error
   return data as CartDbItem[]
 }
