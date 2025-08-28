@@ -118,13 +118,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems(mergedWithPrices)
 
         // Clear guest cart to avoid double-merge next time
-        try { localStorage.removeItem('venthub-cart') } catch {}
-          localStorage.setItem('venthub-cart', JSON.stringify(merged))
+        try {
+          localStorage.removeItem('venthub-cart')
+          localStorage.setItem('venthub-cart', JSON.stringify(mergedWithPrices))
           localStorage.setItem('venthub-cart-owner', user.id)
           const v = Date.now()
           localVersionRef.current = v
           localStorage.setItem('venthub-cart-version', String(v))
-        } catch {}
+        } catch (e) {}
       } catch (e) {
         console.error('cart sync error', e)
       } finally {
@@ -155,7 +156,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             localVersionRef.current = v
           }
         }
-      } catch {}
+      } catch (e) {}
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
@@ -192,10 +193,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Dispatch a global event so UI can present a rich toast/modal
     try {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
-    } catch {
+    } catch (e) {
       try {
         toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })
-      } catch {}
+      } catch (e) {}
     }
   }
 
