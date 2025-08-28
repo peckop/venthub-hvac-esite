@@ -520,3 +520,141 @@ export async function clearCartItems(cartId: string) {
   if (error) throw error
   return true
 }
+
+// ========== Pricing: getEffectiveUnitPrice ==========
+export type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
+
+export interface UserProfileLight {
+  id: string
+  role?: UserRole | null
+  organization_id?: string | null
+}
+
+export interface OrganizationLight {
+  id: string
+  tier_level?: number | null
+}
+
+function nowIso() {
+  return new Date().toISOString()
+}
+
+// Compute effective unit price for a product based on user's role/tier and active price lists.
+// Fallbacks safely to product.price numeric parse on any error or if no matching price found.
+export async function getEffectiveUnitPrice(product: Product): Promise<number> {
+  // Fallback: product.price numeric
+  const fallback = (() => {
+    const v = parseFloat(product.price || '0')
+    return Number.isFinite(v) ? v : 0
+  })()
+
+  try {
+    // Try to get current user
+    const { data: authData, error: userErr } = await supabase.auth.getUser()
+    const user = userErr ? null : authData?.user
+
+    // If not authenticated, return public price immediately
+    if (!user) return fallback
+
+    // Fetch user profile (role, organization)
+    const { data: prof, error: profErr } = await supabase
+      .from('user_profiles')
+      .select('id, role, organization_id')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (profErr) return fallback
+
+    const profile = (prof || {}) as UserProfileLight
+    const role = (profile.role || 'individual') as UserRole
+
+    // Fetch organization tier if available
+    let tierLevel: number | null = null
+    if (profile.organization_id) {
+      const { data: org, error: orgErr } = await supabase
+        .from('organizations')
+        .select('id, tier_level')
+        .eq('id', profile.organization_id)
+        .maybeSingle()
+      if (!orgErr && org) {
+        tierLevel = (org as OrganizationLight)?.tier_level ?? null
+      }
+    }
+
+    // Load active price lists (time window + is_active)
+    const now = nowIso()
+    const { data: lists, error: listErr } = await supabase
+      .from('price_lists')
+      .select('*')
+      .eq('is_active', true)
+      .lte('effective_from', now)
+      .or('effective_to.is.null,effective_to.gte.' + now)
+
+    if (listErr || !Array.isArray(lists)) return fallback
+
+    // Filter lists by role and tier (client-side contains checks)
+    type AnyList = { id: string; is_default?: boolean | null; allowed_user_roles?: UserRole[] | null; organization_tiers?: number[] | null; effective_from?: string | null }
+    const filtered = (lists as AnyList[]).filter(pl => {
+      const roleOk = !pl.allowed_user_roles || pl.allowed_user_roles.length === 0 || pl.allowed_user_roles.includes(role)
+      const tierOk = tierLevel == null || !pl.organization_tiers || pl.organization_tiers.length === 0 || pl.organization_tiers.includes(tierLevel)
+      return roleOk && tierOk
+    })
+
+    // Choose a list: prefer specific over default; latest effective_from wins
+    const chosen = filtered.sort((a, b) => {
+      const aDef = a.is_default ? 1 : 0
+      const bDef = b.is_default ? 1 : 0
+      // non-default before default
+      if (aDef !== bDef) return aDef - bDef
+      const aTime = a.effective_from ? Date.parse(a.effective_from) : 0
+      const bTime = b.effective_from ? Date.parse(b.effective_from) : 0
+      return bTime - aTime
+    })[0]
+
+    // Try product_prices with chosen list, otherwise global (price_list_id is null)
+    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: chosen.id }, { price_list_id: null }] : [{ price_list_id: null }]
+
+    for (const pq of priceQueries) {
+      let query = supabase
+        .from('product_prices')
+        .select('base_price, sale_price, discount_percentage, is_active, valid_from, valid_until')
+        .eq('product_id', product.id)
+        .eq('is_active', true)
+
+      if (pq.price_list_id === null) {
+        query = query.is('price_list_id', null as unknown as undefined)
+      } else {
+        query = query.eq('price_list_id', pq.price_list_id)
+      }
+
+      const { data: rows, error: prErr } = await query
+      if (prErr || !Array.isArray(rows) || rows.length === 0) continue
+
+      // pick first valid by date window
+      const pick = rows.find(r => {
+        const fromOk = !r.valid_from || Date.parse(r.valid_from) <= Date.now()
+        const toOk = !r.valid_until || Date.parse(r.valid_until) >= Date.now()
+        return fromOk && toOk
+      }) || rows[0]
+
+      const base = Number(pick.base_price || 0)
+      const sale = pick.sale_price != null ? Number(pick.sale_price) : null
+      const disc = Number(pick.discount_percentage || 0)
+
+      if (sale != null && Number.isFinite(sale) && sale > 0) return sale
+      if (Number.isFinite(base) && base > 0) {
+        if (disc > 0) {
+          const val = base * (1 - disc / 100)
+          return Math.max(0, Number(val.toFixed(2)))
+        }
+        return base
+      }
+    }
+
+    // No special price found -> fallback
+    return fallback
+  } catch (e) {
+    console.error('getEffectiveUnitPrice error', e)
+    return fallback
+  }
+}

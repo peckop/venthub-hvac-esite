@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState, ReactNode, useRef } from 'react'
-import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts } from '../lib/supabase'
+import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts, getEffectiveUnitPrice } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
@@ -90,7 +90,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Upsert all merged items to server (idempotent)
         for (const it of merged) {
           try {
-            await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: parseFloat(it.product.price || '0') || 0 })
+            const unit = await getEffectiveUnitPrice(it.product)
+            await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: unit })
           } catch (e) {
             console.error('cart upsert error', e)
           }
@@ -127,7 +128,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // If logged in, also sync to server (optimistic)
     if (CART_SERVER_SYNC && user && serverCartId) {
-      upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: parseFloat(product.price || '0') || 0 })
+      // compute effective price and upsert optimistically
+      getEffectiveUnitPrice(product)
+        .then(unit => upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: unit }))
         .catch(err => console.error('server addToCart error', err))
     }
 
@@ -172,7 +175,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (CART_SERVER_SYNC && user && serverCartId) {
       const product = items.find(i => i.product.id === productId)?.product
       if (product) {
-        upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: parseFloat(product.price || '0') || 0 })
+        getEffectiveUnitPrice(product)
+          .then(unit => upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: unit }))
           .catch(err => console.error('server updateQuantity error', err))
       }
     }
