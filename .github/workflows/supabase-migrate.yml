@@ -39,6 +39,23 @@ jobs:
           # Host mask (do not print full URL)
           echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
+      - name: Normalize DB URL (enforce sslmode=require)
+        run: |
+          if echo "$SUPABASE_DB_URL" | grep -q "sslmode="; then
+            DB_URL="$SUPABASE_DB_URL"
+          else
+            if echo "$SUPABASE_DB_URL" | grep -q "?"; then
+              DB_URL="${SUPABASE_DB_URL}&sslmode=require"
+            else
+              DB_URL="${SUPABASE_DB_URL}?sslmode=require"
+            fi
+          fi
+          echo "DB_URL=$DB_URL" >> $GITHUB_ENV
+
+      - name: Test DB connection
+        run: |
+          psql "$DB_URL" -c "select 1;"
+
       - name: Apply migrations via psql (psql-only)
         run: |
           set -e
@@ -50,6 +67,6 @@ jobs:
           fi
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
             echo "Applying $f"
-            psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
           done
           echo "Migrations applied successfully via psql."
