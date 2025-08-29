@@ -120,12 +120,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const currentOwner = localStorage.getItem(CART_OWNER_KEY)
         const isGuestCart = !currentOwner || currentOwner === '' || currentOwner !== user.id
         
-        // Fetch server items
+        // If we have a guest cart with items, clear server cart first
+        if (isGuestCart && items.length > 0) {
+          console.log('Guest cart detected, clearing server cart')
+          await clearDbCartItems(cart.id)
+        }
+        
+        // Fetch server items (will be empty if we just cleared)
         const serverRows = await listCartItemsWithProducts(cart.id)
         const serverItems: CartItem[] = serverRows.map(({ item, product }) => ({ id: item.product_id, product, quantity: item.quantity }))
 
         // Merge local guest items with server items
-        const merged = mergeItems(items, serverItems, isGuestCart)
+        const merged = isGuestCart && items.length > 0 ? items : mergeItems(items, serverItems, isGuestCart)
         // Compute unit prices for merged items and upsert server
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
