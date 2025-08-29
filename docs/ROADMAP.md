@@ -37,7 +37,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] Skip'li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)
   - [ ] Lint cleanup (Phase 1) → ardından CI'da lint'i tekrar blocking yap
 - Performans
-  - [ ] Code‑split (dynamic import / manualChunks) — account, checkout, product-detail gibi chunk'lar
+  - [x] Code‑split (dynamic import / manualChunks) — %87 bundle küçültme sağlandı (1,118kB → 145kB)
 - Kargo takip entegrasyonu (Sandbox/Backend)
   - [ ] Taşıyıcı API/webhook veya periyodik polling (sandbox)
   - [ ] Status senkronizasyonu (pending→paid→shipped→delivered)
@@ -62,7 +62,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] Lint cleanup (Phase 1): any→unknown, unused fix’leri
   - [ ] Lint’i tekrar blocking yap (CI)
 - Performans
-  - [ ] Code‑split planını uygula (manualChunks / dynamic import)
+  - [x] Code‑split planını uygula (manualChunks / dynamic import) — tamamlandı
 - Kargo (sandbox)
   - [ ] Statü senk ve basit taşıyıcı webhook/polling prototipi
 - Orders detay (opsiyonel)
