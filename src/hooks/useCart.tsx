@@ -62,6 +62,23 @@ useEffect(() => {
       } catch {}
     }
 
+    // Safety: if the last order status was success, enforce an empty cart on fresh load
+    const lastStatus = localStorage.getItem('vh_last_order_status')
+    if (lastStatus === 'success') {
+      try {
+        setItems([])
+        localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+        localStorage.removeItem(CART_VERSION_KEY)
+        localStorage.removeItem(CART_OWNER_KEY)
+        localStorage.removeItem('vh_pending_order')
+        localStorage.removeItem('vh_last_order_id')
+        // keep a breadcrumb but don't keep success forever to avoid repeated forced clears
+        localStorage.removeItem('vh_last_order_status')
+        // Cross-tab sync
+        window.dispatchEvent(new StorageEvent('storage', { key: CART_LOCAL_STORAGE_KEY, newValue: JSON.stringify([]), oldValue: null, storageArea: localStorage }))
+      } catch {}
+    }
+
     const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
     const savedVer = localStorage.getItem(CART_VERSION_KEY)
     if (savedVer) {
