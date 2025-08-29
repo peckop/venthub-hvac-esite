@@ -88,6 +88,7 @@ export const PaymentSuccessPage: React.FC = () => {
             localStorage.removeItem('venthub-cart-owner');
             localStorage.removeItem('vh_pending_order');
             localStorage.setItem('vh_last_order_status', 'success');
+            localStorage.setItem('vh_clear_server_cart_once', '1');
           } catch {}
           if (orderId) await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
@@ -118,6 +119,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('venthub-cart-owner');
               localStorage.removeItem('vh_pending_order');
               localStorage.setItem('vh_last_order_status', 'success');
+              localStorage.setItem('vh_clear_server_cart_once', '1');
             } catch {}
             await fetchOrderDetails(orderId)
             toast.success(t('checkout.paymentSuccess'))
@@ -161,6 +163,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('venthub-cart-owner');
               localStorage.removeItem('vh_pending_order');
               localStorage.setItem('vh_last_order_status', 'success');
+              localStorage.setItem('vh_clear_server_cart_once', '1');
             } catch {}
             await fetchOrderDetails(orderId)
             toast.success('🎉 Ödeme başarıyla tamamlandı!')
