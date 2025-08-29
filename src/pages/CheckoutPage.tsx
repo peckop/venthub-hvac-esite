@@ -26,7 +26,7 @@ interface Address {
 }
 
 export const CheckoutPage: React.FC = () => {
-  const { items, getCartTotal, clearCart, removeFromCart, updateQuantity } = useCart()
+  const { items, getCartTotal, clearCart, removeFromCart, updateQuantity, applyServerPricing } = useCart()
   // Test ortamı tespiti (Vitest) — global "vi" varlığını kontrol et
   const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined'
   const { user, loading: authLoading } = useAuth()
@@ -282,7 +282,8 @@ export const CheckoutPage: React.FC = () => {
         const localTotal = authoritativeTotal
         const diff = Math.abs(serverTotal - localTotal)
         if (diff > 0.01) {
-          // Her durumda onay iste: kullanıcıyı bilgilendirip Review adımına döndür
+          // Sunucunun fiyatlarını yerel sepete uygula ve onay için Review'a dön
+          try { applyServerPricing(validation.items || []) } catch {}
           authoritativeTotal = Number(serverTotal.toFixed(2))
           toast('Fiyatlar güncellendi, lütfen onaylayın.')
           setStep(3)
