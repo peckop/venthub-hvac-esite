@@ -6,6 +6,11 @@ import { useAuth } from '../hooks/useAuth'
 // Feature flag: server-side cart sync
 const CART_SERVER_SYNC = ((import.meta as any).env?.VITE_CART_SERVER_SYNC ?? 'true') === 'true'
 
+// LocalStorage keys
+const CART_LOCAL_STORAGE_KEY = 'venthub-cart'
+const CART_VERSION_KEY = 'venthub-cart-version'
+const CART_OWNER_KEY = 'venthub-cart-owner'
+
 interface CartItem {
   id: string
   product: Product
@@ -42,8 +47,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem('venthub-cart')
-      const savedVer = localStorage.getItem('venthub-cart-version')
+      const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
+      const savedVer = localStorage.getItem(CART_VERSION_KEY)
       if (savedVer) {
         const v = parseInt(savedVer, 10)
         if (Number.isFinite(v)) localVersionRef.current = v
@@ -59,10 +64,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Save cart to localStorage whenever items change (and bump version)
   useEffect(() => {
     try {
-      localStorage.setItem('venthub-cart', JSON.stringify(items))
+      localStorage.setItem(CART_LOCAL_STORAGE_KEY, JSON.stringify(items))
       const v = Date.now()
       localVersionRef.current = v
-      localStorage.setItem('venthub-cart-version', String(v))
+      localStorage.setItem(CART_VERSION_KEY, String(v))
     } catch (error) {
       console.error('Error saving cart to localStorage:', error)
     }
@@ -121,12 +126,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // Clear guest cart to avoid double-merge next time
         try {
-          localStorage.removeItem('venthub-cart')
-          localStorage.setItem('venthub-cart', JSON.stringify(mergedWithPrices))
-          localStorage.setItem('venthub-cart-owner', user.id)
+          localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+          localStorage.setItem(CART_LOCAL_STORAGE_KEY, JSON.stringify(mergedWithPrices))
+          localStorage.setItem(CART_OWNER_KEY, user.id)
           const v = Date.now()
           localVersionRef.current = v
-          localStorage.setItem('venthub-cart-version', String(v))
+          localStorage.setItem(CART_VERSION_KEY, String(v))
         } catch (e) {}
       } catch (e) {
         console.error('cart sync error', e)
@@ -144,14 +149,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Cross-tab sync via storage events (newer version wins)
   useEffect(() => {
     function onStorage(e: StorageEvent) {
-      if (!e.key || (e.key !== 'venthub-cart' && e.key !== 'venthub-cart-version')) return
+      if (!e.key || (e.key !== CART_LOCAL_STORAGE_KEY && e.key !== CART_VERSION_KEY)) return
       try {
-        const owner = localStorage.getItem('venthub-cart-owner')
+        const owner = localStorage.getItem(CART_OWNER_KEY)
         if (user && owner && owner !== user.id) return
-        const vStr = localStorage.getItem('venthub-cart-version') || '0'
+        const vStr = localStorage.getItem(CART_VERSION_KEY) || '0'
         const v = parseInt(vStr, 10) || 0
         if (v > localVersionRef.current) {
-          const raw = localStorage.getItem('venthub-cart')
+          const raw = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
           if (raw) {
             const next = JSON.parse(raw)
             setItems(next)
@@ -247,7 +252,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([])
+    
+    // Clear all localStorage cart data
+    try {
+      localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+      localStorage.removeItem(CART_VERSION_KEY)
+      localStorage.removeItem(CART_OWNER_KEY)
+      localStorage.removeItem('vh_pending_order')
+      
+      // Dispatch cross-tab sync event
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: CART_LOCAL_STORAGE_KEY,
+        newValue: JSON.stringify([]),
+        oldValue: null,
+        storageArea: localStorage
+      }))
+    } catch (e) {
+      console.error('Error clearing localStorage:', e)
+    }
+    
     toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
+    
     if (CART_SERVER_SYNC && user && serverCartId) {
       clearDbCartItems(serverCartId).catch(err => console.error('server clearCart error', err))
     }
