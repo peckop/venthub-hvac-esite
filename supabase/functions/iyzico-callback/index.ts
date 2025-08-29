@@ -183,7 +183,7 @@ Deno.serve(async (req) => {
     if (paid) {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
-      // After a successful payment, try to clear the server cart for this user (if any)
+      // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
         const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
@@ -206,14 +206,14 @@ Deno.serve(async (req) => {
             uid = row?.user_id || null
           }
           if (uid) {
-            // Look up shopping cart and clear its items
-            const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&select=id&limit=1`, {
+            // Look up ALL shopping carts for the user and clear their items
+            const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&select=id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
             const carts = await cResp.json().catch(()=>[])
-            const cartId = Array.isArray(carts) && carts[0]?.id
-            if (cartId) {
-              await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cartId)}`, {
+            const cartIds: string[] = Array.isArray(carts) ? carts.map((c: any) => c?.id).filter(Boolean) : []
+            for (const cid of cartIds) {
+              await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cid)}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${sk}`, apikey: sk, Prefer: 'return=minimal' }
               }).catch(()=>{})
