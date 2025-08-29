@@ -183,6 +183,44 @@ Deno.serve(async (req) => {
     if (paid) {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
+      // After a successful payment, try to clear the server cart for this user (if any)
+      try {
+        const su = Deno.env.get('SUPABASE_URL') || ''
+        const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+        if (su && sk) {
+          // Fetch order row to get user_id
+          let uid: string | null = null
+          if (orderId) {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=user_id`, {
+              headers: { Authorization: `Bearer ${sk}`, apikey: sk }
+            })
+            const arr = await oResp.json().catch(()=>[])
+            const row = Array.isArray(arr) ? arr[0] : null
+            uid = row?.user_id || null
+          } else if (result?.conversationId || conversationId) {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}&select=user_id`, {
+              headers: { Authorization: `Bearer ${sk}`, apikey: sk }
+            })
+            const arr = await oResp.json().catch(()=>[])
+            const row = Array.isArray(arr) ? arr[0] : null
+            uid = row?.user_id || null
+          }
+          if (uid) {
+            // Look up shopping cart and clear its items
+            const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&select=id&limit=1`, {
+              headers: { Authorization: `Bearer ${sk}`, apikey: sk }
+            })
+            const carts = await cResp.json().catch(()=>[])
+            const cartId = Array.isArray(carts) && carts[0]?.id
+            if (cartId) {
+              await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cartId)}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${sk}`, apikey: sk, Prefer: 'return=minimal' }
+              }).catch(()=>{})
+            }
+          }
+        }
+      } catch (_) { /* best-effort */ }
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
       const r = await patchStatus('failed');
       updateOk = !!(r && r.ok);

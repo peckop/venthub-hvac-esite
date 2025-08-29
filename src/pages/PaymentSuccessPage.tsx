@@ -87,6 +87,7 @@ export const PaymentSuccessPage: React.FC = () => {
             localStorage.removeItem('venthub-cart-version');
             localStorage.removeItem('venthub-cart-owner');
             localStorage.removeItem('vh_pending_order');
+            localStorage.setItem('vh_last_order_status', 'success');
           } catch {}
           if (orderId) await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
@@ -116,6 +117,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('venthub-cart-version');
               localStorage.removeItem('venthub-cart-owner');
               localStorage.removeItem('vh_pending_order');
+              localStorage.setItem('vh_last_order_status', 'success');
             } catch {}
             await fetchOrderDetails(orderId)
             toast.success(t('checkout.paymentSuccess'))
@@ -158,6 +160,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('venthub-cart-version');
               localStorage.removeItem('venthub-cart-owner');
               localStorage.removeItem('vh_pending_order');
+              localStorage.setItem('vh_last_order_status', 'success');
             } catch {}
             await fetchOrderDetails(orderId)
             toast.success('🎉 Ödeme başarıyla tamamlandı!')
@@ -169,10 +172,12 @@ export const PaymentSuccessPage: React.FC = () => {
         if (errorMessage) {
           setStatus('error')
           setPaymentInfo({ errorMessage })
+          try { localStorage.setItem('vh_last_order_status', 'failure') } catch {}
           toast.error(t('payment.errorDuring', { msg: errorMessage }))
         } else {
           setStatus('error')
           setPaymentInfo({ errorMessage: t('payment.unverified') })
+          try { localStorage.setItem('vh_last_order_status', 'failure') } catch {}
           toast.error(t('payment.unverified'))
         }
       } catch (e: unknown) {
