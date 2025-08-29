@@ -53,11 +53,18 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Değişiklik Özeti (Son Çalışmalar)
 Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
 
-Tarih: 2025-08-28/29
+Tarih: 2025-08-29
 
-- Cart / Fiyatlandırma
-  - Server senkronunda `upsertCartItem` artık hem INSERT hem UPDATE sırasında `unit_price` ve `price_list_id` alanlarını yazar.
-  - UI tarafında footer’a yayın sürüm etiketi eklendi (`branch@sha`) — üretimde hangi commit’in çalıştığı netleşti.
+- **Sepet Senkronizasyon Düzeltmeleri**
+  - Misafir sepeti öncelik alıyor: Giriş yapıldığında eski sunucu sepet ürünleri karışmıyor
+  - Ödeme sonrası agresif sepet temizleme: Tüm tablar arasında localStorage tamamen temizleniyor
+  - Çıkış yaptığında owner temizleniyor: Yeni girişte misafir sepeti olarak algılanıyor
+  - Cross-tab senkronizasyon: Storage event'leri ile tüm sekmeler güncelleniyor
+  - localStorage sabitler eklendi: Daha iyi kod yönetimi için
+
+- Cart / Fiyatlandırma (Daha önceki)
+  - Server senkronunda `upsertCartItem` artık hem INSERT hem UPDATE sırasında `unit_price` ve `price_list_id` alanlarını yazar
+  - UI tarafında footer'a yayın sürüm etiketi eklendi (`branch@sha`)
 - Doğrulama / İzleme
   - Yeni iş akışı: `.github/workflows/verify-cart-items.yml` — son kayıtları kontrol eder, satırlarda `unit_price` null ise FAIL olur; aksi halde PASS.
   - Gecelik çalışma eklendi (cron: 03:00 UTC). İstenirse manuel “Run workflow” ile de tetiklenebilir.
