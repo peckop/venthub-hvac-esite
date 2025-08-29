@@ -263,19 +263,13 @@ export const CheckoutPage: React.FC = () => {
         const serverTotal = validation?.totals?.subtotal ?? authoritativeTotal
         const localTotal = authoritativeTotal
         const diff = Math.abs(serverTotal - localTotal)
-        const threshold = Math.max(localTotal * 0.03, 25) // %3 veya 25 TL
         if (diff > 0.01) {
+          // Her durumda onay iste: kullanıcıyı bilgilendirip Review adımına döndür
           authoritativeTotal = Number(serverTotal.toFixed(2))
-        }
-        if (diff > threshold) {
-          toast((t)=> t && typeof t==='object' ? 'Fiyatlar güncellendi, lütfen onaylayın.' : 'Fiyatlar güncellendi, lütfen onaylayın.')
-          // Büyük fark: kullanıcıyı bilgilendirip Review adımına dön
+          toast('Fiyatlar güncellendi, lütfen onaylayın.')
           setStep(3)
           setLoading(false)
           return
-        } else if (diff > 0.01) {
-          // Küçük fark: otomatik güncelle ve devam et
-          toast.success('Fiyatlar güncellendi')
         }
       } catch (e) {
         // Doğrulama hatasını kullanıcıya yansıtmayalım; ödeme akışını engellemesin
