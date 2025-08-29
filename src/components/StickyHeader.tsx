@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../hooks/useCartHook'
+import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { searchProducts, Product } from '../lib/supabase'
 import MegaMenu from './MegaMenu'

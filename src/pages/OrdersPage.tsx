@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase, Product } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { useCart } from '../hooks/useCartHook'
+import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
 
 
