@@ -3,7 +3,7 @@ import { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { ShoppingCart, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../hooks/useCartHook'
+import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
 
 interface ProductCardProps {

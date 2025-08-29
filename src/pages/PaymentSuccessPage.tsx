@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
-import { useCart } from '../hooks/useCartHook'
+import { useCart } from '../hooks/useCart'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'

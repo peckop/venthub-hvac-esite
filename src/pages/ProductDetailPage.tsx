@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
-import { useCart } from '../hooks/useCartHook'
+import { useCart } from '../hooks/useCart'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
 import Seo from '../components/Seo'

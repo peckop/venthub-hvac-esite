@@ -7,7 +7,7 @@ import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, Refre
 import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { useCart } from '../../hooks/useCartHook'
+import { useCart } from '../../hooks/useCart'
 
 interface ShippingAddress {
   fullAddress?: string
