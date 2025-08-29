@@ -10,6 +10,9 @@ const CART_SERVER_SYNC = ((import.meta as any).env?.VITE_CART_SERVER_SYNC ?? 'tr
 const CART_LOCAL_STORAGE_KEY = 'venthub-cart'
 const CART_VERSION_KEY = 'venthub-cart-version'
 const CART_OWNER_KEY = 'venthub-cart-owner'
+// New: cart schema version key to invalidate stale carts across deployments
+const CART_SCHEMA_KEY = 'venthub-cart-schema'
+const CURRENT_CART_SCHEMA = '2'
 
 interface CartItem {
   id: string
@@ -44,22 +47,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const mergingRef = useRef(false)
   const localVersionRef = useRef<number>(0)
 
-  // Load cart from localStorage on mount
-  useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
-      const savedVer = localStorage.getItem(CART_VERSION_KEY)
-      if (savedVer) {
-        const v = parseInt(savedVer, 10)
-        if (Number.isFinite(v)) localVersionRef.current = v
-      }
-      if (savedCart) {
-        setItems(JSON.parse(savedCart))
-      }
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error)
+// Load cart from localStorage on mount
+useEffect(() => {
+  try {
+    // One-time migration: if schema mismatch, silently clear any stale cart from previous deployments
+    const schema = localStorage.getItem(CART_SCHEMA_KEY)
+    if (schema !== CURRENT_CART_SCHEMA) {
+      try {
+        localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+        localStorage.removeItem(CART_VERSION_KEY)
+        localStorage.removeItem(CART_OWNER_KEY)
+        localStorage.removeItem('vh_pending_order')
+        localStorage.setItem(CART_SCHEMA_KEY, CURRENT_CART_SCHEMA)
+      } catch {}
     }
-  }, [])
+
+    const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
+    const savedVer = localStorage.getItem(CART_VERSION_KEY)
+    if (savedVer) {
+      const v = parseInt(savedVer, 10)
+      if (Number.isFinite(v)) localVersionRef.current = v
+    }
+    if (savedCart) {
+      setItems(JSON.parse(savedCart))
+    }
+  } catch (error) {
+    console.error('Error loading cart from localStorage:', error)
+  }
+}, [])
 
   // Save cart to localStorage whenever items change (and bump version)
   useEffect(() => {
