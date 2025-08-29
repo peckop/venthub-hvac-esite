@@ -1,10 +1,27 @@
 # Changelog
 
-## 2025-08-28/29
+## 2025-08-29
+
+### Cart Synchronization Fixes
+- **Fix: Payment success cart clearing** - PaymentSuccessPage now aggressively clears all cart localStorage data on payment success
+- **Fix: Guest cart priority** - Guest cart items are now prioritized over old server cart items when user logs in
+- **Fix: Server cart clearing** - Server cart is completely cleared when guest cart exists during login to prevent old items from reappearing
+- **Fix: Logout owner clearing** - Cart owner is cleared from localStorage on logout, marking cart as guest cart
+- **Improvement: clearCart function** - Enhanced to properly clear all localStorage keys and dispatch cross-tab sync events
+- **Add: localStorage constants** - Added proper constants for cart localStorage keys for better maintainability
+
+### Cart Behavior Summary
+- ✅ Guest users can add items to cart (stored in localStorage)
+- ✅ Guest cart is preserved and prioritized when user logs in
+- ✅ Payment completion completely clears cart across all tabs
+- ✅ User logout clears ownership, enabling fresh guest cart experience
+- ✅ No more old server cart items mixing with new guest items
+
+## 2025-08-28
 
 ### Cart / Pricing
 - Fix: `upsertCartItem` hem INSERT hem UPDATE sırasında `unit_price` ve `price_list_id` yazar.
-- UI: Footer’a build etiketi eklendi (`branch@sha`).
+- UI: Footer'a build etiketi eklendi (`branch@sha`).
 
 ### Verify / Monitoring
 - Yeni: `.github/workflows/verify-cart-items.yml`

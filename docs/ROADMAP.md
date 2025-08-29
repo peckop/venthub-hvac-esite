@@ -1,10 +1,11 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-08-28
+Last updated: 2025-08-29
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
 ## 1) Durum Özeti (TL;DR)
+- Sepet Senkronizasyonu: Misafir ve kullanıcı sepeti senkronizasyonu tamamen düzeltildi. Misafir sepeti korunuyor, ödeme sonrası sepet tamamen temizleniyor, eski ürünler karışmıyor.
 - Router & Navigasyon: Sipariş Detay sayfası eklendi, Orders listesi detay sayfasına yönlendiriyor, inline panel kaldırıldı.
 - Kargo: Detay sayfasında kargo alanları ve timeline var; link olduğunda dış bağlantı ikonu gösteriliyor (UI hazır).
 - İadeler: Returns listesinde sipariş kodu yeni detay rotasına gidiyor.
@@ -28,11 +29,15 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - [x] Header’daki işlevsiz “Siparişlerim” butonlarının kaldırılması
 
 ### Sprint 2 — Devam ediyor (Şirket/Server bağımsız işler)
+- Sepet ve Senkronizasyon
+  - [x] Misafir sepeti korunuyor (ödeme gerektiriyor, giriş yaptığında misafir sepet öncelikli)
+  - [x] Ödeme sonrası sepet temizleniyor (agresif localStorage temizleme)
+  - [x] Sunucu sepeti ve misafir sepeti uyumlu çalışıyor (çıkış-giriş döngüsünde eski veriler karışmıyor)
 - Test/kalite
-  - [ ] Skip’li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)
-  - [ ] Lint cleanup (Phase 1) → ardından CI’da lint’i tekrar blocking yap
+  - [ ] Skip'li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)
+  - [ ] Lint cleanup (Phase 1) → ardından CI'da lint'i tekrar blocking yap
 - Performans
-  - [ ] Code‑split (dynamic import / manualChunks) — account, checkout, product-detail gibi chunk’lar
+  - [ ] Code‑split (dynamic import / manualChunks) — account, checkout, product-detail gibi chunk'lar
 - Kargo takip entegrasyonu (Sandbox/Backend)
   - [ ] Taşıyıcı API/webhook veya periyodik polling (sandbox)
   - [ ] Status senkronizasyonu (pending→paid→shipped→delivered)
@@ -69,6 +74,10 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Faz 1–3 ve QA kontrol listeleri: [ ] Beklemede (kurumsal/PLP odaklı). E‑ticaret sprintleriyle çakışma yok; uygun zamanda ele alınacak.
 
 ## 5) QA (Örnek Kontrol Başlıkları)
+- [x] Sepet senkronizasyonu:
+  - [x] Misafir olarak ürün ekleyip çıkış yapma: sepet korunur
+  - [x] Kullanıcı girişi yapma: misafir sepeti öncelikli, eski sunucu ürünleri eklenmez
+  - [x] Ödeme tamamlama: sepet tüm tablar arasında temizlenir
 - [ ] Orders→Detay: kargo alanları, timeline, dış link (varsa)
 - [ ] Returns→Sipariş linki: /account/orders/:id rotasına gider
 - [ ] Proforma PDF: dosya indirir, içerik alanları doğru
