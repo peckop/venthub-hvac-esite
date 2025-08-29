@@ -73,18 +73,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items])
 
-  // Helper: merge two cart item arrays by product.id (sum quantities)
-  function mergeItems(local: CartItem[], server: CartItem[]) {
-    // Server wins: take server quantities as source of truth, add only missing local products.
+  // Helper: merge two cart item arrays by product.id
+  function mergeItems(local: CartItem[], server: CartItem[], isGuestCart: boolean) {
     const map = new Map<string, CartItem>()
-    for (const it of server) {
-      map.set(it.product.id, it)
-    }
-    for (const it of local) {
-      if (!map.has(it.product.id)) {
+    
+    // If we have a guest cart with items, prioritize it (user just added items before login)
+    if (isGuestCart && local.length > 0) {
+      // Start with local guest cart items
+      for (const it of local) {
         map.set(it.product.id, it)
       }
-      // if exists on server, keep server quantity
+      // Add server items that are not in local cart
+      for (const it of server) {
+        if (!map.has(it.product.id)) {
+          map.set(it.product.id, it)
+        }
+      }
+    } else {
+      // Otherwise use server as source of truth
+      for (const it of server) {
+        map.set(it.product.id, it)
+      }
+      // Add local items not on server
+      for (const it of local) {
+        if (!map.has(it.product.id)) {
+          map.set(it.product.id, it)
+        }
+      }
     }
     return Array.from(map.values())
   }
@@ -101,12 +116,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (cancelled) return
         setServerCartId(cart.id)
 
+        // Check if this is a guest cart (no owner in localStorage)
+        const currentOwner = localStorage.getItem(CART_OWNER_KEY)
+        const isGuestCart = !currentOwner || currentOwner === '' || currentOwner !== user.id
+        
         // Fetch server items
         const serverRows = await listCartItemsWithProducts(cart.id)
         const serverItems: CartItem[] = serverRows.map(({ item, product }) => ({ id: item.product_id, product, quantity: item.quantity }))
 
         // Merge local guest items with server items
-        const merged = mergeItems(items, serverItems)
+        const merged = mergeItems(items, serverItems, isGuestCart)
         // Compute unit prices for merged items and upsert server
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
@@ -144,6 +163,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true }
     // only run when user changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+  
+  // Clear owner when user logs out
+  useEffect(() => {
+    if (!user) {
+      // User logged out, remove owner to mark as guest cart
+      try {
+        localStorage.removeItem(CART_OWNER_KEY)
+        setServerCartId(null)
+      } catch (e) {
+        console.error('Error clearing owner on logout:', e)
+      }
+    }
   }, [user])
 
   // Cross-tab sync via storage events (newer version wins)
