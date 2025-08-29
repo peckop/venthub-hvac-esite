@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { CartProvider } from './hooks/useCart'
@@ -6,45 +6,61 @@ import { AuthProvider } from './contexts/AuthContext'
 import { useScrollThrottle } from './hooks/useScrollThrottle'
 import StickyHeader from './components/StickyHeader'
 import ScrollToTop from './components/ScrollToTop'
-import HomePage from './pages/HomePage'
-import ProductsPage from './pages/ProductsPage'
 import LanguageSwitcher from './components/LanguageSwitcher'
-import CartPage from './pages/CartPage'
-import ProductDetailPage from './pages/ProductDetailPage'
-import CategoryPage from './pages/CategoryPage'
-import CheckoutPage from './pages/CheckoutPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import AuthCallbackPage from './pages/AuthCallbackPage'
-import PaymentSuccessPage from './pages/PaymentSuccessPage'
-import OrdersPage from './pages/OrdersPage'
 import Footer from './components/Footer'
 import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
 import AddToCartToast from './components/AddToCartToast'
-import KVKKPage from './pages/legal/KVKKPage'
-import DistanceSalesAgreementPage from './pages/legal/DistanceSalesAgreementPage'
-import PreInformationPage from './pages/legal/PreInformationPage'
-import CookiePolicyPage from './pages/legal/CookiePolicyPage'
-import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
-import TermsOfUsePage from './pages/legal/TermsOfUsePage'
-import SupportHomePage from './pages/support/SupportHomePage'
-import FAQPage from './pages/support/FAQPage'
-import ReturnsPage from './pages/support/ReturnsPage'
-import ShippingPage from './pages/support/ShippingPage'
-import WarrantyPage from './pages/support/WarrantyPage'
-import BrandsPage from './pages/BrandsPage'
-import BrandDetailPage from './pages/BrandDetailPage'
-import AccountLayout from './pages/account/AccountLayout'
-import AccountOverviewPage from './pages/account/AccountOverviewPage'
-import AccountAddressesPage from './pages/account/AccountAddressesPage'
-import AccountSecurityPage from './pages/account/AccountSecurityPage'
-import AccountInvoicesPage from './pages/account/AccountInvoicesPage'
-import AccountProfilePage from './pages/account/AccountProfilePage'
-import AccountShipmentsPage from './pages/account/AccountShipmentsPage'
-import AccountReturnsPage from './pages/account/AccountReturnsPage'
-import OrderDetailPage from './pages/account/OrderDetailPage'
+import LoadingSpinner from './components/LoadingSpinner'
+import { ErrorBoundary } from './components/ErrorBoundary'
+
+// Keep HomePage as direct import for fastest initial load
+import HomePage from './pages/HomePage'
+
+// Lazy load major page groups
+const ProductsPage = lazy(() => import('./pages/ProductsPage'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'))
+const CategoryPage = lazy(() => import('./pages/CategoryPage'))
+
+// Auth pages
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage'))
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
+
+// Account pages
+const AccountLayout = lazy(() => import('./pages/account/AccountLayout'))
+const AccountOverviewPage = lazy(() => import('./pages/account/AccountOverviewPage'))
+const AccountAddressesPage = lazy(() => import('./pages/account/AccountAddressesPage'))
+const AccountSecurityPage = lazy(() => import('./pages/account/AccountSecurityPage'))
+const AccountInvoicesPage = lazy(() => import('./pages/account/AccountInvoicesPage'))
+const AccountProfilePage = lazy(() => import('./pages/account/AccountProfilePage'))
+const AccountShipmentsPage = lazy(() => import('./pages/account/AccountShipmentsPage'))
+const AccountReturnsPage = lazy(() => import('./pages/account/AccountReturnsPage'))
+const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage'))
+const OrdersPage = lazy(() => import('./pages/OrdersPage'))
+
+// Brand pages
+const BrandsPage = lazy(() => import('./pages/BrandsPage'))
+const BrandDetailPage = lazy(() => import('./pages/BrandDetailPage'))
+
+// Support pages
+const SupportHomePage = lazy(() => import('./pages/support/SupportHomePage'))
+const FAQPage = lazy(() => import('./pages/support/FAQPage'))
+const ReturnsPage = lazy(() => import('./pages/support/ReturnsPage'))
+const ShippingPage = lazy(() => import('./pages/support/ShippingPage'))
+const WarrantyPage = lazy(() => import('./pages/support/WarrantyPage'))
+
+// Legal pages (lowest priority)
+const KVKKPage = lazy(() => import('./pages/legal/KVKKPage'))
+const DistanceSalesAgreementPage = lazy(() => import('./pages/legal/DistanceSalesAgreementPage'))
+const PreInformationPage = lazy(() => import('./pages/legal/PreInformationPage'))
+const CookiePolicyPage = lazy(() => import('./pages/legal/CookiePolicyPage'))
+const PrivacyPolicyPage = lazy(() => import('./pages/legal/PrivacyPolicyPage'))
+const TermsOfUsePage = lazy(() => import('./pages/legal/TermsOfUsePage'))
 
 function App() {
   // Performance optimize edilmiş scroll handling
@@ -67,7 +83,9 @@ function App() {
                 <BackToTopButton />
                 <PaymentWatcher />
                 <LanguageSwitcher />
-                <Routes>
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/cart" element={<CartPage />} />
@@ -112,7 +130,9 @@ function App() {
                 <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
                 <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
                 <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
-                </Routes>
+                    </Routes>
+                  </Suspense>
+                </ErrorBoundary>
               </main>
 
               <Footer />
