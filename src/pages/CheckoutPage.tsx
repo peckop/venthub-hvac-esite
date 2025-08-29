@@ -321,7 +321,18 @@ export const CheckoutPage: React.FC = () => {
       if (data && data.data) {
         console.log('İyzico payment response:', data.data);
         
-        // En güvenilir yol: token ile gömme (React, innerHTML içindeki <script> etiketlerini çalıştırmaz)
+        // Öncelik: hosted ödeme sayfasına yönlendirme (3D sonrası otomatik dönüş daha sorunsuz)
+        if (data.data.paymentPageUrl) {
+          console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
+          try {
+            localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
+            localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
+          } catch {}
+          window.location.href = data.data.paymentPageUrl;
+          return;
+        }
+
+        // İkinci tercih: token ile gömme (iframe)
         if (data.data.token) {
           setIyzToken(data.data.token || '')
           setPaymentUrl(data.data.paymentPageUrl || '')
@@ -335,24 +346,13 @@ export const CheckoutPage: React.FC = () => {
           return
         }
 
-        // İkinci tercih: checkoutFormContent (script yürütme garantisi olmayabilir)
+        // Üçüncü tercih: checkoutFormContent (script yürütme garantisi olmayabilir)
         if (data.data.checkoutFormContent) {
           setPaymentFrameContent(data.data.checkoutFormContent)
           setOrderId(data.data.orderId || '')
           setConvId(data.data.conversationId || '')
           setStep(3)
           return
-        }
-
-        // Fallback: ödeme sayfasına yönlendirme (aynı sekme)
-        if (data.data.paymentPageUrl) {
-          console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
-          try {
-            localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
-            localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
-          } catch {}
-          window.location.href = data.data.paymentPageUrl;
-          return;
         }
         
         // Hemen tamamlanan ödeme (demo)
