@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
-import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts, getEffectivePriceInfo } from '../lib/supabase'
+import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts, getEffectivePriceInfo, supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
@@ -152,13 +152,44 @@ useEffect(() => {
         const currentOwner = localStorage.getItem(CART_OWNER_KEY)
         const isGuestCart = !currentOwner || currentOwner === '' || currentOwner !== user.id
         
-        // If we have a guest cart with items, clear server cart first
-        const clearOnce = localStorage.getItem('vh_clear_server_cart_once') === '1'
-        if (isGuestCart && items.length > 0) {
-          console.log('Guest cart detected, clearing server cart')
-          await clearDbCartItems(cart.id)
-        } else if (clearOnce) {
-          console.log('Clearing server cart due to post-order flag')
+        // Determine if we must discard local guest cart due to a recently paid order
+        let discardLocalGuestCart = false
+        let clearOnce = localStorage.getItem('vh_clear_server_cart_once') === '1'
+        // If post-order clear flag is present, wipe local immediately to avoid local->server rehydration
+        if (clearOnce) {
+          try {
+            setItems([])
+            localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+            localStorage.removeItem(CART_VERSION_KEY)
+            localStorage.removeItem(CART_OWNER_KEY)
+          } catch {}
+        }
+        try {
+          const raw = localStorage.getItem('vh_pending_order')
+          if (raw) {
+            const data = JSON.parse(raw || '{}') as { orderId?: string }
+            const oid = data?.orderId
+            if (oid) {
+              const { data: ord, error: ordErr } = await supabase
+                .from('venthub_orders')
+                .select('status, created_at')
+                .eq('id', oid)
+                .maybeSingle()
+              if (!ordErr && ord && String((ord as any).status) === 'paid') {
+                discardLocalGuestCart = true
+                clearOnce = true
+                try {
+                  localStorage.setItem('vh_last_order_status', 'success')
+                  localStorage.removeItem('vh_pending_order')
+                } catch {}
+              }
+            }
+          }
+        } catch {}
+        
+        // If we have a guest cart with items, or we have a post-order clear flag, clear server cart first
+        if ((isGuestCart && items.length > 0) || clearOnce) {
+          console.log('Clearing server cart (guest items present or post-order flag)')
           await clearDbCartItems(cart.id)
         }
         
@@ -166,8 +197,10 @@ useEffect(() => {
         const serverRows = await listCartItemsWithProducts(cart.id)
         const serverItems: CartItem[] = serverRows.map(({ item, product }) => ({ id: item.product_id, product, quantity: item.quantity }))
 
-        // Merge local guest items with server items
-        const merged = isGuestCart && items.length > 0 ? items : mergeItems(items, serverItems, isGuestCart)
+        // Decide merge strategy
+        const merged = discardLocalGuestCart
+          ? serverItems
+          : (isGuestCart && items.length > 0 ? items : mergeItems(items, serverItems, isGuestCart))
 
         // If we cleared server due to post-order flag, also remove the flag now
         try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch {}
