@@ -47,6 +47,12 @@ export const PaymentSuccessPage: React.FC = () => {
           setStatus('success')
           setPaymentInfo({ conversationId: conversationId || orderId, token })
           clearCart()
+          try {
+            localStorage.removeItem('venthub-cart');
+            localStorage.removeItem('venthub-cart-version');
+            localStorage.removeItem('venthub-cart-owner');
+            localStorage.removeItem('vh_pending_order');
+          } catch {}
           if (orderId) await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
           return
@@ -70,6 +76,12 @@ export const PaymentSuccessPage: React.FC = () => {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
             clearCart()
+            try {
+              localStorage.removeItem('venthub-cart');
+              localStorage.removeItem('venthub-cart-version');
+              localStorage.removeItem('venthub-cart-owner');
+              localStorage.removeItem('vh_pending_order');
+            } catch {}
             await fetchOrderDetails(orderId)
             toast.success(t('checkout.paymentSuccess'))
             return
@@ -106,6 +118,12 @@ export const PaymentSuccessPage: React.FC = () => {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId, token })
             clearCart()
+            try {
+              localStorage.removeItem('venthub-cart');
+              localStorage.removeItem('venthub-cart-version');
+              localStorage.removeItem('venthub-cart-owner');
+              localStorage.removeItem('vh_pending_order');
+            } catch {}
             await fetchOrderDetails(orderId)
             toast.success('🎉 Ödeme başarıyla tamamlandı!')
             return
