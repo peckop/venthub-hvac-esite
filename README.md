@@ -48,6 +48,33 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 - Secrets: `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` zorunludur.
 - GitHub Actions: `.github/workflows/supabase-migrate.yml` tetikleyicileri ve job’ları sizin policy’nize göre düzenlenebilir.
 
+---
+
+## Değişiklik Özeti (Son Çalışmalar)
+Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
+
+Tarih: 2025-08-28/29
+
+- Cart / Fiyatlandırma
+  - Server senkronunda `upsertCartItem` artık hem INSERT hem UPDATE sırasında `unit_price` ve `price_list_id` alanlarını yazar.
+  - UI tarafında footer’a yayın sürüm etiketi eklendi (`branch@sha`) — üretimde hangi commit’in çalıştığı netleşti.
+- Doğrulama / İzleme
+  - Yeni iş akışı: `.github/workflows/verify-cart-items.yml` — son kayıtları kontrol eder, satırlarda `unit_price` null ise FAIL olur; aksi halde PASS.
+  - Gecelik çalışma eklendi (cron: 03:00 UTC). İstenirse manuel “Run workflow” ile de tetiklenebilir.
+  - Lokal hızlı kontrol: `.scripts/query_cart.ps1` `.env.local` okur; tek komutla `COUNT` ve örnek satırlar (id, qty, `unit_price`, `price_list_id`).
+- Veritabanı
+  - Migration: `supabase/migrations/20250828_cart_items_timestamps.sql` — `cart_items` tablosuna `created_at`, `updated_at` + trigger eklendi.
+  - Daha önce eklenen migration’larla `cart_items.unit_price` ve `cart_items.price_list_id` alanları mevcut.
+- CI/CD
+  - Cloudflare Pages: deploy workflow’unda `paths` filtresi kaldırıldı → master’a her push’ta otomatik deploy.
+  - Build env’leri eklendi: `VITE_CART_SERVER_SYNC=true`, `VITE_COMMIT_SHA`, `VITE_BRANCH`.
+  - Supabase migrate workflow’u güçlendirildi:
+    - `sslmode=require` zorunlu, bağlantı testi (psql `select 1`) eklendi.
+    - `SUPABASE_DB_URL` yoksa `SUPABASE_ACCESS_TOKEN + SUPABASE_PROJECT_REF` ile Supabase CLI yoluna otomatik geçiş.
+
+Notlar:
+- Lokal gizli bilgiler `.env.local` dosyasında tutulabilir (gitignore’da). CI tarafında gizli bilgiler her zaman GitHub Secrets üzerinden sağlanmalıdır.
+
 ## Geliştirme
 - pnpm install
 - pnpm dev

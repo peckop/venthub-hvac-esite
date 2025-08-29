@@ -1,5 +1,6 @@
 export interface ValidationItem { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }
-export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: any[]; totals: { subtotal: number }; cart_id: string }
+export interface StockIssue { product_id: string; requested: number; available: number }
+export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: any[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id: string }
 
 export async function validateServerCart(input: { cartId?: string; userId?: string }): Promise<ValidationResult> {
   const url = (import.meta as any).env?.VITE_SUPABASE_URL || ''
