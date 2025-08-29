@@ -63,6 +63,31 @@ jobs:
             "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects" || true)
           echo "Create project response: $RESP"
 
+      - name: Ensure production branch is set to master
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          set -e
+          echo "Setting production_branch=master for $CF_PAGES_PROJECT_NAME"
+          PATCH_RESP=$(curl -s -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"production_branch":"master"}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$CF_PAGES_PROJECT_NAME")
+          echo "Patch response: $PATCH_RESP"
+
+      - name: Show project info
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$CF_PAGES_PROJECT_NAME" | jq '{name: .result.name, production_branch: .result.production_branch}'
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
