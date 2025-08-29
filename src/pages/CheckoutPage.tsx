@@ -9,6 +9,7 @@ import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import ReviewSummary from './checkout/ReviewSummary'
+import { validateServerCart } from '../lib/order'
 
 interface CustomerInfo {
   name: string
@@ -255,10 +256,36 @@ export const CheckoutPage: React.FC = () => {
 
     setLoading(true)
     try {
+      // 0) Server-side fiyat doğrulaması (sessiz)
+      let authoritativeTotal = getCartTotal()
+      try {
+        const validation = await validateServerCart({ userId: user?.id || undefined })
+        const serverTotal = validation?.totals?.subtotal ?? authoritativeTotal
+        const localTotal = authoritativeTotal
+        const diff = Math.abs(serverTotal - localTotal)
+        const threshold = Math.max(localTotal * 0.03, 25) // %3 veya 25 TL
+        if (diff > 0.01) {
+          authoritativeTotal = Number(serverTotal.toFixed(2))
+        }
+        if (diff > threshold) {
+          toast((t)=> t && typeof t==='object' ? 'Fiyatlar güncellendi, lütfen onaylayın.' : 'Fiyatlar güncellendi, lütfen onaylayın.')
+          // Büyük fark: kullanıcıyı bilgilendirip Review adımına dön
+          setStep(3)
+          setLoading(false)
+          return
+        } else if (diff > 0.01) {
+          // Küçük fark: otomatik güncelle ve devam et
+          toast.success('Fiyatlar güncellendi')
+        }
+      } catch (e) {
+        // Doğrulama hatasını kullanıcıya yansıtmayalım; ödeme akışını engellemesin
+        console.warn('validateServerCart failed:', e)
+      }
+
       // İstek verisini tek bir saf fonksiyonla oluştur
       const { buildPaymentRequest } = await import('./checkout/buildPaymentRequest')
       const requestData = buildPaymentRequest({
-        amount: getCartTotal(),
+        amount: authoritativeTotal,
         items,
         customer: { name: customerInfo.name, email: customerInfo.email, phone: customerInfo.phone },
         shipping: shippingAddress,
