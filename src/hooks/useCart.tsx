@@ -23,6 +23,8 @@ interface CartContextType {
   clearCart: () => void
   getCartTotal: () => number
   getCartCount: () => number
+  // Yeni: Sunucunun hesapladığı birim fiyatları uygula (mismatch sonrası loop'u kırmak için)
+  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -262,6 +264,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return items.reduce((count, item) => count + item.quantity, 0)
   }
 
+  // Sunucudan gelen birim fiyatları yerel sepete uygula ve (varsa) sunucu sepetine yaz
+  const applyServerPricing = (serverItems: { product_id: string, unit_price: number }[]) => {
+    if (!Array.isArray(serverItems) || serverItems.length === 0) return
+    const pmap = new Map<string, number>()
+    for (const it of serverItems) {
+      const pid = String(it.product_id)
+      const up = Number(it.unit_price)
+      if (Number.isFinite(up)) pmap.set(pid, up)
+    }
+    // Yerel güncelle
+    setItems(curr => curr.map(it => pmap.has(it.product.id) ? { ...it, unitPrice: pmap.get(it.product.id)! } : it))
+    // Sunucuya da yansıt (varsa)
+    if (CART_SERVER_SYNC && user && serverCartId) {
+      try {
+        const tasks = items.map(it => {
+          const up = pmap.get(it.product.id)
+          if (up == null) return Promise.resolve()
+          return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
+            .catch(e => console.warn('applyServerPricing upsert error', e))
+        })
+        Promise.allSettled(tasks).catch(()=>{})
+      } catch (e) { /* no-op */ }
+    }
+  }
+
   const value = {
     items,
     syncing,
@@ -270,7 +297,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateQuantity,
     clearCart,
     getCartTotal,
-    getCartCount
+    getCartCount,
+    applyServerPricing,
   }
 
   return (
