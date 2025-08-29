@@ -153,8 +153,12 @@ useEffect(() => {
         const isGuestCart = !currentOwner || currentOwner === '' || currentOwner !== user.id
         
         // If we have a guest cart with items, clear server cart first
+        const clearOnce = localStorage.getItem('vh_clear_server_cart_once') === '1'
         if (isGuestCart && items.length > 0) {
           console.log('Guest cart detected, clearing server cart')
+          await clearDbCartItems(cart.id)
+        } else if (clearOnce) {
+          console.log('Clearing server cart due to post-order flag')
           await clearDbCartItems(cart.id)
         }
         
@@ -164,6 +168,9 @@ useEffect(() => {
 
         // Merge local guest items with server items
         const merged = isGuestCart && items.length > 0 ? items : mergeItems(items, serverItems, isGuestCart)
+
+        // If we cleared server due to post-order flag, also remove the flag now
+        try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch {}
         // Compute unit prices for merged items and upsert server
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
