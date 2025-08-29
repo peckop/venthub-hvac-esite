@@ -49,6 +49,40 @@ Deno.serve(async (req) => {
             });
         }
 
+        // Authoritative server-side validation (prices + stock)
+        let authoritativeItems: any[] = []
+        let authoritativeTotalNum: number = typeof amount === 'number' ? Number(amount) : 0
+        try {
+            const vHeaders = {
+                'Authorization': `Bearer ${serviceRoleKey}`,
+                'apikey': serviceRoleKey,
+                'Content-Type': 'application/json'
+            } as Record<string,string>;
+            const vResp = await fetch(`${supabaseUrl}/functions/v1/order-validate`, {
+                method: 'POST',
+                headers: vHeaders,
+                body: JSON.stringify({ user_id })
+            });
+            if (vResp.ok) {
+                const validation = await vResp.json().catch(() => ({}));
+                const stockIssues = Array.isArray(validation?.stock_issues) ? validation.stock_issues : [];
+                const mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
+                if ((stockIssues && stockIssues.length > 0) || (mismatches && mismatches.length > 0)) {
+                    return new Response(JSON.stringify({ error: { code: 'VALIDATION_CHANGED', message: 'Prices or stock changed', stock_issues: stockIssues, mismatches } }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+                }
+                authoritativeItems = Array.isArray(validation?.items) ? validation.items : []
+                if (validation?.totals?.subtotal != null) {
+                    authoritativeTotalNum = Number(validation.totals.subtotal)
+                }
+            }
+        } catch (_) {
+            // fallback to client-requested cartItems
+        }
+        if (authoritativeItems.length === 0 && Array.isArray(cartItems)) {
+            authoritativeItems = cartItems.map((ci: any) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price), price_list_id: null }))
+            authoritativeTotalNum = authoritativeItems.reduce((s, it) => s + Number(it.unit_price) * Number(it.quantity), 0)
+        }
+
         // İyzico credentials (Environment)
         const iyzicoApiKey = Deno.env.get('IYZICO_API_KEY');
         const iyzicoSecretKey = Deno.env.get('IYZICO_SECRET_KEY');
@@ -103,7 +137,8 @@ Deno.serve(async (req) => {
             user_id: user_id || null,
             conversation_id: conversationId,
             // order_number kolonu şemada yoksa göndermiyoruz; gerekirse ileride eklenir.
-            total_amount: parseFloat(amount.toFixed(2)),
+            total_amount: Number(authoritativeTotalNum.toFixed(2)),
+            subtotal_snapshot: Number(authoritativeTotalNum.toFixed(2)),
             shipping_address: shippingAddress,
             billing_address: billingAddress || shippingAddress,
             customer_email: customerInfo.email,
@@ -143,15 +178,45 @@ Deno.serve(async (req) => {
 
         console.log('✅ Order created successfully with id:', dbOrderId);
 
-        // Create order items (order_id olarak veritabanındaki gerçek id kullanılır)
-        const orderItems = cartItems.map(item => ({
-            order_id: dbOrderId,
-            product_id: item.product_id,
-            quantity: parseInt(item.quantity),
-            price_at_time: parseFloat(item.price),
-            product_name: item.product_name,
-            product_image_url: item.product_image_url || null
-        }));
+        // Create order items (order_id olarak veritabanındaki gerçek id kullanılır) using authoritative items
+        // Fetch product metadata for snapshots
+        const ids = authoritativeItems.map((it: any) => it.product_id)
+        const uniqIds = Array.from(new Set(ids))
+        let prodMap = new Map<string, any>()
+        try {
+            if (uniqIds.length > 0) {
+                const pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku,image_url&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
+                    headers: {
+                        'Authorization': `Bearer ${serviceRoleKey}`,
+                        'apikey': serviceRoleKey,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                if (pRes.ok) {
+                    const rows = await pRes.json().catch(()=>[])
+                    if (Array.isArray(rows)) {
+                        prodMap = new Map(rows.map((p: any) => [p.id, p]))
+                    }
+                }
+            }
+        } catch {}
+
+        const orderItems = authoritativeItems.map((it: any) => {
+            const p = prodMap.get(it.product_id) || {}
+            return {
+                order_id: dbOrderId,
+                product_id: it.product_id,
+                quantity: parseInt(it.quantity),
+                price_at_time: parseFloat(it.unit_price),
+                product_name: p.name || null,
+                product_image_url: p.image_url || null,
+                // snapshots
+                unit_price_snapshot: parseFloat(it.unit_price),
+                price_list_id_snapshot: it.price_list_id || null,
+                product_name_snapshot: p.name || null,
+                product_sku_snapshot: p.sku || null
+            }
+        });
 
         await fetch(`${supabaseUrl}/rest/v1/venthub_order_items`, {
             method: 'POST',
@@ -166,17 +231,17 @@ Deno.serve(async (req) => {
 
         // İyzico checkout form initialize request
         // Fiyat tutarlılığı: price == basketItems toplamı olmalı, paidPrice >= price olabilir.
-        const basketItems = cartItems.map((item: any) => ({
+        const basketItems = authoritativeItems.map((item: any) => ({
             id: item.product_id,
-            name: item.product_name,
+            name: (typeof prodMap.get === 'function' ? (prodMap.get(item.product_id)?.name) : undefined) || 'Ürün',
             category1: 'HVAC',
             category2: 'Products',
             itemType: 'PHYSICAL',
-            price: (Number(item.price) * Number(item.quantity)).toFixed(2)
+            price: (Number(item.unit_price) * Number(item.quantity)).toFixed(2)
         }));
         const itemsTotal = Number(basketItems.reduce((sum: number, it: any) => sum + Number(it.price), 0).toFixed(2));
-        // KDV dahil fiyatlar: iyzico'ya price ve paidPrice olarak toplamdaki brüt tutarı (amount) gönderiyoruz
-        const requestedAmount = typeof amount === 'number' ? Number(amount) : Number((amount || 0));
+        // KDV dahil fiyatlar: iyzico'ya price ve paidPrice olarak toplamdaki brüt tutarı (authoritative) gönderiyoruz
+        const requestedAmount = Number(authoritativeTotalNum);
         const paidPriceNumber = isNaN(requestedAmount) ? itemsTotal : Number(requestedAmount.toFixed(2));
 
         const callbackBase = Deno.env.get('IYZICO_CALLBACK_URL') || (() => {
@@ -310,7 +375,7 @@ Deno.serve(async (req) => {
                     checkoutFormContent: iyzicoResult.checkoutFormContent,
                     paymentPageUrl: iyzicoResult.paymentPageUrl,
                     token: iyzicoResult.token,
-                    amount: parseFloat(amount.toFixed(2)),
+                    amount: Number(paidPriceNumber.toFixed(2)),
                     currency: 'TRY'
                 }
             }), {

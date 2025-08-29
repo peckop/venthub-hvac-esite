@@ -26,7 +26,7 @@ interface Address {
 }
 
 export const CheckoutPage: React.FC = () => {
-  const { items, getCartTotal, clearCart } = useCart()
+  const { items, getCartTotal, clearCart, removeFromCart, updateQuantity } = useCart()
   // Test ortamı tespiti (Vitest) — global "vi" varlığını kontrol et
   const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined'
   const { user, loading: authLoading } = useAuth()
@@ -260,6 +260,24 @@ export const CheckoutPage: React.FC = () => {
       let authoritativeTotal = getCartTotal()
       try {
         const validation = await validateServerCart({ userId: user?.id || undefined })
+        // 0.a) Stok problemleri varsa sepeti uyumla ve kullanıcıyı Review'a döndür
+        const stockIssues = validation?.stock_issues ?? []
+        if (Array.isArray(stockIssues) && stockIssues.length > 0) {
+          for (const s of stockIssues) {
+            const pid = s.product_id
+            const avail = Number(s.available)
+            if (!Number.isFinite(avail) || avail <= 0) {
+              try { removeFromCart(pid) } catch {}
+            } else {
+              try { updateQuantity(pid, avail) } catch {}
+            }
+          }
+          toast('Bazı ürünlerin stokları güncellendi. Lütfen kontrol edin ve onaylayın.')
+          setStep(3)
+          setLoading(false)
+          return
+        }
+        // 0.b) Fiyat farkı varsa her durumda onay iste
         const serverTotal = validation?.totals?.subtotal ?? authoritativeTotal
         const localTotal = authoritativeTotal
         const diff = Math.abs(serverTotal - localTotal)

@@ -114,20 +114,35 @@ Deno.serve(async (req) => {
 
     const recalculated: any[] = [];
     const mismatches: any[] = [];
+    const stockIssues: any[] = [];
     for (const it of items) {
       const product = pmap.get(it.product_id);
       if (!product) continue;
       const pr = await priceFor(product);
       const unit = pr.unit;
       const equal = it.unit_price!=null && Math.abs(Number(it.unit_price)-unit) < 0.005;
-      recalculated.push({ product_id: it.product_id, quantity: it.quantity, unit_price: unit, price_list_id: pr.listId });
+      // Stock check (best-effort): try common field names
+      let available: number | null = null;
+      const cand = [product.stock, product.quantity_available, product.inventory, product.inventory_quantity, product.available, product.on_hand];
+      for (const c of cand) {
+        if (typeof c === 'number') { available = c; break; }
+        if (typeof c === 'string' && !isNaN(Number(c))) { available = Number(c); break; }
+      }
+      const qty = Number(it.quantity)||0;
+      let finalQty = qty;
+      if (available!=null && available>=0 && qty>available) {
+        stockIssues.push({ product_id: it.product_id, requested: qty, available });
+        finalQty = available; // suggestion
+      }
+
+      recalculated.push({ product_id: it.product_id, quantity: finalQty, unit_price: unit, price_list_id: pr.listId });
       if (!equal) mismatches.push({ product_id: it.product_id, had: it.unit_price, expected: unit, price_list_id: pr.listId });
     }
 
     const subtotal = recalculated.reduce((s, r)=> s + Number(r.unit_price)*Number(r.quantity), 0);
-    const ok = mismatches.length===0;
+    const ok = mismatches.length===0 && stockIssues.length===0;
 
-    return new Response(JSON.stringify({ ok, items: recalculated, mismatches, totals: { subtotal: Number(subtotal.toFixed(2)) }, cart_id: cartId }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ ok, items: recalculated, mismatches, stock_issues: stockIssues, totals: { subtotal: Number(subtotal.toFixed(2)) }, cart_id: cartId }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
   } catch (e) {
     return new Response(JSON.stringify({ error: e?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
   }
