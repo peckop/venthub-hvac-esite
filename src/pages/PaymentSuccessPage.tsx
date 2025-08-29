@@ -15,6 +15,41 @@ export const PaymentSuccessPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
+  
+  // Clear cart on mount for safety
+  useEffect(() => {
+    const forceClear = () => {
+      try {
+        // Force clear all localStorage cart data
+        localStorage.removeItem('venthub-cart')
+        localStorage.removeItem('venthub-cart-version')
+        localStorage.removeItem('venthub-cart-owner')
+        localStorage.removeItem('vh_pending_order')
+        
+        // Also dispatch storage event for cross-tab sync
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'venthub-cart',
+          newValue: '[]',
+          oldValue: null,
+          storageArea: localStorage
+        }))
+      } catch (e) {
+        console.error('Error in forceClear:', e)
+      }
+    }
+    
+    // If we detect any success indicators in URL, immediately clear
+    const hasSuccessIndicators = 
+      searchParams.get('status') === 'success' ||
+      searchParams.get('conversationId') ||
+      searchParams.get('token') ||
+      searchParams.get('orderId')
+      
+    if (hasSuccessIndicators) {
+      forceClear()
+      clearCart()
+    }
+  }, [])
 
   useEffect(() => {
     const conversationId = searchParams.get('conversationId') || undefined
