@@ -131,13 +131,28 @@ export const ProductDetailPage: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
-      // Sekme barı yüksekliğini dinamik hesapla ki hedef başlık gizlenmesin
       const navEl = document.getElementById('pdp-sticky-nav')
-      const navHeight = navEl?.offsetHeight ?? 0
-      // Küçük bir ek boşluk bırak (8px)
+      const currentNavHeight = navEl?.offsetHeight ?? navHeight ?? 0
       const extraGap = 8
-      const y = element.getBoundingClientRect().top + window.pageYOffset - navHeight - extraGap
+      const y = element.getBoundingClientRect().top + window.pageYOffset - currentNavHeight - extraGap
       window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+  }
+
+  // Sekmeye tıklamada: Eğer henüz sekme barına gelinmemişse önce onu görünür konuma getir, sonra hedefe kaydır
+  const handleTabClick = (sectionId: string) => {
+    const navEl = document.getElementById('pdp-sticky-nav')
+    if (!navEl) {
+      scrollToSection(sectionId)
+      return
+    }
+    const navDocTop = navEl.getBoundingClientRect().top + window.pageYOffset
+    const notReachedNavYet = window.pageYOffset < navDocTop - 1
+    if (notReachedNavYet) {
+      window.scrollTo({ top: navDocTop - 8, behavior: 'smooth' })
+      setTimeout(() => scrollToSection(sectionId), 250)
+    } else {
+      scrollToSection(sectionId)
     }
   }
 
@@ -400,8 +415,8 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Section Tabs - fixed under header */}
-      <div id="pdp-sticky-nav" className="fixed top-14 md:top-16 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
+      {/* Sticky Section Navigation (orijinal konumunda başlar, sonra header'ı takip eder) */}
+      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-40 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => {
@@ -409,7 +424,7 @@ export const ProductDetailPage: React.FC = () => {
               return (
                 <button
                   key={section.id}
-                  onClick={() => scrollToSection(section.id)}
+                  onClick={() => handleTabClick(section.id)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                     activeSection === section.id
                       ? 'bg-primary-navy text-white shadow-sm'
@@ -424,8 +439,6 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
-      {/* Spacer to prevent content from sliding under fixed tabs */}
-      <div aria-hidden className="w-full" style={{ height: navHeight }} />
 
       {/* JSON-LD Product Schema */}
       <script
