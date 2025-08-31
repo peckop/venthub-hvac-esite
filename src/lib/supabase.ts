@@ -1,7 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
-const supabaseAnonKey = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRub2Zld3drd2x5anNxZ3dqamdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2Mzg1MzIsImV4cCI6MjA3MTIxNDUzMn0.pqgvGZQS4x9WcIo7TqqobK_1PiUSbuCyw_mORBea4g4'
+// Define import.meta.env interface for Vite
+declare module 'vite/client' {
+  interface ImportMetaEnv {
+    readonly VITE_SUPABASE_URL?: string
+    readonly VITE_SUPABASE_ANON_KEY?: string
+    // Add other environment variables as needed
+  }
+}
+
+const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
+const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRub2Zld3drd2x5anNxZ3dqamdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2Mzg1MzIsImV4cCI6MjA3MTIxNDUzMn0.pqgvGZQS4x9WcIo7TqqobK_1PiUSbuCyw_mORBea4g4'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
@@ -487,12 +496,17 @@ export async function getOrCreateShoppingCart(userId: string) {
 
   let { data, error } = await attemptInsert()
   // If FK to user_profiles missing, create profile then retry once
-  if (error && (String((error as any).code) === '23503' || /user_profiles/i.test(String((error as any).message || '')))) {
+  interface SupabaseError {
+    code?: string
+    message?: string
+  }
+  
+  if (error && (String((error as SupabaseError).code) === '23503' || /user_profiles/i.test(String((error as SupabaseError).message || '')))) {
     await ensureUserProfile(userId)
     ;({ data, error } = await attemptInsert())
   }
   // If unique conflict (cart already exists), select and return it
-  if (error && (String((error as any).code) === '23505' || String((error as any).code) === '409' || /conflict|duplicate key/i.test(String((error as any).message || '')))) {
+  if (error && (String((error as SupabaseError).code) === '23505' || String((error as SupabaseError).code) === '409' || /conflict|duplicate key/i.test(String((error as SupabaseError).message || '')))) {
     const { data: again, error: sel2 } = await supabase
       .from('shopping_carts')
       .select('*')
@@ -675,7 +689,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     })[0]
 
     // Try product_prices with chosen list, otherwise global (price_list_id is null)
-    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: (chosen as any).id }, { price_list_id: null }] : [{ price_list_id: null }]
+    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: (chosen as { id: string }).id }, { price_list_id: null }] : [{ price_list_id: null }]
 
     for (const pq of priceQueries) {
       let query = supabase
@@ -715,7 +729,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     }
 
     // No special price found -> fallback
-    return { unitPrice: fallback, priceListId: chosen ? (chosen as any).id : null }
+    return { unitPrice: fallback, priceListId: chosen ? (chosen as { id: string }).id : null }
   } catch (e) {
     console.error('getEffectiveUnitPrice error', e)
     return { unitPrice: fallback, priceListId: null }

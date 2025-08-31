@@ -4,11 +4,25 @@ import { listAddresses, UserAddress, supabase } from '../../lib/supabase'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 
+interface OrderRecord {
+  id: string
+  created_at: string
+  total_amount: number
+  status: string
+  order_number?: string | null
+}
+
+interface SupabaseError {
+  code?: string
+  status?: number
+  message?: string
+}
+
 export default function AccountOverviewPage() {
   const { user } = useAuth()
   const { t } = useI18n()
   const [addresses, setAddresses] = useState<UserAddress[]>([])
-  const [lastOrders, setLastOrders] = useState<{ id: string; created_at: string; total_amount: number; status: string; order_number?: string|null }[]>([])
+  const [lastOrders, setLastOrders] = useState<OrderRecord[]>([])
 
   useEffect(() => {
     let mounted = true
@@ -26,23 +40,23 @@ export default function AccountOverviewPage() {
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
           .limit(3)
-        if (error && ((error as any).code === '42703' || (error as any).status === 400)) {
+        if (error && ((error as SupabaseError).code === '42703' || (error as SupabaseError).status === 400)) {
           const fb = await supabase
             .from('venthub_orders')
             .select('id, created_at, total_amount, status')
             .eq('user_id', user?.id || '')
             .order('created_at', { ascending: false })
             .limit(3)
-          orders = fb.data as any
-          error = fb.error as any
+          orders = fb.data as OrderRecord[]
+          error = fb.error
         }
         if (error) throw error
         if (mounted) setLastOrders((orders || []).map(o => ({
           id: o.id,
-          created_at: o.created_at as string,
-          total_amount: Number((o as any).total_amount) || 0,
-          status: (o as any).status || 'pending',
-          order_number: (o as any).order_number || null,
+          created_at: o.created_at,
+          total_amount: Number(o.total_amount) || 0,
+          status: o.status || 'pending',
+          order_number: o.order_number || null,
         })))
       } catch (e) {
         console.warn('Last orders load error', e)

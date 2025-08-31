@@ -1,10 +1,20 @@
 export interface ValidationItem { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }
 export interface StockIssue { product_id: string; requested: number; available: number }
-export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: any[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id: string }
+interface PriceMismatch {
+  product_id: string;
+  expected_price: number;
+  actual_price: number;
+}
+
+export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: PriceMismatch[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id: string }
+
+interface ImportMeta {
+  env?: Record<string, string | undefined>;
+}
 
 export async function validateServerCart(input: { cartId?: string; userId?: string }): Promise<ValidationResult> {
-  const url = (import.meta as any).env?.VITE_SUPABASE_URL || ''
-  const anon = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || ''
+  const url = (import.meta as ImportMeta).env?.VITE_SUPABASE_URL || ''
+  const anon = (import.meta as ImportMeta).env?.VITE_SUPABASE_ANON_KEY || ''
   if (!url || !anon) throw new Error('Missing Supabase envs')
   const resp = await fetch(`${url}/functions/v1/order-validate`, {
     method: 'POST',
