@@ -44,6 +44,7 @@ export const ProductDetailPage: React.FC = () => {
   const [tabsFixed, setTabsFixed] = useState(false)
   const navRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const navTopRef = useRef<number>(0)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -120,15 +121,30 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [product])
 
-  // Measure nav height (for fixed nav spacer and precise scroll offset)
+  // Measure nav height and initial top (for fixed nav spacer and precise scroll offset)
   useEffect(() => {
     const measure = () => {
       const el = navRef.current || document.getElementById('pdp-sticky-nav')
-      setNavHeight(el?.offsetHeight ?? 0)
+      if (el) {
+        setNavHeight(el.offsetHeight)
+        navTopRef.current = el.getBoundingClientRect().top + window.pageYOffset
+      }
     }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  // JS fallback: scroll konumuna göre fixed/sticky modunu belirle (tüm tarayıcılarda çalışır)
+  useEffect(() => {
+    const HEADER_OFFSET = 60 // compact header ~ 56-64px aralığı için güvenli marj
+    const onScroll = () => {
+      const threshold = Math.max(0, navTopRef.current - HEADER_OFFSET)
+      setTabsFixed(window.pageYOffset >= threshold)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   // Fallback sticky: sentinel ile görünürlük kontrolü (sticky çalışmazsa fixed'e geç)
