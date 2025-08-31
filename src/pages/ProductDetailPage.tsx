@@ -40,6 +40,7 @@ export const ProductDetailPage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const [navHeight, setNavHeight] = useState(0)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -115,6 +116,17 @@ export const ProductDetailPage: React.FC = () => {
       }
     }
   }, [product])
+
+  // Measure nav height (for fixed nav spacer and precise scroll offset)
+  useEffect(() => {
+    const measure = () => {
+      const el = document.getElementById('pdp-sticky-nav')
+      setNavHeight(el?.offsetHeight ?? 0)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
 
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
@@ -388,8 +400,8 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Sticky Section Navigation */}
-      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-40 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
+      {/* Section Tabs - fixed under header */}
+      <div id="pdp-sticky-nav" className="fixed top-14 md:top-16 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => {
@@ -412,6 +424,8 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
+      {/* Spacer to prevent content from sliding under fixed tabs */}
+      <div aria-hidden className="w-full" style={{ height: navHeight }} />
 
       {/* JSON-LD Product Schema */}
       <script
