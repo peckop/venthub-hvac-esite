@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "yes | pnpm install && rm -rf node_modules/.vite-temp && tsc -b tsconfig.build.json && vite build",
-    "build:prod": "yes | pnpm install && rm -rf node_modules/.vite-temp && tsc -b tsconfig.build.json && BUILD_MODE=prod vite build",
+    "build": "tsc -b tsconfig.build.json && vite build",
+    "build:prod": "BUILD_MODE=prod tsc -b tsconfig.build.json && vite build",
     "build:ci": "tsc -b tsconfig.build.json && vite build",
-    "lint": "yes | pnpm install && eslint .",
-    "preview": "yes | pnpm install && vite preview",
+    "lint": "eslint .",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:ui": "vitest"
   },
