@@ -117,7 +117,6 @@ export const ProductDetailPage: React.FC = () => {
   }, [product])
 
   const scrollToSection = (sectionId: string) => {
-  const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
       const navEl = document.getElementById('pdp-sticky-nav')
@@ -407,7 +406,7 @@ export const ProductDetailPage: React.FC = () => {
                   <span>{section.title}</span>
                 </button>
               )}
-            })}
+            })
           </nav>
         </div>
       </div>
