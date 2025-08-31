@@ -40,11 +40,6 @@ export const ProductDetailPage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
-  const [navHeight, setNavHeight] = useState(0)
-  const [tabsFixed, setTabsFixed] = useState(false)
-  const navRef = useRef<HTMLDivElement | null>(null)
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
-  const navTopRef = useRef<number>(0)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -121,76 +116,15 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [product])
 
-  // Measure nav height and initial top (for fixed nav spacer and precise scroll offset)
-  useEffect(() => {
-    const measure = () => {
-      const el = navRef.current || document.getElementById('pdp-sticky-nav')
-      if (el) {
-        setNavHeight(el.offsetHeight)
-        navTopRef.current = el.getBoundingClientRect().top + window.pageYOffset
-      }
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
-
-  // JS fallback: scroll konumuna göre fixed/sticky modunu belirle (tüm tarayıcılarda çalışır)
-  useEffect(() => {
-    const HEADER_OFFSET = 60 // compact header ~ 56-64px aralığı için güvenli marj
-    const onScroll = () => {
-      const threshold = Math.max(0, navTopRef.current - HEADER_OFFSET)
-      setTabsFixed(window.pageYOffset >= threshold)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  // Fallback sticky: sentinel ile görünürlük kontrolü (sticky çalışmazsa fixed'e geç)
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // Sentinel görünmüyorsa sekme çubuğu fixed olsun
-        setTabsFixed(!entry.isIntersecting)
-      },
-      {
-        root: null,
-        rootMargin: '-64px 0px 0px 0px', // header için yaklaşık boşluk
-        threshold: 0,
-      }
-    )
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [])
-
+  const scrollToSection = (sectionId: string) => {
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
       const navEl = document.getElementById('pdp-sticky-nav')
-      const currentNavHeight = navEl?.offsetHeight ?? navHeight ?? 0
+      const currentNavHeight = navEl ? navEl.offsetHeight : 0
       const extraGap = 8
       const y = element.getBoundingClientRect().top + window.pageYOffset - currentNavHeight - extraGap
       window.scrollTo({ top: y, behavior: 'smooth' })
-    }
-  }
-
-  // Sekmeye tıklamada: Eğer henüz sekme barına gelinmemişse önce onu görünür konuma getir, sonra hedefe kaydır
-  const handleTabClick = (sectionId: string) => {
-    const navEl = document.getElementById('pdp-sticky-nav')
-    if (!navEl) {
-      scrollToSection(sectionId)
-      return
-    }
-    const navDocTop = navEl.getBoundingClientRect().top + window.pageYOffset
-    const notReachedNavYet = window.pageYOffset < navDocTop - 1
-    if (notReachedNavYet) {
-      window.scrollTo({ top: navDocTop - 8, behavior: 'smooth' })
-      setTimeout(() => scrollToSection(sectionId), 250)
-    } else {
-      scrollToSection(sectionId)
     }
   }
 
@@ -453,15 +387,8 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Sentinel: sticky fallback için referans noktası */}
-      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-
-      {/* Section Tabs: sticky + fixed fallback */}
-      <div
-        id="pdp-sticky-nav"
-        ref={navRef}
-        className={`${tabsFixed ? 'fixed top-14 md:top-16 left-0 right-0 z-50' : 'sticky top-14 md:top-16 z-40'} bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm`}
-      >
+      {/* Sticky Section Navigation */}
+      <div id="pdp-sticky-nav" className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => {
@@ -469,7 +396,7 @@ export const ProductDetailPage: React.FC = () => {
               return (
                 <button
                   key={section.id}
-                  onClick={() => handleTabClick(section.id)}
+                  onClick={() => scrollToSection(section.id)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                     activeSection === section.id
                       ? 'bg-primary-navy text-white shadow-sm'
@@ -479,13 +406,11 @@ export const ProductDetailPage: React.FC = () => {
                   <IconComponent size={16} />
                   <span>{section.title}</span>
                 </button>
-              )
+              )}
             })}
           </nav>
         </div>
       </div>
-      {/* Fixed modda içerik zıplamasın diye spacer */}
-      {tabsFixed && <div aria-hidden className="w-full" style={{ height: navHeight }} />}
 
       {/* JSON-LD Product Schema */}
       <script
