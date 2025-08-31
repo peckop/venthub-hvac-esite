@@ -49,6 +49,39 @@ interface Order {
   delivered_at?: string
 }
 
+interface SupabaseOrderData {
+  id: string
+  total_amount: number | string
+  status: string
+  created_at: string
+  customer_name?: string
+  customer_email?: string
+  shipping_address: unknown
+  order_number?: string
+  conversation_id?: string
+  carrier?: string
+  tracking_number?: string
+  tracking_url?: string
+  shipped_at?: string
+  delivered_at?: string
+  venthub_order_items: SupabaseOrderItem[]
+}
+
+interface SupabaseOrderItem {
+  id: string
+  product_id?: string
+  product_name: string
+  quantity: number
+  price_at_time: number | string
+  product_image_url?: string
+}
+
+interface SupabaseError {
+  code?: string
+  status?: number
+  message?: string
+}
+
 export default function OrderDetailPage() {
   const { id } = useParams()
   const { user, loading: authLoading } = useAuth()
@@ -78,7 +111,7 @@ export default function OrderDetailPage() {
           .eq('id', id)
           .limit(1)
           .single()
-        if (error && (((error as any).code === '42703') || ((error as any).status === 400))) {
+        if (error && (((error as SupabaseError).code === '42703') || ((error as SupabaseError).status === 400))) {
           // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
           const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
           const fb = await supabase
@@ -87,19 +120,20 @@ export default function OrderDetailPage() {
             .eq('id', id)
             .limit(1)
             .single()
-          data = fb.data as any
-          error = fb.error as any
+          data = fb.data as SupabaseOrderData
+          error = fb.error
         }
         if (error) throw error
+        const orderData = data as SupabaseOrderData
         const mapped: Order = {
-          id: (data as any).id,
-          total_amount: Number((data as any).total_amount) || 0,
-          status: (data as any).status || 'pending',
-          created_at: (data as any).created_at,
-          customer_name: (data as any).customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
-          customer_email: (data as any).customer_email || user?.email || '-',
-          shipping_address: (data as any).shipping_address,
-          order_items: (((data as any).venthub_order_items) || []).map((it: any) => ({
+          id: orderData.id,
+          total_amount: Number(orderData.total_amount) || 0,
+          status: orderData.status || 'pending',
+          created_at: orderData.created_at,
+          customer_name: orderData.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_email: orderData.customer_email || user?.email || '-',
+          shipping_address: orderData.shipping_address,
+          order_items: (orderData.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
             id: it.id,
             product_id: it.product_id ?? undefined,
             product_name: it.product_name,
@@ -108,15 +142,15 @@ export default function OrderDetailPage() {
             total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
             product_image_url: it.product_image_url ?? undefined,
           })),
-          order_number: (data as any).order_number || undefined,
+          order_number: orderData.order_number || undefined,
           is_demo: false,
           payment_data: undefined,
-          conversation_id: (data as any).conversation_id || undefined,
-          carrier: (data as any).carrier || undefined,
-          tracking_number: (data as any).tracking_number || undefined,
-          tracking_url: (data as any).tracking_url || undefined,
-          shipped_at: (data as any).shipped_at || undefined,
-          delivered_at: (data as any).delivered_at || undefined,
+          conversation_id: orderData.conversation_id || undefined,
+          carrier: orderData.carrier || undefined,
+          tracking_number: orderData.tracking_number || undefined,
+          tracking_url: orderData.tracking_url || undefined,
+          shipped_at: orderData.shipped_at || undefined,
+          delivered_at: orderData.delivered_at || undefined,
         }
         setOrder(mapped)
       } catch (e) {
@@ -153,7 +187,7 @@ export default function OrderDetailPage() {
       const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
       const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), nf.format(Number(it.unit_price) || 0), nf.format(Number(it.total_price) || 0)])
       autoTable(doc, { startY: 100, head, body, styles: { font: 'helvetica', fontSize: 10 }, headStyles: { fillColor: [245,247,250], textColor: 20 }, columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } } })
-      const after = (doc as any).lastAutoTable?.finalY || 100
+      const after = (doc as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY || 100
       doc.setFont('helvetica','bold'); doc.setFontSize(12)
       doc.text(`${t('orders.grandTotal')}: ${nf.format(o.total_amount)}`, 40, after + 24)
       doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100)
@@ -227,7 +261,7 @@ export default function OrderDetailPage() {
     }
   }
   const steps = ['pending','paid','shipped','delivered'] as const
-  const activeIdx = Math.max(steps.indexOf((order.status || 'pending').toLowerCase() as any), 0)
+  const activeIdx = Math.max(steps.indexOf((order.status || 'pending').toLowerCase() as typeof steps[number]), 0)
 
   return (
     <div className="min-h-screen bg-clean-white py-8">
