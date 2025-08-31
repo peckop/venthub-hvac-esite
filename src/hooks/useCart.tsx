@@ -4,7 +4,10 @@ import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
 // Feature flag: server-side cart sync
-const CART_SERVER_SYNC = ((import.meta as any).env?.VITE_CART_SERVER_SYNC ?? 'true') === 'true'
+interface ImportMeta {
+  env?: Record<string, string>
+}
+const CART_SERVER_SYNC = ((import.meta as ImportMeta).env?.VITE_CART_SERVER_SYNC ?? 'true') === 'true'
 
 // LocalStorage keys
 const CART_LOCAL_STORAGE_KEY = 'venthub-cart'
@@ -175,7 +178,7 @@ useEffect(() => {
                 .select('status, created_at')
                 .eq('id', oid)
                 .maybeSingle()
-              if (!ordErr && ord && String((ord as any).status) === 'paid') {
+              if (!ordErr && ord && String((ord as Record<string, unknown>).status) === 'paid') {
                 discardLocalGuestCart = true
                 clearOnce = true
                 try {
@@ -229,7 +232,8 @@ useEffect(() => {
           const v = Date.now()
           localVersionRef.current = v
           localStorage.setItem(CART_VERSION_KEY, String(v))
-        } catch (e) {}
+        } catch {}
+
       } catch (e) {
         console.error('cart sync error', e)
       } finally {
@@ -273,7 +277,7 @@ useEffect(() => {
             localVersionRef.current = v
           }
         }
-      } catch (e) {}
+      } catch {}
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
@@ -310,10 +314,10 @@ useEffect(() => {
     // Dispatch a global event so UI can present a rich toast/modal
     try {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
-    } catch (e) {
+    } catch {
       try {
         toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })
-      } catch (e) {}
+      } catch {}
     }
   }
 
@@ -420,7 +424,7 @@ useEffect(() => {
             .catch(e => console.warn('applyServerPricing upsert error', e))
         })
         Promise.allSettled(tasks).catch(()=>{})
-      } catch (e) { /* no-op */ }
+      } catch { /* no-op */ }
     }
   }
 
@@ -443,11 +447,13 @@ useEffect(() => {
   )
 }
 
-// Hook to use cart context
-export const useCart = () => {
+// Hook to use cart context  
+function useCartHook() {
   const context = useContext(CartContext)
   if (!context) {
     throw new Error('useCart must be used within a CartProvider')
   }
   return context
 }
+
+export const useCart = useCartHook
