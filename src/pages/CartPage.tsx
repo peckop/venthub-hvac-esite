@@ -80,11 +80,11 @@ export const CartPage: React.FC = () => {
                     </p>
                     <div className="flex items-center space-x-4">
                       <span className="text-lg font-bold text-primary-navy">
-                        ₺{Number((item as any).unitPrice ?? parseFloat(item.product.price)).toLocaleString('tr-TR')}
+                        ₺{Number(item.unitPrice ?? parseFloat(item.product.price)).toLocaleString('tr-TR')}
                       </span>
                       {item.quantity > 1 && (
                         <span className="text-sm text-steel-gray">
-                          Toplam: ₺{(Number((item as any).unitPrice ?? parseFloat(item.product.price)) * item.quantity).toLocaleString('tr-TR')}
+                          Toplam: ₺{(Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity).toLocaleString('tr-TR')}
                         </span>
                       )}
                     </div>

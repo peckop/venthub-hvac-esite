@@ -16,6 +16,12 @@ interface ReturnRow {
 
 interface OrderLite { id: string; order_number?: string | null; created_at: string }
 
+interface SupabaseError {
+  code?: string
+  status?: number
+  message?: string
+}
+
 export default function AccountReturnsPage() {
   const { user } = useAuth()
   const { t } = useI18n()
@@ -39,7 +45,7 @@ export default function AccountReturnsPage() {
           .order('created_at', { ascending: false })
         if (error) {
           // Table yoksa (404) boş liste göster, toast yapma
-          if ((error as any).status === 404) {
+          if ((error as SupabaseError).status === 404) {
             if (mounted) setRows([])
           } else {
             throw error
@@ -67,14 +73,14 @@ export default function AccountReturnsPage() {
           .select('id, order_number, created_at')
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
-        if (error && ((error as any).code === '42703' || (error as any).status === 400)) {
+        if (error && ((error as SupabaseError).code === '42703' || (error as SupabaseError).status === 400)) {
           const fb = await supabase
             .from('venthub_orders')
             .select('id, created_at')
             .eq('user_id', user?.id || '')
             .order('created_at', { ascending: false })
-          data = fb.data as any
-          error = fb.error as any
+          data = fb.data as OrderLite[]
+          error = fb.error
         }
         if (error) throw error
         if (mounted) setOrders((data || []) as OrderLite[])

@@ -3,14 +3,20 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 
+interface UserMetadata {
+  full_name?: string
+  phone?: string
+  [key: string]: unknown
+}
+
 export default function AccountProfilePage() {
-  const { user, setUser } = useAuth() as any
+  const { user, setUser } = useAuth()
   const [fullName, setFullName] = React.useState<string>('')
   const [phone, setPhone] = React.useState<string>('')
   const [saving, setSaving] = React.useState(false)
 
   React.useEffect(() => {
-    const meta = (user?.user_metadata || {}) as any
+    const meta = (user?.user_metadata || {}) as UserMetadata
     setFullName(meta.full_name || '')
     setPhone(meta.phone || '')
   }, [user])

@@ -19,6 +19,12 @@ interface ShipmentRow {
   delivered_at?: string | null
 }
 
+interface SupabaseError {
+  code?: string
+  status?: number
+  message?: string
+}
+
 export default function AccountShipmentsPage() {
   const { user } = useAuth()
   const { t } = useI18n()
@@ -38,14 +44,14 @@ export default function AccountShipmentsPage() {
           .eq('user_id', user?.id || '')
           .order('created_at', { ascending: false })
         // Fallback: prod DB henüz shipping kolonları yoksa 400 dönebilir
-        if (error && (((error as any).code === 'PGRST100') || ((error as any).status === 400))) {
+        if (error && (((error as SupabaseError).code === 'PGRST100') || ((error as SupabaseError).status === 400))) {
           const fallback = await supabase
             .from('venthub_orders')
             .select('id, created_at, total_amount, status, order_number')
             .eq('user_id', user?.id || '')
             .order('created_at', { ascending: false })
-          data = fallback.data as any
-          error = fallback.error as any
+          data = fallback.data as ShipmentRow[]
+          error = fallback.error
         }
         if (error) throw error
         const items = (data || []) as ShipmentRow[]
