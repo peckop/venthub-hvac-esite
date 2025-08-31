@@ -30,7 +30,7 @@ vi.mock('../../../i18n/I18nProvider', () => ({
   })
 }))
 
-function selectResult(data: any) {
+function selectResult(data: unknown) {
   return Promise.resolve({ data, error: null })
 }
 
@@ -50,7 +50,7 @@ vi.mock('../../../lib/supabase', () => ({
           })
         }
       }
-      return { select: () => ({}) } as any
+      return { select: () => ({}) }
     }
   }
 }))

@@ -91,7 +91,7 @@ vi.mock('../../../lib/supabase', () => ({
       if (table === 'products') {
         return { select: () => ({ in: () => Promise.resolve({ data: [], error: null }) }) }
       }
-      return { select: () => ({}) } as any
+      return { select: () => ({}) }
     }
   }
 }))
@@ -110,7 +110,7 @@ vi.mock('../../lib/supabase', () => ({
       if (table === 'products') {
         return { select: () => ({ in: () => Promise.resolve({ data: [], error: null }) }) }
       }
-      return { select: () => ({}) } as any
+      return { select: () => ({}) }
     }
   }
 }))
@@ -131,7 +131,7 @@ describe.skip('OrderDetailPage', () => {
     )
 
     // Özet sekmesi görünene kadar bekle (sayfa yüklendi işareti)
-    await screen.findByRole('button', { name: 'Özet' }, { timeout: 5000 } as any)
+    await screen.findByRole('button', { name: 'Özet' }, { timeout: 5000 })
 
     // Kargo Takibi sekmesine geçiş
     const shippingTab = screen.getByRole('button', { name: 'Kargo Takibi' })
