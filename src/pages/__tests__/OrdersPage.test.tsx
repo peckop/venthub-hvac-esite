@@ -14,7 +14,7 @@ vi.mock('../../hooks/useCartHook', () => ({
 
 vi.mock('../../i18n/I18nProvider', () => ({
   useI18n: () => ({
-    t: (k: string, _?: any) => ({
+    t: (k: string, _?: Record<string, unknown>) => ({
       'orders.title': 'Siparişler',
       'orders.subtitle': 'Geçmiş siparişleriniz',
       'orders.status': 'Durum',
@@ -65,7 +65,7 @@ const ordersRow = {
   ]
 }
 
-function chainResult(data: any) {
+function chainResult(data: unknown) {
   return {
     select: () => ({
       eq: () => ({
@@ -109,7 +109,7 @@ describe.skip('OrdersPage', () => {
     )
 
     // Liste yüklenene kadar "Detaylar" butonunu bekle
-    const detailsBtn = await screen.findByRole('button', { name: /Detaylar/i }, { timeout: 5000 } as any)
+    const detailsBtn = await screen.findByRole('button', { name: /Detaylar/i }, { timeout: 5000 })
     const user = userEvent.setup()
     await user.click(detailsBtn)
 
