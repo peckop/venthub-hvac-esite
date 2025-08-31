@@ -38,10 +38,8 @@ export const ProductDetailPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
-  const [navHeight, setNavHeight] = useState(0)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
-  const navRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -118,16 +116,6 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [product])
 
-  // Ölç: fixed nav yüksekliği
-  useEffect(() => {
-    const measure = () => {
-      const el = navRef.current || document.getElementById('pdp-sticky-nav')
-      setNavHeight(el ? el.offsetHeight : 0)
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
 
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
@@ -399,12 +387,8 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Fixed Section Navigation */}
-      <div
-        id="pdp-sticky-nav"
-        ref={navRef}
-        className="fixed left-0 right-0 top-14 md:top-16 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm"
-      >
+      {/* Sticky Section Navigation */}
+      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => (
@@ -424,9 +408,6 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
-
-      {/* Spacer: fixed nav yüksekliği kadar boşluk */}
-      <div aria-hidden="true" style={{ height: navHeight }} />
 
       {/* JSON-LD Product Schema */}
       <script
