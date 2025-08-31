@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { supabase, Product } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
 
 
@@ -83,7 +82,7 @@ export const OrdersPage: React.FC = () => {
   const [searchCode, setSearchCode] = useState<string>('')
   const [productFilter, setProductFilter] = useState<string>('')
 
-  const { addToCart } = useCart()
+  // const { addToCart: _addToCart } = useCart() // Not used in this component
   const { t } = useI18n()
 
   const fetchOrders = React.useCallback(async () => {

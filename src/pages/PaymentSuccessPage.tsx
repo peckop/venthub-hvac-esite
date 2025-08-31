@@ -49,7 +49,7 @@ export const PaymentSuccessPage: React.FC = () => {
       forceClear()
       clearCart()
     }
-  }, [])
+  }, [searchParams, clearCart])
 
   useEffect(() => {
     const conversationId = searchParams.get('conversationId') || undefined

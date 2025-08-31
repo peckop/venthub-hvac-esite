@@ -1,7 +1,11 @@
 import React from 'react'
 
-const commit = (import.meta as any).env?.VITE_COMMIT_SHA as string | undefined
-const branch = (import.meta as any).env?.VITE_BRANCH as string | undefined
+interface ImportMeta {
+  env?: Record<string, string | undefined>
+}
+
+const commit = (import.meta as ImportMeta).env?.VITE_COMMIT_SHA as string | undefined
+const branch = (import.meta as ImportMeta).env?.VITE_BRANCH as string | undefined
 
 export const BuildTag: React.FC = () => {
   const short = commit ? commit.slice(0, 7) : ''
