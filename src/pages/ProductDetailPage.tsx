@@ -41,6 +41,9 @@ export const ProductDetailPage: React.FC = () => {
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
   const [navHeight, setNavHeight] = useState(0)
+  const [tabsFixed, setTabsFixed] = useState(false)
+  const navRef = useRef<HTMLDivElement | null>(null)
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -120,12 +123,31 @@ export const ProductDetailPage: React.FC = () => {
   // Measure nav height (for fixed nav spacer and precise scroll offset)
   useEffect(() => {
     const measure = () => {
-      const el = document.getElementById('pdp-sticky-nav')
+      const el = navRef.current || document.getElementById('pdp-sticky-nav')
       setNavHeight(el?.offsetHeight ?? 0)
     }
     measure()
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  // Fallback sticky: sentinel ile görünürlük kontrolü (sticky çalışmazsa fixed'e geç)
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Sentinel görünmüyorsa sekme çubuğu fixed olsun
+        setTabsFixed(!entry.isIntersecting)
+      },
+      {
+        root: null,
+        rootMargin: '-64px 0px 0px 0px', // header için yaklaşık boşluk
+        threshold: 0,
+      }
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
   }, [])
 
   const scrollToSection = (sectionId: string) => {
@@ -415,8 +437,15 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Sticky Section Navigation (orijinal konumunda başlar, sonra header'ı takip eder) */}
-      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-40 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
+      {/* Sentinel: sticky fallback için referans noktası */}
+      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+
+      {/* Section Tabs: sticky + fixed fallback */}
+      <div
+        id="pdp-sticky-nav"
+        ref={navRef}
+        className={`${tabsFixed ? 'fixed top-14 md:top-16 left-0 right-0 z-50' : 'sticky top-14 md:top-16 z-40'} bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => {
@@ -439,6 +468,8 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
+      {/* Fixed modda içerik zıplamasın diye spacer */}
+      {tabsFixed && <div aria-hidden className="w-full" style={{ height: navHeight }} />}
 
       {/* JSON-LD Product Schema */}
       <script
