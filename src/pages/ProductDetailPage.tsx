@@ -38,8 +38,10 @@ export const ProductDetailPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
+  const [isNavSticky, setIsNavSticky] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const navTriggerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -82,6 +84,27 @@ export const ProductDetailPage: React.FC = () => {
 
     fetchProduct()
   }, [id, navigate])
+
+  // Scroll listener for sticky nav behavior
+  useEffect(() => {
+    const handleScroll = () => {
+      if (navTriggerRef.current) {
+        const triggerTop = navTriggerRef.current.offsetTop
+        const scrollY = window.scrollY
+        
+        // Nav becomes sticky when we scroll past the trigger point
+        setIsNavSticky(scrollY > triggerTop)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    // Call once to set initial state
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [product])
 
   // Intersection Observer for scroll spy
   useEffect(() => {
@@ -387,8 +410,16 @@ export const ProductDetailPage: React.FC = () => {
 
       </div>
 
-      {/* Sticky Section Navigation */}
-      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
+      {/* Sticky Nav Trigger Point */}
+      <div ref={navTriggerRef} className="h-0" />
+
+      {/* Section Navigation */}
+      <div 
+        id="pdp-sticky-nav" 
+        className={`transition-all duration-300 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm ${
+          isNavSticky ? 'fixed top-14 md:top-16 left-0 right-0' : 'relative'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => (
@@ -408,6 +439,25 @@ export const ProductDetailPage: React.FC = () => {
           </nav>
         </div>
       </div>
+
+      {/* Sticky Nav Spacer - prevents content from jumping when nav becomes fixed */}
+      {isNavSticky && (
+        <div className="bg-white/95 border-b border-light-gray">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex space-x-1 overflow-x-auto py-3 invisible">
+              {sections.map((section) => (
+                <button
+                  key={`spacer-${section.id}`}
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap"
+                >
+                  <section.icon size={16} />
+                  <span>{section.title}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* JSON-LD Product Schema */}
       <script
