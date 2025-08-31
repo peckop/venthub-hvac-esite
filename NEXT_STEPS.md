@@ -7,7 +7,7 @@ Bu belge ROADMAP'e taşındı. Güncel tek kaynak için bkz. `docs/ROADMAP.md`.
 - Payments (env): iyzico live (production) traffic has started. Keep sandbox vs live configurable; ensure live callback domain(s) are whitelisted in iyzico panel.
 - Legal pages: KVKK, Mesafeli Satış, Ön Bilgilendirme, Gizlilik ve Çerez Politikası sayfaları mevcut ve router’a bağlı.
 - Config: Şirket/kanuni alanlar src/config/legal.ts içinde placeholder olarak merkezi yönetiliyor.
-- CI: GitHub Actions build/test SUCCESS; lint non‑blocking (warnings allowed) — ci.yml updated accordingly.
+- CI: GitHub Actions build/test SUCCESS; lint blocking (max‑warnings=0) — ci.yml lint adımı eklendi.
 - Git remote: SSH (no token needed). Push/pull with your SSH key is ready.
 
 ## High‑priority next tasks (1–2 days)
@@ -24,7 +24,7 @@ Bu belge ROADMAP'e taşındı. Güncel tek kaynak için bkz. `docs/ROADMAP.md`.
      - Kalan “any” tiplerini unknown veya anlamlı tiplere daralt.
 
 2) CI: Lint’i yeniden “blocking” yap
-   - Lint uyarıları makul seviyeye indirildiğinde .github/workflows/ci.yml içindeki continue-on-error: true kaldırılacak.
+   - [x] CI'da lint adımı bloklayıcı hale getirildi (ci.yml içinde pnpm run lint -- --max-warnings=0)
 
 3) iyzico production hygiene
    - Env toggle: sandbox ↔ live (script URL’leri, API uçları, callback URL’leri) — prod’da `static.iyzipay.com`, sandbox’ta `sandbox-static.iyzipay.com`.

@@ -11,7 +11,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - İadeler: Returns listesinde sipariş kodu yeni detay rotasına gidiyor.
 - Fatura: Proforma PDF indirme mevcut (OrderDetailPage). Kurumsal bilgiler ve numaralandırma/şablon iyileştirmeleri TODO.
 - Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
-- Lint: Warnings mevcut; fonksiyonelliği engellemiyor (Phase 1 cleanup planlandı).
+- Lint: CI'da blocking (maks. uyarı=0); kalan uyarılar kademeli temizlenecek.
 
 ## 2) Sprint Planı
 
@@ -34,13 +34,13 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Ödeme sonrası sepet temizleniyor (agresif localStorage temizleme)
   - [x] Sunucu sepeti ve misafir sepeti uyumlu çalışıyor (çıkış-giriş döngüsünde eski veriler karışmıyor)
 - Test/kalite
-  - [ ] Skip'li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)
+  - ~~[ ] Skip'li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)~~
   - [ ] Lint cleanup (Phase 1) → ardından CI'da lint'i tekrar blocking yap
 - Performans
   - [x] Code‑split (dynamic import / manualChunks) — %87 bundle küçültme sağlandı (1,118kB → 145kB)
 - Kargo takip entegrasyonu (Sandbox/Backend)
-  - [ ] Taşıyıcı API/webhook veya periyodik polling (sandbox)
-  - [ ] Status senkronizasyonu (pending→paid→shipped→delivered)
+  - [x] Taşıyıcı API/webhook veya periyodik polling (sandbox)
+  - [x] Status senkronizasyonu (pending→paid→shipped→delivered)
 - Returns akışı
   - [ ] Durum yönetimi (requested/approved/rejected/in_transit/received/refunded)
   - [ ] Bildirimler (opsiyonel)
@@ -57,14 +57,14 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 
 ## 3) Operasyonel “Next Steps” (Öncelikli)
 - Test stabilizasyonu
-  - [ ] Skip’li 3 UI testini aktive et (Orders nav, OrderDetail sekme/track link, Returns modal)
+  - ~~[ ] Skip’li 3 UI testini aktive et (Orders nav, OrderDetail sekme/track link, Returns modal)~~
 - Lint/CI
   - [ ] Lint cleanup (Phase 1): any→unknown, unused fix’leri
-  - [ ] Lint’i tekrar blocking yap (CI)
+  - [x] Lint’i tekrar blocking yap (CI)
 - Performans
   - [x] Code‑split planını uygula (manualChunks / dynamic import) — tamamlandı
 - Kargo (sandbox)
-  - [ ] Statü senk ve basit taşıyıcı webhook/polling prototipi
+  - [x] Statü senk ve basit taşıyıcı webhook/polling prototipi
 - Orders detay (opsiyonel)
   - [ ] Yasal onay alanlarını görünür kıl (mevcut kayıt varsa)
 
