@@ -119,8 +119,12 @@ export const ProductDetailPage: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
-      const yOffset = -100 // Account for sticky header
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
+      // Sekme barı yüksekliğini dinamik hesapla ki hedef başlık gizlenmesin
+      const navEl = document.getElementById('pdp-sticky-nav')
+      const navHeight = navEl?.offsetHeight ?? 0
+      // Küçük bir ek boşluk bırak (8px)
+      const extraGap = 8
+      const y = element.getBoundingClientRect().top + window.pageYOffset - navHeight - extraGap
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
   }
@@ -385,7 +389,7 @@ export const ProductDetailPage: React.FC = () => {
       </div>
 
       {/* Sticky Section Navigation */}
-      <div className="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
+      <div id="pdp-sticky-nav" className="sticky top-14 md:top-16 z-40 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
             {sections.map((section) => {
