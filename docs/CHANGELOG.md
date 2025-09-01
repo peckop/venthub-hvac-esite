@@ -1,5 +1,22 @@
 # Changelog
 
+## 2025-09-01
+
+### Security / Logging Hygiene
+- Remove unused `supabase/functions/iyzico-payment/iyzico-real.ts` that contained hardcoded sandbox credentials (replaced with safe stub)
+- Edge Function (`iyzico-payment/index.ts`): gate info logs behind `IYZICO_DEBUG=true` and sanitize PII (mask email/phone; redact addresses)
+- App (frontend): replace/remove `console.log` calls; add dev-only `debug(...)` helper gated by `VITE_DEBUG` that logs via `console.warn`
+- Analytics fallback logs now use `console.warn`; PaymentSuccess/AuthContext stray logs removed
+
+### Lint / CI
+- Enforce `no-console` in app code (allow `warn` and `error`)
+- Fix minor TS warnings in Checkout debug helper (use `unknown` types, safe `import.meta` typing)
+- `npm run lint` passes with `--max-warnings=0`
+
+### Developer Notes
+- To see debug logs locally: set `VITE_DEBUG=true` in your `.env.development`
+- To see edge logs in production/sandbox: set `IYZICO_DEBUG=true` in the function environment
+
 ## 2025-08-29
 
 ### Cart Synchronization Fixes

@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-08-29
+Last updated: 2025-09-01
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -12,6 +12,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Fatura: Proforma PDF indirme mevcut (OrderDetailPage). Kurumsal bilgiler ve numaralandırma/şablon iyileştirmeleri TODO.
 - Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
 - Lint: CI'da blocking (maks. uyarı=0); kalan uyarılar kademeli temizlenecek.
+- Güvenlik/Log Hijyeni: Uygulama tarafında konsol logları kaldırıldı/koşullandı (VITE_DEBUG); Edge Function logları IYZICO_DEBUG ile koşullu ve PII maskeli; ESLint 'no-console' politikası etkin.
 
 ## 2) Sprint Planı
 
@@ -36,6 +37,12 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Test/kalite
   - ~~[ ] Skip'li 3 UI testini stabilize edip aktifleştir (OrdersPage nav, OrderDetail sekmeler, Returns modal)~~
   - [ ] Lint cleanup (Phase 1) → ardından CI'da lint'i tekrar blocking yap
+  - [x] ESLint no-console politikası: app kodunda console.log engellendi (warn/error serbest)
+- Güvenlik/Log Hijyeni
+  - [x] Edge Function loglarını IYZICO_DEBUG env ile koşullandır
+  - [x] PII maskeleme: e‑posta/telefon/adres içeren logları sanitize et
+  - [x] Kullanılmayan ve hardcoded sandbox credential içeren modülü kaldır (iyzico-real.ts)
+  - [x] Frontend debug helper ile (VITE_DEBUG) PII sızdırmadan tanılama yap
 - Performans
   - [x] Code‑split (dynamic import / manualChunks) — %87 bundle küçültme sağlandı (1,118kB → 145kB)
 - Kargo takip entegrasyonu (Sandbox/Backend)
@@ -61,6 +68,10 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Lint/CI
   - [ ] Lint cleanup (Phase 1): any→unknown, unused fix’leri
   - [x] Lint’i tekrar blocking yap (CI)
+  - [x] no-console politikası: app kodunda console.log engelle (warn/error serbest)
+- Güvenlik/Log Hijyeni
+  - [x] Frontend debug helper (VITE_DEBUG) ve PII‑siz özet loglar
+  - [x] Edge Function loglarını IYZICO_DEBUG ile koşullandır ve PII maskesi uygula
 - Performans
   - [x] Code‑split planını uygula (manualChunks / dynamic import) — tamamlandı
 - Kargo (sandbox)
