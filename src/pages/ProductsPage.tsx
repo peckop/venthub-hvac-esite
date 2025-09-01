@@ -76,23 +76,13 @@ const ProductsPage: React.FC = () => {
       if (!hasLoadedAll) {
         fetchAllIfNeeded()
       }
-      // Do not block the entire page with a global skeleton on toggle.
-      // Only show global skeleton on first mount when no data at all exists.
-      if (loading && featured.length > 0) {
-        setLoading(false)
-      }
     } else if (!hasQuery) {
       // Discover view without a search query: fetch the light set
       if (featured.length === 0 || categories.length === 0 || newProducts.length === 0) {
         fetchDiscoverLight()
-      } else if (loading) {
-        setLoading(false)
       }
-    } else {
-      // Search mode: search effect will handle results; ensure we don't show global skeleton unnecessarily
-      if (loading) setLoading(false)
     }
-  }, [location.search, hasLoadedAll, featured.length, categories.length, newProducts.length, searchQuery, loading])
+  }, [location.search, hasLoadedAll, featured.length, categories.length, newProducts.length, searchQuery])
 
   // Arama sonuçlarını (varsa) yükle
   useEffect(() => {
