@@ -160,7 +160,8 @@ Deno.serve(async (req) => {
             shipping_method: (typeof shippingMethod === 'string' && shippingMethod) ? shippingMethod : 'standard'
         };
 
-        const orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
+        // Try creating order; if schema drift (shipping_method column missing), retry without it
+        let orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${serviceRoleKey}`,
@@ -173,7 +174,26 @@ Deno.serve(async (req) => {
 
         if (!orderResponse.ok) {
             const errorText = await orderResponse.text();
-            console.error('Order creation failed:', errorText);
+            // Fallback: remove shipping_method if column doesn't exist yet
+            const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
+            if (mayRetry) {
+                const { shipping_method, ...withoutShipMethod } = orderData as any
+                orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${serviceRoleKey}`,
+                        'apikey': serviceRoleKey,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(withoutShipMethod)
+                });
+            } else {
+                console.error('Order creation failed:', errorText);
+            }
+        }
+
+        if (!orderResponse.ok) {
             return new Response(JSON.stringify({
                 error: { code: 'DATABASE_ERROR', message: 'Sipariş oluşturulamadı' }
             }), {
