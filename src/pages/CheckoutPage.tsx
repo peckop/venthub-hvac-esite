@@ -359,7 +359,7 @@ export const CheckoutPage: React.FC = () => {
       })
 
       const headers: Record<string,string> = {}
-      try { if ((import.meta as any).env?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch {}
+      try { const e2 = (import.meta as unknown as { env?: Record<string,string> }).env; if (e2?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch {}
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
         body: requestData,

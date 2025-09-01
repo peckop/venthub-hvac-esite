@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
 
         // Create order in database
         // Not: venthub_orders.id NOT NULL ise, burada UUID oluşturup gönderiyoruz.
-        const dbGeneratedId = (crypto as any).randomUUID ? (crypto as any).randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        const dbGeneratedId = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
         const orderData = {
             id: dbGeneratedId,
             user_id: user_id || null,
@@ -340,12 +340,11 @@ Deno.serve(async (req) => {
         if (debugEnabled) console.log('İyzico Request:', JSON.stringify(sanitize(iyzicoRequest), null, 2));
 
         // İyzipay Node SDK ile isteği yap
-
-        const sdk = new (Iyzipay as any)({
-            apiKey: iyzicoApiKey,
-            secretKey: iyzicoSecretKey,
-            uri: iyzicoBaseUrl,
-        });
+        type IyziStatic = { PAYMENT_CHANNEL?: { WEB: string }, BASKET_ITEM_TYPE?: { PHYSICAL: string } }
+        const IYZI = Iyzipay as unknown as IyziStatic
+        type IyziSdk = { checkoutFormInitialize: { create: (req: Record<string, unknown>, cb: (err: unknown, res: { status?: string; token?: string; paymentPageUrl?: string; checkoutFormContent?: string; errorMessage?: string }) => void) => void } }
+        const IyziCtor = Iyzipay as unknown as { new(args: { apiKey: string; secretKey: string; uri: string }): IyziSdk }
+        const sdk = new IyziCtor({ apiKey: iyzicoApiKey, secretKey: iyzicoSecretKey, uri: iyzicoBaseUrl });
 
         const sdkRequest: any = {
             locale: iyzicoRequest.locale,
@@ -355,7 +354,7 @@ Deno.serve(async (req) => {
             currency: iyzicoRequest.currency,
             basketId: iyzicoRequest.basketId,
             paymentGroup: iyzicoRequest.paymentGroup,
-            paymentChannel: (Iyzipay as any).PAYMENT_CHANNEL ? (Iyzipay as any).PAYMENT_CHANNEL.WEB : 'WEB',
+            paymentChannel: IYZI.PAYMENT_CHANNEL?.WEB ?? 'WEB',
             callbackUrl: iyzicoRequest.callbackUrl,
             enabledInstallments: iyzicoRequest.enabledInstallments,
             buyer: iyzicoRequest.buyer,
@@ -366,13 +365,13 @@ Deno.serve(async (req) => {
                 name: it.name,
                 category1: it.category1,
                 category2: it.category2,
-                itemType: (Iyzipay as any).BASKET_ITEM_TYPE ? (Iyzipay as any).BASKET_ITEM_TYPE.PHYSICAL : 'PHYSICAL',
+                itemType: IYZI.BASKET_ITEM_TYPE?.PHYSICAL ?? 'PHYSICAL',
                 price: it.price,
             })),
         };
 
-        const iyzicoResult = await new Promise<any>((resolve, reject) => {
-            (sdk as any).checkoutFormInitialize.create(sdkRequest, (err: any, res: any) => {
+        const iyzicoResult = await new Promise<{ status?: string; token?: string; paymentPageUrl?: string; checkoutFormContent?: string; errorMessage?: string }>((resolve, reject) => {
+            sdk.checkoutFormInitialize.create(sdkRequest, (err: unknown, res: { status?: string; token?: string; paymentPageUrl?: string; checkoutFormContent?: string; errorMessage?: string }) => {
                 if (err) return reject(err);
                 resolve(res);
             });
@@ -397,7 +396,8 @@ Deno.serve(async (req) => {
                     })
                 }
             } catch (e) {
-                console.warn('payment_data token patch skipped:', (e as any)?.message)
+                const msg = e instanceof Error ? e.message : String(e ?? '')
+                console.warn('payment_data token patch skipped:', msg)
             }
             
             return new Response(JSON.stringify({
