@@ -127,7 +127,7 @@ export const CartPage: React.FC = () => {
             {/* Clear Cart Button */}
             <div className="pt-4">
               <button
-                onClick={clearCart}
+                onClick={() => clearCart()}
                 className="text-steel-gray hover:text-red-500 text-sm transition-colors"
               >
                 {t('cart.clearCart')}
