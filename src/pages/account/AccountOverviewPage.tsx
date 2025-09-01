@@ -9,7 +9,7 @@ interface OrderRecord {
   created_at: string
   total_amount: number
   status: string
-  order_number?: string | null
+  order_number: string
 }
 
 interface SupabaseError {
@@ -56,7 +56,7 @@ export default function AccountOverviewPage() {
           created_at: o.created_at,
           total_amount: Number(o.total_amount) || 0,
           status: o.status || 'pending',
-          order_number: o.order_number || null,
+          order_number: o.order_number || o.id,
         })))
       } catch (e) {
         console.warn('Last orders load error', e)

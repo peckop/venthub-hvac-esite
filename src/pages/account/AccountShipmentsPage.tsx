@@ -9,14 +9,14 @@ import toast from 'react-hot-toast'
 interface ShipmentRow {
   id: string
   created_at: string
-  order_number?: string | null
+  order_number: string
   total_amount: number | string
   status: string
-  carrier?: string | null
-  tracking_number?: string | null
-  tracking_url?: string | null
-  shipped_at?: string | null
-  delivered_at?: string | null
+  carrier: string | null
+  tracking_number: string | null
+  tracking_url: string | null
+  shipped_at: string | null
+  delivered_at: string | null
 }
 
 interface SupabaseError {
@@ -54,7 +54,10 @@ export default function AccountShipmentsPage() {
           error = fallback.error
         }
         if (error) throw error
-        const items = (data || []) as ShipmentRow[]
+        const items = (data || []).map(item => ({
+          ...item,
+          order_number: item.order_number || item.id,
+        })) as ShipmentRow[]
         // Only ones with any shipping info
         const filtered = items.filter(it => it.carrier || it.tracking_number || it.tracking_url || it.shipped_at || it.delivered_at)
         if (mounted) setRows(filtered)

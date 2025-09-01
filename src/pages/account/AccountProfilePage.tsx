@@ -10,7 +10,7 @@ interface UserMetadata {
 }
 
 export default function AccountProfilePage() {
-  const { user, setUser } = useAuth()
+  const { user } = useAuth()
   const [fullName, setFullName] = React.useState<string>('')
   const [phone, setPhone] = React.useState<string>('')
   const [saving, setSaving] = React.useState(false)
@@ -25,12 +25,11 @@ export default function AccountProfilePage() {
     e.preventDefault()
     try {
       setSaving(true)
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         data: { full_name: fullName || undefined, phone: phone || undefined }
       })
       if (error) throw error
-      // Auth context'i güncelle (varsa)
-      if (setUser && data?.user) setUser(data.user)
+      // Auth context updated automatically via session
       toast.success('Profil güncellendi')
     } catch (e) {
       console.error(e)
