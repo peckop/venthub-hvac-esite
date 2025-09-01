@@ -31,7 +31,7 @@ interface CartContextType {
   addToCart: (product: Product, quantity?: number) => void
   removeFromCart: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
-  clearCart: () => void
+  clearCart: (opts?: { silent?: boolean }) => void
   getCartTotal: () => number
   getCartCount: () => number
   // Yeni: Sunucunun hesapladığı birim fiyatları uygula (mismatch sonrası loop'u kırmak için)
@@ -366,7 +366,7 @@ useEffect(() => {
     }
   }
 
-  const clearCart = () => {
+  const clearCart = (opts?: { silent?: boolean }) => {
     setItems([])
     
     // Clear all localStorage cart data
@@ -387,7 +387,9 @@ useEffect(() => {
       console.error('Error clearing localStorage:', e)
     }
     
-    toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
+    if (!opts?.silent) {
+      toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
+    }
     
     if (CART_SERVER_SYNC && user && serverCartId) {
       clearDbCartItems(serverCartId).catch(err => console.error('server clearCart error', err))
