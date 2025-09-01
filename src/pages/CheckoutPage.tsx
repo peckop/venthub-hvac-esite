@@ -52,6 +52,19 @@ export const CheckoutPage: React.FC = () => {
       return fallback
     }
   }
+  // Price hash helpers to prevent repeated confirmation loops
+  const to2 = (n: number) => Number(Number(n).toFixed(2))
+  const priceHashLocal = () => {
+    const norm = items.map(i => ({ id: i.id, qty: i.quantity, unit: to2(Number((typeof i.unitPrice === 'number' ? i.unitPrice : parseFloat(i.product.price)))) }))
+      .sort((a,b)=>a.id.localeCompare(b.id))
+    return JSON.stringify(norm)
+  }
+  const priceHashServer = (serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }>|undefined|null) => {
+    const arr = Array.isArray(serverItems) ? serverItems : []
+    const norm = arr.map(i => ({ id: String(i.product_id), qty: Number(i.quantity ?? items.find(it=>it.id===String(i.product_id))?.quantity ?? 0), unit: to2(Number(i.unit_price)) }))
+      .sort((a,b)=>a.id.localeCompare(b.id))
+    return JSON.stringify(norm)
+  }
 
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
@@ -296,15 +309,19 @@ export const CheckoutPage: React.FC = () => {
           setLoading(false)
           return
         }
-        // 0.b) Fiyat farkı varsa her durumda onay iste
+        // 0.b) Fiyatlar değişmiş mi? Önce hash ile kontrol et (idempotent)
         const serverTotal = validation?.totals?.subtotal ?? authoritativeTotal
         const localTotal = authoritativeTotal
         const s2 = Number(Number(serverTotal).toFixed(2))
         const l2 = Number(Number(localTotal).toFixed(2))
-        const diff = Math.abs(s2 - l2)
-        if (diff > 0.01) {
+        const localHash = priceHashLocal()
+        const serverHash = priceHashServer((validation as unknown as { items?: Array<{ product_id: string; quantity?: number; unit_price: number }> })?.items)
+        const hashesDiffer = serverHash !== localHash
+
+        if (hashesDiffer || Math.abs(s2 - l2) > 0.01) {
           // Sunucunun fiyatlarını yerel sepete uygula ve onay için Review'a dön
-          try { applyServerPricing(validation.items || []) } catch {}
+          try { applyServerPricing((validation as unknown as { items?: Array<{ product_id: string; unit_price: number }> }).items || []) } catch {}
+          try { localStorage.setItem('vh_last_price_hash', serverHash) } catch {}
           authoritativeTotal = s2
           toast('Fiyatlar güncellendi, lütfen onaylayın.')
           setStep(3)
