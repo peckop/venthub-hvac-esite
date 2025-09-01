@@ -77,3 +77,17 @@ CMD ["nginx", "-g", "daemon off;"]
 - Missing env: ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set on Cloudflare for both Preview and Production.
 - pnpm not found: enable pnpm in Pages project settings or use `corepack enable && pnpm --version` in a prebuild step.
 
+### Debug logging (safe)
+Frontend (Vite):
+- Set `VITE_DEBUG=true` to enable dev-only debug logs (printed as `console.warn`).
+- These logs avoid PII; still keep disabled in Production unless actively troubleshooting.
+- How to set:
+  - Local: add to `.env.development` → `VITE_DEBUG=true`
+  - Cloudflare Pages (Preview only recommended): Project → Settings → Environment Variables → add `VITE_DEBUG=true`
+
+Edge Function (Supabase):
+- Set `IYZICO_DEBUG=true` on the iyzico-payment function to enable additional server-side logs.
+- PII is sanitized (email/phone masked, addresses redacted) but prefer enabling only in Sandbox or temporarily in Production.
+- How to set:
+  - Supabase Dashboard → Functions → `iyzico-payment` → Settings/Config → Environment Variables → add `IYZICO_DEBUG=true` → redeploy function.
+
