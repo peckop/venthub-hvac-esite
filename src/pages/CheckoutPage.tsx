@@ -154,7 +154,7 @@ export const CheckoutPage: React.FC = () => {
   const [legalConsents, setLegalConsents] = useState<LegalConsents>({ kvkk: false, distanceSales: false, preInfo: false, orderConfirm: false, marketing: false })
 
   const [sameAsShipping, setSameAsShipping] = useState(true)
-  const [preferredCarrier, setPreferredCarrier] = useState<string>('mock')
+  const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard')
   const [paymentFrameContent, setPaymentFrameContent] = useState('')
   const [orderCompleted, setOrderCompleted] = useState(false)
   const [orderId, setOrderId] = useState('')
@@ -317,7 +317,7 @@ export const CheckoutPage: React.FC = () => {
         invoiceType,
         invoiceInfo,
         legalConsents,
-        preferredCarrier,
+        shippingMethod,
       })
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
@@ -943,23 +943,23 @@ export const CheckoutPage: React.FC = () => {
               {/* Step 2: Address Information */}
               {step === 2 && (
                 <div className="space-y-8">
-                  {/* Shipping Method (Carrier) */}
+                  {/* Shipping Method (Service Level) */}
                   <div>
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('checkout.shipping.methodTitle') || 'Kargo Firması'}</h3>
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('checkout.shipping.methodTitle') || 'Teslimat Yöntemi'}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${preferredCarrier==='auto' ? 'border-primary-navy' : 'border-light-gray'}`}>
+                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod==='standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
-                          <div className="text-sm font-medium text-industrial-gray">Otomatik (önerilen)</div>
-                          <div className="text-xs text-steel-gray">Sistem en uygun kargoyu seçer</div>
+                          <div className="text-sm font-medium text-industrial-gray">Standart</div>
+                          <div className="text-xs text-steel-gray">3–5 iş günü</div>
                         </div>
-                        <input type="radio" name="carrier" className="ml-3" checked={preferredCarrier==='auto'} onChange={() => setPreferredCarrier('auto')} />
+                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod==='standard'} onChange={() => setShippingMethod('standard')} />
                       </label>
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${preferredCarrier==='mock' ? 'border-primary-navy' : 'border-light-gray'}`}>
+                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod==='express' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
-                          <div className="text-sm font-medium text-industrial-gray">Mock (Sandbox)</div>
-                          <div className="text-xs text-steel-gray">Test amaçlı</div>
+                          <div className="text-sm font-medium text-industrial-gray">Ekspres</div>
+                          <div className="text-xs text-steel-gray">1–2 iş günü</div>
                         </div>
-                        <input type="radio" name="carrier" className="ml-3" checked={preferredCarrier==='mock'} onChange={() => setPreferredCarrier('mock')} />
+                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod==='express'} onChange={() => setShippingMethod('express')} />
                       </label>
                     </div>
                   </div>

@@ -21,11 +21,11 @@ export interface BuildPaymentArgs {
   invoiceType: InvoiceType
   invoiceInfo: InvoiceInfo
   legalConsents: LegalConsentsInput
-  preferredCarrier?: string | null
+  shippingMethod?: 'standard' | 'express' | string | null
 }
 
 export function buildPaymentRequest(args: BuildPaymentArgs) {
-  const { amount, items, customer, shipping, billing, sameAsShipping, userId, invoiceType, invoiceInfo, legalConsents, preferredCarrier } = args
+  const { amount, items, customer, shipping, billing, sameAsShipping, userId, invoiceType, invoiceInfo, legalConsents, shippingMethod } = args
 
   const cartItems = items.map(it => ({
     product_id: it.product.id,
@@ -65,7 +65,7 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
       orderConfirm: { accepted: !!legalConsents.orderConfirm, ts: new Date().toISOString() },
       marketing: { accepted: !!legalConsents.marketing, ts: legalConsents.marketing ? new Date().toISOString() : null },
     },
-    preferredCarrier: preferredCarrier || null,
+    shippingMethod: shippingMethod || 'standard',
   }
 
   return req
