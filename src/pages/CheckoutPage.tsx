@@ -319,14 +319,12 @@ export const CheckoutPage: React.FC = () => {
         const hashesDiffer = serverHash !== localHash
 
         if (hashesDiffer || Math.abs(s2 - l2) > 0.01) {
-          // Sunucunun fiyatlarını yerel sepete uygula ve onay için Review'a dön
+          // Sunucunun fiyatlarını uygula ve ÖDEMEYE DEVAM ET (kullanıcıyı geri döndürme)
           try { applyServerPricing((validation as unknown as { items?: Array<{ product_id: string; unit_price: number }> }).items || []) } catch {}
           try { localStorage.setItem('vh_last_price_hash', serverHash) } catch {}
           authoritativeTotal = s2
-          toast('Fiyatlar güncellendi, lütfen onaylayın.')
-          setStep(3)
-          setLoading(false)
-          return
+          toast('Fiyatlar güncellendi, ödeme devam ediyor.')
+          // Not: Artık geri dönmüyoruz; ödeme isteği düzeltilmiş tutarla devam edecek
         }
       } catch (e) {
         // Doğrulama hatasını kullanıcıya yansıtmayalım; ödeme akışını engellemesin
