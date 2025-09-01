@@ -299,11 +299,13 @@ export const CheckoutPage: React.FC = () => {
         // 0.b) Fiyat farkı varsa her durumda onay iste
         const serverTotal = validation?.totals?.subtotal ?? authoritativeTotal
         const localTotal = authoritativeTotal
-        const diff = Math.abs(serverTotal - localTotal)
+        const s2 = Number(Number(serverTotal).toFixed(2))
+        const l2 = Number(Number(localTotal).toFixed(2))
+        const diff = Math.abs(s2 - l2)
         if (diff > 0.01) {
           // Sunucunun fiyatlarını yerel sepete uygula ve onay için Review'a dön
           try { applyServerPricing(validation.items || []) } catch {}
-          authoritativeTotal = Number(serverTotal.toFixed(2))
+          authoritativeTotal = s2
           toast('Fiyatlar güncellendi, lütfen onaylayın.')
           setStep(3)
           setLoading(false)

@@ -408,18 +408,41 @@ useEffect(() => {
   // Sunucudan gelen birim fiyatları yerel sepete uygula ve (varsa) sunucu sepetine yaz
   const applyServerPricing = (serverItems: { product_id: string, unit_price: number }[]) => {
     if (!Array.isArray(serverItems) || serverItems.length === 0) return
+
+    const to2 = (n: number) => Number(Number(n).toFixed(2))
+    const nearlyEqual = (a: number, b: number) => Math.abs(to2(a) - to2(b)) <= 0.01
+
+    // Gelen veriyi normalize ederek bir harita oluştur (2 ondalık)
     const pmap = new Map<string, number>()
     for (const it of serverItems) {
       const pid = String(it.product_id)
       const up = Number(it.unit_price)
-      if (Number.isFinite(up)) pmap.set(pid, up)
+      if (Number.isFinite(up)) pmap.set(pid, to2(up))
     }
-    // Yerel güncelle
-    setItems(curr => curr.map(it => pmap.has(it.product.id) ? { ...it, unitPrice: pmap.get(it.product.id)! } : it))
-    // Sunucuya da yansıt (varsa)
-    if (CART_SERVER_SYNC && user && serverCartId) {
+
+    // Hangi kalemlerin gerçekten değişeceğini önceden belirle (idempotent davranış için)
+    const changedIds = new Set<string>()
+    for (const it of items) {
+      const nextUnit = pmap.get(it.product.id)
+      if (nextUnit == null) continue
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
+      if (!nearlyEqual(currUnit, nextUnit)) changedIds.add(it.product.id)
+    }
+
+    // Yerel güncelle (yalnızca değişen kalemlerde yeni referans üret)
+    setItems(curr => curr.map(it => {
+      const nextUnit = pmap.get(it.product.id)
+      if (nextUnit == null) return it
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
+      if (nearlyEqual(currUnit, nextUnit)) return it
+      return { ...it, unitPrice: nextUnit }
+    }))
+
+    // Sunucuya da yalnızca değişenleri yansıt (varsa)
+    if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
         const tasks = items.map(it => {
+          if (!changedIds.has(it.product.id)) return Promise.resolve()
           const up = pmap.get(it.product.id)
           if (up == null) return Promise.resolve()
           return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
