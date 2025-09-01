@@ -46,6 +46,7 @@ jobs:
           VITE_CART_SERVER_SYNC: "true"
           VITE_COMMIT_SHA: "${{ github.sha }}"
           VITE_BRANCH: "${{ github.ref_name }}"
+          VITE_DEBUG: "true"
         run: pnpm run build:ci
 
       - name: Ensure Cloudflare Pages project exists (idempotent)
