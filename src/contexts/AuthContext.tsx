@@ -34,7 +34,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function initializeAuth() {
       try {
-        console.log('Initializing auth...');
         
         // Get initial session
         const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
@@ -42,7 +41,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (sessionError) {
           console.error('Session error:', sessionError);
         } else {
-          console.log('Initial session:', initialSession ? 'Found' : 'None');
           if (isMounted) {
             setSession(initialSession);
             setUser(initialSession?.user || null);
@@ -62,7 +60,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Enhanced auth listener with better error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
-        console.log('Auth state changed:', { event, hasSession: !!newSession, userId: newSession?.user?.id });
         
         if (!isMounted) return;
         
@@ -81,13 +78,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
             toast.success('Çıkış yaptınız');
             break;
           case 'TOKEN_REFRESHED':
-            console.log('Token refreshed successfully');
             break;
           case 'USER_UPDATED':
             toast.success('Bilgileriniz güncellendi');
             break;
           default:
-            console.log('Auth event:', event);
         }
       }
     );

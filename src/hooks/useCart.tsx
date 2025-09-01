@@ -192,7 +192,9 @@ useEffect(() => {
         
         // If we have a guest cart with items, or we have a post-order clear flag, clear server cart first
         if ((isGuestCart && items.length > 0) || clearOnce) {
-          console.log('Clearing server cart (guest items present or post-order flag)')
+          if (((import.meta as ImportMeta).env?.VITE_DEBUG ?? 'false') === 'true') {
+            console.warn('Clearing server cart (guest items present or post-order flag)')
+          }
           await clearDbCartItems(cart.id)
         }
         

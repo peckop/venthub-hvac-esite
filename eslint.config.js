@@ -29,6 +29,8 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      // Disallow console logs in app code (allow errors/warns). Edge functions are already ignored via ignores.
+      'no-console': ['error', { allow: ['warn', 'error'] }],
       // Relax strict rules to reduce CI noise while we incrementally fix types
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-empty': ['warn', { allowEmptyCatch: true }],
