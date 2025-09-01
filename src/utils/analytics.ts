@@ -22,11 +22,11 @@ export function trackEvent(name: string, params: Record<string, unknown> = {}) {
     }
     // Fallback / debug log (visible when in dev OR when explicitly enabled)
     if (!delivered && (process.env.NODE_ENV !== 'production' || window.DEBUG_ANALYTICS)) {
-      console.log('[analytics]', name, params)
+      console.warn('[analytics]', name, params)
     }
     // Optional: when DEBUG_ANALYTICS is enabled, always mirror to console
     if (window.DEBUG_ANALYTICS) {
-      console.log('[analytics->mirror]', name, params)
+      console.warn('[analytics->mirror]', name, params)
     }
 } catch {
     // swallow

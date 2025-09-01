@@ -58,7 +58,6 @@ export const PaymentSuccessPage: React.FC = () => {
     const orderId = searchParams.get('orderId') || undefined
     const statusParam = searchParams.get('status') || undefined
 
-    console.log('Payment success page params:', { conversationId, token, orderId, errorMessage, statusParam })
 
     async function fetchOrderDetails(oid?: string) {
       try {

@@ -20,7 +20,15 @@ Deno.serve(async (req) => {
     }
 
     try {
-        console.log('İyzico Payment Request Started');
+        const debugEnabled = (Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true';
+        const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
+        const sanitize = (obj: any) => ({
+            ...obj,
+            buyer: obj?.buyer ? { ...obj.buyer, email: mask(obj.buyer.email), gsmNumber: mask(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
+            shippingAddress: obj?.shippingAddress ? { ...obj.shippingAddress, address: '***' } : undefined,
+            billingAddress: obj?.billingAddress ? { ...obj.billingAddress, address: '***' } : undefined,
+        });
+        if (debugEnabled) console.log('İyzico Payment Request Started');
 
         // Parse request body
         const requestData = await req.json();
@@ -104,7 +112,7 @@ Deno.serve(async (req) => {
             if (s.length <= 10) return s;
             return s.slice(0, 6) + '…' + s.slice(-4);
         };
-        console.log('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
+        if (debugEnabled) console.log('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
 
         // Generate unique identifiers
         const orderId = `VH-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -127,7 +135,7 @@ Deno.serve(async (req) => {
         const forwarded = req.headers.get('x-forwarded-for') || '';
         const realIp = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '');
 
-        console.log('Order ID:', orderId);
+        if (debugEnabled) console.log('Order ID:', orderId);
 
         // Create order in database
         // Not: venthub_orders.id NOT NULL ise, burada UUID oluşturup gönderiyoruz.
@@ -176,7 +184,7 @@ Deno.serve(async (req) => {
         const createdOrders = await orderResponse.json().catch(() => null);
         const dbOrderId = (Array.isArray(createdOrders) && createdOrders[0]?.id) ? createdOrders[0].id : dbGeneratedId;
 
-        console.log('✅ Order created successfully with id:', dbOrderId);
+        if (debugEnabled) console.log('✅ Order created successfully with id:', dbOrderId);
 
         // Create order items (order_id olarak veritabanındaki gerçek id kullanılır) using authoritative items
         // Fetch product metadata for snapshots
@@ -302,10 +310,9 @@ Deno.serve(async (req) => {
             basketItems
         };
 
-        console.log('İyzico Request:', JSON.stringify(iyzicoRequest, null, 2));
+        if (debugEnabled) console.log('İyzico Request:', JSON.stringify(sanitize(iyzicoRequest), null, 2));
 
         // İyzipay Node SDK ile isteği yap
-        const debugEnabled = (Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true';
 
         const sdk = new (Iyzipay as any)({
             apiKey: iyzicoApiKey,
@@ -344,9 +351,9 @@ Deno.serve(async (req) => {
             });
         });
 
-        console.log('İyzico Result:', iyzicoResult);
+        if (debugEnabled) console.log('İyzico Result:', { status: iyzicoResult?.status, hasToken: !!iyzicoResult?.token, hasPaymentPageUrl: !!iyzicoResult?.paymentPageUrl });
         if (iyzicoResult && iyzicoResult.status === 'success' && (iyzicoResult.checkoutFormContent || iyzicoResult.paymentPageUrl || iyzicoResult.token)) {
-            console.log('✅ İyzico checkout form created successfully');
+            if (debugEnabled) console.log('✅ İyzico checkout form created successfully');
             
             // Minimal token saklama: reconcile için yeterli.
             try {

@@ -30,6 +30,14 @@ export const CheckoutPage: React.FC = () => {
   // Test ortamı tespiti (Vitest) — global "vi" varlığını kontrol et
   const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined'
   const { user, loading: authLoading } = useAuth()
+
+  // Dev-only debug logger to avoid leaking PII in production
+  const debug = (...args: unknown[]) => {
+    const env = (import.meta as unknown as { env?: Record<string, string> }).env
+    if (env?.VITE_DEBUG === 'true') {
+      try { console.warn(...args) } catch {}
+    }
+  }
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
@@ -242,11 +250,11 @@ export const CheckoutPage: React.FC = () => {
   }
 
   const initiatePayment = async () => {
-    console.log('=== İNITATE PAYMENT STARTED ===');
-    console.log('Cart items:', items);
-    console.log('Cart total:', getCartTotal());
-    console.log('Customer info:', customerInfo);
-    console.log('Shipping address:', shippingAddress);
+    debug('=== İNITATE PAYMENT STARTED ===');
+    debug('Cart items:', items);
+    debug('Cart total:', getCartTotal());
+    debug('Customer info present:', Boolean(customerInfo?.email));
+    debug('Shipping city:', shippingAddress?.city);
     
     // Test ortamında yan etkileri tamamen kapat ve direkt 4. adıma geç
     if (isTest) {
@@ -319,12 +327,12 @@ export const CheckoutPage: React.FC = () => {
         throw error;
       }
 
-      if (data && data.data) {
-        console.log('İyzico payment response:', data.data);
-        
-        // Öncelik: hosted ödeme sayfasına yönlendirme (3D sonrası otomatik dönüş daha sorunsuz)
-        if (data.data.paymentPageUrl) {
-          console.log('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
+        if (data && data.data) {
+          debug('İyzico payment response:', { status: data.data?.status, hasToken: !!data.data?.token, hasUrl: !!data.data?.paymentPageUrl });
+          
+          // Öncelik: hosted ödeme sayfasına yönlendirme (3D sonrası otomatik dönüş daha sorunsuz)
+          if (data.data.paymentPageUrl) {
+            debug('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
           try {
             localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
             localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
@@ -358,7 +366,7 @@ export const CheckoutPage: React.FC = () => {
         
         // Hemen tamamlanan ödeme (demo)
         if (data.data.status === 'success') {
-          console.log('Payment completed immediately');
+          debug('Payment completed immediately');
           setOrderId(data.data.orderId || data.data.conversationId || 'completed_order');
           setOrderCompleted(true);
           clearCart();
