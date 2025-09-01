@@ -266,18 +266,21 @@ Deno.serve(async (req) => {
 
         // İyzico checkout form initialize request
         // Fiyat tutarlılığı: price == basketItems toplamı olmalı, paidPrice >= price olabilir.
+        const to2 = (n:number)=> Number(Number(n).toFixed(2))
+        const toCents = (n:number)=> Math.round(Number(n)*100)
         const basketItems = authoritativeItems.map((item: any) => ({
             id: item.product_id,
             name: (typeof prodMap.get === 'function' ? (prodMap.get(item.product_id)?.name) : undefined) || 'Ürün',
             category1: 'HVAC',
             category2: 'Products',
             itemType: 'PHYSICAL',
-            price: (Number(item.unit_price) * Number(item.quantity)).toFixed(2)
+            price: to2(Number(item.unit_price) * Number(item.quantity)).toFixed(2)
         }));
-        const itemsTotal = Number(basketItems.reduce((sum: number, it: any) => sum + Number(it.price), 0).toFixed(2));
-        // price: basket kalemlerinin toplamı olmalı; paidPrice >= price olabilir
-        const requestedAmount = Number(authoritativeTotalNum);
-        const paidPriceNumber = isNaN(requestedAmount) ? itemsTotal : Number(requestedAmount.toFixed(2));
+        // Toplamı kuruş bazında hesapla ve her iki alana da aynı değeri yaz
+        const subtotalCents = authoritativeItems.reduce((s:number, it:any)=> s + toCents(Number(it.unit_price)) * Number(it.quantity), 0)
+        const normalizedTotal = subtotalCents / 100
+        const itemsTotal = normalizedTotal
+        const paidPriceNumber = normalizedTotal
 
         const callbackBase = Deno.env.get('IYZICO_CALLBACK_URL') || (() => {
             const su = Deno.env.get('SUPABASE_URL') || ''
