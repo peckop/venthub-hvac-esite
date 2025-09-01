@@ -46,8 +46,8 @@ export const PaymentSuccessPage: React.FC = () => {
       searchParams.get('orderId')
       
     if (hasSuccessIndicators) {
+      // Sadece local veriyi sessizce temizle; kullanıcıya toast gösterme
       forceClear()
-      clearCart()
     }
   }, [searchParams, clearCart])
 
@@ -80,7 +80,7 @@ export const PaymentSuccessPage: React.FC = () => {
         if (statusParam === 'success') {
           setStatus('success')
           setPaymentInfo({ conversationId: conversationId || orderId, token })
-          clearCart()
+          clearCart({ silent: true })
           try {
             localStorage.removeItem('venthub-cart');
             localStorage.removeItem('venthub-cart-version');
@@ -111,7 +111,7 @@ export const PaymentSuccessPage: React.FC = () => {
           if (data?.status === 'success') {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
-            clearCart()
+            clearCart({ silent: true })
             try {
               localStorage.removeItem('venthub-cart');
               localStorage.removeItem('venthub-cart-version');
@@ -155,7 +155,7 @@ export const PaymentSuccessPage: React.FC = () => {
           if (data?.status === 'paid') {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId, token })
-            clearCart()
+            clearCart({ silent: true })
             try {
               localStorage.removeItem('venthub-cart');
               localStorage.removeItem('venthub-cart-version');

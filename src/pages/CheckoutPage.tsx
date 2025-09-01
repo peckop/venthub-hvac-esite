@@ -417,7 +417,7 @@ export const CheckoutPage: React.FC = () => {
           debug('Payment completed immediately');
           setOrderId(data.data.orderId || data.data.conversationId || 'completed_order');
           setOrderCompleted(true);
-          clearCart();
+          clearCart({ silent: true });
           toast.success(t('checkout.paymentSuccess'));
         } else {
           throw new Error('Ödeme başlatma hatası: Geçersiz yanıt');
@@ -484,7 +484,7 @@ export const CheckoutPage: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.event === 'payment_success') {
         setOrderCompleted(true)
-        clearCart()
+        clearCart({ silent: true })
         toast.success(t('checkout.paymentSuccess'))
       } else if (event.data.event === 'payment_error') {
         toast.error(event.data.error || t('checkout.paymentError'))
