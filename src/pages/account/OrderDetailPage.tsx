@@ -107,13 +107,19 @@ export default function OrderDetailPage() {
       try {
         setLoading(true)
 const baseSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
-        let { data, error } = await supabase
+        const baseRes = await supabase
           .from('venthub_orders')
           .select(baseSelect)
           .eq('id', id)
           .limit(1)
           .single()
-        if (error && (((error as SupabaseError).code === '42703') || ((error as SupabaseError).status === 400))) {
+
+        let data: SupabaseOrderData | null = null
+        let error: SupabaseError | null = baseRes.error as SupabaseError | null
+
+        if (!baseRes.error) {
+          data = baseRes.data as unknown as SupabaseOrderData
+        } else if (((baseRes.error as SupabaseError).code === '42703') || ((baseRes.error as SupabaseError).status === 400)) {
           // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
           const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
           const fb = await supabase
@@ -122,17 +128,18 @@ const baseSelect = 'id, total_amount, status, created_at, customer_name, custome
             .eq('id', id)
             .limit(1)
             .single()
-          data = fb.data as SupabaseOrderData
-          error = fb.error
+          data = (fb.data as unknown as SupabaseOrderData) ?? null
+          error = (fb.error as SupabaseError | null)
         }
-        if (error) throw error
+
+        if (error || !data) throw (error || { message: 'Order not found' })
         // Ensure all required fields have fallback values
-        const orderDataWithDefaults = {
+        const orderDataWithDefaults: SupabaseOrderData = {
           ...data,
           customer_name: data.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
           customer_email: data.customer_email || (user?.email || '-'),
           order_number: data.order_number || data.id,
-        } as SupabaseOrderData
+        }
         
 const mapped: Order = {
   id: orderDataWithDefaults.id,
