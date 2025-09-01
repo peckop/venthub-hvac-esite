@@ -44,7 +44,13 @@ export const CheckoutPage: React.FC = () => {
   const { t } = useI18n()
   // i18n fallback helper (if missing key, t(key) returns key string)
   const tf = (key: string, fallback: string) => {
-    try { const v = t(key as any); return v === key ? fallback : v } catch { return fallback }
+    try {
+      const translate = t as unknown as (k: string) => string
+      const v = translate(key)
+      return v === key ? fallback : v
+    } catch {
+      return fallback
+    }
   }
 
   // Auth check - redirect to login if not authenticated
