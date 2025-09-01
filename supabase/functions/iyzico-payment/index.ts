@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
 
         // Parse request body
         const requestData = await req.json();
-        const { amount, cartItems, customerInfo, shippingAddress, billingAddress, user_id, invoiceInfo, invoiceType, legalConsents } = requestData;
+        const { amount, cartItems, customerInfo, shippingAddress, billingAddress, user_id, invoiceInfo, invoiceType, legalConsents, preferredCarrier } = requestData;
 
         // Validate required fields
         if (!amount || !cartItems?.length || !customerInfo?.name || !customerInfo?.email || !shippingAddress?.fullAddress) {
@@ -156,7 +156,8 @@ Deno.serve(async (req) => {
             status: 'pending',
             invoice_type: invoiceType || null,
             invoice_info: invoiceInfo || null,
-            legal_consents: legalConsents || null
+            legal_consents: legalConsents || null,
+            carrier: (typeof preferredCarrier === 'string' && preferredCarrier) ? preferredCarrier : null
         };
 
         const orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
