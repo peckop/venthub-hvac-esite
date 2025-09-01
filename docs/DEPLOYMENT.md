@@ -91,3 +91,23 @@ Edge Function (Supabase):
 - How to set:
   - Supabase Dashboard → Functions → `iyzico-payment` → Settings/Config → Environment Variables → add `IYZICO_DEBUG=true` → redeploy function.
 
+### Shipping Webhook (Sandbox Test)
+- Endpoint: `https://<PROJECT_REF>.functions.supabase.co/shipping-webhook`
+- Auth: Prefer HMAC-SHA256 base64 over raw body in `X-Signature`; optional legacy token `X-Webhook-Token`.
+- Optional replay guard headers: `X-Timestamp` (epoch ms or ISO) and `X-Id` (event id). If timestamp is present, ±5 dk tolerans kontrol edilir.
+- Test script (Windows PowerShell): `.scripts/send_shipping_webhook.ps1`
+
+Example:
+```powershell path=null start=null
+$project = "<PROJECT_REF>"
+$secret  = "<SHIPPING_WEBHOOK_SECRET>"
+$body    = '{"order_id":"<uuid>","carrier":"mock","status":"in_transit","tracking_number":"T123"}'
+
+powershell -ExecutionPolicy Bypass -File .scripts/send_shipping_webhook.ps1 `
+  -ProjectRef $project `
+  -Secret $secret `
+  -BodyJson $body `
+  -Carrier mock
+```
+- Status mapping: created/info_received → paid; in_transit/out_for_delivery → shipped; delivered → delivered; failed/exception/canceled → failed.
+

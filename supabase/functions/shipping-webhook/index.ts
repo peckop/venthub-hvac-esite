@@ -39,7 +39,41 @@ function mapCarrierStatus(input?: string): { status?: string; setShipped?: boole
   return { status: s }
 }
 
+function normalizePayload(carrierHint: string, obj: any) {
+  const c = (carrierHint || obj?.carrier || '').toString().trim().toLowerCase()
+  // Common aliases
+  const pick = (...keys: string[]) => {
+    for (const k of keys) {
+      const v = obj?.[k]
+      if (v != null) return v
+    }
+    return undefined
+  }
+  const norm = {
+    order_id: (pick('order_id','orderId','id') || '').toString(),
+    order_number: (pick('order_number','orderNo','orderCode') || '').toString(),
+    carrier: c || (pick('carrier','provider') || '').toString(),
+    tracking_number: (pick('tracking_number','trackingNumber','trackingNo','tn') || '').toString(),
+    tracking_url: (pick('tracking_url','trackingUrl','url','link') || '').toString(),
+    status: (pick('status','state','shipmentStatus') || '').toString(),
+    shipped_at: (pick('shipped_at','shippedAt','shipDate') || '').toString(),
+    delivered_at: (pick('delivered_at','deliveredAt','deliveryDate') || '').toString(),
+  }
+  // Example: mock carrier custom mapping
+  if (c === 'mock') {
+    // no extra mapping for now
+  }
+  return norm
+}
+
+async function sha256Base64(input: string): Promise<string> {
+  const bytes = new TextEncoder().encode(input)
+  const hash = await crypto.subtle.digest('SHA-256', bytes)
+  return btoa(String.fromCharCode(...new Uint8Array(hash)))
+}
+
 const RANK: Record<string, number> = { pending: 0, paid: 1, confirmed: 2, shipped: 3, delivered: 4 }
+const SKEW_MS = 5 * 60 * 1000 // 5 minutes tolerance
 
 Deno.serve(async (req: Request) => {
   try {
@@ -71,6 +105,22 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Optional replay guard — enforce only if timestamp header present
+    const tsHeader = req.headers.get('x-timestamp') || req.headers.get('x-event-time') || ''
+    if (tsHeader) {
+      let t = 0
+      // support epoch ms or ISO
+      if (/^\d+$/.test(tsHeader.trim())) {
+        t = parseInt(tsHeader.trim(), 10)
+      } else {
+        const d = Date.parse(tsHeader)
+        t = Number.isFinite(d) ? d : 0
+      }
+      if (!t || Math.abs(Date.now() - t) > SKEW_MS) {
+        return jsonResponse({ error: 'Stale or invalid timestamp' }, { status: 401 })
+      }
+    }
+
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     if (!SUPABASE_URL || !SERVICE_KEY) {
@@ -79,9 +129,9 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    // Expected payload
-    // { order_id?, order_number?, carrier?, tracking_number?, tracking_url?, status?, shipped_at?, delivered_at? }
-    const p = payload as {
+    // Normalize payload (carrier adapters)
+    const carrierHint = (req.headers.get('x-carrier') || payload?.carrier || '') as string
+    const p = normalizePayload(carrierHint, payload) as {
       order_id?: string
       order_number?: string
       carrier?: string
@@ -90,6 +140,21 @@ Deno.serve(async (req: Request) => {
       status?: string
       shipped_at?: string
       delivered_at?: string
+    }
+
+    // Optional dedup by event id
+    const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
+    if (eventId) {
+      try {
+        const { data: existing } = await supabase
+          .from('shipping_webhook_events')
+          .select('event_id')
+          .eq('event_id', eventId)
+          .limit(1)
+        if (Array.isArray(existing) && existing.length > 0) {
+          return jsonResponse({ ok: true, event_id: eventId, duplicate: true, unchanged: true })
+        }
+      } catch {}
     }
 
     let orderId = (p.order_id || '').trim()
@@ -102,7 +167,7 @@ Deno.serve(async (req: Request) => {
         .limit(1)
         .single()
       if (error) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
-      orderId = data?.id
+      orderId = (data as any)?.id
     }
 
     if (!orderId) {
@@ -118,13 +183,13 @@ Deno.serve(async (req: Request) => {
     if (curErr || !current) return jsonResponse({ error: 'Order not found' }, { status: 404 })
 
     const patch: Record<string, unknown> = {}
-    if (typeof p.carrier === 'string') patch.carrier = p.carrier
-    if (typeof p.tracking_number === 'string') patch.tracking_number = p.tracking_number
-    if (typeof p.tracking_url === 'string') patch.tracking_url = p.tracking_url
+    if (typeof p.carrier === 'string' && p.carrier) patch.carrier = p.carrier
+    if (typeof p.tracking_number === 'string' && p.tracking_number) patch.tracking_number = p.tracking_number
+    if (typeof p.tracking_url === 'string' && p.tracking_url) patch.tracking_url = p.tracking_url
 
     // Map external status to internal and enforce monotonic upgrade
     const mapped = mapCarrierStatus(p.status)
-    const curStatus = String(current.status || 'pending').toLowerCase()
+    const curStatus = String((current as any).status || 'pending').toLowerCase()
     if (mapped.status) {
       const next = mapped.status.toLowerCase()
       const curRank = RANK[curStatus] ?? 0
@@ -133,10 +198,10 @@ Deno.serve(async (req: Request) => {
         patch.status = next
         // Timestamps: allow explicit dates from payload, otherwise set now if transitioning
         const parseDate = (s?: string) => (s ? new Date(s).toISOString() : undefined)
-        if (next === 'shipped' && !current.shipped_at) {
+        if (next === 'shipped' && !(current as any).shipped_at) {
           patch.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
         }
-        if (next === 'delivered' && !current.delivered_at) {
+        if (next === 'delivered' && !(current as any).delivered_at) {
           patch.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
         }
       }
@@ -145,14 +210,30 @@ Deno.serve(async (req: Request) => {
     // If no effective changes, short‑circuit
     const noChange =
       (patch.status == null || patch.status === curStatus) &&
-      (patch.tracking_number == null || patch.tracking_number === current.tracking_number) &&
-      (patch.tracking_url == null || patch.tracking_url === current.tracking_url) &&
-      (patch.carrier == null || patch.carrier === current.carrier) &&
+      (patch.tracking_number == null || patch.tracking_number === (current as any).tracking_number) &&
+      (patch.tracking_url == null || patch.tracking_url === (current as any).tracking_url) &&
+      (patch.carrier == null || patch.carrier === (current as any).carrier) &&
       (patch.shipped_at == null) &&
       (patch.delivered_at == null)
 
     if (noChange) {
-      return jsonResponse({ ok: true, order_id: current.id, shipping: current, unchanged: true })
+      // Log event as unchanged
+      try {
+        const bodyHash = await sha256Base64(raw)
+        if (eventId) {
+          await supabase.from('shipping_webhook_events').insert({
+            event_id: eventId,
+            order_id: orderId,
+            carrier: p.carrier || null,
+            status_raw: p.status || null,
+            status_mapped: (patch.status as string) || curStatus,
+            body_hash: bodyHash,
+            received_at: new Date().toISOString(),
+            processed_at: new Date().toISOString(),
+          }, { onConflict: 'event_id', ignoreDuplicates: true } as any)
+        }
+      } catch {}
+      return jsonResponse({ ok: true, order_id: (current as any).id, shipping: current, unchanged: true })
     }
 
     const { data, error } = await supabase
@@ -162,9 +243,26 @@ Deno.serve(async (req: Request) => {
       .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
       .single()
 
-    if (error) return jsonResponse({ error: error.message || 'Update failed' }, { status: 500 })
+    if (error) return jsonResponse({ error: (error as any).message || 'Update failed' }, { status: 500 })
 
-    return jsonResponse({ ok: true, order_id: data.id, shipping: data })
+    // Insert event audit
+    try {
+      const bodyHash = await sha256Base64(raw)
+      if (eventId) {
+        await supabase.from('shipping_webhook_events').insert({
+          event_id: eventId,
+          order_id: orderId,
+          carrier: p.carrier || null,
+          status_raw: p.status || null,
+          status_mapped: (data as any).status,
+          body_hash: bodyHash,
+          received_at: new Date().toISOString(),
+          processed_at: new Date().toISOString(),
+        }, { onConflict: 'event_id', ignoreDuplicates: true } as any)
+      }
+    } catch {}
+
+    return jsonResponse({ ok: true, order_id: (data as any).id, shipping: data })
   } catch (e) {
     return jsonResponse({ error: (e as Error).message || 'Unexpected error' }, { status: 500 })
   }
