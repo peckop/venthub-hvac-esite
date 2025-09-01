@@ -37,14 +37,20 @@ Deno.serve(async (req) => {
         const requestData = await req.json();
         const { amount, cartItems, customerInfo, shippingAddress, billingAddress, user_id, invoiceInfo, invoiceType, legalConsents, shippingMethod } = requestData;
 
-        // Validate required fields
-        if (!amount || !cartItems?.length || !customerInfo?.name || !customerInfo?.email || !shippingAddress?.fullAddress) {
+        // Validate required fields (relaxed): amount/cartItems optional; we derive authoritative items/total below
+        if (!customerInfo?.email || !shippingAddress?.fullAddress) {
             return new Response(JSON.stringify({
-                error: { code: 'VALIDATION_ERROR', message: 'Gerekli alanlar eksik' }
+                error: { code: 'VALIDATION_ERROR', message: 'Email ve gönderim adresi gereklidir' }
             }), {
                 status: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
+        }
+        // Fill missing buyer name from email prefix if not provided
+        if (!customerInfo?.name || String(customerInfo.name).trim().length === 0) {
+            const emailStr = String(customerInfo.email || '')
+            const prefix = emailStr.includes('@') ? emailStr.split('@')[0] : 'Musteri'
+            requestData.customerInfo = { ...(customerInfo||{}), name: prefix }
         }
 
         // Environment variables
@@ -310,8 +316,8 @@ Deno.serve(async (req) => {
             enabledInstallments: [1, 2, 3, 6, 9, 12],
             buyer: {
                 id: user_id || 'guest_' + Date.now(),
-                name: customerInfo.name.split(' ')[0] || 'Ad',
-                surname: customerInfo.name.split(' ').slice(1).join(' ') || 'Soyad',
+                name: (customerInfo.name || '').split(' ')[0] || 'Ad',
+                surname: (customerInfo.name || '').split(' ').slice(1).join(' ') || 'Soyad',
                 gsmNumber: (() => { const raw = customerInfo.phone || '+905555555555'; const digits = raw.replace(/\s+/g,''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g,'')); })(),
                 email: customerInfo.email,
                 identityNumber: '11111111110',
