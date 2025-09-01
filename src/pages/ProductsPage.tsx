@@ -57,11 +57,14 @@ const ProductsPage: React.FC = () => {
       try {
         if (hasLoadedAll) return
         // For All Products mode, fetch the complete list only when needed
+        setLoading(true)
         const productsData = await getAllProducts()
         setAllProducts(productsData)
         setHasLoadedAll(true)
       } catch (error) {
         console.error('Error fetching all products:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -264,11 +267,19 @@ const ProductsPage: React.FC = () => {
       {/* All products modu */}
       {isAll ? (
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          {allProducts.length === 0 ? (
+          {!hasLoadedAll ? (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
               {[1,2,3,4,5,6,7,8,9].map((i) => (
                 <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
               ))}
+            </div>
+          ) : allProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl text-light-gray mb-4">📦</div>
+              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
+                {t('products.noProducts')}
+              </h3>
+              <p className="text-steel-gray">{t('products.noProductsDesc')}</p>
             </div>
           ) : (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
