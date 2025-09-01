@@ -75,9 +75,12 @@ Deno.serve(async (req) => {
                 const validation = await vResp.json().catch(() => ({}));
                 const stockIssues = Array.isArray(validation?.stock_issues) ? validation.stock_issues : [];
                 const mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
-                if ((stockIssues && stockIssues.length > 0) || (mismatches && mismatches.length > 0)) {
-                    return new Response(JSON.stringify({ error: { code: 'VALIDATION_CHANGED', message: 'Prices or stock changed', stock_issues: stockIssues, mismatches } }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+                // Eski davranış: 409 döndürüp akışı durdurmak. Yeni davranış: sunucu otoritesini uygula ve devam et.
+                if ((stockIssues && stockIssues.length > 0)) {
+                    // Stok problemi varsa yine durdur (kullanıcı müdahalesi gerekir)
+                    return new Response(JSON.stringify({ error: { code: 'VALIDATION_STOCK', message: 'Stock issue', stock_issues: stockIssues } }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
                 }
+                // Fiyat uyuşmazlığında: authoritativeItems ve subtotal ile devam et (ödeme bloklanmasın)
                 authoritativeItems = Array.isArray(validation?.items) ? validation.items : []
                 if (validation?.totals?.subtotal != null) {
                     authoritativeTotalNum = Number(validation.totals.subtotal)
