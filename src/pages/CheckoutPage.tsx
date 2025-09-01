@@ -34,7 +34,9 @@ export const CheckoutPage: React.FC = () => {
   // Dev-only debug logger to avoid leaking PII in production
   const debug = (...args: unknown[]) => {
     const env = (import.meta as unknown as { env?: Record<string, string> }).env
-    if (env?.VITE_DEBUG === 'true') {
+    let on = env?.VITE_DEBUG === 'true'
+    try { if (!on && typeof localStorage !== 'undefined') on = localStorage.getItem('vh_debug') === '1' } catch {}
+    if (on) {
       try { console.warn(...args) } catch {}
     }
   }
@@ -316,6 +318,7 @@ export const CheckoutPage: React.FC = () => {
         const l2 = Number(Number(localTotal).toFixed(2))
         const localHash = priceHashLocal()
         const serverHash = priceHashServer((validation as unknown as { items?: Array<{ product_id: string; quantity?: number; unit_price: number }> })?.items)
+        debug('validation diff check', { s2, l2, diff: Number(Math.abs(s2-l2).toFixed(4)), hashesDiffer, localHash, serverHash })
         const hashesDiffer = serverHash !== localHash
 
         if (hashesDiffer || Math.abs(s2 - l2) > 0.01) {
@@ -347,9 +350,23 @@ export const CheckoutPage: React.FC = () => {
         shippingMethod,
       })
 
-      const { data, error } = await supabase.functions.invoke('iyzico-payment', {
-        body: requestData
+      // Debug: özet log (PII maskelemeden minimal alanlarla)
+      debug('iyz init payload summary', {
+        amount: requestData?.amount,
+        items: Array.isArray(requestData?.cartItems) ? requestData.cartItems.map((i: any) => ({ id: i.product_id, q: i.quantity, p: i.price })) : [],
+        shipCity: requestData?.shippingAddress?.city,
+        billCity: requestData?.billingAddress?.city,
       })
+
+      const headers: Record<string,string> = {}
+      try { if ((import.meta as any).env?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch {}
+
+      const { data, error } = await supabase.functions.invoke('iyzico-payment', {
+        body: requestData,
+        headers,
+      })
+
+      debug('iyz init response', { ok: !error, hasData: !!data, status: data?.data?.status, hasUrl: !!data?.data?.paymentPageUrl, hasToken: !!data?.data?.token, err: error?.message })
 
       if (error) {
         console.error('İyzico payment error:', error);

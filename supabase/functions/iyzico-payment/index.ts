@@ -20,7 +20,10 @@ Deno.serve(async (req) => {
     }
 
     try {
-        const debugEnabled = (Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true';
+        const url = new URL(req.url);
+        const debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
+          || (url.searchParams.get('debug') === '1')
+          || ((req.headers.get('x-debug') || '') === '1');
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
         const sanitize = (obj: any) => ({
             ...obj,
@@ -272,7 +275,7 @@ Deno.serve(async (req) => {
             price: (Number(item.unit_price) * Number(item.quantity)).toFixed(2)
         }));
         const itemsTotal = Number(basketItems.reduce((sum: number, it: any) => sum + Number(it.price), 0).toFixed(2));
-        // KDV dahil fiyatlar: iyzico'ya price ve paidPrice olarak toplamdaki brüt tutarı (authoritative) gönderiyoruz
+        // price: basket kalemlerinin toplamı olmalı; paidPrice >= price olabilir
         const requestedAmount = Number(authoritativeTotalNum);
         const paidPriceNumber = isNaN(requestedAmount) ? itemsTotal : Number(requestedAmount.toFixed(2));
 
@@ -294,7 +297,7 @@ Deno.serve(async (req) => {
         const iyzicoRequest = {
             locale: 'tr',
             conversationId: conversationId,
-            price: paidPriceNumber.toFixed(2),
+            price: itemsTotal.toFixed(2),
             paidPrice: paidPriceNumber.toFixed(2),
             currency: 'TRY',
             basketId: orderId,
