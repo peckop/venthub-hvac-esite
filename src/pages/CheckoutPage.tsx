@@ -289,6 +289,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     setLoading(true)
+    let lastRequestData: unknown = null
     try {
       // 0) Server-side fiyat doğrulaması (sessiz)
       let authoritativeTotal = getCartTotal()
@@ -349,6 +350,7 @@ export const CheckoutPage: React.FC = () => {
         legalConsents,
         shippingMethod,
       })
+      lastRequestData = requestData
 
       // Debug: özet log (PII maskelemeden minimal alanlarla)
       debug('iyz init payload summary', {
@@ -432,6 +434,33 @@ export const CheckoutPage: React.FC = () => {
         code: err?.code,
         stack: err?.stack
       })
+
+      // Try to fetch detailed error body directly (debug only)
+      try {
+        const env = (import.meta as unknown as { env?: Record<string, string> }).env
+        const dbg = env?.VITE_DEBUG === 'true' || (typeof localStorage !== 'undefined' && localStorage.getItem('vh_debug') === '1')
+        if (dbg) {
+          const base = env?.VITE_SUPABASE_URL || ''
+          const anon = env?.VITE_SUPABASE_ANON_KEY || ''
+          if (base && anon) {
+            const resp = await fetch(`${base}/functions/v1/iyzico-payment?debug=1`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', apikey: anon, Authorization: `Bearer ${anon}`, 'x-debug': '1' },
+              body: JSON.stringify(lastRequestData || {})
+            })
+            const txt = await resp.text()
+            debug('iyz direct response', { status: resp.status, body: txt })
+            try {
+              const j = JSON.parse(txt) as { error?: { code?: string; message?: string; details?: unknown } }
+              if (j?.error?.message) {
+                toast.error(`${j.error.code || 'ERR'}: ${j.error.message}`)
+              }
+            } catch { /* no-op */ }
+          }
+        }
+      } catch (e) {
+        console.warn('debug direct fetch failed:', e)
+      }
       
       // More detailed error message
       let errorMessage = t('checkout.errors.paymentInit')
