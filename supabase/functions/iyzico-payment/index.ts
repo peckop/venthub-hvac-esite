@@ -35,22 +35,33 @@ Deno.serve(async (req) => {
 
         // Parse request body
         const requestData = await req.json();
-        const { amount, cartItems, customerInfo, shippingAddress, billingAddress, user_id, invoiceInfo, invoiceType, legalConsents, shippingMethod } = requestData;
+        const amount = requestData?.amount
+        const cartItems = requestData?.cartItems
+        const user_id = requestData?.user_id
+        const invoiceInfo = requestData?.invoiceInfo
+        const invoiceType = requestData?.invoiceType
+        const legalConsents = requestData?.legalConsents
+        const shippingMethod = requestData?.shippingMethod
+        // Coalesce customer/shipping/billing from alternative keys and apply fallbacks
+        let ci = requestData?.customerInfo || requestData?.customer || {}
+        let shipAddr = requestData?.shippingAddress || requestData?.shipping || requestData?.shipping_address || null
+        let billAddr = requestData?.billingAddress || requestData?.billing || requestData?.billing_address || null
+        if (!shipAddr && billAddr) shipAddr = billAddr
+        if (!ci?.name || String(ci.name).trim().length===0) {
+            const emailStr = String(ci?.email || '')
+            const prefix = emailStr.includes('@') ? emailStr.split('@')[0] : 'Musteri'
+            ci = { ...(ci||{}), name: prefix }
+        }
 
         // Validate required fields (relaxed): amount/cartItems optional; we derive authoritative items/total below
-        if (!customerInfo?.email || !shippingAddress?.fullAddress) {
+        if (!(ci?.email) || !(shipAddr?.fullAddress)) {
+            const missing = [!ci?.email ? 'email' : null, !shipAddr?.fullAddress ? 'shipping.fullAddress' : null].filter(Boolean)
             return new Response(JSON.stringify({
-                error: { code: 'VALIDATION_ERROR', message: 'Email ve gönderim adresi gereklidir' }
+                error: { code: 'VALIDATION_ERROR', message: 'Eksik alanlar', details: missing }
             }), {
                 status: 400,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
-        }
-        // Fill missing buyer name from email prefix if not provided
-        if (!customerInfo?.name || String(customerInfo.name).trim().length === 0) {
-            const emailStr = String(customerInfo.email || '')
-            const prefix = emailStr.includes('@') ? emailStr.split('@')[0] : 'Musteri'
-            requestData.customerInfo = { ...(customerInfo||{}), name: prefix }
         }
 
         // Environment variables
@@ -159,11 +170,11 @@ Deno.serve(async (req) => {
             // order_number kolonu şemada yoksa göndermiyoruz; gerekirse ileride eklenir.
             total_amount: Number(authoritativeTotalNum.toFixed(2)),
             subtotal_snapshot: Number(authoritativeTotalNum.toFixed(2)),
-            shipping_address: shippingAddress,
-            billing_address: billingAddress || shippingAddress,
-            customer_email: customerInfo.email,
-            customer_name: customerInfo.name,
-            customer_phone: customerInfo.phone || null,
+            shipping_address: shipAddr,
+            billing_address: billAddr || shipAddr,
+            customer_email: ci.email,
+            customer_name: ci.name,
+            customer_phone: ci.phone || null,
             payment_method: 'iyzico',
             status: 'pending',
             invoice_type: invoiceType || null,
@@ -316,32 +327,32 @@ Deno.serve(async (req) => {
             enabledInstallments: [1, 2, 3, 6, 9, 12],
             buyer: {
                 id: user_id || 'guest_' + Date.now(),
-                name: (customerInfo.name || '').split(' ')[0] || 'Ad',
-                surname: (customerInfo.name || '').split(' ').slice(1).join(' ') || 'Soyad',
-                gsmNumber: (() => { const raw = customerInfo.phone || '+905555555555'; const digits = raw.replace(/\s+/g,''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g,'')); })(),
-                email: customerInfo.email,
+                name: (ci.name || '').split(' ')[0] || 'Ad',
+                surname: (ci.name || '').split(' ').slice(1).join(' ') || 'Soyad',
+                gsmNumber: (() => { const raw = ci.phone || '+905555555555'; const digits = raw.replace(/\s+/g,''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g,'')); })(),
+                email: ci.email,
                 identityNumber: '11111111110',
                 lastLoginDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
                 registrationDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
-                registrationAddress: shippingAddress.fullAddress,
+                registrationAddress: shipAddr.fullAddress,
                 ip: realIp || '85.34.78.112',
-                city: shippingAddress.city,
+                city: shipAddr.city,
                 country: 'Turkey',
-                zipCode: shippingAddress.postalCode
+                zipCode: shipAddr.postalCode
             },
             shippingAddress: {
-                contactName: customerInfo.name,
-                city: shippingAddress.city,
+                contactName: ci.name,
+                city: shipAddr.city,
                 country: 'Turkey',
-                address: shippingAddress.fullAddress,
-                zipCode: shippingAddress.postalCode
+                address: shipAddr.fullAddress,
+                zipCode: shipAddr.postalCode
             },
             billingAddress: {
-                contactName: customerInfo.name,
-                city: (billingAddress || shippingAddress).city,
+                contactName: ci.name,
+                city: (billAddr || shipAddr).city,
                 country: 'Turkey',
-                address: (billingAddress || shippingAddress).fullAddress,
-                zipCode: (billingAddress || shippingAddress).postalCode
+                address: (billAddr || shipAddr).fullAddress,
+                zipCode: (billAddr || shipAddr).postalCode
             },
             basketItems
         };
