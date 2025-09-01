@@ -160,7 +160,7 @@ const mapped: Order = {
   tracking_url: orderDataWithDefaults.tracking_url || undefined,
   shipped_at: orderDataWithDefaults.shipped_at || undefined,
   delivered_at: orderDataWithDefaults.delivered_at || undefined,
-  shipping_method: (orderDataWithDefaults.shipping_method || undefined) as any,
+  shipping_method: (orderDataWithDefaults.shipping_method || undefined) as string | undefined,
 }
         setOrder(mapped)
       } catch (e) {
