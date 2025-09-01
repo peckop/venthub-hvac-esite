@@ -318,8 +318,8 @@ export const CheckoutPage: React.FC = () => {
         const l2 = Number(Number(localTotal).toFixed(2))
         const localHash = priceHashLocal()
         const serverHash = priceHashServer((validation as unknown as { items?: Array<{ product_id: string; quantity?: number; unit_price: number }> })?.items)
-        debug('validation diff check', { s2, l2, diff: Number(Math.abs(s2-l2).toFixed(4)), hashesDiffer, localHash, serverHash })
         const hashesDiffer = serverHash !== localHash
+        debug('validation diff check', { s2, l2, diff: Number(Math.abs(s2-l2).toFixed(4)), hashesDiffer, localHash, serverHash })
 
         if (hashesDiffer || Math.abs(s2 - l2) > 0.01) {
           // Sunucunun fiyatlarını uygula ve ÖDEMEYE DEVAM ET (kullanıcıyı geri döndürme)
@@ -353,7 +353,7 @@ export const CheckoutPage: React.FC = () => {
       // Debug: özet log (PII maskelemeden minimal alanlarla)
       debug('iyz init payload summary', {
         amount: requestData?.amount,
-        items: Array.isArray(requestData?.cartItems) ? requestData.cartItems.map((i: any) => ({ id: i.product_id, q: i.quantity, p: i.price })) : [],
+        items: Array.isArray(requestData?.cartItems) ? requestData.cartItems.map(({ product_id, quantity, price }: { product_id: string; quantity: number; price: number }) => ({ id: product_id, q: quantity, p: price })) : [],
         shipCity: requestData?.shippingAddress?.city,
         billCity: requestData?.billingAddress?.city,
       })
