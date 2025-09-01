@@ -47,6 +47,7 @@ interface Order {
   tracking_url?: string
   shipped_at?: string
   delivered_at?: string
+  shipping_method?: 'standard' | 'express' | string
 }
 
 interface SupabaseOrderData {
@@ -64,6 +65,7 @@ interface SupabaseOrderData {
   tracking_url: string | null
   shipped_at: string | null
   delivered_at: string | null
+  shipping_method?: string | null
   venthub_order_items: SupabaseOrderItem[]
 }
 
@@ -104,7 +106,7 @@ export default function OrderDetailPage() {
     async function load() {
       try {
         setLoading(true)
-        const baseSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+const baseSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
         let { data, error } = await supabase
           .from('venthub_orders')
           .select(baseSelect)
@@ -132,33 +134,34 @@ export default function OrderDetailPage() {
           order_number: data.order_number || data.id,
         } as SupabaseOrderData
         
-        const mapped: Order = {
-          id: orderDataWithDefaults.id,
-          total_amount: Number(orderDataWithDefaults.total_amount) || 0,
-          status: orderDataWithDefaults.status || 'pending',
-          created_at: orderDataWithDefaults.created_at,
-          customer_name: orderDataWithDefaults.customer_name,
-          customer_email: orderDataWithDefaults.customer_email,
-          shipping_address: orderDataWithDefaults.shipping_address,
-          order_items: (orderDataWithDefaults.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
-            id: it.id,
-            product_id: it.product_id ?? undefined,
-            product_name: it.product_name,
-            quantity: it.quantity,
-            unit_price: Number(it.price_at_time) || 0,
-            total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
-            product_image_url: it.product_image_url ?? undefined,
-          })),
-          order_number: orderDataWithDefaults.order_number || undefined,
-          is_demo: false,
-          payment_data: undefined,
-          conversation_id: orderDataWithDefaults.conversation_id || undefined,
-          carrier: orderDataWithDefaults.carrier || undefined,
-          tracking_number: orderDataWithDefaults.tracking_number || undefined,
-          tracking_url: orderDataWithDefaults.tracking_url || undefined,
-          shipped_at: orderDataWithDefaults.shipped_at || undefined,
-          delivered_at: orderDataWithDefaults.delivered_at || undefined,
-        }
+const mapped: Order = {
+  id: orderDataWithDefaults.id,
+  total_amount: Number(orderDataWithDefaults.total_amount) || 0,
+  status: orderDataWithDefaults.status || 'pending',
+  created_at: orderDataWithDefaults.created_at,
+  customer_name: orderDataWithDefaults.customer_name,
+  customer_email: orderDataWithDefaults.customer_email,
+  shipping_address: orderDataWithDefaults.shipping_address,
+  order_items: (orderDataWithDefaults.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
+    id: it.id,
+    product_id: it.product_id ?? undefined,
+    product_name: it.product_name,
+    quantity: it.quantity,
+    unit_price: Number(it.price_at_time) || 0,
+    total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
+    product_image_url: it.product_image_url ?? undefined,
+  })),
+  order_number: orderDataWithDefaults.order_number || undefined,
+  is_demo: false,
+  payment_data: undefined,
+  conversation_id: orderDataWithDefaults.conversation_id || undefined,
+  carrier: orderDataWithDefaults.carrier || undefined,
+  tracking_number: orderDataWithDefaults.tracking_number || undefined,
+  tracking_url: orderDataWithDefaults.tracking_url || undefined,
+  shipped_at: orderDataWithDefaults.shipped_at || undefined,
+  delivered_at: orderDataWithDefaults.delivered_at || undefined,
+  shipping_method: (orderDataWithDefaults.shipping_method || undefined) as any,
+}
         setOrder(mapped)
       } catch (e) {
         console.error('Order load error', e)
@@ -369,6 +372,10 @@ export default function OrderDetailPage() {
                       <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
                     </>
                   )}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-medium">Teslimat Yöntemi</span>
+                    <span className="text-industrial-gray">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -418,6 +425,10 @@ export default function OrderDetailPage() {
 
           {tab==='shipping' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <div className="text-steel-gray">Teslimat Yöntemi</div>
+                <div className="font-medium text-industrial-gray">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</div>
+              </div>
               <div>
                 <div className="text-steel-gray">{t('orders.carrier')}</div>
                 <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
