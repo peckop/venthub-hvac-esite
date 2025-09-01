@@ -14,7 +14,7 @@ interface ReturnRow {
   created_at: string
 }
 
-interface OrderLite { id: string; order_number?: string | null; created_at: string }
+interface OrderLite { id: string; order_number: string; created_at: string }
 
 interface SupabaseError {
   code?: string
@@ -83,7 +83,11 @@ export default function AccountReturnsPage() {
           error = fb.error
         }
         if (error) throw error
-        if (mounted) setOrders((data || []) as OrderLite[])
+        if (mounted) setOrders((data || []).map(o => ({
+          id: o.id,
+          created_at: o.created_at,
+          order_number: o.order_number || o.id,
+        })))
       } catch (e) {
         console.warn('Orders for returns load error', e)
       }

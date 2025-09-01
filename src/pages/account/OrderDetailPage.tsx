@@ -54,26 +54,26 @@ interface SupabaseOrderData {
   total_amount: number | string
   status: string
   created_at: string
-  customer_name?: string
-  customer_email?: string
+  customer_name: string
+  customer_email: string
   shipping_address: unknown
-  order_number?: string
-  conversation_id?: string
-  carrier?: string
-  tracking_number?: string
-  tracking_url?: string
-  shipped_at?: string
-  delivered_at?: string
+  order_number: string
+  conversation_id: string | null
+  carrier: string | null
+  tracking_number: string | null
+  tracking_url: string | null
+  shipped_at: string | null
+  delivered_at: string | null
   venthub_order_items: SupabaseOrderItem[]
 }
 
 interface SupabaseOrderItem {
   id: string
-  product_id?: string
+  product_id: string | null
   product_name: string
   quantity: number
   price_at_time: number | string
-  product_image_url?: string
+  product_image_url: string | null
 }
 
 interface SupabaseError {
@@ -124,16 +124,23 @@ export default function OrderDetailPage() {
           error = fb.error
         }
         if (error) throw error
-        const orderData = data as SupabaseOrderData
+        // Ensure all required fields have fallback values
+        const orderDataWithDefaults = {
+          ...data,
+          customer_name: data.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_email: data.customer_email || (user?.email || '-'),
+          order_number: data.order_number || data.id,
+        } as SupabaseOrderData
+        
         const mapped: Order = {
-          id: orderData.id,
-          total_amount: Number(orderData.total_amount) || 0,
-          status: orderData.status || 'pending',
-          created_at: orderData.created_at,
-          customer_name: orderData.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
-          customer_email: orderData.customer_email || user?.email || '-',
-          shipping_address: orderData.shipping_address,
-          order_items: (orderData.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
+          id: orderDataWithDefaults.id,
+          total_amount: Number(orderDataWithDefaults.total_amount) || 0,
+          status: orderDataWithDefaults.status || 'pending',
+          created_at: orderDataWithDefaults.created_at,
+          customer_name: orderDataWithDefaults.customer_name,
+          customer_email: orderDataWithDefaults.customer_email,
+          shipping_address: orderDataWithDefaults.shipping_address,
+          order_items: (orderDataWithDefaults.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
             id: it.id,
             product_id: it.product_id ?? undefined,
             product_name: it.product_name,
@@ -142,15 +149,15 @@ export default function OrderDetailPage() {
             total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
             product_image_url: it.product_image_url ?? undefined,
           })),
-          order_number: orderData.order_number || undefined,
+          order_number: orderDataWithDefaults.order_number || undefined,
           is_demo: false,
           payment_data: undefined,
-          conversation_id: orderData.conversation_id || undefined,
-          carrier: orderData.carrier || undefined,
-          tracking_number: orderData.tracking_number || undefined,
-          tracking_url: orderData.tracking_url || undefined,
-          shipped_at: orderData.shipped_at || undefined,
-          delivered_at: orderData.delivered_at || undefined,
+          conversation_id: orderDataWithDefaults.conversation_id || undefined,
+          carrier: orderDataWithDefaults.carrier || undefined,
+          tracking_number: orderDataWithDefaults.tracking_number || undefined,
+          tracking_url: orderDataWithDefaults.tracking_url || undefined,
+          shipped_at: orderDataWithDefaults.shipped_at || undefined,
+          delivered_at: orderDataWithDefaults.delivered_at || undefined,
         }
         setOrder(mapped)
       } catch (e) {
