@@ -42,6 +42,10 @@ export const CheckoutPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
   const { t } = useI18n()
+  // i18n fallback helper (if missing key, t(key) returns key string)
+  const tf = (key: string, fallback: string) => {
+    try { const v = t(key as any); return v === key ? fallback : v } catch { return fallback }
+  }
 
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
@@ -945,7 +949,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="space-y-8">
                   {/* Shipping Method (Service Level) */}
                   <div>
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('checkout.shipping.methodTitle') || 'Teslimat Yöntemi'}</h3>
+<h3 className="text-lg font-semibold text-industrial-gray mb-3">{tf('checkout.shipping.methodTitle','Teslimat Yöntemi')}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod==='standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
