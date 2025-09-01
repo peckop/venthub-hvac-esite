@@ -53,34 +53,17 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Değişiklik Özeti (Son Çalışmalar)
 Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
 
-Tarih: 2025-08-29
+Tarih: 2025-09-01
 
-- **Sepet Senkronizasyon Düzeltmeleri**
-  - Misafir sepeti öncelik alıyor: Giriş yapıldığında eski sunucu sepet ürünleri karışmıyor
-  - Ödeme sonrası agresif sepet temizleme: Tüm tablar arasında localStorage tamamen temizleniyor
-  - Çıkış yaptığında owner temizleniyor: Yeni girişte misafir sepeti olarak algılanıyor
-  - Cross-tab senkronizasyon: Storage event'leri ile tüm sekmeler güncelleniyor
-  - localStorage sabitler eklendi: Daha iyi kod yönetimi için
+- Güvenlik / Log Hijyeni
+  - App: `console.log` kaldırıldı/koşullandı; dev-only `debug(...)` (VITE_DEBUG) ile PII sızdırmadan tanılama
+  - Edge Function: loglar `IYZICO_DEBUG` ile koşullu; PII (email/telefon/adres) maskeleme
+  - Kullanılmayan ve hardcoded sandbox credential içeren modül kaldırıldı: `supabase/functions/iyzico-payment/iyzico-real.ts`
+- Lint / CI
+  - App kodunda `no-console` politikası etkin (warn/error serbest)
+  - Checkout debug helper TS uyarıları giderildi; lint `--max-warnings=0` ile geçiyor
 
-- Cart / Fiyatlandırma (Daha önceki)
-  - Server senkronunda `upsertCartItem` artık hem INSERT hem UPDATE sırasında `unit_price` ve `price_list_id` alanlarını yazar
-  - UI tarafında footer'a yayın sürüm etiketi eklendi (`branch@sha`)
-- Doğrulama / İzleme
-  - Yeni iş akışı: `.github/workflows/verify-cart-items.yml` — son kayıtları kontrol eder, satırlarda `unit_price` null ise FAIL olur; aksi halde PASS.
-  - Gecelik çalışma eklendi (cron: 03:00 UTC). İstenirse manuel “Run workflow” ile de tetiklenebilir.
-  - Lokal hızlı kontrol: `.scripts/query_cart.ps1` `.env.local` okur; tek komutla `COUNT` ve örnek satırlar (id, qty, `unit_price`, `price_list_id`).
-- Veritabanı
-  - Migration: `supabase/migrations/20250828_cart_items_timestamps.sql` — `cart_items` tablosuna `created_at`, `updated_at` + trigger eklendi.
-  - Daha önce eklenen migration’larla `cart_items.unit_price` ve `cart_items.price_list_id` alanları mevcut.
-- CI/CD
-  - Cloudflare Pages: deploy workflow’unda `paths` filtresi kaldırıldı → master’a her push’ta otomatik deploy.
-  - Build env’leri eklendi: `VITE_CART_SERVER_SYNC=true`, `VITE_COMMIT_SHA`, `VITE_BRANCH`.
-  - Supabase migrate workflow’u güçlendirildi:
-    - `sslmode=require` zorunlu, bağlantı testi (psql `select 1`) eklendi.
-    - `SUPABASE_DB_URL` yoksa `SUPABASE_ACCESS_TOKEN + SUPABASE_PROJECT_REF` ile Supabase CLI yoluna otomatik geçiş.
-
-Notlar:
-- Lokal gizli bilgiler `.env.local` dosyasında tutulabilir (gitignore’da). CI tarafında gizli bilgiler her zaman GitHub Secrets üzerinden sağlanmalıdır.
+Önceki çalışmalar için `docs/CHANGELOG.md` dosyasına bakın (2025-08-29 ve öncesi).
 
 ## Geliştirme
 - pnpm install
