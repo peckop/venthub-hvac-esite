@@ -443,6 +443,7 @@ export const en = {
       idPlaceholder: '12345678901'
     },
     shipping: {
+      methodTitle: 'Delivery Method',
       title: 'Shipping Address',
       addressLabel: 'Address *',
       addressPlaceholder: 'Street, building, door no, apartment no',

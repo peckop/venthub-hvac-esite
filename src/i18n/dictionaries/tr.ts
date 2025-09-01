@@ -441,6 +441,7 @@ export const tr = {
       idPlaceholder: '12345678901'
     },
     shipping: {
+      methodTitle: 'Teslimat Yöntemi',
       title: 'Teslimat Adresi',
       addressLabel: 'Adres *',
       addressPlaceholder: 'Mahalle, sokak, apartman/site adı, kapı no, daire no',
