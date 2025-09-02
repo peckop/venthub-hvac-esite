@@ -57,22 +57,23 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 
 ### Sprint 2 — Operasyon & Stok (Yeni eklenen işler)
 - Envanter ve Stok (M1)
-  - [ ] Şema: venthub_products.stock_qty (int, default 0)
-  - [ ] Şema: venthub_inventory_movements (id, product_id, delta, reason, order_id?, created_at)
-  - [ ] Şema: inventory_settings (single row) → default_low_stock_threshold
-  - [ ] Şema: venthub_products.low_stock_threshold (ürün bazında override)
+  - [x] Şema: venthub_products.stock_qty (int, default 0)
+  - [x] Şema: venthub_inventory_movements (id, product_id, delta, reason, order_id?, created_at)
+  - [x] Şema: inventory_settings (single row) → default_low_stock_threshold
+  - [x] Şema: venthub_products.low_stock_threshold (ürün bazında override)
   - [ ] RLS: inventory_settings update sadece admin; products stok alanlarını admin veya RPC ile güncelle
-  - [ ] RPC: set_stock(p_product_id uuid, p_new_qty int, p_reason text)
-  - [ ] RPC: adjust_stock(p_product_id uuid, p_delta int, p_reason text)
+  - [x] RPC: set_stock(p_product_id uuid, p_new_qty int, p_reason text)
+  - [x] RPC: adjust_stock(p_product_id uuid, p_delta int, p_reason text)
   - [ ] Order sonrası atomik stok düşümü (edge function/RPC) + idempotent guard (aynı order için çift düşüm engeli)
 - Operasyon Sayfası (Admin)
-  - [ ] Operasyon > Stok: liste, arama, +1/−1, “Ayarla”, hazır sebepler (Satış, İade, Sayım, Hasar, Tedarik)
+  - [x] Operasyon > Stok: liste, arama, +1/−1, “Ayarla”
   - [ ] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
   - [ ] Toplu işlem ve CSV içe/dışa aktar (SKU, qty)
   - [ ] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo) özelliği (opsiyonel)
+  - [x] Account menüsünde admin’e özel “Operasyon” sekmesi görünür
 - Müşteri UX
-  - [ ] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
-  - [ ] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
+  - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
+  - [x] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
   - [ ] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
 - WhatsApp (Fazlı)
   - [ ] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
