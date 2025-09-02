@@ -84,16 +84,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
             </span>
           </div>
 
-          {/* Price */}
+          {/* Price + Stock badge */}
           <div className="flex items-center justify-between mb-2">
             <div className="text-xl font-bold text-primary-navy">
               ₺{price.toLocaleString('tr-TR')}
             </div>
-            {product.status === 'out_of_stock' && (
-              <span className="text-xs text-warning-orange bg-warning-orange/10 px-2 py-1 rounded">
-                {t('pdp.outOfStock')}
-              </span>
-            )}
+            {(() => {
+              const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
+              return (
+                <span className={`text-xs px-2 py-1 rounded ${inStock ? 'text-success-green bg-success-green/10' : 'text-warning-orange bg-warning-orange/10'}`}>
+                  {inStock ? t('pdp.inStock') : t('pdp.outOfStock')}
+                </span>
+              )
+            })()}
           </div>
 
           {/* Compare inside content (below price, above actions) */}
@@ -128,7 +131,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           <div className="flex items-center space-x-2">
             <button
               onClick={handleAddToCart}
-              disabled={product.status === 'out_of_stock'}
+              disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
               className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ShoppingCart size={16} />

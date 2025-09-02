@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import LeadModal from '../components/LeadModal'
+import legalConfig from '../config/legal'
 import { 
   ArrowLeft, 
   ShoppingCart, 
@@ -307,13 +308,14 @@ export const ProductDetailPage: React.FC = () => {
               <span className="text-steel-gray">
                 {t('pdp.model')}: <span className="font-medium">{product.sku}</span>
               </span>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                product.status === 'active' 
-                  ? 'bg-success-green/10 text-success-green' 
-                  : 'bg-warning-orange/10 text-warning-orange'
-              }`}>
-                {product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}
-              </div>
+              {(() => {
+                const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
+                return (
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${inStock ? 'bg-success-green/10 text-success-green' : 'bg-warning-orange/10 text-warning-orange'}`}>
+                    {inStock ? t('pdp.inStock') : t('pdp.outOfStock')}
+                  </div>
+                )
+              })()}
             </div>
 
             {/* Price */}
@@ -353,7 +355,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="flex space-x-2 sm:space-x-4">
                 <button
                   onClick={handleAddToCart}
-                  disabled={product.status !== 'active'}
+                  disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
                   className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingCart size={18} />
@@ -379,14 +381,29 @@ export const ProductDetailPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Lead CTA */}
-              <div>
+              {/* Lead CTA and Stock Inquiry */}
+              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                 <button
                   onClick={() => setLeadOpen(true)}
                   className="w-full md:w-auto mt-2 bg-success-green hover:bg-success-green/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                 >
                   {t('pdp.techQuote')}
                 </button>
+                {(() => {
+                  const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
+                  if (inStock) return null
+                  const mail = legalConfig?.sellerEmail || 'info@example.com'
+                  const subject = encodeURIComponent('Stok Bilgisi Talebi')
+                  const body = encodeURIComponent(`Merhaba, ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''} ürünü için stok durumu hakkında bilgi alabilir miyim?`)
+                  return (
+                    <a
+                      href={`mailto:${mail}?subject=${subject}&body=${body}`}
+                      className="w-full md:w-auto mt-2 text-primary-navy hover:text-secondary-blue underline"
+                    >
+                      {t('pdp.askStock') || 'Stok sor'}
+                    </a>
+                  )
+                })()}
               </div>
             </div>
 

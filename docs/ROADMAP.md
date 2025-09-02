@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-01
+Last updated: 2025-09-02
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -55,6 +55,32 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] İndir/Paylaş (Proforma PDF mevcut)
   - (Kurumsal bilgiler ve resmi numaralandırma "Parked" bölümünde)
 
+### Sprint 2 — Operasyon & Stok (Yeni eklenen işler)
+- Envanter ve Stok (M1)
+  - [ ] Şema: venthub_products.stock_qty (int, default 0)
+  - [ ] Şema: venthub_inventory_movements (id, product_id, delta, reason, order_id?, created_at)
+  - [ ] Şema: inventory_settings (single row) → default_low_stock_threshold
+  - [ ] Şema: venthub_products.low_stock_threshold (ürün bazında override)
+  - [ ] RLS: inventory_settings update sadece admin; products stok alanlarını admin veya RPC ile güncelle
+  - [ ] RPC: set_stock(p_product_id uuid, p_new_qty int, p_reason text)
+  - [ ] RPC: adjust_stock(p_product_id uuid, p_delta int, p_reason text)
+  - [ ] Order sonrası atomik stok düşümü (edge function/RPC) + idempotent guard (aynı order için çift düşüm engeli)
+- Operasyon Sayfası (Admin)
+  - [ ] Operasyon > Stok: liste, arama, +1/−1, “Ayarla”, hazır sebepler (Satış, İade, Sayım, Hasar, Tedarik)
+  - [ ] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
+  - [ ] Toplu işlem ve CSV içe/dışa aktar (SKU, qty)
+  - [ ] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo) özelliği (opsiyonel)
+- Müşteri UX
+  - [ ] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
+  - [ ] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
+  - [ ] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
+- WhatsApp (Fazlı)
+  - [ ] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
+  - [ ] Faz 2: WhatsApp Business Cloud API değerlendirmesi (token güvenliği, şablon mesajlar)
+- Kargo Operasyonları (minimal)
+  - [ ] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
+  - [ ] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
+
 ### Sprint 3 — Planlı
 - Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
 - Kargo 3PL/API entegrasyonları ve otomatik status güncellemeleri
@@ -102,6 +128,11 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 
 ## 7) Notlar
 - Bu belge tek ve güncel kaynak (Single Source of Truth). Eski NEXT_STEPS ve plan-and-tasklist korunur; fakat her değişiklik önce ROADMAP’e işlenecektir.
+
+## 8) Operasyon & Stok Planı (Özet)
+- Kapsam: Envanter tabanı (stock_qty + inventory_movements), admin Operasyon > Stok sayfası, düşük stok eşikleri (global + ürün), müşteri tarafı “Stokta/Stokta yok” ve “Stok sor” akışı, minimal kargo operasyonları.
+- Detaylı plan ve teknik ekler: bkz. docs/OPERATIONS_PLAN.md
+- Geleceğe hazırlık: Çoklu depo/variant/shipments şeması additive genişleyecek; bugün atılan adımlar geriye dönük uyumlu.
 
 ## Parked / Deferred (Şirket ve Server hazır olunca)
 - Kurumsal bilgiler: `src/config/legal.ts` doldurma (ünvan, adres, vergi dairesi/no, MERSİS, KVKK e‑posta)

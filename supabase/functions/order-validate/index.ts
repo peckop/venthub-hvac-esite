@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
       const equal = it.unit_price!=null && Math.abs(Number(it.unit_price) - unitNorm) < 0.005;
       // Stock check (best-effort): try common field names
       let available: number | null = null;
-      const cand = [product.stock, product.quantity_available, product.inventory, product.inventory_quantity, product.available, product.on_hand];
+      const cand = [product.stock_qty, product.stock, product.quantity_available, product.inventory, product.inventory_quantity, product.available, product.on_hand];
       for (const c of cand) {
         if (typeof c === 'number') { available = c; break; }
         if (typeof c === 'string' && !isNaN(Number(c))) { available = Number(c); break; }
