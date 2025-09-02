@@ -128,5 +128,5 @@ jobs:
           fi
           echo "Found ${#files[@]} migration files to apply."
           # Use supabase db push to apply all pending migrations
-          supabase db push
+          supabase db push --include-all
           echo "Migrations applied successfully via Supabase CLI."
