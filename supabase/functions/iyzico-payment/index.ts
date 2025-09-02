@@ -253,19 +253,36 @@ Deno.serve(async (req) => {
             }
         } catch {}
 
+        // Fallback name/image maps from client cart (in case product metadata is missing)
+        const nameMap = new Map<string, string>()
+        const imageMap = new Map<string, string | null>()
+        try {
+            if (Array.isArray(cartItems)) {
+                for (const ci of cartItems as Array<{ product_id: string; product_name?: string; product_image_url?: string | null }>) {
+                    if (ci?.product_id) {
+                        if (ci.product_name) nameMap.set(String(ci.product_id), String(ci.product_name))
+                        if (ci.product_image_url !== undefined) imageMap.set(String(ci.product_id), ci.product_image_url as string | null)
+                    }
+                }
+            }
+        } catch {}
+
         const orderItems = authoritativeItems.map((it: any) => {
             const p = prodMap.get(it.product_id) || {}
+            const fid = String(it.product_id)
+            const fallbackName = p?.name || nameMap.get(fid) || 'Ürün'
+            const fallbackImage = p?.image_url || imageMap.get(fid) || null
             return {
                 order_id: dbOrderId,
                 product_id: it.product_id,
                 quantity: parseInt(it.quantity),
                 price_at_time: parseFloat(it.unit_price),
-                product_name: p.name || null,
-                product_image_url: p.image_url || null,
+                product_name: fallbackName,
+                product_image_url: fallbackImage,
                 // snapshots
                 unit_price_snapshot: parseFloat(it.unit_price),
                 price_list_id_snapshot: it.price_list_id || null,
-                product_name_snapshot: p.name || null,
+                product_name_snapshot: fallbackName,
                 product_sku_snapshot: p.sku || null
             }
         });
