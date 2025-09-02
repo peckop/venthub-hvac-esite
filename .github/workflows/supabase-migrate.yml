@@ -103,8 +103,8 @@ jobs:
           # Login with access token (environment variable)
           export SUPABASE_ACCESS_TOKEN="$SUPABASE_ACCESS_TOKEN"
           supabase login
-          # Link project 
-          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          # Link project with --create-client flag to avoid password prompt
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --create-client
 
       - name: Apply migrations via Supabase CLI (linked)
         if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
