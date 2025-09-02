@@ -47,11 +47,19 @@ export default function AdminStockPage() {
   async function adjust(productId: string, delta: number) {
     try {
       setSaving(productId)
-      const { error } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: delta >= 0 ? 'adjust' : 'adjust' })
+      // Direkt UPDATE query - RPC yerine
+      const currentProduct = all.find(p => p.id === productId)
+      const newQty = Math.max(0, (currentProduct?.stock_qty ?? 0) + delta)
+      
+      const { error } = await supabase
+        .from('products')
+        .update({ stock_qty: newQty })
+        .eq('id', productId)
+        
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: ((p.stock_qty ?? 0) + delta) as number } : p))
-    } catch {
-      // surface minimal error UI later
+      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
+    } catch (err) {
+      console.error('Stock adjust error:', err)
     } finally {
       setSaving(null)
     }
@@ -60,11 +68,18 @@ export default function AdminStockPage() {
   async function setQty(productId: string, qty: number) {
     try {
       setSaving(productId)
-      const { error } = await supabase.rpc('set_stock', { p_product_id: productId, p_new_qty: qty, p_reason: 'adjust' })
+      // Direkt UPDATE query - RPC yerine
+      const newQty = Math.max(0, qty)
+      
+      const { error } = await supabase
+        .from('products')
+        .update({ stock_qty: newQty })
+        .eq('id', productId)
+        
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: qty } : p))
-    } catch {
-      // no-op
+      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
+    } catch (err) {
+      console.error('Stock set error:', err)
     } finally {
       setSaving(null)
     }
