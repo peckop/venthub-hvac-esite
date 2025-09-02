@@ -1,6 +1,10 @@
 name: Supabase Migrate
 
 on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'supabase/migrations/**.sql'
   workflow_dispatch:
 
 concurrency:
