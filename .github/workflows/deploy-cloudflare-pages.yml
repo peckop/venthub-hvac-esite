@@ -1,3 +1,14 @@
+name: Deploy Cloudflare Pages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Cloudflare Pages deploy is disabled (manual run only)."
+
 name: Deploy to Cloudflare Pages
 
 on:

@@ -4,10 +4,12 @@
 begin;
 
 -- Helper: enable RLS on a table if it exists
-create or replace function public._enable_rls_if_exists(tbl regclass)
+create or replace function public._enable_rls_if_exists(tbl_name text)
 returns void language plpgsql as $$
 begin
-  execute format('alter table if exists %s enable row level security', tbl);
+  if to_regclass(tbl_name) is not null then
+    execute format('alter table %s enable row level security', tbl_name);
+  end if;
 end; $$;
 
 -- Helper: create SELECT policy if not exists
@@ -115,7 +117,7 @@ select public._enable_rls_if_exists('public.product_analytics');
 
 -- Cleanup helpers (optional keep for future use). Comment out drop if you want to reuse.
 drop function if exists public._create_select_policy_if_absent(text,text,text,text);
-drop function if exists public._enable_rls_if_exists(regclass);
+drop function if exists public._enable_rls_if_exists(text);
 
 commit;
 

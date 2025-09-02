@@ -1,11 +1,7 @@
 name: Migrate DB
 
 on:
-  workflow_dispatch: {}
-  push:
-    branches: [main]
-    paths:
-      - "supabase/migrations/**"
+  workflow_dispatch:
 
 permissions:
   contents: read
