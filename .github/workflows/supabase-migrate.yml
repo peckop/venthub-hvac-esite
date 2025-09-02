@@ -100,8 +100,11 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
         run: |
           set -euo pipefail
-          supabase logout || true
-          supabase link --project-ref "$SUPABASE_PROJECT_REF" --access-token "$SUPABASE_ACCESS_TOKEN"
+          # Login with access token (environment variable)
+          export SUPABASE_ACCESS_TOKEN="$SUPABASE_ACCESS_TOKEN"
+          supabase login
+          # Link project 
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
       - name: Apply migrations via Supabase CLI (linked)
         if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
