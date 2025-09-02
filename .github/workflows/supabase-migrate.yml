@@ -23,21 +23,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Decide execution path
+      - name: Decide execution path (prefer Supabase CLI)
         run: |
-          if [ -n "${SUPABASE_DB_URL}" ]; then
-            echo "Using psql path with SUPABASE_DB_URL (will enforce sslmode=require)."
-            exit 0
-          fi
           if [ -n "${SUPABASE_ACCESS_TOKEN}" ] && [ -n "${SUPABASE_PROJECT_REF}" ]; then
-            echo "SUPABASE_DB_URL not set — will use Supabase CLI API fallback with ACCESS_TOKEN + PROJECT_REF."
+            echo "Will use Supabase CLI API with ACCESS_TOKEN + PROJECT_REF."
             exit 0
           fi
-          echo "::error::Missing both DB URL and Supabase token/ref. Set either SUPABASE_DB_URL or SUPABASE_ACCESS_TOKEN + SUPABASE_PROJECT_REF in repository secrets."
+          if [ -n "${SUPABASE_DB_URL}" ]; then
+            echo "CLI secrets missing — fallback to psql with SUPABASE_DB_URL (sslmode=require)."
+            exit 0
+          fi
+          echo "::error::Missing configuration. Set SUPABASE_ACCESS_TOKEN + SUPABASE_PROJECT_REF (preferred), or SUPABASE_DB_URL as fallback."
           exit 1
 
-      - name: Install PostgreSQL client
-        if: ${{ env.SUPABASE_DB_URL != '' }}
+      - name: Install PostgreSQL client (fallback)
+        if: ${{ env.SUPABASE_ACCESS_TOKEN == '' && env.SUPABASE_PROJECT_REF == '' && env.SUPABASE_DB_URL != '' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
@@ -48,8 +48,8 @@ jobs:
           # Host mask (do not print full URL)
           echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
-      - name: Normalize DB URL (enforce sslmode=require)
-        if: ${{ env.SUPABASE_DB_URL != '' }}
+      - name: Normalize DB URL (enforce sslmode=require) [fallback]
+        if: ${{ env.SUPABASE_ACCESS_TOKEN == '' && env.SUPABASE_PROJECT_REF == '' && env.SUPABASE_DB_URL != '' }}
         run: |
           if echo "$SUPABASE_DB_URL" | grep -q "sslmode="; then
             DB_URL="$SUPABASE_DB_URL"
@@ -62,13 +62,13 @@ jobs:
           fi
           echo "DB_URL=$DB_URL" >> $GITHUB_ENV
 
-      - name: Test DB connection
-        if: ${{ env.SUPABASE_DB_URL != '' }}
+      - name: Test DB connection [fallback]
+        if: ${{ env.SUPABASE_ACCESS_TOKEN == '' && env.SUPABASE_PROJECT_REF == '' && env.SUPABASE_DB_URL != '' }}
         run: |
           psql "$DB_URL" -c "select 1;"
 
-      - name: Apply migrations via psql (psql-only)
-        if: ${{ env.SUPABASE_DB_URL != '' }}
+      - name: Apply migrations via psql [fallback]
+        if: ${{ env.SUPABASE_ACCESS_TOKEN == '' && env.SUPABASE_PROJECT_REF == '' && env.SUPABASE_DB_URL != '' }}
         run: |
           set -e
           shopt -s nullglob
@@ -83,12 +83,12 @@ jobs:
           done
           echo "Migrations applied successfully via psql."
 
-      - name: Setup Supabase CLI (fallback path)
-        if: ${{ env.SUPABASE_DB_URL == '' && env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+      - name: Setup Supabase CLI
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         uses: supabase/setup-cli@v1
 
-      - name: Apply migrations via Supabase API (fallback)
-        if: ${{ env.SUPABASE_DB_URL == '' && env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+      - name: Apply migrations via Supabase API
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
