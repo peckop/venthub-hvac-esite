@@ -185,27 +185,81 @@ Deno.serve(async (req) => {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
       
-      // Process stock reduction after successful payment
+      // Process stock reduction after successful payment - Direct REST API approach
       try {
         if (orderId) {
-          const stockResp = await fetch(`${supabaseUrl}/rest/v1/rpc/process_order_stock_reduction`, {
-            method: 'POST',
+          // Get order items
+          const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
             headers: {
               'Authorization': `Bearer ${serviceRoleKey}`,
-              'apikey': serviceRoleKey,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ p_order_id: orderId })
+              'apikey': serviceRoleKey
+            }
           });
           
-          if (stockResp.ok) {
-            stockResult = await stockResp.json().catch(() => null);
-            console.log('✅ Stock reduction processed:', stockResult?.processed_count || 0, 'items');
-            if (stockResult?.failed_products && stockResult.failed_products.length > 0) {
-              console.warn('⚠️ Some products failed stock reduction:', stockResult.failed_products);
+          if (itemsResp.ok) {
+            const items = await itemsResp.json();
+            let processedCount = 0;
+            let failedProducts: string[] = [];
+            
+            for (const item of items) {
+              try {
+                // Get current product stock
+                const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty`, {
+                  headers: {
+                    'Authorization': `Bearer ${serviceRoleKey}`,
+                    'apikey': serviceRoleKey
+                  }
+                });
+                
+                if (productResp.ok) {
+                  const products = await productResp.json();
+                  const product = products[0];
+                  
+                  if (product && (product.stock_qty || 0) >= item.quantity) {
+                    // Reduce stock
+                    const newStock = (product.stock_qty || 0) - item.quantity;
+                    const updateResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}`, {
+                      method: 'PATCH',
+                      headers: {
+                        'Authorization': `Bearer ${serviceRoleKey}`,
+                        'apikey': serviceRoleKey,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                      },
+                      body: JSON.stringify({ stock_qty: newStock })
+                    });
+                    
+                    if (updateResp.ok) {
+                      processedCount++;
+                      console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock}`);
+                    } else {
+                      failedProducts.push(product.name || 'Unknown');
+                      console.warn(`❌ Failed to update stock for ${product.name}`);
+                    }
+                  } else {
+                    failedProducts.push(product?.name || 'Unknown');
+                    console.warn(`❌ Insufficient stock for ${product?.name}: need ${item.quantity}, have ${product?.stock_qty || 0}`);
+                  }
+                }
+              } catch (itemError: any) {
+                failedProducts.push('Unknown product');
+                console.warn('❌ Error processing item:', itemError.message);
+              }
+            }
+            
+            stockResult = {
+              success: true,
+              processed_count: processedCount,
+              failed_products: failedProducts,
+              order_id: orderId
+            };
+            
+            console.log('✅ Stock reduction completed:', processedCount, 'items processed');
+            if (failedProducts.length > 0) {
+              console.warn('⚠️ Some products failed stock reduction:', failedProducts);
             }
           } else {
-            console.warn('Stock reduction request failed:', stockResp.status);
+            console.warn('Failed to fetch order items:', itemsResp.status);
           }
         }
       } catch (e: any) {
