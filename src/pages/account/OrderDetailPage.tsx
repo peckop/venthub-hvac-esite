@@ -153,7 +153,8 @@ const baseSelect = 'id, total_amount, status, created_at, customer_name, custome
               .eq('venthub_orders.user_id', user?.id || '')
             if (!itemsRes.error && Array.isArray(itemsRes.data)) {
               // Join ile gelen ekstra alanları yok say
-              itemsData = (itemsRes.data as any[]).map(r => ({
+              type JoinedRow = { id: string; product_id: string | null; product_name: string; quantity: number; price_at_time: number | string; product_image_url: string | null }
+              itemsData = (itemsRes.data as unknown as JoinedRow[]).map((r) => ({
                 id: r.id,
                 product_id: r.product_id,
                 product_name: r.product_name,
