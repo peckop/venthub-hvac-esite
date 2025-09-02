@@ -86,14 +86,27 @@ jobs:
       - name: Setup Supabase CLI
         if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - name: Apply migrations via Supabase API
+      - name: Show Supabase CLI version
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        run: supabase --version
+
+      - name: Login & link project
         if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
         env:
           SUPABASE_ACCESS_TOKEN: ${{ env.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
         run: |
-          set -e
+          set -euo pipefail
+          supabase logout || true
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" --access-token "$SUPABASE_ACCESS_TOKEN"
+
+      - name: Apply migrations via Supabase CLI (linked)
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' && env.SUPABASE_PROJECT_REF != '' }}
+        run: |
+          set -euo pipefail
           shopt -s nullglob
           files=(supabase/migrations/*.sql)
           if [ ${#files[@]} -eq 0 ]; then
@@ -101,7 +114,7 @@ jobs:
             exit 0
           fi
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
-            echo "Executing $f via Supabase API"
-            supabase db execute --project-ref "$SUPABASE_PROJECT_REF" --file "$f"
+            echo "Executing $f via Supabase CLI (linked)"
+            supabase db execute --file "$f"
           done
-          echo "Migrations applied successfully via Supabase API."
+          echo "Migrations applied successfully via Supabase CLI."
