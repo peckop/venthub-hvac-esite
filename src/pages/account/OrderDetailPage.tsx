@@ -140,6 +140,20 @@ const baseSelect = 'id, total_amount, status, created_at, customer_name, custome
           customer_email: data.customer_email || (user?.email || '-'),
           order_number: data.order_number || data.id,
         }
+
+        // If relationship-based items are missing (FK veya ilişki ayarı yoksa), doğrudan tablodan çek
+        let itemsData: SupabaseOrderItem[] = Array.isArray(orderDataWithDefaults.venthub_order_items) ? orderDataWithDefaults.venthub_order_items : []
+        if (!itemsData || itemsData.length === 0) {
+          try {
+            const itemsRes = await supabase
+              .from('venthub_order_items')
+              .select('id, product_id, product_name, quantity, price_at_time, product_image_url')
+              .eq('order_id', orderDataWithDefaults.id)
+            if (!itemsRes.error && Array.isArray(itemsRes.data)) {
+              itemsData = itemsRes.data as unknown as SupabaseOrderItem[]
+            }
+          } catch {}
+        }
         
 const mapped: Order = {
   id: orderDataWithDefaults.id,
@@ -149,7 +163,7 @@ const mapped: Order = {
   customer_name: orderDataWithDefaults.customer_name,
   customer_email: orderDataWithDefaults.customer_email,
   shipping_address: orderDataWithDefaults.shipping_address,
-  order_items: (orderDataWithDefaults.venthub_order_items || []).map((it: SupabaseOrderItem) => ({
+  order_items: (itemsData || []).map((it: SupabaseOrderItem) => ({
     id: it.id,
     product_id: it.product_id ?? undefined,
     product_name: it.product_name,
