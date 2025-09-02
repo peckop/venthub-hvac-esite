@@ -31,6 +31,9 @@ export interface Product {
   description?: string
   technical_specs?: unknown
   image_url?: string
+  // Stok alanları (opsiyonel; migration sonrası gelir)
+  stock_qty?: number | null
+  low_stock_threshold?: number | null
   // Teknik alanlar (varsa Supabase'ten gelir)
   airflow_capacity?: number | null
   noise_level?: number | null

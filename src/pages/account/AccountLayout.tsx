@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 
-const tabs = [
+const baseTabs = [
   { to: '/account', label: 'Özet', end: true },
   { to: '/account/orders', label: 'Siparişler' },
   { to: '/account/shipments', label: 'Kargo Takibi' },
@@ -11,15 +12,44 @@ const tabs = [
   { to: '/account/returns', label: 'İadeler' },
   { to: '/account/profile', label: 'Profil' },
   { to: '/account/security', label: 'Güvenlik' },
-]
+] as const
 
 export default function AccountLayout() {
   const { user, loading } = useAuth()
   const location = useLocation()
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    async function loadRole() {
+      try {
+        if (!user) { setIsAdmin(false); return }
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (!mounted) return
+        if (!error && data && (data as { role?: string }).role === 'admin') {
+          setIsAdmin(true)
+        } else {
+          setIsAdmin(false)
+        }
+      } catch {
+        if (mounted) setIsAdmin(false)
+      }
+    }
+    loadRole()
+    return () => { mounted = false }
+  }, [user])
 
   if (!loading && !user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />
   }
+
+  const tabs = isAdmin
+    ? [...baseTabs, { to: '/account/operations/stock', label: 'Operasyon' }]
+    : baseTabs
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -30,6 +60,7 @@ export default function AccountLayout() {
             <NavLink
               key={tab.to}
               to={tab.to}
+              // @ts-expect-error end props exists on some tabs
               end={tab.end}
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
