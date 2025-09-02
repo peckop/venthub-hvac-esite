@@ -145,12 +145,22 @@ const baseSelect = 'id, total_amount, status, created_at, customer_name, custome
         let itemsData: SupabaseOrderItem[] = Array.isArray(orderDataWithDefaults.venthub_order_items) ? orderDataWithDefaults.venthub_order_items : []
         if (!itemsData || itemsData.length === 0) {
           try {
+            // RLS altında kullanıcıya ait siparişi garantiye almak için orders ile inner join yap
             const itemsRes = await supabase
               .from('venthub_order_items')
-              .select('id, product_id, product_name, quantity, price_at_time, product_image_url')
+              .select('id, product_id, product_name, quantity, price_at_time, product_image_url, venthub_orders!inner(user_id)')
               .eq('order_id', orderDataWithDefaults.id)
+              .eq('venthub_orders.user_id', user?.id || '')
             if (!itemsRes.error && Array.isArray(itemsRes.data)) {
-              itemsData = itemsRes.data as unknown as SupabaseOrderItem[]
+              // Join ile gelen ekstra alanları yok say
+              itemsData = (itemsRes.data as any[]).map(r => ({
+                id: r.id,
+                product_id: r.product_id,
+                product_name: r.product_name,
+                quantity: r.quantity,
+                price_at_time: r.price_at_time,
+                product_image_url: r.product_image_url,
+              })) as unknown as SupabaseOrderItem[]
             }
           } catch {}
         }
