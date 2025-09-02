@@ -2,6 +2,10 @@ name: Deploy Supabase Functions
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'supabase/functions/**'
 
 concurrency:
   group: deploy-functions-${{ github.ref }}

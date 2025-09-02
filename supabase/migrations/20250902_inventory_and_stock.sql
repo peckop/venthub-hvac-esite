@@ -36,52 +36,11 @@ ON CONFLICT (id) DO NOTHING;
 CREATE TABLE IF NOT EXISTS public.inventory_movements (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  order_id uuid NULL,
+  order_id uuid NULL REFERENCES public.venthub_orders(id) ON DELETE SET NULL,
   delta integer NOT NULL,
   reason text NOT NULL CHECK (char_length(reason) BETWEEN 3 AND 32),
   created_at timestamptz NOT NULL DEFAULT now()
 );
--- Ensure order_id column has proper FK even if table existed before
-ALTER TABLE public.inventory_movements
-  ADD COLUMN IF NOT EXISTS order_id uuid;
-DO $$
-DECLARE
-  v_orders_type text;
-  v_movements_type text;
-BEGIN
-  SELECT data_type INTO v_orders_type FROM information_schema.columns WHERE table_schema='public' AND table_name='venthub_orders' AND column_name='id';
-  SELECT data_type INTO v_movements_type FROM information_schema.columns WHERE table_schema='public' AND table_name='inventory_movements' AND column_name='order_id';
-
-  IF v_orders_type IS NULL OR v_movements_type IS NULL THEN
-    RETURN;
-  END IF;
-
-  IF v_orders_type <> v_movements_type THEN
-    IF v_orders_type = 'text' THEN
-      EXECUTE 'ALTER TABLE public.inventory_movements ALTER COLUMN order_id TYPE text USING order_id::text';
-    ELSIF v_orders_type = 'uuid' THEN
-      EXECUTE 'ALTER TABLE public.inventory_movements ALTER COLUMN order_id TYPE uuid USING order_id::uuid';
-    ELSE
-      RETURN;
-    END IF;
-  END IF;
-
-  -- Ensure product_id column and FK as well (in case table existed without it)
-  ALTER TABLE public.inventory_movements
-    ADD COLUMN IF NOT EXISTS product_id uuid;
-  BEGIN
-    ALTER TABLE public.inventory_movements
-      ADD CONSTRAINT inventory_movements_product_id_fkey
-      FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;
-  EXCEPTION WHEN duplicate_object THEN NULL; END;
-
-  BEGIN
-    ALTER TABLE public.inventory_movements
-      ADD CONSTRAINT inventory_movements_order_id_fkey
-      FOREIGN KEY (order_id) REFERENCES public.venthub_orders(id) ON DELETE SET NULL;
-  EXCEPTION WHEN duplicate_object THEN NULL; END;
-END$$;
-
 -- Unique guard to prevent double-deduction for the same order+product+reason
 DO $$
 BEGIN
