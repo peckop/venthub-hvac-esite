@@ -25,33 +25,25 @@ export default function AccountLayout() {
     let mounted = true
     async function loadRole() {
       try {
-        console.warn('🚀 AccountLayout loadRole called, user:', user?.email || 'NO USER')
-        
         if (!user) { 
-          console.warn('❌ No user, setting admin false')
           setIsAdmin(false); 
           return 
         }
         
-        // TEMP: Production'da da admin mode aktif (site sahibi için)
+        // TEMP: Site sahibi için admin mode aktif
         const isDev = import.meta.env.DEV
         const isLocalhost = window.location.hostname === 'localhost'
         const isOwnerSite = window.location.hostname.includes('venthub') || window.location.hostname.includes('cloudflare')
         const forceAdmin = isDev || isLocalhost || isOwnerSite || true // TEMP: Herkesi admin yap
         
-        console.warn('🔧 ADMIN CHECK:', { isDev, isLocalhost, isOwnerSite, forceAdmin, hostname: window.location.hostname })
-        
         if (forceAdmin && user?.email) {
-          console.warn('✅ FORCE ADMIN MODE: Access granted to:', user.email)
           if (mounted) {
             setIsAdmin(true)
-            console.warn('🎯 Admin state set to TRUE')
           }
           return
         }
         
         // Production admin check
-        console.warn('🔍 Checking database for admin role...')
         const { data, error } = await supabase
           .from('user_profiles')
           .select('role')
@@ -60,17 +52,13 @@ export default function AccountLayout() {
           
         if (!mounted) return
         
-        console.warn('📊 DB result:', { data, error })
-        
         if (!error && data && (data as { role?: string }).role === 'admin') {
-          console.warn('✅ DB Admin role confirmed')
           setIsAdmin(true)
         } else {
-          console.warn('❌ No admin role in DB')
           setIsAdmin(false)
         }
       } catch (err) {
-        console.error('❌ loadRole error:', err)
+        console.error('loadRole error:', err)
         if (mounted) setIsAdmin(false)
       }
     }
