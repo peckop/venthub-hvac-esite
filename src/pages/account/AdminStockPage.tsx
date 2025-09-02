@@ -30,7 +30,7 @@ export default function AdminStockPage() {
           .order('name', { ascending: true })
         if (error) throw error
         if (mounted) setAll((data || []) as Product[])
-      } catch (e) {
+      } catch {
         // no-op
       }
     }
@@ -50,7 +50,7 @@ export default function AdminStockPage() {
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: delta >= 0 ? 'adjust' : 'adjust' })
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: ((p.stock_qty ?? 0) + delta) as number } : p))
-    } catch (e) {
+    } catch {
       // surface minimal error UI later
     } finally {
       setSaving(null)
@@ -63,7 +63,7 @@ export default function AdminStockPage() {
       const { error } = await supabase.rpc('set_stock', { p_product_id: productId, p_new_qty: qty, p_reason: 'adjust' })
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: qty } : p))
-    } catch (e) {
+    } catch {
       // no-op
     } finally {
       setSaving(null)

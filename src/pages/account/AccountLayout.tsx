@@ -3,7 +3,9 @@ import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 
-const baseTabs = [
+type TabItem = { to: string; label: string; end?: boolean }
+
+const baseTabs: TabItem[] = [
   { to: '/account', label: 'Özet', end: true },
   { to: '/account/orders', label: 'Siparişler' },
   { to: '/account/shipments', label: 'Kargo Takibi' },
@@ -12,7 +14,7 @@ const baseTabs = [
   { to: '/account/returns', label: 'İadeler' },
   { to: '/account/profile', label: 'Profil' },
   { to: '/account/security', label: 'Güvenlik' },
-] as const
+]
 
 export default function AccountLayout() {
   const { user, loading } = useAuth()
@@ -47,7 +49,7 @@ export default function AccountLayout() {
     return <Navigate to="/auth/login" state={{ from: location }} replace />
   }
 
-  const tabs = isAdmin
+  const tabs: TabItem[] = isAdmin
     ? [...baseTabs, { to: '/account/operations/stock', label: 'Operasyon' }]
     : baseTabs
 
@@ -60,7 +62,6 @@ export default function AccountLayout() {
             <NavLink
               key={tab.to}
               to={tab.to}
-              // @ts-expect-error end props exists on some tabs
               end={tab.end}
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
