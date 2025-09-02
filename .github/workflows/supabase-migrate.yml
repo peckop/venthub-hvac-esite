@@ -118,8 +118,7 @@ jobs:
             echo "No migrations to apply."
             exit 0
           fi
-          for f in $(ls -1 supabase/migrations/*.sql | sort); do
-            echo "Executing $f via Supabase CLI (linked)"
-            supabase db execute --file "$f"
-          done
+          echo "Found ${#files[@]} migration files to apply."
+          # Use supabase db push to apply all pending migrations
+          supabase db push
           echo "Migrations applied successfully via Supabase CLI."
