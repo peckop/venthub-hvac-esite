@@ -1,3 +1,14 @@
+name: Build Web
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Build workflow is disabled (manual run only)."
+
 name: Web Build
 
 on:

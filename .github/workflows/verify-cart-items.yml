@@ -1,3 +1,14 @@
+name: Verify Cart Items
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Verify workflow is disabled (manual run only)."
+
 name: Verify Cart Items (unit_price + price_list_id)
 
 on:
