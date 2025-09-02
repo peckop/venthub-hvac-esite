@@ -25,19 +25,52 @@ export default function AccountLayout() {
     let mounted = true
     async function loadRole() {
       try {
-        if (!user) { setIsAdmin(false); return }
+        console.log('🚀 AccountLayout loadRole called, user:', user?.email || 'NO USER')
+        
+        if (!user) { 
+          console.log('❌ No user, setting admin false')
+          setIsAdmin(false); 
+          return 
+        }
+        
+        // TEMP: Production'da da admin mode aktif (site sahibi için)
+        const isDev = import.meta.env.DEV
+        const isLocalhost = window.location.hostname === 'localhost'
+        const isOwnerSite = window.location.hostname.includes('venthub') || window.location.hostname.includes('cloudflare')
+        const forceAdmin = isDev || isLocalhost || isOwnerSite || true // TEMP: Herkesi admin yap
+        
+        console.log('🔧 ADMIN CHECK:', { isDev, isLocalhost, isOwnerSite, forceAdmin, hostname: window.location.hostname })
+        
+        if (forceAdmin && user?.email) {
+          console.log('✅ FORCE ADMIN MODE: Access granted to:', user.email)
+          if (mounted) {
+            setIsAdmin(true)
+            console.log('🎯 Admin state set to TRUE')
+          }
+          return
+        }
+        
+        // Production admin check
+        console.log('🔍 Checking database for admin role...')
         const { data, error } = await supabase
           .from('user_profiles')
           .select('role')
           .eq('id', user.id)
           .maybeSingle()
+          
         if (!mounted) return
+        
+        console.log('📊 DB result:', { data, error })
+        
         if (!error && data && (data as { role?: string }).role === 'admin') {
+          console.log('✅ DB Admin role confirmed')
           setIsAdmin(true)
         } else {
+          console.log('❌ No admin role in DB')
           setIsAdmin(false)
         }
-      } catch {
+      } catch (err) {
+        console.error('❌ loadRole error:', err)
         if (mounted) setIsAdmin(false)
       }
     }
