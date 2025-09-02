@@ -1,5 +1,8 @@
 begin;
 
+-- Ensure required extensions
+create extension if not exists pgcrypto;
+
 -- 1) Add stock and low stock threshold columns to products (idempotent)
 DO $$
 BEGIN
