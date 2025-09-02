@@ -180,9 +180,38 @@ Deno.serve(async (req) => {
     }
 
     let updateOk = false;
+    let stockResult = null;
     if (paid) {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
+      
+      // Process stock reduction after successful payment
+      try {
+        if (orderId) {
+          const stockResp = await fetch(`${supabaseUrl}/rest/v1/rpc/process_order_stock_reduction`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${serviceRoleKey}`,
+              'apikey': serviceRoleKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ p_order_id: orderId })
+          });
+          
+          if (stockResp.ok) {
+            stockResult = await stockResp.json().catch(() => null);
+            console.log('✅ Stock reduction processed:', stockResult?.processed_count || 0, 'items');
+            if (stockResult?.failed_products && stockResult.failed_products.length > 0) {
+              console.warn('⚠️ Some products failed stock reduction:', stockResult.failed_products);
+            }
+          } else {
+            console.warn('Stock reduction request failed:', stockResp.status);
+          }
+        }
+      } catch (e: any) {
+        console.warn('Stock reduction error:', e?.message || e);
+      }
+      
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
