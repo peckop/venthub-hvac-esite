@@ -267,27 +267,27 @@ Deno.serve(async (req) => {
             }
         } catch {}
 
-        const orderItems = authoritativeItems.map((it: any) => {
-            const p = prodMap.get(it.product_id) || {}
-            const fid = String(it.product_id)
-            const fallbackName = p?.name || nameMap.get(fid) || 'Ürün'
-            const fallbackImage = p?.image_url || imageMap.get(fid) || null
+        // Yalnızca mevcut kolonları gönder (şema uyumu): order_id, product_id, quantity, price_at_time, product_name, product_image_url
+        const orderItems = authoritativeItems.map((raw: any) => {
+            const productId = raw.product_id ?? raw.productId
+            const unitPrice = Number(raw.unit_price ?? raw.price)
+            const qty = Number(raw.quantity ?? 1)
+            const p = productId ? (prodMap.get(productId) || {}) : {}
+            const fid = String(productId || '')
+            const fallbackName = (p?.name) || nameMap.get(fid) || 'Ürün'
+            const fallbackImage = (p?.image_url) || imageMap.get(fid) || null
             return {
                 order_id: dbOrderId,
-                product_id: it.product_id,
-                quantity: parseInt(it.quantity),
-                price_at_time: parseFloat(it.unit_price),
+                product_id: productId,
+                quantity: qty,
+                price_at_time: Number.isFinite(unitPrice) ? unitPrice : 0,
                 product_name: fallbackName,
                 product_image_url: fallbackImage,
-                // snapshots
-                unit_price_snapshot: parseFloat(it.unit_price),
-                price_list_id_snapshot: it.price_list_id || null,
-                product_name_snapshot: fallbackName,
-                product_sku_snapshot: p.sku || null
             }
         });
 
-        await fetch(`${supabaseUrl}/rest/v1/venthub_order_items`, {
+        // Insert order items ve sonucu kontrol et; başarısızsa işlemi durdur
+        const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${serviceRoleKey}`,
@@ -297,6 +297,11 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify(orderItems)
         });
+        if (!itemsResp.ok) {
+            const errTxt = await itemsResp.text().catch(()=> '')
+            console.error('Order items insert failed:', itemsResp.status, errTxt)
+            return new Response(JSON.stringify({ error: { code: 'DATABASE_ERROR', message: 'Sipariş kalemleri eklenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        }
 
         // İyzico checkout form initialize request
         // Fiyat tutarlılığı: price == basketItems toplamı olmalı, paidPrice >= price olabilir.
