@@ -64,7 +64,8 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] RLS: inventory_settings update sadece admin; products stok alanlarını admin veya RPC ile güncelle
   - [x] RPC: set_stock(p_product_id uuid, p_new_qty int, p_reason text)
   - [x] RPC: adjust_stock(p_product_id uuid, p_delta int, p_reason text)
-  - [ ] Order sonrası atomik stok düşümü (edge function/RPC) + idempotent guard (aynı order için çift düşüm engeli)
+  - [x] Order sonrası atomik stok düşümü (REST API) + idempotent guard (stock_processed flag)
+  - [x] Stok uyarı sistemi: otomatik WhatsApp/SMS/Email bildirimleri (threshold ≤ 5)
 - Operasyon Sayfası (Admin)
   - [x] Operasyon > Stok: liste, arama, +1/−1, “Ayarla”
   - [ ] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
@@ -75,9 +76,16 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
   - [x] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
   - [ ] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
-- WhatsApp (Fazlı)
+- WhatsApp & Bildirim Sistemi
+  - [x] notification-service Edge Function: WhatsApp/SMS/Email altyapısı
+  - [x] stock-alert Edge Function: otomatik stok uyarıları
+  - [x] Twilio entegrasyonu: WhatsApp Business API + SMS
+  - [x] Template sistemi: özelleştirilebilir mesaj şablonları
+  - [x] İdempotency: çoklu bildirim engelleme
+  - [x] İyzico callback entegrasyonu: ödeme sonrası stok uyarısı tetikleyicisi
+  - [ ] Environment variables: Twilio + Resend API keys
+  - [ ] Kurumsal numara: WhatsApp Business onayı
   - [ ] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
-  - [ ] Faz 2: WhatsApp Business Cloud API değerlendirmesi (token güvenliği, şablon mesajlar)
 - Kargo Operasyonları (minimal)
   - [ ] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
   - [ ] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)

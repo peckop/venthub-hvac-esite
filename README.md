@@ -53,15 +53,26 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Değişiklik Özeti (Son Çalışmalar)
 Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
 
-Tarih: 2025-09-01
+Tarih: 2025-09-02
 
-- Güvenlik / Log Hijyeni
-  - App: `console.log` kaldırıldı/koşullandı; dev-only `debug(...)` (VITE_DEBUG) ile PII sızdırmadan tanılama
-  - Edge Function: loglar `IYZICO_DEBUG` ile koşullu; PII (email/telefon/adres) maskeleme
-  - Kullanılmayan ve hardcoded sandbox credential içeren modül kaldırıldı: `supabase/functions/iyzico-payment/iyzico-real.ts`
-- Lint / CI
-  - App kodunda `no-console` politikası etkin (warn/error serbest)
-  - Checkout debug helper TS uyarıları giderildi; lint `--max-warnings=0` ile geçiyor
+- **WhatsApp & SMS Bildirim Sistemi**
+  - Twilio entegrasyonu ile WhatsApp Business API ve SMS desteği
+  - Otomatik stok uyarı sistemi: eşik değerinin altına düştüğünde bildirim
+  - Edge Functions: `notification-service` ve `stock-alert` tamamen hazır
+  - Template sistemi ve idempotency koruması mevcut
+  - Kurulum rehberi: `docs/WHATSAPP_SETUP_GUIDE.md`
+- **Stok Yönetimi**
+  - Otomatik stok düşümü: ödeme sonrası idempotent stok güncelleme
+  - Ürün bazında düşük stok eşikleri (`low_stock_threshold`)
+  - Müşteri UI: "Stokta/Stokta yok" rozeti ve "Stok sor" butonu
+  - Admin operasyon sayfası: stok düzenleme ve raporlama
+- **Güvenlik / Log Hijyeni**
+  - App: `console.log` kaldırıldı/koşullandı; dev-only `debug(...)` (VITE_DEBUG)
+  - Edge Function: loglar `IYZICO_DEBUG` ile koşullu; PII maskeleme
+  - Kullanılmayan modüller temizlendi
+- **CI/CD & Build**
+  - Lint politikası: `no-console` etkin, `--max-warnings=0` ile geçiyor
+  - Bundle optimizasyonu: %87 küçültme (1,118kB → 145kB)
 
 Önceki çalışmalar için `docs/CHANGELOG.md` dosyasına bakın (2025-08-29 ve öncesi).
 

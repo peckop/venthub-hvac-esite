@@ -185,29 +185,25 @@ Deno.serve(async (req) => {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
       
-      // Process stock reduction after successful payment - Direct REST API with idempotency
+      // Process stock reduction after successful payment - Direct REST API approach
       try {
         if (orderId) {
-          // 1. Check if already processed (idempotency)
-          const existingMovementsResp = await fetch(`${supabaseUrl}/rest/v1/inventory_movements?order_id=eq.${orderId}&reason=eq.order_sale&select=id`, {
+          // 1. Check if stock reduction has already been processed by looking for a flag
+          const orderCheckResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}&select=status,payment_debug`, {
             headers: {
               'Authorization': `Bearer ${serviceRoleKey}`,
               'apikey': serviceRoleKey
             }
           });
           
-          if (existingMovementsResp.ok) {
-            const existingMovements = await existingMovementsResp.json();
-            if (existingMovements.length > 0) {
-              console.log('⚠️ Stock reduction already processed for order:', orderId);
-              stockResult = {
-                success: true,
-                processed_count: 0,
-                failed_products: [],
-                order_id: orderId,
-                message: 'Already processed (idempotent)'
-              };
-            } else {
+          if (orderCheckResp.ok) {
+            const orders = await orderCheckResp.json();
+            const currentOrder = orders[0];
+            
+            // Check if stock reduction was already processed (look for stock_processed flag)
+            const stockAlreadyProcessed = currentOrder?.payment_debug?.stock_processed === true;
+            
+            if (!stockAlreadyProcessed) {
               // 2. Get order items
               const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
                 headers: {
@@ -224,7 +220,7 @@ Deno.serve(async (req) => {
                 for (const item of items) {
                   try {
                     // 3. Get current product stock with atomic read
-                    const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty`, {
+                    const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty,low_stock_threshold`, {
                       headers: {
                         'Authorization': `Bearer ${serviceRoleKey}`,
                         'apikey': serviceRoleKey
@@ -250,29 +246,24 @@ Deno.serve(async (req) => {
                         });
                         
                         if (updateResp.ok) {
-                          // 5. Create inventory movement record
-                          const movementResp = await fetch(`${supabaseUrl}/rest/v1/inventory_movements`, {
-                            method: 'POST',
-                            headers: {
-                              'Authorization': `Bearer ${serviceRoleKey}`,
-                              'apikey': serviceRoleKey,
-                              'Content-Type': 'application/json',
-                              'Prefer': 'return=minimal'
-                            },
-                            body: JSON.stringify({
-                              product_id: item.product_id,
-                              order_id: orderId,
-                              delta: -item.quantity,
-                              reason: 'order_sale'
-                            })
-                          });
+                          processedCount++;
+                          console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock}`);
                           
-                          if (movementResp.ok) {
-                            processedCount++;
-                            console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock} (tracked)`);
-                          } else {
-                            console.warn(`⚠️ Stock updated but movement tracking failed for ${product.name}`);
-                            processedCount++; // Still count as success
+                          // Check if stock alert is needed after reduction
+                          if (newStock <= (product.low_stock_threshold || 5)) {
+                            try {
+                              await fetch(`${supabaseUrl}/functions/v1/stock-alert`, {
+                                method: 'POST',
+                                headers: {
+                                  'Authorization': `Bearer ${serviceRoleKey}`,
+                                  'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ productId: item.product_id })
+                              });
+                              console.log(`📢 Stock alert triggered for ${product.name}`);
+                            } catch (alertError: any) {
+                              console.warn(`⚠️ Stock alert failed for ${product.name}:`, alertError.message);
+                            }
                           }
                         } else if (updateResp.status === 406) {
                           // Optimistic lock failed - stock changed during our operation
@@ -304,12 +295,39 @@ Deno.serve(async (req) => {
                 if (failedProducts.length > 0) {
                   console.warn('⚠️ Some products failed stock reduction:', failedProducts);
                 }
+                
+                // Mark stock as processed to prevent duplicate reductions
+                try {
+                  const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString() };
+                  await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                      'Authorization': `Bearer ${serviceRoleKey}`,
+                      'apikey': serviceRoleKey,
+                      'Content-Type': 'application/json',
+                      'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ payment_debug: updatedDebugInfo })
+                  });
+                  console.log('✅ Stock processed flag updated');
+                } catch (flagError: any) {
+                  console.warn('⚠️ Failed to update stock processed flag:', flagError.message);
+                }
               } else {
                 console.warn('Failed to fetch order items:', itemsResp.status);
               }
+            } else {
+              console.log('⚠️ Stock reduction already processed for order:', orderId);
+              stockResult = {
+                success: true,
+                processed_count: 0,
+                failed_products: [],
+                order_id: orderId,
+                message: 'Already processed (idempotent)'
+              };
             }
           } else {
-            console.warn('Failed to check existing movements:', existingMovementsResp.status);
+            console.warn('Failed to check order status:', orderCheckResp.status);
           }
         }
       } catch (e: any) {
