@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
+import { checkAdminAccess } from '../../config/admin'
 
 type TabItem = { to: string; label: string; end?: boolean }
 
@@ -30,13 +31,8 @@ export default function AccountLayout() {
           return 
         }
         
-        // TEMP: Site sahibi için admin mode aktif
-        const isDev = import.meta.env.DEV
-        const isLocalhost = window.location.hostname === 'localhost'
-        const isOwnerSite = window.location.hostname.includes('venthub') || window.location.hostname.includes('cloudflare')
-        const forceAdmin = isDev || isLocalhost || isOwnerSite || true // TEMP: Herkesi admin yap
-        
-        if (forceAdmin && user?.email) {
+        // Merkezi admin kontrolü
+        if (checkAdminAccess(user)) {
           if (mounted) {
             setIsAdmin(true)
           }

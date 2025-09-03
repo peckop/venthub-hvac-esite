@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useCart } from '../../hooks/useCart'
+import { checkAdminAccess } from '../../config/admin'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -115,13 +116,8 @@ export default function OrderDetailPage() {
           return 
         }
         
-        // TEMP: Site sahibi için admin mode aktif
-        const isDev = import.meta.env.DEV
-        const isLocalhost = window.location.hostname === 'localhost'
-        const isOwnerSite = window.location.hostname.includes('venthub') || window.location.hostname.includes('cloudflare')
-        const forceAdmin = isDev || isLocalhost || isOwnerSite || true // TEMP: Herkesi admin yap
-        
-        if (forceAdmin && user?.email) {
+        // Merkezi admin kontrolü
+        if (checkAdminAccess(user)) {
           if (mounted) {
             setIsAdmin(true)
           }
