@@ -197,10 +197,14 @@ Deno.serve(async (req) => {
 
         if (!orderResponse.ok) {
             const errorText = await orderResponse.text();
+            console.error('Order creation failed - Status:', orderResponse.status, 'Error:', errorText);
+            console.error('Order data was:', JSON.stringify(orderData, null, 2));
+            
             // Fallback: remove shipping_method if column doesn't exist yet
             const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
             if (mayRetry) {
                 const { shipping_method, ...withoutShipMethod } = orderData as any
+                console.log('Retrying without shipping_method...');
                 orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
                     method: 'POST',
                     headers: {
@@ -211,14 +215,23 @@ Deno.serve(async (req) => {
                     },
                     body: JSON.stringify(withoutShipMethod)
                 });
-            } else {
-                console.error('Order creation failed:', errorText);
+                if (!orderResponse.ok) {
+                    const retryError = await orderResponse.text();
+                    console.error('Retry also failed:', retryError);
+                }
             }
         }
 
         if (!orderResponse.ok) {
+            const finalErrorText = await orderResponse.text().catch(() => 'Unknown error');
             return new Response(JSON.stringify({
-                error: { code: 'DATABASE_ERROR', message: 'Sipariş oluşturulamadı' }
+                error: { 
+                    code: 'DATABASE_ERROR', 
+                    message: 'Sipariş oluşturulamadı', 
+                    details: finalErrorText,
+                    status: orderResponse.status,
+                    orderData: orderData
+                }
             }), {
                 status: 500,
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -277,6 +290,8 @@ Deno.serve(async (req) => {
                 product_id: it.product_id,
                 quantity: parseInt(it.quantity),
                 price_at_time: parseFloat(it.unit_price),
+                unit_price: parseFloat(it.unit_price),
+                total_price: parseFloat(it.unit_price) * parseInt(it.quantity),
                 product_name: fallbackName,
                 product_image_url: fallbackImage,
                 // snapshots

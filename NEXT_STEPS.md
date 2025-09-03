@@ -22,7 +22,14 @@
 - [x] **WhatsApp & SMS sistemi** — Notification service ve stock alerts hazır
 - [x] **Stok yönetimi** — Otomatik stok düşümü, idempotent guards, admin UI
 
-### 📋 KALAN ÖNCELIKLI GÖREVLER
+### ✅ YENİ TAMAMLANAN GÖREVLER (2025-09-03)
+- [x] **İyzico Payment System** — Kritik veritabanı şeması ve callback düzeltmeleri
+- [x] **Order Management** — Sipariş oluşturma ve items kaydetme tamamen çalışır durumda
+- [x] **Payment Status Tracking** — payment_status ve status kolonları doğru şekilde ayrıldı
+- [x] **Stock Integration** — Ödeme sonrası otomatik stok düşümü aktif
+- [x] **Database Migrations** — Disaster recovery ve incremental fix migration'ları oluşturuldu
+
+### 📋 KALAN ÖNCELİKLİ GÖREVLER
 1) **Lint cleanup (Phase 1 – detay temizliği)**
    - CheckoutPage.tsx
      - Missing deps (clearCart, orderId, convId), "any" tiplerini unknown'a çevir
