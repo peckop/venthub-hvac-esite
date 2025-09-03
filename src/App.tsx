@@ -43,6 +43,7 @@ const AccountReturnsPage = lazy(() => import('./pages/account/AccountReturnsPage
 const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage'))
 const OrdersPage = lazy(() => import('./pages/OrdersPage'))
 const AdminStockPage = lazy(() => import('./pages/account/AdminStockPage'))
+const AdminReturnsPage = lazy(() => import('./pages/account/AdminReturnsPage'))
 
 // Brand pages
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -110,6 +111,7 @@ function App() {
                   <Route path="security" element={<AccountSecurityPage />} />
                   {/* Admin operations (hidden from tabs) */}
                   <Route path="operations/stock" element={<AdminStockPage />} />
+                  <Route path="operations/returns" element={<AdminReturnsPage />} />
                 </Route>
                 
                 {/* Auth Routes */}

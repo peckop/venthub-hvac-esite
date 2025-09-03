@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Clock, CheckCircle, XCircle, Truck, Package, RefreshCw } from 'lucide-react'
 
 interface ReturnRow {
   id: string
@@ -152,6 +153,49 @@ export default function AccountReturnsPage() {
     return 'bg-air-blue/10 text-primary-navy'
   }
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'requested': return <Clock className="text-yellow-600" size={16} />
+      case 'approved': return <CheckCircle className="text-green-600" size={16} />
+      case 'rejected': return <XCircle className="text-red-600" size={16} />
+      case 'in_transit': return <Truck className="text-blue-600" size={16} />
+      case 'received': return <Package className="text-purple-600" size={16} />
+      case 'refunded': return <CheckCircle className="text-green-700" size={16} />
+      case 'cancelled': return <XCircle className="text-gray-600" size={16} />
+      default: return <RefreshCw className="text-gray-400" size={16} />
+    }
+  }
+
+  const getStatusLabel = (status: string): string => {
+    return t(`returns.statusLabels.${status}`) || status
+  }
+
+  const getReturnTimeline = (currentStatus: string) => {
+    const allSteps = [
+      { key: 'requested', label: 'Talep Alındı' },
+      { key: 'approved', label: 'Onaylandı' },
+      { key: 'in_transit', label: 'Kargoda (İade)' },
+      { key: 'received', label: 'İade Teslim Alındı' },
+      { key: 'refunded', label: 'İade Ücreti Ödendi' }
+    ]
+    
+    // Rejected/cancelled are terminal states that don't follow the normal flow
+    if (currentStatus === 'rejected' || currentStatus === 'cancelled') {
+      return [
+        { key: 'requested', label: 'Talep Alındı', completed: true },
+        { key: currentStatus, label: getStatusLabel(currentStatus), completed: true, isTerminal: true }
+      ]
+    }
+    
+    const currentIndex = allSteps.findIndex(step => step.key === currentStatus)
+    
+    return allSteps.map((step, index) => ({
+      ...step,
+      completed: index <= currentIndex,
+      isCurrent: index === currentIndex
+    }))
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -166,35 +210,90 @@ export default function AccountReturnsPage() {
       ) : rows.length === 0 ? (
         <div className="text-sm text-steel-gray">{t('returns.empty')}</div>
       ) : (
-        <div className="overflow-hidden bg-white rounded-xl border border-gray-100">
-          <table className="w-full">
-            <thead className="bg-light-gray">
-              <tr>
-                <th className="text-left p-3 text-sm text-industrial-gray">{t('returns.order')}</th>
-                <th className="text-left p-3 text-sm text-industrial-gray">{t('returns.reason')}</th>
-                <th className="text-left p-3 text-sm text-industrial-gray">{t('returns.status')}</th>
-                <th className="text-left p-3 text-sm text-industrial-gray">{t('returns.created')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(r => (
-                <tr key={r.id} className="border-t border-gray-50">
-                  <td className="p-3 text-sm">
-                    {(() => {
-                      const o = orders.find(x => x.id === r.order_id)
-                      const code = o?.order_number ? `#${o.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
-                      return <button onClick={() => navigate(`/account/orders/${r.order_id}`)} className="text-primary-navy hover:underline">{code}</button>
-                    })()}
-                  </td>
-                  <td className="p-3 text-sm text-industrial-gray">{r.reason}</td>
-                  <td className="p-3 text-sm">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${statusClass(r.status)}`}>{r.status}</span>
-                  </td>
-                  <td className="p-3 text-sm text-steel-gray">{new Date(r.created_at).toLocaleString('tr-TR')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {rows.map(r => {
+            const o = orders.find(x => x.id === r.order_id)
+            const code = o?.order_number ? `#${o.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
+            const timeline = getReturnTimeline(r.status)
+            
+            return (
+              <div key={r.id} className="bg-white rounded-xl border border-gray-100 p-4">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary-navy text-white rounded-full w-10 h-10 flex items-center justify-center">
+                      <Package size={18} />
+                    </div>
+                    <div>
+                      <button 
+                        onClick={() => navigate(`/account/orders/${r.order_id}`)} 
+                        className="font-semibold text-primary-navy hover:underline"
+                      >
+                        {code}
+                      </button>
+                      <div className="text-xs text-steel-gray">{new Date(r.created_at).toLocaleDateString('tr-TR')}</div>
+                    </div>
+                  </div>
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${statusClass(r.status)}`}>
+                    {getStatusIcon(r.status)}
+                    {getStatusLabel(r.status)}
+                  </div>
+                </div>
+                
+                {/* Return Details */}
+                <div className="mb-4">
+                  <div className="text-sm">
+                    <span className="font-medium text-steel-gray">İade Sebebi:</span> 
+                    <span className="text-industrial-gray ml-2">{r.reason}</span>
+                  </div>
+                  {r.description && (
+                    <div className="text-sm mt-1">
+                      <span className="font-medium text-steel-gray">Açıklama:</span>
+                      <span className="text-industrial-gray ml-2">{r.description}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Progress Timeline */}
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-xs font-medium text-steel-gray mb-3">İade Süreci</div>
+                  <div className="flex items-center justify-between">
+                    {timeline.map((step, index) => (
+                      <React.Fragment key={step.key}>
+                        <div className="flex flex-col items-center min-w-[60px]">
+                          <div 
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                              step.completed 
+                                ? step.isTerminal && (step.key === 'rejected' || step.key === 'cancelled')
+                                  ? 'bg-red-500 text-white' 
+                                  : 'bg-success-green text-white'
+                                : 'bg-gray-200 text-gray-600'
+                            }`}
+                          >
+                            {step.completed ? (
+                              step.isTerminal && (step.key === 'rejected' || step.key === 'cancelled') 
+                                ? '✕' 
+                                : '✓'
+                            ) : index + 1}
+                          </div>
+                          <span className={`mt-1 text-[10px] text-center leading-tight ${
+                            step.completed ? 'text-industrial-gray font-medium' : 'text-steel-gray'
+                          }`}>
+                            {step.label}
+                          </span>
+                        </div>
+                        {index < timeline.length - 1 && !step.isTerminal && (
+                          <div className={`flex-1 h-0.5 mx-2 ${
+                            step.completed ? 'bg-success-green' : 'bg-gray-200'
+                          }`}></div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
 

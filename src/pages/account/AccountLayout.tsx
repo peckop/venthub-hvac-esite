@@ -71,7 +71,11 @@ export default function AccountLayout() {
   }
 
   const tabs: TabItem[] = isAdmin
-    ? [...baseTabs, { to: '/account/operations/stock', label: 'Operasyon' }]
+    ? [
+        ...baseTabs, 
+        { to: '/account/operations/stock', label: 'Stok' },
+        { to: '/account/operations/returns', label: 'İade Yönetimi' }
+      ]
     : baseTabs
 
   return (
