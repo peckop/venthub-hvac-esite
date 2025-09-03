@@ -16,8 +16,30 @@ export const AuthCallbackPage: React.FC = () => {
         const hashFragment = window.location.hash
 
         if (hashFragment && hashFragment.length > 0) {
-          // Exchange the auth code for a session
+          // Handle auth callback with URL hash
           const { data, error } = await supabase.auth.getSession()
+          
+          // If no session yet, try to exchange the tokens from URL
+          if (!data.session) {
+            const { error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href)
+            if (sessionError) {
+              console.error('Error exchanging tokens:', sessionError)
+            }
+            // Get session again after exchange
+            const { data: newData, error: newError } = await supabase.auth.getSession()
+            if (newError) {
+              throw newError
+            }
+            if (newData.session) {
+              setStatus('success')
+              setMessage('E-posta başarıyla doğrulandı! Anasayfaya yönlendiriliyorsunuz...')
+              toast.success('E-posta başarıyla doğrulandı!')
+              setTimeout(() => {
+                navigate('/')
+              }, 2000)
+              return
+            }
+          }
 
           if (error) {
             console.error('Error exchanging code for session:', error.message)
