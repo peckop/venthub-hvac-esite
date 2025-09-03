@@ -439,7 +439,9 @@ const mapped: Order = {
     }
   }
   const steps = ['pending','paid','shipped','delivered'] as const
-  const activeIdx = Math.max(steps.indexOf((order.status || 'pending').toLowerCase() as typeof steps[number]), 0)
+  // Normalize 'confirmed' status to 'paid' for progress bar
+  const normalizedStatus = (order.status || 'pending').toLowerCase() === 'confirmed' ? 'paid' : (order.status || 'pending').toLowerCase()
+  const activeIdx = Math.max(steps.indexOf(normalizedStatus as typeof steps[number]), 0)
 
   return (
     <div className="min-h-screen bg-clean-white py-8">
@@ -594,7 +596,7 @@ const mapped: Order = {
           {tab==='shipping' && (
             <div className="space-y-6">
               {/* Admin Kargo Operasyon Formu */}
-              {isAdmin && order.status === 'paid' && !order.carrier && (
+              {isAdmin && (order.status === 'paid' || order.status === 'confirmed') && !order.carrier && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Truck className="text-yellow-600" size={20} />
