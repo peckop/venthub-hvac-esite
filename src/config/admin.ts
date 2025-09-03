@@ -30,6 +30,7 @@ export const FALLBACK_ADMIN_EMAILS: string[] = [
   'admin@venthub.com',
   'info@venthub.com', 
   'alize@venthub.com',
+  'recep.varlik@gmail.com',
   // Acil durum için e-postalar
 ]
 
