@@ -537,7 +537,7 @@ export async function listCartItemsWithProducts(cartId: string) {
   for (const p of (products || []) as Product[]) map.set(p.id, p)
   return items
     .map(i => ({ item: i, product: map.get(i.product_id)! }))
-    .filter(x => !!x.product && !!x.product.id)
+    .filter(x => !!x.product)
 }
 
 export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {

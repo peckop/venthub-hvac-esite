@@ -5,7 +5,6 @@ Last updated: 2025-09-02
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
 ## 1) Durum Özeti (TL;DR)
-- Ödeme Sistemi: İyzico entegrasyonu tamamen çalışır durumda. Sipariş oluşturma, ödeme, callback ve stok düşümü otomatik çalışıyor.
 - Sepet Senkronizasyonu: Misafir ve kullanıcı sepeti senkronizasyonu tamamen düzeltildi. Misafir sepeti korunuyor, ödeme sonrası sepet tamamen temizleniyor, eski ürünler karışmıyor.
 - Router & Navigasyon: Sipariş Detay sayfası eklendi, Orders listesi detay sayfasına yönlendiriyor, inline panel kaldırıldı.
 - Kargo: Detay sayfasında kargo alanları ve timeline var; link olduğunda dış bağlantı ikonu gösteriliyor (UI hazır).
@@ -14,7 +13,6 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
 - Lint: CI'da blocking (maks. uyarı=0); kalan uyarılar kademeli temizlenecek.
 - Güvenlik/Log Hijyeni: Uygulama tarafında konsol logları kaldırıldı/koşullandı (VITE_DEBUG); Edge Function logları IYZICO_DEBUG ile koşullu ve PII maskeli; ESLint 'no-console' politikası etkin.
-- Database Migrations: Disaster recovery (complete table recreation) ve incremental fix migration'ları hazır. Tablolar silinse bile tek dosya ile full restore.
 
 ## 2) Sprint Planı
 
