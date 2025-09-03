@@ -1,5 +1,40 @@
 # Changelog
 
+## 2025-09-03
+
+### İyzico Payment System Critical Fixes
+- **Fix: Database schema mismatch** - Added missing columns to `venthub_orders` table:
+  - `customer_phone` TEXT
+  - `payment_debug` JSONB 
+  - `payment_status` (separate from order `status`)
+- **Fix: Order items creation** - Fixed `venthub_order_items` table schema and Edge Function:
+  - Added required columns: `unit_price`, `total_price`
+  - Removed NOT NULL constraints from optional fields
+  - Updated Edge Function to populate all required fields
+- **Fix: Payment callback function** - Fixed iyzico callback to update correct columns:
+  - `payment_status` (paid/failed) for payment state
+  - `status` (confirmed/pending) for order state
+  - Proper error handling and logging
+- **Fix: Stock reduction** - Manual fix for existing orders, automatic for new orders
+- **Fix: RLS policies** - Temporarily disabled for debugging, restored with proper structure
+
+### Database Schema Updates
+- `venthub_orders` table: Added missing columns for proper payment flow
+- `venthub_order_items` table: Fixed schema to match Edge Function expectations  
+- Payment flow now works end-to-end: order creation → payment → callback → status update
+- **Disaster Recovery Migration:** `20250903_complete_payment_system.sql` - Complete table recreation if needed
+- **Incremental Migration:** `20250903_fix_payment_system.sql` - Add missing columns only
+
+### Edge Functions
+- `iyzico-payment`: Fixed order items creation with all required fields
+- `iyzico-callback`: Fixed to update correct status columns
+- Enhanced error logging for better debugging
+
+### Developer Notes
+- Payment system now fully functional from order creation to completion
+- All database constraints and foreign keys properly configured
+- Stock reduction happens automatically on successful payment
+
 ## 2025-09-01
 
 ### Security / Logging Hygiene

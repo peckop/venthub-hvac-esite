@@ -210,20 +210,25 @@ useEffect(() => {
         // If we cleared server due to post-order flag, also remove the flag now
         try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch {}
         // Compute unit prices for merged items and upsert server
+        const validMerged = merged.filter(it => it.product && it.product.id)
+        if (validMerged.length !== merged.length) {
+          console.warn('syncWithServer: Filtered out items with missing product IDs', merged.length - validMerged.length)
+        }
+        
         const priceInfoList = await Promise.all(
-          merged.map(async (it) => {
+          validMerged.map(async (it) => {
             try {
               const info = await getEffectivePriceInfo(it.product)
               await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
               return { productId: it.product.id, unitPrice: info.unitPrice }
             } catch (e) {
-              console.error('cart upsert error', e)
+              console.error('cart upsert error for product', it.product.id, e)
               return { productId: it.product.id, unitPrice: undefined as number | undefined }
             }
           })
         )
         const unitMap = new Map<string, number | undefined>(priceInfoList.map(p => [p.productId, p.unitPrice]))
-        const mergedWithPrices = merged.map(it => ({ ...it, unitPrice: unitMap.get(it.product.id) ?? it.unitPrice }))
+        const mergedWithPrices = validMerged.map(it => ({ ...it, unitPrice: unitMap.get(it.product.id) ?? it.unitPrice }))
         setItems(mergedWithPrices)
 
         // Clear guest cart to avoid double-merge next time
@@ -286,6 +291,13 @@ useEffect(() => {
   }, [user])
 
   const addToCart = (product: Product, quantity = 1) => {
+    // Product ID validation
+    if (!product || !product.id) {
+      console.error('addToCart: Invalid product or missing ID', product)
+      toast.error('Ürün bilgisi eksik. Lütfen sayfayı yenileyin.')
+      return
+    }
+    
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.product.id === product.id)
       
@@ -338,6 +350,12 @@ useEffect(() => {
   }
 
   const updateQuantity = (productId: string, quantity: number) => {
+    // Product ID validation
+    if (!productId) {
+      console.error('updateQuantity: Missing productId')
+      return
+    }
+    
     if (quantity <= 0) {
       removeFromCart(productId)
       return
@@ -352,16 +370,18 @@ useEffect(() => {
     )
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      const product = items.find(i => i.product.id === productId)?.product
-      if (product) {
+      const product = items.find(i => i.product && i.product.id === productId)?.product
+      if (product && product.id) {
         getEffectivePriceInfo(product)
           .then(info => {
             upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
               .catch(err => console.error('server updateQuantity error', err))
             // Ensure local snapshot unit price is present
-            setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
+            setItems(curr => curr.map(it => it.product && it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
           })
           .catch(err => console.error('server updateQuantity error', err))
+      } else {
+        console.error('updateQuantity: Product not found or missing ID for productId:', productId)
       }
     }
   }
@@ -425,6 +445,10 @@ useEffect(() => {
     // Hangi kalemlerin gerçekten değişeceğini önceden belirle (idempotent davranış için)
     const changedIds = new Set<string>()
     for (const it of items) {
+      if (!it.product || !it.product.id) {
+        console.warn('applyServerPricing: Skipping item with missing product ID', it)
+        continue
+      }
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) continue
       const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
@@ -433,6 +457,7 @@ useEffect(() => {
 
     // Yerel güncelle (yalnızca değişen kalemlerde yeni referans üret)
     setItems(curr => curr.map(it => {
+      if (!it.product || !it.product.id) return it
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) return it
       const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
@@ -444,7 +469,7 @@ useEffect(() => {
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
         const tasks = items.map(it => {
-          if (!changedIds.has(it.product.id)) return Promise.resolve()
+          if (!it.product || !it.product.id || !changedIds.has(it.product.id)) return Promise.resolve()
           const up = pmap.get(it.product.id)
           if (up == null) return Promise.resolve()
           return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })

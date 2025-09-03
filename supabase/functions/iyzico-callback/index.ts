@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
           Prefer: "return=representation",
         },
-        body: JSON.stringify({ status: newStatus, payment_debug: debugInfo }),
+        body: JSON.stringify({ payment_status: newStatus, status: newStatus === 'paid' ? 'confirmed' : 'pending', payment_debug: debugInfo }),
       });
       return resp;
     }
