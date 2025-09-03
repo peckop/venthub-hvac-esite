@@ -185,81 +185,131 @@ Deno.serve(async (req) => {
       const r = await patchStatus('paid');
       updateOk = !!(r && r.ok);
       
-      // Process stock reduction after successful payment - Direct REST API approach
+      // Process stock reduction after successful payment - Direct REST API with idempotency
       try {
         if (orderId) {
-          // Get order items
-          const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
+          // 1. Check if already processed (idempotency)
+          const existingMovementsResp = await fetch(`${supabaseUrl}/rest/v1/inventory_movements?order_id=eq.${orderId}&reason=eq.order_sale&select=id`, {
             headers: {
               'Authorization': `Bearer ${serviceRoleKey}`,
               'apikey': serviceRoleKey
             }
           });
           
-          if (itemsResp.ok) {
-            const items = await itemsResp.json();
-            let processedCount = 0;
-            let failedProducts: string[] = [];
-            
-            for (const item of items) {
-              try {
-                // Get current product stock
-                const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty`, {
-                  headers: {
-                    'Authorization': `Bearer ${serviceRoleKey}`,
-                    'apikey': serviceRoleKey
-                  }
-                });
+          if (existingMovementsResp.ok) {
+            const existingMovements = await existingMovementsResp.json();
+            if (existingMovements.length > 0) {
+              console.log('⚠️ Stock reduction already processed for order:', orderId);
+              stockResult = {
+                success: true,
+                processed_count: 0,
+                failed_products: [],
+                order_id: orderId,
+                message: 'Already processed (idempotent)'
+              };
+            } else {
+              // 2. Get order items
+              const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
+                headers: {
+                  'Authorization': `Bearer ${serviceRoleKey}`,
+                  'apikey': serviceRoleKey
+                }
+              });
+              
+              if (itemsResp.ok) {
+                const items = await itemsResp.json();
+                let processedCount = 0;
+                let failedProducts: string[] = [];
                 
-                if (productResp.ok) {
-                  const products = await productResp.json();
-                  const product = products[0];
-                  
-                  if (product && (product.stock_qty || 0) >= item.quantity) {
-                    // Reduce stock
-                    const newStock = (product.stock_qty || 0) - item.quantity;
-                    const updateResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}`, {
-                      method: 'PATCH',
+                for (const item of items) {
+                  try {
+                    // 3. Get current product stock with atomic read
+                    const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty`, {
                       headers: {
                         'Authorization': `Bearer ${serviceRoleKey}`,
-                        'apikey': serviceRoleKey,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
-                      },
-                      body: JSON.stringify({ stock_qty: newStock })
+                        'apikey': serviceRoleKey
+                      }
                     });
                     
-                    if (updateResp.ok) {
-                      processedCount++;
-                      console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock}`);
-                    } else {
-                      failedProducts.push(product.name || 'Unknown');
-                      console.warn(`❌ Failed to update stock for ${product.name}`);
+                    if (productResp.ok) {
+                      const products = await productResp.json();
+                      const product = products[0];
+                      
+                      if (product && (product.stock_qty || 0) >= item.quantity) {
+                        // 4. Atomic stock reduction with optimistic locking
+                        const newStock = (product.stock_qty || 0) - item.quantity;
+                        const updateResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&stock_qty=eq.${product.stock_qty}`, {
+                          method: 'PATCH',
+                          headers: {
+                            'Authorization': `Bearer ${serviceRoleKey}`,
+                            'apikey': serviceRoleKey,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                          },
+                          body: JSON.stringify({ stock_qty: newStock })
+                        });
+                        
+                        if (updateResp.ok) {
+                          // 5. Create inventory movement record
+                          const movementResp = await fetch(`${supabaseUrl}/rest/v1/inventory_movements`, {
+                            method: 'POST',
+                            headers: {
+                              'Authorization': `Bearer ${serviceRoleKey}`,
+                              'apikey': serviceRoleKey,
+                              'Content-Type': 'application/json',
+                              'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                              product_id: item.product_id,
+                              order_id: orderId,
+                              delta: -item.quantity,
+                              reason: 'order_sale'
+                            })
+                          });
+                          
+                          if (movementResp.ok) {
+                            processedCount++;
+                            console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock} (tracked)`);
+                          } else {
+                            console.warn(`⚠️ Stock updated but movement tracking failed for ${product.name}`);
+                            processedCount++; // Still count as success
+                          }
+                        } else if (updateResp.status === 406) {
+                          // Optimistic lock failed - stock changed during our operation
+                          failedProducts.push(`${product.name} (stock changed during update)`);
+                          console.warn(`⚠️ Race condition detected for ${product.name} - stock changed during update`);
+                        } else {
+                          failedProducts.push(product.name || 'Unknown');
+                          console.warn(`❌ Failed to update stock for ${product.name}: ${updateResp.status}`);
+                        }
+                      } else {
+                        failedProducts.push(product?.name || 'Unknown');
+                        console.warn(`❌ Insufficient stock for ${product?.name}: need ${item.quantity}, have ${product?.stock_qty || 0}`);
+                      }
                     }
-                  } else {
-                    failedProducts.push(product?.name || 'Unknown');
-                    console.warn(`❌ Insufficient stock for ${product?.name}: need ${item.quantity}, have ${product?.stock_qty || 0}`);
+                  } catch (itemError: any) {
+                    failedProducts.push('Unknown product');
+                    console.warn('❌ Error processing item:', itemError.message);
                   }
                 }
-              } catch (itemError: any) {
-                failedProducts.push('Unknown product');
-                console.warn('❌ Error processing item:', itemError.message);
+                
+                stockResult = {
+                  success: true,
+                  processed_count: processedCount,
+                  failed_products: failedProducts,
+                  order_id: orderId
+                };
+                
+                console.log('✅ Stock reduction completed:', processedCount, 'items processed');
+                if (failedProducts.length > 0) {
+                  console.warn('⚠️ Some products failed stock reduction:', failedProducts);
+                }
+              } else {
+                console.warn('Failed to fetch order items:', itemsResp.status);
               }
             }
-            
-            stockResult = {
-              success: true,
-              processed_count: processedCount,
-              failed_products: failedProducts,
-              order_id: orderId
-            };
-            
-            console.log('✅ Stock reduction completed:', processedCount, 'items processed');
-            if (failedProducts.length > 0) {
-              console.warn('⚠️ Some products failed stock reduction:', failedProducts);
-            }
           } else {
-            console.warn('Failed to fetch order items:', itemsResp.status);
+            console.warn('Failed to check existing movements:', existingMovementsResp.status);
           }
         }
       } catch (e: any) {
