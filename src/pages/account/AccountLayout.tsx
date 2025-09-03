@@ -70,7 +70,8 @@ export default function AccountLayout() {
     ? [
         ...baseTabs, 
         { to: '/account/operations/stock', label: 'Stok' },
-        { to: '/account/operations/returns', label: 'İade Yönetimi' }
+        { to: '/account/operations/returns', label: 'İade Yönetimi' },
+        { to: '/account/operations/users', label: 'Kullanıcılar' }
       ]
     : baseTabs
 
