@@ -5,6 +5,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { checkAdminAccess } from '../../config/admin'
 
 interface ReturnWithOrder {
   id: string
@@ -51,13 +52,8 @@ export default function AdminReturnsPage() {
           return 
         }
         
-        // TEMP: Site sahibi için admin mode aktif
-        const isDev = import.meta.env.DEV
-        const isLocalhost = window.location.hostname === 'localhost'
-        const isOwnerSite = window.location.hostname.includes('venthub') || window.location.hostname.includes('cloudflare')
-        const forceAdmin = isDev || isLocalhost || isOwnerSite || true // TEMP: Herkesi admin yap
-        
-        if (forceAdmin && user?.email) {
+        // Merkezi admin kontrolü
+        if (checkAdminAccess(user)) {
           if (mounted) {
             setIsAdmin(true)
           }

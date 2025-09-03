@@ -3,6 +3,7 @@ import { supabase, Product } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Minus, Save } from 'lucide-react'
+import { checkAdminAccess } from '../../config/admin'
 
 export default function AdminStockPage() {
   const { user, loading } = useAuth()
@@ -13,6 +14,7 @@ export default function AdminStockPage() {
   const [saving, setSaving] = useState<string | null>(null)
   const [tempQty, setTempQty] = useState<Record<string, number | ''>>({})
   const [tempThreshold, setTempThreshold] = useState<Record<string, number | ''>>({})
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -20,6 +22,11 @@ export default function AdminStockPage() {
       return
     }
   }, [user, loading, navigate])
+
+  // Admin kontrolü
+  useEffect(() => {
+    setIsAdmin(checkAdminAccess(user))
+  }, [user])
 
   useEffect(() => {
     let mounted = true
@@ -106,6 +113,18 @@ export default function AdminStockPage() {
     } finally {
       setSaving(null)
     }
+  }
+
+  // Admin değilse erişim reddet
+  if (!isAdmin) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center py-8">
+          <h2 className="text-xl font-semibold text-red-600">Erişim Reddedildi</h2>
+          <p className="text-steel-gray mt-2">Bu sayfaya erişmek için admin yetkisi gerekiyor.</p>
+        </div>
+      </div>
+    )
   }
 
   return (
