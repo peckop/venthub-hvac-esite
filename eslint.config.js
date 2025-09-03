@@ -36,4 +36,22 @@ export default tseslint.config(
       'no-empty': ['warn', { allowEmptyCatch: true }],
     },
   },
+  // Allow console.log in scripts, tests, and dev tools
+  {
+    files: [
+      'scripts/**/*.js',
+      'scripts/**/*.ts', 
+      '**/*.test.js',
+      '**/*.test.ts',
+      '**/*.spec.js', 
+      '**/*.spec.ts',
+      'tools/**/*.js',
+      'tools/**/*.ts',
+      'debug/**/*.js',
+      'debug/**/*.ts'
+    ],
+    rules: {
+      'no-console': 'off', // Allow all console methods in scripts and tests
+    },
+  },
 )
