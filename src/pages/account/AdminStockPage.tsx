@@ -12,6 +12,7 @@ export default function AdminStockPage() {
   const [q, setQ] = useState('')
   const [saving, setSaving] = useState<string | null>(null)
   const [tempQty, setTempQty] = useState<Record<string, number | ''>>({})
+  const [tempThreshold, setTempThreshold] = useState<Record<string, number | ''>>({})
 
   useEffect(() => {
     if (!loading && !user) {
@@ -78,8 +79,30 @@ export default function AdminStockPage() {
         
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
+      setTempQty(prev => ({ ...prev, [productId]: '' }))
     } catch (err) {
       console.error('Stock set error:', err)
+    } finally {
+      setSaving(null)
+    }
+  }
+
+  async function setThreshold(productId: string, threshold: number | null) {
+    try {
+      setSaving(productId)
+      // null değeri "varsayılan kullan" anlamına gelir
+      const newThreshold = threshold !== null && threshold >= 0 ? threshold : null
+      
+      const { error } = await supabase
+        .from('products')
+        .update({ low_stock_threshold: newThreshold })
+        .eq('id', productId)
+        
+      if (error) throw error
+      setAll(prev => prev.map(p => p.id === productId ? { ...p, low_stock_threshold: newThreshold } : p))
+      setTempThreshold(prev => ({ ...prev, [productId]: '' }))
+    } catch (err) {
+      console.error('Threshold set error:', err)
     } finally {
       setSaving(null)
     }
@@ -117,24 +140,55 @@ export default function AdminStockPage() {
             {filtered.map(p => {
               const qty = typeof p.stock_qty === 'number' ? p.stock_qty : 0
               const threshold = typeof p.low_stock_threshold === 'number' ? p.low_stock_threshold : undefined
-              const temp = tempQty[p.id] ?? ''
+              const tempQty_val = tempQty[p.id] ?? ''
+              const tempThreshold_val = tempThreshold[p.id] ?? ''
               return (
                 <tr key={p.id} className="border-t border-gray-100">
                   <td className="px-3 py-2 text-industrial-gray font-medium">{p.name}</td>
                   <td className="px-3 py-2 text-steel-gray">{p.sku}</td>
                   <td className={`px-3 py-2 font-semibold ${qty <= (threshold ?? -1) ? 'text-warning-orange' : 'text-industrial-gray'}`}>{qty}</td>
-                  <td className="px-3 py-2 text-steel-gray">{threshold ?? '-'}</td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-steel-gray ${threshold === undefined ? 'italic' : ''}`}>
+                        {threshold ?? 'varsayılan'}
+                      </span>
+                      <input
+                        value={tempThreshold_val}
+                        onChange={(e) => setTempThreshold(prev => ({ ...prev, [p.id]: e.target.value === '' ? '' : Number(e.target.value) }))}
+                        placeholder="Eşik"
+                        className="w-16 px-2 py-1 border border-light-gray rounded text-xs"
+                      />
+                      <button 
+                        disabled={saving === p.id || tempThreshold_val === ''} 
+                        onClick={() => setThreshold(p.id, Number(tempThreshold_val))} 
+                        className="px-1 py-1 rounded border border-light-gray hover:border-secondary-blue disabled:opacity-50 text-xs"
+                        title="Eşik kaydet"
+                      >
+                        <Save size={12} />
+                      </button>
+                      {threshold !== undefined && (
+                        <button 
+                          disabled={saving === p.id} 
+                          onClick={() => setThreshold(p.id, null)} 
+                          className="px-1 py-1 rounded border border-warning-orange text-warning-orange hover:bg-warning-orange hover:text-white disabled:opacity-50 text-xs"
+                          title="Varsayılan kullan"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <button disabled={saving === p.id} onClick={() => adjust(p.id, -1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Minus size={14} /></button>
                       <button disabled={saving === p.id} onClick={() => adjust(p.id, +1)} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50"><Plus size={14} /></button>
                       <input
-                        value={temp}
+                        value={tempQty_val}
                         onChange={(e) => setTempQty(prev => ({ ...prev, [p.id]: e.target.value === '' ? '' : Number(e.target.value) }))}
                         placeholder="Ayarla"
                         className="w-20 px-2 py-1 border border-light-gray rounded"
                       />
-                      <button disabled={saving === p.id || temp === ''} onClick={() => setQty(p.id, Number(temp))} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50 flex items-center gap-1"><Save size={14} /> Kaydet</button>
+                      <button disabled={saving === p.id || tempQty_val === ''} onClick={() => setQty(p.id, Number(tempQty_val))} className="px-2 py-1 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50 flex items-center gap-1"><Save size={14} /> Kaydet</button>
                     </div>
                   </td>
                 </tr>

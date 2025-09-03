@@ -1,6 +1,8 @@
-# NEXT_STEPS (Taşındı)
+# NEXT_STEPS — Kısa Vadeli Görevler (Güncel)
 
-Bu belge ROADMAP'e taşındı. Güncel tek kaynak için bkz. `docs/ROADMAP.md`.
+**📍 Durum:** Bu belge ROADMAP.md ile senkronize edilmiş detaylı görev listesidir.
+**🎯 Ana kaynak:** `docs/ROADMAP.md` (genel yol haritası)
+**🔧 Bu belge:** Kısa vadeli teknik detaylar ve komut örnekleri
 
 ## Current state (TL;DR)
 - Payments: iyzico flow works; legal consents (KVKK, Mesafeli Satış, Ön Bilgilendirme, sipariş onayı) collected and saved.
@@ -11,38 +13,43 @@ Bu belge ROADMAP'e taşındı. Güncel tek kaynak için bkz. `docs/ROADMAP.md`.
 - Git remote: SSH (no token needed). Push/pull with your SSH key is ready.
 
 ## High‑priority next tasks (1–2 days)
-1) Lint cleanup (Phase 1 – remove most warnings)
+
+### ✅ TAMAMLANAN GÖREVLER (2025-09-02'ye kadar)
+- [x] **CI: Lint'i "blocking" yap** — CI'da lint adımı bloklayıcı (--max-warnings=0)
+- [x] **Performans: Bundle optimizasyonu** — %87 küçültme sağlandı (1,118kB → 145kB)
+- [x] **Güvenlik/Log Hijyeni** — PII maskeleme, VITE_DEBUG/IYZICO_DEBUG gates
+- [x] **no-console politikası** — ESLint kuralı aktif (warn/error serbest)
+- [x] **WhatsApp & SMS sistemi** — Notification service ve stock alerts hazır
+- [x] **Stok yönetimi** — Otomatik stok düşümü, idempotent guards, admin UI
+
+### 📋 KALAN ÖNCELIKLI GÖREVLER
+1) **Lint cleanup (Phase 1 – detay temizliği)**
    - CheckoutPage.tsx
-     - Elimizdeki uyarılar: missing deps (clearCart, orderId, convId), birkaç “any” (catch blokları ve event listener seçenekleri) — mümkün olduğunca unknown + type‑guard/konkret tiplere çevir.
+     - Missing deps (clearCart, orderId, convId), "any" tiplerini unknown'a çevir
    - PaymentWatcher.tsx
-     - useEffect: checkOnce bağımlılığı için ya useCallback ile sarmala ve ekle ya da mevcut suppress yaklaşımını koru (tercihen useCallback).
+     - useEffect: checkOnce bağımlılığı (useCallback ile çöz)
    - HomePage.tsx
-     - handleCartToast kullanılmıyor — kaldır ya da kullan.
+     - handleCartToast kullanılmıyor — kaldır ya da kullan
    - AuthContext.tsx, hooks/useCart.tsx, components/HVACIcons.tsx
-     - react-refresh/only-export-components uyarıları: component dışı sabitleri/yardımcıları ayrı bir dosyaya taşı (örn. constants.ts) veya dosya yapısını sadeleştir.
-   - Genel
-     - Kalan “any” tiplerini unknown veya anlamlı tiplere daralt.
+     - react-refresh/only-export-components uyarıları
+   - Genel: Kalan "any" tiplerini daralt
 
-2) CI: Lint’i yeniden “blocking” yap
-   - [x] CI'da lint adımı bloklayıcı hale getirildi (ci.yml içinde pnpm run lint -- --max-warnings=0)
+2) **iyzico production hygiene** 🔄 Kısmen yapıldı
+   - [x] PII maskeleme ve debug gating
+   - [ ] Env toggle: sandbox ↔ live (script URLs, API endpoints)
+   - [ ] Live callback domain whitelist (iyzico panel)
 
-3) iyzico production hygiene
-   - Env toggle: sandbox ↔ live (script URL’leri, API uçları, callback URL’leri) — prod’da `static.iyzipay.com`, sandbox’ta `sandbox-static.iyzipay.com`.
-   - Live callback alan ad(lar)ını iyzico panelinde whitelist et ve loglamayı minimal PII ile tut.
+3) **Sipariş/İdari işlevler**
+   - [ ] Orders detayında fatura bilgileri + yasal onayları görünür kıl
+   - [ ] (Opsiyonel) Admin için basit görüntüleme sayfası
 
-4) Performans: Büyük bundle uyarıları
-   - Vite/Rollup manualChunks veya dynamic import ile code‑split.
+4) **İçerik/Legal**
+   - [ ] Çerez Politikası metni (src/config/legal.ts) şirket bilgileri ile güncelle
 
-4) Sipariş/İdari işlevler
-   - Orders detayında fatura bilgileri + yasal onayları görünür kıl.
-   - (Opsiyonel) Admin için basit bir görüntüleme sayfası.
-
-5) İçerik/Legal
-   - Çerez Politikası metnini şirket bilgilerinizle güncelle (src/config/legal.ts) ve tasdik et.
-
-6) Güvenlik/Temizlik
-   - Gerekli tüm gizli anahtarlar dışarıda (SSH hazır). GITHUB_TOKEN terminal değişkeni olarak kalmalı; repoda saklanmıyor.
-   - Supabase anon key istemcide kalabilir (public). Sunucu tarafı anahtarları saklamıyoruz.
+5) **Stok sistemi son adımlar** (ROADMAP'de detay)
+   - [ ] RLS policies (güvenlik)
+   - [ ] Checkout stock revalidation (oversell engelleme)
+   - [ ] WhatsApp wa.me config (frontend entegrasyonu)
 
 ## Nice‑to‑have (yakın vade)
 - E‑fatura veya PDF fatura taslağı (ileride).
