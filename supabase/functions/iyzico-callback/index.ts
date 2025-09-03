@@ -182,7 +182,11 @@ Deno.serve(async (req) => {
     let updateOk = false;
     let stockResult = null;
     if (paid) {
-      const r = await patchStatus('paid');
+      // Önce 'paid' olarak güncellemeyi dene; constraint nedeniyle reddedilirse 'confirmed' ile tekrar dene
+      let r = await patchStatus('paid');
+      if (!r || !r.ok) {
+        r = await patchStatus('confirmed' as any);
+      }
       updateOk = !!(r && r.ok);
       
       // Process stock reduction after successful payment - Direct REST API approach
