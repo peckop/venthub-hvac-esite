@@ -330,7 +330,9 @@ export const OrdersPage: React.FC = () => {
                   <div className="mb-4">
                     <div className="flex items-center gap-2">
                       {steps.map((s, idx) => {
-                        const activeIdx = Math.max(steps.indexOf(order.status.toLowerCase() as 'paid' | 'pending' | 'shipped' | 'delivered'), 0)
+                        // Normalize 'confirmed' status to 'paid' for progress bar
+                        const normalizedStatus = order.status.toLowerCase() === 'confirmed' ? 'paid' : order.status.toLowerCase()
+                        const activeIdx = Math.max(steps.indexOf(normalizedStatus as 'paid' | 'pending' | 'shipped' | 'delivered'), 0)
                         const active = idx <= activeIdx
                         return (
                           <React.Fragment key={s}>
