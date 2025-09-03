@@ -23,16 +23,12 @@ interface ReturnWithOrder {
   total_amount?: number
 }
 
-interface SupabaseError {
-  code?: string
-  status?: number
-  message?: string
-}
+// Interface removed - not used
 
 export default function AdminReturnsPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
-  const { t } = useI18n()
+  const _t = useI18n() // Prefix with underscore to indicate intentionally unused
   
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
@@ -113,6 +109,7 @@ export default function AdminReturnsPage() {
         if (error) throw error
 
         if (mounted) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const mapped = (data || []).map((item: any) => ({
             id: item.id,
             order_id: item.order_id,
