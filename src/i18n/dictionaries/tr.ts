@@ -297,6 +297,7 @@ export const tr = {
     failed: 'Başarısız',
     cancelled: 'İptal Edildi',
     refunded: 'İade Edildi',
+    partialRefunded: 'Kısmi İade',
     startDate: 'Başlangıç',
     endDate: 'Bitiş',
     orderCode: 'Sipariş No (son 8)',

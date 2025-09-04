@@ -11,6 +11,7 @@ interface Order {
   id: string
   total_amount: number
   status: string
+  payment_status?: string
   created_at: string
   customer_name: string
   customer_email: string
@@ -51,6 +52,7 @@ interface VenthubOrderRow {
   id: string
   total_amount: number | string
   status: string
+  payment_status?: string | null
   created_at: string
   customer_name?: string | null
   customer_email?: string | null
@@ -92,7 +94,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, created_at, customer_name, customer_email, shipping_address, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
+        .select('id, user_id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -117,6 +119,7 @@ export const OrdersPage: React.FC = () => {
           id: order.id,
           total_amount: Number(order.total_amount) || 0,
           status: order.status || 'pending',
+          payment_status: order.payment_status || undefined,
           created_at: order.created_at,
           customer_name: order.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
           customer_email: order.customer_email || user?.email || '-',
@@ -381,6 +384,11 @@ export const OrdersPage: React.FC = () => {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
                         {getStatusText(order.status)}
                       </span>
+                      {order.payment_status?.toLowerCase() === 'partial_refunded' && (
+                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                          {t('orders.partialRefunded')}
+                        </span>
+                      )}
                       <button
                         onClick={() => navigate(`/account/orders/${order.id}`)}
                         className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
