@@ -297,6 +297,8 @@ export const en = {
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
+    cancelled: 'Cancelled',
+    refunded: 'Refunded',
     startDate: 'Start Date',
     endDate: 'End Date',
     orderCode: 'Order Code (last 8)',

@@ -295,6 +295,8 @@ export const tr = {
     shipped: 'Kargoda',
     delivered: 'Teslim Edildi',
     failed: 'Başarısız',
+    cancelled: 'İptal Edildi',
+    refunded: 'İade Edildi',
     startDate: 'Başlangıç',
     endDate: 'Bitiş',
     orderCode: 'Sipariş No (son 8)',
