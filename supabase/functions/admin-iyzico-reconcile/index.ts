@@ -67,7 +67,12 @@ Deno.serve(async (req) => {
         const cbUrl = `${fnHost}/iyzico-callback`
         const cbResp = await fetch(cbUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            // Add Authorization header to satisfy verify_jwt when enabled
+            Authorization: `Bearer ${serviceRoleKey}`,
+            apikey: serviceRoleKey
+          },
           body: JSON.stringify({ token, conversationId: o.conversation_id, orderId: o.id })
         })
         const cbJson = await cbResp.json().catch(()=>({}))

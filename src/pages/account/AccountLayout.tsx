@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
-import { checkAdminAccess } from '../../config/admin'
 
 type TabItem = { to: string; label: string; end?: boolean }
 
@@ -20,60 +18,13 @@ const baseTabs: TabItem[] = [
 export default function AccountLayout() {
   const { user, loading } = useAuth()
   const location = useLocation()
-  const [isAdmin, setIsAdmin] = useState(false)
-
-  useEffect(() => {
-    let mounted = true
-    async function loadRole() {
-      try {
-        if (!user) { 
-          setIsAdmin(false); 
-          return 
-        }
-        
-        // Merkezi admin kontrolü
-        if (checkAdminAccess(user)) {
-          if (mounted) {
-            setIsAdmin(true)
-          }
-          return
-        }
-        
-        // Production admin check
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle()
-          
-        if (!mounted) return
-        
-        if (!error && data && (data as { role?: string }).role === 'admin') {
-          setIsAdmin(true)
-        } else {
-          setIsAdmin(false)
-        }
-      } catch (err) {
-        console.error('loadRole error:', err)
-        if (mounted) setIsAdmin(false)
-      }
-    }
-    loadRole()
-    return () => { mounted = false }
-  }, [user])
 
   if (!loading && !user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />
   }
 
-  const tabs: TabItem[] = isAdmin
-    ? [
-        ...baseTabs, 
-        { to: '/account/operations/stock', label: 'Stok' },
-        { to: '/account/operations/returns', label: 'İade Yönetimi' },
-        { to: '/account/operations/users', label: 'Kullanıcılar' }
-      ]
-    : baseTabs
+  // Admin sekmeleri artık Account altında gösterilmiyor; müşteri alanı sade tutulur
+  const tabs: TabItem[] = baseTabs
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

@@ -42,12 +42,13 @@ const AccountShipmentsPage = lazy(() => import('./pages/account/AccountShipments
 const AccountReturnsPage = lazy(() => import('./pages/account/AccountReturnsPage'))
 const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage'))
 const OrdersPage = lazy(() => import('./pages/OrdersPage'))
-const AdminStockPage = lazy(() => import('./pages/account/AdminStockPage'))
 const AdminReturnsPage = lazy(() => import('./pages/account/AdminReturnsPage'))
 const AdminUsersPage = lazy(() => import('./pages/account/AdminUsersPage'))
 
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 const AdminInventoryPage = lazy(() => import('./pages/admin/AdminInventoryPage'))
+const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'))
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 
 // Brand pages
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -104,8 +105,9 @@ function App() {
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminInventoryPage />} />
+                  <Route index element={<AdminDashboardPage />} />
                   <Route path="inventory" element={<AdminInventoryPage />} />
+                  <Route path="orders" element={<AdminOrdersPage />} />
                   {/* Geçici: mevcut admin sayfalarına geçiş */}
                   <Route path="returns" element={<AdminReturnsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />
@@ -122,10 +124,7 @@ function App() {
                   <Route path="returns" element={<AccountReturnsPage />} />
                   <Route path="profile" element={<AccountProfilePage />} />
                   <Route path="security" element={<AccountSecurityPage />} />
-                  {/* Admin operations (hidden from tabs) */}
-                  <Route path="operations/stock" element={<AdminStockPage />} />
-                  <Route path="operations/returns" element={<AdminReturnsPage />} />
-                  <Route path="operations/users" element={<AdminUsersPage />} />
+                  {/* Admin operations routes kaldırıldı */}
                 </Route>
                 
                 {/* Auth Routes */}
