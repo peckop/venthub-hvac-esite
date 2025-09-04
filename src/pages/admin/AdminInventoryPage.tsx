@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabase'
 
 type Row = { product_id: string; name: string; physical_stock: number; reserved_stock: number; available_stock: number }
 
+type ReservedRow = { order_id: string; created_at: string; status: string; payment_status: string | null; quantity: number }
+
 enum LoadState { Idle, Loading, Error }
 
 const AdminInventoryPage: React.FC = () => {
@@ -10,7 +12,7 @@ const AdminInventoryPage: React.FC = () => {
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
   const [selected, setSelected] = React.useState<Row | null>(null)
-  const [reservedOrders, setReservedOrders] = React.useState<{order_id:string; created_at:string; status:string; payment_status:string; quantity:number}[]>([])
+  const [reservedOrders, setReservedOrders] = React.useState<ReservedRow[]>([])
 
   const load = React.useCallback(async () => {
     try {
@@ -18,8 +20,8 @@ const AdminInventoryPage: React.FC = () => {
       const { data, error } = await supabase.from('inventory_summary').select('*')
       if (error) throw error
       setRows((data || []) as Row[])
-    } catch (e:any) {
-      setError(e?.message || 'Yükleme hatası')
+    } catch {
+      setError('Yükleme hatası')
       setRows([])
       setLoading(LoadState.Error)
       return
@@ -37,8 +39,8 @@ const AdminInventoryPage: React.FC = () => {
         .eq('product_id', productId)
         .order('created_at', { ascending: false })
       if (error) throw error
-      setReservedOrders((data||[]) as any)
-    } catch (e) {
+      setReservedOrders((data || []) as ReservedRow[])
+    } catch {
       setReservedOrders([])
     }
   }, [])
