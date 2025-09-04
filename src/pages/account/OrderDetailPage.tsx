@@ -217,7 +217,7 @@ const mapped: Order = {
   id: orderDataWithDefaults.id,
   total_amount: Number(orderDataWithDefaults.total_amount) || 0,
   status: orderDataWithDefaults.status || 'pending',
-  payment_status: (orderDataWithDefaults as any).payment_status || undefined,
+  payment_status: orderDataWithDefaults.payment_status || undefined,
   created_at: orderDataWithDefaults.created_at,
   customer_name: orderDataWithDefaults.customer_name,
   customer_email: orderDataWithDefaults.customer_email,
