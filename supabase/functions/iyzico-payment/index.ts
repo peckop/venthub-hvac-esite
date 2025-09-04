@@ -267,11 +267,13 @@ Deno.serve(async (req) => {
             }
         } catch {}
 
-        // Yalnızca mevcut kolonları gönder (şema uyumu): order_id, product_id, quantity, price_at_time, product_name, product_image_url
+        // Şema uyumlu kolonlar: order_id, product_id, product_name, unit_price, quantity, total_price,
+        // opsiyonel: price_at_time, product_image_url
         const orderItems = authoritativeItems.map((raw: any) => {
             const productId = raw.product_id ?? raw.productId
             const unitPrice = Number(raw.unit_price ?? raw.price)
-            const qty = Number(raw.quantity ?? 1)
+            const qty = Math.max(1, Number(raw.quantity ?? 1))
+            const safeUnit = Number.isFinite(unitPrice) ? unitPrice : 0
             const p = productId ? (prodMap.get(productId) || {}) : {}
             const fid = String(productId || '')
             const fallbackName = (p?.name) || nameMap.get(fid) || 'Ürün'
@@ -279,9 +281,11 @@ Deno.serve(async (req) => {
             return {
                 order_id: dbOrderId,
                 product_id: productId,
-                quantity: qty,
-                price_at_time: Number.isFinite(unitPrice) ? unitPrice : 0,
                 product_name: fallbackName,
+                unit_price: safeUnit,
+                quantity: qty,
+                total_price: safeUnit * qty,
+                price_at_time: safeUnit,
                 product_image_url: fallbackImage,
             }
         });
