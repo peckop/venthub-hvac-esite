@@ -34,6 +34,7 @@ interface Order {
   id: string
   total_amount: number
   status: string
+  payment_status?: string
   created_at: string
   customer_name: string
   customer_email: string
@@ -55,6 +56,7 @@ interface SupabaseOrderData {
   id: string
   total_amount: number | string
   status: string
+  payment_status?: string | null
   created_at: string
   customer_name: string
   customer_email: string
@@ -151,7 +153,7 @@ export default function OrderDetailPage() {
     async function load() {
       try {
         setLoading(true)
-const baseSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
         const baseRes = await supabase
           .from('venthub_orders')
           .select(baseSelect)
@@ -215,6 +217,7 @@ const mapped: Order = {
   id: orderDataWithDefaults.id,
   total_amount: Number(orderDataWithDefaults.total_amount) || 0,
   status: orderDataWithDefaults.status || 'pending',
+  payment_status: (orderDataWithDefaults as any).payment_status || undefined,
   created_at: orderDataWithDefaults.created_at,
   customer_name: orderDataWithDefaults.customer_name,
   customer_email: orderDataWithDefaults.customer_email,
@@ -463,6 +466,9 @@ const mapped: Order = {
             </div>
             <div className="flex items-center gap-2">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
+              {order.payment_status?.toLowerCase() === 'partial_refunded' && (
+                <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
+              )}
               <button onClick={()=>navigate(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
               <button onClick={()=>handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
             </div>

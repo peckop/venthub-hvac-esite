@@ -299,6 +299,7 @@ export const en = {
     failed: 'Failed',
     cancelled: 'Cancelled',
     refunded: 'Refunded',
+    partialRefunded: 'Partial Refunded',
     startDate: 'Start Date',
     endDate: 'End Date',
     orderCode: 'Order Code (last 8)',
