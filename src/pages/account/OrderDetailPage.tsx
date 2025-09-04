@@ -433,8 +433,9 @@ const mapped: Order = {
       case 'confirmed': return t('orders.paid')
       case 'shipped': return t('orders.shipped')
       case 'delivered': return t('orders.delivered')
-      case 'failed':
-      case 'cancelled': return t('orders.failed')
+      case 'failed': return t('orders.failed')
+      case 'cancelled': return t('orders.cancelled')
+      case 'refunded': return t('orders.refunded')
       default: return status
     }
   }
