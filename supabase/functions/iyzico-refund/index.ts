@@ -91,11 +91,15 @@ Deno.serve(async (req) => {
     }
 
     // Idempotency
-    if (order.payment_status === 'refunded' || order?.payment_debug?.manual_refund_applied === true) {
+    // Tam iade tamamlanmışsa tekrar etmeyelim; parsiyel iadeler birikimli olabilir
+    if (order.payment_status === 'refunded') {
       return new Response(JSON.stringify({ status: 'already_refunded', order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const totalAmount = Number(order.total_amount) || 0;
+    const prevDebug: any = order?.payment_debug || {};
+    const refundedTotalPrev = Number(prevDebug?.refunded_total || 0);
+
     const payId = order?.payment_debug?.paymentId || order?.payment_debug?.raw?.paymentId || null;
     const transactions: any[] = Array.isArray(order?.payment_debug?.raw?.itemTransactions) ? order.payment_debug.raw.itemTransactions : [];
 
@@ -106,7 +110,7 @@ Deno.serve(async (req) => {
 
     // Decide: full cancel vs partial refund
     const epsilon = 0.0001;
-    const isFull = Math.abs(targetAmount - totalAmount) < epsilon || !amountReq;
+    const isFull = Math.abs((refundedTotalPrev + targetAmount) - totalAmount) < epsilon && !!targetAmount || (!amountReq && refundedTotalPrev === 0);
 
     let iyzResult: any = null;
     try {
@@ -145,44 +149,69 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: { code: "IYZICO_FAIL", result: iyzResult } }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Stock restore (idempotent by manual_refund_applied flag)
-    try {
-      const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${encodeURIComponent(orderId)}&select=product_id,quantity`, {
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-      });
-      const items = itemsResp.ok ? await itemsResp.json().catch(() => []) : [];
-      for (const it of items) {
-        try {
-          // Increase stock
-          // Get current to use optimistic lock
-          const pResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}&select=id,stock_qty`, {
-            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-          });
-          const arr = pResp.ok ? await pResp.json().catch(() => []) : [];
-          const cur = Array.isArray(arr) ? arr[0] : null;
-          const curStock = Number(cur?.stock_qty ?? 0);
-          const newStock = curStock + Number(it.quantity || 0);
-          await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}`, {
-            method: 'PATCH',
-            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-            body: JSON.stringify({ stock_qty: newStock })
-          });
-        } catch {}
+    // Full cancel: stok iadesi + status güncelle; Parsiyel: sadece refund bilgisini biriktir
+    if (isFull) {
+      // Stock restore (idempotent by manual_refund_applied flag)
+      try {
+        const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${encodeURIComponent(orderId)}&select=product_id,quantity`, {
+          headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+        });
+        const items = itemsResp.ok ? await itemsResp.json().catch(() => []) : [];
+        for (const it of items) {
+          try {
+            const pResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}&select=id,stock_qty`, {
+              headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+            });
+            const arr = pResp.ok ? await pResp.json().catch(() => []) : [];
+            const cur = Array.isArray(arr) ? arr[0] : null;
+            const curStock = Number(cur?.stock_qty ?? 0);
+            const newStock = curStock + Number(it.quantity || 0);
+            await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}`, {
+              method: 'PATCH',
+              headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+              body: JSON.stringify({ stock_qty: newStock })
+            });
+          } catch {}
+        }
+      } catch {}
+
+      // Update order: payment_status=refunded, status (cancelled unless shipped/delivered)
+      try {
+        const newDebug = { ...prevDebug, refund_result: iyzResult, refund_type: 'cancel', refund_amount: targetAmount, refunded_total: totalAmount, manual_refund_applied: true, manual_refund_applied_at: new Date().toISOString() };
+        const newStatus = (order.status === 'shipped' || order.status === 'delivered') ? order.status : 'cancelled';
+        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ payment_status: 'refunded', status: newStatus, payment_debug: newDebug })
+        });
+      } catch {}
+
+      return new Response(JSON.stringify({ status: 'refunded', type: 'cancel', amount: targetAmount, order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    } else {
+      // Partial refund: biriktir, status'u değiştirme, stok iadesi yapma
+      try {
+        const partials = Array.isArray(prevDebug?.partial_refunds) ? prevDebug.partial_refunds : [];
+        const newRefundedTotal = refundedTotalPrev + Number(targetAmount || 0);
+        const newStatusPayment = (newRefundedTotal + epsilon >= totalAmount) ? 'refunded' : 'partial_refunded';
+        const dbg = { 
+          ...prevDebug, 
+          refund_result: iyzResult, 
+          refund_type: 'refund', 
+          refund_amount: targetAmount, 
+          refunded_total: newRefundedTotal, 
+          partial_refunds: [...partials, { amount: targetAmount, at: new Date().toISOString() }]
+        };
+        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ payment_status: newStatusPayment, payment_debug: dbg })
+        });
+
+        return new Response(JSON.stringify({ status: newStatusPayment, type: 'refund', amount: targetAmount, refunded_total: newRefundedTotal, order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      } catch (e: any) {
+        return new Response(JSON.stringify({ error: { code: 'DB_UPDATE_FAIL', message: e?.message || String(e) } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-    } catch {}
-
-    // Update order: payment_status=refunded, status
-    try {
-      const newDebug = { ...(order.payment_debug || {}), refund_result: iyzResult, manual_refund_applied: true, manual_refund_applied_at: new Date().toISOString(), refund_type: refundType, refund_amount: targetAmount };
-      const newStatus = (order.status === 'shipped' || order.status === 'delivered') ? order.status : 'cancelled';
-      await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ payment_status: 'refunded', status: newStatus, payment_debug: newDebug })
-      });
-    } catch {}
-
-    return new Response(JSON.stringify({ status: 'refunded', type: refundType, amount: targetAmount, order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
   } catch (e: any) {
     return new Response(JSON.stringify({ error: { code: 'UNEXPECTED', message: e?.message || String(e) } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
