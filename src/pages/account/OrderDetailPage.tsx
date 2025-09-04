@@ -3,12 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
-import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw, Truck, Send } from 'lucide-react'
+import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { useCart } from '../../hooks/useCart'
-import { checkAdminAccess } from '../../config/admin'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -97,9 +96,6 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'overview'|'items'|'shipping'|'invoice'>('overview')
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [shippingForm, setShippingForm] = useState({ carrier: '', tracking_number: '', sendEmail: false })
-  const [shippingLoading, setShippingLoading] = useState(false)
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -108,46 +104,6 @@ export default function OrderDetailPage() {
     }
   }, [authLoading, user, id, navigate])
 
-  // Admin kontrol hook
-  useEffect(() => {
-    let mounted = true
-    async function loadRole() {
-      try {
-        if (!user) { 
-          setIsAdmin(false); 
-          return 
-        }
-        
-        // Merkezi admin kontrolü
-        if (checkAdminAccess(user)) {
-          if (mounted) {
-            setIsAdmin(true)
-          }
-          return
-        }
-        
-        // Production admin check
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle()
-          
-        if (!mounted) return
-        
-        if (!error && data && (data as { role?: string }).role === 'admin') {
-          setIsAdmin(true)
-        } else {
-          setIsAdmin(false)
-        }
-      } catch (err) {
-        console.error('loadRole error:', err)
-        if (mounted) setIsAdmin(false)
-      }
-    }
-    loadRole()
-    return () => { mounted = false }
-  }, [user])
 
   useEffect(() => {
     async function load() {
@@ -315,96 +271,6 @@ const mapped: Order = {
     } catch (e) { console.error(e); toast.error(t('orders.reorderError')) }
   }
 
-  const handleShippingUpdate = async () => {
-    if (!order || !shippingForm.carrier.trim() || !shippingForm.tracking_number.trim()) {
-      toast.error('Kargo firması ve takip numarası zorunludur')
-      return
-    }
-
-    try {
-      setShippingLoading(true)
-      
-      const updateData = {
-        carrier: shippingForm.carrier.trim(),
-        tracking_number: shippingForm.tracking_number.trim(),
-        tracking_url: generateTrackingUrl(shippingForm.carrier.trim(), shippingForm.tracking_number.trim()),
-        shipped_at: new Date().toISOString(),
-        status: 'shipped'
-      }
-
-      const { error } = await supabase
-        .from('venthub_orders')
-        .update(updateData)
-        .eq('id', order.id)
-
-      if (error) throw error
-
-      // Local state güncelle
-      setOrder(prev => prev ? {
-        ...prev,
-        ...updateData
-      } : null)
-
-      // Form temizle
-      setShippingForm({ carrier: '', tracking_number: '', sendEmail: false })
-
-      toast.success('Kargo bilgileri güncellendi ve sipariş "Kargolandı" durumuna geçirildi!')
-
-      // Opsiyonel e-posta bildirimi
-      if (shippingForm.sendEmail) {
-        try {
-          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-          const functionUrl = `${supabaseUrl}/functions/v1/shipping-notification`
-          
-          await fetch(functionUrl, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-            },
-            body: JSON.stringify({
-              order_id: order.id,
-              customer_email: order.customer_email,
-              customer_name: order.customer_name,
-              order_number: order.order_number,
-              carrier: shippingForm.carrier.trim(),
-              tracking_number: shippingForm.tracking_number.trim(),
-              tracking_url: updateData.tracking_url
-            })
-          })
-          toast.success('Müşteriye e-posta bildirimi gönderildi')
-        } catch (emailError) {
-          console.error('Email notification failed:', emailError)
-          toast.error('E-posta bildirimi gönderilemedi, ancak kargo bilgileri kaydedildi')
-        }
-      }
-    } catch (error) {
-      console.error('Shipping update error:', error)
-      toast.error('Kargo bilgileri güncellenirken hata oluştu')
-    } finally {
-      setShippingLoading(false)
-    }
-  }
-
-  const generateTrackingUrl = (carrier: string, trackingNumber: string): string | null => {
-    const c = carrier.toLowerCase()
-    if (c.includes('yurtiçi') || c.includes('yurtici')) {
-      return `https://www.yurticikargo.com/tr/online-servisler/gonderi-sorgula?code=${trackingNumber}`
-    } else if (c.includes('aras')) {
-      return `https://kargotakip.araskargo.com.tr/tarama.aspx?code=${trackingNumber}`
-    } else if (c.includes('mng')) {
-      return `https://www.mngkargo.com.tr/kargotakip?kargono=${trackingNumber}`
-    } else if (c.includes('ptt')) {
-      return `https://gonderitakip.ptt.gov.tr/?kargonumarasi=${trackingNumber}`
-    } else if (c.includes('ups')) {
-      return `https://www.ups.com/track?tracknum=${trackingNumber}`
-    } else if (c.includes('fedex')) {
-      return `https://www.fedex.com/fedextrack/?tracknumbers=${trackingNumber}`
-    } else if (c.includes('dhl')) {
-      return `https://www.dhl.com.tr/tr/express/takip.html?brand=DHL&AWB=${trackingNumber}`
-    }
-    return null
-  }
 
   if (authLoading || loading || !order) {
     return (
@@ -602,63 +468,6 @@ const mapped: Order = {
 
           {tab==='shipping' && (
             <div className="space-y-6">
-              {/* Admin Kargo Operasyon Formu */}
-              {isAdmin && (order.status === 'paid' || order.status === 'confirmed') && !order.carrier && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Truck className="text-yellow-600" size={20} />
-                    <h4 className="font-semibold text-yellow-800">Admin: Kargo İşlemleri</h4>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Kargo Firması *</label>
-                      <input
-                        type="text"
-                        value={shippingForm.carrier}
-                        onChange={(e) => setShippingForm(prev => ({ ...prev, carrier: e.target.value }))}
-                        placeholder="Örn: Yurtiçi Kargo, Aras Kargo, MNG Kargo"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Takip Numarası *</label>
-                      <input
-                        type="text"
-                        value={shippingForm.tracking_number}
-                        onChange={(e) => setShippingForm(prev => ({ ...prev, tracking_number: e.target.value }))}
-                        placeholder="Kargo takip numarasını girin"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 text-sm text-gray-700">
-                      <input
-                        type="checkbox"
-                        checked={shippingForm.sendEmail}
-                        onChange={(e) => setShippingForm(prev => ({ ...prev, sendEmail: e.target.checked }))}
-                        className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy"
-                      />
-                      Müşteriye e-posta bildirimi gönder
-                    </label>
-                    <button
-                      onClick={handleShippingUpdate}
-                      disabled={shippingLoading || !shippingForm.carrier.trim() || !shippingForm.tracking_number.trim()}
-                      className="flex items-center gap-2 px-4 py-2 bg-primary-navy text-white rounded-md hover:bg-primary-navy/90 disabled:opacity-50 text-sm"
-                    >
-                      {shippingLoading ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Send size={16} />
-                      )}
-                      {shippingLoading ? 'Güncelleniyor...' : 'Kargoya Ver'}
-                    </button>
-                  </div>
-                  <div className="text-xs text-gray-600 mt-2">
-                    Bu işlem siparişi "Kargolandı" durumuna geçirecek ve kargo takip bilgilerini kaydedecektir.
-                  </div>
-                </div>
-              )}
 
               {/* Mevcut Kargo Bilgileri */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">

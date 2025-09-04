@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut } from 'lucide-react'
+import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { searchProducts, Product } from '../lib/supabase'
+import { checkAdminAccess } from '../config/admin'
 import MegaMenu from './MegaMenu'
 import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
@@ -21,6 +22,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const { getCartCount, syncing } = useCart()
   const { user, signOut } = useAuth()
+  const isAdmin = checkAdminAccess(user)
   const navigate = useNavigate()
   const searchRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -247,6 +249,16 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             <User size={16} />
                             <span>Hesabım</span>
                           </Link>
+                          {isAdmin && (
+                            <Link
+                              to="/admin"
+                              onClick={() => setIsUserMenuOpen(false)}
+                              className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
+                            >
+                              <Crown size={16} />
+                              <span>Admin Paneli</span>
+                            </Link>
+                          )}
                           <button
                             onClick={handleSignOut}
                             className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-steel-gray hover:text-red-600 hover:bg-red-50/50 transition-all duration-200 rounded-lg m-1"

@@ -1,14 +1,16 @@
 import React from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { checkAdminAccess } from '../../config/admin'
+import { checkAdminAccess, isDevAdmin } from '../../config/admin'
+import { adminNavClass } from '../../utils/adminUi'
 
 const AdminLayout: React.FC = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    if (!user || !checkAdminAccess(user)) {
+    // In dev, allow admin pages without strict auth to ease local testing
+    if (!checkAdminAccess(user) && !isDevAdmin()) {
       navigate('/auth/login', { replace: true })
     }
   }, [user, navigate])
@@ -19,10 +21,11 @@ const AdminLayout: React.FC = () => {
         <aside className="col-span-12 md:col-span-3">
           <nav className="bg-white rounded-lg shadow-hvac-md p-4 space-y-2">
             <h2 className="text-sm font-semibold text-industrial-gray mb-2">Admin</h2>
-            <NavLink to="/admin" end className={({isActive})=>`block px-3 py-2 rounded ${isActive?'bg-primary-navy text-white':'text-steel-gray hover:bg-light-gray'}`}>Dashboard</NavLink>
-            <NavLink to="/admin/inventory" className={({isActive})=>`block px-3 py-2 rounded ${isActive?'bg-primary-navy text-white':'text-steel-gray hover:bg-light-gray'}`}>Stok Özeti</NavLink>
-            <NavLink to="/account/operations/returns" className={({isActive})=>`block px-3 py-2 rounded ${isActive?'bg-primary-navy text-white':'text-steel-gray hover:bg-light-gray'}`}>İadeler</NavLink>
-            <NavLink to="/account/operations/users" className={({isActive})=>`block px-3 py-2 rounded ${isActive?'bg-primary-navy text-white':'text-steel-gray hover:bg-light-gray'}`}>Kullanıcılar</NavLink>
+            <NavLink to="/admin" end className={({isActive})=>adminNavClass(isActive)}>Dashboard</NavLink>
+            <NavLink to="/admin/orders" className={({isActive})=>adminNavClass(isActive)}>Siparişler</NavLink>
+            <NavLink to="/admin/inventory" className={({isActive})=>adminNavClass(isActive)}>Stok Özeti</NavLink>
+            <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>İadeler</NavLink>
+            <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>Kullanıcılar</NavLink>
           </nav>
         </aside>
         <section className="col-span-12 md:col-span-9">

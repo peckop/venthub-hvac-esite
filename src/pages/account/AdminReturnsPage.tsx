@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
+import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 
 interface ReturnWithOrder {
   id: string
@@ -81,7 +82,7 @@ export default function AdminReturnsPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth/login', { replace: true, state: { from: { pathname: '/account/operations/returns' } } })
+      navigate('/auth/login', { replace: true, state: { from: { pathname: '/admin/returns' } } })
       return
     }
   }, [user, loading, navigate])
@@ -297,16 +298,14 @@ export default function AdminReturnsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-industrial-gray">Operasyon &gt; İade Yönetimi</h2>
-        <div className="text-sm text-steel-gray">
-          Toplam {returns.length} iade talebi
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className={adminSectionTitleClass}>İade Yönetimi</h2>
+        <div className="text-sm text-steel-gray">Toplam {returns.length} iade talebi</div>
       </div>
 
       {/* Filtreler */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className={`${adminCardClass} p-4 flex flex-col sm:flex-row gap-4`}>
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
           <input
@@ -330,11 +329,11 @@ export default function AdminReturnsPage() {
 
       {/* İçerik */}
       {isLoading ? (
-        <div className="min-h-[30vh] flex items-center justify-center">
+        <div className={`${adminCardClass} min-h-[20vh] flex items-center justify-center`}>
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy"/>
         </div>
       ) : filteredReturns.length === 0 ? (
-        <div className="text-center py-8">
+        <div className={`${adminCardClass} text-center py-8`}>
           <div className="text-steel-gray">
             {searchQuery || statusFilter !== 'all' 
               ? 'Filtrelere uygun iade talebi bulunamadı.' 
@@ -342,17 +341,17 @@ export default function AdminReturnsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-light-gray overflow-hidden">
+        <div className={`${adminCardClass} overflow-hidden`}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-steel-gray">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-3">Sipariş</th>
-                  <th className="text-left px-4 py-3">Müşteri</th>
-                  <th className="text-left px-4 py-3">Sebep</th>
-                  <th className="text-left px-4 py-3">Durum</th>
-                  <th className="text-left px-4 py-3">Tarih</th>
-                  <th className="text-left px-4 py-3">İşlemler</th>
+                  <th className={adminTableHeadCellClass}>Sipariş</th>
+                  <th className={adminTableHeadCellClass}>Müşteri</th>
+                  <th className={adminTableHeadCellClass}>Sebep</th>
+                  <th className={adminTableHeadCellClass}>Durum</th>
+                  <th className={adminTableHeadCellClass}>Tarih</th>
+                  <th className={adminTableHeadCellClass}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -363,7 +362,7 @@ export default function AdminReturnsPage() {
                   
                   return (
                     <tr key={returnItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                      <td className="px-4 py-3">
+                      <td className={adminTableCellClass}>
                         <div className="flex flex-col">
                           <button
                             onClick={() => navigate(`/account/orders/${returnItem.order_id}`)}
@@ -378,13 +377,13 @@ export default function AdminReturnsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={adminTableCellClass}>
                         <div className="flex flex-col">
                           <span className="font-medium text-industrial-gray">{returnItem.customer_name}</span>
                           <span className="text-xs text-steel-gray">{returnItem.customer_email}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={adminTableCellClass}>
                         <div className="max-w-xs">
                           <div className="font-medium text-industrial-gray">{returnItem.reason}</div>
                           {returnItem.description && (
@@ -394,13 +393,13 @@ export default function AdminReturnsPage() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={adminTableCellClass}>
                         <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getStatusColor(returnItem.status)}`}>
                           {getStatusIcon(returnItem.status)}
                           {getStatusLabel(returnItem.status)}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={adminTableCellClass}>
                         <div className="flex flex-col">
                           <span className="font-medium">{new Date(returnItem.created_at).toLocaleDateString('tr-TR')}</span>
                           <span className="text-xs text-steel-gray">{new Date(returnItem.created_at).toLocaleTimeString('tr-TR')}</span>

@@ -14,8 +14,46 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const limit = 10
-    const resp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,status,conversation_id,total_amount,created_at&order=created_at.desc&limit=${limit}`, {
+    // Parse filters from query string
+    const url = new URL(req.url)
+    const status = url.searchParams.get('status')?.trim() || ''
+    const from = url.searchParams.get('from')?.trim() || ''
+    const to = url.searchParams.get('to')?.trim() || ''
+    const q = url.searchParams.get('q')?.trim() || ''
+    const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100)
+
+    const params = new URLSearchParams()
+    params.set('select', 'id,status,conversation_id,total_amount,created_at')
+    params.set('order', 'created_at.desc')
+    params.set('limit', String(limitParam))
+
+    if (status) params.set('status', `eq.${status}`)
+
+    function normalizeDateStart(d: string) {
+      // accepts YYYY-MM-DD or ISO; returns ISO start of day Z
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return `${d}T00:00:00Z`
+      return d
+    }
+    function normalizeDateEnd(d: string) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return `${d}T23:59:59Z`
+      return d
+    }
+
+    if (from) params.append('created_at', `gte.${normalizeDateStart(from)}`)
+    if (to) params.append('created_at', `lte.${normalizeDateEnd(to)}`)
+
+    if (q) {
+      const isUuid = /^[0-9a-fA-F-]{32,36}$/.test(q)
+      const like = `*${q}*`
+      const orExpr = isUuid
+        ? `(id.eq.${q},conversation_id.ilike.${like})`
+        : `(conversation_id.ilike.${like},id.ilike.${like})`
+      params.append('or', orExpr)
+    }
+
+    const requestUrl = `${supabaseUrl}/rest/v1/venthub_orders?${params.toString()}`
+
+    const resp = await fetch(requestUrl, {
       headers: {
         Authorization: `Bearer ${serviceRoleKey}`,
         apikey: serviceRoleKey,

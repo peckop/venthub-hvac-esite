@@ -189,153 +189,82 @@ Deno.serve(async (req) => {
       }
       updateOk = !!(r && r.ok);
       
-      // Process stock reduction after successful payment - Direct REST API approach
+      // Process stock reduction after successful payment - Use DB RPC (idempotent)
       try {
         if (orderId) {
-          // 1. Check if stock reduction has already been processed by looking for a flag
-          const orderCheckResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}&select=status,payment_debug`, {
+          // Call centralized RPC for atomic, idempotent stock reduction
+          const rpcResp = await fetch(`${supabaseUrl}/rest/v1/rpc/process_order_stock_reduction`, {
+            method: 'POST',
             headers: {
               'Authorization': `Bearer ${serviceRoleKey}`,
-              'apikey': serviceRoleKey
-            }
+              'apikey': serviceRoleKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ p_order_id: orderId })
           });
-          
-          if (orderCheckResp.ok) {
-            const orders = await orderCheckResp.json();
-            const currentOrder = orders[0];
-            
-            // Check if stock reduction was already processed (look for stock_processed flag)
-            const stockAlreadyProcessed = currentOrder?.payment_debug?.stock_processed === true;
-            
-            if (!stockAlreadyProcessed) {
-              // 2. Get order items
+
+          if (rpcResp.ok) {
+            const rpcJson = await rpcResp.json().catch(() => ({}));
+            stockResult = rpcJson || { success: true, processed_count: null, order_id: orderId };
+
+            // Mark stock processed flag and attach RPC summary to payment_debug
+            try {
+              const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString(), stock_rpc_result: rpcJson };
+              await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${serviceRoleKey}`,
+                  'apikey': serviceRoleKey,
+                  'Content-Type': 'application/json',
+                  'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ payment_debug: updatedDebugInfo })
+              });
+            } catch (_) { /* best-effort */ }
+
+            // Optional: trigger low stock alerts after RPC (best-effort, non-blocking)
+            try {
               const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${orderId}&select=product_id,quantity`, {
                 headers: {
                   'Authorization': `Bearer ${serviceRoleKey}`,
                   'apikey': serviceRoleKey
                 }
               });
-              
               if (itemsResp.ok) {
-                const items = await itemsResp.json();
-                let processedCount = 0;
-                let failedProducts: string[] = [];
-                
-                for (const item of items) {
+                const items = await itemsResp.json().catch(() => []);
+                for (const it of items) {
                   try {
-                    // 3. Get current product stock with atomic read
-                    const productResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&select=id,name,stock_qty,low_stock_threshold`, {
+                    const pResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}&select=id,name,stock_qty,low_stock_threshold`, {
                       headers: {
                         'Authorization': `Bearer ${serviceRoleKey}`,
                         'apikey': serviceRoleKey
                       }
                     });
-                    
-                    if (productResp.ok) {
-                      const products = await productResp.json();
-                      const product = products[0];
-                      
-                      if (product && (product.stock_qty || 0) >= item.quantity) {
-                        // 4. Atomic stock reduction with optimistic locking
-                        const newStock = (product.stock_qty || 0) - item.quantity;
-                        const updateResp = await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${item.product_id}&stock_qty=eq.${product.stock_qty}`, {
-                          method: 'PATCH',
+                    if (pResp.ok) {
+                      const arr = await pResp.json().catch(() => []);
+                      const pr = Array.isArray(arr) ? arr[0] : null;
+                      if (pr && Number(pr.stock_qty) <= Number(pr.low_stock_threshold ?? 5)) {
+                        await fetch(`${supabaseUrl}/functions/v1/stock-alert`, {
+                          method: 'POST',
                           headers: {
                             'Authorization': `Bearer ${serviceRoleKey}`,
-                            'apikey': serviceRoleKey,
-                            'Content-Type': 'application/json',
-                            'Prefer': 'return=minimal'
+                            'Content-Type': 'application/json'
                           },
-                          body: JSON.stringify({ stock_qty: newStock })
-                        });
-                        
-                        if (updateResp.ok) {
-                          processedCount++;
-                          console.log(`✅ Stock reduced for ${product.name}: ${product.stock_qty} -> ${newStock}`);
-                          
-                          // Check if stock alert is needed after reduction
-                          if (newStock <= (product.low_stock_threshold || 5)) {
-                            try {
-                              await fetch(`${supabaseUrl}/functions/v1/stock-alert`, {
-                                method: 'POST',
-                                headers: {
-                                  'Authorization': `Bearer ${serviceRoleKey}`,
-                                  'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ productId: item.product_id })
-                              });
-                              console.log(`📢 Stock alert triggered for ${product.name}`);
-                            } catch (alertError: any) {
-                              console.warn(`⚠️ Stock alert failed for ${product.name}:`, alertError.message);
-                            }
-                          }
-                        } else if (updateResp.status === 406) {
-                          // Optimistic lock failed - stock changed during our operation
-                          failedProducts.push(`${product.name} (stock changed during update)`);
-                          console.warn(`⚠️ Race condition detected for ${product.name} - stock changed during update`);
-                        } else {
-                          failedProducts.push(product.name || 'Unknown');
-                          console.warn(`❌ Failed to update stock for ${product.name}: ${updateResp.status}`);
-                        }
-                      } else {
-                        failedProducts.push(product?.name || 'Unknown');
-                        console.warn(`❌ Insufficient stock for ${product?.name}: need ${item.quantity}, have ${product?.stock_qty || 0}`);
+                          body: JSON.stringify({ productId: it.product_id })
+                        }).catch(() => {});
                       }
                     }
-                  } catch (itemError: any) {
-                    failedProducts.push('Unknown product');
-                    console.warn('❌ Error processing item:', itemError.message);
-                  }
+                  } catch { /* ignore */ }
                 }
-                
-                stockResult = {
-                  success: true,
-                  processed_count: processedCount,
-                  failed_products: failedProducts,
-                  order_id: orderId
-                };
-                
-                console.log('✅ Stock reduction completed:', processedCount, 'items processed');
-                if (failedProducts.length > 0) {
-                  console.warn('⚠️ Some products failed stock reduction:', failedProducts);
-                }
-                
-                // Mark stock as processed to prevent duplicate reductions
-                try {
-                  const updatedDebugInfo = { ...debugInfo, stock_processed: true, stock_processed_at: new Date().toISOString() };
-                  await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${orderId}`, {
-                    method: 'PATCH',
-                    headers: {
-                      'Authorization': `Bearer ${serviceRoleKey}`,
-                      'apikey': serviceRoleKey,
-                      'Content-Type': 'application/json',
-                      'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify({ payment_debug: updatedDebugInfo })
-                  });
-                  console.log('✅ Stock processed flag updated');
-                } catch (flagError: any) {
-                  console.warn('⚠️ Failed to update stock processed flag:', flagError.message);
-                }
-              } else {
-                console.warn('Failed to fetch order items:', itemsResp.status);
               }
-            } else {
-              console.log('⚠️ Stock reduction already processed for order:', orderId);
-              stockResult = {
-                success: true,
-                processed_count: 0,
-                failed_products: [],
-                order_id: orderId,
-                message: 'Already processed (idempotent)'
-              };
-            }
+            } catch { /* ignore */ }
           } else {
-            console.warn('Failed to check order status:', orderCheckResp.status);
+            const errTxt = await rpcResp.text().catch(() => '');
+            console.warn('process_order_stock_reduction failed', rpcResp.status, errTxt);
           }
         }
       } catch (e: any) {
-        console.warn('Stock reduction error:', e?.message || e);
+        console.warn('Stock reduction RPC error:', e?.message || e);
       }
       
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)

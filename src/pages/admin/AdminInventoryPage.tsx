@@ -1,5 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
+import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 
 type Row = { product_id: string; name: string; physical_stock: number; reserved_stock: number; available_stock: number }
 
@@ -47,22 +48,22 @@ const AdminInventoryPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-industrial-gray">Stok Özeti</h1>
+      <h1 className={adminSectionTitleClass}>Stok Özeti</h1>
 
-      <div className="bg-white rounded-lg shadow-hvac-md overflow-hidden">
+      <div className={`${adminCardClass} overflow-hidden`}>
         <table className="w-full">
           <thead className="bg-light-gray">
             <tr>
-              <th className="text-left p-3 text-sm text-industrial-gray">Ürün</th>
-              <th className="text-right p-3 text-sm text-industrial-gray">Fiziksel</th>
-              <th className="text-right p-3 text-sm text-industrial-gray">Rezerve</th>
-              <th className="text-right p-3 text-sm text-industrial-gray">Satılabilir</th>
+              <th className={adminTableHeadCellClass}>Ürün</th>
+              <th className={adminTableHeadCellClass + ' text-right'}>Fiziksel</th>
+              <th className={adminTableHeadCellClass + ' text-right'}>Rezerve</th>
+              <th className={adminTableHeadCellClass + ' text-right'}>Satılabilir</th>
             </tr>
           </thead>
           <tbody>
             {rows.map(r => (
               <tr key={r.product_id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => { setSelected(r); loadReserved(r.product_id) }}>
-                <td className="p-3 text-industrial-gray">{r.name}</td>
+                <td className={adminTableCellClass}>{r.name}</td>
                 <td className="p-3 text-right">{r.physical_stock}</td>
                 <td className="p-3 text-right">{r.reserved_stock}</td>
                 <td className="p-3 text-right font-semibold">{r.available_stock}</td>

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess, listAdminUsers, setUserAdminRole } from '../../config/admin'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 
 interface AdminUser {
   id: string
@@ -42,7 +43,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth/login', { replace: true, state: { from: { pathname: '/account/operations/users' } } })
+      navigate('/auth/login', { replace: true, state: { from: { pathname: '/admin/users' } } })
       return
     }
   }, [user, loading, navigate])
@@ -206,13 +207,13 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-industrial-gray">Operasyon &gt; Kullanıcı Yönetimi</h2>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className={adminSectionTitleClass}>Kullanıcı Yönetimi</h2>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className={`${adminCardClass} p-3 flex gap-2`}>
         <button
           onClick={() => setActiveTab('admins')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -236,7 +237,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Arama */}
-      <div className="mb-6 relative">
+      <div className={`${adminCardClass} p-4 relative`}>
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
         <input
           type="text"
@@ -249,25 +250,25 @@ export default function AdminUsersPage() {
 
       {/* İçerik */}
       {isLoading ? (
-        <div className="min-h-[30vh] flex items-center justify-center">
+        <div className={`${adminCardClass} min-h-[20vh] flex items-center justify-center`}>
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy"/>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-light-gray overflow-hidden">
+        <div className={`${adminCardClass} overflow-hidden`}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-steel-gray">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left px-4 py-3">Kullanıcı</th>
-                  <th className="text-left px-4 py-3">Role</th>
-                  <th className="text-left px-4 py-3">Kayıt Tarihi</th>
-                  {activeTab === 'all' && <th className="text-left px-4 py-3">İşlemler</th>}
+                  <th className={adminTableHeadCellClass}>Kullanıcı</th>
+                  <th className={adminTableHeadCellClass}>Role</th>
+                  <th className={adminTableHeadCellClass}>Kayıt Tarihi</th>
+                  {activeTab === 'all' && <th className={adminTableHeadCellClass}>İşlemler</th>}
                 </tr>
               </thead>
               <tbody>
                 {(activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).map((userItem, index) => (
                   <tr key={userItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                    <td className="px-4 py-3">
+                    <td className={adminTableCellClass}>
                       <div className="flex flex-col">
                         <span className="font-medium text-industrial-gray">{userItem.email}</span>
                         {'full_name' in userItem && userItem.full_name && (
@@ -278,13 +279,13 @@ export default function AdminUsersPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={adminTableCellClass}>
                       <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getRoleColor(userItem.role || 'user')}`}>
                         {getRoleIcon(userItem.role || 'user')}
                         {userItem.role || 'user'}
                       </div>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={adminTableCellClass}>
                       <span className="text-steel-gray">
                         {new Date(userItem.created_at).toLocaleDateString('tr-TR')}
                       </span>
@@ -336,7 +337,7 @@ export default function AdminUsersPage() {
           </div>
           
           {(activeTab === 'admins' ? filteredAdminUsers.length === 0 : filteredAllUsers.length === 0) && (
-            <div className="text-center py-8">
+            <div className={`${adminCardClass} text-center py-8`}>
               <div className="text-steel-gray">
                 {searchQuery 
                   ? 'Arama kriterine uygun kullanıcı bulunamadı.' 
