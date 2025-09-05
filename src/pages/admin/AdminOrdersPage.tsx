@@ -2,6 +2,7 @@ import React from 'react'
 import { format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -238,47 +239,27 @@ const AdminOrdersPage: React.FC = () => {
     <div className="space-y-4">
       <header className="flex items-center justify-between">
         <h1 className={adminSectionTitleClass}>Siparişler</h1>
-        <button
-          onClick={fetchOrders}
-          className={adminButtonPrimaryClass}
-          disabled={loading}
-        >
-          {loading ? 'Yükleniyor...' : 'Yenile'}
-        </button>
       </header>
 
-      {/* Filters */}
-      <section className="bg-white rounded-lg shadow-hvac-md p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-          <label className="block text-xs text-industrial-gray mb-1">Durum</label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full border border-gray-200 rounded px-3 py-2"
-          >
-            {STATUSES.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs text-industrial-gray mb-1">Başlangıç</label>
-          <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2" />
-        </div>
-        <div>
-          <label className="block text-xs text-industrial-gray mb-1">Bitiş</label>
-          <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2" />
-        </div>
-        <div>
-          <label className="block text-xs text-industrial-gray mb-1">Arama</label>
-          <input
-            placeholder="Order ID veya Conversation ID"
-            value={query}
-            onChange={(e)=>setQuery(e.target.value)}
-            className="w-full border border-gray-200 rounded px-3 py-2"
-          />
-        </div>
-      </section>
+      {/* Filters - AdminToolbar */}
+      <AdminToolbar
+        search={{ value: query, onChange: setQuery, placeholder: 'Order ID veya Conversation ID', focusShortcut: '/' }}
+        select={{
+          value: status,
+          onChange: setStatus,
+          title: 'Durum',
+          options: STATUSES.map(s => ({ value: s.value, label: s.label }))
+        }}
+        onClear={()=>{ setStatus(''); setFromDate(''); setToDate(''); setQuery('') }}
+        recordCount={filtered.length}
+        rightExtra={(
+          <div className="flex items-center gap-2">
+            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
+            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
+          </div>
+        )}
+      />
 
       {/* Bulk actions */}
       {selectedIds.length > 0 && (
