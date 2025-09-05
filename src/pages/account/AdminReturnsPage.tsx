@@ -24,6 +24,8 @@ interface ReturnWithOrder {
   total_amount?: number
 }
 
+type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
+
 // Interface removed - not used
 
 export default function AdminReturnsPage() {
@@ -36,8 +38,20 @@ export default function AdminReturnsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  // Çoklu durum filtresi
+  const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({
+    requested: true,
+    approved: true,
+    rejected: true,
+    in_transit: true,
+    received: true,
+    refunded: true,
+    cancelled: true
+  })
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  // Sıralama durumu
+  const [sortKey, setSortKey] = useState<SortKey>('date')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
   // Admin kontrolü
   useEffect(() => {
@@ -144,9 +158,10 @@ export default function AdminReturnsPage() {
   useEffect(() => {
     let filtered = returns
 
-    // Durum filtresi
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(r => r.status === statusFilter)
+    // Durum filtresi (çoklu)
+    const anyStatus = Object.values(statusFilter).some(Boolean)
+    if (anyStatus) {
+      filtered = filtered.filter(r => statusFilter[r.status] === true)
     }
 
     // Arama filtresi
@@ -162,6 +177,44 @@ export default function AdminReturnsPage() {
 
     setFilteredReturns(filtered)
   }, [returns, statusFilter, searchQuery])
+
+  // Sıralama
+  const sortedReturns = React.useMemo(() => {
+    const arr = [...filteredReturns]
+    arr.sort((a,b) => {
+      const dir = sortDir === 'asc' ? 1 : -1
+      switch (sortKey) {
+        case 'order': {
+          const ao = a.order_number ? a.order_number : a.order_id
+          const bo = b.order_number ? b.order_number : b.order_id
+          return dir * String(ao).localeCompare(String(bo))
+        }
+        case 'customer':
+          return dir * String(a.customer_name||'').localeCompare(String(b.customer_name||''), 'tr')
+        case 'reason':
+          return dir * a.reason.localeCompare(b.reason, 'tr')
+        case 'status':
+          return dir * a.status.localeCompare(b.status)
+        case 'amount':
+          return dir * (Number(a.total_amount||0) - Number(b.total_amount||0))
+        case 'date':
+          return dir * (Date.parse(a.created_at) - Date.parse(b.created_at))
+        default:
+          return 0
+      }
+    })
+    return arr
+  }, [filteredReturns, sortKey, sortDir])
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(key); setSortDir(key==='date' ? 'desc' : 'asc') }
+  }
+
+  function sortIndicator(key: SortKey) {
+    if (sortKey !== key) return ''
+    return sortDir === 'asc' ? '▲' : '▼'
+  }
 
   const handleStatusUpdate = async (returnId: string, newStatus: string) => {
     if (!isAdmin) return
@@ -316,15 +369,19 @@ export default function AdminReturnsPage() {
             className="w-full pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-        >
-          {statusOptions.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+        {/* Çoklu durum filtresi */}
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          {statusOptions.filter(o=>o.value!=='all').map(option => (
+            <label key={option.value} className="inline-flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={!!statusFilter[option.value]}
+                onChange={(e)=>setStatusFilter(prev=>({ ...prev, [option.value]: e.target.checked }))}
+              />
+              {option.label}
+            </label>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* İçerik */}
@@ -335,7 +392,7 @@ export default function AdminReturnsPage() {
       ) : filteredReturns.length === 0 ? (
         <div className={`${adminCardClass} text-center py-8`}>
           <div className="text-steel-gray">
-            {searchQuery || statusFilter !== 'all' 
+{searchQuery || !Object.values(statusFilter).every(Boolean)
               ? 'Filtrelere uygun iade talebi bulunamadı.' 
               : 'Henüz iade talebi yok.'}
           </div>
@@ -346,16 +403,16 @@ export default function AdminReturnsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className={adminTableHeadCellClass}>Sipariş</th>
-                  <th className={adminTableHeadCellClass}>Müşteri</th>
-                  <th className={adminTableHeadCellClass}>Sebep</th>
-                  <th className={adminTableHeadCellClass}>Durum</th>
-                  <th className={adminTableHeadCellClass}>Tarih</th>
+                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>Sipariş {sortIndicator('order')}</button></th>
+                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>Müşteri {sortIndicator('customer')}</button></th>
+                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button></th>
+                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>
+                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button></th>
                   <th className={adminTableHeadCellClass}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredReturns.map((returnItem, index) => {
+                {sortedReturns.map((returnItem, index) => {
                   const orderNo = returnItem.order_number ? 
                     `#${returnItem.order_number.split('-')[1]}` : 
                     `#${returnItem.order_id.slice(-8).toUpperCase()}`
