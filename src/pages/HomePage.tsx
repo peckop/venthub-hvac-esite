@@ -12,6 +12,9 @@ import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import TiltCard from '../components/TiltCard'
 import BentoGrid from '../components/BentoGrid'
+import SpotlightList from '../components/SpotlightList'
+import ScrollLinkedProcess from '../components/ScrollLinkedProcess'
+import MagneticCTA from '../components/MagneticCTA'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
 import ResourcesSection from '../components/ResourcesSection'
@@ -97,6 +100,9 @@ export const HomePage: React.FC = () => {
 
       {/* Bento Grid (hover video önizleme) */}
       <BentoGrid />
+
+      {/* Spotlight List */}
+      <SpotlightList />
 
       {/* Uygulamaya Göre Çözümler */}
       <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
@@ -197,6 +203,12 @@ export const HomePage: React.FC = () => {
 
       {/* Resources */}
       <ResourcesSection />
+
+      {/* Scroll-Linked Process */}
+      <ScrollLinkedProcess />
+
+      {/* Magnetic CTA */}
+      <MagneticCTA />
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (

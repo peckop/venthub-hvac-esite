@@ -3,6 +3,8 @@ import { format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { Download } from 'lucide-react'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -235,6 +237,51 @@ const AdminOrdersPage: React.FC = () => {
     return sortDir === 'asc' ? '▲' : '▼'
   }
 
+  // Export helpers
+  function exportOrdersCsv() {
+    const header = ['Sipariş ID','Durum','Konuşma ID','Tutar','Oluşturulma']
+    const lines = filtered.map(r => {
+      const cols = [
+        r.id,
+        r.status,
+        r.conversation_id || '',
+        formatAmount(r.total_amount),
+        safeDate(r.created_at),
+      ]
+      return cols.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+    })
+    const bom = '\ufeff'
+    const csv = [header.join(','), ...lines].join('\n')
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `orders_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function exportOrdersXls() {
+    // Basit HTML tablo ile .xls uyumlu çıktı
+    const rowsHtml = filtered.map(r => (
+      `<tr>`+
+        `<td>${r.id}</td>`+
+        `<td>${r.status}</td>`+
+        `<td>${r.conversation_id || ''}</td>`+
+        `<td>${formatAmount(r.total_amount)}</td>`+
+        `<td>${safeDate(r.created_at)}</td>`+
+      `</tr>`
+    )).join('')
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Sipariş ID</th><th>Durum</th><th>Konuşma ID</th><th>Tutar</th><th>Oluşturulma</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `orders_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xls`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
@@ -256,6 +303,24 @@ const AdminOrdersPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">
+                  <Download size={16} />
+                  Dışa Aktar
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content className="min-w-44 rounded-md bg-white shadow-lg border border-light-gray p-1">
+                  <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportOrdersCsv() }}>
+                    CSV (Excel uyumlu UTF‑8 BOM)
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportOrdersXls() }}>
+                    Excel (.xls — HTML tablo)
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
             <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
           </div>
         )}
