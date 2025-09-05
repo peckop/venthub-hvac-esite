@@ -172,6 +172,7 @@ export const tr = {
     vatIncluded: '(KDV Dahil)',
     qty: 'Miktar:',
     addToCart: 'Sepete Ekle',
+    askStock: 'Stok sorunuz',
     techQuote: 'Teknik teklif al',
     freeShipping: 'Bedava Kargo',
     warranty2y: '2 Yıl Garanti',

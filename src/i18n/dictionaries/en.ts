@@ -174,6 +174,7 @@ export const en = {
     vatIncluded: '(VAT Included)',
     qty: 'Quantity:',
     addToCart: 'Add to Cart',
+    askStock: 'Ask about stock',
     techQuote: 'Request Technical Offer',
     freeShipping: 'Free Shipping',
     warranty2y: '2-Year Warranty',

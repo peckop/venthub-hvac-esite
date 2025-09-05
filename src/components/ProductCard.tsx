@@ -137,6 +137,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <ShoppingCart size={16} />
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>
+            {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (
+              <Link
+                to="/contact"
+                onClick={(e) => { e.stopPropagation() }}
+                className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
+                title={t('pdp.askStock') as string}
+              >
+                {t('pdp.askStock')}
+              </Link>
+            )}
             {onQuickView ? (
               <button
                 type="button"

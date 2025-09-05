@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-02
+Last updated: 2025-09-04
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -13,6 +13,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
 - Lint: CI'da blocking (maks. uyarı=0); kalan uyarılar kademeli temizlenecek.
 - Güvenlik/Log Hijyeni: Uygulama tarafında konsol logları kaldırıldı/koşullandı (VITE_DEBUG); Edge Function logları IYZICO_DEBUG ile koşullu ve PII maskeli; ESLint 'no-console' politikası etkin.
+- Ürün Görünürlüğü & RLS: Products/Categories tablolarına herkese SELECT politikası eklendi; user_profiles üzerindeki RLS sonsuz döngü hatası kalıcı olarak giderildi (SECURITY DEFINER fonksiyonları ile). Ürün istekleri 500 → 200.
 
 ## 2) Sprint Planı
 
@@ -68,7 +69,9 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Stok uyarı sistemi: otomatik WhatsApp/SMS/Email bildirimleri (threshold ≤ 5)
 - Operasyon Sayfası (Admin)
   - [x] Operasyon > Stok: liste, arama, +1/−1, “Ayarla”
-  - [ ] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
+  - [x] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
+  - [x] Satır içi stok düzenleme sütunu (− / miktar / + / Kaydet) ve anlık “Satılabilir” güncellemesi
+  - [x] “Ürün seç” dropdown kaldırıldı; satır tıklama ile seçim ve bağlam paneli (Hızlı Eşik Ayarları) sadece seçim olduğunda görünür
   - [ ] Toplu işlem ve CSV içe/dışa aktar (SKU, qty)
   - [ ] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo) özelliği (opsiyonel)
   - [x] Account menüsünde admin’e özel “Operasyon” sekmesi görünür
@@ -76,6 +79,9 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
   - [x] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
   - [ ] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
+- Erişim ve RLS Stabilizasyonu (Yeni)
+  - [x] Products ve Categories için herkese SELECT politikası (RLS) eklendi
+  - [x] user_profiles RLS sonsuz döngü hatası giderildi (SECURITY DEFINER fonksiyonları ile)
 - WhatsApp & Bildirim Sistemi
   - [x] notification-service Edge Function: WhatsApp/SMS/Email altyapısı
   - [x] stock-alert Edge Function: otomatik stok uyarıları

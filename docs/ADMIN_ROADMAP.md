@@ -11,6 +11,14 @@ Tarih: 2025-09-04
   - inventory_summary (tek satılabilir stok kaynağı)
   - reserved_orders (ürünü rezerve eden siparişler)
 
+## Güncellemeler (2025-09-05)
+- Admin > Stok Özeti (/admin/inventory)
+  - Hızlı arama (ürün adı) — anlık filtreleme
+  - Satır içi stok düzenleme sütunu: − / miktar / + / Kaydet (optimistic update)
+  - Satır içi minimum eşik düzenleme: rozet + input + Kaydet + Varsayılan
+  - “Ürün seç” dropdown kaldırıldı; satır tıklama ile seçim ve yalnızca seçim olduğunda görünen bağlam paneli (Hızlı Eşik Ayarları)
+  - Tablo başlıkları ve açıklamalar iyileştirildi (Eşik: “Efektif • Yeni • Aksiyon”)
+
 ## Devam Eden (Sprint 2 – Orders Modülü)
 - /admin/orders iskeleti ve rotası
 - Liste ve veri modeli: status + payment_status rozetleri, toplam, tarih
