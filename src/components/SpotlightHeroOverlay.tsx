@@ -27,15 +27,17 @@ const SpotlightHeroOverlay: React.FC = () => {
     return () => el.removeEventListener('mousemove', onMove)
   }, [reduced])
 
+  // Karartma overlay: merkezde şeffaf, dışarıda yarı saydam
+  // Mask yerine doğrudan radial-gradient ile uygulandı (daha uyumlu)
   return (
     <div
       ref={ref}
       className="pointer-events-none absolute inset-0 z-10"
-      style={reduced ? undefined : ({ WebkitMaskImage: 'radial-gradient(220px at var(--mx,50%) var(--my,50%), #000 0%, transparent 65%)' } as React.CSSProperties)}
+      style={reduced ? undefined : ({
+        background: 'radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 70%)'
+      } as React.CSSProperties)}
       aria-hidden="true"
-    >
-      <div className="absolute inset-0 bg-white/10" />
-    </div>
+    />
   )
 }
 

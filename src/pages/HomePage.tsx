@@ -10,6 +10,8 @@ import QuickViewModal from '../components/QuickViewModal'
 import { Star, TrendingUp, Clock } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
+import TiltCard from '../components/TiltCard'
+import BentoGrid from '../components/BentoGrid'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
 import ResourcesSection from '../components/ResourcesSection'
@@ -93,6 +95,9 @@ export const HomePage: React.FC = () => {
       {/* Product Flow (ürün görselleri akışı) */}
       <ProductFlow />
 
+      {/* Bento Grid (hover video önizleme) */}
+      <BentoGrid />
+
       {/* Uygulamaya Göre Çözümler */}
       <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,24 +110,25 @@ export const HomePage: React.FC = () => {
             return (
               <div className={`${gridColsClass(appCards.length)}`}>
                 {appCards.map(card => (
-                  <Link
-                    key={card.key}
-                    to={card.href}
-                    className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
-                    onClick={() => {
-                      trackEvent('application_click', { key: card.key, source: 'home' })
-                    }}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
-                    <div className="p-5 relative z-10">
-                      <div className="flex items-center gap-2 text-primary-navy">
-                        {iconFor(card.icon, 18)}
-                        <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                  <TiltCard key={card.key}>
+                    <Link
+                      to={card.href}
+                      className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
+                      onClick={() => {
+                        trackEvent('application_click', { key: card.key, source: 'home' })
+                      }}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
+                      <div className="p-5 relative z-10">
+                        <div className="flex items-center gap-2 text-primary-navy">
+                          {iconFor(card.icon, 18)}
+                          <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                        </div>
+                        <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
+                        <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
                       </div>
-                      <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
-                      <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </TiltCard>
                 ))}
               </div>
             )
