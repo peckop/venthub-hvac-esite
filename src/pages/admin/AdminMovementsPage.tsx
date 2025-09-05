@@ -1,6 +1,7 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 
 type Movement = {
   id: string
@@ -209,26 +210,32 @@ const AdminMovementsPage: React.FC = () => {
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>Hareket Defteri</h1>
 
-      <div className={`${adminCardClass} p-4`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <input className="w-full md:w-72 border rounded px-3 py-2 text-sm" placeholder="Ürün adı/SKU ara" value={q} onChange={(e)=>setQ(e.target.value)} />
-          {/* Kategori filtresi */}
-          <select className="border rounded px-2 py-2 text-sm" value={selectedCategory} onChange={(e)=>{setPage(1); setSelectedCategory(e.target.value)}} title="Kategori">
-            <option value="">Tüm Kategoriler</option>
-            {visibleCategories.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
-          </select>
-          {/* Reason çoklu filtresi */}
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            {ALL_REASONS.map(r => (
-              <label key={r} className="inline-flex items-center gap-1">
-                <input type="checkbox" checked={!!reasonFilter[r]} onChange={(e)=>setReasonFilter(prev=>({ ...prev, [r]: e.target.checked }))} />
-                {reasonLabel(r)}
-              </label>
-            ))}
-          </div>
-          <button className="ml-auto px-3 py-2 border rounded text-sm" onClick={exportCsv}>CSV Dışa Aktar</button>
-        </div>
-      </div>
+      <AdminToolbar
+        search={{ value: q, onChange: setQ, placeholder: 'Ürün adı/SKU ara', focusShortcut: '/' }}
+        select={{
+          value: selectedCategory,
+          onChange: (v)=>{ setPage(1); setSelectedCategory(v) },
+          title: 'Kategori',
+          options: [
+            { value: '', label: 'Tüm Kategoriler' },
+            ...visibleCategories.map(c => ({ value: c.id, label: c.name }))
+          ]
+        }}
+        chips={ALL_REASONS.map(r => ({
+          key: r,
+          label: reasonLabel(r),
+          active: !!reasonFilter[r],
+          onToggle: ()=>setReasonFilter(prev=>({ ...prev, [r]: !prev[r] }))
+        }))}
+        onClear={()=>{
+          setPage(1);
+          setQ('');
+          setSelectedCategory('');
+          setReasonFilter(Object.fromEntries(ALL_REASONS.map(r => [r, true])) as Record<string, boolean>);
+        }}
+        recordCount={filtered.length}
+        rightExtra={<button className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm" onClick={exportCsv}>CSV Dışa Aktar</button>}
+      />
 
       <div className={`${adminCardClass} overflow-hidden`}>
         <table className="w-full">

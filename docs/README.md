@@ -73,6 +73,10 @@ proje/
 - WhatsApp backend sistemi hazır, sadece Twilio hesabı ve kurumsal numara gerekli
 - Deprecated dosyalar `docs/archive/` klasöründe korunuyor
 
+## Yeni Doküman
+
+- HOMEPAGE_ENHANCEMENTS.md — Ana sayfa geliştirmeleri ve etkileşimli bileşen backlog’u (2025-09-05)
+
 ## 🔄 Güncel Tutma
 
 Bu dosya otomatik güncellenmez. Yeni dokümantasyon eklendiğinde veya yapı değiştiğinde lütfen bu dosyayı da güncelleyin.

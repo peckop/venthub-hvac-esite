@@ -129,6 +129,7 @@ const ProductsPage: React.FC = () => {
   const isAll = params.get('all') === '1'
   const canonicalUrl = `${window.location.origin}/products`
   const noindex = Boolean(searchQuery) || isAll
+  const breadcrumbLabel = searchQuery ? t('products.searchResultsTitle') : (isAll ? t('common.allProducts') : t('common.discoverPage'))
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -142,7 +143,7 @@ const ProductsPage: React.FC = () => {
       <div className="flex items-center text-sm text-steel-gray mb-4">
         <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
         <span className="mx-2">/</span>
-        <span className="text-industrial-gray font-medium">{t('common.discoverPage')}</span>
+        <span className="text-industrial-gray font-medium">{breadcrumbLabel}</span>
       </div>
 
       {/* Keşfet / Tüm Ürünler toggle */}
@@ -345,7 +346,7 @@ onClick={() => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {mainCategories.slice(0, 6).map((cat) => (
-                  <Link key={cat.id} to={`/category/${cat.slug}`} className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition">
+                  <Link key={cat.id} to={`/category/${cat.slug}`} className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition" onClick={() => { trackEvent('category_click', { level: 0, slug: cat.slug, source: 'products' }) }}>
                     <div className="p-4">
                       <div className="flex items-center gap-2 text-primary-navy">
                         <Layers size={16} />

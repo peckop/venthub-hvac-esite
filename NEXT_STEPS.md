@@ -51,6 +51,16 @@
    - [ ] Checkout stock revalidation (oversell engelleme)
    - [ ] WhatsApp wa.me config (frontend entegrasyonu)
 
+## Ana Sayfa Geliştirmeleri — Takip (2025-09-05)
+
+- [ ] VisualShowcase ve ProductFlow metin/içeriklerini i18n’e taşı (tr/en)
+- [ ] TrustSection rozetlerine detay linki ekle (KVKK → /legal/kvkk, İade → /support/iade-degisim)
+- [ ] ProductFlow: melez akış (image_url varsa görsel, yoksa marka kartı)
+- [ ] ProductFlow: hız ve boyut ince ayarı (masaüstü/mobil farklı hızlar)
+- [ ] (Opsiyonel) IO ile VisualShowcase/ProductFlow’u viewport’a girince başlat
+- [ ] Öneri 1. Dalga: Spotlight Hero + In‑view Sayaçlar + Before/After Slider
+- [ ] QA: a11y (odak), Lighthouse, analytics event doğrulama
+
 ## Nice‑to‑have (yakın vade)
 - E‑fatura veya PDF fatura taslağı (ileride).
 - Erişilebilirlik ve Lighthouse turu.

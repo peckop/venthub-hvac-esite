@@ -1,6 +1,7 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 
 type Row = { product_id: string; name: string; physical_stock: number; reserved_stock: number; available_stock: number }
 
@@ -31,6 +32,7 @@ const AdminInventoryPage: React.FC = () => {
   const [overrideMap, setOverrideMap] = React.useState<Record<string, boolean>>({})
   const [sortKey, setSortKey] = React.useState<SortKey>('name')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('asc')
+  const [groupByCategory, setGroupByCategory] = React.useState<boolean>(false)
 
   // Arama
   const [q, setQ] = React.useState<string>('')
@@ -209,6 +211,31 @@ const AdminInventoryPage: React.FC = () => {
     return arr
   }, [filteredRows, sortKey, sortDir, computeEffectiveThresholdLocal, statusRank])
 
+  const getCategoryName = React.useCallback((cid: string | null | undefined): string => {
+    if (!cid) return 'Kategorisiz'
+    const c = categories.find(x => x.id === cid)
+    return c?.name || 'Kategorisiz'
+  }, [categories])
+
+  const groupedRows = React.useMemo(() => {
+    if (!groupByCategory) return [] as { cid: string | null; name: string; items: Row[] }[]
+    const bucket = new Map<string, Row[]>()
+    for (const r of sortedRows) {
+      const cid = (productCategoryMap[r.product_id] || '') as string
+      const key = cid || 'null'
+      const arr = bucket.get(key) || []
+      arr.push(r)
+      bucket.set(key, arr)
+    }
+    const out: { cid: string | null; name: string; items: Row[] }[] = []
+    for (const [key, items] of bucket.entries()) {
+      const cid = key === 'null' ? null : key
+      out.push({ cid, name: getCategoryName(cid), items })
+    }
+    out.sort((a,b) => a.name.localeCompare(b.name, 'tr'))
+    return out
+  }, [groupByCategory, sortedRows, productCategoryMap, getCategoryName])
+
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
@@ -330,35 +357,28 @@ const AdminInventoryPage: React.FC = () => {
       <h1 className={adminSectionTitleClass}>Stok Özeti</h1>
 
       {/* Hızlı arama */}
-      <div className={`${adminCardClass} p-4 sticky top-4 z-10`}>
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            className="w-full md:w-72 border border-light-gray rounded-lg px-3 py-2 text-sm"
-            placeholder="Ürün ara (ad)"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-          <select
-            className="border border-light-gray rounded px-2 py-2 text-sm"
-            value={selectedCategory}
-            onChange={(e)=>setSelectedCategory(e.target.value)}
-            title="Kategori"
-          >
-            <option value="">Tüm Kategoriler</option>
-            {visibleCategories.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-          {/* Durum çoklu filtre */}
-          <div className="flex items-center gap-2 text-xs">
-            <label className="inline-flex items-center gap-1"><input type="checkbox" checked={statusFilter.out} onChange={(e)=>setStatusFilter(s=>({ ...s, out: e.target.checked }))} /> Tükendi</label>
-            <label className="inline-flex items-center gap-1"><input type="checkbox" checked={statusFilter.critical} onChange={(e)=>setStatusFilter(s=>({ ...s, critical: e.target.checked }))} /> Kritik</label>
-            <label className="inline-flex items-center gap-1"><input type="checkbox" checked={statusFilter.reserved} onChange={(e)=>setStatusFilter(s=>({ ...s, reserved: e.target.checked }))} /> Rezervli</label>
-            <label className="inline-flex items-center gap-1"><input type="checkbox" checked={statusFilter.ok} onChange={(e)=>setStatusFilter(s=>({ ...s, ok: e.target.checked }))} /> Uygun</label>
-          </div>
-          <span className="text-xs text-steel-gray ml-auto">{filteredRows.length} kayıt</span>
-        </div>
-      </div>
+      <AdminToolbar
+        sticky
+        search={{ value: q, onChange: setQ, placeholder: 'Ürün ara (ad)', focusShortcut: '/' }}
+        select={{
+          value: selectedCategory,
+          onChange: setSelectedCategory,
+          title: 'Kategori',
+          options: [
+            { value: '', label: 'Tüm Kategoriler' },
+            ...visibleCategories.map(c => ({ value: c.id, label: c.name }))
+          ]
+        }}
+        chips={[
+          { key: 'out', label: 'Tükendi', active: statusFilter.out, onToggle: ()=>setStatusFilter(s=>({ ...s, out: !s.out })), classOn: 'bg-gray-200 text-gray-800 border-gray-300', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: ()=>setStatusFilter(s=>({ ...s, critical: !s.critical })), classOn: 'bg-warning-orange/10 text-warning-orange border-warning-orange/30', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'reserved', label: 'Rezervli', active: statusFilter.reserved, onToggle: ()=>setStatusFilter(s=>({ ...s, reserved: !s.reserved })), classOn: 'bg-blue-100 text-blue-700 border-blue-200', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'ok', label: 'Uygun', active: statusFilter.ok, onToggle: ()=>setStatusFilter(s=>({ ...s, ok: !s.ok })), classOn: 'bg-green-100 text-green-700 border-green-200', classOff: 'bg-white text-steel-gray border-light-gray' },
+        ]}
+        toggles={[{ key: 'groupByCategory', label: 'Grupla: Kategori', checked: groupByCategory, onChange: setGroupByCategory }]}
+        onClear={()=>{ setQ(''); setSelectedCategory(''); setStatusFilter({ out:false, critical:false, reserved:false, ok:false }); setGroupByCategory(false) }}
+        recordCount={filteredRows.length}
+      />
 
       <div className={`${adminCardClass} overflow-hidden`}>
         <table className="w-full">
@@ -397,24 +417,52 @@ const AdminInventoryPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map(r => (
-              <tr
-                key={r.product_id}
-                className="border-b hover:bg-gray-50 cursor-pointer"
-                onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id) }}
-              >
-                <td className={adminTableCellClass}>{r.name}</td>
-                <td className="p-3 text-right">{r.physical_stock}</td>
-                <td className="p-3 text-right">{r.reserved_stock}</td>
-                <td className="p-3 text-right font-semibold">{r.available_stock}</td>
-                <td className="p-3 text-right">
-                  <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
-                    {(effectiveThreshold(r.product_id) ?? '-') as number | string}
-                  </span>
-                </td>
-                <td className="p-3 text-right">{statusBadge(r)}</td>
-              </tr>
-            ))}
+            {groupByCategory ? (
+              groupedRows.map(g => (
+                <React.Fragment key={g.cid ?? 'null'}>
+                  <tr className="bg-gray-100">
+                    <th colSpan={6} className="text-left px-3 py-2 text-industrial-gray font-semibold">{g.name}</th>
+                  </tr>
+                  {g.items.map(r => (
+                    <tr
+                      key={r.product_id}
+                      className="border-b hover:bg-gray-50 cursor-pointer"
+                      onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id) }}
+                    >
+                      <td className={adminTableCellClass}>{r.name}</td>
+                      <td className="p-3 text-right">{r.physical_stock}</td>
+                      <td className="p-3 text-right">{r.reserved_stock}</td>
+                      <td className="p-3 text-right font-semibold">{r.available_stock}</td>
+                      <td className="p-3 text-right">
+                        <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
+                          {(effectiveThreshold(r.product_id) ?? '-') as number | string}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right">{statusBadge(r)}</td>
+                    </tr>
+                  ))}
+                </React.Fragment>
+              ))
+            ) : (
+              sortedRows.map(r => (
+                <tr
+                  key={r.product_id}
+                  className="border-b hover:bg-gray-50 cursor-pointer"
+                  onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id) }}
+                >
+                  <td className={adminTableCellClass}>{r.name}</td>
+                  <td className="p-3 text-right">{r.physical_stock}</td>
+                  <td className="p-3 text-right">{r.reserved_stock}</td>
+                  <td className="p-3 text-right font-semibold">{r.available_stock}</td>
+                  <td className="p-3 text-right">
+                    <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
+                      {(effectiveThreshold(r.product_id) ?? '-') as number | string}
+                    </span>
+                  </td>
+                  <td className="p-3 text-right">{statusBadge(r)}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
         {loading === LoadState.Loading && (

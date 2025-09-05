@@ -4,6 +4,7 @@ import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Menu, X, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
+import { trackEvent } from '../utils/analytics'
 
 interface MegaMenuProps {
   isOpen: boolean
@@ -152,7 +153,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                     {/* Main Category */}
                     <Link
                       to={`/category/${category.slug}`}
-                      onClick={onClose}
+                      onClick={() => { trackEvent('category_click', { level: 0, slug: category.slug, source: 'megamenu' }); onClose() }}
                       className="block group/item"
                     >
                       <div className="flex items-start space-x-4">
@@ -180,7 +181,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                           <Link
                             key={sub.id}
                             to={`/category/${category.slug}/${sub.slug}`}
-                            onClick={onClose}
+                            onClick={() => { trackEvent('category_click', { level: 1, slug: sub.slug, parent: category.slug, source: 'megamenu' }); onClose() }}
                             className="group/sub flex items-center justify-between px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 rounded-lg transition-all duration-200"
                           >
                             <span className="font-medium">{sub.name}</span>
