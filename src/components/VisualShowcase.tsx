@@ -44,19 +44,20 @@ function usePrefersReducedMotion() {
 
 const VisualShowcase: React.FC = () => {
   const [index, setIndex] = useState(0)
-  const [hover, setHover] = useState(false)
   const [playing, setPlaying] = useState(true)
   const startXRef = useRef<number | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = usePrefersReducedMotion()
+  const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+  const disableFancy = reducedMotion || isCoarse || (typeof window !== 'undefined' && window.innerWidth < 640)
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
 
   // Autoplay
   useEffect(() => {
-    if (hover || !playing) return
+    if (!playing) return
     const id = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), AUTOPLAY_MS)
     return () => clearInterval(id)
-  }, [hover, playing])
+  }, [playing])
 
   const prev = () => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
   const next = () => setIndex((i) => (i + 1) % SLIDES.length)
@@ -138,11 +139,7 @@ const VisualShowcase: React.FC = () => {
   }, [particles, reducedMotion])
 
   return (
-    <section
-      className="py-8"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
+    <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className="relative overflow-hidden rounded-2xl"
@@ -152,12 +149,12 @@ const VisualShowcase: React.FC = () => {
           aria-roledescription="carousel"
         >
           {/* Canvas particles (arka plan) */}
-          {!reducedMotion && (
+          {!disableFancy && (
             <canvas ref={canvasRef} className="absolute inset-0 z-0" aria-hidden="true" />
           )}
 
           {/* Parallax Layers */}
-          {!reducedMotion && (
+          {!disableFancy && (
             <>
               <div className="pointer-events-none absolute -top-10 -left-16 w-64 h-64 rounded-full bg-white/10 blur-2xl z-0"
                    style={{ transform: `translate(${(mouse.x-0.5)*20}px, ${(mouse.y-0.5)*20}px)` }} />

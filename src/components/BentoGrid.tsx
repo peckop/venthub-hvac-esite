@@ -18,12 +18,13 @@ const ITEMS: BentoItem[] = [
 
 const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
   return (
     <div
       className={`relative overflow-hidden rounded-2xl border border-light-gray shadow-sm group ${large ? 'md:col-span-2 md:row-span-2' : ''}`}
     >
       <img src={item.image} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
-      {item.video && (
+      {item.video && !isCoarse && (
         <video
           ref={videoRef}
           src={item.video}

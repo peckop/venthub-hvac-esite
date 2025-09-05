@@ -4,6 +4,10 @@ const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(ma
 
 const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ children, maxTilt = 8 }) => {
   const ref = useRef<HTMLDivElement | null>(null)
+  const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+  if (isCoarse) {
+    return <>{children}</>
+  }
 
   const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const el = ref.current
