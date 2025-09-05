@@ -24,7 +24,7 @@ export const HeroSection: React.FC = () => {
         <img
           src="/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg"
           alt=""
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover object-center opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
@@ -100,7 +100,7 @@ export const HeroSection: React.FC = () => {
               <img
                 src="/images/industrial_HVAC_air_handling_unit_warehouse.jpg"
                 alt="HVAC Equipment"
-                className="w-full rounded-xl shadow-hvac-lg"
+                className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
             </div>

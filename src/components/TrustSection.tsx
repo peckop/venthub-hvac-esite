@@ -27,7 +27,7 @@ const TrustSection: React.FC = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Güven ve Uygunluk</h2>
           <p className="text-steel-gray mt-1">Altyapı, güvenlik ve süreçlerimiz şeffaf ve standartlara uygundur.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {TRUST_ITEMS.map((item) => (
             <div key={item.title} className="rounded-2xl border border-light-gray bg-white p-5 hover:shadow-md transition">
               <div className="flex items-start gap-3">
