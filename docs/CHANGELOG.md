@@ -1,5 +1,20 @@
 # Changelog
 
+## 2025-09-05
+
+### Homepage Enhancements
+- Add VisualShowcase (parallax + canvas particles + play/pause + keyboard/swipe)
+- Add ProductFlow (three-lane product image marquee; clickable brand cards fallback; reduced-motion static grid)
+- Add TrustSection (KVKK, iyzico, Returns; remove Cloudflare card)
+- Add FAQShortSection and integrate ResourcesSection
+- HomePage: place VisualShowcase + ProductFlow above Applications; keep product teasers lower
+- Navigation/Analytics: nav_click (Products/Categories) and category_click (MegaMenu/ProductsPage popular categories)
+- ProductsPage: dynamic breadcrumb (Discover/All/Search), analytics on popular categories
+- main.tsx: disable scroll restoration for refresh (scroll to top)
+- Remove CaseStudySection from HomePage
+
+(See docs/HOMEPAGE_ENHANCEMENTS.md for details and backlog.)
+
 ## 2025-09-01
 
 ### Security / Logging Hygiene

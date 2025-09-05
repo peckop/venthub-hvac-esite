@@ -8,6 +8,7 @@ import { checkAdminAccess } from '../config/admin'
 import MegaMenu from './MegaMenu'
 import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
+import { trackEvent } from '../utils/analytics'
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -113,7 +114,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             {/* Desktop Navigation - Reordered per requirements */}
             <nav className="hidden xl:flex items-center space-x-1">
               <button
-                onClick={() => setIsMenuOpen(true)}
+                onClick={() => { trackEvent('nav_click', { target: 'categories' }); setIsMenuOpen(true) }}
                 className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30"
               >
                 <Menu size={18} className="group-hover:rotate-180 transition-transform duration-300" />
@@ -121,6 +122,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </button>
               <Link
                 to="/products"
+                onClick={() => trackEvent('nav_click', { target: 'products' })}
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
               >
                 {t('common.products')}

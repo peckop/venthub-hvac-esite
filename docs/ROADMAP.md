@@ -157,6 +157,31 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 
 ## Ek: Kurumsal/PLP Planı Checklist (Arşivden taşınan)
 
+---
+
+## Güncelleme — 2025-09-05: Ana Sayfa Geliştirmeleri Uygulaması
+
+Bu güncelleme ile ana sayfa kurumsal ve etkileşim odaklı hale getirildi. Ayrıntılar: docs/HOMEPAGE_ENHANCEMENTS.md
+
+Uygulananlar:
+- VisualShowcase (Hero altında): parallax + canvas parçacık + play/pause + klavye/swipe
+- ProductFlow (Uygulamaya Göre Çözümler üzerinde): görsel akış, yoksa tıklanabilir marka kartları, reduced‑motion grid
+- TrustSection: KVKK/iyzico/İade-Değişim rozetleri (Cloudflare kartı kaldırıldı)
+- FAQShortSection: 3 soru-cevap ve Support linkleri
+- ResourcesSection: destek içerikleri mini alanı
+- ProductsPage: breadcrumb dinamik (Keşfet / Tüm Ürünler / Arama), Popüler Kategoriler tıklamasında analytics
+- StickyHeader/MegaMenu: nav_click ve category_click event’leri
+- main.tsx: history.scrollRestoration = 'manual' (yenilemede sayfa başı)
+- CaseStudySection kaldırıldı
+
+Sıradaki Öneriler (kısa liste):
+- Spotlight Hero, In‑view Sayaçlar, Before/After Slider (1. dalga)
+- Bento Grid, 3D Tilt Card (2. dalga)
+- Scroll‑Linked Process, Magnetic CTA, Spotlight List (3. dalga)
+- Masonry/Gallery, Soft‑Particles varyasyonları (4. dalga)
+
+Not: Ayrıntılı backlog ve QA başlıkları için docs/HOMEPAGE_ENHANCEMENTS.md
+
 ### Faz 0 (Tamamlandı)
 - [x] Uygulama kartlarını merkezi konfige taşı
 - [x] Home ve Keşfet sayfalarını bu konfig ile render et

@@ -12,6 +12,11 @@ import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
+import ResourcesSection from '../components/ResourcesSection'
+import TrustSection from '../components/TrustSection'
+import FAQShortSection from '../components/FAQShortSection'
+import VisualShowcase from '../components/VisualShowcase'
+import ProductFlow from '../components/ProductFlow'
 
 export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
@@ -80,6 +85,12 @@ export const HomePage: React.FC = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Visual Showcase (etkileşimli görsel akış) */}
+      <VisualShowcase />
+
+      {/* Product Flow (ürün görselleri akışı) */}
+      <ProductFlow />
 
       {/* Uygulamaya Göre Çözümler */}
       <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
@@ -163,6 +174,15 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Trust / Certifications */}
+      <TrustSection />
+
+      {/* FAQ Short Strip */}
+      <FAQShortSection />
+
+      {/* Resources */}
+      <ResourcesSection />
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
