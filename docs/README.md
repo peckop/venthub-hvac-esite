@@ -81,4 +81,6 @@ proje/
 
 Bu dosya otomatik güncellenmez. Yeni dokümantasyon eklendiğinde veya yapı değiştiğinde lütfen bu dosyayı da güncelleyin.
 
-Son güncelleme: 2025-09-03
+Not: Admin UI standardizasyonu ve toolbar entegrasyonlarının detayları için CHANGELOG.md ve ADMIN_ROADMAP.md dosyalarına bakınız.
+
+Son güncelleme: 2025-09-05

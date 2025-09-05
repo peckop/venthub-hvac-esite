@@ -1,8 +1,15 @@
 # Changelog
 
-## 2025-09-05
+## 2025-09-05 (Admin UI Standardizasyonu)
+- Yeni: Ortak AdminToolbar bileşeni (arama, select, chip grubu, toggle, Temizle, sayaç, sticky yüzey, focus ring)
+- Düzen: 2 satır (üst: arama/select/aksiyonlar, alt: chip’ler); 48px kontrol yüksekliği; shrink-0 sağ blok, nowrap metinler
+- Movements: Toolbar entegrasyonu + Dışa Aktar (CSV) dropdown
+- Orders: Toolbar entegrasyonu + Durum select + Tarih aralığı alanları + Dışa Aktar (CSV, Excel .xls) dropdown
+- Returns: Toolbar entegrasyonu + çoklu durum chip’leri
+- Users: Toolbar ile arama standardizasyonu
+- Görsel uyum: Tüm toolbar’larda bg-gray-50 + border ile ayrı panel hissi; “Grupla” gibi checkbox’lar Radix Switch’e geçirildi
 
-### Homepage Enhancements
+## 2025-09-05 (Homepage Enhancements)
 - Add VisualShowcase (parallax + canvas particles + play/pause + keyboard/swipe)
 - Add ProductFlow (three-lane product image marquee; clickable brand cards fallback; reduced-motion static grid)
 - Add TrustSection (KVKK, iyzico, Returns; remove Cloudflare card)
@@ -14,6 +21,13 @@
 - Remove CaseStudySection from HomePage
 
 (See docs/HOMEPAGE_ENHANCEMENTS.md for details and backlog.)
+
+### 2025-09-05 Evening Updates
+- Increase 3D tilt intensity (18°) with shine + dynamic shadow; enable on (hover:hover & pointer:fine) devices; respect reduced-motion.
+- Switch Hero spotlight to screen-blend lighting; imleci doğru takip eder, dalga estetigini bozmaz.
+- VisualShowcase: hover’da autoplay durdurma kaldırıldı; parallax/canvas touch ve küçük ekranlarda devre dışı.
+- Mobile: Tilt dokunmatik cihazlarda kapalı; BentoGrid video katmanı dokunmatik cihazlarda render edilmez.
+- TrustSection: 3 kart gridi lg:grid-cols-3 ile ortalandı; görseller object-center ile sola kayma düzeltildi.
 
 ## 2025-09-01
 

@@ -1,6 +1,6 @@
 # Admin Panel Roadmap (Güncel Durum ve Plan)
 
-Tarih: 2025-09-04
+Tarih: 2025-09-05
 
 ## Tamamlananlar (Sprint 1)
 - /admin çatı layout ve guard (sadece admin erişir)
@@ -12,30 +12,35 @@ Tarih: 2025-09-04
   - reserved_orders (ürünü rezerve eden siparişler)
 
 ## Güncellemeler (2025-09-05)
-- Admin > Stok Özeti (/admin/inventory)
-  - Hızlı arama (ürün adı) — anlık filtreleme
-  - Satır içi stok düzenleme sütunu: − / miktar / + / Kaydet (optimistic update)
-  - Satır içi minimum eşik düzenleme: rozet + input + Kaydet + Varsayılan
-  - “Ürün seç” dropdown kaldırıldı; satır tıklama ile seçim ve yalnızca seçim olduğunda görünen bağlam paneli (Hızlı Eşik Ayarları)
-  - Tablo başlıkları ve açıklamalar iyileştirildi (Eşik: “Efektif • Yeni • Aksiyon”)
+- Ortak AdminToolbar bileşeni oluşturuldu ve sayfalara uygulandı
+  - Özellikler: arama (/ kısayol), select, chip grubu, toggle (Radix Switch), Temizle, kayıt sayacı, sticky yüzey, odak halkaları
+  - Düzen: 2 satır (üst: arama/select/aksiyonlar, alt: chip’ler), 48px kontrol yüksekliği, shrink-0 sağ blok, nowrap metinler
+- Entegrasyonlar
+  - Inventory (/admin/inventory): Toolbar + mevcut filtreler, sağ panel ve metrikler korunarak düzenlendi
+  - Movements (/admin/movements): Toolbar + Dışa Aktar dropdown (CSV), hizalama düzeltmeleri
+  - Orders (/admin/orders): Toolbar + durum select + tarih aralığı alanları + Dışa Aktar dropdown (CSV, Excel .xls)
+  - Returns (/account/AdminReturnsPage): Toolbar + çoklu durum chip’leri (requested/approved/...)
+  - Users (/account/AdminUsersPage): Toolbar ile arama alanı standardize edildi
+- Görsel uyum
+  - Tüm toolbar’lar kart içinde yumuşak arka plan (bg-gray-50 + border) ile ayrı bir yüzey olarak gösteriliyor
+  - “Grupla” gibi boolean kontroller Radix Switch ile birleştirildi (tik işareti kaldırıldı)
 
 ## Devam Eden (Sprint 2 – Orders Modülü)
-- /admin/orders iskeleti ve rotası
-- Liste ve veri modeli: status + payment_status rozetleri, toplam, tarih
-- Filtreler: durum, ödeme durumu, kargolanmamış, tarih aralığı, sipariş no
-- Tek sipariş aksiyonu: Kargoya Ver (carrier + tracking_number)
-- API katmanı: modules/common/api/orders.ts
-- Test & i18n (orders.*)
-- Milestone 2: Çoklu seçim + Toplu Kargoya Ver
+- /admin/orders işlevleri
+  - Liste ve veri modeli: status rozetleri, toplam, tarih (mevcut)
+  - Filtreler: durum, tarih aralığı, arama (mevcut)
+  - Aksiyon: Kargoya Ver (tekil ve toplu) (kısmen mevcut; bulk akışı sırada)
+  - Dışa Aktar: CSV + Excel (.xls) (mevcut)
 
-## Sıradaki (Sprint 3 – Returns Modülü)
-- /admin/returns sayfası: iade talepleri, tam/parsiyel iade, kalem seçimi
-- Kargolanmış ürünler için: “İade alındı → stok +” (idempotent)
+## Sıradaki (Sprint 3 – Returns & Movements)
+- Dışa Aktar menüsü: Returns ve Movements için Excel (.xls) eklenmesi
+- Toolbar durumlarının kalıcılığı (localStorage; sayfa bazlı anahtarlar)
+- Gelişmiş filtre çekmecesi (Orders)
 
 ## Sıradaki (Sprint 4 – Dashboard & Users)
 - Dashboard: Bugün/7g/30g KPI kartları (sipariş, ciro, iade, bekleyen kargo)
 - Recent activity feed
-- Users modülünün taşınması (/admin/users)
+- Users modülünün /admin/users altına taşınması
 
 ## Standartlar ve Kurallar
 - Stok: satılabilir stok = physical − reserved (reserved = paid/confirmed/processing ve shipped_at IS NULL)
@@ -50,5 +55,4 @@ Tarih: 2025-09-04
 ## Notlar
 - Mevcut dağınık admin sayfaları (/account/operations/*) aşamalı olarak /admin altına taşınacak; mükerrerlik kaldırılacak.
 - i18n anahtarları tekilleştirilecek; ortak UI bileşenleri (rozet, tablo) modül dışına alınacak.
-
 
