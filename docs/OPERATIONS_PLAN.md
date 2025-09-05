@@ -59,12 +59,12 @@ RPCs (security definer)
 Admin UI — Operasyon > Stok (UX spec)
 - List/table
   - Columns: Image, Name, SKU, Stock, Threshold (effective), Status badge (Low stock)
-  - Search by SKU/name; pagination and virtualization for performance
+  - Search by name; pagination and virtualization for performance
 - Row actions
   - +1 / −1 buttons
-  - Set quantity (direct number)
-  - Reason presets: Satış, İade, Sayım, Hasar, Tedarik
-  - Inline threshold edit: use default or override per product
+  - Set quantity (direct number) ve Kaydet; optimistic update ile “Satılabilir” anında güncellenir
+  - Inline threshold edit: use default or override per product (rozet + input + Kaydet + Varsayılan)
+  - Row click = select; selection context panel (Hızlı Eşik Ayarları) yalnızca seçim olduğunda görünür
   - Mini movement history: last 5 changes (collapsed panel)
   - Undo: allow revert of last change within 10 minutes (optional, via inverse movement)
 - Bulk actions
