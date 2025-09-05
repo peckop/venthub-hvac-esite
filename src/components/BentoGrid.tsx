@@ -23,7 +23,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
     <div
       className={`relative overflow-hidden rounded-2xl border border-light-gray shadow-sm group ${large ? 'md:col-span-2 md:row-span-2' : ''}`}
     >
-      <img src={item.image} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+      <img src={item.image} alt={item.title} className="w-full h-full object-cover object-center" loading="lazy" />
       {item.video && !isCoarse && (
         <video
           ref={videoRef}
