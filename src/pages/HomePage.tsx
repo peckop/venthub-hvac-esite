@@ -17,6 +17,7 @@ import TrustSection from '../components/TrustSection'
 import FAQShortSection from '../components/FAQShortSection'
 import VisualShowcase from '../components/VisualShowcase'
 import ProductFlow from '../components/ProductFlow'
+import BeforeAfterSlider from '../components/BeforeAfterSlider'
 
 export const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
@@ -180,6 +181,13 @@ export const HomePage: React.FC = () => {
 
       {/* FAQ Short Strip */}
       <FAQShortSection />
+
+      {/* Before/After Slider */}
+      <BeforeAfterSlider
+        beforeSrc="/images/before_parking_jet_fan.jpg"
+        afterSrc="/images/after_parking_jet_fan.jpg"
+        alt="Otopark jet fan uygulaması öncesi/sonrası"
+      />
 
       {/* Resources */}
       <ResourcesSection />

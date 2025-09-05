@@ -91,38 +91,73 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
 
   return (
     <Container>
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-        {/* Arama */}
-        {search && (
-          <div className="flex-1 min-w-[240px]">
-            <input
-              ref={inputRef}
-              className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
-              placeholder={search.placeholder || 'Ara'}
-              title={search.title || `Kısayol: ${search.focusShortcut || '/'}`}
-              value={search.value}
-              onChange={(e) => search.onChange(e.target.value)}
-            />
-          </div>
-        )}
+      <div className="flex flex-col gap-3">
+        {/* Üst sıra: arama + select + sağ aksiyonlar */}
+        <div className="flex items-center gap-3">
+          {search && (
+            <div className="flex-1 min-w-[240px]">
+              <input
+                ref={inputRef}
+                className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+                placeholder={search.placeholder || 'Ara'}
+                title={search.title || `Kısayol: ${search.focusShortcut || '/'}`}
+                value={search.value}
+                onChange={(e) => search.onChange(e.target.value)}
+              />
+            </div>
+          )}
 
-        {/* Select */}
-        {select && (
-          <div className="flex items-center gap-2">
-            <select
-              className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm min-w-[180px] bg-white focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1"
-              value={select.value}
-              onChange={(e)=>select.onChange(e.target.value)}
-              title={select.title || 'Seçim'}
-            >
-              {select.options.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-        )}
+          {select && (
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm min-w-[180px] bg-white focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1"
+                value={select.value}
+                onChange={(e)=>select.onChange(e.target.value)}
+                title={select.title || 'Seçim'}
+              >
+                {select.options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        {/* Chip Grup */}
+          <div className="ml-auto shrink-0 flex items-center gap-3">
+            {toggles && toggles.length > 0 && (
+              <div className="flex items-center gap-4">
+                {toggles.map(t => (
+                  <div key={t.key} className="flex items-center gap-2 text-xs">
+                    <span className="text-industrial-gray whitespace-nowrap">{t.label}</span>
+                    <Switch.Root
+                      checked={t.checked}
+                      onCheckedChange={t.onChange}
+                      className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
+                      aria-label={t.title || t.label}
+                    >
+                      <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
+                    </Switch.Root>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {onClear && (
+              <button
+                type="button"
+                onClick={onClear}
+                className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy whitespace-nowrap"
+              >Temizle</button>
+            )}
+
+            {typeof recordCount === 'number' && (
+              <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} kayıt</span>
+            )}
+
+            {rightExtra}
+          </div>
+        </div>
+
+        {/* Alt sıra: chip'ler */}
         {chips && chips.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {chips.map(ch => (
@@ -137,41 +172,6 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             ))}
           </div>
         )}
-
-        {/* Sağ blok */}
-        <div className="flex items-center gap-3 md:ml-auto">
-          {toggles && toggles.length > 0 && (
-            <div className="flex items-center gap-4">
-              {toggles.map(t => (
-                <div key={t.key} className="flex items-center gap-2 text-xs">
-                  <span className="text-industrial-gray">{t.label}</span>
-                  <Switch.Root
-                    checked={t.checked}
-                    onCheckedChange={t.onChange}
-                    className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
-                    aria-label={t.title || t.label}
-                  >
-                    <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
-                  </Switch.Root>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {onClear && (
-            <button
-              type="button"
-              onClick={onClear}
-              className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy"
-            >Temizle</button>
-          )}
-
-          {typeof recordCount === 'number' && (
-            <span className="text-xs text-steel-gray" aria-live="polite">{recordCount} kayıt</span>
-          )}
-
-          {rightExtra}
-        </div>
       </div>
     </Container>
   )
