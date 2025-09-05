@@ -1,19 +1,23 @@
 import React from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { checkAdminAccess, isDevAdmin } from '../../config/admin'
+import { checkAdminAccessAsync } from '../../config/admin'
 import { adminNavClass } from '../../utils/adminUi'
 
 const AdminLayout: React.FC = () => {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    // In dev, allow admin pages without strict auth to ease local testing
-    if (!checkAdminAccess(user) && !isDevAdmin()) {
-      navigate('/auth/login', { replace: true })
+    let active = true
+    async function guard() {
+      if (loading) return
+      const ok = await checkAdminAccessAsync(user)
+      if (!ok && active) navigate('/auth/login', { replace: true })
     }
-  }, [user, navigate])
+    guard()
+    return () => { active = false }
+  }, [user, loading, navigate])
 
   return (
     <div className="min-h-screen bg-clean-white">
@@ -24,6 +28,8 @@ const AdminLayout: React.FC = () => {
             <NavLink to="/admin" end className={({isActive})=>adminNavClass(isActive)}>Dashboard</NavLink>
             <NavLink to="/admin/orders" className={({isActive})=>adminNavClass(isActive)}>Siparişler</NavLink>
             <NavLink to="/admin/inventory" className={({isActive})=>adminNavClass(isActive)}>Stok Özeti</NavLink>
+            <NavLink to="/admin/movements" className={({isActive})=>adminNavClass(isActive)}>Hareket Defteri</NavLink>
+            <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>Eşik & Ayarlar</NavLink>
             <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>İadeler</NavLink>
             <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>Kullanıcılar</NavLink>
           </nav>

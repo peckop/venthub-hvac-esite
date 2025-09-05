@@ -12,6 +12,8 @@ interface AdminOrderRow {
   created_at: string
 }
 
+type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
+
 const STATUSES: { value: string; label: string }[] = [
   { value: '', label: 'Tümü' },
   { value: 'paid', label: 'Ödendi' },
@@ -26,6 +28,8 @@ const AdminOrdersPage: React.FC = () => {
   const [rows, setRows] = React.useState<AdminOrderRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [sortKey, setSortKey] = React.useState<SortKey>('created')
+  const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
 
   // Filters
   const [status, setStatus] = React.useState('')
@@ -198,6 +202,38 @@ const AdminOrdersPage: React.FC = () => {
     })
   }, [rows, status, fromDate, toDate, debouncedQuery])
 
+  const sorted = React.useMemo(() => {
+    const arr = [...filtered]
+    arr.sort((a,b) => {
+      const dir = sortDir === 'asc' ? 1 : -1
+      switch (sortKey) {
+        case 'id':
+          return dir * a.id.localeCompare(b.id)
+        case 'status':
+          return dir * a.status.localeCompare(b.status)
+        case 'conversation':
+          return dir * String(a.conversation_id||'').localeCompare(String(b.conversation_id||''))
+        case 'amount':
+          return dir * ((a.total_amount||0) - (b.total_amount||0))
+        case 'created':
+          return dir * (Date.parse(a.created_at) - Date.parse(b.created_at))
+        default:
+          return 0
+      }
+    })
+    return arr
+  }, [filtered, sortKey, sortDir])
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(key); setSortDir(key==='created' ? 'desc' : 'asc') }
+  }
+
+  function sortIndicator(key: SortKey) {
+    if (sortKey !== key) return ''
+    return sortDir === 'asc' ? '▲' : '▼'
+  }
+
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
@@ -269,11 +305,11 @@ const AdminOrdersPage: React.FC = () => {
           <thead>
             <tr>
               <th className={adminTableHeadCellClass}></th>
-              <th className={adminTableHeadCellClass}>Order ID</th>
-              <th className={adminTableHeadCellClass}>Durum</th>
-              <th className={adminTableHeadCellClass}>Conversation</th>
-              <th className={adminTableHeadCellClass}>Tutar</th>
-              <th className={adminTableHeadCellClass}>Oluşturma</th>
+              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>Sipariş ID {sortIndicator('id')}</button></th>
+              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>
+              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>Konuşma ID {sortIndicator('conversation')}</button></th>
+              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>Tutar {sortIndicator('amount')}</button></th>
+              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>Oluşturma Tarihi {sortIndicator('created')}</button></th>
               <th className={adminTableHeadCellClass}>İşlemler</th>
             </tr>
           </thead>
@@ -283,7 +319,7 @@ const AdminOrdersPage: React.FC = () => {
             ) : filtered.length === 0 ? (
               <tr><td className="px-4 py-6" colSpan={5}>Kayıt bulunamadı</td></tr>
             ) : (
-              filtered.map((r) => (
+              sorted.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
                   <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>{
                     setSelectedIds(prev => e.target.checked ? [...new Set([...prev, r.id])] : prev.filter(x=>x!==r.id))
