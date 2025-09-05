@@ -1,6 +1,8 @@
 import React from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
+import SpotlightHeroOverlay from './SpotlightHeroOverlay'
+import InViewCounter from './InViewCounter'
 
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
@@ -15,6 +17,9 @@ export const HeroSection: React.FC = () => {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
+
+      {/* Spotlight Overlay */}
+      <SpotlightHeroOverlay />
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -71,24 +76,12 @@ export const HeroSection: React.FC = () => {
 
           {/* Right Content - Featured Product/Stats */}
           <div className="space-y-6">
-            {/* Stats Cards */}
+            {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
-                <div className="text-3xl font-bold text-primary-navy">6</div>
-                <div className="text-steel-gray">{t('home.stats.premiumBrands')}</div>
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
-                <div className="text-3xl font-bold text-primary-navy">50+</div>
-                <div className="text-steel-gray">{t('home.stats.productTypes')}</div>
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
-                <div className="text-3xl font-bold text-primary-navy">15+</div>
-                <div className="text-steel-gray">{t('home.stats.yearsExperience')}</div>
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-glass border border-white/20">
-                <div className="text-3xl font-bold text-primary-navy">1000+</div>
-                <div className="text-steel-gray">{t('home.stats.happyCustomers')}</div>
-              </div>
+              <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
+              <InViewCounter label={t('home.stats.productTypes') as string} to={50} suffix="+" />
+              <InViewCounter label={t('home.stats.yearsExperience') as string} to={15} suffix="+" />
+              <InViewCounter label={t('home.stats.happyCustomers') as string} to={1000} suffix="+" />
             </div>
 
             {/* Featured Image */}

@@ -2,6 +2,8 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { Download } from 'lucide-react'
 
 type Movement = {
   id: string
@@ -234,7 +236,23 @@ const AdminMovementsPage: React.FC = () => {
           setReasonFilter(Object.fromEntries(ALL_REASONS.map(r => [r, true])) as Record<string, boolean>);
         }}
         recordCount={filtered.length}
-        rightExtra={<button className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm" onClick={exportCsv}>CSV Dışa Aktar</button>}
+        rightExtra={(
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">
+                <Download size={16} />
+                Dışa Aktar
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content className="min-w-40 rounded-md bg-white shadow-lg border border-light-gray p-1">
+                <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportCsv() }}>
+                  CSV (görünür filtrelerle)
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
+        )}
       />
 
       <div className={`${adminCardClass} overflow-hidden`}>
