@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
 import SpotlightHeroOverlay from './SpotlightHeroOverlay'
@@ -6,8 +6,19 @@ import InViewCounter from './InViewCounter'
 
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
+  const heroRef = useRef<HTMLDivElement | null>(null)
   return (
-    <div className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden">
+    <div
+      ref={heroRef}
+      onMouseMove={(e) => {
+        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
+        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
+        ;(e.currentTarget as HTMLDivElement).style.setProperty('--mx', `${x}%`)
+        ;(e.currentTarget as HTMLDivElement).style.setProperty('--my', `${y}%`)
+      }}
+      className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
+    >
       {/* Background Image */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <img

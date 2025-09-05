@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-// Spotlight overlay: imleci takip eden ışık efekti (motion-safe)
-const SpotlightHeroOverlay: React.FC = () => {
-  const ref = useRef<HTMLDivElement | null>(null)
+// Spotlight overlay: merkezde beyaz parıltı, dışı tamamen şeffaf.
+// Karartma yerine aydınlatma (mix-blend-mode: screen) kullanılır.
+const SpotlightHeroOverlay: React.FC<{ radius?: number; intensity?: number }> = ({ radius = 240, intensity = 0.35 }) => {
   const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
@@ -13,28 +13,13 @@ const SpotlightHeroOverlay: React.FC = () => {
     return () => mq.removeEventListener?.('change', onChange)
   }, [])
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el || reduced) return
-    const onMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width) * 100
-      const y = ((e.clientY - rect.top) / rect.height) * 100
-      el.style.setProperty('--mx', `${x}%`)
-      el.style.setProperty('--my', `${y}%`)
-    }
-    el.addEventListener('mousemove', onMove)
-    return () => el.removeEventListener('mousemove', onMove)
-  }, [reduced])
-
-  // Karartma overlay: merkezde şeffaf, dışarıda yarı saydam
-  // Mask yerine doğrudan radial-gradient ile uygulandı (daha uyumlu)
   return (
     <div
-      ref={ref}
       className="pointer-events-none absolute inset-0 z-10"
       style={reduced ? undefined : ({
-        background: 'radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 70%)'
+        // Dış kısım tamamen şeffaf, sadece merkezde beyaz parıltı
+        background: `radial-gradient(${radius}px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,${intensity}) 0%, rgba(255,255,255,0) 60%)`,
+        mixBlendMode: 'screen'
       } as React.CSSProperties)}
       aria-hidden="true"
     />

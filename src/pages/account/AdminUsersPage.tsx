@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
-import { Search, Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
+import { Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess, listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 
 interface AdminUser {
   id: string
@@ -237,16 +238,10 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Arama */}
-      <div className={`${adminCardClass} p-4 relative`}>
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
-        <input
-          type="text"
-          placeholder="E-posta veya isim ile ara"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-md pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-        />
-      </div>
+      <AdminToolbar
+        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'E-posta veya isim ile ara', focusShortcut: '/' }}
+        recordCount={(activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length}
+      />
 
       {/* İçerik */}
       {isLoading ? (
