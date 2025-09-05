@@ -3,10 +3,11 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useNavigate } from 'react-router-dom'
-import { Search, ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
+import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
+import AdminToolbar from '../../components/admin/AdminToolbar'
 
 interface ReturnWithOrder {
   id: string
@@ -358,31 +359,17 @@ export default function AdminReturnsPage() {
       </div>
 
       {/* Filtreler */}
-      <div className={`${adminCardClass} p-4 flex flex-col sm:flex-row gap-4`}>
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
-          <input
-            type="text"
-            placeholder="Sipariş no, müşteri adı, email veya sebep ile ara"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-          />
-        </div>
-        {/* Çoklu durum filtresi */}
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          {statusOptions.filter(o=>o.value!=='all').map(option => (
-            <label key={option.value} className="inline-flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={!!statusFilter[option.value]}
-                onChange={(e)=>setStatusFilter(prev=>({ ...prev, [option.value]: e.target.checked }))}
-              />
-              {option.label}
-            </label>
-          ))}
-        </div>
-      </div>
+      <AdminToolbar
+        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Sipariş no, müşteri adı, email veya sebep ile ara', focusShortcut: '/' }}
+        chips={statusOptions.filter(o=>o.value!=='all').map(o => ({
+          key: o.value,
+          label: o.label,
+          active: !!statusFilter[o.value],
+          onToggle: ()=>setStatusFilter(prev=>({ ...prev, [o.value]: !prev[o.value] }))
+        }))}
+        onClear={()=>{ setSearchQuery(''); setStatusFilter({ requested:true, approved:true, rejected:true, in_transit:true, received:true, refunded:true, cancelled:true }) }}
+        recordCount={filteredReturns.length}
+      />
 
       {/* İçerik */}
       {isLoading ? (
