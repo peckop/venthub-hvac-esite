@@ -1,40 +1,60 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v))
 
-const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ children, maxTilt = 8 }) => {
-  const ref = useRef<HTMLDivElement | null>(null)
+const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ children, maxTilt = 14 }) => {
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const innerRef = useRef<HTMLDivElement | null>(null)
+  const [hover, setHover] = useState(false)
   const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
   if (isCoarse) {
     return <>{children}</>
   }
 
   const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    const el = ref.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
+    const container = wrapperRef.current
+    const el = innerRef.current
+    if (!el || !container) return
+    const rect = container.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width
     const y = (e.clientY - rect.top) / rect.height
     const rx = clamp((0.5 - y) * maxTilt, -maxTilt, maxTilt)
     const ry = clamp((x - 0.5) * maxTilt, -maxTilt, maxTilt)
-    el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`
+    container.style.setProperty('--px', `${Math.round(x * 100)}%`)
+    container.style.setProperty('--py', `${Math.round(y * 100)}%`)
+    el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0) scale(${hover ? 1.02 : 1})`
+  }
+
+  const onEnter: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    setHover(true)
+    onMove(e)
   }
 
   const onLeave: React.MouseEventHandler<HTMLDivElement> = () => {
-    const el = ref.current
+    setHover(false)
+    const el = innerRef.current
     if (!el) return
-    el.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0)'
+    el.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0) scale(1)'
   }
 
   return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className="transition-transform duration-200 will-change-transform"
-      style={{ transformStyle: 'preserve-3d' }}
-    >
-      {children}
+    <div ref={wrapperRef} onMouseMove={onMove} onMouseEnter={onEnter} onMouseLeave={onLeave} className="relative group">
+      <div
+        ref={innerRef}
+        className="transition-transform duration-300 will-change-transform"
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {children}
+      </div>
+      {/* Shine overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{
+          background:
+            'radial-gradient(140px circle at var(--px,50%) var(--py,50%), rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 60%)',
+          mixBlendMode: 'screen',
+        }}
+      />
     </div>
   )
 }
