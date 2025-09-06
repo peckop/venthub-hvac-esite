@@ -9,6 +9,11 @@
 - Users: Toolbar ile arama standardizasyonu
 - Görsel uyum: Tüm toolbar’larda bg-gray-50 + border ile ayrı panel hissi; “Grupla” gibi checkbox’lar Radix Switch’e geçirildi
 
+## 2025-09-06 (Homepage Cleanup)
+- Remove BrandFlow component; brand marquee flow integrated directly into BrandsShowcase (single-line, gapless, full-bleed)
+- HomePage ordering: BrandsShowcase moved after BentoGrid; Before/After moved under By Application; Resources placed under Product Gallery; Why VentHub moved under FAQ with softened transition; TrustSection moved to ProductsPage Discover
+- ProductsPage: add LeadModal for “Teklif Al”; fix Turkish placeholders; show TrustSection under Discover hero
+
 ## 2025-09-05 (Homepage Enhancements)
 - Add VisualShowcase (parallax + canvas particles + play/pause + keyboard/swipe)
 - Add ProductFlow (three-lane product image marquee; clickable brand cards fallback; reduced-motion static grid)

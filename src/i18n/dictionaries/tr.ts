@@ -30,9 +30,11 @@ export const tr = {
     notFound: "Sonuç bulunamadı",
     clearSearch: "Aramayı Temizle",
     searchPlaceholder: "Ürün adı, marka...",
+    searchPlaceholderLong: "Ürün adı, marka, model...",
     selectByNeed: "İhtiyacına Göre Seç",
     seeAllProducts: "Tüm Ürünleri Gör",
     backToTop: "Başa dön",
+    gotoCategory: "Kategoriye git",
     cancel: "İptal",
   },
   home: {

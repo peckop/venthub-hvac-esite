@@ -85,6 +85,35 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     navigate('/')
   }
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    try {
+      const atHome = window.location.pathname === '/'
+      const forceScrollTop = () => {
+        try {
+          // 1) Window
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          // 2) Scrolling element (Safari/older browsers)
+          const se = (document.scrollingElement || document.documentElement) as HTMLElement
+          if (se) se.scrollTop = 0
+          // 3) Body fallback
+          document.body && (document.body.scrollTop = 0)
+        } catch {}
+      }
+      if (atHome) {
+        e.preventDefault()
+        // Birkaç kez tetikle: anlık layout/raf gecikmelerine karşı dayanıklı
+        forceScrollTop()
+        requestAnimationFrame(forceScrollTop)
+        setTimeout(forceScrollTop, 50)
+      } else {
+        // Route değişiminde en üste al
+        setTimeout(() => {
+          forceScrollTop()
+        }, 0)
+      }
+    } catch {}
+  }
+
   return (
     <>
       {/* Skip to main content link for accessibility */}
@@ -97,7 +126,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 group">
+            <Link to="/" onClick={handleLogoClick} className="flex items-center space-x-3 group">
               <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-3 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
                 <div className="text-white font-bold text-xl">VH</div>
               </div>

@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { checkAdminAccess, listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 
 interface AdminUser {
   id: string
@@ -196,6 +197,16 @@ export default function AdminUsersPage() {
     }
   }
 
+  // Görünür kolonlar ve yoğunluk (erken - hooks unconditional)
+  const STORAGE_KEY = 'toolbar:users'
+  const [visibleCols, setVisibleCols] = useState<{ user: boolean; role: boolean; created: boolean; actions: boolean }>({ user: true, role: true, created: true, actions: true })
+  const [density, setDensity] = useState<Density>('comfortable')
+  useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
+  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
+  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+
   if (!isAdmin) {
     return (
       <div className="max-w-7xl mx-auto">
@@ -239,8 +250,21 @@ export default function AdminUsersPage() {
 
       {/* Arama */}
       <AdminToolbar
+        storageKey="toolbar:users"
         search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'E-posta veya isim ile ara', focusShortcut: '/' }}
         recordCount={(activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length}
+        rightExtra={(
+          <ColumnsMenu
+            columns={[
+              { key: 'user', label: 'Kullanıcı', checked: visibleCols.user, onChange: (v)=>setVisibleCols(s=>({ ...s, user: v })) },
+              { key: 'role', label: 'Role', checked: visibleCols.role, onChange: (v)=>setVisibleCols(s=>({ ...s, role: v })) },
+              { key: 'created', label: 'Kayıt Tarihi', checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
+              ...(activeTab==='all' ? [{ key: 'actions', label: 'İşlemler', checked: visibleCols.actions, onChange: (v: boolean)=>setVisibleCols(s=>({ ...s, actions: v })) }] : [])
+            ]}
+            density={density}
+            onDensityChange={setDensity}
+          />
+        )}
       />
 
       {/* İçerik */}
@@ -254,39 +278,45 @@ export default function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className={adminTableHeadCellClass}>Kullanıcı</th>
-                  <th className={adminTableHeadCellClass}>Role</th>
-                  <th className={adminTableHeadCellClass}>Kayıt Tarihi</th>
-                  {activeTab === 'all' && <th className={adminTableHeadCellClass}>İşlemler</th>}
+                  {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kullanıcı</th>)}
+                  {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Role</th>)}
+                  {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kayıt Tarihi</th>)}
+                  {activeTab === 'all' && visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>}
                 </tr>
               </thead>
               <tbody>
                 {(activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).map((userItem, index) => (
                   <tr key={userItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                    <td className={adminTableCellClass}>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-industrial-gray">{userItem.email}</span>
-                        {'full_name' in userItem && userItem.full_name && (
-                          <span className="text-xs text-steel-gray">{String(userItem.full_name)}</span>
-                        )}
-                        {'phone' in userItem && userItem.phone && (
-                          <span className="text-xs text-steel-gray">{String(userItem.phone)}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getRoleColor(userItem.role || 'user')}`}>
-                        {getRoleIcon(userItem.role || 'user')}
-                        {userItem.role || 'user'}
-                      </div>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <span className="text-steel-gray">
-                        {new Date(userItem.created_at).toLocaleDateString('tr-TR')}
-                      </span>
-                    </td>
-                    {activeTab === 'all' && (
-                      <td className="px-4 py-3">
+                    {visibleCols.user && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-industrial-gray">{userItem.email}</span>
+                          {'full_name' in userItem && userItem.full_name && (
+                            <span className="text-xs text-steel-gray">{String(userItem.full_name)}</span>
+                          )}
+                          {'phone' in userItem && userItem.phone && (
+                            <span className="text-xs text-steel-gray">{String(userItem.phone)}</span>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {visibleCols.role && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getRoleColor(userItem.role || 'user')}`}>
+                          {getRoleIcon(userItem.role || 'user')}
+                          {userItem.role || 'user'}
+                        </div>
+                      </td>
+                    )}
+                    {visibleCols.created && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <span className="text-steel-gray">
+                          {new Date(userItem.created_at).toLocaleDateString('tr-TR')}
+                        </span>
+                      </td>
+                    )}
+                    {activeTab === 'all' && visibleCols.actions && (
+                      <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
                         <div className="flex gap-1">
                           {userItem.role !== 'admin' && (
                             <button

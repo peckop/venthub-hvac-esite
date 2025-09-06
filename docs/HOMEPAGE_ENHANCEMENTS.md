@@ -4,7 +4,15 @@ Son güncelleme: 2025-09-05
 
 Bu doküman, VentHub ana sayfası için uygulanmış geliştirmeleri ve sıradaki etkileşimli bileşen önerilerini tek yerde toplar. Amaç: Kurumsallık, bilgi ve güveni öne çıkaran; React’in etkileşim gücünü gösteren modern bir deneyim.
 
-## 1) Uygulanan Geliştirmeler (2025-09-05)
+## 1) Uygulanan Geliştirmeler (2025-09-06 güncelleme ile)
+
+- BrandFlow bileşeni kaldırıldı; marka akışı (tek satır, boşluksuz, full-bleed) BrandsShowcase içine entegre edildi.
+- HomePage sıralama güncellendi:
+  - BentoGrid → Premium HVAC Markaları (BrandsShowcase) → Uygulamaya Göre Çözümler → Öncesi/Sonrası → Ürün Galerisi (full-bleed) → Kaynaklar/Kılavuzlar → Scroll-Linked Process → Magnetic CTA → SSS → Neden VentHub (yumuşatılmış geçiş) → Alt CTA.
+- Trust (Güven) bölümü ana sayfadan kaldırıldı; ProductsPage’de Keşfet hero altına taşındı.
+- Ürün Galerisi başlığı ve bazı kopyalar Türkçeleştirildi; i18n eksik anahtarlar eklendi.
+
+## (Önceki) 1) Uygulanan Geliştirmeler (2025-09-05)
 
 Uygulama odaklı kurgu, ürün satışına zorlamadan bilgilendirici bir akış sağlar. Uygulanan başlıca değişiklikler:
 
