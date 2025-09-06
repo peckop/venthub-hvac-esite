@@ -92,12 +92,9 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
       last = now
       if (!hover) {
         setOffset(prev => {
-          const dir = direction === -1 ? -1 : 1
-          let next = prev + dir * speed * dt
-          if (halfWidth > 0) {
-            if (dir === 1 && next >= halfWidth) next -= halfWidth
-            if (dir === -1 && next <= -halfWidth) next += halfWidth
-          }
+          // Baz referans: sola akış
+          let next = prev - speed * dt
+          if (halfWidth > 0 && next <= -halfWidth) next += halfWidth
           return next
         })
       }
@@ -105,11 +102,11 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
     }
     raf = requestAnimationFrame(step)
     return () => cancelAnimationFrame(raf)
-  }, [direction, speed, hover, halfWidth])
+  }, [speed, hover, halfWidth])
 
   return (
     <div className="relative overflow-hidden" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <div ref={trackRef} className="flex items-center gap-3 will-change-transform" style={{ transform: `translateX(${offset}px)` }}>
+      <div ref={trackRef} className="flex items-center gap-3 will-change-transform" style={{ transform: `translateX(${direction === -1 ? offset : -offset}px)` }}>
         {doubled.map((src, idx) => (
           <img
             key={idx}
@@ -200,23 +197,19 @@ const ProductFlow: React.FC = () => {
           const dt = (now - last) / 1000
           last = now
           if (!hover) setOffset(prev => {
-            const dir = direction === -1 ? -1 : 1
-            let next = prev + dir * speed * dt
-            if (halfWidth > 0) {
-              if (dir === 1 && next >= halfWidth) next -= halfWidth
-              if (dir === -1 && next <= -halfWidth) next += halfWidth
-            }
+            let next = prev - speed * dt
+            if (halfWidth > 0 && next <= -halfWidth) next += halfWidth
             return next
           })
           raf = requestAnimationFrame(step)
         }
         raf = requestAnimationFrame(step)
         return () => cancelAnimationFrame(raf)
-      }, [direction, speed, hover, halfWidth])
+      }, [speed, hover, halfWidth])
 
       return (
         <div className="relative overflow-hidden" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-          <div ref={trackRef} className="flex items-stretch gap-4 will-change-transform" style={{ transform: `translateX(${offset}px)` }}>
+          <div ref={trackRef} className="flex items-stretch gap-4 will-change-transform" style={{ transform: `translateX(${direction === -1 ? offset : -offset}px)` }}>
             {twice.map((p, idx) => (
               <Link key={p.id + '-' + idx} to={`/product/${p.id}`} className="group block">
                 <div className="h-28 sm:h-32 md:h-36 w-48 sm:w-56 md:w-64 rounded-xl bg-white border border-light-gray shadow-sm overflow-hidden flex items-center gap-3 px-3">
