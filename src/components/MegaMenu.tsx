@@ -15,6 +15,14 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   const { t } = useI18n()
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Debug
+  useEffect(() => {
+    console.log('[MegaMenu] isOpen:', isOpen)
+    if (isOpen) {
+      console.log('[MegaMenu] Menu opened - this might block navigation!')
+    }
+  }, [isOpen])
 
   useEffect(() => {
     async function fetchCategories() {
@@ -79,7 +87,10 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <Link
               to="/products"
-              onClick={onClose}
+              onClick={(e) => {
+                console.log('[MegaMenu] Products link clicked')
+                onClose()
+              }}
               className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-xl hover:from-secondary-blue hover:to-primary-navy transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <span className="font-bold">{t('common.products')}</span>

@@ -13,6 +13,7 @@ import BackToTopButton from './components/BackToTopButton'
 import AddToCartToast from './components/AddToCartToast'
 import LoadingSpinner from './components/LoadingSpinner'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { prefetchProductsPage } from './utils/prefetch'
 
 // Keep HomePage as direct import for fastest initial load
 import HomePage from './pages/HomePage'
@@ -63,6 +64,16 @@ const ReturnsPage = lazy(() => import('./pages/support/ReturnsPage'))
 const ShippingPage = lazy(() => import('./pages/support/ShippingPage'))
 const WarrantyPage = lazy(() => import('./pages/support/WarrantyPage'))
 
+// Knowledge hub & topics
+const KnowledgeHubPage = lazy(() => import('./pages/knowledge/HubPage'))
+const KnowledgeTopicPage = lazy(() => import('./pages/knowledge/TopicPage'))
+
+// Calculators (v1 skeletons)
+const HRVCalcPage = lazy(() => import('./pages/calculators/HRVCalcPage'))
+const AirCurtainCalcPage = lazy(() => import('./pages/calculators/AirCurtainCalcPage'))
+const JetFanCalcPage = lazy(() => import('./pages/calculators/JetFanCalcPage'))
+const DuctCalcPage = lazy(() => import('./pages/calculators/DuctCalcPage'))
+
 // Legal pages (lowest priority)
 const KVKKPage = lazy(() => import('./pages/legal/KVKKPage'))
 const DistanceSalesAgreementPage = lazy(() => import('./pages/legal/DistanceSalesAgreementPage'))
@@ -71,9 +82,19 @@ const CookiePolicyPage = lazy(() => import('./pages/legal/CookiePolicyPage'))
 const PrivacyPolicyPage = lazy(() => import('./pages/legal/PrivacyPolicyPage'))
 const TermsOfUsePage = lazy(() => import('./pages/legal/TermsOfUsePage'))
 
+// About page (simple corporate landing)
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+
 function App() {
   // Performance optimize edilmiş scroll handling
   const isScrolled = useScrollThrottle(100, 16)
+
+  // Prefetch ProductsPage chunk on idle so first navigation is instant
+  React.useEffect(() => {
+    const idle = (cb: () => void) => ("requestIdleCallback" in window ? (window as any).requestIdleCallback(cb) : setTimeout(cb, 600))
+    idle(() => prefetchProductsPage())
+  }, [])
 
   return (
     <AuthProvider>
@@ -92,9 +113,8 @@ function App() {
                 <BackToTopButton />
                 <PaymentWatcher />
                 <LanguageSwitcher />
-                <ErrorBoundary>
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <Routes>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/cart" element={<CartPage />} />
@@ -104,6 +124,10 @@ function App() {
                 <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
                 <Route path="/brands" element={<BrandsPage />} />
                 <Route path="/brands/:slug" element={<BrandDetailPage />} />
+
+                {/* Corporate */}
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminLayout />}>
@@ -138,6 +162,16 @@ function App() {
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
 
+                {/* Knowledge Routes */}
+                <Route path="/destek/merkez" element={<KnowledgeHubPage />} />
+                <Route path="/destek/konular/:slug" element={<KnowledgeTopicPage />} />
+
+                {/* Calculators (v1) */}
+                <Route path="/destek/hesaplayicilar/hrv" element={<HRVCalcPage />} />
+                <Route path="/destek/hesaplayicilar/hava-perdesi" element={<AirCurtainCalcPage />} />
+                <Route path="/destek/hesaplayicilar/jet-fan" element={<JetFanCalcPage />} />
+                <Route path="/destek/hesaplayicilar/kanal" element={<DuctCalcPage />} />
+
                 {/* Support Routes */}
                 <Route path="/support" element={<SupportHomePage />} />
                 <Route path="/support/sss" element={<FAQPage />} />
@@ -152,9 +186,8 @@ function App() {
                 <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
                 <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
                 <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
-                    </Routes>
-                  </Suspense>
-                </ErrorBoundary>
+                  </Routes>
+                </Suspense>
               </main>
 
               <Footer />

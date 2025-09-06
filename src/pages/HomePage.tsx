@@ -13,7 +13,6 @@ import MagneticCTA from '../components/MagneticCTA'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
 import ResourcesSection from '../components/ResourcesSection'
-import FAQShortSection from '../components/FAQShortSection'
 import ProductFlow from '../components/ProductFlow'
 import BeforeAfterSlider from '../components/BeforeAfterSlider'
 
@@ -112,10 +111,7 @@ export const HomePage: React.FC = () => {
 
 
 
-      {/* Sık Sorulanlar (alta yakın) */}
-      <FAQShortSection />
-
-      {/* Neden VentHub (SSS altına, geçişi yumuşatılmış) */}
+      {/* Neden VentHub (kurumsal blok) */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl bg-gradient-to-br from-primary-navy/90 to-secondary-blue/90 text-white p-8 sm:p-10 shadow-lg ring-1 ring-black/5">

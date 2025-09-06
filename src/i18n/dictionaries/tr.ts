@@ -14,6 +14,7 @@ export const tr = {
     signUp: "Kayıt Ol",
     skipToContent: "Ana içeriğe geç",
     searchHeaderPlaceholder: "Ürün, marka veya model ara...",
+    quickSearch: "Hızlı ara...",
 
     // Existing
     discover: "Keşfet",
@@ -36,6 +37,74 @@ export const tr = {
     backToTop: "Başa dön",
     gotoCategory: "Kategoriye git",
     cancel: "İptal",
+  },
+  resources: {
+    title: 'Kaynaklar ve Kılavuzlar',
+    allGuides: 'Tüm kılavuzlar',
+    items: {
+      jetFan: 'Otopark Jet Fan seçimi',
+      airCurtain: 'Hava perdesi seçimi',
+      hrv: 'Isı geri kazanım (HRV) rehberi'
+    }
+  },
+  knowledge: {
+    hub: {
+      title: 'Bilgi ve Kılavuz Merkezi',
+      subtitle: 'Doğru ürüne rahatça ulaşmanız için konu bazlı rehberler, (yakında) hesaplayıcılar ve seçim sihirbazı.',
+      searchPlaceholder: 'Konu ara…',
+      readMore: 'Devamını oku',
+      calculatorsSoon: 'Hesaplayıcılar (Yakında)',
+      calculatorsSoonDesc: 'HRV debi, jet fan kapsama, hava perdesi hız/debi ve kanal basınç kaybı.',
+      selectorSoon: 'Ürün Seçici (Yakında)',
+      selectorSoonDesc: '4–6 soruda ihtiyacınıza uygun ürün listesini oluşturun.'
+    },
+    tags: {
+      all: 'Tümü',
+      havaPerdesi: 'Hava Perdesi',
+      jetFan: 'Jet Fan',
+      hrv: 'HRV/ERV'
+    },
+    topic: {
+      notFoundTitle: 'Bilgi bulunamadı',
+      notFoundDesc: 'Aradığınız konu henüz eklenmemiş olabilir.',
+      backToHub: 'Merkeze dön',
+      stepsTitle: '3 adımda seçim',
+      pitfallsTitle: 'Sık hatalar',
+      toProducts: 'İlgili ürünlere git',
+      getQuote: 'Teklif Al'
+    },
+    topics: {
+      'hava-perdesi': {
+        title: 'Hava Perdesi',
+        summary: 'Girişlerde konforu korumak ve enerji kaybını azaltmak için kapı üstüne yerleştirilir; kapı genişliğini tam kapsamalıdır.',
+        steps: [
+          'Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).',
+          'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.',
+          'Nozül 10–15° iç mekâna eğimli; kapı kontağı ile otomatik hız.'
+        ],
+        pitfalls: ['Kısa cihaz kullanımı', 'Çok düşük hız', 'Nozülü dışa doğru eğmek']
+      },
+      'jet-fan': {
+        title: 'Jet Fan (Otopark)',
+        summary: 'CO/NOx ve duman senaryosu için akışı egzoza yönlendiren tavan fanları; kör nokta bırakmadan yerleşim gerekir.',
+        steps: [
+          'Debi: Hacim × ACH (ör. 7.200 m³ × 8 ACH ≈ 57.600 m³/h).',
+          'İtme kuvveti 50–100 N tipik; mesafe ve plana göre belirlenir.',
+          'Yerleşim: eksen aralığı 25–35 m; egzoza sürükleme; sensör zonları kapsansın.'
+        ],
+        pitfalls: ['Kör hacim bırakmak', 'Sensör kapsamasını atlamak']
+      },
+      hrv: {
+        title: 'Isı Geri Kazanım (HRV/ERV)',
+        summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
+        steps: [
+          'Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).',
+          'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).',
+          'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'
+        ],
+        pitfalls: ['Yüksek verime bakıp harici statik basıncı atlamak']
+      }
+    }
   },
   home: {
     features: {
