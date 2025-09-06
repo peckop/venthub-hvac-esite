@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 
 interface ReturnWithOrder {
   id: string
@@ -331,7 +332,7 @@ export default function AdminReturnsPage() {
   ]
 
   const nextStatuses: Record<string, string[]> = {
-    requested: ['approved', 'rejected'],
+    requested: ['approved', 'cancelled'],
     approved: ['in_transit', 'cancelled'],
     rejected: [],
     in_transit: ['received', 'cancelled'],
@@ -339,6 +340,16 @@ export default function AdminReturnsPage() {
     refunded: [],
     cancelled: []
   }
+
+  // Görünür kolonlar ve yoğunluk (erken - hooks unconditional)
+  const STORAGE_KEY = 'toolbar:returns'
+  const [visibleCols, setVisibleCols] = useState<{ order: boolean; customer: boolean; reason: boolean; status: boolean; date: boolean }>({ order: true, customer: true, reason: true, status: true, date: true })
+  const [density, setDensity] = useState<Density>('comfortable')
+  useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
+  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
+  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+  const cellPad = density==='compact' ? 'px-2 py-2' : ''
 
   if (!isAdmin) {
     return (
@@ -360,7 +371,21 @@ export default function AdminReturnsPage() {
 
       {/* Filtreler */}
       <AdminToolbar
+        storageKey="toolbar:returns"
         search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Sipariş no, müşteri adı, email veya sebep ile ara', focusShortcut: '/' }}
+        rightExtra={(
+          <ColumnsMenu
+            columns={[
+              { key: 'order', label: 'Sipariş', checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
+              { key: 'customer', label: 'Müşteri', checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
+              { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
+              { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+              { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+            ]}
+            density={density}
+            onDensityChange={setDensity}
+          />
+        )}
         chips={statusOptions.filter(o=>o.value!=='all').map(o => ({
           key: o.value,
           label: o.label,
@@ -390,12 +415,12 @@ export default function AdminReturnsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>Sipariş {sortIndicator('order')}</button></th>
-                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>Müşteri {sortIndicator('customer')}</button></th>
-                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button></th>
-                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>
-                  <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button></th>
-                  <th className={adminTableHeadCellClass}>İşlemler</th>
+                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>Sipariş {sortIndicator('order')}</button></th>)}
+                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>Müşteri {sortIndicator('customer')}</button></th>)}
+                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button></th>)}
+                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>)}
+                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button></th>)}
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>
@@ -406,50 +431,60 @@ export default function AdminReturnsPage() {
                   
                   return (
                     <tr key={returnItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                      <td className={adminTableCellClass}>
-                        <div className="flex flex-col">
-                          <button
-                            onClick={() => navigate(`/account/orders/${returnItem.order_id}`)}
-                            className="text-primary-navy hover:underline font-medium text-left"
-                          >
-                            {orderNo}
-                          </button>
-                          {returnItem.total_amount && (
-                            <span className="text-xs text-steel-gray">
-                              {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(returnItem.total_amount))}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className={adminTableCellClass}>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-industrial-gray">{returnItem.customer_name}</span>
-                          <span className="text-xs text-steel-gray">{returnItem.customer_email}</span>
-                        </div>
-                      </td>
-                      <td className={adminTableCellClass}>
-                        <div className="max-w-xs">
-                          <div className="font-medium text-industrial-gray">{returnItem.reason}</div>
-                          {returnItem.description && (
-                            <div className="text-xs text-steel-gray mt-1 truncate" title={returnItem.description}>
-                              {returnItem.description}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className={adminTableCellClass}>
-                        <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getStatusColor(returnItem.status)}`}>
-                          {getStatusIcon(returnItem.status)}
-                          {getStatusLabel(returnItem.status)}
-                        </div>
-                      </td>
-                      <td className={adminTableCellClass}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{new Date(returnItem.created_at).toLocaleDateString('tr-TR')}</span>
-                          <span className="text-xs text-steel-gray">{new Date(returnItem.created_at).toLocaleTimeString('tr-TR')}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
+                      {visibleCols.order && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className="flex flex-col">
+                            <button
+                              onClick={() => navigate(`/account/orders/${returnItem.order_id}`)}
+                              className="text-primary-navy hover:underline font-medium text-left"
+                            >
+                              {orderNo}
+                            </button>
+                            {returnItem.total_amount && (
+                              <span className="text-xs text-steel-gray">
+                                {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(returnItem.total_amount))}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                      {visibleCols.customer && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-industrial-gray">{returnItem.customer_name}</span>
+                            <span className="text-xs text-steel-gray">{returnItem.customer_email}</span>
+                          </div>
+                        </td>
+                      )}
+                      {visibleCols.reason && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className="max-w-xs">
+                            <div className="font-medium text-industrial-gray">{returnItem.reason}</div>
+                            {returnItem.description && (
+                              <div className="text-xs text-steel-gray mt-1 truncate" title={returnItem.description}>
+                                {returnItem.description}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                      {visibleCols.status && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getStatusColor(returnItem.status)}`}>
+                            {getStatusIcon(returnItem.status)}
+                            {getStatusLabel(returnItem.status)}
+                          </div>
+                        </td>
+                      )}
+                      {visibleCols.date && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{new Date(returnItem.created_at).toLocaleDateString('tr-TR')}</span>
+                            <span className="text-xs text-steel-gray">{new Date(returnItem.created_at).toLocaleTimeString('tr-TR')}</span>
+                          </div>
+                        </td>
+                      )}
+                      <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
                         <div className="flex gap-1">
                           {nextStatuses[returnItem.status]?.map(status => (
                             <button
