@@ -190,7 +190,9 @@ const ProductFlow: React.FC = () => {
 
     return (
       <section className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative w-screen left-1/2 -translate-x-1/2">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
           <div className="space-y-4">
             <LaneFallback items={FA} direction={1} speed={36} />
             <LaneFallback items={FB} direction={-1} speed={48} />
@@ -202,8 +204,10 @@ const ProductFlow: React.FC = () => {
   }
 
   return (
-    <section className="py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-8">
+      <div className="relative w-screen left-1/2 -translate-x-1/2">
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
         <div className="space-y-3">
           <Lane urls={A} direction={1} speed={36} />
           <Lane urls={B} direction={-1} speed={48} />

@@ -3,8 +3,8 @@ import { format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Download } from 'lucide-react'
+import ExportMenu from '../../components/admin/ExportMenu'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -282,6 +282,23 @@ const AdminOrdersPage: React.FC = () => {
     URL.revokeObjectURL(url)
   }
 
+  // Görünür kolonlar ve yoğunluk
+  const STORAGE_KEY = 'toolbar:orders'
+  const [visibleCols, setVisibleCols] = React.useState<{ id: boolean; status: boolean; conversation: boolean; amount: boolean; created: boolean }>({ id: true, status: true, conversation: true, amount: true, created: true })
+  const [density, setDensity] = React.useState<Density>('comfortable')
+  React.useEffect(()=>{
+    try {
+      const rawCols = localStorage.getItem(`${STORAGE_KEY}:cols`)
+      if (rawCols) setVisibleCols(prev=>({ ...prev, ...JSON.parse(rawCols) }))
+      const rawDen = localStorage.getItem(`${STORAGE_KEY}:density`)
+      if (rawDen === 'compact' || rawDen === 'comfortable') setDensity(rawDen as Density)
+    } catch {}
+  },[])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch {} }, [visibleCols])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch {} }, [density])
+  const colCount = 1 + (visibleCols.id?1:0) + (visibleCols.status?1:0) + (visibleCols.conversation?1:0) + (visibleCols.amount?1:0) + (visibleCols.created?1:0) + 1
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
@@ -290,6 +307,7 @@ const AdminOrdersPage: React.FC = () => {
 
       {/* Filters - AdminToolbar */}
       <AdminToolbar
+        storageKey="toolbar:orders"
         search={{ value: query, onChange: setQuery, placeholder: 'Order ID veya Conversation ID', focusShortcut: '/' }}
         select={{
           value: status,
@@ -303,24 +321,18 @@ const AdminOrdersPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger asChild>
-                <button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">
-                  <Download size={16} />
-                  Dışa Aktar
-                </button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content className="min-w-44 rounded-md bg-white shadow-lg border border-light-gray p-1">
-                  <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportOrdersCsv() }}>
-                    CSV (Excel uyumlu UTF‑8 BOM)
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportOrdersXls() }}>
-                    Excel (.xls — HTML tablo)
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
+            <ExportMenu items={[{ key: 'csv', label: 'CSV (Excel uyumlu UTF‑8 BOM)', onSelect: exportOrdersCsv }, { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportOrdersXls }]} />
+            <ColumnsMenu
+              columns={[
+                { key: 'id', label: 'Sipariş ID', checked: visibleCols.id, onChange: (v)=>setVisibleCols(s=>({ ...s, id: v })) },
+                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'conversation', label: 'Konuşma ID', checked: visibleCols.conversation, onChange: (v)=>setVisibleCols(s=>({ ...s, conversation: v })) },
+                { key: 'amount', label: 'Tutar', checked: visibleCols.amount, onChange: (v)=>setVisibleCols(s=>({ ...s, amount: v })) },
+                { key: 'created', label: 'Oluşturulma', checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
+              ]}
+              density={density}
+              onDensityChange={setDensity}
+            />
             <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
           </div>
         )}
@@ -350,34 +362,32 @@ const AdminOrdersPage: React.FC = () => {
         <table className="min-w-full text-sm">
           <thead>
             <tr>
-              <th className={adminTableHeadCellClass}></th>
-              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>Sipariş ID {sortIndicator('id')}</button></th>
-              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>
-              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>Konuşma ID {sortIndicator('conversation')}</button></th>
-              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>Tutar {sortIndicator('amount')}</button></th>
-              <th className={adminTableHeadCellClass}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>Oluşturma Tarihi {sortIndicator('created')}</button></th>
-              <th className={adminTableHeadCellClass}>İşlemler</th>
+              <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
+              {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>Sipariş ID {sortIndicator('id')}</button></th>)}
+              {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>)}
+              {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>Konuşma ID {sortIndicator('conversation')}</button></th>)}
+              {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>Tutar {sortIndicator('amount')}</button></th>)}
+              {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>Oluşturma Tarihi {sortIndicator('created')}</button></th>)}
+              <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>
             </tr>
           </thead>
           <tbody>
             {loading && rows.length === 0 ? (
-              <tr><td className="px-4 py-6" colSpan={5}>Yükleniyor...</td></tr>
+              <tr><td className="px-4 py-6" colSpan={colCount}>Yükleniyor...</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td className="px-4 py-6" colSpan={5}>Kayıt bulunamadı</td></tr>
+              <tr><td className="px-4 py-6" colSpan={colCount}>Kayıt bulunamadı</td></tr>
             ) : (
               sorted.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                  <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>{
+                  <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>{
                     setSelectedIds(prev => e.target.checked ? [...new Set([...prev, r.id])] : prev.filter(x=>x!==r.id))
                   }} /></td>
-                  <td className="px-4 py-3 font-mono text-xs">{r.id}</td>
-                  <td className="px-4 py-3">
-                    <span className={badgeClass(r.status)}>{prettyStatus(r.status)}</span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-industrial-gray">{r.conversation_id || '-'}</td>
-                  <td className="px-4 py-3">{formatAmount(r.total_amount)}</td>
-                  <td className="px-4 py-3">{safeDate(r.created_at)}</td>
-                  <td className="px-4 py-3">
+                  {visibleCols.id && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} font-mono text-xs`}>{r.id}</td>)}
+                  {visibleCols.status && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status)}</span></td>)}
+                  {visibleCols.conversation && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} text-xs text-industrial-gray`}>{r.conversation_id || '-'}</td>)}
+                  {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount)}</td>)}
+                  {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at)}</td>)}
+                  <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
                     <button
                       onClick={() => openShipModal(r.id)}
                       className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"

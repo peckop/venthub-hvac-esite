@@ -42,6 +42,8 @@ export type AdminToolbarProps = {
   recordCount?: number
   rightExtra?: React.ReactNode
   sticky?: boolean // if true, wraps in a sticky card like inventory page
+  storageKey?: string // kalıcılık için benzersiz anahtar (ör. 'toolbar:orders')
+  persist?: { search?: boolean; select?: boolean; chips?: boolean; toggles?: boolean }
 }
 
 const defaultChipOn = 'bg-light-gray text-industrial-gray border-light-gray'
@@ -56,8 +58,11 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   recordCount,
   rightExtra,
   sticky,
+  storageKey,
+  persist,
 }) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null)
+  const hydratedRef = React.useRef(false)
 
   React.useEffect(() => {
     const shortcut = (search?.focusShortcut || '/').trim()
@@ -81,6 +86,78 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     return () => window.removeEventListener('keydown', handler)
   }, [search?.focusShortcut])
 
+  // Kalıcılık: yükleme
+  React.useEffect(() => {
+    if (!storageKey) return
+    try {
+      const enable = {
+        search: persist?.search !== false,
+        select: persist?.select !== false,
+        chips: persist?.chips !== false,
+        toggles: persist?.toggles !== false,
+      }
+      const raw = localStorage.getItem(storageKey)
+      if (!raw) { hydratedRef.current = true; return }
+      const saved = JSON.parse(raw) as {
+        search?: string
+        select?: string
+        chips?: Record<string, boolean>
+        toggles?: Record<string, boolean>
+      }
+      // search/select controlled değerlerini parent'a yaz
+      if (enable.search && search && typeof saved.search === 'string' && saved.search !== search.value) {
+        search.onChange(saved.search)
+      }
+      if (enable.select && select && typeof saved.select === 'string' && saved.select !== select.value) {
+        select.onChange(saved.select)
+      }
+      // chips/toggles için farkları uygula (yalnızca bir kez)
+      if (enable.chips && chips && saved.chips) {
+        chips.forEach(ch => {
+          const want = saved.chips?.[ch.key]
+          if (typeof want === 'boolean' && want !== ch.active) {
+            ch.onToggle()
+          }
+        })
+      }
+      if (enable.toggles && toggles && saved.toggles) {
+        toggles.forEach(t => {
+          const want = saved.toggles?.[t.key]
+          if (typeof want === 'boolean' && want !== t.checked) {
+            t.onChange(want)
+          }
+        })
+      }
+    } catch {
+      // no-op
+    } finally {
+      hydratedRef.current = true
+    }
+  // chips/toggles dizileri her render'da yeni referans olabilir; mount'ta bir kez çalıştırmak yeterli.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey])
+
+  // Kalıcılık: kaydetme
+  React.useEffect(() => {
+    if (!storageKey || !hydratedRef.current) return
+    try {
+      const enable = {
+        search: persist?.search !== false,
+        select: persist?.select !== false,
+        chips: persist?.chips !== false,
+        toggles: persist?.toggles !== false,
+      }
+      const payload: Record<string, unknown> = {}
+      if (enable.search && search) payload.search = search.value
+      if (enable.select && select) payload.select = select.value
+      if (enable.chips && chips) payload.chips = Object.fromEntries(chips.map(c => [c.key, !!c.active]))
+      if (enable.toggles && toggles) payload.toggles = Object.fromEntries(toggles.map(t => [t.key, !!t.checked]))
+      localStorage.setItem(storageKey, JSON.stringify(payload))
+    } catch {
+      // no-op
+    }
+  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, search, search?.value, select, select?.value, chips, toggles])
+
   const Container: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
       <div className="rounded-md bg-gray-50 border border-light-gray p-3 md:p-3">
@@ -93,7 +170,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     <Container>
       <div className="flex flex-col gap-3">
         {/* Üst sıra: arama + select + sağ aksiyonlar */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {search && (
             <div className="flex-1 min-w-[240px]">
               <input
@@ -122,7 +199,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             </div>
           )}
 
-          <div className="ml-auto shrink-0 flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-3 flex-wrap w-full sm:w-auto justify-end">
             {toggles && toggles.length > 0 && (
               <div className="flex items-center gap-4">
                 {toggles.map(t => (
