@@ -64,7 +64,11 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
   const [halfWidth, setHalfWidth] = useState(0)
   const measureRef = useRef<() => void>(() => {})
 
-  const doubled = useMemo(() => [...urls, ...urls], [urls])
+  const doubled = useMemo(() => {
+    // Görsel yön illüzyonu için: tüm hareketler sola; üst/alt şeritlerde içerik ters sırada
+    const base = direction === 1 ? [...urls].reverse() : urls
+    return [...base, ...base]
+  }, [urls, direction])
 
   const measure = React.useCallback(() => {
     const el = trackRef.current
@@ -92,10 +96,10 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
       last = now
       if (!hover) {
         setOffset(prev => {
-          let next = prev + direction * speed * dt
-          if (halfWidth > 0) {
-            if (direction === 1 && next >= halfWidth) next -= halfWidth
-            if (direction === -1 && next <= -halfWidth) next += halfWidth
+          // Tüm şeritler sola doğru akar; wrap sürekli
+          let next = prev - speed * dt
+          if (halfWidth > 0 && next <= -halfWidth) {
+            next += halfWidth
           }
           return next
         })
@@ -180,7 +184,10 @@ const ProductFlow: React.FC = () => {
       const [hover, setHover] = useState(false)
       const [halfWidth, setHalfWidth] = useState(0)
 
-      const twice = useMemo(() => [...items, ...items], [items])
+      const twice = useMemo(() => {
+        const base = direction === 1 ? [...items].reverse() : items
+        return [...base, ...base]
+      }, [items, direction])
 
       useLayoutEffect(() => {
         const el = trackRef.current
@@ -199,10 +206,9 @@ const ProductFlow: React.FC = () => {
           const dt = (now - last) / 1000
           last = now
           if (!hover) setOffset(prev => {
-            let next = prev + direction * speed * dt
-            if (halfWidth > 0) {
-              if (direction === 1 && next >= halfWidth) next -= halfWidth
-              if (direction === -1 && next <= -halfWidth) next += halfWidth
+            let next = prev - speed * dt
+            if (halfWidth > 0 && next <= -halfWidth) {
+              next += halfWidth
             }
             return next
           })
