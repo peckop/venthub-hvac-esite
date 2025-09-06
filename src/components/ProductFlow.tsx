@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, startTransition } from 'react'
+import React, { useEffect, useMemo, useRef, useState, startTransition, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getFeaturedProducts, getProducts, Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
@@ -61,6 +61,28 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
   const trackRef = useRef<HTMLDivElement | null>(null)
   const [offset, setOffset] = useState(0)
   const [hover, setHover] = useState(false)
+  const [halfWidth, setHalfWidth] = useState(0)
+  const measureRef = useRef<() => void>(() => {})
+
+  const doubled = useMemo(() => [...urls, ...urls], [urls])
+
+  const measure = React.useCallback(() => {
+    const el = trackRef.current
+    if (!el) return
+    // Tek kopyanın genişliği
+    const hw = el.scrollWidth / 2
+    if (hw > 0) setHalfWidth(hw)
+  }, [])
+
+  measureRef.current = measure
+
+  useLayoutEffect(() => {
+    measure()
+    const onResize = () => measure()
+    window.addEventListener('resize', onResize)
+    const t = setTimeout(measure, 250)
+    return () => { window.removeEventListener('resize', onResize); clearTimeout(t) }
+  }, [measure, doubled])
 
   useEffect(() => {
     let raf = 0
@@ -70,8 +92,11 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
       last = now
       if (!hover) {
         setOffset(prev => {
-          const next = prev + direction * speed * dt
-          // büyük bir aralıkta mod almayı kolaylaştırmak için
+          let next = prev + direction * speed * dt
+          if (halfWidth > 0) {
+            if (direction === 1 && next >= halfWidth) next -= halfWidth
+            if (direction === -1 && next <= -halfWidth) next += halfWidth
+          }
           return next
         })
       }
@@ -79,13 +104,12 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
     }
     raf = requestAnimationFrame(step)
     return () => cancelAnimationFrame(raf)
-  }, [direction, speed, hover])
+  }, [direction, speed, hover, halfWidth])
 
-  // Sürekli akış için iki kopya render edilir
   return (
     <div className="relative overflow-hidden" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <div ref={trackRef} className="flex items-center gap-3 will-change-transform" style={{ transform: `translateX(${offset % -400}px)` }}>
-        {[...urls, ...urls].map((src, idx) => (
+      <div ref={trackRef} className="flex items-center gap-3 will-change-transform" style={{ transform: `translateX(${offset}px)` }}>
+        {doubled.map((src, idx) => (
           <img
             key={idx}
             src={src}
@@ -93,7 +117,7 @@ function Lane({ urls, direction, speed = 40 }: { urls: string[]; direction: 1 | 
             decoding="async"
             alt="product"
             className="h-24 sm:h-28 md:h-32 w-auto rounded-xl object-cover bg-gray-100 border border-light-gray shadow-sm"
-            onLoad={e => (e.currentTarget as HTMLImageElement).decode?.().catch(()=>{})}
+            onLoad={() => measureRef.current?.()}
           />
         ))}
       </div>
@@ -151,25 +175,46 @@ const ProductFlow: React.FC = () => {
     })()
 
     const LaneFallback = ({ items, direction, speed = 40 }: { items: Product[]; direction: 1 | -1; speed?: number }) => {
+      const trackRef = useRef<HTMLDivElement | null>(null)
       const [offset, setOffset] = useState(0)
       const [hover, setHover] = useState(false)
+      const [halfWidth, setHalfWidth] = useState(0)
+
+      const twice = useMemo(() => [...items, ...items], [items])
+
+      useLayoutEffect(() => {
+        const el = trackRef.current
+        if (!el) return
+        const measure = () => setHalfWidth(el.scrollWidth / 2)
+        measure()
+        window.addEventListener('resize', measure)
+        const t = setTimeout(measure, 250)
+        return () => { window.removeEventListener('resize', measure); clearTimeout(t) }
+      }, [twice])
+
       useEffect(() => {
         let raf = 0
         let last = performance.now()
         const step = (now: number) => {
           const dt = (now - last) / 1000
           last = now
-          if (!hover) setOffset(prev => prev + direction * speed * dt)
+          if (!hover) setOffset(prev => {
+            let next = prev + direction * speed * dt
+            if (halfWidth > 0) {
+              if (direction === 1 && next >= halfWidth) next -= halfWidth
+              if (direction === -1 && next <= -halfWidth) next += halfWidth
+            }
+            return next
+          })
           raf = requestAnimationFrame(step)
         }
         raf = requestAnimationFrame(step)
         return () => cancelAnimationFrame(raf)
-      }, [direction, speed, hover])
+      }, [direction, speed, hover, halfWidth])
 
-      const twice = [...items, ...items]
       return (
         <div className="relative overflow-hidden" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-          <div className="flex items-stretch gap-4 will-change-transform" style={{ transform: `translateX(${offset % -600}px)` }}>
+          <div ref={trackRef} className="flex items-stretch gap-4 will-change-transform" style={{ transform: `translateX(${offset}px)` }}>
             {twice.map((p, idx) => (
               <Link key={p.id + '-' + idx} to={`/product/${p.id}`} className="group block">
                 <div className="h-28 sm:h-32 md:h-36 w-48 sm:w-56 md:w-64 rounded-xl bg-white border border-light-gray shadow-sm overflow-hidden flex items-center gap-3 px-3">
