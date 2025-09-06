@@ -1,108 +1,45 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getProducts, Product } from '../lib/supabase'
-import ProductCard from '../components/ProductCard'
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
 import BrandsShowcase from '../components/BrandsShowcase'
-import CartToast from '../components/CartToast'
-import QuickViewModal from '../components/QuickViewModal'
 import { Star, TrendingUp, Clock } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import TiltCard from '../components/TiltCard'
 import BentoGrid from '../components/BentoGrid'
-import SpotlightList from '../components/SpotlightList'
 import ScrollLinkedProcess from '../components/ScrollLinkedProcess'
 import MagneticCTA from '../components/MagneticCTA'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
 import ResourcesSection from '../components/ResourcesSection'
-import TrustSection from '../components/TrustSection'
 import FAQShortSection from '../components/FAQShortSection'
-import VisualShowcase from '../components/VisualShowcase'
 import ProductFlow from '../components/ProductFlow'
 import BeforeAfterSlider from '../components/BeforeAfterSlider'
 
 export const HomePage: React.FC = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
-  const [newProducts, setNewProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [toastProduct, setToastProduct] = useState<Product | null>(null)
-  const [showToast, setShowToast] = useState(false)
-  const [quickViewOpen, setQuickViewOpen] = useState(false)
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
   const [leadOpen, setLeadOpen] = useState(false)
 
   const { t } = useI18n()
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const [productsData] = await Promise.all([
-          getProducts()
-        ])
 
-        // Featured products (is_featured = true)
-        const featured = productsData.filter(p => p.is_featured).slice(0, 8)
-        setFeaturedProducts(featured)
 
-        // New products (latest 8) - fallback to all non-featured products
-        const newItems = productsData
-          .filter(p => !p.is_featured)
-          .slice(0, 8)
-        setNewProducts(newItems)
-
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  const handleQuickView = (product: Product) => {
-    setQuickViewProduct(product)
-    setQuickViewOpen(true)
-  }
-
-  const closeToast = () => {
-    setShowToast(false)
-    setToastProduct(null)
-  }
 
   // Global lead modal trigger for HeroSection button
   ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy mx-auto mb-4"></div>
-          <p className="text-steel-gray">{t('common.loadingApp')}</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Visual Showcase (etkileşimli görsel akış) */}
-      <VisualShowcase />
-
-      {/* Product Flow (ürün görselleri akışı) */}
-      <ProductFlow />
-
       {/* Bento Grid (hover video önizleme) */}
       <BentoGrid />
 
-      {/* Spotlight List */}
-      <SpotlightList />
+      {/* Premium HVAC Markaları (BentoGrid sonrası) */}
+      <BrandsShowcase />
+
 
       {/* Uygulamaya Göre Çözümler */}
       <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
@@ -142,66 +79,28 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Why Choose Us Section (öne alındı) */}
-      <section className="py-16 bg-gradient-to-br from-primary-navy to-secondary-blue text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('common.whyUs')}
-            </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              {t('home.whyParagraph')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Star size={32} className="text-gold-accent" fill="currentColor" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.why.premiumTitle')}</h3>
-              <p className="text-blue-100">
-                {t('home.why.premiumText')}
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <TrendingUp size={32} className="text-success-green" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.why.expertTitle')}</h3>
-              <p className="text-blue-100">
-                {t('home.why.expertText')}
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Clock size={32} className="text-warning-orange" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">{t('home.why.fastTitle')}</h3>
-              <p className="text-blue-100">
-                {t('home.why.fastText')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust / Certifications */}
-      <TrustSection />
-
-      {/* FAQ Short Strip */}
-      <FAQShortSection />
-
-      {/* Before/After Slider */}
+      {/* Before/After Slider (Uygulamaya göre çözümler altı) */}
       <BeforeAfterSlider
         beforeSrc="/images/before_parking_jet_fan.jpg"
         afterSrc="/images/after_parking_jet_fan.jpg"
         alt="Otopark jet fan uygulaması öncesi/sonrası"
       />
 
-      {/* Resources */}
+
+
+
+
+
+      {/* Ürün Galerisi başlık + akış */}
+      <section className="pt-8 pb-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Ürün Galerisi</h2>
+          <p className="text-steel-gray mt-2">Portföyümüzden seçilmiş ürün görselleri</p>
+        </div>
+      </section>
+      <ProductFlow />
+
+      {/* Resources (Ürün görsel akışının altında) */}
       <ResourcesSection />
 
       {/* Scroll-Linked Process */}
@@ -210,57 +109,59 @@ export const HomePage: React.FC = () => {
       {/* Magnetic CTA */}
       <MagneticCTA />
 
-      {/* Featured Products */}
-      {featuredProducts.length > 0 && (
-        <section className="py-16 bg-light-gray">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center mb-12">
-              <Star className="text-gold-accent mr-3" size={28} fill="currentColor" />
-              <h2 className="text-3xl md:text-4xl font-bold text-industrial-gray">
-                {t('common.featured')}
+
+
+
+      {/* Sık Sorulanlar (alta yakın) */}
+      <FAQShortSection />
+
+      {/* Neden VentHub (SSS altına, geçişi yumuşatılmış) */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl bg-gradient-to-br from-primary-navy/90 to-secondary-blue/90 text-white p-8 sm:p-10 shadow-lg ring-1 ring-black/5">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                {t('common.whyUs')}
               </h2>
+              <p className="text-xl text-blue-100/90 max-w-3xl mx-auto">
+                {t('home.whyParagraph')}
+              </p>
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.slice(0,4).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onQuickView={handleQuickView}
-                  highlightFeatured
-                />
-              ))}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <Star size={32} className="text-gold-accent" fill="currentColor" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{t('home.why.premiumTitle')}</h3>
+                <p className="text-blue-100">
+                  {t('home.why.premiumText')}
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp size={32} className="text-success-green" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{t('home.why.expertTitle')}</h3>
+                <p className="text-blue-100">
+                  {t('home.why.expertText')}
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <Clock size={32} className="text-warning-orange" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{t('home.why.fastTitle')}</h3>
+                <p className="text-blue-100">
+                  {t('home.why.fastText')}
+                </p>
+              </div>
             </div>
           </div>
-        </section>
-      )}
-
-      {/* Brands Showcase */}
-      <BrandsShowcase />
-
-      {/* New Products */}
-      {newProducts.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center mb-12">
-              <Clock className="text-secondary-blue mr-3" size={28} />
-              <h2 className="text-3xl md:text-4xl font-bold text-industrial-gray">
-                {t('common.newProducts')}
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {newProducts.slice(0,4).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onQuickView={handleQuickView}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Alt CTA */}
       <section className="py-12">
@@ -285,17 +186,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Cart Toast */}
-      <CartToast
-        isVisible={showToast}
-        product={toastProduct}
-        onClose={closeToast}
-      />
-      <QuickViewModal
-        product={quickViewProduct}
-        open={quickViewOpen}
-        onClose={() => { setQuickViewOpen(false); setQuickViewProduct(null) }}
-      />
       <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
     </div>
   )

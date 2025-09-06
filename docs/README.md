@@ -76,6 +76,7 @@ proje/
 ## Yeni Doküman
 
 - HOMEPAGE_ENHANCEMENTS.md — Ana sayfa geliştirmeleri ve etkileşimli bileşen backlog’u (2025-09-05)
+- admin-toolbar.md — AdminToolbar kılavuzu: API, düzen, export, kalıcılık planı (2025-09-05)
 
 ## 🔄 Güncel Tutma
 

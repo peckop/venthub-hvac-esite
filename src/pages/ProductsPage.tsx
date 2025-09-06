@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
+import TrustSection from '../components/TrustSection'
+import LeadModal from '../components/LeadModal'
 import { Grid, List, Search, Star, Clock, BadgeCheck, ShieldCheck, Layers } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
@@ -12,9 +14,13 @@ import { useI18n } from '../i18n/I18nProvider'
 
 const ProductsPage: React.FC = () => {
   const location = useLocation()
+  const [leadOpen, setLeadOpen] = useState(false)
   const params = new URLSearchParams(location.search)
   const q = params.get('q')?.trim() || ''
   const { t } = useI18n()
+
+  // Teklif/lead modalını global tetikleyiciye bağla (sayfa içinde kullanılacak)
+  ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
   const [featured, setFeatured] = useState<Product[]>([])
   const [newProducts, setNewProducts] = useState<Product[]>([])
@@ -193,7 +199,7 @@ const ProductsPage: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
               <input
                 type="text"
-                placeholder={t('common.searchPlaceholder')}
+placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full sm:w-72 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
@@ -205,6 +211,7 @@ const ProductsPage: React.FC = () => {
 
       {/* Keşfet hero (yalnızca Keşfet modunda) */}
       {!isAll && !searchQuery && (
+        <>
         <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
           <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div>
@@ -220,9 +227,9 @@ const ProductsPage: React.FC = () => {
               </div>
               <div className="relative mt-6 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
-                <input
+                  <input
                   type="text"
-                  placeholder={t('common.searchPlaceholderLong')}
+placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
@@ -253,6 +260,9 @@ const ProductsPage: React.FC = () => {
             </div>
           </div>
         </section>
+        {/* Keşfet kahramanının hemen altında Güven/Uygunluk */}
+        <TrustSection />
+        </>
       )}
 
       {/* All products modu */}
@@ -410,6 +420,7 @@ onClick={() => {
           <BrandsShowcase />
         </>
       )}
+      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
     </div>
   )
 }

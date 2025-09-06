@@ -2,8 +2,8 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Download } from 'lucide-react'
+import ExportMenu from '../../components/admin/ExportMenu'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 
 type Movement = {
   id: string
@@ -208,11 +208,29 @@ const AdminMovementsPage: React.FC = () => {
     URL.revokeObjectURL(url)
   }
 
+  // Görünür kolonlar ve yoğunluk
+  const STORAGE_KEY = 'toolbar:movements'
+  const [visibleCols, setVisibleCols] = React.useState<{ date: boolean; product: boolean; delta: boolean; reason: boolean; ref: boolean }>({ date: true, product: true, delta: true, reason: true, ref: true })
+  const [density, setDensity] = React.useState<Density>('comfortable')
+  React.useEffect(()=>{
+    try {
+      const rawCols = localStorage.getItem(`${STORAGE_KEY}:cols`)
+      if (rawCols) setVisibleCols(prev=>({ ...prev, ...JSON.parse(rawCols) }))
+      const rawDen = localStorage.getItem(`${STORAGE_KEY}:density`)
+      if (rawDen === 'compact' || rawDen === 'comfortable') setDensity(rawDen as Density)
+    } catch {}
+  },[])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch {} }, [visibleCols])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch {} }, [density])
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>Hareket Defteri</h1>
 
       <AdminToolbar
+        storageKey="toolbar:movements"
         search={{ value: q, onChange: setQ, placeholder: 'Ürün adı/SKU ara', focusShortcut: '/' }}
         select={{
           value: selectedCategory,
@@ -237,21 +255,20 @@ const AdminMovementsPage: React.FC = () => {
         }}
         recordCount={filtered.length}
         rightExtra={(
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">
-                <Download size={16} />
-                Dışa Aktar
-              </button>
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content className="min-w-40 rounded-md bg-white shadow-lg border border-light-gray p-1">
-                <DropdownMenu.Item className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer" onSelect={(e)=>{ e.preventDefault(); exportCsv() }}>
-                  CSV (görünür filtrelerle)
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+          <div className="flex items-center gap-2">
+            <ExportMenu items={[{ key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv }]} />
+            <ColumnsMenu
+              columns={[
+                { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+                { key: 'product', label: 'Ürün', checked: visibleCols.product, onChange: (v)=>setVisibleCols(s=>({ ...s, product: v })) },
+                { key: 'delta', label: 'Delta', checked: visibleCols.delta, onChange: (v)=>setVisibleCols(s=>({ ...s, delta: v })) },
+                { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
+                { key: 'ref', label: 'Referans', checked: visibleCols.ref, onChange: (v)=>setVisibleCols(s=>({ ...s, ref: v })) },
+              ]}
+              density={density}
+              onDensityChange={setDensity}
+            />
+          </div>
         )}
       />
 
@@ -259,38 +276,58 @@ const AdminMovementsPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className={`${adminTableHeadCellClass} text-sm font-semibold text-industrial-gray`}>
-                <button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button>
-              </th>
-              <th className={`${adminTableHeadCellClass} text-sm font-semibold text-industrial-gray`}>
-                <button type="button" className="hover:underline" onClick={()=>toggleSort('product')}>Ürün {sortIndicator('product')}</button>
-              </th>
-              <th className={`${adminTableHeadCellClass} text-sm font-semibold text-industrial-gray text-right`}>
-                <button type="button" className="hover:underline" onClick={()=>toggleSort('delta')}>Delta {sortIndicator('delta')}</button>
-              </th>
-              <th className={`${adminTableHeadCellClass} text-sm font-semibold text-industrial-gray`}>
-                <button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button>
-              </th>
-              <th className={`${adminTableHeadCellClass} text-sm font-semibold text-industrial-gray`}>
-                <button type="button" className="hover:underline" onClick={()=>toggleSort('ref')}>Referans {sortIndicator('ref')}</button>
-              </th>
+              {visibleCols.date && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button>
+                </th>
+              )}
+              {visibleCols.product && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('product')}>Ürün {sortIndicator('product')}</button>
+                </th>
+              )}
+              {visibleCols.delta && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('delta')}>Delta {sortIndicator('delta')}</button>
+                </th>
+              )}
+              {visibleCols.reason && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button>
+                </th>
+              )}
+              {visibleCols.ref && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('ref')}>Referans {sortIndicator('ref')}</button>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {sorted.map(m => (
               <tr key={m.id} className="border-b">
-                <td className={adminTableCellClass}>{new Date(m.created_at).toLocaleString('tr-TR')}</td>
-                <td className={adminTableCellClass}>
-                  <div className="flex flex-col">
-                    <span>{productMap[m.product_id]?.name || m.product_id}</span>
-                    {productMap[m.product_id]?.sku && (
-                      <span className="text-xs text-steel-gray">{productMap[m.product_id]?.sku}</span>
-                    )}
-                  </div>
-                </td>
-                <td className="p-3 text-right font-mono">{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
-                <td className={adminTableCellClass}>{reasonLabel(m.reason)}</td>
-                <td className={adminTableCellClass}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
+                {visibleCols.date && (
+                  <td className={`${adminTableCellClass} ${cellPad}`}>{new Date(m.created_at).toLocaleString('tr-TR')}</td>
+                )}
+                {visibleCols.product && (
+                  <td className={`${adminTableCellClass} ${cellPad}`}>
+                    <div className="flex flex-col">
+                      <span>{productMap[m.product_id]?.name || m.product_id}</span>
+                      {productMap[m.product_id]?.sku && (
+                        <span className="text-xs text-steel-gray">{productMap[m.product_id]?.sku}</span>
+                      )}
+                    </div>
+                  </td>
+                )}
+                {visibleCols.delta && (
+                  <td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right font-mono`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
+                )}
+                {visibleCols.reason && (
+                  <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason)}</td>
+                )}
+                {visibleCols.ref && (
+                  <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
+                )}
               </tr>
             ))}
           </tbody>
