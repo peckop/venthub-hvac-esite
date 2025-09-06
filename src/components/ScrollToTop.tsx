@@ -9,22 +9,19 @@ const ScrollToTop = () => {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    // RAF kullanarak DOM güncellenene kadar bekle
-    const scrollToTop = () => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth' // Mevcut smooth scroll davranışını koru
-      })
+    console.log('[ScrollToTop] pathname changed to:', pathname)
+    
+    // ScrollToTop'u tamamen devre dışı bırakalım
+    // Navigasyon sorununu çözmek için
+    return
+    
+    // Aşağıdaki kod şu an devre dışı
+    /*
+    if (pathname === '/') {
+      return
     }
-
-    // Sayfa geçişinde kısa bir gecikme ile scroll
-    // DOM'un render edilmesini bekle
-    const timeoutId = setTimeout(() => {
-      requestAnimationFrame(scrollToTop)
-    }, 0)
-
-    return () => clearTimeout(timeoutId)
+    window.scrollTo(0, 0)
+    */
   }, [pathname]) // pathname değiştiğinde tetikle
 
   return null // UI render etmez

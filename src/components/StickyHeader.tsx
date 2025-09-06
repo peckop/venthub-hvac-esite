@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown } from 'lucide-react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Package, Star, Clock, TrendingUp, Zap, Grid3X3 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
-import { searchProducts, Product } from '../lib/supabase'
+import { searchProducts, Product, getCategories, Category } from '../lib/supabase'
 import { checkAdminAccess } from '../config/admin'
 import MegaMenu from './MegaMenu'
 import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
 import { trackEvent } from '../utils/analytics'
+import { prefetchProductsPage } from '../utils/prefetch'
+import { getCategoryIcon } from '../utils/getCategoryIcon'
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -21,12 +23,25 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [searchResults, setSearchResults] = useState<Product[]>([])
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const { getCartCount, syncing } = useCart()
+  const [stickySearchQuery, setStickySearchQuery] = useState('')
+  const [stickySearchResults, setStickySearchResults] = useState<Product[]>([])
+  const [isStickySearchOpen, setIsStickySearchOpen] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  const { getCartCount, syncing, getCartTotal } = useCart()
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
   const navigate = useNavigate()
   const searchRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
+  const stickySearchRef = useRef<HTMLDivElement>(null)
+  const categoriesRef = useRef<HTMLDivElement>(null)
+  
+  // Debug: Navigation monitoring
+  useEffect(() => {
+    console.log('[StickyHeader] Component rendered, isScrolled:', isScrolled)
+  })
 
   // Handle search
   useEffect(() => {
@@ -49,7 +64,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     return () => clearTimeout(delayedSearch)
   }, [searchQuery])
 
-  // Close search and user menu when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -58,11 +73,68 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
+      if (stickySearchRef.current && !stickySearchRef.current.contains(event.target as Node)) {
+        setIsStickySearchOpen(false)
+      }
+      if (categoriesRef.current && !categoriesRef.current.contains(event.target as Node)) {
+        setIsCategoriesOpen(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Scroll progress tracker
+  useEffect(() => {
+    const handleScroll = () => {
+      const winScroll = document.documentElement.scrollTop
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
+      const scrolled = (winScroll / height) * 100
+      setScrollProgress(scrolled)
+    }
+
+    if (isScrolled) {
+      window.addEventListener('scroll', handleScroll)
+      handleScroll()
+    }
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isScrolled])
+
+  // Fetch categories for quick access
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const data = await getCategories()
+        setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  // Handle sticky search
+  useEffect(() => {
+    const delayedSearch = setTimeout(async () => {
+      if (stickySearchQuery.trim().length > 2) {
+        try {
+          const results = await searchProducts(stickySearchQuery.trim())
+          setStickySearchResults(results.slice(0, 5)) // Max 5 results in sticky
+          setIsStickySearchOpen(true)
+        } catch (error) {
+          console.error('Sticky search error:', error)
+          setStickySearchResults([])
+        }
+      } else {
+        setStickySearchResults([])
+        setIsStickySearchOpen(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(delayedSearch)
+  }, [stickySearchQuery])
 
   const handleProductClick = (productId: string) => {
     navigate(`/product/${productId}`)
@@ -85,36 +157,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     navigate('/')
   }
 
-  const handleLogoClick = (e: React.MouseEvent) => {
-    try {
-      const atHome = window.location.pathname === '/'
-      const forceScrollTop = () => {
-        try {
-          // 1) Window
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-          // 2) Scrolling element (Safari/older browsers)
-          const se = (document.scrollingElement || document.documentElement) as HTMLElement
-          if (se) se.scrollTop = 0
-          // 3) Body fallback
-          if (document.body) {
-            document.body.scrollTop = 0
-          }
-        } catch {}
-      }
-      if (atHome) {
-        e.preventDefault()
-        // Birkaç kez tetikle: anlık layout/raf gecikmelerine karşı dayanıklı
-        forceScrollTop()
-        requestAnimationFrame(forceScrollTop)
-        setTimeout(forceScrollTop, 50)
-      } else {
-        // Route değişiminde en üste al
-        setTimeout(() => {
-          forceScrollTop()
-        }, 0)
-      }
-    } catch {}
-  }
+  // Logo click handler kaldırıldı - navigasyon sorunlarını önlemek için
 
   return (
     <>
@@ -128,7 +171,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" onClick={handleLogoClick} className="flex items-center space-x-3 group">
+            <Link to="/" className="flex items-center space-x-3 group">
               <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-3 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
                 <div className="text-white font-bold text-xl">VH</div>
               </div>
@@ -153,7 +196,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </button>
               <Link
                 to="/products"
-                onClick={() => trackEvent('nav_click', { target: 'products' })}
+                onClick={(e) => {
+                  console.log('[Header] Products link clicked, pathname:', window.location.pathname)
+                  console.log('[Header] isMenuOpen:', isMenuOpen)
+                }}
+                onMouseEnter={() => prefetchProductsPage()}
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
               >
                 {t('common.products')}
@@ -339,52 +386,216 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         </div>
       </header>
 
-      {/* Enhanced Sticky Compact Header */}
+      {/* Enhanced Full-Featured Sticky Header */}
       {isScrolled && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-all duration-500 animate-slideDown">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-14">
-              <Link to="/" className="flex items-center space-x-2 group">
-                <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-                  <div className="text-white font-bold text-sm">VH</div>
-                </div>
-                <span className="font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
-                  VentHub
-                </span>
-              </Link>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setIsMenuOpen(true)}
-                  className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
-                >
-                  <Menu size={18} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
-                </button>
-                <Link
-                  to="/cart"
-                  className="relative p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
-                >
-                  <ShoppingCart size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
-                  {getCartCount() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                      {getCartCount()}
-                    </span>
-                  )}
+        <>
+          {/* Progress Bar */}
+          <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50">
+            <div 
+              className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
+          
+          <div className="fixed top-1 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-all duration-500 animate-slideDown">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between h-16">
+                {/* Logo */}
+                <Link to="/" className="flex items-center space-x-2 group flex-shrink-0">
+                  <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                    <div className="text-white font-bold text-sm">VH</div>
+                  </div>
+                  <span className="hidden sm:block font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
+                    VentHub
+                  </span>
                 </Link>
-                {user && (
-                  <>
+
+                {/* Quick Navigation */}
+                <nav className="hidden lg:flex items-center space-x-1 mx-4">
+                  <Link
+                    to="/products"
+                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                  >
+                    {t('common.products')}
+                  </Link>
+                  
+                  {/* Categories Dropdown */}
+                  <div className="relative" ref={categoriesRef}>
+                    <button
+                      onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                    >
+                      <Grid3X3 size={16} />
+                      <span>{t('common.categories')}</span>
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {isCategoriesOpen && (
+                      <div className="absolute top-full left-0 mt-1 w-64 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl overflow-hidden">
+                        <div className="p-2 max-h-96 overflow-y-auto">
+                          {categories.map((cat) => (
+                            <Link
+                              key={cat.id}
+                              to={`/category/${cat.slug}`}
+                              onClick={() => setIsCategoriesOpen(false)}
+                              className="flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                            >
+                              <div className="text-primary-navy">
+                                {getCategoryIcon(cat.slug, { size: 18 })}
+                              </div>
+                              <span className="text-sm font-medium text-industrial-gray hover:text-primary-navy">
+                                {cat.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <Link
+                    to="/brands"
+                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                  >
+                    {t('common.brands')}
+                  </Link>
+                </nav>
+
+                {/* Sticky Search Bar */}
+                <div className="flex-1 max-w-sm mx-2 relative" ref={stickySearchRef}>
+                  <form onSubmit={(e) => {
+                    e.preventDefault()
+                    if (stickySearchQuery.trim()) {
+                      navigate(`/products?q=${encodeURIComponent(stickySearchQuery.trim())}`)
+                      setStickySearchQuery('')
+                      setIsStickySearchOpen(false)
+                    }
+                  }}>
+                    <div className="relative group">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors" size={16} />
+                      <input
+                        type="text"
+                        placeholder={t('common.quickSearch')}
+                        value={stickySearchQuery}
+                        onChange={(e) => setStickySearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
+                      />
+                      {/* Quick search hint */}
+                      <kbd className="hidden lg:block absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-steel-gray/50 font-mono">/</kbd>
+                    </div>
+                  </form>
+
+                  {/* Sticky Search Results */}
+                  {isStickySearchOpen && stickySearchResults.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+                      {stickySearchResults.map((product) => (
+                        <button
+                          key={product.id}
+                          onClick={() => {
+                            navigate(`/product/${product.id}`)
+                            setStickySearchQuery('')
+                            setIsStickySearchOpen(false)
+                          }}
+                          className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 text-left transition-all duration-200"
+                        >
+                          <BrandIcon brand={product.brand} />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-industrial-gray truncate">{product.name}</div>
+                            <div className="text-xs text-steel-gray">{product.brand}</div>
+                          </div>
+                          <div className="text-sm font-bold text-primary-navy">
+                            ₺{parseFloat(product.price).toLocaleString('tr-TR')}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Smart Actions & Right Icons */}
+                <div className="flex items-center space-x-1">
+                  {/* Quick Order Button */}
+                  <button
+                    onClick={() => navigate('/products?sort=bestsellers')}
+                    className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
+                    title="Hızlı Sipariş"
+                  >
+                    <Zap size={16} className="text-warning-orange group-hover:animate-pulse" />
+                    <span className="hidden 2xl:block">Hızlı Sipariş</span>
+                  </button>
+
+                  {/* Recent Products */}
+                  {typeof window !== 'undefined' && window.localStorage.getItem('recentProducts') && (
+                    <button
+                      onClick={() => {
+                        const recent = JSON.parse(window.localStorage.getItem('recentProducts') || '[]')
+                        if (recent.length > 0) navigate(`/product/${recent[0]}`)
+                      }}
+                      className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                      title="Son Görüntülenen"
+                    >
+                      <Clock size={16} className="text-steel-gray group-hover:text-primary-navy" />
+                    </button>
+                  )}
+
+                  {/* Favorites (placeholder for future) */}
+                  <button
+                    onClick={() => navigate('/account/favorites')}
+                    className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                    title="Favoriler"
+                  >
+                    <Star size={16} className="text-steel-gray group-hover:text-gold-accent" />
+                  </button>
+
+                  {/* Menu Button */}
+                  <button
+                    onClick={() => setIsMenuOpen(true)}
+                    className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                  >
+                    <Menu size={18} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
+                  </button>
+
+                  {/* Cart with Total */}
+                  <Link
+                    to="/cart"
+                    className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
+                  >
+                    <div className="relative">
+                      <ShoppingCart size={18} className="text-steel-gray group-hover:text-success-green transition-all duration-300" />
+                      {getCartCount() > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
+                          {getCartCount()}
+                        </span>
+                      )}
+                    </div>
+                    {getCartTotal && getCartTotal() > 0 && (
+                      <span className="hidden xl:block text-sm font-bold text-success-green">
+                        ₺{getCartTotal().toLocaleString('tr-TR')}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* User Menu */}
+                  {user ? (
                     <Link
                       to="/account"
-                      className="p-2 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-lg transition-all duration-300 group"
+                      className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     >
                       <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
                     </Link>
-                  </>
-                )}
+                  ) : (
+                    <Link
+                      to="/auth/login"
+                      className="px-3 py-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-300"
+                    >
+                      {t('common.signIn')}
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Mega Menu */}

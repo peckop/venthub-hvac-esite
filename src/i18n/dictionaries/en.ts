@@ -37,6 +37,74 @@ export const en = {
     gotoCategory: "Go to category",
     cancel: "Cancel",
   },
+  resources: {
+    title: 'Resources & Guides',
+    allGuides: 'All guides',
+    items: {
+      jetFan: 'Parking Jet Fan selection',
+      airCurtain: 'Air curtain selection',
+      hrv: 'Heat recovery (HRV) guide'
+    }
+  },
+  knowledge: {
+    hub: {
+      title: 'Knowledge & Guides Center',
+      subtitle: 'Topic-based guides with (coming soon) calculators and a selection wizard to help you choose the right product.',
+      searchPlaceholder: 'Search topic…',
+      readMore: 'Read more',
+      calculatorsSoon: 'Calculators (Coming Soon)',
+      calculatorsSoonDesc: 'HRV airflow, jet fan coverage, air curtain velocity/flow and duct pressure drop.',
+      selectorSoon: 'Product Selector (Coming Soon)',
+      selectorSoonDesc: 'Build a product list in 4–6 questions.'
+    },
+    tags: {
+      all: 'All',
+      havaPerdesi: 'Air Curtain',
+      jetFan: 'Jet Fan',
+      hrv: 'HRV/ERV'
+    },
+    topic: {
+      notFoundTitle: 'Topic not found',
+      notFoundDesc: 'The topic you are looking for may not be added yet.',
+      backToHub: 'Back to hub',
+      stepsTitle: '3-step selection',
+      pitfallsTitle: 'Common pitfalls',
+      toProducts: 'Go to related products',
+      getQuote: 'Get a Quote'
+    },
+    topics: {
+      'hava-perdesi': {
+        title: 'Air Curtain',
+        summary: 'Installed above entrances to preserve comfort and reduce energy loss; device should fully cover door width.',
+        steps: [
+          'Door width = device width (unbroken barrier).',
+          'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.',
+          'Nozzle tilted 10–15° inwards; auto speed via door contact.'
+        ],
+        pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward']
+      },
+      'jet-fan': {
+        title: 'Jet Fan (Parking)',
+        summary: 'Ceiling fans that direct flow to exhaust for CO/NOx and smoke scenarios; layout must avoid dead zones.',
+        steps: [
+          'Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).',
+          'Thrust 50–100 N typical; pick by distance and plan.',
+          'Layout: axis spacing 25–35 m; drive to exhaust; cover sensor zones.'
+        ],
+        pitfalls: ['Leaving dead zones', 'Missing sensor coverage']
+      },
+      hrv: {
+        title: 'Heat Recovery (HRV/ERV)',
+        summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
+        steps: [
+          'Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).',
+          'Efficiency/SFP: 70–85% efficiency, low SFP.',
+          'Pressure: external static matching filter/duct losses.'
+        ],
+        pitfalls: ['Focusing on efficiency while ignoring external static']
+      }
+    }
+  },
   home: {
     features: {
       euQuality: "European quality standards",

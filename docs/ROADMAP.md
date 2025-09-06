@@ -103,6 +103,23 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - KVKK/GDPR self‑service (veri indirme, silme talebi vb.)
 - Performans: dynamic import / manualChunks ile code‑split ve bundle küçültme
 
+### Bilgi & Kılavuz Merkezi (Yeni Yol Haritası Bağlantısı)
+- Referans belge: docs/VENTHUB_BILGI_MERKEZI_GELISMIS.md
+- Sprint 1 (Kısa vade)
+  - [ ] /destek/merkez (Hub) sayfası
+  - [ ] 3 konu: Hava Perdesi, Jet Fan, HRV (kısa içerik + çift CTA)
+  - [ ] v1 hesaplayıcılar: HRV, Hava Perdesi, Jet Fan, Kanal hız/Δp (ön-boyutlandırma)
+  - [ ] Ürün filtre eşlemesi ve “filtreli URL” ile ürün listesine geçiş
+- Sprint 2
+  - [ ] Ürün Seçici (wizard) → konu sayfalarından bağlama
+  - [ ] Hesap girdilerinin URL ile paylaşımı (link/share)
+- Sprint 3
+  - [ ] Fan Eğrisi Motoru (v2): üretici eğrileri + sistem eğrisi kesişimi + FEI
+  - [ ] Jet fan itme (N) doğrulama ve duman senaryosu notları
+- Standart profilleri
+  - [ ] EU/US profil seçimi, varsayılan aralıkların profile göre gelmesi
+  - [ ] Her hesaplayıcı altında 2–3 maddelik standart referans bloğu
+
 ## 3) Operasyonel “Next Steps” (Öncelikli)
 - Test stabilizasyonu
   - ~~[ ] Skip’li 3 UI testini aktive et (Orders nav, OrderDetail sekme/track link, Returns modal)~~
