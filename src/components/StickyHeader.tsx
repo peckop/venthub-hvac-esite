@@ -96,7 +96,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
           const se = (document.scrollingElement || document.documentElement) as HTMLElement
           if (se) se.scrollTop = 0
           // 3) Body fallback
-          document.body && (document.body.scrollTop = 0)
+          if (document.body) {
+            document.body.scrollTop = 0
+          }
         } catch {}
       }
       if (atHome) {
