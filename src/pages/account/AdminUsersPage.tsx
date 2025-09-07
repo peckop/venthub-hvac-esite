@@ -162,7 +162,7 @@ export default function AdminUsersPage() {
           })
         } catch {}
 
-        toast.success(`Kullanıcı rolü \"${newRole}\" olarak güncellendi`)
+        toast.success(`Kullanıcı rolü "${newRole}" olarak güncellendi`)
         
         // Local state güncelle
         setAllUsers(prev => prev.map(u => 

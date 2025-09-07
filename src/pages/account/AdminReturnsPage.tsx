@@ -254,7 +254,7 @@ export default function AdminReturnsPage() {
         r.id === returnId ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
       ))
 
-      toast.success(`İade durumu \"${getStatusLabel(newStatus)}\" olarak güncellendi`)
+      toast.success(`İade durumu "${getStatusLabel(newStatus)}" olarak güncellendi`)
 
       // Müşteriye e-posta bildirimi gönder
       try {
