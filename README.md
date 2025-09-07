@@ -53,7 +53,21 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Değişiklik Özeti (Son Çalışmalar)
 Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
 
-Tarih: 2025-09-02
+Tarih: 2025-09-07
+
+- **Ana Sayfa Konsolidasyonu**
+  - VisualShowcase ve SpotlightList kaldırıldı; ProductFlow tek vitrin (full‑bleed) olarak kaldı.
+  - BrandFlow eklendi (iki şeritli marka akışı); Featured/New Products kaldırıldı.
+  - TrustSection, ResourcesSection, FAQShortSection konumları kurumsal plana göre netleşti; spacing normalize edildi.
+- **Knowledge Hub & Hesaplayıcılar v1**
+  - /destek/merkez hub: arama + etiket filtresi; TopicPage i18n.
+  - Hesaplayıcı iskeletleri: HRV, Hava Perdesi, Jet Fan, Kanal (rotalar aktif).
+- **Deploy**
+  - GitHub → Cloudflare Pages otomatik yayın (PR preview’lar açık). Env: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY.
+- **Bilinen konu**
+  - Ana sayfada bazı menü linklerinde ilk tık gecikmesi/bloklanması (overlay/pointer‑events şüphesi). İlgisiz header/mega‑menu değişiklikleri geri alındı.
+
+Önceki çalışmalar (2025-09-02):
 
 - **WhatsApp & SMS Bildirim Sistemi**
   - Twilio entegrasyonu ile WhatsApp Business API ve SMS desteği

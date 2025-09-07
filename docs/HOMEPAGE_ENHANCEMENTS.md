@@ -1,16 +1,18 @@
 # HOMEPAGE_ENHANCEMENTS.md — Ana Sayfa Geliştirmeleri ve Etkileşimli Bileşenler (VentHub)
 
-Son güncelleme: 2025-09-05
+Son güncelleme: 2025-09-07
 
 Bu doküman, VentHub ana sayfası için uygulanmış geliştirmeleri ve sıradaki etkileşimli bileşen önerilerini tek yerde toplar. Amaç: Kurumsallık, bilgi ve güveni öne çıkaran; React’in etkileşim gücünü gösteren modern bir deneyim.
 
-## 1) Uygulanan Geliştirmeler (2025-09-06 güncelleme ile)
+## 1) Uygulanan Geliştirmeler (2025-09-07)
 
-- BrandFlow bileşeni kaldırıldı; marka akışı (tek satır, boşluksuz, full-bleed) BrandsShowcase içine entegre edildi.
-- HomePage sıralama güncellendi:
-  - BentoGrid → Premium HVAC Markaları (BrandsShowcase) → Uygulamaya Göre Çözümler → Öncesi/Sonrası → Ürün Galerisi (full-bleed) → Kaynaklar/Kılavuzlar → Scroll-Linked Process → Magnetic CTA → SSS → Neden VentHub (yumuşatılmış geçiş) → Alt CTA.
-- Trust (Güven) bölümü ana sayfadan kaldırıldı; ProductsPage’de Keşfet hero altına taşındı.
-- Ürün Galerisi başlığı ve bazı kopyalar Türkçeleştirildi; i18n eksik anahtarlar eklendi.
+- VisualShowcase ve SpotlightList kaldırıldı (kurumsal, bilgi-odaklı sade akış tercih edildi).
+- ProductFlow ana vitrin olarak korundu (full‑bleed bant, üç şeritli akış; reduced‑motion’da statik fallback).
+- BrandFlow eklendi: iki şeritli, daha sakin marka logosu akışı (prestij odağı), ProductFlow’dan ayrı.
+- TrustSection, FAQShortSection ve ResourcesSection ana sayfada — Why Choose Us ardından konumlandırıldı.
+- Featured ve New Products bölümleri kaldırıldı.
+- HomePage spacing/padding normalize edildi; bileşen sıralaması kurumsal plana göre sadeleştirildi.
+- i18n: başlıklar/kopyalar için eksik anahtarlar eklendi.
 
 ## (Önceki) 1) Uygulanan Geliştirmeler (2025-09-05)
 

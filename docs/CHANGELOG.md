@@ -1,5 +1,15 @@
 # Changelog
 
+## 2025-09-07 (Homepage Consolidation + Knowledge Hub v1)
+- HomePage: VisualShowcase ve SpotlightList kaldırıldı; ana vitrin olarak ProductFlow (full-bleed tek bant) korundu.
+- HomePage: BrandFlow eklendi (iki şeritli, sakin marka logosu akışı) — prestij odaklı.
+- HomePage: Featured ve New Products bölümleri kaldırıldı; spacing/padding kurumsal plana göre normalize edildi.
+- Knowledge Hub: /destek/merkez (HubPage) arama + etiket filtresi ile eklendi; TopicPage i18n’e alındı.
+- Calculators v1: dört iskelet sayfa eklendi — /destek/hesaplayicilar/hrv, /hava-perdesi, /jet-fan, /kanal.
+- i18n: Resources/Knowledge metinleri sözlüğe taşındı (tr/en).
+- Navigasyon: Kaynaklar kartları Hub’a bağlanır; hesaplayıcılar şimdilik doğrudan URL ile erişilebilir (menü girdisi TBD).
+- Deploy: GitHub → Cloudflare Pages otomatik yayın; PR preview’ları aktif.
+- Known issue: Ana sayfada bazı menü linklerinde ilk tıkın gecikmesi/bloklanması (overlay/pointer-events şüphesi). Header/MegaMenu yan değişiklikleri geri alındı; kök neden araştırılıyor.
 ## 2025-09-05 (Admin UI Standardizasyonu)
 - Yeni: Ortak AdminToolbar bileşeni (arama, select, chip grubu, toggle, Temizle, sayaç, sticky yüzey, focus ring)
 - Düzen: 2 satır (üst: arama/select/aksiyonlar, alt: chip’ler); 48px kontrol yüksekliği; shrink-0 sağ blok, nowrap metinler
