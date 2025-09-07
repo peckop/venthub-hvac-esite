@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 
+# Faceted/search URLs'yi indeksleme
+Disallow: /products?all=1
+Disallow: /products?q=
+
 # Mutlaka alan adınızı buraya ekleyin (ör. https://venthub.com.tr/sitemap.xml)
 Sitemap: /sitemap.xml
