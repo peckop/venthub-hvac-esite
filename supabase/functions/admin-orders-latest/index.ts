@@ -21,11 +21,12 @@ Deno.serve(async (req) => {
     const to = url.searchParams.get('to')?.trim() || ''
     const q = url.searchParams.get('q')?.trim() || ''
     const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100)
+    const pageParam = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1)
+    const offset = (pageParam - 1) * limitParam
 
     const params = new URLSearchParams()
     params.set('select', 'id,status,conversation_id,total_amount,created_at')
     params.set('order', 'created_at.desc')
-    params.set('limit', String(limitParam))
 
     if (status) params.set('status', `eq.${status}`)
 
@@ -57,11 +58,16 @@ Deno.serve(async (req) => {
       headers: {
         Authorization: `Bearer ${serviceRoleKey}`,
         apikey: serviceRoleKey,
+        "Prefer": "count=exact",
+        "Range-Unit": "items",
+        "Range": `${offset}-${offset + limitParam - 1}`
       }
     })
 
     const rows = await resp.json().catch(()=>[])
-    return new Response(JSON.stringify({ count: Array.isArray(rows)? rows.length: 0, rows }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
+    const contentRange = resp.headers.get('content-range') || '0-0/0'
+    const total = Number(contentRange.split('/')[1] || '0') || 0
+    return new Response(JSON.stringify({ total, page: pageParam, limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
