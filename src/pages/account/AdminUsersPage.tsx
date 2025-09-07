@@ -149,7 +149,20 @@ export default function AdminUsersPage() {
       const success = await setUserAdminRole(userId, newRole)
       
       if (success) {
-        toast.success(`Kullanıcı rolü "${newRole}" olarak güncellendi`)
+        // Audit log
+        try {
+          const { logAdminAction } = await import('../../lib/audit')
+          await logAdminAction(supabase, {
+            table_name: 'user_profiles',
+            row_pk: userId,
+            action: 'UPDATE',
+            before: { role: (allUsers.find(u => u.id === userId)?.role || 'user') },
+            after: { role: newRole },
+            comment: 'role change'
+          })
+        } catch {}
+
+        toast.success(`Kullanıcı rolü \"${newRole}\" olarak güncellendi`)
         
         // Local state güncelle
         setAllUsers(prev => prev.map(u => 

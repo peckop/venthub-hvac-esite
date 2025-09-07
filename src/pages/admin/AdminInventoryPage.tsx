@@ -303,11 +303,22 @@ const AdminInventoryPage: React.FC = () => {
         low_stock_threshold: (isDefault ? null : Number(selectedThreshold)),
         low_stock_override: !isDefault
       }
+      const before = { low_stock_threshold: thresholdMap[productId] ?? null, low_stock_override: !!overrideMap[productId] }
       const { error } = await supabase
         .from('products')
         .update(payload)
         .eq('id', productId)
       if (error) throw error
+      // Audit log
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, {
+        table_name: 'products',
+        row_pk: productId,
+        action: 'UPDATE',
+        before,
+        after: payload,
+        comment: 'update low_stock_threshold'
+      })
       // tablo gösterimini güncelle
       setThresholdMap(prev => ({ ...prev, [productId]: (isDefault ? null : Number(selectedThreshold)) }))
       setOverrideMap(prev => ({ ...prev, [productId]: !isDefault }))
@@ -323,6 +334,16 @@ const AdminInventoryPage: React.FC = () => {
       setMoving(true)
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: reason })
       if (error) throw error
+      // Audit log
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, {
+        table_name: 'inventory_movements',
+        row_pk: productId,
+        action: 'INSERT',
+        before: null,
+        after: { delta, reason },
+        comment: 'adjust_stock RPC'
+      })
       // Lokal satırı güncelle
       setRows(prev => prev.map(r => r.product_id === productId ? ({
         ...r,

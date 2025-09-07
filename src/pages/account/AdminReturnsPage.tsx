@@ -236,12 +236,25 @@ export default function AdminReturnsPage() {
 
       if (error) throw error
 
+      // Audit log
+      try {
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, {
+          table_name: 'venthub_returns',
+          row_pk: returnId,
+          action: 'UPDATE',
+          before: { status: oldStatus },
+          after: { status: newStatus },
+          comment: 'return status update'
+        })
+      } catch {}
+
       // Local state güncelle
       setReturns(prev => prev.map(r => 
         r.id === returnId ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
       ))
 
-      toast.success(`İade durumu "${getStatusLabel(newStatus)}" olarak güncellendi`)
+      toast.success(`İade durumu \"${getStatusLabel(newStatus)}\" olarak güncellendi`)
 
       // Müşteriye e-posta bildirimi gönder
       try {
