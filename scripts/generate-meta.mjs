@@ -16,7 +16,7 @@ try {
   const u = new URL(rawSiteUrl)
   // strip trailing slash
   siteUrl = `${u.origin}`
-} catch (e) {
+} catch {
   console.warn(`[generate-meta] VITE_SITE_URL invalid (${rawSiteUrl}), falling back to http://localhost:4173`)
   siteUrl = 'http://localhost:4173'
 }
@@ -42,7 +42,7 @@ if (isPreview) {
 robotsLines.push(`Sitemap: ${siteUrl}/sitemap.xml`)
 const robotsTxt = robotsLines.join('\n') + '\n'
 fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsTxt, 'utf8')
-console.log('[generate-meta] Wrote robots.txt with', isPreview ? 'noindex (preview)' : 'index (prod)')
+console.warn('[generate-meta] robots.txt:', isPreview ? 'noindex (preview)' : 'index (prod)')
 
 // sitemap.xml
 const sitemapPath = path.join(publicDir, 'sitemap.xml')
@@ -64,4 +64,4 @@ if (fs.existsSync(sitemapPath)) {
 `</urlset>\n`
 }
 fs.writeFileSync(sitemapPath, sitemap, 'utf8')
-console.log('[generate-meta] Ensured sitemap.xml with base', siteUrl)
+console.warn('[generate-meta] sitemap.xml base:', siteUrl)
