@@ -1,5 +1,13 @@
 # Changelog
 
+## 2025-09-07 (SEO/A11y/Perf Hardening)
+- SEO: sitemap.xml ve robots.txt içindeki base URL portu 5173 → 4173 olarak düzeltildi (preview parity). Lighthouse sitemap hataları giderildi.
+- A11y: Footer kontrast iyileştirildi (text-steel-gray → text-gray-300). Icon-only link ve butonlara `aria-label` eklendi (Header + Footer). Splide kaynaklı `aria-allowed-role` uyarıları görünmüyor.
+- Perf (prod): LCP görseli preload + fetchpriority=high; dekoratif arka plan görseli lazy yüklenecek <img> içine taşındı. LCP ile ağ rekabeti azaltıldı.
+- React uyarısı: `fetchPriority` prop’u yerine DOM’a lowercase `fetchpriority` geçirildi (TSX güvenli spread ile).
+- Bugfix: StickyHeader JSX içinde hatalı `>` ve artan metin temizlendi; dev (5173) derleme hatası giderildi.
+- Sonuç (prod Lighthouse): 98 Performans / 96 Erişilebilirlik / 100 Best Practices / 100 SEO.
+
 ## 2025-09-07 (Homepage Consolidation + Knowledge Hub v1)
 - HomePage: VisualShowcase ve SpotlightList kaldırıldı; ana vitrin olarak ProductFlow (full-bleed tek bant) korundu.
 - HomePage: BrandFlow eklendi (iki şeritli, sakin marka logosu akışı) — prestij odaklı.

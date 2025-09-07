@@ -84,4 +84,4 @@ Bu dosya otomatik güncellenmez. Yeni dokümantasyon eklendiğinde veya yapı de
 
 Not: Admin UI standardizasyonu ve toolbar entegrasyonlarının detayları için CHANGELOG.md ve ADMIN_ROADMAP.md dosyalarına bakınız.
 
-Son güncelleme: 2025-09-05
+Son güncelleme: 2025-09-07
