@@ -51,6 +51,11 @@ Kaynak dosyalar (özet):
 
 ## 2) Tasarım İlkeleri
 
+### Performans Notu (2025-09-07)
+- Hero LCP görseli preload + fetchpriority=high (index.html) ile öne çekildi.
+- Dekoratif arka plan görseli CSS yerine lazy `<img>` (loading="lazy") olarak taşındı; LCP ile ağ rekabeti azaldı.
+- Non-critical görseller `loading="lazy"` + `decoding="async"` kullanıyor.
+
 - Kurumsal öncelik: Satışa zorlamadan güven ve bilgi.
 - Erişilebilirlik: prefers‑reduced‑motion, klavye ile kontrol, kontrast ve odak durumları.
 - Performans: RAF tabanlı akış, lazy görseller, in‑view başlatma (opsiyonel geliştirme), minimal hesaplama.
