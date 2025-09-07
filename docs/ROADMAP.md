@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-04
+Last updated: 2025-09-07
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -106,9 +106,9 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 ### Bilgi & Kılavuz Merkezi (Yeni Yol Haritası Bağlantısı)
 - Referans belge: docs/VENTHUB_BILGI_MERKEZI_GELISMIS.md
 - Sprint 1 (Kısa vade)
-  - [ ] /destek/merkez (Hub) sayfası
-  - [ ] 3 konu: Hava Perdesi, Jet Fan, HRV (kısa içerik + çift CTA)
-  - [ ] v1 hesaplayıcılar: HRV, Hava Perdesi, Jet Fan, Kanal hız/Δp (ön-boyutlandırma)
+  - [x] /destek/merkez (Hub) sayfası — arama + etiket filtresi
+  - [x] 3 konu için TopicPage yapısı + i18n (Hava Perdesi, Jet Fan, HRV)
+  - [x] v1 hesaplayıcılar: HRV, Hava Perdesi, Jet Fan, Kanal hız/Δp (ön-boyutlandırma) — iskelet sayfalar
   - [ ] Ürün filtre eşlemesi ve “filtreli URL” ile ürün listesine geçiş
 - Sprint 2
   - [ ] Ürün Seçici (wizard) → konu sayfalarından bağlama
@@ -175,6 +175,23 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 ## Ek: Kurumsal/PLP Planı Checklist (Arşivden taşınan)
 
 ---
+
+## Güncelleme — 2025-09-07: Ana Sayfa Konsolidasyonu + Knowledge Hub v1
+
+Bu güncelleme ile ana sayfa kurumsal plana göre sadeleştirildi ve Bilgi Merkezi ilk sürümü yayına alındı.
+
+Uygulananlar:
+- VisualShowcase ve SpotlightList kaldırıldı.
+- ProductFlow tek vitrin (full‑bleed bant) olarak korundu; hız/akış optimizasyonları sırada.
+- BrandFlow eklendi (iki şerit, sakin marka akışı) — ProductFlow’dan farklı, prestij odaklı.
+- Featured ve New Products bölümleri kaldırıldı.
+- Spacing ve blok sıralamaları normalize edildi.
+- Knowledge Hub: /destek/merkez (arama + etiket filtre), TopicPage i18n.
+- Hesaplayıcılar v1: HRV, Hava Perdesi, Jet Fan, Kanal — iskelet sayfalar ve rotalar.
+- Deploy: GitHub → Cloudflare Pages otomatik; PR preview akışı.
+- Bilinen konu: Ana sayfada bazı menü linklerinde ilk tık gecikmesi/bloklanması (overlay/pointer-events) araştırılıyor; geçici yan değişiklikler geri alındı.
+
+Ayrıntılar ve backlog: docs/HOMEPAGE_ENHANCEMENTS.md
 
 ## Güncelleme — 2025-09-05: Ana Sayfa Geliştirmeleri Uygulaması
 

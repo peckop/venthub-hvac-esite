@@ -51,15 +51,28 @@
    - [ ] Checkout stock revalidation (oversell engelleme)
    - [ ] WhatsApp wa.me config (frontend entegrasyonu)
 
-## Ana Sayfa Geliştirmeleri — Takip (2025-09-05)
+## Ana Sayfa Geliştirmeleri — Takip (2025-09-07)
 
-- [ ] VisualShowcase ve ProductFlow metin/içeriklerini i18n’e taşı (tr/en)
-- [ ] TrustSection rozetlerine detay linki ekle (KVKK → /legal/kvkk, İade → /support/iade-degisim)
-- [ ] ProductFlow: melez akış (image_url varsa görsel, yoksa marka kartı)
-- [ ] ProductFlow: hız ve boyut ince ayarı (masaüstü/mobil farklı hızlar)
-- [ ] (Opsiyonel) IO ile VisualShowcase/ProductFlow’u viewport’a girince başlat
-- [ ] Öneri 1. Dalga: Spotlight Hero + In‑view Sayaçlar + Before/After Slider
-- [ ] QA: a11y (odak), Lighthouse, analytics event doğrulama
+- [x] VisualShowcase ve SpotlightList’i kaldır
+- [x] Featured ve New Products bölümlerini kaldır
+- [x] BrandFlow’u ekle (iki şeritli sakin marka akışı)
+- [ ] ProductFlow: üç şerit yön/warp optimizasyonu (kesintisiz akış, doğru yönlendirme)
+- [ ] i18n: ProductFlow etiketleri + Resources/FAQ metinleri (tr/en)
+- [ ] IO: ProductFlow’u viewport’a girince başlat (prefers-reduced-motion saygılı)
+- [ ] 1. Dalga: Spotlight Hero + Sayaçlar + Before/After Slider (opsiyonel)
+- [ ] QA: a11y (odak/focus), Lighthouse, analytics event doğrulama
+
+## Knowledge Hub & Hesaplayıcılar
+- [x] HubPage: arama + etiket filtresi (/destek/merkez)
+- [x] Hesaplayıcılar v1 iskeleti: /destek/hesaplayicilar/{hrv,hava-perdesi,jet-fan,kanal}
+- [ ] Header menüde Knowledge Hub girişi ve Hesaplayıcılar index linki
+- [ ] Hesaplayıcılar v2: gerçek formüller, birimler, hata durumları, paylaşılabilir URL (querystring)
+
+## Navigasyon Sorunu (HomePage tık gecikmesi)
+- [ ] Overlay/pointer-events ve z-index denetimi (hamburger/megamenu/hero üstü yüzeyler)
+- [ ] Lazy-loaded rotalar için prefetch/üst‑katman isabet testi
+- [ ] Click-through telemetry: data-attr ile event yayımlama ve zamanlama ölçümü
+- [ ] Repro script ve fix; unrelated değişiklikleri uzak tut — sadece kök nedenin PR’ı
 
 ## Nice‑to‑have (yakın vade)
 - E‑fatura veya PDF fatura taslağı (ileride).
