@@ -6,6 +6,10 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
 - Code → GitHub → (optional) GitHub Actions run tests/lint/build → Cloudflare Pages builds and deploys `dist/`.
 - Database migrations: Supabase migrations are applied by a dedicated GitHub Actions workflow.
 
+### Local preview ports
+- Vite dev: http://localhost:5173 (geliştirme, performans skorları düşük olabilir)
+- Vite preview: http://localhost:4173 (prod benzeri, Lighthouse ölçümleri için önerilir)
+
 ## GitHub Actions
 - Migration workflow: `.github/workflows/supabase-migrate.yml` (status badge is in README)
 - Required secrets:
@@ -71,6 +75,19 @@ CMD ["nginx", "-g", "daemon off;"]
 - `pnpm exec eslint .` — Lint
 - `pnpm test -- --run` — Tests
 - `pnpm run build:ci` — Type-check + Vite production build
+- `pnpm run preview` — Prod benzeri statik önizleme (4173)
+
+### Lighthouse (Windows PowerShell)
+Prod benzeri ölçüm (preview 4173):
+```powershell
+npx -y lighthouse http://localhost:4173 `
+  --preset=desktop `
+  --only-categories=performance,accessibility,seo,best-practices `
+  --output=json `
+  --output-path=./lighthouse-report.json `
+  --quiet `
+  --chrome-flags="--headless"
+```
 
 ## Troubleshooting
 - Large chunks warning: consider code-splitting via dynamic imports or Rollup `manualChunks`.
