@@ -198,8 +198,9 @@ const AdminMovementsPage: React.FC = () => {
         m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
 ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
     })
+    const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
