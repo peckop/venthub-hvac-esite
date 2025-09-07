@@ -33,6 +33,35 @@ export const HomePage: React.FC = () => {
       {/* Hero Section */}
       <HeroSection />
 
+      {/* JSON-LD: Organization & WebSite */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'VentHub',
+            url: `${window.location.origin}/`,
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'VentHub',
+            url: `${window.location.origin}/`,
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: `${window.location.origin}/products?q={search_term_string}`,
+              'query-input': 'required name=search_term_string',
+            },
+          }),
+        }}
+      />
+
       {/* Bento Grid (hover video önizleme) */}
       <BentoGrid />
 
