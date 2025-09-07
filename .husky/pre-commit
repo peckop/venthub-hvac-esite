@@ -1,11 +1,6 @@
-#!/usr/bin/env sh
-# Minimal pre-commit guard: block committing package-lock.json and
-# require pnpm-lock.yaml when package.json changes.
-
-# If husky helper exists, source it (optional)
-if [ -f "$(dirname -- "$0")/_/husky.sh" ]; then
-  . "$(dirname -- "$0")/_/husky.sh"
-fi
+# Minimal pre-commit guard (Husky v10 uyumlu):
+# - package-lock.json commitlerini engeller
+# - package.json değiştiyse pnpm-lock.yaml'ın da stage edilmesini zorunlu kılar
 
 set -eu
 
@@ -13,17 +8,17 @@ STAGED_FILES=$(git diff --cached --name-only)
 
 # 1) Block package-lock.json
 if echo "$STAGED_FILES" | grep -q '^package-lock\.json$'; then
-  echo "\033[1;31mError:\033[0m package-lock.json commitlenemez. CI pnpm-lock.yaml kullanıyor."
-  echo "Lütfen: git restore --staged package-lock.json"
+  printf "\033[1;31mError:\033[0m package-lock.json commitlenemez. CI pnpm-lock.yaml kullanıyor.\n"
+  printf "Lütfen: git restore --staged package-lock.json\n"
   exit 1
 fi
 
 # 2) If package.json changed, ensure pnpm-lock.yaml is staged too
 if echo "$STAGED_FILES" | grep -q '^package\.json$'; then
   if ! echo "$STAGED_FILES" | grep -q '^pnpm-lock\.yaml$'; then
-    echo "\033[1;33mUyarı:\033[0m package.json değişti ama pnpm-lock.yaml stage edilmemiş."
-    echo "pnpm install çalıştırın ve pnpm-lock.yaml dosyasını ekleyin:"
-    echo "  npx pnpm@10 install && git add pnpm-lock.yaml"
+    printf "\033[1;33mUyarı:\033[0m package.json değişti ama pnpm-lock.yaml stage edilmemiş.\n"
+    printf "pnpm install çalıştırın ve pnpm-lock.yaml dosyasını ekleyin:\n"
+    printf "  npx pnpm@10 install && git add pnpm-lock.yaml\n"
     exit 1
   fi
 fi
