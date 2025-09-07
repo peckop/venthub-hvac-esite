@@ -498,6 +498,22 @@ export const ProductDetailPage: React.FC = () => {
           }),
         }}
       />
+      {/* JSON-LD BreadcrumbList for PDP */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: (typeof t === 'function' ? t('category.breadcrumbHome') : 'Ana Sayfa'), item: `${window.location.origin}/` },
+              ...(mainCategory ? [{ '@type': 'ListItem', position: 2, name: mainCategory.name, item: `${window.location.origin}/category/${mainCategory.slug}` }] : []),
+              ...(subCategory ? [{ '@type': 'ListItem', position: mainCategory ? 3 : 2, name: subCategory.name, item: `${window.location.origin}/category/${mainCategory?.slug}/${subCategory.slug}` }] : []),
+              { '@type': 'ListItem', position: (mainCategory && subCategory) ? 4 : (mainCategory ? 3 : 2), name: product.name, item: canonicalUrl },
+            ],
+          }),
+        }}
+      />
 
       {/* Vertical Section Layout */}
       <div className="space-y-0">
