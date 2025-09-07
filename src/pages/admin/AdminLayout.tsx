@@ -32,6 +32,7 @@ const AdminLayout: React.FC = () => {
             <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>Eşik & Ayarlar</NavLink>
             <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>İadeler</NavLink>
             <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>Kullanıcılar</NavLink>
+            <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>Kayıtlar</NavLink>
           </nav>
         </aside>
         <section className="col-span-12 md:col-span-9">
