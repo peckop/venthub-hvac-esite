@@ -1,6 +1,6 @@
 # AdminToolbar Kılavuzu
 
-Tarih: 2025-09-05
+Tarih: 2025-09-07
 Durum: Aktif kullanımda (Inventory, Movements, Orders, Returns, Users)
 
 Amaç
@@ -59,6 +59,8 @@ export type AdminToolbarProps = {
   recordCount?: number
   rightExtra?: React.ReactNode
   sticky?: boolean // üstte sabit görünüm
+  storageKey?: string // kalıcılık için benzersiz anahtar (örn. 'toolbar:orders')
+  persist?: { search?: boolean; select?: boolean; chips?: boolean; toggles?: boolean }
 }
 ```
 
@@ -124,16 +126,11 @@ Excel (.xls)
 </DropdownMenu.Root>
 ```
 
-Kalıcılık (Plan)
-- Amaç: Toolbar durumu sayfa yeniden ziyaretlerinde hatırlansın.
-- Yöntem: localStorage; sayfa bazlı anahtarlandırma.
-- Önerilen anahtar şeması:
-  - admin:inventory:toolbar:search
-  - admin:inventory:toolbar:category
-  - admin:inventory:toolbar:chips
-  - admin:movements:toolbar:reasons
-  - admin:orders:toolbar:status | :from | :to | :q
-- Değerler: JSON.stringify ile saklanmalı; okurken try/catch ile güvenli parse.
+Kalıcılık
+- Uygulama: storageKey ile localStorage üzerinde toolbar durumu saklanır.
+- Alanlar: search, select, chips, toggles (persist ile tek tek devre dışı bırakılabilir).
+- Örnek anahtarlar: toolbar:inventory, toolbar:movements, toolbar:orders, toolbar:returns, toolbar:users
+- Format: JSON.stringify ile yazılır; mount sırasında güvenli parse (try/catch) ile yüklenir ve controlled state’lere yansıtılır.
 
 Test Kontrol Listesi
 - Görsel hizalar: 48px kontrolller, iki satırlı düzen, shrink-0 sağ blok, chip sarımları.
@@ -144,8 +141,8 @@ Test Kontrol Listesi
 
 Genişletmeler
 - XLSX (gerçek): SheetJS (xlsx) ile export; bağımlılık eklenmesi gerekir.
-- Görünür Sütunlar menüsü: Tablo başlıklarıyla entegre ya da toolbar sağ blokta.
-- Yoğunluk (density) toggle’ı: compact/comfortable sınıfları.
+- Görünür Sütunlar menüsü: ColumnsMenu ile uygulanmıştır (tablo başlıklarıyla entegre veya toolbar sağ blokta).
+- Yoğunluk (density): ColumnsMenu ile 'comfortable'/'compact' mevcut.
 - URL query senkronu: state ↔ URL (paylaşılabilir filtre linkleri).
 
 Uygulama Notları
