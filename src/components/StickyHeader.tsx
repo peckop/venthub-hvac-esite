@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Package, Star, Clock, TrendingUp, Zap, Grid3X3 } from 'lucide-react'
+import React, { useState, useRef, useEffect } from 'react'
+import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Star, Clock, Zap, Grid3X3 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
@@ -38,10 +38,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const stickySearchRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
   
-  // Debug: Navigation monitoring
-  useEffect(() => {
-    console.log('[StickyHeader] Component rendered, isScrolled:', isScrolled)
-  })
 
   // Handle search
   useEffect(() => {
@@ -196,10 +192,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </button>
               <Link
                 to="/products"
-                onClick={(e) => {
-                  console.log('[Header] Products link clicked, pathname:', window.location.pathname)
-                  console.log('[Header] isMenuOpen:', isMenuOpen)
-                }}
                 onMouseEnter={() => prefetchProductsPage()}
                 className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
               >

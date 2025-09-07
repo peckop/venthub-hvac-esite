@@ -1,4 +1,4 @@
-let flags = { products: false }
+const flags = { products: false }
 
 export function prefetchProductsPage() {
   if (flags.products) return
