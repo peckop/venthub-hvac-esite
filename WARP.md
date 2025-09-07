@@ -1,7 +1,7 @@
 # WARP.md
+Last updated: 2025-09-07
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
-
 ## ℹ️ Overview
 
 VentHub is a Turkish HVAC e-commerce platform built with modern web technologies. It's a React SPA with TypeScript, backed by Supabase for the database, authentication, and real-time features.
@@ -35,11 +35,12 @@ pnpm test
 | `pnpm dev` | Start Vite dev server at localhost:5173 | Development server with HMR |
 | `pnpm build` | Type-check + production build | `dist/` folder |
 | `pnpm build:ci` | CI build with type checking | Optimized production bundle |
+| `pnpm build:prod` | Production build with `BUILD_MODE=prod` | `dist/` folder |
 | `pnpm lint` | ESLint with `--max-warnings=0` | Code quality check |
 | `pnpm test` | Run Vitest unit tests | Test results |
 | `pnpm test:ui` | Interactive test UI | Vitest browser interface |
 | `pnpm preview` | Preview production build locally | Local server for `dist/` |
-
+| `pnpm prepare` | Setup git hooks (husky) | Husky installed |
 ### Database Commands (requires Supabase CLI)
 
 ```powershell
@@ -67,17 +68,23 @@ Frontend (React SPA) ← REST API → Supabase (PostgreSQL + Auth + Functions)
 ```
 src/
 ├── components/          # Reusable UI components
-├── pages/              # Route components (lazy-loaded)
-│   ├── account/        # User account pages
-│   ├── support/        # Customer support pages
-│   └── legal/          # Legal/compliance pages
-├── hooks/              # Custom React hooks
-├── contexts/           # React Context providers
-├── lib/               # External service integrations
-│   └── supabase.ts    # Database client + types
-├── i18n/              # Internationalization (Turkish/English)
-├── utils/             # Utility functions
-└── config/            # App configuration
+├── pages/               # Route components (lazy-loaded)
+│   ├── account/         # User account pages
+│   ├── admin/           # Admin console pages
+│   ├── calculators/     # HVAC calculators
+│   ├── checkout/        # Checkout flow
+│   ├── knowledge/       # Knowledge base
+│   ├── support/         # Customer support pages
+│   └── legal/           # Legal/compliance pages
+├── hooks/               # Custom React hooks
+├── contexts/            # React Context providers
+├── lib/                 # External service integrations
+│   └── supabase.ts      # Database client + types
+├── i18n/                # Internationalization (TR/EN)
+│   └── dictionaries/
+├── test/                # Testing utilities and helpers
+├── utils/               # Utility functions
+└── config/              # App configuration
 ```
 
 ### Data Flow
@@ -214,6 +221,11 @@ $env:SUPABASE_DB_URL="postgresql://..."
   - `VITE_SUPABASE_ANON_KEY`
 
 ### GitHub Actions
+- **Workflows:**
+  - `ci.yml`
+  - `deploy-cloudflare-pages.yml`
+  - `deploy-functions.yml`
+  - `supabase-migrate.yml`
 - **Migration Workflow:** `.github/workflows/supabase-migrate.yml`
 - **Triggers:** Push to `supabase/migrations/` or main branch
 - **Required Secrets:**
@@ -222,9 +234,21 @@ $env:SUPABASE_DB_URL="postgresql://..."
 
 ### Edge Functions
 Located in `supabase/functions/`:
-- `iyzico-payment` - Payment processing
-- `notification-service` - WhatsApp/SMS notifications  
-- `stock-alert` - Low stock notifications
+- `admin-iyzico-reconcile`
+- `admin-order-inspect`
+- `admin-orders-latest`
+- `admin-update-order`
+- `iyzico-callback`
+- `iyzico-payment`
+- `iyzico-refund`
+- `notification-service`
+- `order-housekeeping`
+- `order-validate`
+- `return-status-notification`
+- `shipping-notification`
+- `shipping-status`
+- `shipping-webhook`
+- `stock-alert`
 
 ## 🔧 Development Tips
 
