@@ -1,3 +1,5 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
+
 export type AdminAuditAction = 'INSERT' | 'UPDATE' | 'DELETE' | 'CUSTOM'
 
 export interface AdminAuditLogInput {
@@ -11,12 +13,13 @@ export interface AdminAuditLogInput {
 
 // Lightweight helper; errors are swallowed on purpose to not block UI
 export async function logAdminAction(
-  client: { from: (table: string) => { insert: (rows: unknown | unknown[]) => Promise<{ error: unknown | null }> } },
+  client: SupabaseClient,
   input: AdminAuditLogInput | AdminAuditLogInput[]
 ): Promise<void> {
   try {
     const rows = Array.isArray(input) ? input : [input]
-    const { error } = await client.from('admin_audit_log').insert(rows)
+    // Chain .select() to satisfy TS and to ensure request executes immediately
+    const { error } = await client.from('admin_audit_log').insert(rows).select('id')
     if (error) {
       console.warn('audit log insert failed', error)
     }
