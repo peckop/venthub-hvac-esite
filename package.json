@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-meta.mjs",
     "build": "tsc -b tsconfig.build.json && vite build",
     "build:prod": "BUILD_MODE=prod tsc -b tsconfig.build.json && vite build",
     "build:ci": "tsc -b tsconfig.build.json && vite build",
