@@ -12,7 +12,6 @@ import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
 import AddToCartToast from './components/AddToCartToast'
 import LoadingSpinner from './components/LoadingSpinner'
-import { ErrorBoundary } from './components/ErrorBoundary'
 import { prefetchProductsPage } from './utils/prefetch'
 
 // Keep HomePage as direct import for fastest initial load
@@ -92,7 +91,8 @@ function App() {
 
   // Prefetch ProductsPage chunk on idle so first navigation is instant
   React.useEffect(() => {
-    const idle = (cb: () => void) => ("requestIdleCallback" in window ? (window as any).requestIdleCallback(cb) : setTimeout(cb, 600))
+    const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+    const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 600))
     idle(() => prefetchProductsPage())
   }, [])
 
