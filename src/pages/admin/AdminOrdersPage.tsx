@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import { logAdminAction } from '../../lib/audit'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -124,6 +125,15 @@ const AdminOrdersPage: React.FC = () => {
           .update(updateData)
           .eq('id', shipId)
         if (error) throw error
+        // Audit log
+        await logAdminAction(supabase, {
+          table_name: 'venthub_orders',
+          row_pk: shipId,
+          action: 'UPDATE',
+          before: { status: rows.find(r => r.id === shipId)?.status },
+          after: { status: isShipped ? rows.find(r => r.id === shipId)?.status : 'shipped', carrier, tracking_number: tracking },
+          comment: 'shipment update'
+        })
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         if (sendEmail && carrier && tracking) {
           try {
@@ -162,6 +172,15 @@ const AdminOrdersPage: React.FC = () => {
         .update(updateData)
         .in('id', targets)
       if (error) throw error
+      // Audit log (bulk)
+      await logAdminAction(supabase, targets.map(id => ({
+        table_name: 'venthub_orders',
+        row_pk: id,
+        action: 'UPDATE',
+        before: { status: rows.find(r => r.id === id)?.status },
+        after: { status: 'shipped', carrier: carrier || undefined, tracking_number: tracking || undefined },
+        comment: 'bulk shipment update'
+      })))
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
       if (sendEmail && carrier && tracking) {
         try {
