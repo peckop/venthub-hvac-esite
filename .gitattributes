@@ -1,0 +1,30 @@
+# Minimal, risksiz ayarlar
+# Varsayılan metin algılama (satır sonunu zorlamaz)
+* text=auto
+
+# Binary dosyalar
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.pdf binary
+*.ico binary
+
+# Yaygın metin türleri (opsiyonel açık ifade)
+*.js   text
+*.ts   text
+*.jsx  text
+*.tsx  text
+*.css  text
+*.scss text
+*.html text
+*.md   text
+*.json text
+*.yml  text
+*.yaml text
+*.env  text
+
+# Lockfile (CI pnpm kullanıyor)
+pnpm-lock.yaml text
+
