@@ -145,6 +145,24 @@ const ProductsPage: React.FC = () => {
         canonical={canonicalUrl}
         noindex={noindex}
       />
+      {/* JSON-LD: ItemList for /products (All or Search modes) */}
+      {(isAll || !!searchQuery) && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              itemListElement: (isAll ? allProducts : searchResults).map((p, idx) => ({
+                '@type': 'ListItem',
+                position: idx + 1,
+                url: `${window.location.origin}/product/${p.id}`,
+                name: p.name,
+              })),
+            }),
+          }}
+        />
+      )}
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-steel-gray mb-4">
         <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
