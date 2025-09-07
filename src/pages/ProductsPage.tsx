@@ -163,6 +163,20 @@ const ProductsPage: React.FC = () => {
           }}
         />
       )}
+      {/* JSON-LD: BreadcrumbList for /products */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: t('common.home'), item: `${window.location.origin}/` },
+              { '@type': 'ListItem', position: 2, name: breadcrumbLabel, item: canonicalUrl },
+            ],
+          }),
+        }}
+      />
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-steel-gray mb-4">
         <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
