@@ -34,6 +34,10 @@ const AdminOrdersPage: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null)
   const [sortKey, setSortKey] = React.useState<SortKey>('created')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
+  // Pagination
+  const [page, setPage] = React.useState(1)
+  const [total, setTotal] = React.useState(0)
+  const PAGE_SIZE = 50
 
   // Filters
   const [status, setStatus] = React.useState('')
@@ -68,20 +72,22 @@ const AdminOrdersPage: React.FC = () => {
       if (fromDate) params.set('from', fromDate)
       if (toDate) params.set('to', toDate)
       if (debouncedQuery) params.set('q', debouncedQuery)
-      params.set('limit', '50')
+      params.set('limit', String(PAGE_SIZE))
+      params.set('page', String(page))
       const url = `${supabaseUrl}/functions/v1/admin-orders-latest?${params.toString()}`
       const resp = await fetch(url, { method: 'GET' })
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-      const data: unknown = await resp.json()
-      const list = Array.isArray((data as { rows?: unknown })?.rows) ? ((data as { rows?: AdminOrderRow[] }).rows as AdminOrderRow[]) : []
+      const data = (await resp.json()) as { rows?: AdminOrderRow[]; total?: number }
+      const list = Array.isArray(data?.rows) ? data.rows as AdminOrderRow[] : []
       setRows(list)
+      setTotal(Number(data?.total || 0))
     } catch (e) {
       const msg = (e as Error).message || 'Yüklenemedi'
       setError(msg)
     } finally {
       setLoading(false)
     }
-  }, [status, fromDate, toDate, debouncedQuery])
+  }, [status, fromDate, toDate, debouncedQuery, page])
 
   React.useEffect(() => { fetchOrders() }, [fetchOrders])
 
@@ -334,8 +340,8 @@ const AdminOrdersPage: React.FC = () => {
           title: 'Durum',
           options: STATUSES.map(s => ({ value: s.value, label: s.label }))
         }}
-        onClear={()=>{ setStatus(''); setFromDate(''); setToDate(''); setQuery('') }}
-        recordCount={filtered.length}
+        onClear={()=>{ setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
+        recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
@@ -356,6 +362,21 @@ const AdminOrdersPage: React.FC = () => {
           </div>
         )}
       />
+
+      {/* Pagination controls */}
+      <div className="flex items-center justify-end gap-2">
+        <button
+          onClick={() => setPage(p => Math.max(1, p - 1))}
+          disabled={page <= 1}
+          className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
+        >Önceki</button>
+        <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
+        <button
+          onClick={() => setPage(p => p + 1)}
+          disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))}
+          className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
+        >Sonraki</button>
+      </div>
 
       {/* Bulk actions */}
       {selectedIds.length > 0 && (
