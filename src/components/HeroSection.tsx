@@ -19,16 +19,18 @@ export const HeroSection: React.FC = () => {
       }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
-      {/* Background Image */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      {/* Background (decorative) moved to CSS to keep it out of LCP */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        aria-hidden="true"
+        role="presentation"
+      >
         <img
           src="/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg"
           alt=""
-          width={1920}
-          height={1080}
+          loading="lazy"
           decoding="async"
-          fetchPriority="low"
-          className="w-full h-full object-cover object-center opacity-20"
+          className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
@@ -107,8 +109,8 @@ export const HeroSection: React.FC = () => {
                 width={1200}
                 height={800}
                 loading="eager"
-                decoding="async"
                 fetchPriority="high"
+                decoding="async"
                 className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />

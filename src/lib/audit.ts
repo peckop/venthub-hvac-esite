@@ -18,11 +18,9 @@ export async function logAdminAction(
     const rows = Array.isArray(input) ? input : [input]
     const { error } = await client.from('admin_audit_log').insert(rows)
     if (error) {
-      // eslint-disable-next-line no-console
       console.warn('audit log insert failed', error)
     }
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.warn('audit log insert exception', e)
   }
 }
