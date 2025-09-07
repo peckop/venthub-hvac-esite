@@ -84,7 +84,7 @@ async function main() {
     const outPath = resolve(__dirname, '../public/sitemap.xml')
     mkdirSync(resolve(__dirname, '../public'), { recursive: true })
     writeFileSync(outPath, xml, 'utf8')
-    console.log(`[sitemap] Yazıldı: ${outPath} (${urls.length} URL)`) 
+    console.warn(`[sitemap] Yazıldı: ${outPath} (${urls.length} URL)`) 
   } catch (e) {
     console.error('[sitemap] Hata:', e)
     // Minimal fallback
@@ -95,7 +95,7 @@ async function main() {
     ])
     const outPath = resolve(__dirname, '../public/sitemap.xml')
     writeFileSync(outPath, fallback, 'utf8')
-    console.log('[sitemap] Fallback sitemap yazıldı')
+    console.warn('[sitemap] Fallback sitemap yazıldı')
   }
 }
 
