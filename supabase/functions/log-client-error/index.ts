@@ -30,6 +30,47 @@ Deno.serve(async (req) => {
       .replace(/[A-Za-z0-9_\-]{20,}/g, '***')
 
     const payload = body as Record<string, unknown>
+
+    // Build signature from message + first stack line + url path
+    const firstLine = String(payload.stack || '').split('\n')[0] || ''
+    const urlObj = (()=>{ try { return new URL(String(payload.url||'')) } catch { return null } })()
+    const path = urlObj?.pathname || ''
+    const signature = mask(`${String(payload.msg||'')}`.slice(0,300) + ' :: ' + `${firstLine}`.slice(0,300) + ' :: ' + `${path}`.slice(0,200))
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
+
+    // Upsert group
+    const groupPayload = {
+      signature,
+      level: mask(String(payload.level || 'error')),
+      last_message: mask(String(payload.msg || '')),
+      url_sample: mask(String(payload.url || '')),
+      env: mask(String(payload.env || '')),
+      release: mask(String(payload.release || '')),
+      last_seen: new Date().toISOString(),
+    }
+    const upsertRes = await supabase
+      .from('error_groups')
+      .upsert(groupPayload, { onConflict: 'signature' })
+      .select('id, count')
+      .single()
+      .catch(()=>({ data: null }))
+
+    let groupId: string | null = null
+    // If select did not return existing row, fetch id now
+    if (upsertRes && (upsertRes as any).data && (upsertRes as any).data.id) {
+      groupId = (upsertRes as any).data.id as string
+    } else {
+      // Try to get id by signature
+      const q = await supabase.from('error_groups').select('id').eq('signature', signature).maybeSingle()
+      groupId = (q.data as { id?: string } | null)?.id || null
+    }
+
+    // Update count atomically
+    if (groupId) {
+      await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).catch(()=>{})
+    }
+
     const row = {
       at: new Date().toISOString(),
       url: mask(String(payload.url || '')),
@@ -40,9 +81,9 @@ Deno.serve(async (req) => {
       env: mask(String(payload.env || '')),
       level: mask(String(payload.level || 'error')),
       extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
+      group_id: groupId,
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
       return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
