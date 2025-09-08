@@ -37,6 +37,8 @@ const AdminLayout: React.FC = () => {
             <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.logs')}</NavLink>
             <NavLink to="/admin/errors" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errors')}</NavLink>
             <NavLink to="/admin/error-groups" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errorGroups') ?? 'Hata Grupları'}</NavLink>
+            <NavLink to="/admin/products" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.products') ?? 'Ürünler'}</NavLink>
+            <NavLink to="/admin/categories" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.categories') ?? 'Kategoriler'}</NavLink>
           </nav>
         </aside>
         <section className="col-span-12 md:col-span-9">
