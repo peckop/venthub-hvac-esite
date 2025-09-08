@@ -30,23 +30,23 @@ export const Footer: React.FC = () => {
               </div>
               <div>
                 <div className="text-xl font-bold">VentHub</div>
-                <div className="text-xs text-steel-gray">HVAC Premium</div>
+                <div className="text-xs text-gray-300">HVAC Premium</div>
               </div>
             </Link>
-            <p className="text-steel-gray leading-relaxed">
+            <p className="text-gray-300 leading-relaxed">
               {t('home.heroSubtitle')}
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-steel-gray hover:text-secondary-blue transition-colors">
+              <a href="#" aria-label="Facebook" className="text-gray-300 hover:text-secondary-blue transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-steel-gray hover:text-secondary-blue transition-colors">
+              <a href="#" aria-label="Twitter" className="text-gray-300 hover:text-secondary-blue transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-steel-gray hover:text-secondary-blue transition-colors">
+              <a href="#" aria-label="LinkedIn" className="text-gray-300 hover:text-secondary-blue transition-colors">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="text-steel-gray hover:text-secondary-blue transition-colors">
+              <a href="#" aria-label="Instagram" className="text-gray-300 hover:text-secondary-blue transition-colors">
                 <Instagram size={20} />
               </a>
             </div>
@@ -57,32 +57,32 @@ export const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.home')}
                 </Link>
               </li>
               <li>
-                <Link to="/products?all=1" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/products?all=1" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.products')}
                 </Link>
               </li>
               <li>
-                <Link to="/brands" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/brands" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.brands')}
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.about')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.contact')}
                 </Link>
               </li>
               <li>
-                <Link to="/support" className="text-steel-gray hover:text-white transition-colors">
+                <Link to="/support" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.supportCenter')}
                 </Link>
               </li>
@@ -117,7 +117,7 @@ export const Footer: React.FC = () => {
                 <li key={category.slug}>
                   <Link 
                     to={`/category/${category.slug}`} 
-                    className="text-steel-gray hover:text-white transition-colors text-sm"
+                    className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
                     {category.name}
                   </Link>
@@ -132,20 +132,20 @@ export const Footer: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <MapPin size={16} className="text-secondary-blue mt-1 flex-shrink-0" />
-                <span className="text-steel-gray text-sm">
+                <span className="text-gray-300 text-sm">
                   Teknokent Mah. Teknopark Blv.<br />
                   No: 1/4A 34906 Pendik/İstanbul
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-secondary-blue flex-shrink-0" />
-                <span className="text-steel-gray text-sm">
+                <span className="text-gray-300 text-sm">
                   +90 (216) 123-45-67
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-secondary-blue flex-shrink-0" />
-                <span className="text-steel-gray text-sm">
+                <span className="text-gray-300 text-sm">
                   info@venthub.com.tr
                 </span>
               </div>
@@ -154,7 +154,7 @@ export const Footer: React.FC = () => {
             {/* Working Hours */}
             <div className="mt-4 p-3 bg-white/5 rounded-lg">
               <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
-              <p className="text-steel-gray text-xs">
+              <p className="text-gray-300 text-xs">
                 {t('footer.weekdays')}: 09:00 - 18:00<br />
                 {t('footer.saturday')}: 09:00 - 14:00
               </p>
@@ -167,28 +167,28 @@ export const Footer: React.FC = () => {
       <div className="border-t border-steel-gray">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-steel-gray text-sm">
+            <div className="text-gray-300 text-sm">
               © 2025 VentHub HVAC. {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}
               <BuildTag />
-              <Link to="/legal/kvkk" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/kvkk" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.kvkk')}
               </Link>
-              <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.distanceSales')}
               </Link>
-              <Link to="/legal/on-bilgilendirme-formu" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/on-bilgilendirme-formu" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.preInformation')}
               </Link>
-              <Link to="/legal/cerez-politikasi" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/cerez-politikasi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.cookies')}
               </Link>
-              <Link to="/legal/gizlilik-politikasi" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/gizlilik-politikasi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.privacy')}
               </Link>
-              <Link to="/legal/kullanim-kosullari" className="text-steel-gray hover:text-white transition-colors">
+              <Link to="/legal/kullanim-kosullari" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.terms')}
               </Link>
             </div>

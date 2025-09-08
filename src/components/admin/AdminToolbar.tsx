@@ -1,6 +1,7 @@
 import React from 'react'
 import { adminCardClass } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
+import { useI18n } from '../../i18n/I18nProvider'
 
 export type AdminToolbarChip = {
   key: string
@@ -61,6 +62,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   storageKey,
   persist,
 }) => {
+  const { t } = useI18n()
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const hydratedRef = React.useRef(false)
 
@@ -176,7 +178,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
               <input
                 ref={inputRef}
                 className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
-                placeholder={search.placeholder || 'Ara'}
+                placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                 title={search.title || `Kısayol: ${search.focusShortcut || '/'}`}
                 value={search.value}
                 onChange={(e) => search.onChange(e.target.value)}
@@ -223,11 +225,11 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 type="button"
                 onClick={onClear}
                 className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy whitespace-nowrap"
-              >Temizle</button>
+              >{t('admin.toolbar.clear')}</button>
             )}
 
             {typeof recordCount === 'number' && (
-              <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} kayıt</span>
+              <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
             )}
 
             {rightExtra}

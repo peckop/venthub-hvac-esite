@@ -2,6 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface AuditRow {
   id: string
@@ -18,6 +19,7 @@ interface AuditRow {
 const PAGE_SIZE = 50
 
 const AdminAuditLogPage: React.FC = () => {
+  const { t } = useI18n()
   const [rows, setRows] = React.useState<AuditRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -80,7 +82,7 @@ const AdminAuditLogPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <h1 className={adminSectionTitleClass}>Denetim Kayıtları</h1>
+      <h1 className={adminSectionTitleClass}>{t('admin.titles.audit')}</h1>
 
       <AdminToolbar
         storageKey="toolbar:audit"

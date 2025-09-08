@@ -267,10 +267,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
             {/* Right Actions - Enhanced */}
             <div className="flex items-center space-x-2">
-              <Link
-                to="/cart"
-                className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
-              >
+                  <Link
+                    to="/cart"
+                    aria-label="Sepet"
+                    className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
+                  >
                 <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
                 {syncing && (
                   <span title="Senkronize ediliyor" className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
@@ -358,6 +359,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     </Link>
                     <Link
                       to="/auth/login"
+                      aria-label={t('common.signIn')}
                       className="lg:hidden p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300"
                     >
                       <User size={22} className="text-steel-gray" />
@@ -369,6 +371,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMenuOpen(true)}
+                aria-label="Menü"
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 xl:hidden group"
               >
                 <Menu size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
@@ -511,6 +514,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     onClick={() => navigate('/products?sort=bestsellers')}
                     className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
                     title="Hızlı Sipariş"
+                    aria-label="Hızlı Sipariş"
                   >
                     <Zap size={16} className="text-warning-orange group-hover:animate-pulse" />
                     <span className="hidden 2xl:block">Hızlı Sipariş</span>
@@ -525,6 +529,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       }}
                       className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                       title="Son Görüntülenen"
+                      aria-label="Son Görüntülenen"
                     >
                       <Clock size={16} className="text-steel-gray group-hover:text-primary-navy" />
                     </button>
@@ -535,6 +540,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     onClick={() => navigate('/account/favorites')}
                     className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     title="Favoriler"
+                    aria-label="Favoriler"
                   >
                     <Star size={16} className="text-steel-gray group-hover:text-gold-accent" />
                   </button>
@@ -542,6 +548,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {/* Menu Button */}
                   <button
                     onClick={() => setIsMenuOpen(true)}
+                    aria-label="Menü"
                     className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                   >
                     <Menu size={18} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
@@ -550,6 +557,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {/* Cart with Total */}
                   <Link
                     to="/cart"
+                    aria-label="Sepet"
                     className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
                   >
                     <div className="relative">
@@ -571,6 +579,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {user ? (
                     <Link
                       to="/account"
+                      aria-label="Hesabım"
                       className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     >
                       <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />

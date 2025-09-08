@@ -1,20 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
-import BrandsShowcase from '../components/BrandsShowcase'
 import { Star, TrendingUp, Clock } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import TiltCard from '../components/TiltCard'
-import BentoGrid from '../components/BentoGrid'
-import ScrollLinkedProcess from '../components/ScrollLinkedProcess'
-import MagneticCTA from '../components/MagneticCTA'
 import { trackEvent } from '../utils/analytics'
 import LeadModal from '../components/LeadModal'
-import ResourcesSection from '../components/ResourcesSection'
-import ProductFlow from '../components/ProductFlow'
-import BeforeAfterSlider from '../components/BeforeAfterSlider'
+import Seo from '../components/Seo'
+
+// Kritik olmayan blokları tembel yükleme
+const BentoGrid = React.lazy(() => import('../components/BentoGrid'))
+const BrandsShowcase = React.lazy(() => import('../components/BrandsShowcase'))
+const ResourcesSection = React.lazy(() => import('../components/ResourcesSection'))
+const ProductFlow = React.lazy(() => import('../components/ProductFlow'))
+const BeforeAfterSlider = React.lazy(() => import('../components/BeforeAfterSlider'))
+const ScrollLinkedProcess = React.lazy(() => import('../components/ScrollLinkedProcess'))
+const MagneticCTA = React.lazy(() => import('../components/MagneticCTA'))
 
 export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
@@ -30,6 +33,11 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
+      <Seo
+        title="VentHub | HVAC Ürünleri ve Çözümleri"
+        description="Endüstriyel havalandırma (HVAC) ürünleri ve çözümlerini keşfedin. Hızlı teslimat, 2 yıl garanti ve uzman desteği."
+        canonical={`${window.location.origin}/`}
+      />
       {/* Hero Section */}
       <HeroSection />
 
@@ -63,17 +71,21 @@ export const HomePage: React.FC = () => {
       />
 
       {/* Bento Grid (hover video önizleme) */}
-      <BentoGrid />
+      <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
+        <BentoGrid />
+      </Suspense>
 
       {/* Premium HVAC Markaları (BentoGrid sonrası) */}
-      <BrandsShowcase />
+      <Suspense fallback={<div className="min-h-[120px]" aria-hidden="true" />}> 
+        <BrandsShowcase />
+      </Suspense>
 
 
       {/* Uygulamaya Göre Çözümler */}
-      <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white">
+      <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white" aria-labelledby="by-application-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('common.byApplication')}</h2>
+            <h2 id="by-application-heading" className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('common.byApplication')}</h2>
             <a href="/products#by-application" className="text-primary-navy hover:underline text-sm font-medium">{t('common.viewAll')} →</a>
           </div>
           {(() => {
@@ -108,11 +120,13 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Before/After Slider (Uygulamaya göre çözümler altı) */}
-      <BeforeAfterSlider
-        beforeSrc="/images/before_parking_jet_fan.jpg"
-        afterSrc="/images/after_parking_jet_fan.jpg"
-        alt="Otopark jet fan uygulaması öncesi/sonrası"
-      />
+      <Suspense fallback={<div className="min-h-[160px]" aria-hidden="true" />}> 
+        <BeforeAfterSlider
+          beforeSrc="/images/before_parking_jet_fan.jpg"
+          afterSrc="/images/after_parking_jet_fan.jpg"
+          alt="Otopark jet fan uygulaması öncesi/sonrası"
+        />
+      </Suspense>
 
 
 
@@ -126,16 +140,24 @@ export const HomePage: React.FC = () => {
           <p className="text-steel-gray mt-2">Portföyümüzden seçilmiş ürün görselleri</p>
         </div>
       </section>
-      <ProductFlow />
+      <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
+        <ProductFlow />
+      </Suspense>
 
       {/* Resources (Ürün görsel akışının altında) */}
-      <ResourcesSection />
+      <Suspense fallback={null}> 
+        <ResourcesSection />
+      </Suspense>
 
       {/* Scroll-Linked Process */}
-      <ScrollLinkedProcess />
+      <Suspense fallback={null}> 
+        <ScrollLinkedProcess />
+      </Suspense>
 
       {/* Magnetic CTA */}
-      <MagneticCTA />
+      <Suspense fallback={null}> 
+        <MagneticCTA />
+      </Suspense>
 
 
 

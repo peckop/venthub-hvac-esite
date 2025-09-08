@@ -188,9 +188,32 @@ const AdminErrorGroupsPage: React.FC = () => {
   const [topScrollWidth, setTopScrollWidth] = React.useState(0)
   const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
   React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
-  const onBottomScroll = React.useCallback(()=>{ if(!topScrollRef.current||!tableWrapRef.current) return; if(topScrollRef.current.scrollLeft!==tableWrapRef.current.scrollLeft){ topScrollRef.current.scrollLeft=tableWrapRef.current.scrollLeft } },[])
-  const onTopScroll = React.useCallback(()=>{ if(!topScrollRef.current||!tableWrapRef.current) return; if(tableWrapRef.current.scrollLeft!==topScrollRef.current.scrollLeft){ tableWrapRef.current.scrollLeft=topScrollRef.current.scrollLeft } },[])
-  const onWheelToHorizontal = React.useCallback((e: React.WheelEvent<HTMLDivElement>)=>{ const el=tableWrapRef.current; if(!el) return; if(!e.shiftKey && Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth>el.clientWidth){ el.scrollLeft += e.deltaY; e.preventDefault() } },[])
+
+  // Prevent scroll event feedback loop between top and bottom scrollers
+  const syncingRef = React.useRef(false)
+  const onBottomScroll = React.useCallback(()=>{
+    if(!topScrollRef.current||!tableWrapRef.current) return
+    if (syncingRef.current) return
+    const from = tableWrapRef.current
+    const to = topScrollRef.current
+    if (to.scrollLeft !== from.scrollLeft) {
+      syncingRef.current = true
+      to.scrollLeft = from.scrollLeft
+      // allow the browser to flush scroll event before releasing the flag
+      requestAnimationFrame(() => { syncingRef.current = false })
+    }
+  },[])
+  const onTopScroll = React.useCallback(()=>{
+    if(!topScrollRef.current||!tableWrapRef.current) return
+    if (syncingRef.current) return
+    const from = topScrollRef.current
+    const to = tableWrapRef.current
+    if (to.scrollLeft !== from.scrollLeft) {
+      syncingRef.current = true
+      to.scrollLeft = from.scrollLeft
+      requestAnimationFrame(() => { syncingRef.current = false })
+    }
+  },[])
 
   return (
     <div className="space-y-4">
@@ -217,6 +240,21 @@ const AdminErrorGroupsPage: React.FC = () => {
             </select>
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            {/* Görünüm/kolonlar menüsü: stok özet sayfasındaki gibi sağ üstte */}
+            <ColumnsMenu
+              density={density}
+              onDensityChange={setDensity}
+              columns={[
+                { key: 'lastSeen', label: 'Last Seen', checked: visibleCols.lastSeen, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastSeen: v })) },
+                { key: 'level', label: 'Level', checked: visibleCols.level, onChange: (v)=> setVisibleCols(prev=>({ ...prev, level: v })) },
+                { key: 'signature', label: 'Signature', checked: visibleCols.signature, onChange: (v)=> setVisibleCols(prev=>({ ...prev, signature: v })) },
+                { key: 'lastMsg', label: 'Last Message', checked: visibleCols.lastMsg, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastMsg: v })) },
+                { key: 'count', label: 'Count', checked: visibleCols.count, onChange: (v)=> setVisibleCols(prev=>({ ...prev, count: v })) },
+                { key: 'status', label: 'Status', checked: visibleCols.status, onChange: (v)=> setVisibleCols(prev=>({ ...prev, status: v })) },
+                { key: 'assigned', label: 'Assigned', checked: visibleCols.assigned, onChange: (v)=> setVisibleCols(prev=>({ ...prev, assigned: v })) },
+                { key: 'actions', label: 'Actions', checked: visibleCols.actions, onChange: (v)=> setVisibleCols(prev=>({ ...prev, actions: v })) },
+              ]}
+            />
           </div>
         )}
       />
@@ -233,12 +271,13 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Top horizontal scrollbar */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden>
+        {/* Top horizontal scrollbar (visual only) */}
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70 pointer-events-none" role="presentation" aria-hidden>
           <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
         </div>
 
-        <div ref={tableWrapRef} onScroll={onBottomScroll} onWheel={onWheelToHorizontal} className="overflow-x-auto">
+        {/* Main table wrapper: only horizontal scroll; prevent scroll chaining */}
+        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-contain">
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
@@ -296,7 +335,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                           <div className="grid md:grid-cols-3 gap-3 text-xs">
                             <div className="md:col-span-2">
                               <div className="font-medium text-industrial-gray mb-1">Son Kayıtlar</div>
-                              <div className="space-y-2 max-h-72 overflow-auto bg-white p-2 rounded border">
+                              <div className="space-y-2 max-h-72 overflow-auto overscroll-contain bg-white p-2 rounded border">
                                 {(latestClientErrors[r.id] || []).map((e: ClientErrorRow) => (
                                   <div key={e.id} className="border-b last:border-b-0 pb-1">
                                     <div className="text-steel-gray">{new Date(e.at).toLocaleString('tr-TR')} • {e.level || 'error'}</div>
@@ -325,23 +364,8 @@ const AdminErrorGroupsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Columns & density controller (same as Inventory) */}
-      <div className="flex justify-end">
-        <ColumnsMenu
-          density={density}
-          onDensityChange={setDensity}
-          columns={[
-            { key: 'lastSeen', label: 'Last Seen', checked: visibleCols.lastSeen, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastSeen: v })) },
-            { key: 'level', label: 'Level', checked: visibleCols.level, onChange: (v)=> setVisibleCols(prev=>({ ...prev, level: v })) },
-            { key: 'signature', label: 'Signature', checked: visibleCols.signature, onChange: (v)=> setVisibleCols(prev=>({ ...prev, signature: v })) },
-            { key: 'lastMsg', label: 'Last Message', checked: visibleCols.lastMsg, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastMsg: v })) },
-            { key: 'count', label: 'Count', checked: visibleCols.count, onChange: (v)=> setVisibleCols(prev=>({ ...prev, count: v })) },
-            { key: 'status', label: 'Status', checked: visibleCols.status, onChange: (v)=> setVisibleCols(prev=>({ ...prev, status: v })) },
-            { key: 'assigned', label: 'Assigned', checked: visibleCols.assigned, onChange: (v)=> setVisibleCols(prev=>({ ...prev, assigned: v })) },
-            { key: 'actions', label: 'Actions', checked: visibleCols.actions, onChange: (v)=> setVisibleCols(prev=>({ ...prev, actions: v })) },
-          ]}
-        />
-      </div>
+      {/* Görünüm butonu artık toolbar’ın sağında; burada tekrar göstermiyoruz */}
+      
     </div>
   )
 }

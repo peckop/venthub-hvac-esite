@@ -363,6 +363,8 @@ export const CategoryPage: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setViewMode('grid')}
+                    aria-label="Izgara görünümü"
+                    aria-pressed={viewMode === 'grid'}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'grid' 
                         ? 'bg-primary-navy text-white' 
@@ -373,6 +375,8 @@ export const CategoryPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
+                    aria-label="Liste görünümü"
+                    aria-pressed={viewMode === 'list'}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'list' 
                         ? 'bg-primary-navy text-white' 
