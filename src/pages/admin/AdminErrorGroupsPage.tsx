@@ -107,6 +107,33 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   React.useEffect(() => { fetchGroups() }, [fetchGroups])
 
+  // Keep a stable ref to fetchGroups so we don't have to re-subscribe the channel
+  const fetchRef = React.useRef(fetchGroups)
+  React.useEffect(() => { fetchRef.current = fetchGroups }, [fetchGroups])
+
+  // Debounced refetch to avoid spamming on bursts
+  const refetchTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scheduleRefetch = React.useCallback(() => {
+    if (refetchTimer.current) clearTimeout(refetchTimer.current)
+    refetchTimer.current = setTimeout(() => {
+      fetchRef.current()
+    }, 400)
+  }, [])
+
+  // Realtime: refresh list on any change in error_groups
+  React.useEffect(() => {
+    const ch = supabase
+      .channel('error-groups')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'error_groups' }, () => {
+        scheduleRefetch()
+      })
+      .subscribe()
+    return () => {
+      supabase.removeChannel(ch)
+      if (refetchTimer.current) clearTimeout(refetchTimer.current)
+    }
+  }, [scheduleRefetch])
+
   const updateStatus = async (id: string, newStatus: 'open' | 'resolved' | 'ignored') => {
     const prev = rows
     setRows(rs => rs.map(r => r.id === id ? { ...r, status: newStatus } : r))
