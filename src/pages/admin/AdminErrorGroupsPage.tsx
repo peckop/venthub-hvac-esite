@@ -1,5 +1,4 @@
 import React from 'react'
-import * as ScrollArea from '@radix-ui/react-scroll-area'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -256,9 +255,59 @@ const AdminErrorGroupsPage: React.FC = () => {
   }, [fromDate, toDate, level, status, debouncedQ, sortBy, sortDir])
 
   // Top and bottom synchronized horizontal scroll
-  // (ScrollArea ile özel üst/alt scroll senkron koduna gerek yok)
+  const topScrollRef = React.useRef<HTMLDivElement | null>(null)
+  const tableWrapRef = React.useRef<HTMLDivElement | null>(null)
+  const [topScrollWidth, setTopScrollWidth] = React.useState(0)
+  const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
+  React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
 
-  // Radix ScrollArea kullanımı ile yerleşik yatay scrollbar senkronizasyonu (üst ve alt)
+  // Smooth, bi-directional sync with rAF + programmatic update guard
+  const rafIdRef = React.useRef<number | null>(null)
+  const latestLeftRef = React.useRef(0)
+  const programmaticTargetRef = React.useRef<null | 'top' | 'bottom'>(null)
+  const pendingSourceRef = React.useRef<null | 'top' | 'bottom'>(null)
+
+  const flushSync = React.useCallback(() => {
+    if (rafIdRef.current != null) return
+    rafIdRef.current = requestAnimationFrame(() => {
+      const source = pendingSourceRef.current
+      rafIdRef.current = null
+      pendingSourceRef.current = null
+      if (!source) return
+      if (!topScrollRef.current || !tableWrapRef.current) return
+      const srcEl = source === 'top' ? topScrollRef.current : tableWrapRef.current
+      const dstEl = source === 'top' ? tableWrapRef.current : topScrollRef.current
+      const srcMax = Math.max(0, srcEl.scrollWidth - srcEl.clientWidth)
+      const dstMax = Math.max(0, dstEl.scrollWidth - dstEl.clientWidth)
+      const ratio = srcMax > 0 ? (latestLeftRef.current / srcMax) : 0
+      const mappedLeft = Math.max(0, Math.min(dstMax, ratio * dstMax))
+      programmaticTargetRef.current = source === 'top' ? 'bottom' : 'top'
+      dstEl.scrollLeft = mappedLeft
+    })
+  }, [])
+
+  const onTopScroll = React.useCallback(() => {
+    if (!topScrollRef.current || !tableWrapRef.current) return
+    if (programmaticTargetRef.current === 'top') {
+      // consume one programmatic event
+      programmaticTargetRef.current = null
+      return
+    }
+    latestLeftRef.current = topScrollRef.current.scrollLeft
+    pendingSourceRef.current = 'top'
+    flushSync()
+  }, [flushSync])
+
+  const onBottomScroll = React.useCallback(() => {
+    if (!topScrollRef.current || !tableWrapRef.current) return
+    if (programmaticTargetRef.current === 'bottom') {
+      programmaticTargetRef.current = null
+      return
+    }
+    latestLeftRef.current = tableWrapRef.current.scrollLeft
+    pendingSourceRef.current = 'bottom'
+    flushSync()
+  }, [flushSync])
 
   return (
     <div className="space-y-4">
@@ -317,18 +366,15 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Scrollable table with Radix ScrollArea */}
-        <ScrollArea.Root type="always" scrollHideDelay={0} className="w-full">
-          {/* Top horizontal scrollbar (sticky) */}
-          <div className="sticky top-0 z-10 bg-white">
-            <ScrollArea.Scrollbar orientation="horizontal" className="h-4 border-b border-light-gray/70">
-              <ScrollArea.Thumb />
-            </ScrollArea.Scrollbar>
-          </div>
+        {/* Top horizontal scrollbar */}
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-4 bg-gray-100 border-b border-light-gray/70 select-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
+          <div style={{ width: topScrollWidth || '100%' }} className="h-4" />
+        </div>
 
-          <ScrollArea.Viewport className="overscroll-x-contain">
-            <table className="w-full text-sm min-w-[980px]">
-              <thead className="bg-gray-50 sticky top-0 z-10">
+        {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
+        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-x-contain" style={{ willChange: 'scroll-position' }}>
+          <table className="w-full text-sm min-w-[980px]">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
                 {visibleCols.lastSeen && (
                   <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>
@@ -423,15 +469,8 @@ const AdminErrorGroupsPage: React.FC = () => {
                 ))
               )}
             </tbody>
-            </table>
-          </ScrollArea.Viewport>
-
-          {/* Bottom horizontal scrollbar */}
-          <ScrollArea.Scrollbar orientation="horizontal" className="h-4">
-            <ScrollArea.Thumb />
-          </ScrollArea.Scrollbar>
-          <ScrollArea.Corner />
-        </ScrollArea.Root>
+          </table>
+        </div>
       </div>
 
       {/* Görünüm butonu artık toolbar’ın sağında; burada tekrar göstermiyoruz */}
