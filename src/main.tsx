@@ -15,7 +15,8 @@ try {
       ? `${supaUrl}/functions/v1/log-client-error`
       : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
     const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
-    installErrorReporter(endpoint, { sample: 0.2, release, env: viteEnv.MODE })
+    const devSample = (viteEnv.MODE === 'production' ? 0.2 : 1.0)
+    installErrorReporter(endpoint, { sample: devSample, release, env: viteEnv.MODE, ttlMs: viteEnv.MODE === 'production' ? 15_000 : 0 })
   }
 } catch {}
 
