@@ -191,8 +191,8 @@ Sıradaki (kısa vadeli öneriler):
 - Hata Grupları:
   - [x] Sıralama (Count/Last Seen başlıktan)
   - [x] CSV export
-  - [ ] Assigned-to filtresi ve bulk status değişikliği
-- Detay paneli: Top-5 URL/Release/Env/UA dağılımı; ilk stack frame özet.
+  - [x] Assigned-to filtresi ve bulk status değişikliği
+- Detay paneli: Top-5 URL/Release/Env/UA dağılımı; ilk stack frame özet. [x]
 
 ## Güncelleme — 2025-09-07: Ana Sayfa Konsolidasyonu + Knowledge Hub v1
 
