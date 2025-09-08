@@ -161,6 +161,7 @@ All environment variables use `VITE_` prefix for Vite bundling:
 - `VITE_SUPABASE_ANON_KEY` - Public anon key
 - `VITE_DEBUG` - Enable debug logging (dev only)
 - `VITE_SHOP_WHATSAPP` - (Optional) WhatsApp phone for wa.me deeplink (e.g., 90XXXXXXXXXX)
+- Edge Functions (set in platform, not local): `RESEND_API_KEY`, `EMAIL_FROM`, `TWILIO_*`, `NOTIFY_DEBUG`
 
 ## ⚙️ Environment Setup
 

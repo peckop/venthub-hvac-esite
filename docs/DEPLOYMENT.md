@@ -31,6 +31,11 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
   - `VITE_SUPABASE_URL` → `https://<project-ref>.supabase.co`
   - `VITE_SUPABASE_ANON_KEY` → `<anon key>`
   - `VITE_SHOP_WHATSAPP` → Optional WhatsApp phone (e.g., 90XXXXXXXXXX) for “Stok sor” deeplink
+- Edge Function env (set in Supabase → Functions → Settings → Env Variables):
+  - `RESEND_API_KEY` (Email provider)
+  - `EMAIL_FROM` (e.g., `VentHub <info@venthub.com>`)
+  - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER`, `TWILIO_PHONE_NUMBER` (opsiyonel: WhatsApp/SMS)
+  - `NOTIFY_DEBUG` (optional: `true` to enable safe debug logs)
 
 Notes:
 - Do not commit secrets; always use platform env vars/secrets.

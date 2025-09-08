@@ -44,11 +44,23 @@ serve(async (req) => {
     const twilioWhatsAppNumber = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // e.g., 'whatsapp:+14155238886'
     const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER')
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <noreply@venthub.com>'
+    const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     
-    let result: any = { success: false }
+    let result: any = { success: false, note: undefined }
+
+    // Graceful disable per channel if missing config
+    const isWhatsAppEnabled = !!(twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber)
+    const isSmsEnabled = !!(twilioAccountSid && twilioAuthToken && twilioPhoneNumber)
+    const isEmailEnabled = !!resendApiKey
 
     switch (type) {
       case 'whatsapp':
+        if (!isWhatsAppEnabled) {
+          if (notifyDebug) console.warn('[notification-service] WhatsApp disabled: missing env')
+          result = { success: true, disabled: true, channel: 'whatsapp' }
+          break
+        }
         result = await sendWhatsApp(to, message, template, data, {
           accountSid: twilioAccountSid!,
           authToken: twilioAuthToken!,
@@ -57,6 +69,11 @@ serve(async (req) => {
         break
       
       case 'sms':
+        if (!isSmsEnabled) {
+          if (notifyDebug) console.warn('[notification-service] SMS disabled: missing env')
+          result = { success: true, disabled: true, channel: 'sms' }
+          break
+        }
         result = await sendSMS(to, message, {
           accountSid: twilioAccountSid!,
           authToken: twilioAuthToken!,
@@ -65,8 +82,14 @@ serve(async (req) => {
         break
       
       case 'email':
-        result = await sendEmail(to, message, template, data, {
-          apiKey: resendApiKey!
+        if (!isEmailEnabled) {
+          if (notifyDebug) console.warn('[notification-service] Email disabled: missing RESEND_API_KEY')
+          result = { success: true, disabled: true, channel: 'email' }
+          break
+        }
+        result = await sendEmail(to, message, template, { ...(data||{}), emailFrom }, {
+          apiKey: resendApiKey!,
+          from: emailFrom,
         })
         break
       
@@ -170,6 +193,7 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
 
   const subject = data?.subject || 'VentHub Bildirim'
   const finalMessage = template ? formatTemplate(template, data) : message
+  const from = config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
   
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -178,7 +202,7 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'VentHub <noreply@venthub.com>',
+      from,
       to: [to],
       subject: subject,
       text: finalMessage,
