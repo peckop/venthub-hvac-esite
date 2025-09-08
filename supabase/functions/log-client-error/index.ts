@@ -18,6 +18,34 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
+    // Optional origin restriction (comma-separated list)
+    const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean)
+    if (allowedOrigins.length > 0) {
+      const originHeader = req.headers.get('origin') || ''
+      let originToCheck = originHeader
+      if (!originToCheck) {
+        const ref = req.headers.get('referer') || ''
+        try { originToCheck = new URL(ref).origin } catch {}
+      }
+      if (!originToCheck || !allowedOrigins.includes(originToCheck)) {
+        return new Response('Forbidden', { status: 403, headers: cors })
+      }
+    }
+
+    const requireAuth = (Deno.env.get('REQUIRE_AUTH') ?? 'true').toLowerCase() !== 'false'
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    if (requireAuth) {
+      const authHeader = req.headers.get('authorization') || req.headers.get('Authorization') || ''
+      if (!authHeader.toLowerCase().startsWith('bearer ')) {
+        return new Response('Unauthorized', { status: 401, headers: cors })
+      }
+      const accessToken = authHeader.slice(7).trim()
+      const { data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
+      if (authErr || !authData?.user) {
+        return new Response('Unauthorized', { status: 401, headers: cors })
+      }
+    }
+
     const body = await req.json().catch(()=>null) as unknown
     if (!body || typeof body !== 'object') {
       return new Response('Bad Request', { status: 400, headers: cors })
@@ -36,8 +64,6 @@ Deno.serve(async (req) => {
     const urlObj = (()=>{ try { return new URL(String(payload.url||'')) } catch { return null } })()
     const path = urlObj?.pathname || ''
     const signature = mask(`${String(payload.msg||'')}`.slice(0,300) + ' :: ' + `${firstLine}`.slice(0,300) + ' :: ' + `${path}`.slice(0,200))
-
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
 
     // Upsert group (best-effort: do not fail request if grouping fails)
     let groupId: string | null = null
@@ -72,6 +98,25 @@ Deno.serve(async (req) => {
     } catch (_) {
       // ignore grouping errors
       groupId = null
+    }
+
+    // Server-side lightweight dedup by group within a short window (default 5s)
+    const dedupSeconds = parseInt(Deno.env.get('DEDUP_SECONDS') || '5')
+    if (groupId && dedupSeconds > 0) {
+      try {
+        const since = new Date(Date.now() - dedupSeconds * 1000).toISOString()
+        const { data: recent } = await supabase
+          .from('client_errors')
+          .select('id, at')
+          .eq('group_id', groupId)
+          .gte('at', since)
+          .limit(1)
+        if (Array.isArray(recent) && recent.length > 0) {
+          return new Response('ok', { status: 200, headers: cors })
+        }
+      } catch {
+        // ignore dedup errors, proceed to insert
+      }
     }
 
     const row: Record<string, unknown> = {

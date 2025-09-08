@@ -16,8 +16,10 @@ try {
       ? `${supaUrl}/functions/v1/log-client-error`
       : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
     const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
-    const devSample = (viteEnv.MODE === 'production' ? 0.2 : 1.0)
-    installErrorReporter(endpoint, { sample: devSample, release, env: viteEnv.MODE, ttlMs: viteEnv.MODE === 'production' ? 15_000 : 0 })
+    const isProd = viteEnv.MODE === 'production'
+    const sample = isProd ? 0.1 : 1.0
+    const ttlMs = isProd ? 60_000 : 0
+    installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
   }
 } catch {}
 
