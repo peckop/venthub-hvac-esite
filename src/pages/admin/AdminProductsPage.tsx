@@ -1,6 +1,7 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -27,6 +28,16 @@ const AdminProductsPage: React.FC = () => {
   const [q, setQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+
+  // Columns & density
+  const STORAGE_KEY = 'toolbar:products'
+  const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
+  const [density, setDensity] = React.useState<Density>('comfortable')
+  React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+  const cellPad = density==='compact' ? 'px-2 py-2' : ''
 
   // selection & form state
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
@@ -288,8 +299,22 @@ const AdminProductsPage: React.FC = () => {
       <AdminToolbar
         storageKey="toolbar:products"
         search={{ value: q, onChange: setQ, placeholder: 'ürün adı/SKU/marka ara', focusShortcut: '/' }}
+        recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
+            <ColumnsMenu
+              columns={[
+                { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
+                { key: 'sku', label: 'SKU', checked: visibleCols.sku, onChange: (v)=>setVisibleCols(s=>({ ...s, sku: v })) },
+                { key: 'category', label: 'Kategori', checked: visibleCols.category, onChange: (v)=>setVisibleCols(s=>({ ...s, category: v })) },
+                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'price', label: 'Fiyat', checked: visibleCols.price, onChange: (v)=>setVisibleCols(s=>({ ...s, price: v })) },
+                { key: 'stock', label: 'Stok', checked: visibleCols.stock, onChange: (v)=>setVisibleCols(s=>({ ...s, stock: v })) },
+                { key: 'actions', label: 'İşlem', checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
+              ]}
+              density={density}
+              onDensityChange={setDensity}
+            />
             <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
           </div>
         )}
@@ -409,13 +434,13 @@ const AdminProductsPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className={adminTableHeadCellClass}>Ad</th>
-              <th className={adminTableHeadCellClass}>SKU</th>
-              <th className={adminTableHeadCellClass}>Kategori</th>
-              <th className={adminTableHeadCellClass}>Durum</th>
-              <th className={adminTableHeadCellClass}>Fiyat</th>
-              <th className={adminTableHeadCellClass}>Stok</th>
-              <th className={adminTableHeadCellClass}>İşlem</th>
+              {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
+              {visibleCols.sku && <th className={`${adminTableHeadCellClass} ${headPad}`}>SKU</th>}
+              {visibleCols.category && <th className={`${adminTableHeadCellClass} ${headPad}`}>Kategori</th>}
+              {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad}`}>Durum</th>}
+              {visibleCols.price && <th className={`${adminTableHeadCellClass} ${headPad}`}>Fiyat</th>}
+              {visibleCols.stock && <th className={`${adminTableHeadCellClass} ${headPad}`}>Stok</th>}
+              {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
             </tr>
           </thead>
           <tbody>
@@ -426,16 +451,18 @@ const AdminProductsPage: React.FC = () => {
             ) : (
               filtered.map(r => (
                 <tr key={r.id} className="border-b border-light-gray/60">
-                  <td className={adminTableCellClass}>{r.name}</td>
-                  <td className={adminTableCellClass}>{r.sku}</td>
-                  <td className={adminTableCellClass}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>
-                  <td className={adminTableCellClass}>{r.status || '-'}</td>
-                  <td className={adminTableCellClass}>{(r.price!=null?Number(r.price):null) ?? '-'}</td>
-                  <td className={adminTableCellClass}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>
-                  <td className={`${adminTableCellClass} space-x-2`}>
-                    <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
-                    <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
-                  </td>
+                  {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
+                  {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
+                  {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>}
+                  {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{r.status || '-'}</td>}
+                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.price!=null?Number(r.price):null) ?? '-'}</td>}
+                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
+                  {visibleCols.actions && (
+                    <td className={`${adminTableCellClass} ${cellPad} space-x-2`}>
+                      <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
+                      <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

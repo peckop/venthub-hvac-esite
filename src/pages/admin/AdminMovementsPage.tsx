@@ -198,7 +198,7 @@ const AdminMovementsPage: React.FC = () => {
         m.delta,
         reasonLabel(m.reason),
         m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
-].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+      ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
     })
     const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
@@ -207,6 +207,27 @@ const AdminMovementsPage: React.FC = () => {
     const a = document.createElement('a')
     a.href = url
     a.download = `inventory_movements_p${page}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function exportXls() {
+    const rowsHtml = filtered.map(m => {
+      const p = productMap[m.product_id]
+      const date = new Date(m.created_at).toLocaleString('tr-TR')
+      const prod = p?.name || m.product_id
+      const sku = p?.sku || ''
+      const delta = m.delta
+      const reason = reasonLabel(m.reason)
+      const ref = m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
+      return `<tr><td>${date}</td><td>${prod}</td><td>${sku}</td><td>${delta}</td><td>${reason}</td><td>${ref}</td></tr>`
+    }).join('')
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Tarih</th><th>Ürün</th><th>SKU</th><th>Delta</th><th>Sebep</th><th>Referans</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `inventory_movements_p${page}.xls`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -259,7 +280,10 @@ const AdminMovementsPage: React.FC = () => {
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <ExportMenu items={[{ key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv }]} />
+            <ExportMenu items={[
+              { key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv },
+              { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportXls }
+            ]} />
             <ColumnsMenu
               columns={[
                 { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },

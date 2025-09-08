@@ -1,6 +1,6 @@
 # Changelog
 
-## 2025-09-08 (Admin Error Logs, Realtime ve Scroll UX + WhatsApp Deeplink + Order Consents)
+## 2025-09-08 (Admin Error Logs, Realtime ve Scroll UX + WhatsApp Deeplink + Order Consents + Admin Exports)
 - Yeni: AdminErrorGroupsPage — grup görünümü (signature, last_message, count, last_seen, level, status, assigned_to), filtreler (arama, seviye, durum, tarih), server-side sayfalama.
 - Yeni: AdminErrorsPage — ham client_errors listesi; Realtime abonelikler eklendi.
 - Realtime: error_groups ve client_errors için Postgres Realtime ile canlı güncellemeler.
@@ -12,6 +12,8 @@
 - PDP/ProductCard: "Stok sor" için opsiyonel WhatsApp deeplink (VITE_SHOP_WHATSAPP). Env yoksa PDP'de mailto ve kartta /contact fallback korunur.
 - OrderDetail: Fatura sekmesinde fatura bilgileri (bireysel/ticari) ve yasal onayların (KVKK, Mesafeli, Ön Bilgilendirme, Sipariş Onayı, Pazarlama) görünürlüğü eklendi.
 - Admin Error Groups: Assigned-to filtresi ve toplu durum değişikliği eklendi; detay panelinde URL/Release/Env/UA için Top‑5 dağılımı gösteriliyor.
+- Admin Returns: Export menüsü eklendi (CSV + Excel .xls)
+- Admin Movements: Export menüsüne Excel (.xls) eklendi
 
 ## 2025-09-07 (SEO/A11y/Perf Hardening)
 - SEO: sitemap.xml ve robots.txt içindeki base URL portu 5173 → 4173 olarak düzeltildi (preview parity). Lighthouse sitemap hataları giderildi.
