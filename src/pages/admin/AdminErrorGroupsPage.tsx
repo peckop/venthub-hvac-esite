@@ -261,20 +261,52 @@ const AdminErrorGroupsPage: React.FC = () => {
   const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
   React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
 
-  // Smooth, single-direction sync (bottom driver -> top visual)
+  // Smooth, bi-directional sync with rAF + programmatic update guard
   const rafIdRef = React.useRef<number | null>(null)
   const latestLeftRef = React.useRef(0)
-  const onBottomScroll = React.useCallback(() => {
-    if (!topScrollRef.current || !tableWrapRef.current) return
-    latestLeftRef.current = tableWrapRef.current.scrollLeft
+  const programmaticTargetRef = React.useRef<null | 'top' | 'bottom'>(null)
+  const pendingSourceRef = React.useRef<null | 'top' | 'bottom'>(null)
+
+  const flushSync = React.useCallback(() => {
     if (rafIdRef.current != null) return
     rafIdRef.current = requestAnimationFrame(() => {
-      if (topScrollRef.current) {
+      const source = pendingSourceRef.current
+      rafIdRef.current = null
+      pendingSourceRef.current = null
+      if (!source) return
+      if (!topScrollRef.current || !tableWrapRef.current) return
+      if (source === 'top') {
+        programmaticTargetRef.current = 'bottom'
+        tableWrapRef.current.scrollLeft = latestLeftRef.current
+      } else {
+        programmaticTargetRef.current = 'top'
         topScrollRef.current.scrollLeft = latestLeftRef.current
       }
-      rafIdRef.current = null
     })
   }, [])
+
+  const onTopScroll = React.useCallback(() => {
+    if (!topScrollRef.current || !tableWrapRef.current) return
+    if (programmaticTargetRef.current === 'top') {
+      // consume one programmatic event
+      programmaticTargetRef.current = null
+      return
+    }
+    latestLeftRef.current = topScrollRef.current.scrollLeft
+    pendingSourceRef.current = 'top'
+    flushSync()
+  }, [flushSync])
+
+  const onBottomScroll = React.useCallback(() => {
+    if (!topScrollRef.current || !tableWrapRef.current) return
+    if (programmaticTargetRef.current === 'bottom') {
+      programmaticTargetRef.current = null
+      return
+    }
+    latestLeftRef.current = tableWrapRef.current.scrollLeft
+    pendingSourceRef.current = 'bottom'
+    flushSync()
+  }, [flushSync])
 
   return (
     <div className="space-y-4">
@@ -333,8 +365,8 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Top horizontal scrollbar (visual only) */}
-        <div ref={topScrollRef} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70 pointer-events-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
+        {/* Top horizontal scrollbar */}
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
           <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
         </div>
 
