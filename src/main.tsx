@@ -20,6 +20,19 @@ try {
   }
 } catch {}
 
+// Optional: automatic test error trigger behind a flag
+try {
+  const params = new URLSearchParams(location.search)
+  const hash = String(location.hash || '')
+  const trigger = params.get('vh_error_test') === '1' || /vh_error_test=1/.test(hash) || localStorage.getItem('errorlog:test') === '1'
+  if (trigger) {
+    setTimeout(() => {
+      // Throw a real error to validate logging pipeline end-to-end
+      throw new Error('VH TEST ' + new Date().toISOString())
+    }, 300)
+  }
+} catch {}
+
 // Sayfa yenilemelerinde tarayıcının otomatik scroll restorasyonunu kapat
 // Böylece yenilemede her zaman sayfa başına çıkılır
 if ('scrollRestoration' in window.history) {
