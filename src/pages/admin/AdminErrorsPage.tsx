@@ -32,6 +32,7 @@ const AdminErrorsPage: React.FC = () => {
   const [fromDate, setFromDate] = React.useState('')
   const [toDate, setToDate] = React.useState('')
   const [level, setLevel] = React.useState('')
+  const [env, setEnv] = React.useState('production')
 
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
@@ -50,6 +51,7 @@ const AdminErrorsPage: React.FC = () => {
       if (fromDate) query = query.gte('at', `${fromDate}T00:00:00Z`)
       if (toDate) query = query.lte('at', `${toDate}T23:59:59Z`)
       if (level) query = query.eq('level', level)
+      if (env) query = query.eq('env', env)
       if (debouncedQ) {
         const like = `%${debouncedQ}%`
         query = query.or(`url.ilike.${like},message.ilike.${like}`)
@@ -67,7 +69,7 @@ const AdminErrorsPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [fromDate, toDate, level, debouncedQ, page])
+  }, [fromDate, toDate, level, env, debouncedQ, page])
 
   React.useEffect(() => { fetchErrors() }, [fetchErrors])
 
@@ -113,6 +115,12 @@ const AdminErrorsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
+            <select value={env} onChange={(e)=>setEnv(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Ortam">
+              <option value="production">production</option>
+              <option value="preview">preview</option>
+              <option value="development">development</option>
+              <option value="">(tümü)</option>
+            </select>
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
           </div>
