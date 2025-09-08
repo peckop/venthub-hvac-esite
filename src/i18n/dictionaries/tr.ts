@@ -208,7 +208,9 @@ export const tr = {
       users: 'Kullanıcılar',
       logs: 'Kayıtlar',
       errors: 'Hatalar',
-      errorGroups: 'Hata Grupları'
+      errorGroups: 'Hata Grupları',
+      products: 'Ürünler',
+      categories: 'Kategoriler'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -219,7 +221,9 @@ export const tr = {
       users: 'Kullanıcı Yönetimi',
       audit: 'Denetim Kayıtları',
       errors: 'Hata Kayıtları',
-      errorGroups: 'Hata Grupları'
+      errorGroups: 'Hata Grupları',
+      products: 'Ürünler',
+      categories: 'Kategoriler'
     }
   },
   footer: {
