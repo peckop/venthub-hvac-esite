@@ -261,31 +261,20 @@ const AdminErrorGroupsPage: React.FC = () => {
   const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
   React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
 
-  // Prevent scroll event feedback loop between top and bottom scrollers
-  const syncingRef = React.useRef(false)
-  const onBottomScroll = React.useCallback(()=>{
-    if(!topScrollRef.current||!tableWrapRef.current) return
-    if (syncingRef.current) return
-    const from = tableWrapRef.current
-    const to = topScrollRef.current
-    if (to.scrollLeft !== from.scrollLeft) {
-      syncingRef.current = true
-      to.scrollLeft = from.scrollLeft
-      // allow the browser to flush scroll event before releasing the flag
-      requestAnimationFrame(() => { syncingRef.current = false })
-    }
-  },[])
-  const onTopScroll = React.useCallback(()=>{
-    if(!topScrollRef.current||!tableWrapRef.current) return
-    if (syncingRef.current) return
-    const from = topScrollRef.current
-    const to = tableWrapRef.current
-    if (to.scrollLeft !== from.scrollLeft) {
-      syncingRef.current = true
-      to.scrollLeft = from.scrollLeft
-      requestAnimationFrame(() => { syncingRef.current = false })
-    }
-  },[])
+  // Smooth, single-direction sync (bottom driver -> top visual)
+  const rafIdRef = React.useRef<number | null>(null)
+  const latestLeftRef = React.useRef(0)
+  const onBottomScroll = React.useCallback(() => {
+    if (!topScrollRef.current || !tableWrapRef.current) return
+    latestLeftRef.current = tableWrapRef.current.scrollLeft
+    if (rafIdRef.current != null) return
+    rafIdRef.current = requestAnimationFrame(() => {
+      if (topScrollRef.current) {
+        topScrollRef.current.scrollLeft = latestLeftRef.current
+      }
+      rafIdRef.current = null
+    })
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -344,13 +333,13 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Top horizontal scrollbar */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden>
+        {/* Top horizontal scrollbar (visual only) */}
+        <div ref={topScrollRef} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70 pointer-events-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
           <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
         </div>
 
         {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
-        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-x-contain">
+        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-x-contain" style={{ willChange: 'scroll-position' }}>
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
