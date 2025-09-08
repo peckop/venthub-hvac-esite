@@ -2,24 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import AppWrapper from './AppWrapper.tsx'
-import * as Sentry from '@sentry/react'
 import { installErrorReporter } from './lib/errorReporter'
 
 // Sentry init (yalnızca DSN varsa)
 try {
   const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
-  const DSN = viteEnv.VITE_SENTRY_DSN
-  if (DSN) {
-    Sentry.init({
-      dsn: DSN,
-      integrations: [
-        Sentry.browserTracingIntegration(),
-      ],
-      tracesSampleRate: 0.2,
-      environment: viteEnv.MODE,
-      release: (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__,
-    })
-  }
   // Install lightweight error reporter to Supabase Edge Function
   const supaUrl = viteEnv.VITE_SUPABASE_URL
   if (supaUrl) {
