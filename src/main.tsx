@@ -10,7 +10,10 @@ try {
   // Install lightweight error reporter to Supabase Edge Function
   const supaUrl = viteEnv.VITE_SUPABASE_URL
   if (supaUrl) {
-    const endpoint = `${supaUrl}/functions/v1/log-client-error`
+    const isLocal = /localhost|127\.0\.0\.1/.test(supaUrl)
+    const endpoint = isLocal
+      ? `${supaUrl}/functions/v1/log-client-error`
+      : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
     const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
     installErrorReporter(endpoint, { sample: 0.2, release, env: viteEnv.MODE })
   }
