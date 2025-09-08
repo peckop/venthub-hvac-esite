@@ -1,6 +1,6 @@
 # Changelog
 
-## 2025-09-08 (Admin Error Logs, Realtime ve Scroll UX)
+## 2025-09-08 (Admin Error Logs, Realtime ve Scroll UX + WhatsApp Deeplink + Order Consents)
 - Yeni: AdminErrorGroupsPage — grup görünümü (signature, last_message, count, last_seen, level, status, assigned_to), filtreler (arama, seviye, durum, tarih), server-side sayfalama.
 - Yeni: AdminErrorsPage — ham client_errors listesi; Realtime abonelikler eklendi.
 - Realtime: error_groups ve client_errors için Postgres Realtime ile canlı güncellemeler.
@@ -9,6 +9,8 @@
 - Supabase Şema/RLS: client_errors.group_id, error_groups; admin/moderator JWT rolü ve e‑posta fallback ile erişim politikaları.
 - Edge Function: log-client-error — 404/401 ve 500 hataları giderildi; supabase.functions.invoke kullanımı; try/catch + maybeSingle ile güvenli sorgu; prod uç nokta doğrulandı.
 - Deploy/Cache: Cloudflare Pages’de /public/_headers ile index.html no-store; bayat UI problemi çözüldü.
+- PDP/ProductCard: "Stok sor" için opsiyonel WhatsApp deeplink (VITE_SHOP_WHATSAPP). Env yoksa PDP'de mailto ve kartta /contact fallback korunur.
+- OrderDetail: Fatura sekmesinde fatura bilgileri (bireysel/ticari) ve yasal onayların (KVKK, Mesafeli, Ön Bilgilendirme, Sipariş Onayı, Pazarlama) görünürlüğü eklendi.
 
 ## 2025-09-07 (SEO/A11y/Perf Hardening)
 - SEO: sitemap.xml ve robots.txt içindeki base URL portu 5173 → 4173 olarak düzeltildi (preview parity). Lighthouse sitemap hataları giderildi.

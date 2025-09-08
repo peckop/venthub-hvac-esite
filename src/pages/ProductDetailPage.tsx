@@ -8,6 +8,7 @@ import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import LeadModal from '../components/LeadModal'
 import legalConfig from '../config/legal'
+import { buildWhatsAppLink } from '../lib/utils'
 import { 
   ArrowLeft, 
   ShoppingCart, 
@@ -397,6 +398,21 @@ export const ProductDetailPage: React.FC = () => {
                 {(() => {
                   const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
                   if (inStock) return null
+                  const env = (import.meta as unknown as { env?: Record<string, string> }).env
+                  const wa = env?.VITE_SHOP_WHATSAPP
+                  if (typeof wa === 'string' && wa.trim()) {
+                    const href = buildWhatsAppLink(wa, `Stok bilgisi: ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''}`)
+                    return (
+                      <a
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full md:w-auto mt-2 text-primary-navy hover:text-secondary-blue underline"
+                      >
+                        {t('pdp.askStock') || 'Stok sor'}
+                      </a>
+                    )
+                  }
                   const mail = legalConfig?.sellerEmail || 'info@example.com'
                   const subject = encodeURIComponent('Stok Bilgisi Talebi')
                   const body = encodeURIComponent(`Merhaba, ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''} ürünü için stok durumu hakkında bilgi alabilir miyim?`)

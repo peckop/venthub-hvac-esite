@@ -50,8 +50,8 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Taşıyıcı API/webhook veya periyodik polling (sandbox)
   - [x] Status senkronizasyonu (pending→paid→shipped→delivered)
 - Returns akışı
-  - [ ] Durum yönetimi (requested/approved/rejected/in_transit/received/refunded)
-  - [ ] Bildirimler (opsiyonel)
+  - [x] Durum yönetimi (requested/approved/rejected/in_transit/received/refunded)
+  - [x] Bildirimler (opsiyonel)
 - Fatura (Proforma PDF mevcut)
   - [x] İndir/Paylaş (Proforma PDF mevcut)
   - (Kurumsal bilgiler ve resmi numaralandırma "Parked" bölümünde)
@@ -78,7 +78,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Müşteri UX
   - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)
   - [x] Stok yoksa: “Stok sor” butonu → mailto formu (başlangıç), WhatsApp linki yapılandırılabilir
-  - [ ] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
+  - [x] Sepete ekle disabled; checkout’ta stok yeniden doğrulaması
 - Erişim ve RLS Stabilizasyonu (Yeni)
   - [x] Products ve Categories için herkese SELECT politikası (RLS) eklendi
   - [x] user_profiles RLS sonsuz döngü hatası giderildi (SECURITY DEFINER fonksiyonları ile)
@@ -91,10 +91,10 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] İyzico callback entegrasyonu: ödeme sonrası stok uyarısı tetikleyicisi
   - [ ] Environment variables: Twilio + Resend API keys
   - [ ] Kurumsal numara: WhatsApp Business onayı
-  - [ ] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
+  - [x] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
 - Kargo Operasyonları (minimal)
-  - [ ] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
-  - [ ] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
+  - [x] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
+  - [x] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
 
 ### Sprint 3 — Planlı
 - Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
@@ -135,7 +135,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Kargo (sandbox)
   - [x] Statü senk ve basit taşıyıcı webhook/polling prototipi
 - Orders detay (opsiyonel)
-  - [ ] Yasal onay alanlarını görünür kıl (mevcut kayıt varsa)
+  - [x] Yasal onay alanlarını görünür kıl (mevcut kayıt varsa)
 
 ## 4) Kurumsal/PLP Planı (Özet)
 - Kaynak: docs/plan-and-tasklist.md (detay korunuyor), ancak güncel kaynak ROADMAP.
@@ -188,7 +188,10 @@ Uygulananlar:
 - Deploy/Cache: Cloudflare Pages’de index.html için no-store başlıkları eklendi; bayat UI problemi giderildi.
 
 Sıradaki (kısa vadeli öneriler):
-- Hata Grupları: Count/Last Seen başlıktan sıralama; CSV export; assigned-to filtresi ve bulk status.
+- Hata Grupları:
+  - [x] Sıralama (Count/Last Seen başlıktan)
+  - [x] CSV export
+  - [ ] Assigned-to filtresi ve bulk status değişikliği
 - Detay paneli: Top-5 URL/Release/Env/UA dağılımı; ilk stack frame özet.
 
 ## Güncelleme — 2025-09-07: Ana Sayfa Konsolidasyonu + Knowledge Hub v1

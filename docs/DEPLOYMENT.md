@@ -30,6 +30,7 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
 - Environment variables (Production + Preview):
   - `VITE_SUPABASE_URL` → `https://<project-ref>.supabase.co`
   - `VITE_SUPABASE_ANON_KEY` → `<anon key>`
+  - `VITE_SHOP_WHATSAPP` → Optional WhatsApp phone (e.g., 90XXXXXXXXXX) for “Stok sor” deeplink
 
 Notes:
 - Do not commit secrets; always use platform env vars/secrets.

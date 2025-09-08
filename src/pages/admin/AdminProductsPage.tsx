@@ -1,0 +1,450 @@
+import React from 'react'
+import { supabase } from '../../lib/supabase'
+import AdminToolbar from '../../components/admin/AdminToolbar'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { useI18n } from '../../i18n/I18nProvider'
+
+interface ProductRow {
+  id: string
+  name: string
+  sku: string
+  brand?: string | null
+  status?: string | null
+  category_id?: string | null
+  price?: number | null
+  purchase_price?: number | null
+  stock_qty?: number | null
+  low_stock_threshold?: number | null
+}
+
+interface CategoryOpt { id: string; name: string }
+interface ImageRow { id: string; product_id: string; path: string; alt?: string | null; sort_order: number }
+
+const AdminProductsPage: React.FC = () => {
+  const { t } = useI18n()
+  const [rows, setRows] = React.useState<ProductRow[]>([])
+  const [cats, setCats] = React.useState<CategoryOpt[]>([])
+  const [q, setQ] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // selection & form state
+  const [selectedId, setSelectedId] = React.useState<string | null>(null)
+  const [tab, setTab] = React.useState<'info'|'pricing'|'stock'|'images'|'seo'>('info')
+
+  // info
+  const [name, setName] = React.useState('')
+  const [sku, setSku] = React.useState('')
+  const [brand, setBrand] = React.useState('')
+  const [status, setStatus] = React.useState('active')
+  const [categoryId, setCategoryId] = React.useState('')
+  const [isFeatured, setIsFeatured] = React.useState(false)
+
+  // pricing
+  const [price, setPrice] = React.useState<string>('')
+  const [purchasePrice, setPurchasePrice] = React.useState<string>('')
+
+  // stock
+  const [stockQty, setStockQty] = React.useState<string>('')
+  const [lowStock, setLowStock] = React.useState<string>('')
+
+  // images
+  const [images, setImages] = React.useState<ImageRow[]>([])
+  const [uploading, setUploading] = React.useState(false)
+
+  // seo
+  const [slug, setSlug] = React.useState('')
+  const [metaTitle, setMetaTitle] = React.useState('')
+  const [metaDesc, setMetaDesc] = React.useState('')
+
+  const slugify = (s: string) => s
+    .toLowerCase()
+    .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$|--+/g, '-')
+
+  const load = React.useCallback(async ()=>{
+    setLoading(true)
+    setError(null)
+    try {
+      const [p, c] = await Promise.all([
+        supabase.from('products').select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold').order('name', { ascending: true }),
+        supabase.from('categories').select('id,name').order('name', { ascending: true })
+      ])
+      if (p.error) throw p.error
+      if (c.error) throw c.error
+      setRows((p.data || []) as ProductRow[])
+      setCats((c.data || []) as CategoryOpt[])
+    } catch (e) {
+      setError((e as Error).message || 'Yüklenemedi')
+      setRows([])
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  React.useEffect(()=>{ load() }, [load])
+
+  const filtered = React.useMemo(()=>{
+    const term = q.trim().toLowerCase()
+    if (!term) return rows
+    return rows.filter(r => [r.name, r.sku, r.brand || ''].some(v => (v||'').toLowerCase().includes(term)))
+  }, [rows, q])
+
+  const startCreate = () => {
+    setSelectedId(null)
+    setTab('info')
+    setName('')
+    setSku('')
+    setBrand('')
+    setStatus('active')
+    setCategoryId('')
+    setIsFeatured(false)
+    setPrice('')
+    setPurchasePrice('')
+    setStockQty('')
+    setLowStock('')
+    setSlug('')
+    setMetaTitle('')
+    setMetaDesc('')
+    setImages([])
+  }
+
+  type DBProduct = { id: string; name?: string|null; sku?: string|null; brand?: string|null; status?: string|null; category_id?: string|null; is_featured?: boolean|null; price?: number|null; purchase_price?: number|null; stock_qty?: number|null; low_stock_threshold?: number|null; slug?: string|null; meta_title?: string|null; meta_description?: string|null }
+  const startEdit = async (id: string) => {
+    setSelectedId(id)
+    setTab('info')
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle()
+      if (error) throw error
+      const p = (data as DBProduct) || ({} as DBProduct)
+      setName(p?.name || '')
+      setSku(p?.sku || '')
+      setBrand(p?.brand || '')
+      setStatus(p?.status || 'active')
+      setCategoryId(p?.category_id || '')
+      setIsFeatured(!!p?.is_featured)
+      setPrice(p?.price != null ? String(p.price) : '')
+      setPurchasePrice(p?.purchase_price != null ? String(p.purchase_price) : '')
+      setStockQty(p?.stock_qty != null ? String(p.stock_qty) : '')
+      setLowStock(p?.low_stock_threshold != null ? String(p.low_stock_threshold) : '')
+      setSlug(p?.slug || '')
+      setMetaTitle(p?.meta_title || '')
+      setMetaDesc(p?.meta_description || '')
+      await loadImages(id)
+    } catch (e) {
+      alert('Ürün yüklenemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const loadImages = async (productId: string) => {
+    const { data, error } = await supabase
+      .from('product_images')
+      .select('id, product_id, path, alt, sort_order')
+      .eq('product_id', productId)
+      .order('sort_order', { ascending: true })
+    if (!error) setImages((data || []) as ImageRow[])
+  }
+
+  const saveInfo = async () => {
+    try {
+      const payload: { name: string; sku: string; brand?: string; status?: string; category_id: string | null; is_featured: boolean } = {
+        name: name.trim(), sku: sku.trim(), brand: brand.trim(), status,
+        category_id: categoryId || null, is_featured: isFeatured,
+      }
+      if (!payload.name || !payload.sku) return
+      if (selectedId) {
+        const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
+        if (error) throw error
+      } else {
+        const { data, error } = await supabase.from('products').insert(payload).select('id').maybeSingle()
+        if (error) throw error
+        const inserted = (data as { id: string } | null)
+        setSelectedId(inserted?.id || null)
+      }
+      await load()
+    } catch (e) {
+      alert('Kaydedilemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const savePricing = async () => {
+    if (!selectedId) return
+    try {
+      const payload = {
+        price: price === '' ? null : Number(price),
+        purchase_price: purchasePrice === '' ? null : Number(purchasePrice),
+      }
+      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
+      if (error) throw error
+      await load()
+    } catch (e) {
+      alert('Fiyat kaydedilemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const saveStock = async () => {
+    if (!selectedId) return
+    try {
+      const payload = {
+        stock_qty: stockQty === '' ? null : Number(stockQty),
+        low_stock_threshold: lowStock === '' ? null : Number(lowStock),
+      }
+      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
+      if (error) throw error
+      await load()
+    } catch (e) {
+      alert('Stok kaydedilemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const uploadImages = async (files: FileList | null) => {
+    if (!selectedId || !files || files.length === 0) return
+    setUploading(true)
+    try {
+      for (const file of Array.from(files)) {
+        const ext = file.name.split('.').pop() || 'jpg'
+        const filename = `${Date.now()}-${slugify(name || 'urun')}.${ext}`
+        const path = `product/${selectedId}/${filename}`
+        const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
+        if (upErr) throw upErr
+        // insert DB ref
+        const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
+        if (dbErr) throw dbErr
+      }
+      await loadImages(selectedId)
+    } catch (e) {
+      alert('Yükleme hatası: ' + ((e as Error).message || e))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const deleteImage = async (img: ImageRow) => {
+    if (!confirm('Görseli silmek istiyor musunuz?')) return
+    try {
+      await supabase.from('product_images').delete().eq('id', img.id)
+      // storage’dan da sil (best-effort)
+      await supabase.storage.from('product-images').remove([img.path])
+      if (selectedId) await loadImages(selectedId)
+    } catch (e) {
+      alert('Görsel silinemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const bumpImage = async (img: ImageRow, dir: -1 | 1) => {
+    const list = [...images]
+    const idx = list.findIndex(x => x.id === img.id)
+    const swapIdx = idx + dir
+    if (idx < 0 || swapIdx < 0 || swapIdx >= list.length) return
+    const a = list[idx]
+    const b = list[swapIdx]
+    try {
+      await Promise.all([
+        supabase.from('product_images').update({ sort_order: b.sort_order }).eq('id', a.id),
+        supabase.from('product_images').update({ sort_order: a.sort_order }).eq('id', b.id)
+      ])
+      if (selectedId) await loadImages(selectedId)
+    } catch (e) {
+      alert('Sıralama değişmedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const saveSeo = async () => {
+    if (!selectedId) return
+    try {
+      const payload = {
+        slug: (slug || slugify(name)).trim() || null,
+        meta_title: metaTitle || null,
+        meta_description: metaDesc || null,
+      }
+      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
+      if (error) throw error
+      await load()
+    } catch (e) {
+      alert('SEO kaydedilemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  const remove = async (id: string) => {
+    if (!confirm('Bu ürünü silmek istiyor musunuz?')) return
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id)
+      if (error) throw error
+      await load()
+      if (selectedId === id) startCreate()
+    } catch (e) {
+      alert('Silinemedi: ' + ((e as Error).message || e))
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
+
+      <AdminToolbar
+        storageKey="toolbar:products"
+        search={{ value: q, onChange: setQ, placeholder: 'ürün adı/SKU/marka ara', focusShortcut: '/' }}
+        rightExtra={(
+          <div className="flex items-center gap-2">
+            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
+          </div>
+        )}
+      />
+
+      {/* Edit Panel */}
+      <div className={`${adminCardClass} p-4`}>
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          {(['info','pricing','stock','images','seo'] as const).map(k => (
+            <button key={k} onClick={()=>setTab(k)} className={`px-3 py-2 text-sm rounded border ${tab===k?'border-primary-navy':'border-light-gray'}`}>{k.toUpperCase()}</button>
+          ))}
+          <div className="ml-auto text-sm text-steel-gray">{selectedId ? 'Düzenle' : 'Yeni Ürün'}</div>
+        </div>
+
+        {tab === 'info' && (
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-sm text-steel-gray">Ad</label>
+              <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <label className="text-sm text-steel-gray">SKU</label>
+              <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <label className="text-sm text-steel-gray">Marka</label>
+              <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full px-3 py-2 border rounded" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm text-steel-gray">Durum</label>
+              <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full px-3 py-2 border rounded">
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+                <option value="out_of_stock">out_of_stock</option>
+              </select>
+              <label className="text-sm text-steel-gray">Kategori</label>
+              <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full px-3 py-2 border rounded">
+                <option value="">(Seçilmemiş)</option>
+                {cats.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
+              </select>
+              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> Öne Çıkan</label>
+            </div>
+            <div className="col-span-full flex gap-2">
+              <button onClick={saveInfo} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+            </div>
+          </div>
+        )}
+
+        {tab === 'pricing' && (
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-sm text-steel-gray">Satış Fiyatı</label>
+              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 1999.90" />
+              <label className="text-sm text-steel-gray">Alış Maliyeti</label>
+              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 1499.50" />
+            </div>
+            <div className="col-span-full flex gap-2">
+              <button onClick={savePricing} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+            </div>
+          </div>
+        )}
+
+        {tab === 'stock' && (
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-sm text-steel-gray">Stok</label>
+              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 50" />
+              <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
+              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 5" />
+            </div>
+            <div className="col-span-full flex gap-2">
+              <button onClick={saveStock} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+            </div>
+          </div>
+        )}
+
+        {tab === 'images' && (
+          <div className="space-y-3">
+            {!selectedId && <div className="text-sm text-steel-gray">Önce ürünü kaydedin.</div>}
+            {selectedId && (
+              <>
+                <input type="file" multiple onChange={(e)=>uploadImages(e.target.files)} disabled={uploading} />
+                <div className="grid md:grid-cols-4 gap-3">
+                  {images.map((img, idx) => (
+                    <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
+                      <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
+                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border rounded text-sm" placeholder="alt" />
+                      <div className="flex gap-2">
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
+                        <button className="px-2 py-1 border rounded text-xs text-red-600 ml-auto" onClick={()=>deleteImage(img)}>Sil</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {tab === 'seo' && (
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-sm text-steel-gray">Slug</label>
+              <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="ornek-urun" />
+              <label className="text-sm text-steel-gray">Meta Title</label>
+              <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <label className="text-sm text-steel-gray">Meta Description</label>
+              <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full px-3 py-2 border rounded" rows={3} />
+            </div>
+            <div className="col-span-full flex gap-2">
+              <button onClick={saveSeo} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Table */}
+      <div className={`${adminCardClass} overflow-hidden`}>
+        {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className={adminTableHeadCellClass}>Ad</th>
+              <th className={adminTableHeadCellClass}>SKU</th>
+              <th className={adminTableHeadCellClass}>Kategori</th>
+              <th className={adminTableHeadCellClass}>Durum</th>
+              <th className={adminTableHeadCellClass}>Fiyat</th>
+              <th className={adminTableHeadCellClass}>Stok</th>
+              <th className={adminTableHeadCellClass}>İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading && rows.length === 0 ? (
+              <tr><td className="p-4" colSpan={7}>Yükleniyor…</td></tr>
+            ) : filtered.length === 0 ? (
+              <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
+            ) : (
+              filtered.map(r => (
+                <tr key={r.id} className="border-b border-light-gray/60">
+                  <td className={adminTableCellClass}>{r.name}</td>
+                  <td className={adminTableCellClass}>{r.sku}</td>
+                  <td className={adminTableCellClass}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>
+                  <td className={adminTableCellClass}>{r.status || '-'}</td>
+                  <td className={adminTableCellClass}>{(r.price!=null?Number(r.price):null) ?? '-'}</td>
+                  <td className={adminTableCellClass}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>
+                  <td className={`${adminTableCellClass} space-x-2`}>
+                    <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
+                    <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+export default AdminProductsPage
+

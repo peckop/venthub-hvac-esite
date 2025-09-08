@@ -47,9 +47,9 @@
    - [ ] Çerez Politikası metni (src/config/legal.ts) şirket bilgileri ile güncelle
 
 5) **Stok sistemi son adımlar** (ROADMAP'de detay)
-   - [ ] RLS policies (güvenlik)
-   - [ ] Checkout stock revalidation (oversell engelleme)
-   - [ ] WhatsApp wa.me config (frontend entegrasyonu)
+  - [ ] RLS policies (güvenlik)
+  - [x] Checkout stock revalidation (oversell engelleme)
+  - [ ] WhatsApp wa.me config (frontend entegrasyonu)
 
 ## Ana Sayfa Geliştirmeleri — Takip (2025-09-07)
 

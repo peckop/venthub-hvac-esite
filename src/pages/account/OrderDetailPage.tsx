@@ -49,6 +49,9 @@ interface Order {
   shipped_at?: string
   delivered_at?: string
   shipping_method?: 'standard' | 'express' | string
+  invoice_type?: string
+  invoice_info?: unknown
+  legal_consents?: unknown
 }
 
 interface SupabaseOrderData {
@@ -68,6 +71,9 @@ interface SupabaseOrderData {
   shipped_at: string | null
   delivered_at: string | null
   shipping_method?: string | null
+  invoice_type?: string | null
+  invoice_info?: unknown
+  legal_consents?: unknown
   venthub_order_items: SupabaseOrderItem[]
 }
 
@@ -109,7 +115,7 @@ export default function OrderDetailPage() {
     async function load() {
       try {
         setLoading(true)
-const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
         const baseRes = await supabase
           .from('venthub_orders')
           .select(baseSelect)
@@ -124,7 +130,7 @@ const baseSelect = 'id, total_amount, status, payment_status, created_at, custom
           data = baseRes.data as unknown as SupabaseOrderData
         } else if (((baseRes.error as SupabaseError).code === '42703') || ((baseRes.error as SupabaseError).status === 400)) {
           // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
-          const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
           const fb = await supabase
             .from('venthub_orders')
             .select(fallbackSelect)
@@ -178,15 +184,19 @@ const mapped: Order = {
   customer_name: orderDataWithDefaults.customer_name,
   customer_email: orderDataWithDefaults.customer_email,
   shipping_address: orderDataWithDefaults.shipping_address,
-  order_items: (itemsData || []).map((it: SupabaseOrderItem) => ({
-    id: it.id,
-    product_id: it.product_id ?? undefined,
-    product_name: it.product_name,
-    quantity: it.quantity,
-    unit_price: Number(it.price_at_time) || 0,
-    total_price: (Number(it.price_at_time) || 0) * (Number(it.quantity) || 0),
-    product_image_url: it.product_image_url ?? undefined,
-  })),
+  order_items: (itemsData || []).map((it: SupabaseOrderItem) => {
+    const unit = Number(it.price_at_time) || 0
+    const total = unit * Number(it.quantity || 0)
+    return {
+      id: it.id,
+      product_id: it.product_id ?? undefined,
+      product_name: it.product_name,
+      quantity: it.quantity,
+      unit_price: unit,
+      total_price: total,
+      product_image_url: it.product_image_url,
+    }
+  }),
   order_number: orderDataWithDefaults.order_number || undefined,
   is_demo: false,
   payment_data: undefined,
@@ -197,6 +207,9 @@ const mapped: Order = {
   shipped_at: orderDataWithDefaults.shipped_at || undefined,
   delivered_at: orderDataWithDefaults.delivered_at || undefined,
   shipping_method: (orderDataWithDefaults.shipping_method || undefined) as string | undefined,
+  invoice_type: orderDataWithDefaults.invoice_type || undefined,
+  invoice_info: orderDataWithDefaults.invoice_info || undefined,
+  legal_consents: orderDataWithDefaults.legal_consents || undefined,
 }
         setOrder(mapped)
       } catch (e) {
@@ -509,8 +522,68 @@ const mapped: Order = {
           )}
 
           {tab==='invoice' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <h4 className="font-semibold text-industrial-gray">{t('orders.tabs.invoice')}</h4>
+
+              {/* Invoice Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-steel-gray mb-2 font-medium">Fatura Bilgileri</div>
+                  <div className="space-y-1">
+                    <div><span className="text-steel-gray">Tip:</span> <span className="text-industrial-gray font-medium">{order.invoice_type || '-'}</span></div>
+                    {(() => {
+                      const info = (order.invoice_info || {}) as Record<string, unknown>
+                      const iv = (k: string) => (info?.[k] ? String(info[k]) : '-')
+                      if ((order.invoice_type || '').toLowerCase() === 'corporate') {
+                        return (
+                          <div className="space-y-1">
+                            <div><span className="text-steel-gray">Ünvan:</span> <span className="text-industrial-gray font-medium">{iv('companyName')}</span></div>
+                            <div><span className="text-steel-gray">VKN:</span> <span className="text-industrial-gray font-medium">{iv('vkn')}</span></div>
+                            <div><span className="text-steel-gray">Vergi Dairesi:</span> <span className="text-industrial-gray font-medium">{iv('taxOffice')}</span></div>
+                          </div>
+                        )
+                      }
+                      return (
+                        <div className="space-y-1">
+                          <div><span className="text-steel-gray">TCKN:</span> <span className="text-industrial-gray font-medium">{iv('tckn')}</span></div>
+                        </div>
+                      )
+                    })()}
+                  </div>
+                </div>
+
+                {/* Legal Consents */}
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-steel-gray mb-2 font-medium">Yasal Onaylar</div>
+                  <div className="space-y-1">
+                    {(() => {
+                      const cons = (order.legal_consents || {}) as Record<string, { accepted?: boolean; ts?: string | null }>
+                      const row = (label: string, k: string) => {
+                        const c = cons?.[k]
+                        const ok = !!c?.accepted
+                        const ts = c?.ts ? new Date(c.ts).toLocaleString('tr-TR') : '-'
+                        return (
+                          <div key={k} className="flex items-center justify-between">
+                            <span className="text-steel-gray">{label}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${ok ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>{ok ? 'Kabul' : '—'}</span>
+                            <span className="text-xs text-industrial-gray">{ok ? ts : ''}</span>
+                          </div>
+                        )
+                      }
+                      return (
+                        <>
+                          {row('KVKK', 'kvkk')}
+                          {row('Mesafeli Satış', 'distanceSales')}
+                          {row('Ön Bilgilendirme', 'preInfo')}
+                          {row('Sipariş Onayı', 'orderConfirm')}
+                          {row('Pazarlama İzni', 'marketing')}
+                        </>
+                      )
+                    })()}
+                  </div>
+                </div>
+              </div>
+
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50">{t('orders.invoicePdf')}</button>
               </div>

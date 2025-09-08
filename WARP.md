@@ -160,6 +160,7 @@ All environment variables use `VITE_` prefix for Vite bundling:
 - `VITE_SUPABASE_URL` - Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` - Public anon key
 - `VITE_DEBUG` - Enable debug logging (dev only)
+- `VITE_SHOP_WHATSAPP` - (Optional) WhatsApp phone for wa.me deeplink (e.g., 90XXXXXXXXXX)
 
 ## ⚙️ Environment Setup
 
