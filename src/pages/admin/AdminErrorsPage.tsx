@@ -71,6 +71,29 @@ const AdminErrorsPage: React.FC = () => {
 
   React.useEffect(() => { fetchErrors() }, [fetchErrors])
 
+  // Realtime auto-refresh with debounce
+  const fetchRef = React.useRef(fetchErrors)
+  React.useEffect(() => { fetchRef.current = fetchErrors }, [fetchErrors])
+
+  const refetchTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  const scheduleRefetch = React.useCallback(() => {
+    if (refetchTimer.current) clearTimeout(refetchTimer.current)
+    refetchTimer.current = setTimeout(() => fetchRef.current(), 400)
+  }, [])
+
+  React.useEffect(() => {
+    const ch = supabase
+      .channel('client-errors')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'client_errors' }, () => {
+        scheduleRefetch()
+      })
+      .subscribe()
+    return () => {
+      supabase.removeChannel(ch)
+      if (refetchTimer.current) clearTimeout(refetchTimer.current)
+    }
+  }, [scheduleRefetch])
+
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
 
   return (
