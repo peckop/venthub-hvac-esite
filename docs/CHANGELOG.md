@@ -11,6 +11,7 @@
 - Deploy/Cache: Cloudflare Pages’de /public/_headers ile index.html no-store; bayat UI problemi çözüldü.
 - PDP/ProductCard: "Stok sor" için opsiyonel WhatsApp deeplink (VITE_SHOP_WHATSAPP). Env yoksa PDP'de mailto ve kartta /contact fallback korunur.
 - OrderDetail: Fatura sekmesinde fatura bilgileri (bireysel/ticari) ve yasal onayların (KVKK, Mesafeli, Ön Bilgilendirme, Sipariş Onayı, Pazarlama) görünürlüğü eklendi.
+- Admin Error Groups: Assigned-to filtresi ve toplu durum değişikliği eklendi; detay panelinde URL/Release/Env/UA için Top‑5 dağılımı gösteriliyor.
 
 ## 2025-09-07 (SEO/A11y/Perf Hardening)
 - SEO: sitemap.xml ve robots.txt içindeki base URL portu 5173 → 4173 olarak düzeltildi (preview parity). Lighthouse sitemap hataları giderildi.

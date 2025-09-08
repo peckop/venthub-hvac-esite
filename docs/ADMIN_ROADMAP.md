@@ -58,8 +58,8 @@ Tarih: 2025-09-08
 - Errors / Error Groups
   - [x] Sıralama: Count ve Last Seen başlıktan tıklayarak
   - [x] Export: CSV dışa aktar (grup ve ham kayıtlar)
-  - [ ] Assigned-to filtresi ve bulk status değişikliği
-  - [ ] Detay panelinde en sık URL/Release/Env/UA dağılımı (top-5)
+  - [x] Assigned-to filtresi ve bulk status değişikliği
+  - [x] Detay panelinde en sık URL/Release/Env/UA dağılımı (top-5)
   - [ ] Last Message yanında ilk stack frame özeti (hızlı kök neden ipucu)
 
 ## Sıradaki (Sprint 3A – Products & Categories & Pricing)

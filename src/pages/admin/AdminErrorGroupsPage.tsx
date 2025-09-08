@@ -62,10 +62,15 @@ const AdminErrorGroupsPage: React.FC = () => {
   const [status, setStatus] = React.useState('')
   const [fromDate, setFromDate] = React.useState('')
   const [toDate, setToDate] = React.useState('')
+  const [assigned, setAssigned] = React.useState<string>('') // ''=tümü, '__none__'=atanmamış, aksi halde user id
 
   const [users, setUsers] = React.useState<AdminUserOpt[]>([])
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
   const [latestClientErrors, setLatestClientErrors] = React.useState<Record<string, ClientErrorRow[]>>({})
+  // Selection & bulk actions
+  const [selectedIds, setSelectedIds] = React.useState<string[]>([])
+  const [bulkStatus, setBulkStatus] = React.useState<'open'|'resolved'|'ignored'>('resolved')
+  const [savingBulk, setSavingBulk] = React.useState(false)
 
   // Sorting
   const [sortBy, setSortBy] = React.useState<'last_seen' | 'count'>('last_seen')
@@ -111,6 +116,8 @@ const AdminErrorGroupsPage: React.FC = () => {
       if (toDate) query = query.lte('last_seen', `${toDate}T23:59:59Z`)
       if (level) query = query.eq('level', level)
       if (status) query = query.eq('status', status)
+      if (assigned === '__none__') query = query.is('assigned_to', null)
+      else if (assigned) query = query.eq('assigned_to', assigned)
       if (debouncedQ) {
         const like = `%${debouncedQ}%`
         query = query.or(`signature.ilike.${like},last_message.ilike.${like}`)
@@ -130,7 +137,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [fromDate, toDate, level, status, debouncedQ, page, sortBy, sortDir])
+  }, [fromDate, toDate, level, status, assigned, debouncedQ, page, sortBy, sortDir])
 
   React.useEffect(() => { fetchGroups() }, [fetchGroups])
 
@@ -192,7 +199,7 @@ const AdminErrorGroupsPage: React.FC = () => {
         .select('id, at, url, message, stack, user_agent, release, env, level')
         .eq('group_id', groupId)
         .order('at', { ascending: false })
-        .limit(20)
+        .limit(200)
       if (!error) setLatestClientErrors(prev => ({ ...prev, [groupId]: (data || []) as ClientErrorRow[] }))
     } catch {}
   }
@@ -309,6 +316,25 @@ const AdminErrorGroupsPage: React.FC = () => {
     flushSync()
   }, [flushSync])
 
+  const toggleSelect = (id: string, on: boolean) => {
+    setSelectedIds(prev => on ? Array.from(new Set([...prev, id])) : prev.filter(x => x !== id))
+  }
+
+  const bulkApplyStatus = async () => {
+    if (selectedIds.length === 0) return
+    setSavingBulk(true)
+    try {
+      const { error } = await supabase.from('error_groups').update({ status: bulkStatus }).in('id', selectedIds)
+      if (error) throw error
+      setRows(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status: bulkStatus } : r))
+      setSelectedIds([])
+    } catch (e) {
+      console.error('bulk status error', e)
+    } finally {
+      setSavingBulk(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.errorGroups') ?? 'Hata Grupları'}</h1>
@@ -322,7 +348,7 @@ const AdminErrorGroupsPage: React.FC = () => {
           { value: 'warn', label: 'warn' },
           { value: 'info', label: 'info' },
         ] }}
-        onClear={() => { setQ(''); setLevel(''); setStatus(''); setFromDate(''); setToDate(''); setPage(1) }}
+        onClear={() => { setQ(''); setLevel(''); setStatus(''); setAssigned(''); setFromDate(''); setToDate(''); setPage(1); setSelectedIds([]) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
@@ -331,6 +357,13 @@ const AdminErrorGroupsPage: React.FC = () => {
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
+            </select>
+            <select value={assigned} onChange={(e)=>setAssigned(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+              <option value="">Atanan: Tümü</option>
+              <option value="__none__">(atanmamış)</option>
+              {users.map(u => (
+                <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
+              ))}
             </select>
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
@@ -361,6 +394,23 @@ const AdminErrorGroupsPage: React.FC = () => {
         <button onClick={()=>setPage(p=>p+1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Sonraki</button>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.length > 0 && (
+        <div className={adminCardClass + ' flex items-center justify-between'}>
+          <div className="text-sm text-industrial-gray">Seçili grup: {selectedIds.length}</div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-steel-gray">Durum:</label>
+            <select value={bulkStatus} onChange={(e)=>setBulkStatus(e.target.value as 'open'|'resolved'|'ignored')} className="border border-light-gray rounded-md px-2 h-10 text-sm bg-white">
+              <option value="open">open</option>
+              <option value="resolved">resolved</option>
+              <option value="ignored">ignored</option>
+            </select>
+            <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? 'Uygulanıyor…' : 'Uygula'}</button>
+            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">Temizle</button>
+          </div>
+        </div>
+      )}
+
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && (
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
@@ -376,6 +426,7 @@ const AdminErrorGroupsPage: React.FC = () => {
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
+                <th className={`${adminTableHeadCellClass} ${headPad} min-w-[40px]`}></th>
                 {visibleCols.lastSeen && (
                   <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>
                     <button type="button" onClick={() => toggleSort('last_seen')} className="inline-flex items-center gap-1">
@@ -409,6 +460,9 @@ const AdminErrorGroupsPage: React.FC = () => {
                 rows.map(r => (
                   <React.Fragment key={r.id}>
                     <tr className="border-b border-light-gray/60 align-top">
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>toggleSelect(r.id, e.target.checked)} />
+                      </td>
                       {visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{new Date(r.last_seen).toLocaleString('tr-TR')}</td>}
                       {visibleCols.level && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{r.level || 'error'}</td>}
                       {visibleCols.signature && <td className={`${adminTableCellClass} ${cellPad} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>}
@@ -460,6 +514,41 @@ const AdminErrorGroupsPage: React.FC = () => {
                               <textarea defaultValue={rows.find(x=>x.id===r.id)?.notes || ''} onBlur={(ev)=>updateNotes(r.id, ev.target.value)} className="w-full border border-light-gray rounded p-2 bg-white" rows={7} placeholder="Bu grup hakkında not bırakın..."/>
                               <div className="font-medium text-industrial-gray mb-1 mt-3">Örnek URL</div>
                               <div className="text-[11px] break-all">{r.url_sample || '-'}</div>
+                              <div className="font-medium text-industrial-gray mb-2 mt-3">Top‑5 Dağılımlar</div>
+                              {(() => {
+                                const list = latestClientErrors[r.id] || []
+                                const topN = (arr: ClientErrorRow[], key: (e: ClientErrorRow)=>string, n=5) => {
+                                  const m = new Map<string, number>()
+                                  for (const it of arr) {
+                                    const k = key(it) || '-'
+                                    m.set(k, (m.get(k)||0) + 1)
+                                  }
+                                  return Array.from(m.entries()).sort((a,b)=>b[1]-a[1]).slice(0,n)
+                                }
+                                const topUrl = topN(list, e=>String(e.url||'-'))
+                                const topRel = topN(list, e=>String(e.release||'-'))
+                                const topEnv = topN(list, e=>String(e.env||'-'))
+                                const topUA  = topN(list, e=>String(e.user_agent||'-'))
+                                const Block = ({title, items}:{title:string;items:[string,number][]}) => (
+                                  <div className="mb-2">
+                                    <div className="text-steel-gray font-medium mb-1">{title}</div>
+                                    <ul className="space-y-1 list-disc pl-4">
+                                      {items.map(([k,c]) => (
+                                        <li key={k} className="text-[11px] break-all"><span className="text-industrial-gray">{k}</span> <span className="text-steel-gray">({c})</span></li>
+                                      ))}
+                                      {items.length === 0 && <li className="text-[11px] text-steel-gray">-</li>}
+                                    </ul>
+                                  </div>
+                                )
+                                return (
+                                  <div className="grid grid-cols-1 gap-2 mt-1">
+                                    <Block title="URL" items={topUrl} />
+                                    <Block title="Release" items={topRel} />
+                                    <Block title="Env" items={topEnv} />
+                                    <Block title="User Agent" items={topUA} />
+                                  </div>
+                                )
+                              })()}
                             </div>
                           </div>
                         </td>
