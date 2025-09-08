@@ -62,7 +62,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Şema: venthub_inventory_movements (id, product_id, delta, reason, order_id?, created_at)
   - [x] Şema: inventory_settings (single row) → default_low_stock_threshold
   - [x] Şema: venthub_products.low_stock_threshold (ürün bazında override)
-  - [ ] RLS: inventory_settings update sadece admin; products stok alanlarını admin veya RPC ile güncelle
+  - [x] RLS: inventory_settings update sadece admin; products stok alanlarını admin veya RPC ile güncelle
   - [x] RPC: set_stock(p_product_id uuid, p_new_qty int, p_reason text)
   - [x] RPC: adjust_stock(p_product_id uuid, p_delta int, p_reason text)
   - [x] Order sonrası atomik stok düşümü (REST API) + idempotent guard (stock_processed flag)
