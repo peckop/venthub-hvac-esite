@@ -1,4 +1,6 @@
-export function installErrorReporter(endpoint: string, options?: { sample?: number; release?: string; env?: string }) {
+import { supabase } from './supabase'
+
+export function installErrorReporter(_endpoint: string, options?: { sample?: number; release?: string; env?: string }) {
   const sample = typeof options?.sample === 'number' ? Math.max(0, Math.min(1, options.sample)) : 0.2
   const release = options?.release || 'dev'
   const env = options?.env || 'development'
@@ -19,18 +21,16 @@ export function installErrorReporter(endpoint: string, options?: { sample?: numb
     return true
   }
 
-  function post(payload: Record<string, unknown>) {
+  async function post(payload: Record<string, unknown>) {
     try {
       if (Math.random() > sample) return
       const key = JSON.stringify([payload.msg, payload.url, payload.stack]).slice(0, 256)
       if (!shouldSend(key)) return
-      const json = JSON.stringify(payload)
-      const blob = new Blob([json], { type: 'application/json' })
-      // Prefer Beacon; fallback to fetch
-      if (!(navigator.sendBeacon && navigator.sendBeacon(endpoint, blob))) {
-        fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: json })
-      }
-    } catch {}
+      // Use Supabase client to include Authorization/apikey headers automatically
+      await supabase.functions.invoke('log-client-error', { body: payload })
+    } catch {
+      // swallow
+    }
   }
 
   window.addEventListener('error', (e) => {
