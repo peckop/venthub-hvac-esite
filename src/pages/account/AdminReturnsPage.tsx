@@ -9,6 +9,7 @@ import { checkAdminAccess } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import ExportMenu from '../../components/admin/ExportMenu'
 
 interface ReturnWithOrder {
   id: string
@@ -375,6 +376,52 @@ export default function AdminReturnsPage() {
     )
   }
 
+  function exportCsv() {
+    const header = ['Sipariş','Müşteri','E-posta','Sebep','Durum','Tarih','Tutar']
+    const lines = filteredReturns.map(r => [
+      r.order_number ? `#${r.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`,
+      r.customer_name || '',
+      r.customer_email || '',
+      r.reason || '',
+      getStatusLabel(r.status),
+      new Date(r.created_at).toLocaleString('tr-TR'),
+      typeof r.total_amount === 'number' ? new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(r.total_amount) : ''
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',') )
+    const bom = '\ufeff'
+    const csv = [header.join(','), ...lines].join('\n')
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `returns_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function exportXls() {
+    const rowsHtml = filteredReturns.map(r => {
+      const orderNo = r.order_number ? `#${r.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
+      const amount = typeof r.total_amount === 'number' ? new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(r.total_amount) : ''
+      return `<tr>`+
+        `<td>${orderNo}</td>`+
+        `<td>${r.customer_name||''}</td>`+
+        `<td>${r.customer_email||''}</td>`+
+        `<td>${r.reason||''}</td>`+
+        `<td>${getStatusLabel(r.status)}</td>`+
+        `<td>${new Date(r.created_at).toLocaleString('tr-TR')}</td>`+
+        `<td>${amount}</td>`+
+      `</tr>`
+    }).join('')
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Sipariş</th><th>Müşteri</th><th>E-posta</th><th>Sebep</th><th>Durum</th><th>Tarih</th><th>Tutar</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `returns_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xls`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -387,17 +434,23 @@ export default function AdminReturnsPage() {
         storageKey="toolbar:returns"
         search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Sipariş no, müşteri adı, email veya sebep ile ara', focusShortcut: '/' }}
         rightExtra={(
-          <ColumnsMenu
-            columns={[
-              { key: 'order', label: 'Sipariş', checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
-              { key: 'customer', label: 'Müşteri', checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
-              { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
-              { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-              { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
-            ]}
-            density={density}
-            onDensityChange={setDensity}
-          />
+          <div className="flex items-center gap-2">
+            <ExportMenu items={[
+              { key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv },
+              { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportXls }
+            ]} />
+            <ColumnsMenu
+              columns={[
+                { key: 'order', label: 'Sipariş', checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
+                { key: 'customer', label: 'Müşteri', checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
+                { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
+                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+              ]}
+              density={density}
+              onDensityChange={setDensity}
+            />
+          </div>
         )}
         chips={statusOptions.filter(o=>o.value!=='all').map(o => ({
           key: o.value,

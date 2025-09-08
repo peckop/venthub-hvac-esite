@@ -52,7 +52,6 @@ Tarih: 2025-09-08
   - Dışa Aktar: CSV + Excel (.xls) (mevcut)
 
 ## Sıradaki (Sprint 3 – Returns & Movements & Errors)
-- Dışa Aktar menüsü: Returns ve Movements için Excel (.xls) eklenmesi
 - Toolbar durumlarının kalıcılığı (localStorage; sayfa bazlı anahtarlar)
 - Gelişmiş filtre çekmecesi (Orders)
 - Errors / Error Groups
@@ -60,6 +59,10 @@ Tarih: 2025-09-08
   - [x] Export: CSV dışa aktar (grup ve ham kayıtlar)
   - [x] Assigned-to filtresi ve bulk status değişikliği
   - [x] Detay panelinde en sık URL/Release/Env/UA dağılımı (top-5)
+
+## Güncellemeler (Sprint 3)
+- Movements: Export menüsüne Excel (.xls) eklendi
+- Returns: Export menüsüne CSV ve Excel (.xls) eklendi
   - [ ] Last Message yanında ilk stack frame özeti (hızlı kök neden ipucu)
 
 ## Sıradaki (Sprint 3A – Products & Categories & Pricing)

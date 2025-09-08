@@ -136,6 +136,9 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Statü senk ve basit taşıyıcı webhook/polling prototipi
 - Orders detay (opsiyonel)
   - [x] Yasal onay alanlarını görünür kıl (mevcut kayıt varsa)
+- Export (Admin)
+  - [x] Returns: CSV + Excel (.xls)
+  - [x] Movements: Excel (.xls)
 
 ## 4) Kurumsal/PLP Planı (Özet)
 - Kaynak: docs/plan-and-tasklist.md (detay korunuyor), ancak güncel kaynak ROADMAP.
