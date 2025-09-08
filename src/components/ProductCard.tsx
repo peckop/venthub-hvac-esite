@@ -5,6 +5,7 @@ import { ShoppingCart, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
+import { buildWhatsAppLink } from '../lib/utils'
 
 interface ProductCardProps {
   product: Product
@@ -137,16 +138,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <ShoppingCart size={16} />
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>
-            {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (
-              <Link
-                to="/contact"
-                onClick={(e) => { e.stopPropagation() }}
-                className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
-                title={t('pdp.askStock') as string}
-              >
-                {t('pdp.askStock')}
-              </Link>
-            )}
+            {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
+              const env = (import.meta as unknown as { env?: Record<string, string> }).env
+              const wa = env?.VITE_SHOP_WHATSAPP
+              if (typeof wa === 'string' && wa.trim()) {
+                const href = buildWhatsAppLink(wa, `Stok bilgisi: ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''}`)
+                return (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => { e.stopPropagation() }}
+                    className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
+                    title={t('pdp.askStock') as string}
+                  >
+                    {t('pdp.askStock')}
+                  </a>
+                )
+              }
+              return (
+                <Link
+                  to="/contact"
+                  onClick={(e) => { e.stopPropagation() }}
+                  className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
+                  title={t('pdp.askStock') as string}
+                >
+                  {t('pdp.askStock')}
+                </Link>
+              )
+            })()}
             {onQuickView ? (
               <button
                 type="button"

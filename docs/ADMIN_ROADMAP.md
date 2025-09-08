@@ -34,6 +34,8 @@ Tarih: 2025-09-08
   - [x] Atama ve Durum: assigned_to ve status alanları satır içi düzenlenir
   - [x] Görünüm: ColumnsMenu toolbar’ın sağında; yoğunluk (compact/comfortable)
   - [x] UX: Üst/alt yatay scroller senkron; overscroll-x-contain ile zincir kesimi; dikey scroll normal akışta
+  - [x] Sıralama: Last Seen ve Count başlıklardan tıklayarak
+  - [x] Dışa Aktar: CSV export (filtrelerle, 1000’lik chunk)
 - Yeni: Hatalar (/admin/errors)
   - [x] Liste: client_errors ham kayıtları; realtime; server-side sayfalama
 - Altyapı
@@ -54,10 +56,49 @@ Tarih: 2025-09-08
 - Toolbar durumlarının kalıcılığı (localStorage; sayfa bazlı anahtarlar)
 - Gelişmiş filtre çekmecesi (Orders)
 - Errors / Error Groups
-  - [ ] Sıralama: Count ve Last Seen başlıklarına tıklayarak
-  - [ ] Export: CSV dışa aktar (grup ve ham kayıtlar)
+  - [x] Sıralama: Count ve Last Seen başlıktan tıklayarak
+  - [x] Export: CSV dışa aktar (grup ve ham kayıtlar)
   - [ ] Assigned-to filtresi ve bulk status değişikliği
   - [ ] Detay panelinde en sık URL/Release/Env/UA dağılımı (top-5)
+  - [ ] Last Message yanında ilk stack frame özeti (hızlı kök neden ipucu)
+
+## Sıradaki (Sprint 3A – Products & Categories & Pricing)
+
+Durum (altyapı taraması):
+- products: stock_qty ve low_stock_threshold mevcut (20250902_* migrations)
+- products: purchase_price yok, slug/meta alanları yok
+- product_images tablosu yok
+- Storage bucket/policy için migration yok (product-images)
+- Admin Products (/admin/products)
+  - [ ] Liste: arama, kategori filtresi, sıralama, durum filtresi (aktif/pasif)
+  - [ ] Yeni Ürün Ekle: ad, SKU, kategori, durum, satış fiyatı, alış fiyatı, stok başlangıcı, düşük stok eşiği, kısa/uzun açıklama, görseller, SEO (slug, meta)
+  - [ ] Ürün Düzenle/Sil: aynı alanlar; audit log
+  - [ ] Görseller: ekleme/sıralama/silme (storage)
+- Admin Categories (/admin/categories)
+  - [ ] Kategori listeleme, oluşturma, düzenleme, silme
+  - [ ] Slug, parent (opsiyonel hiyerarşi), aktif/pasif; kategoriye bağlı ürün sayısı
+- Pricing
+  - [ ] Satış fiyatı (price) ve alış maliyeti (purchase_price) alanlarının yönetimi
+  - [ ] (Opsiyon) fiyat listeleri/iskonto kuralları için hazırlık
+  - [ ] KDV oranı alanı ve gösterimi (opsiyonel)
+- Toplu İşlemler
+  - [ ] Ürün CSV import/export (alan eşleme sihirbazı, doğrulama)
+  - [ ] Kategori CSV import/export (slug ile eşleştirme)
+- Erişim ve Denetim
+  - [ ] RLS/policy güncellemeleri (admin/moderator)
+  - [ ] Audit log: ürün/kategori ve fiyat değişiklikleri
+
+### Görev Listesi (Sprint 3A)
+- [x] Migration: products.purchase_price numeric(12,2) NULL
+- [x] Migration: products.slug (unique, lowercase index) + meta_title + meta_description
+- [x] Migration: product_images (id, product_id, path, alt, sort_order, created_at) + index
+- [x] Storage: product-images bucket ve storage.objects policy (read public, write admin/moderator)
+- [ ] RLS: products/products_images/categories için admin/moderator CRUD policy’leri
+- [ ] Admin Categories: liste + CRUD (slug unique)
+- [ ] Admin Products: liste + CRUD (form sekmeleri: Bilgiler, Fiyat, Stok, Görseller, SEO)
+- [ ] Görseller: yükle/sırala/sil; sort_order ile kapak görseli
+- [ ] Audit log: ürün/kategori + fiyat/görsel değişiklikleri
+- [ ] CSV import/export (ürün/kategori) – opsiyonel, sonraki sprint
 
 ## Sıradaki (Sprint 4 – Dashboard & Users)
 - Dashboard: Bugün/7g/30g KPI kartları (sipariş, ciro, iade, bekleyen kargo)
