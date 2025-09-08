@@ -20,6 +20,16 @@ const PAGE_SIZE = 50
 
 const AdminErrorsPage: React.FC = () => {
   const { t } = useI18n()
+  // Default date range: last 7 days (including today)
+  const fmt = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+  const now = new Date()
+  const defaultToDate = fmt(now)
+  const defaultFromDate = fmt(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
   const [rows, setRows] = React.useState<ErrorRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -29,8 +39,8 @@ const AdminErrorsPage: React.FC = () => {
   // Filters
   const [q, setQ] = React.useState('')
   const [debouncedQ, setDebouncedQ] = React.useState('')
-  const [fromDate, setFromDate] = React.useState('')
-  const [toDate, setToDate] = React.useState('')
+  const [fromDate, setFromDate] = React.useState(defaultFromDate)
+  const [toDate, setToDate] = React.useState(defaultToDate)
   const [level, setLevel] = React.useState('')
   const [env, setEnv] = React.useState('production')
 
@@ -111,7 +121,7 @@ const AdminErrorsPage: React.FC = () => {
           { value: 'warn', label: 'warn' },
           { value: 'info', label: 'info' },
         ] }}
-        onClear={() => { setQ(''); setLevel(''); setFromDate(''); setToDate(''); setPage(1) }}
+        onClear={() => { setQ(''); setLevel(''); setFromDate(defaultFromDate); setToDate(defaultToDate); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
