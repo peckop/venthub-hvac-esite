@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import AppWrapper from './AppWrapper.tsx'
 import * as Sentry from '@sentry/react'
+import { installErrorReporter } from './lib/errorReporter'
 
 // Sentry init (yalnızca DSN varsa)
 try {
@@ -16,9 +17,15 @@ try {
       ],
       tracesSampleRate: 0.2,
       environment: viteEnv.MODE,
-      // CI'da istersek pencereye commit SHA enjekte edip release olarak kullanabiliriz
       release: (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__,
     })
+  }
+  // Install lightweight error reporter to Supabase Edge Function
+  const supaUrl = viteEnv.VITE_SUPABASE_URL
+  if (supaUrl) {
+    const endpoint = `${supaUrl}/functions/v1/log-client-error`
+    const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
+    installErrorReporter(endpoint, { sample: 0.2, release, env: viteEnv.MODE })
   }
 } catch {}
 

@@ -191,6 +191,34 @@ export const en = {
     privacy: 'Privacy Policy',
     terms: 'Terms of Use'
   },
+  admin: {
+    toolbar: {
+      searchPlaceholder: 'Search',
+      clear: 'Clear',
+      records: 'records'
+    },
+    menu: {
+      dashboard: 'Dashboard',
+      orders: 'Orders',
+      inventory: 'Inventory',
+      movements: 'Movements',
+      inventorySettings: 'Thresholds & Settings',
+      returns: 'Returns',
+      users: 'Users',
+      logs: 'Logs',
+      errors: 'Errors'
+    },
+    titles: {
+      dashboard: 'Dashboard',
+      orders: 'Orders',
+      inventory: 'Inventory',
+      movements: 'Movements',
+      returns: 'Return Management',
+      users: 'User Management',
+      audit: 'Audit Logs',
+      errors: 'Error Logs'
+    }
+  },
   footer: {
     quickLinks: 'Quick Links',
     categories: 'Categories',

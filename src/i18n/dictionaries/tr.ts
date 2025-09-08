@@ -192,6 +192,34 @@ export const tr = {
     privacy: 'Gizlilik Politikası',
     terms: 'Kullanım Koşulları'
   },
+  admin: {
+    toolbar: {
+      searchPlaceholder: 'Ara',
+      clear: 'Temizle',
+      records: 'kayıt'
+    },
+    menu: {
+      dashboard: 'Dashboard',
+      orders: 'Siparişler',
+      inventory: 'Stok Özeti',
+      movements: 'Hareket Defteri',
+      inventorySettings: 'Eşik & Ayarlar',
+      returns: 'İadeler',
+      users: 'Kullanıcılar',
+      logs: 'Kayıtlar',
+      errors: 'Hatalar'
+    },
+    titles: {
+      dashboard: 'Dashboard',
+      orders: 'Siparişler',
+      inventory: 'Stok Özeti',
+      movements: 'Hareket Defteri',
+      returns: 'İade Yönetimi',
+      users: 'Kullanıcı Yönetimi',
+      audit: 'Denetim Kayıtları',
+      errors: 'Hata Kayıtları'
+    }
+  },
   footer: {
     quickLinks: 'Hızlı Bağlantılar',
     categories: 'Kategoriler',

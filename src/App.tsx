@@ -52,6 +52,7 @@ const AdminInventorySettingsPage = lazy(() => import('./pages/admin/AdminInvento
 const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminAuditLogPage = lazy(() => import('./pages/admin/AdminAuditLogPage'))
+const AdminErrorsPage = lazy(() => import('./pages/admin/AdminErrorsPage'))
 
 // Brand pages
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -138,6 +139,7 @@ function App() {
                   <Route path="movements" element={<AdminMovementsPage />} />
                   <Route path="orders" element={<AdminOrdersPage />} />
                   <Route path="logs" element={<AdminAuditLogPage />} />
+                  <Route path="errors" element={<AdminErrorsPage />} />
                   {/* Geçici: mevcut admin sayfalarına geçiş */}
                   <Route path="returns" element={<AdminReturnsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />

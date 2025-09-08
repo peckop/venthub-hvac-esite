@@ -3,10 +3,12 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { checkAdminAccessAsync } from '../../config/admin'
 import { adminNavClass } from '../../utils/adminUi'
+import { useI18n } from '../../i18n/I18nProvider'
 
 const AdminLayout: React.FC = () => {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const { t } = useI18n()
 
   React.useEffect(() => {
     let active = true
@@ -25,14 +27,15 @@ const AdminLayout: React.FC = () => {
         <aside className="col-span-12 md:col-span-3">
           <nav className="bg-white rounded-lg shadow-hvac-md p-4 space-y-2">
             <h2 className="text-sm font-semibold text-industrial-gray mb-2">Admin</h2>
-            <NavLink to="/admin" end className={({isActive})=>adminNavClass(isActive)}>Dashboard</NavLink>
-            <NavLink to="/admin/orders" className={({isActive})=>adminNavClass(isActive)}>Siparişler</NavLink>
-            <NavLink to="/admin/inventory" className={({isActive})=>adminNavClass(isActive)}>Stok Özeti</NavLink>
-            <NavLink to="/admin/movements" className={({isActive})=>adminNavClass(isActive)}>Hareket Defteri</NavLink>
-            <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>Eşik & Ayarlar</NavLink>
-            <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>İadeler</NavLink>
-            <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>Kullanıcılar</NavLink>
-            <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>Kayıtlar</NavLink>
+            <NavLink to="/admin" end className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.dashboard')}</NavLink>
+            <NavLink to="/admin/orders" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.orders')}</NavLink>
+            <NavLink to="/admin/inventory" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.inventory')}</NavLink>
+            <NavLink to="/admin/movements" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.movements')}</NavLink>
+            <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.inventorySettings')}</NavLink>
+            <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.returns')}</NavLink>
+            <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.users')}</NavLink>
+            <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.logs')}</NavLink>
+            <NavLink to="/admin/errors" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errors')}</NavLink>
           </nav>
         </aside>
         <section className="col-span-12 md:col-span-9">
