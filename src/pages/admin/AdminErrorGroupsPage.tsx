@@ -1,6 +1,7 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -38,6 +39,15 @@ const PAGE_SIZE = 50
 
 const AdminErrorGroupsPage: React.FC = () => {
   const { t } = useI18n()
+  // Columns & density (like Inventory)
+  const STORAGE_KEY = 'toolbar:errorgroups'
+  const [visibleCols, setVisibleCols] = React.useState<{ lastSeen: boolean; level: boolean; signature: boolean; lastMsg: boolean; count: boolean; status: boolean; assigned: boolean; actions: boolean }>({ lastSeen: true, level: true, signature: true, lastMsg: true, count: true, status: true, assigned: true, actions: true })
+  const [density, setDensity] = React.useState<Density>('comfortable')
+  React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
+  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
+  const headPad = density==='compact' ? 'px-2 py-2' : ''
+  const cellPad = density==='compact' ? 'px-2 py-2' : ''
   const [rows, setRows] = React.useState<ErrorGroup[]>([])
   const [total, setTotal] = React.useState(0)
   const [page, setPage] = React.useState(1)
@@ -172,6 +182,15 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+  // Top and bottom synchronized horizontal scroll
+  const topScrollRef = React.useRef<HTMLDivElement | null>(null)
+  const tableWrapRef = React.useRef<HTMLDivElement | null>(null)
+  const [topScrollWidth, setTopScrollWidth] = React.useState(0)
+  const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
+  React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
+  const onBottomScroll = React.useCallback(()=>{ if(!topScrollRef.current||!tableWrapRef.current) return; if(topScrollRef.current.scrollLeft!==tableWrapRef.current.scrollLeft){ topScrollRef.current.scrollLeft=tableWrapRef.current.scrollLeft } },[])
+  const onTopScroll = React.useCallback(()=>{ if(!topScrollRef.current||!tableWrapRef.current) return; if(tableWrapRef.current.scrollLeft!==topScrollRef.current.scrollLeft){ tableWrapRef.current.scrollLeft=topScrollRef.current.scrollLeft } },[])
+  const onWheelToHorizontal = React.useCallback((e: React.WheelEvent<HTMLDivElement>)=>{ const el=tableWrapRef.current; if(!el) return; if(!e.shiftKey && Math.abs(e.deltaY) > Math.abs(e.deltaX) && el.scrollWidth>el.clientWidth){ el.scrollLeft += e.deltaY; e.preventDefault() } },[])
 
   return (
     <div className="space-y-4">
@@ -213,18 +232,24 @@ const AdminErrorGroupsPage: React.FC = () => {
         {error && (
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
+
+        {/* Top horizontal scrollbar */}
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden>
+          <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
+        </div>
+
+        <div ref={tableWrapRef} onScroll={onBottomScroll} onWheel={onWheelToHorizontal} className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[980px]">
+            <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th className={adminTableHeadCellClass}>Last Seen</th>
-                <th className={adminTableHeadCellClass}>Level</th>
-                <th className={adminTableHeadCellClass}>Signature</th>
-                <th className={adminTableHeadCellClass}>Last Message</th>
-                <th className={adminTableHeadCellClass}>Count</th>
-                <th className={adminTableHeadCellClass}>Status</th>
-                <th className={adminTableHeadCellClass}>Assigned</th>
-                <th className={adminTableHeadCellClass}></th>
+                {visibleCols.lastSeen && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>Last Seen</th>}
+                {visibleCols.level && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[90px]`}>Level</th>}
+                {visibleCols.signature && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[320px]`}>Signature</th>}
+                {visibleCols.lastMsg && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[420px]`}>Last Message</th>}
+                {visibleCols.count && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}>Count</th>}
+                {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[120px]`}>Status</th>}
+                {visibleCols.assigned && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[220px]`}>Assigned</th>}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}></th>}
               </tr>
             </thead>
             <tbody>
@@ -236,19 +261,19 @@ const AdminErrorGroupsPage: React.FC = () => {
                 rows.map(r => (
                   <React.Fragment key={r.id}>
                     <tr className="border-b border-light-gray/60 align-top">
-                      <td className={adminTableCellClass}>{new Date(r.last_seen).toLocaleString('tr-TR')}</td>
-                      <td className={adminTableCellClass}>{r.level || 'error'}</td>
-                      <td className={`${adminTableCellClass} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>
-                      <td className={`${adminTableCellClass} max-w-[420px] truncate`} title={r.last_message || ''}>{r.last_message || '-'}</td>
-                      <td className={adminTableCellClass}>{r.count}</td>
-                      <td className={adminTableCellClass}>
+                      {visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{new Date(r.last_seen).toLocaleString('tr-TR')}</td>}
+                      {visibleCols.level && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{r.level || 'error'}</td>}
+                      {visibleCols.signature && <td className={`${adminTableCellClass} ${cellPad} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>}
+                      {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
+                      {visibleCols.count && <td className={`${adminTableCellClass} ${cellPad}`}>{r.count}</td>}
+                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <select value={r.status} onChange={(e)=>updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
                           <option value="open">open</option>
                           <option value="resolved">resolved</option>
                           <option value="ignored">ignored</option>
                         </select>
-                      </td>
-                      <td className={adminTableCellClass}>
+                      </td>}
+                      {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2">
                           <select value={r.assigned_to || ''} onChange={(e)=>updateAssignedTo(r.id, e.target.value)} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
                             <option value="">(kimse)</option>
@@ -257,13 +282,13 @@ const AdminErrorGroupsPage: React.FC = () => {
                             ))}
                           </select>
                         </div>
-                      </td>
-                      <td className={adminTableCellClass}>
+                      </td>}
+                      {visibleCols.actions && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <button className={adminButtonPrimaryClass + ' !px-2 !py-1 text-xs'} onClick={() => {
                           setExpandedId(id => id === r.id ? null : r.id)
                           if (expandedId !== r.id) loadLatestClientErrors(r.id)
                         }}>{expandedId === r.id ? 'Gizle' : 'Detay'}</button>
-                      </td>
+                      </td>}
                     </tr>
                     {expandedId === r.id && (
                       <tr className="bg-gray-50">
@@ -298,6 +323,24 @@ const AdminErrorGroupsPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Columns & density controller (same as Inventory) */}
+      <div className="flex justify-end">
+        <ColumnsMenu
+          density={density}
+          onDensityChange={setDensity}
+          columns={[
+            { key: 'lastSeen', label: 'Last Seen', checked: visibleCols.lastSeen, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastSeen: v })) },
+            { key: 'level', label: 'Level', checked: visibleCols.level, onChange: (v)=> setVisibleCols(prev=>({ ...prev, level: v })) },
+            { key: 'signature', label: 'Signature', checked: visibleCols.signature, onChange: (v)=> setVisibleCols(prev=>({ ...prev, signature: v })) },
+            { key: 'lastMsg', label: 'Last Message', checked: visibleCols.lastMsg, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastMsg: v })) },
+            { key: 'count', label: 'Count', checked: visibleCols.count, onChange: (v)=> setVisibleCols(prev=>({ ...prev, count: v })) },
+            { key: 'status', label: 'Status', checked: visibleCols.status, onChange: (v)=> setVisibleCols(prev=>({ ...prev, status: v })) },
+            { key: 'assigned', label: 'Assigned', checked: visibleCols.assigned, onChange: (v)=> setVisibleCols(prev=>({ ...prev, assigned: v })) },
+            { key: 'actions', label: 'Actions', checked: visibleCols.actions, onChange: (v)=> setVisibleCols(prev=>({ ...prev, actions: v })) },
+          ]}
+        />
       </div>
     </div>
   )
