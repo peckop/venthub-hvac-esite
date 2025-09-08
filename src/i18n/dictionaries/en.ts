@@ -206,7 +206,8 @@ export const en = {
       returns: 'Returns',
       users: 'Users',
       logs: 'Logs',
-      errors: 'Errors'
+      errors: 'Errors',
+      errorGroups: 'Error Groups'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -216,7 +217,8 @@ export const en = {
       returns: 'Return Management',
       users: 'User Management',
       audit: 'Audit Logs',
-      errors: 'Error Logs'
+      errors: 'Error Logs',
+      errorGroups: 'Error Groups'
     }
   },
   footer: {
