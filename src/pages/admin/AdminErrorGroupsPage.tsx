@@ -275,13 +275,14 @@ const AdminErrorGroupsPage: React.FC = () => {
       pendingSourceRef.current = null
       if (!source) return
       if (!topScrollRef.current || !tableWrapRef.current) return
-      if (source === 'top') {
-        programmaticTargetRef.current = 'bottom'
-        tableWrapRef.current.scrollLeft = latestLeftRef.current
-      } else {
-        programmaticTargetRef.current = 'top'
-        topScrollRef.current.scrollLeft = latestLeftRef.current
-      }
+      const srcEl = source === 'top' ? topScrollRef.current : tableWrapRef.current
+      const dstEl = source === 'top' ? tableWrapRef.current : topScrollRef.current
+      const srcMax = Math.max(0, srcEl.scrollWidth - srcEl.clientWidth)
+      const dstMax = Math.max(0, dstEl.scrollWidth - dstEl.clientWidth)
+      const ratio = srcMax > 0 ? (latestLeftRef.current / srcMax) : 0
+      const mappedLeft = Math.max(0, Math.min(dstMax, ratio * dstMax))
+      programmaticTargetRef.current = source === 'top' ? 'bottom' : 'top'
+      dstEl.scrollLeft = mappedLeft
     })
   }, [])
 
@@ -366,8 +367,8 @@ const AdminErrorGroupsPage: React.FC = () => {
         )}
 
         {/* Top horizontal scrollbar */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
-          <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-4 bg-gray-100 border-b border-light-gray/70 select-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
+          <div style={{ width: topScrollWidth || '100%' }} className="h-4" />
         </div>
 
         {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
