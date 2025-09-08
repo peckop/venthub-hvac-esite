@@ -33,7 +33,7 @@ type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
 export default function AdminReturnsPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
-  const _t = useI18n() // Prefix with underscore to indicate intentionally unused
+  const { t: _t } = useI18n()
   
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
@@ -378,7 +378,7 @@ export default function AdminReturnsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className={adminSectionTitleClass}>İade Yönetimi</h2>
+        <h2 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h2>
         <div className="text-sm text-steel-gray">Toplam {returns.length} iade talebi</div>
       </div>
 

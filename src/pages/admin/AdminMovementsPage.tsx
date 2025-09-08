@@ -4,6 +4,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import { useI18n } from '../../i18n/I18nProvider'
 
 type Movement = {
   id: string
@@ -40,6 +41,7 @@ function reasonLabel(key: string | null | undefined): string {
 type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
+  const { t } = useI18n()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -228,7 +230,7 @@ const AdminMovementsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className={adminSectionTitleClass}>Hareket Defteri</h1>
+      <h1 className={adminSectionTitleClass}>{t('admin.titles.movements')}</h1>
 
       <AdminToolbar
         storageKey="toolbar:movements"

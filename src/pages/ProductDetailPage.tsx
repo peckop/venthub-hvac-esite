@@ -338,13 +338,15 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="flex items-center border-2 border-light-gray rounded-lg">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    aria-label="Adeti azalt"
                     className="px-3 py-2 hover:bg-light-gray transition-colors"
                   >
                     -
                   </button>
-                  <span className="px-4 py-2 font-medium">{quantity}</span>
+                  <span className="px-4 py-2 font-medium" aria-live="polite">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
+                    aria-label="Adeti artır"
                     className="px-3 py-2 hover:bg-light-gray transition-colors"
                   >
                     +
@@ -364,6 +366,8 @@ export const ProductDetailPage: React.FC = () => {
                 
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
+                  aria-label={isWishlisted ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
+                  aria-pressed={isWishlisted}
                   className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${
                     isWishlisted 
                       ? 'border-red-500 text-red-500 bg-red-50' 
@@ -375,6 +379,7 @@ export const ProductDetailPage: React.FC = () => {
                 
                 <button
                   onClick={handleShare}
+                  aria-label="Paylaş"
                   className="p-2 sm:p-4 border-2 border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-lg transition-colors"
                 >
                   <Share2 size={18} />

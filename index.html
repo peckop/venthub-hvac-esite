@@ -4,8 +4,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Basic SEO: keep these static for first paint -->
+  <title>VentHub | HVAC Ürünleri ve Çözümleri</title>
+  <meta name="description" content="Endüstriyel havalandırma (HVAC) ürünleri ve çözümlerini keşfedin. Hızlı teslimat, 2 yıl garanti ve uzman desteği." />
+  <link rel="canonical" href="/" />
+
+  <!-- Open Graph / Twitter defaults (Seo.tsx bunları dynamic olarak günceller) -->
+  <meta property="og:title" content="VentHub" />
+  <meta property="og:description" content="HVAC ürünleri ve çözümleri" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/images/hvac_heat_recovery_7.png" />
+  <meta property="og:locale" content="tr_TR" />
+  <meta name="twitter:card" content="summary_large_image" />
+
   <!-- Preconnects for faster first byte on external origins -->
   <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin>
+  <link rel="dns-prefetch" href="%VITE_SUPABASE_URL%">
+
+  <!-- Preload key LCP image of the hero for faster rendering -->
+  <link rel="preload" as="image" href="/images/industrial_HVAC_air_handling_unit_warehouse.jpg" fetchpriority="high">
   <!-- You can add more preconnects (e.g., CDN) as needed -->
 </head>
 

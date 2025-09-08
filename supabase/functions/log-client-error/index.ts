@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       groupId = null
     }
 
-    const row = {
+    const row: Record<string, unknown> = {
       at: new Date().toISOString(),
       url: mask(String(payload.url || '')),
       message: mask(String(payload.msg || '')),
@@ -84,11 +84,13 @@ Deno.serve(async (req) => {
       env: mask(String(payload.env || '')),
       level: mask(String(payload.level || 'error')),
       extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
-      group_id: groupId,
     }
+    // Only include group_id if available; avoid failures if column doesn't exist
+    if (groupId) (row as any).group_id = groupId
 
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
+      // As a last resort, avoid failing the function; report error in body for observability
       return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 

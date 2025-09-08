@@ -9,7 +9,7 @@ Bu klasörde projeye ait tüm dokümantasyon dosyaları bulunmaktadır.
 - Proje yol haritası ve sprint planları
 - Operasyonel görev listesi
 - QA kontrol listeleri
-- Son güncelleme: 2025-09-02
+- Son güncelleme: 2025-09-07
 
 ### 🛠️ **OPERATIONS_PLAN.md**
 Stok yönetimi ve operasyonel süreçler
@@ -75,7 +75,7 @@ proje/
 
 ## Yeni Doküman
 
-- HOMEPAGE_ENHANCEMENTS.md — Ana sayfa geliştirmeleri ve etkileşimli bileşen backlog’u (2025-09-05)
+- HOMEPAGE_ENHANCEMENTS.md — Ana sayfa geliştirmeleri ve etkileşimli bileşen backlog’u (2025-09-07)
 - admin-toolbar.md — AdminToolbar kılavuzu: API, düzen, export, kalıcılık planı (2025-09-05)
 
 ## 🔄 Güncel Tutma

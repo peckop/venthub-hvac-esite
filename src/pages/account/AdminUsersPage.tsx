@@ -8,6 +8,7 @@ import { checkAdminAccess, listAdminUsers, setUserAdminRole } from '../../config
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import { useI18n } from '../../i18n/I18nProvider'
 
 interface AdminUser {
   id: string
@@ -29,6 +30,7 @@ interface AllUser {
 export default function AdminUsersPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
+  const { t: _t } = useI18n()
   
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
@@ -234,7 +236,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className={adminSectionTitleClass}>Kullanıcı Yönetimi</h2>
+        <h2 className={adminSectionTitleClass}>{_t('admin.titles.users')}</h2>
       </div>
 
       {/* Tabs */}

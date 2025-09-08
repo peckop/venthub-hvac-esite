@@ -6,6 +6,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { logAdminAction } from '../../lib/audit'
+import { useI18n } from '../../i18n/I18nProvider'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -29,6 +30,7 @@ const STATUSES: { value: string; label: string }[] = [
 ]
 
 const AdminOrdersPage: React.FC = () => {
+  const { t } = useI18n()
   const [rows, setRows] = React.useState<AdminOrderRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -327,7 +329,7 @@ const AdminOrdersPage: React.FC = () => {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className={adminSectionTitleClass}>Siparişler</h1>
+        <h1 className={adminSectionTitleClass}>{t('admin.titles.orders')}</h1>
       </header>
 
       {/* Filters - AdminToolbar */}

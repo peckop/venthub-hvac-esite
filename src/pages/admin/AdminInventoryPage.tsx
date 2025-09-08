@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import { useI18n } from '../../i18n/I18nProvider'
 
 type Row = { product_id: string; name: string; physical_stock: number; reserved_stock: number; available_stock: number }
 
@@ -15,6 +16,7 @@ type ReservedRow = { order_id: string; created_at: string; status: string; payme
 enum LoadState { Idle, Loading, Error }
 
 const AdminInventoryPage: React.FC = () => {
+  const { t } = useI18n()
   const [rows, setRows] = React.useState<Row[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -387,7 +389,7 @@ const AdminInventoryPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className={adminSectionTitleClass}>Stok Özeti</h1>
+      <h1 className={adminSectionTitleClass}>{t('admin.titles.inventory')}</h1>
 
       {/* Hızlı arama */}
       <AdminToolbar
