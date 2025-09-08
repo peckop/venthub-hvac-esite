@@ -109,7 +109,7 @@ export const HeroSection: React.FC = () => {
                 width={1200}
                 height={800}
                 loading="eager"
-                fetchPriority="high"
+                {...({ fetchpriority: 'high' } as Record<string, string>)}
                 decoding="async"
                 className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
               />
