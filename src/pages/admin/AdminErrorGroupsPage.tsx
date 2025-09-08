@@ -271,13 +271,13 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Top horizontal scrollbar (visual only) */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70 pointer-events-none" role="presentation" aria-hidden>
+        {/* Top horizontal scrollbar */}
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-3 bg-gray-100 border-b border-light-gray/70" role="presentation" aria-hidden>
           <div style={{ width: topScrollWidth || '100%' }} className="h-3" />
         </div>
 
-        {/* Main table wrapper: only horizontal scroll; prevent scroll chaining */}
-        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-contain">
+        {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
+        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-x-contain">
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
@@ -335,7 +335,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                           <div className="grid md:grid-cols-3 gap-3 text-xs">
                             <div className="md:col-span-2">
                               <div className="font-medium text-industrial-gray mb-1">Son Kayıtlar</div>
-                              <div className="space-y-2 max-h-72 overflow-auto overscroll-contain bg-white p-2 rounded border">
+                              <div className="space-y-2 max-h-72 overflow-auto overscroll-y-contain bg-white p-2 rounded border">
                                 {(latestClientErrors[r.id] || []).map((e: ClientErrorRow) => (
                                   <div key={e.id} className="border-b last:border-b-0 pb-1">
                                     <div className="text-steel-gray">{new Date(e.at).toLocaleString('tr-TR')} • {e.level || 'error'}</div>
