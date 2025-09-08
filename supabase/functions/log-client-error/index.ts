@@ -39,36 +39,39 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey)
 
-    // Upsert group
-    const groupPayload = {
-      signature,
-      level: mask(String(payload.level || 'error')),
-      last_message: mask(String(payload.msg || '')),
-      url_sample: mask(String(payload.url || '')),
-      env: mask(String(payload.env || '')),
-      release: mask(String(payload.release || '')),
-      last_seen: new Date().toISOString(),
-    }
-    const { data: upsertRow, error: upsertErr } = await supabase
-      .from('error_groups')
-      .upsert(groupPayload, { onConflict: 'signature' })
-      .select('id, count')
-      .maybeSingle()
-
-    let groupId: string | null = upsertRow?.id ?? null
-    if (!groupId) {
-      // Try to get id by signature (handles cases where upsert returns no row)
-      const q = await supabase
+    // Upsert group (best-effort: do not fail request if grouping fails)
+    let groupId: string | null = null
+    try {
+      const groupPayload = {
+        signature,
+        level: mask(String(payload.level || 'error')),
+        last_message: mask(String(payload.msg || '')),
+        url_sample: mask(String(payload.url || '')),
+        env: mask(String(payload.env || '')),
+        release: mask(String(payload.release || '')),
+        last_seen: new Date().toISOString(),
+      }
+      const { data: upsertRow } = await supabase
         .from('error_groups')
-        .select('id')
-        .eq('signature', signature)
+        .upsert(groupPayload, { onConflict: 'signature' })
+        .select('id, count')
         .maybeSingle()
-      groupId = (q.data as { id?: string } | null)?.id || null
-    }
-
-    // Update count atomically
-    if (groupId) {
-      await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).catch(()=>{})
+      groupId = upsertRow?.id ?? null
+      if (!groupId) {
+        // Try to get id by signature (handles cases where upsert returns no row)
+        const q = await supabase
+          .from('error_groups')
+          .select('id')
+          .eq('signature', signature)
+          .maybeSingle()
+        groupId = (q.data as { id?: string } | null)?.id || null
+      }
+      if (groupId) {
+        await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).catch(()=>{})
+      }
+    } catch (_) {
+      // ignore grouping errors
+      groupId = null
     }
 
     const row = {
