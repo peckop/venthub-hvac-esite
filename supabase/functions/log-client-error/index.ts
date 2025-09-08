@@ -49,20 +49,20 @@ Deno.serve(async (req) => {
       release: mask(String(payload.release || '')),
       last_seen: new Date().toISOString(),
     }
-    const upsertRes = await supabase
+    const { data: upsertRow, error: upsertErr } = await supabase
       .from('error_groups')
       .upsert(groupPayload, { onConflict: 'signature' })
       .select('id, count')
-      .single()
-      .catch(()=>({ data: null }))
+      .maybeSingle()
 
-    let groupId: string | null = null
-    // If select did not return existing row, fetch id now
-    if (upsertRes && (upsertRes as any).data && (upsertRes as any).data.id) {
-      groupId = (upsertRes as any).data.id as string
-    } else {
-      // Try to get id by signature
-      const q = await supabase.from('error_groups').select('id').eq('signature', signature).maybeSingle()
+    let groupId: string | null = upsertRow?.id ?? null
+    if (!groupId) {
+      // Try to get id by signature (handles cases where upsert returns no row)
+      const q = await supabase
+        .from('error_groups')
+        .select('id')
+        .eq('signature', signature)
+        .maybeSingle()
       groupId = (q.data as { id?: string } | null)?.id || null
     }
 
