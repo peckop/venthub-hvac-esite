@@ -114,7 +114,9 @@ const AdminCategoriesPage: React.FC = () => {
 
       <AdminToolbar
         storageKey="toolbar:categories"
+        sticky
         search={{ value: q, onChange: setQ, placeholder: 'kategori adı/slug ara', focusShortcut: '/' }}
+        onClear={()=>setQ('')}
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">

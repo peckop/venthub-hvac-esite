@@ -137,8 +137,11 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     `.trim()
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <info@venthub.com>'
+    const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     if (!resendApiKey) {
-      throw new Error('RESEND_API_KEY environment variable not set')
+      if (notifyDebug) console.warn('[return-status-notification] Email disabled: missing RESEND_API_KEY')
+      return new Response(JSON.stringify({ success: true, disabled: true, channel: 'email' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     // Direct email sending
@@ -149,7 +152,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'VentHub <info@venthub.com>',
+        from: emailFrom,
         to: [customer_email],
         subject: emailSubject,
         text: emailContent,

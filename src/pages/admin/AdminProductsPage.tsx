@@ -29,6 +29,11 @@ const AdminProductsPage: React.FC = () => {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
+  // Toolbar filtreleri (stok özetine uyum)
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = React.useState<string>('')
+  const [statusFilter, setStatusFilter] = React.useState<{ active: boolean; inactive: boolean; out_of_stock: boolean }>({ active: false, inactive: false, out_of_stock: false })
+  const [featuredOnly, setFeaturedOnly] = React.useState<boolean>(false)
+
   // Columns & density
   const STORAGE_KEY = 'toolbar:products'
   const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
@@ -97,9 +102,23 @@ const AdminProductsPage: React.FC = () => {
 
   const filtered = React.useMemo(()=>{
     const term = q.trim().toLowerCase()
-    if (!term) return rows
-    return rows.filter(r => [r.name, r.sku, r.brand || ''].some(v => (v||'').toLowerCase().includes(term)))
-  }, [rows, q])
+    let base = rows
+    if (term) {
+      base = base.filter(r => [r.name, r.sku, r.brand || ''].some(v => (v||'').toLowerCase().includes(term)))
+    }
+    if (selectedCategoryFilter) {
+      base = base.filter(r => (r.category_id || '') === selectedCategoryFilter)
+    }
+    const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
+    if (anyStatus) {
+      base = base.filter(r => (statusFilter as Record<string, boolean>)[(r.status || '').toLowerCase()])
+    }
+    if (featuredOnly) {
+      // Not: rows içinde is_featured alanı yok, bu nedenle bu filtre yalnızca detay çektiğimizde etkili olur.
+      // Şimdilik listede yoksa etkisiz kalır; daha sonra products sorgusuna is_featured eklenebilir.
+    }
+    return base
+  }, [rows, q, selectedCategoryFilter, statusFilter, featuredOnly])
 
   const startCreate = () => {
     setSelectedId(null)
@@ -298,7 +317,21 @@ const AdminProductsPage: React.FC = () => {
 
       <AdminToolbar
         storageKey="toolbar:products"
+        sticky
         search={{ value: q, onChange: setQ, placeholder: 'ürün adı/SKU/marka ara', focusShortcut: '/' }}
+        select={{
+          value: selectedCategoryFilter,
+          onChange: setSelectedCategoryFilter,
+          title: 'Kategori',
+          options: [ { value: '', label: 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name })) ],
+        }}
+        chips={[
+          { key: 'active', label: 'active', active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
+          { key: 'inactive', label: 'inactive', active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
+          { key: 'out_of_stock', label: 'out_of_stock', active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
+        ]}
+        toggles={[{ key: 'featured', label: 'Sadece: Öne Çıkan', checked: featuredOnly, onChange: setFeaturedOnly }]}
+        onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false) }}
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
