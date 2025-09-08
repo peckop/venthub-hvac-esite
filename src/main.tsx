@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import AppWrapper from './AppWrapper.tsx'
 import { installErrorReporter } from './lib/errorReporter'
+import { supabase } from './lib/supabase'
 
 // Sentry init (yalnızca DSN varsa)
 try {
@@ -26,10 +27,31 @@ try {
   const hash = String(location.hash || '')
   const trigger = params.get('vh_error_test') === '1' || /vh_error_test=1/.test(hash) || localStorage.getItem('errorlog:test') === '1'
   if (trigger) {
+    try {
+      // Force error reporting for a short window (bypass sample/dedup)
+      localStorage.setItem('errorlog:force', '1')
+      setTimeout(() => { try { localStorage.removeItem('errorlog:force') } catch {} }, 30000)
+    } catch {}
+    // 1) Throw a real error so window.onerror path is tested
     setTimeout(() => {
-      // Throw a real error to validate logging pipeline end-to-end
       throw new Error('VH TEST ' + new Date().toISOString())
     }, 300)
+    // 2) Also call the Edge Function directly to guarantee a row
+    setTimeout(async () => {
+      try {
+        await supabase.functions.invoke('log-client-error', {
+          body: {
+            msg: 'VH SELF-TEST ' + new Date().toISOString(),
+            stack: 'auto-test',
+            url: location.href,
+            ua: navigator.userAgent,
+            level: 'error',
+            env: (import.meta as unknown as { env?: Record<string,string> }).env?.MODE || 'production',
+            release: (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'prod'
+          }
+        })
+      } catch {}
+    }, 600)
   }
 } catch {}
 
