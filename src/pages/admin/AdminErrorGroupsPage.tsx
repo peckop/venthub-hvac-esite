@@ -2,6 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -66,6 +67,22 @@ const AdminErrorGroupsPage: React.FC = () => {
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
   const [latestClientErrors, setLatestClientErrors] = React.useState<Record<string, ClientErrorRow[]>>({})
 
+  // Sorting
+  const [sortBy, setSortBy] = React.useState<'last_seen' | 'count'>('last_seen')
+  const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
+  const toggleSort = (by: 'last_seen' | 'count') => {
+    setSortBy(prev => {
+      if (prev === by) {
+        setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))
+        return prev
+      } else {
+        // default direction per column
+        setSortDir('desc')
+        return by
+      }
+    })
+  }
+
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
     return () => clearTimeout(t)
@@ -88,7 +105,7 @@ const AdminErrorGroupsPage: React.FC = () => {
       let query = supabase
         .from('error_groups')
         .select('id, signature, level, last_message, url_sample, env, release, first_seen, last_seen, count, status, assigned_to, notes', { count: 'exact' })
-        .order('last_seen', { ascending: false })
+        .order(sortBy, { ascending: sortDir === 'asc' })
 
       if (fromDate) query = query.gte('last_seen', `${fromDate}T00:00:00Z`)
       if (toDate) query = query.lte('last_seen', `${toDate}T23:59:59Z`)
@@ -113,7 +130,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [fromDate, toDate, level, status, debouncedQ, page])
+  }, [fromDate, toDate, level, status, debouncedQ, page, sortBy, sortDir])
 
   React.useEffect(() => { fetchGroups() }, [fetchGroups])
 
@@ -182,6 +199,61 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
 
+  // CSV export (tüm filtrelere göre, 1000'erlik parça ile)
+  const exportGroupsCsv = React.useCallback(async () => {
+    const CHUNK = 1000
+    let offset = 0
+    let all: ErrorGroup[] = []
+    // Aynı filtreleri uygulayan sorgu kurucu
+    const makeQuery = () => {
+      let q = supabase
+        .from('error_groups')
+        .select('id, signature, level, last_message, url_sample, env, release, first_seen, last_seen, count, status, assigned_to, notes')
+      if (fromDate) q = q.gte('last_seen', `${fromDate}T00:00:00Z`)
+      if (toDate) q = q.lte('last_seen', `${toDate}T23:59:59Z`)
+      if (level) q = q.eq('level', level)
+      if (status) q = q.eq('status', status)
+      if (debouncedQ) {
+        const like = `%${debouncedQ}%`
+        q = q.or(`signature.ilike.${like},last_message.ilike.${like}`)
+      }
+      // Export’ta da geçerli sıralamayı koru
+      q = q.order(sortBy, { ascending: sortDir === 'asc' })
+      return q
+    }
+    try {
+      for (;;) {
+        const from = offset
+        const to = offset + CHUNK - 1
+        const { data, error } = await makeQuery().range(from, to)
+        if (error) throw error
+        const chunk = (data || []) as ErrorGroup[]
+        if (!chunk.length) break
+        all = all.concat(chunk)
+        if (chunk.length < CHUNK) break
+        offset += CHUNK
+      }
+      const header = ['id','signature','level','last_message','url_sample','env','release','first_seen','last_seen','count','status','assigned_to','notes']
+      const escape = (v: unknown) => {
+        const s = (v ?? '').toString().replace(/"/g, '""')
+        return `"${s}` + `"`
+      }
+      const rowsCsv = all.map(r => [r.id, r.signature, r.level || '', r.last_message || '', r.url_sample || '', r.env || '', r.release || '', r.first_seen, r.last_seen, r.count, r.status, r.assigned_to || '', r.notes || ''].map(escape).join(','))
+      const csv = '\ufeff' + header.map(h => `"${h}"`).join(',') + '\n' + rowsCsv.join('\n')
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'error-groups.csv'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (e) {
+      console.error('CSV export failed', e)
+    }
+  }, [fromDate, toDate, level, status, debouncedQ, sortBy, sortDir])
+
   // Top and bottom synchronized horizontal scroll
   const topScrollRef = React.useRef<HTMLDivElement | null>(null)
   const tableWrapRef = React.useRef<HTMLDivElement | null>(null)
@@ -240,6 +312,7 @@ const AdminErrorGroupsPage: React.FC = () => {
             </select>
             <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
             <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <ExportMenu items={[{ key: 'csv', label: 'CSV (UTF-8 BOM)', onSelect: () => exportGroupsCsv() }]} />
             {/* Görünüm/kolonlar menüsü: stok özet sayfasındaki gibi sağ üstte */}
             <ColumnsMenu
               density={density}
@@ -281,11 +354,25 @@ const AdminErrorGroupsPage: React.FC = () => {
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                {visibleCols.lastSeen && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>Last Seen</th>}
+                {visibleCols.lastSeen && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-[160px]`}>
+                    <button type="button" onClick={() => toggleSort('last_seen')} className="inline-flex items-center gap-1">
+                      <span>Last Seen</span>
+                      {sortBy === 'last_seen' && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
+                    </button>
+                  </th>
+                )}
                 {visibleCols.level && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[90px]`}>Level</th>}
                 {visibleCols.signature && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[320px]`}>Signature</th>}
                 {visibleCols.lastMsg && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[420px]`}>Last Message</th>}
-                {visibleCols.count && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}>Count</th>}
+                {visibleCols.count && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}>
+                    <button type="button" onClick={() => toggleSort('count')} className="inline-flex items-center gap-1">
+                      <span>Count</span>
+                      {sortBy === 'count' && <span aria-hidden>{sortDir === 'asc' ? '▲' : '▼'}</span>}
+                    </button>
+                  </th>
+                )}
                 {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[120px]`}>Status</th>}
                 {visibleCols.assigned && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[220px]`}>Assigned</th>}
                 {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} min-w-[80px]`}></th>}
