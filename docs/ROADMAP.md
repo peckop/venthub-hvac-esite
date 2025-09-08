@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-07
+Last updated: 2025-09-08
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -175,6 +175,21 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 ## Ek: Kurumsal/PLP Planı Checklist (Arşivden taşınan)
 
 ---
+
+## Güncelleme — 2025-09-08: Hata Loglama Sistemi + Admin Panel
+
+Uygulananlar:
+- Edge Function: log-client-error yayınlandı; 404/401 ve 500 hataları giderildi (supabase.functions.invoke, try/catch, maybeSingle ile güvenli çağrılar).
+- Şema: client_errors içine group_id eklendi; error_groups tablosu ve eksik migration’lar tamamlandı.
+- RLS: admin/moderator JWT rolü ve e‑posta fallback ile admin erişimi sağlandı.
+- Admin > Hata Grupları (/admin/error-groups): grup listesi (signature, last_message, count, last_seen, level, status, assigned_to), filtreler (arama, seviye, durum, tarih), realtime, sayfalama; Detay’da Son Kayıtlar + Notlar + Örnek URL.
+- Admin > Hatalar (/admin/errors): ham client_errors listesi, realtime, sayfalama.
+- UX: Hata Grupları sayfasında scroll davranışı düzeltildi (üst/alt yatay scroller senkron; overscroll-x-contain; dikey scroll normal akışta). ColumnsMenu toolbar’ın sağına taşındı.
+- Deploy/Cache: Cloudflare Pages’de index.html için no-store başlıkları eklendi; bayat UI problemi giderildi.
+
+Sıradaki (kısa vadeli öneriler):
+- Hata Grupları: Count/Last Seen başlıktan sıralama; CSV export; assigned-to filtresi ve bulk status.
+- Detay paneli: Top-5 URL/Release/Env/UA dağılımı; ilk stack frame özet.
 
 ## Güncelleme — 2025-09-07: Ana Sayfa Konsolidasyonu + Knowledge Hub v1
 

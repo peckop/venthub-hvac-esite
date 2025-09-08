@@ -1,6 +1,6 @@
 # Admin Panel Roadmap (Güncel Durum ve Plan)
 
-Tarih: 2025-09-05
+Tarih: 2025-09-08
 
 ## Tamamlananlar (Sprint 1)
 - /admin çatı layout ve guard (sadece admin erişir)
@@ -25,6 +25,23 @@ Tarih: 2025-09-05
   - Tüm toolbar’lar kart içinde yumuşak arka plan (bg-gray-50 + border) ile ayrı bir yüzey olarak gösteriliyor
   - “Grupla” gibi boolean kontroller Radix Switch ile birleştirildi (tik işareti kaldırıldı)
 
+## Güncellemeler (2025-09-08) — Hata Yönetimi
+- Yeni: Hata Grupları (/admin/error-groups)
+  - [x] Liste: signature, level, last_message, last_seen, count, status, assigned_to
+  - [x] Filtreler: arama (signature/mesaj), seviye, durum, tarih aralığı; sayfalama (server-side)
+  - [x] Realtime: Supabase Postgres Realtime ile canlı güncellenir
+  - [x] Detay paneli: Son Kayıtlar (son 20 client_errors), Notlar, Örnek URL
+  - [x] Atama ve Durum: assigned_to ve status alanları satır içi düzenlenir
+  - [x] Görünüm: ColumnsMenu toolbar’ın sağında; yoğunluk (compact/comfortable)
+  - [x] UX: Üst/alt yatay scroller senkron; overscroll-x-contain ile zincir kesimi; dikey scroll normal akışta
+- Yeni: Hatalar (/admin/errors)
+  - [x] Liste: client_errors ham kayıtları; realtime; server-side sayfalama
+- Altyapı
+  - [x] Edge Function: log-client-error — 404/401/500 sorunları giderildi; try/catch + maybeSingle ile güvenli
+  - [x] Şema: client_errors.tablosuna group_id; error_groups tablosu ve eksik migration’lar eklendi
+  - [x] RLS: admin/moderator JWT rolü ve e‑posta fallback ile erişim
+  - [x] CI/CD: Cloudflare Pages dağıtımı; index.html için no-store (public/_headers) ile bayat UI önlendi
+
 ## Devam Eden (Sprint 2 – Orders Modülü)
 - /admin/orders işlevleri
   - Liste ve veri modeli: status rozetleri, toplam, tarih (mevcut)
@@ -32,10 +49,15 @@ Tarih: 2025-09-05
   - Aksiyon: Kargoya Ver (tekil ve toplu) (kısmen mevcut; bulk akışı sırada)
   - Dışa Aktar: CSV + Excel (.xls) (mevcut)
 
-## Sıradaki (Sprint 3 – Returns & Movements)
+## Sıradaki (Sprint 3 – Returns & Movements & Errors)
 - Dışa Aktar menüsü: Returns ve Movements için Excel (.xls) eklenmesi
 - Toolbar durumlarının kalıcılığı (localStorage; sayfa bazlı anahtarlar)
 - Gelişmiş filtre çekmecesi (Orders)
+- Errors / Error Groups
+  - [ ] Sıralama: Count ve Last Seen başlıklarına tıklayarak
+  - [ ] Export: CSV dışa aktar (grup ve ham kayıtlar)
+  - [ ] Assigned-to filtresi ve bulk status değişikliği
+  - [ ] Detay panelinde en sık URL/Release/Env/UA dağılımı (top-5)
 
 ## Sıradaki (Sprint 4 – Dashboard & Users)
 - Dashboard: Bugün/7g/30g KPI kartları (sipariş, ciro, iade, bekleyen kargo)
