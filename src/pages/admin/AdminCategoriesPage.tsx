@@ -2,6 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -82,12 +83,18 @@ const AdminCategoriesPage: React.FC = () => {
         parent_id: parentId || null,
       }
       if (!payload.name || !payload.slug) return
-      if (editingId) {
+if (editingId) {
+        const before = rows.find(r=>r.id===editingId) || null
         const { error } = await supabase.from('categories').update(payload).eq('id', editingId)
         if (error) throw error
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, { table_name: 'categories', row_pk: editingId, action: 'UPDATE', before, after: payload, comment: 'save category' })
       } else {
-        const { error } = await supabase.from('categories').insert(payload)
+        const { data, error } = await supabase.from('categories').insert(payload).select('id').maybeSingle()
         if (error) throw error
+        const inserted = (data as {id:string}|null)?.id || null
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, { table_name: 'categories', row_pk: inserted, action: 'INSERT', before: null, after: payload, comment: 'create category' })
       }
       await load()
       startCreate()
@@ -99,8 +106,11 @@ const AdminCategoriesPage: React.FC = () => {
   const remove = async (id: string) => {
     if (!confirm('Bu kategoriyi silmek istiyor musunuz?')) return
     try {
+const before = rows.find(r=>r.id===id) || null
       const { error } = await supabase.from('categories').delete().eq('id', id)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'categories', row_pk: id, action: 'DELETE', before, after: null, comment: 'delete category' })
       await load()
       if (editingId === id) startCreate()
     } catch (e) {
@@ -118,8 +128,9 @@ const AdminCategoriesPage: React.FC = () => {
         search={{ value: q, onChange: setQ, placeholder: 'kategori adı/slug ara', focusShortcut: '/' }}
         onClear={()=>setQ('')}
         recordCount={filtered.length}
-        rightExtra={(
-          <ColumnsMenu
+rightExtra={(
+          <div className="flex items-center gap-2">
+            <ColumnsMenu
             columns={[
               { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
               { key: 'slug', label: 'Slug', checked: visibleCols.slug, onChange: (v)=>setVisibleCols(s=>({ ...s, slug: v })) },
@@ -127,8 +138,26 @@ const AdminCategoriesPage: React.FC = () => {
               { key: 'actions', label: 'İşlem', checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
             ]}
             density={density}
-            onDensityChange={setDensity}
+onDensityChange={setDensity}
           />
+<ExportMenu
+            items={[
+              { key: 'csv', label: 'CSV (UTF-8 BOM)', onSelect: ()=>{
+                const cols = ['id','name','slug','parent_id']
+                const header = cols.join(',')
+const lines = filtered.map(r=>[r.id,`"${r.name.replace(/"/g,'""')}"`,r.slug,r.parent_id||''].join(','))
+                const csv = '\ufeff' + [header, ...lines].join('\n')
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = 'categories.csv'
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
+            ]}
+          />
+          </div>
         )}
       />
 
