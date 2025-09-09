@@ -69,27 +69,21 @@ Tarih: 2025-09-08
 
 Durum (altyapı taraması):
 - products: stock_qty ve low_stock_threshold mevcut (20250902_* migrations)
-- products: purchase_price yok, slug/meta alanları yok
-- product_images tablosu yok
-- Storage bucket/policy için migration yok (product-images)
-- Admin Products (/admin/products)
-  - [ ] Liste: arama, kategori filtresi, sıralama, durum filtresi (aktif/pasif)
-  - [ ] Yeni Ürün Ekle: ad, SKU, kategori, durum, satış fiyatı, alış fiyatı, stok başlangıcı, düşük stok eşiği, kısa/uzun açıklama, görseller, SEO (slug, meta)
-  - [ ] Ürün Düzenle/Sil: aynı alanlar; audit log
-  - [ ] Görseller: ekleme/sıralama/silme (storage)
-- Admin Categories (/admin/categories)
-  - [ ] Kategori listeleme, oluşturma, düzenleme, silme
-  - [ ] Slug, parent (opsiyonel hiyerarşi), aktif/pasif; kategoriye bağlı ürün sayısı
-- Pricing
-  - [ ] Satış fiyatı (price) ve alış maliyeti (purchase_price) alanlarının yönetimi
-  - [ ] (Opsiyon) fiyat listeleri/iskonto kuralları için hazırlık
-  - [ ] KDV oranı alanı ve gösterimi (opsiyonel)
-- Toplu İşlemler
-  - [ ] Ürün CSV import/export (alan eşleme sihirbazı, doğrulama)
-  - [ ] Kategori CSV import/export (slug ile eşleştirme)
-- Erişim ve Denetim
-  - [ ] RLS/policy güncellemeleri (admin/moderator)
-  - [ ] Audit log: ürün/kategori ve fiyat değişiklikleri
+- purchase_price, slug/meta alanları ve product_images tabloları eklendi; storage bucket/policy tamam.
+
+Tamamlananlar (/admin/products & /admin/categories):
+- [x] Toolbar standardizasyonu (AdminToolbar + ColumnsMenu, density, kalıcılık)
+- [x] Ürünler: arama, kategori filtresi, durum chip’leri, “Sadece: Öne Çıkan” toggle
+- [x] Ürünler: tablo sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok)
+- [x] Ürünler: düzenleme paneli — sekmeler (Bilgi, Fiyat, Stok, Görseller, SEO), üstte gri başlık şeridi ve aksiyonlar (Yeni, Kaydet, Sil)
+- [x] Ürünler: görsel yükleme/sıralama/silme (storage + product_images)
+- [x] Ürünler: düşük stok eşiği override mantığı (boş=varsayılan; dolu=override) — Envanter/Ayarlar ile uyumlu
+- [x] Kategoriler: liste + CRUD (Ad, Slug, Üst Kategori), üstte gri başlık şeridi ve aksiyonlar (Yeni, Kaydet, Sil)
+
+Açık kalanlar / sıradakiler:
+- [ ] RLS: products/product_images/categories için admin/moderator CRUD policy’leri (ince ayar)
+- [ ] Audit log: ürün/kategori + fiyat/görsel değişiklikleri
+- [ ] CSV import/export (ürün/kategori) – opsiyonel, sonraki sprint
 
 ### Görev Listesi (Sprint 3A)
 - [x] Migration: products.purchase_price numeric(12,2) NULL
@@ -97,9 +91,9 @@ Durum (altyapı taraması):
 - [x] Migration: product_images (id, product_id, path, alt, sort_order, created_at) + index
 - [x] Storage: product-images bucket ve storage.objects policy (read public, write admin/moderator)
 - [ ] RLS: products/products_images/categories için admin/moderator CRUD policy’leri
-- [ ] Admin Categories: liste + CRUD (slug unique)
-- [ ] Admin Products: liste + CRUD (form sekmeleri: Bilgiler, Fiyat, Stok, Görseller, SEO)
-- [ ] Görseller: yükle/sırala/sil; sort_order ile kapak görseli
+- [x] Admin Categories: liste + CRUD (slug unique)
+- [x] Admin Products: liste + CRUD (form sekmeleri: Bilgi, Fiyat, Stok, Görseller, SEO)
+- [x] Görseller: yükle/sırala/sil; sort_order
 - [ ] Audit log: ürün/kategori + fiyat/görsel değişiklikleri
 - [ ] CSV import/export (ürün/kategori) – opsiyonel, sonraki sprint
 

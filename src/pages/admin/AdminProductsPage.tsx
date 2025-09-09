@@ -17,6 +17,7 @@ interface ProductRow {
   purchase_price?: number | null
   stock_qty?: number | null
   low_stock_threshold?: number | null
+  is_featured?: boolean | null
 }
 
 interface CategoryOpt { id: string; name: string }
@@ -39,6 +40,7 @@ const AdminProductsPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:products'
   const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
+  const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
   React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
@@ -86,14 +88,16 @@ const AdminProductsPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      const [p, c] = await Promise.all([
-        supabase.from('products').select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold').order('name', { ascending: true }),
-        supabase.from('categories').select('id,name').order('name', { ascending: true })
+      const [p, c, s] = await Promise.all([
+        supabase.from('products').select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured').order('name', { ascending: true }),
+        supabase.from('categories').select('id,name').order('name', { ascending: true }),
+        supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
       ])
       if (p.error) throw p.error
       if (c.error) throw c.error
       setRows((p.data || []) as ProductRow[])
       setCats((c.data || []) as CategoryOpt[])
+      if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number|null } | null)?.default_low_stock_threshold ?? null) as number | null)
     } catch (e) {
       setError((e as Error).message || 'Yüklenemedi')
       setRows([])
@@ -118,8 +122,7 @@ const AdminProductsPage: React.FC = () => {
       base = base.filter(r => (statusFilter as Record<string, boolean>)[(r.status || '').toLowerCase()])
     }
     if (featuredOnly) {
-      // Not: rows içinde is_featured alanı yok, bu nedenle bu filtre yalnızca detay çektiğimizde etkili olur.
-      // Şimdilik listede yoksa etkisiz kalır; daha sonra products sorgusuna is_featured eklenebilir.
+      base = base.filter(r => !!r.is_featured)
     }
     return base
   }, [rows, q, selectedCategoryFilter, statusFilter, featuredOnly])
@@ -317,6 +320,36 @@ const AdminProductsPage: React.FC = () => {
     }
   }
 
+  type SortKey = 'name'|'sku'|'category'|'status'|'price'|'stock'
+  const [sortKey, setSortKey] = React.useState<SortKey>('name')
+  const [sortDir, setSortDir] = React.useState<'asc'|'desc'>('asc')
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir(d => d==='asc'?'desc':'asc')
+    else { setSortKey(key); setSortDir('asc') }
+  }
+  const sortIndicator = (key: SortKey) => sortKey!==key ? '' : (sortDir==='asc'?'▲':'▼')
+
+  const sorted = React.useMemo(()=>{
+    const arr = [...filtered]
+    arr.sort((a,b)=>{
+      const dir = sortDir==='asc'?1:-1
+      switch (sortKey) {
+        case 'name': return dir * a.name.localeCompare(b.name, 'tr')
+        case 'sku': return dir * a.sku.localeCompare(b.sku, 'tr')
+        case 'category': {
+          const an = cats.find(c=>c.id===a.category_id)?.name || ''
+          const bn = cats.find(c=>c.id===b.category_id)?.name || ''
+          return dir * an.localeCompare(bn, 'tr')
+        }
+        case 'status': return dir * (String(a.status||'').localeCompare(String(b.status||''), 'tr'))
+        case 'price': return dir * (((a.price??-Infinity) as number) - ((b.price??-Infinity) as number))
+        case 'stock': return dir * (((a.stock_qty??-Infinity) as number) - ((b.stock_qty??-Infinity) as number))
+        default: return 0
+      }
+    })
+    return arr
+  }, [filtered, sortKey, sortDir, cats])
+
   const saveCurrent = async () => {
     if (tab === 'info') return saveInfo()
     if (tab === 'pricing') return savePricing()
@@ -433,7 +466,7 @@ const AdminProductsPage: React.FC = () => {
               <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 50" />
               <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
               <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 5" />
-              <div className="text-xs text-industrial-gray">Boş bırakılırsa Ayarlar’daki varsayılan eşik kullanılır.</div>
+              <div className="text-xs text-industrial-gray">Boş bırakılırsa Ayarlar’daki varsayılan eşik kullanılır{defaultThreshold!=null?` (Varsayılan: ${defaultThreshold})`:''}.</div>
             </div>
           </div>
         )}
@@ -482,12 +515,36 @@ const AdminProductsPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
-              {visibleCols.sku && <th className={`${adminTableHeadCellClass} ${headPad}`}>SKU</th>}
-              {visibleCols.category && <th className={`${adminTableHeadCellClass} ${headPad}`}>Kategori</th>}
-              {visibleCols.status && <th className={`${adminTableHeadCellClass} ${headPad}`}>Durum</th>}
-              {visibleCols.price && <th className={`${adminTableHeadCellClass} ${headPad}`}>Fiyat</th>}
-              {visibleCols.stock && <th className={`${adminTableHeadCellClass} ${headPad}`}>Stok</th>}
+              {visibleCols.name && (
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>Ad {sortIndicator('name')}</button>
+                </th>
+              )}
+              {visibleCols.sku && (
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('sku')}>SKU {sortIndicator('sku')}</button>
+                </th>
+              )}
+              {visibleCols.category && (
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('category')}>Kategori {sortIndicator('category')}</button>
+                </th>
+              )}
+              {visibleCols.status && (
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button>
+                </th>
+              )}
+              {visibleCols.price && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('price')}>Fiyat {sortIndicator('price')}</button>
+                </th>
+              )}
+              {visibleCols.stock && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('stock')}>Stok {sortIndicator('stock')}</button>
+                </th>
+              )}
               {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
             </tr>
           </thead>
@@ -497,7 +554,7 @@ const AdminProductsPage: React.FC = () => {
             ) : filtered.length === 0 ? (
               <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
             ) : (
-              filtered.map(r => (
+              sorted.map(r => (
                 <tr key={r.id} className="border-b border-light-gray/60">
                   {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
                   {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
