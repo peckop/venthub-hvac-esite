@@ -1,7 +1,7 @@
 # AdminToolbar Kılavuzu
 
 Tarih: 2025-09-07
-Durum: Aktif kullanımda (Inventory, Movements, Orders, Returns, Users)
+Durum: Aktif kullanımda (Inventory, Movements, Orders, Returns, Users, Products, Categories)
 
 Amaç
 - Admin sayfalarındaki arama/filtre/aksiyon barlarını standartlaştırmak.
@@ -10,6 +10,7 @@ Amaç
 Görsel Tasarım ve Düzen
 - Kart içinde ayrı bir yüzey: bg-gray-50 + border + rounded + p-3 (panel hissi)
 - Düzen: 2 satır
+- Üstte Sekmeli Başlık (opsiyonel): Ürünler/Kategoriler gibi formlarda kart içinde ek bir gri başlık şeridi kullanılır; sol tarafta durum etiketi (Yeni/Düzenleniyor), ortada Tabs, sağda aksiyonlar (Yeni/Kaydet/Sil).
   - Üst sıra: Arama + Select + Sağ aksiyon kümesi (Temizle, sayaç, Dışa Aktar vb.)
   - Alt sıra: Chip grubu (çoklu filtreler)
 - Yükseklik: md ve üstü 48px (md:h-12), küçük ekranda h-11

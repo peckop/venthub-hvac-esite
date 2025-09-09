@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-09-09 (Admin Products/Categories UI standardizasyonu + sıralama + eşik mantığı)
+- Ürünler: Toolbar standardı + kategori filtresi + durum chip’leri + “Sadece: Öne Çıkan” toggle
+- Ürünler: Tablo sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok); başlıklardan tıklanarak
+- Ürünler: Düzenleme paneli başlık şeridi; aksiyonlar sağa taşındı (Yeni, Kaydet, Sil); “Yeni Ürün/Düzenleniyor” etiketi sola
+- Ürünler: Stok sekmesi — düşük stok eşiği override mantığı (boş=varsayılan, dolu=override) ve varsayılan eşik bilgisini gösterme
+- Kategoriler: Düzenleme paneli başlık şeridi + aksiyonlar (Yeni, Kaydet, Sil)
+
 ## 2025-09-09 (Knowledge Hub Linking + PDP/PLP Related Guide + i18n)
 - Header: add “Knowledge Hub” link to main nav (/destek/merkez).
 - MegaMenu: add Knowledge Hub tile to Quick Access.
