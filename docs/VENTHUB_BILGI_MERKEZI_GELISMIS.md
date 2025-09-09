@@ -86,6 +86,7 @@ Amaç
   - Kanal fanı: airflow, Δp/HSP aralığı
 - URL örneği: /products?application=jet-fan&thrust_min=50&reversible=true
 - CTA her zaman çift: “İlgili ürünlere git” ve “Teklif Al”
+- Uygulama: PDP ve Kategori sayfalarında konuya bağlanan “İlgili Rehber” linkleri canlıdır (slug eşleme ile).
 
 6) Birimler ve Varsayımlar
 - ρ=1.2 kg/m³, c_p=1.005 kJ/kg·K (varsayılan); profil ve psikrometri ile güncellenebilir

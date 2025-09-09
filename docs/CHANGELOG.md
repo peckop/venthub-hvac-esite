@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-09-09 (Knowledge Hub Linking + PDP/PLP Related Guide + i18n)
+- Header: add “Knowledge Hub” link to main nav (/destek/merkez).
+- MegaMenu: add Knowledge Hub tile to Quick Access.
+- Footer: add Knowledge Hub to Quick Links.
+- SupportHome: add Knowledge Hub card.
+- PDP: show “Related Guide” link below description (category/subcategory → topic mapping).
+- CategoryPage + ProductCard: pass and render optional relatedTopicSlug to show per‑card “Related Guide”.
+- i18n: add common.knowledgeHub, support.home.knowledgeDesc, pdp.relatedGuide keys (tr/en).
+
 ## 2025-09-08 (Admin Error Logs, Realtime ve Scroll UX + WhatsApp Deeplink + Order Consents + Admin Exports)
 - Yeni: AdminErrorGroupsPage — grup görünümü (signature, last_message, count, last_seen, level, status, assigned_to), filtreler (arama, seviye, durum, tarih), server-side sayfalama.
 - Yeni: AdminErrorsPage — ham client_errors listesi; Realtime abonelikler eklendi.

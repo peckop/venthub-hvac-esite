@@ -63,9 +63,12 @@
 - [ ] QA: a11y (odak/focus), Lighthouse, analytics event doğrulama
 
 ## Knowledge Hub & Hesaplayıcılar
+- [x] PDP: Ürün detayında "İlgili Rehber" bağlantısı (kategori/alt kategori → konu eşleme)
+- [x] Kategori Sayfası: Ürün kartlarında bağlama göre "İlgili Rehber" bağlantısı (optional)
 - [x] HubPage: arama + etiket filtresi (/destek/merkez)
 - [x] Hesaplayıcılar v1 iskeleti: /destek/hesaplayicilar/{hrv,hava-perdesi,jet-fan,kanal}
-- [ ] Header menüde Knowledge Hub girişi ve Hesaplayıcılar index linki
+- [x] Header menüde Knowledge Hub girişi
+- [ ] Hesaplayıcılar index linki (menü veya hub üzerinden)
 - [ ] Hesaplayıcılar v2: gerçek formüller, birimler, hata durumları, paylaşılabilir URL (querystring)
 
 ## Navigasyon Sorunu (HomePage tık gecikmesi)
