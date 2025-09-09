@@ -270,17 +270,20 @@ const before = rows.find(r=>r.id===selectedId) || null
         const ext = file.name.split('.').pop() || 'jpg'
         const filename = `${Date.now()}-${slugify(name || 'urun')}.${ext}`
         const path = `product/${selectedId}/${filename}`
-        const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
-        if (upErr) throw upErr
-        // insert DB ref
-const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
-        if (dbErr) throw dbErr
-        const { logAdminAction } = await import('../../lib/audit')
-        await logAdminAction(supabase, { table_name: 'product_images', row_pk: selectedId, action: 'INSERT', before: null, after: { path }, comment: 'uploadImage' })
+const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
+        if (upErr) {
+          console.warn('storage upload error', upErr)
+          throw new Error('Storage upload RLS/policy hatası: ' + (upErr.message || upErr.name))
+        }
+        const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
+        if (dbErr) {
+          console.warn('db insert error', dbErr)
+          throw new Error('DB insert RLS/policy hatası: ' + (dbErr.message || 'unknown'))
+        }
       }
       await loadImages(selectedId)
     } catch (e) {
-      alert('Yükleme hatası: ' + ((e as Error).message || e))
+      alert(String(e))
     } finally {
       setUploading(false)
     }
