@@ -362,7 +362,6 @@ const AdminProductsPage: React.FC = () => {
               density={density}
               onDensityChange={setDensity}
             />
-            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
           </div>
         )}
       />
@@ -381,6 +380,7 @@ const AdminProductsPage: React.FC = () => {
             </Tabs.List>
           </Tabs.Root>
           <div className="ml-auto flex items-center gap-2">
+            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
             <button onClick={saveCurrent} disabled={tab==='images'} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
             {selectedId && (
               <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
@@ -433,6 +433,7 @@ const AdminProductsPage: React.FC = () => {
               <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 50" />
               <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
               <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 5" />
+              <div className="text-xs text-industrial-gray">Boş bırakılırsa Ayarlar’daki varsayılan eşik kullanılır.</div>
             </div>
           </div>
         )}

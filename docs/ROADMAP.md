@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-08
+Last updated: 2025-09-09
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -178,6 +178,17 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 ## Ek: Kurumsal/PLP Planı Checklist (Arşivden taşınan)
 
 ---
+
+## Güncelleme — 2025-09-09: Knowledge Hub Linkleri + PDP/PLP İlgili Rehber
+
+Uygulananlar:
+- Header (masaüstü): “Bilgi Merkezi” bağlantısı (/destek/merkez).
+- MegaMenu: Hızlı Erişim alanına “Bilgi Merkezi” kartı.
+- Footer: Hızlı Bağlantılar altında “Bilgi Merkezi” bağlantısı.
+- Destek Ana Sayfası: Kartlara “Bilgi Merkezi” kartı.
+- PDP: Ürün açıklaması altında “İlgili Rehber” bağlantısı (kategori/alt kategori → konu eşleme).
+- Kategori Sayfası: Ürün kartlarında bağlama göre “İlgili Rehber” bağlantısı (optional, ProductCard.relatedTopicSlug).
+- i18n: common.knowledgeHub, support.home.knowledgeDesc, pdp.relatedGuide anahtarları eklendi (tr/en).
 
 ## Güncelleme — 2025-09-08: Hata Loglama Sistemi + Admin Panel
 
