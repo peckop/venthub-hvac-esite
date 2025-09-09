@@ -150,6 +150,17 @@ export const CategoryPage: React.FC = () => {
     return `${origin}/category/${category.slug}`
   })()
 
+  // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
+  const mapSlugToTopic = (s?: string | null): string | null => {
+    if (!s) return null
+    const slug = s.toLowerCase()
+    if (slug.includes('hava-perde')) return 'hava-perdesi'
+    if (slug.includes('jet-fan')) return 'jet-fan'
+    if (slug.includes('isi-geri-kazanim') || slug.includes('hrv')) return 'hrv'
+    return null
+  }
+  const relatedTopicSlug = mapSlugToTopic(parentCategory?.slug || category.slug)
+
   return (
     <div className="min-h-screen bg-light-gray">
       <Seo 
@@ -407,6 +418,7 @@ export const CategoryPage: React.FC = () => {
                         setCompareIds(prev => prev.includes(pid) ? prev.filter(id => id !== pid) : (prev.length < 4 ? [...prev, pid] : prev))
                       }}
                       layout={viewMode}
+                      relatedTopicSlug={relatedTopicSlug || undefined}
                     />
                   ))}
                 </div>

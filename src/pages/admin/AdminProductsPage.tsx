@@ -223,9 +223,11 @@ const AdminProductsPage: React.FC = () => {
   const saveStock = async () => {
     if (!selectedId) return
     try {
+      const isDefault = lowStock === ''
       const payload = {
         stock_qty: stockQty === '' ? null : Number(stockQty),
-        low_stock_threshold: lowStock === '' ? null : Number(lowStock),
+        low_stock_threshold: isDefault ? null : Number(lowStock),
+        low_stock_override: !isDefault,
       }
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
@@ -367,7 +369,8 @@ const AdminProductsPage: React.FC = () => {
 
       {/* Düzenleme Paneli */}
       <div className={`${adminCardClass} p-4`}>
-        <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-2">
+        <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-3">
+          <span className="text-sm text-steel-gray">{selectedId ? 'Düzenleniyor' : 'Yeni Ürün'}</span>
           <Tabs.Root value={tab} onValueChange={(v)=>setTab(v as typeof tab)}>
             <Tabs.List className="inline-flex items-center gap-1">
               <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Bilgi</Tabs.Trigger>
@@ -378,7 +381,6 @@ const AdminProductsPage: React.FC = () => {
             </Tabs.List>
           </Tabs.Root>
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-sm text-steel-gray hidden sm:inline">{selectedId ? 'Düzenle' : 'Yeni Ürün'}</span>
             <button onClick={saveCurrent} disabled={tab==='images'} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
             {selectedId && (
               <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
@@ -410,9 +412,6 @@ const AdminProductsPage: React.FC = () => {
               </select>
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> Öne Çıkan</label>
             </div>
-            <div className="col-span-full flex gap-2">
-              <button onClick={saveInfo} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
-            </div>
           </div>
         )}
 
@@ -424,9 +423,6 @@ const AdminProductsPage: React.FC = () => {
               <label className="text-sm text-steel-gray">Alış Maliyeti</label>
               <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 1499.50" />
             </div>
-            <div className="col-span-full flex gap-2">
-              <button onClick={savePricing} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
-            </div>
           </div>
         )}
 
@@ -437,9 +433,6 @@ const AdminProductsPage: React.FC = () => {
               <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 50" />
               <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
               <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 5" />
-            </div>
-            <div className="col-span-full flex gap-2">
-              <button onClick={saveStock} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             </div>
           </div>
         )}
@@ -478,9 +471,6 @@ const AdminProductsPage: React.FC = () => {
               <label className="text-sm text-steel-gray">Meta Açıklama</label>
               <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full border border-light-gray rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" rows={3} />
             </div>
-            <div className="col-span-full flex gap-2">
-              <button onClick={saveSeo} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
-            </div>
           </div>
         )}
       </div>
@@ -515,9 +505,11 @@ const AdminProductsPage: React.FC = () => {
                   {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.price!=null?Number(r.price):null) ?? '-'}</td>}
                   {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
                   {visibleCols.actions && (
-                    <td className={`${adminTableCellClass} ${cellPad} space-x-2`}>
-                      <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
-                      <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
+                    <td className={`${adminTableCellClass} ${cellPad}`}>
+                      <div className="flex items-center gap-2 whitespace-nowrap">
+                        <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
+                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
+                      </div>
                     </td>
                   )}
                 </tr>
