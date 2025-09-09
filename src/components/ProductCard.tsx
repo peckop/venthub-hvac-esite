@@ -15,9 +15,10 @@ interface ProductCardProps {
   compareSelected?: boolean
   onToggleCompare?: (productId: string) => void
   layout?: 'grid' | 'list'
+  relatedTopicSlug?: string
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid' }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug }) => {
   const { t } = useI18n()
   const isList = layout === 'list'
   const { addToCart } = useCart()
@@ -127,6 +128,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               </label>
             </div>
           )}
+
+          {/* Related Guide (optional) */}
+          {relatedTopicSlug ? (
+            <div className="mb-2 text-xs">
+              <span className="text-steel-gray">{t('pdp.relatedGuide')}:</span>
+              <Link
+                to={`/destek/konular/${relatedTopicSlug}`}
+                onClick={(e) => { e.stopPropagation() }}
+                className="ml-1 text-primary-navy hover:text-secondary-blue underline"
+              >
+                {t(`knowledge.topics.${relatedTopicSlug}.title`)}
+              </Link>
+            </div>
+          ) : null}
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
