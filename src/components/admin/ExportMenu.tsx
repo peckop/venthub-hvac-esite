@@ -18,8 +18,8 @@ export const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: strin
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className="min-w-44 rounded-md bg-white shadow-lg border border-light-gray p-1">
-          {items.map(item => (
+        <DropdownMenu.Content sideOffset={6} className="z-50 min-w-56 rounded-md bg-white text-steel-gray shadow-lg border border-light-gray p-1">
+          {(items && items.length > 0) ? items.map(item => (
             <DropdownMenu.Item
               key={item.key}
               className="px-3 py-2 text-sm rounded hover:bg-gray-50 cursor-pointer"
@@ -27,7 +27,9 @@ export const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: strin
             >
               {item.label}
             </DropdownMenu.Item>
-          ))}
+          )) : (
+            <div className="px-3 py-2 text-sm text-industrial-gray">Öğe yok</div>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
