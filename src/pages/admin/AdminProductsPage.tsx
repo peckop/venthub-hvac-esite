@@ -300,6 +300,25 @@ await supabase.from('product_images').delete().eq('id', img.id)
     }
   }
 
+  const makeCover = async (img: ImageRow) => {
+    try {
+      if (images.length === 0 || images[0].id === img.id) return
+      const first = images[0]
+      await Promise.all([
+        supabase.from('product_images').update({ sort_order: first.sort_order }).eq('id', img.id),
+        supabase.from('product_images').update({ sort_order: img.sort_order }).eq('id', first.id),
+      ])
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, [
+        { table_name: 'product_images', row_pk: img.id, action: 'UPDATE', before: img, after: { sort_order: first.sort_order }, comment: 'makeCover' },
+        { table_name: 'product_images', row_pk: first.id, action: 'UPDATE', before: first, after: { sort_order: img.sort_order }, comment: 'makeCover' },
+      ])
+      if (selectedId) await loadImages(selectedId)
+    } catch (e) {
+      alert('Kapak ayarlanamadı: '+((e as Error).message||e))
+    }
+  }
+
   const bumpImage = async (img: ImageRow, dir: -1 | 1) => {
     const list = [...images]
     const idx = list.findIndex(x => x.id === img.id)
@@ -406,6 +425,7 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
   }
 
   const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string,string>[]; total: number } | null>(null)
+  const [importRows, setImportRows] = React.useState<Record<string,string>[] | null>(null)
 
   return (
     <div className="space-y-6">
@@ -439,6 +459,7 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
               const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"'))
               const header = split(lines[0]).map(h=>h.trim().toLowerCase())
               const rows = lines.slice(1).map(l=>{ const cells = split(l); const obj: Record<string,string> = {}; header.forEach((h,i)=>obj[h]=cells[i]||''); return obj })
+              setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
             <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">İçe Aktar (beta)</button>
@@ -499,7 +520,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
             </table>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>setImportPreview(null)}>Kapat</button>
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>{ setImportPreview(null); setImportRows(null); }}>Kapat</button>
             <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={()=>{
               const h = (importPreview?.header||[])
               const required = ['name','sku']
@@ -507,6 +528,46 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
               const okCount = (importPreview?.rows||[]).filter(r=>r['name']&&r['sku']).length
               alert(`Dry-run: zorunlu alanlar ${hasRequired?'tam':'eksik'}. Uygun satır sayısı: ${okCount}/${importPreview?.total||0}`)
             }}>Dry-run</button>
+            <button className="px-3 h-10 rounded-md bg-primary-navy text-white text-xs" onClick={async ()=>{
+              if (!importRows || !importPreview) return alert('Önce CSV seçin')
+              const h = importPreview.header
+              if (!h.includes('sku') || !h.includes('name')) { alert('En az sku ve name kolonları gerekli'); return }
+              const mapCategorySlugToId = (slug: string)=>{
+                const s = (slug||'').toLowerCase().trim()
+                const found = cats.find(c=>c.name.toLowerCase()===s)
+                return found?.id || null
+              }
+              const payloads: { sku: string; name: string; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
+              for (const r of importRows) {
+                if (!r['sku'] || !r['name']) continue
+                const p: { sku: string; name: string; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
+                  sku: r['sku'].trim(),
+                  name: r['name'].trim(),
+                }
+                if (r['brand']) p.brand = r['brand'].trim()
+                if (r['status']) p.status = r['status'].trim()
+                if (r['price']) p.price = Number(r['price'])
+                if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
+                if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
+                if (r['category_id']) p.category_id = r['category_id'] || null
+                else if (r['category_slug']||r['category']) p.category_id = mapCategorySlugToId(r['category_slug']||r['category'])
+                payloads.push(p)
+              }
+              if (payloads.length===0) { alert('Uygun satır bulunamadı'); return }
+              try {
+                // chunked upsert by sku
+                let ok=0, fail=0
+                for (let i=0;i<payloads.length;i+=100) {
+                  const chunk = payloads.slice(i,i+100)
+                  const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
+                  if (error) { console.warn('import upsert error', error); fail+=chunk.length } else ok+=chunk.length
+                }
+                alert(`İçe aktarım tamam: ${ok} satır işlendi, ${fail} satır hata`)
+                await load()
+              } catch (e) {
+                alert('İçe aktarım hatası: '+((e as Error).message||e))
+              }
+            }}>Yaz (upsert by SKU)</button>
           </div>
         </div>
       )}
@@ -597,6 +658,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                       <div className="flex gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>makeCover(img)} disabled={idx===0}>Kapak Yap</button>
                         <button className="px-2 py-1 border rounded text-xs text-red-600 ml-auto" onClick={()=>deleteImage(img)}>Sil</button>
                       </div>
                     </div>
