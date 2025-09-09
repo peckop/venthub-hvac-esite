@@ -279,6 +279,7 @@ export const en = {
     warranty2y: '2-Year Warranty',
     support247: '24/7 Support',
     descFallback: 'A detailed description for this product will be added soon.',
+    relatedGuide: 'Related Guide',
     statusLabel: 'Status',
     relatedProducts: 'Related Products',
     labels: {

@@ -284,6 +284,7 @@ export const tr = {
     warranty2y: '2 Yıl Garanti',
     support247: '7/24 Destek',
     descFallback: 'Bu ürün için detaylı açıklama yakında eklenecektir.',
+    relatedGuide: 'İlgili Rehber',
     statusLabel: 'Durum',
     relatedProducts: 'Benzer Ürünler',
     labels: {

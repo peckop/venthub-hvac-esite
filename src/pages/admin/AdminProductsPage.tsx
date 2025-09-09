@@ -48,6 +48,9 @@ const AdminProductsPage: React.FC = () => {
   // selection & form state
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
   const [tab, setTab] = React.useState<'info'|'pricing'|'stock'|'images'|'seo'>('info')
+  const TAB_KEY = 'products:editTab'
+  React.useEffect(()=>{ try { const v=localStorage.getItem(TAB_KEY); if(v==='info'||v==='pricing'||v==='stock'||v==='images'||v==='seo') setTab(v as 'info'|'pricing'|'stock'|'images'|'seo') } catch{} },[])
+  React.useEffect(()=>{ try { localStorage.setItem(TAB_KEY, tab) } catch{} }, [tab])
 
   // info
   const [name, setName] = React.useState('')
@@ -312,6 +315,14 @@ const AdminProductsPage: React.FC = () => {
     }
   }
 
+  const saveCurrent = async () => {
+    if (tab === 'info') return saveInfo()
+    if (tab === 'pricing') return savePricing()
+    if (tab === 'stock') return saveStock()
+    if (tab === 'seo') return saveSeo()
+    return
+  }
+
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
@@ -356,9 +367,9 @@ const AdminProductsPage: React.FC = () => {
 
       {/* Düzenleme Paneli */}
       <div className={`${adminCardClass} p-4`}>
-        <div className="flex items-center gap-3 mb-3">
+        <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-2">
           <Tabs.Root value={tab} onValueChange={(v)=>setTab(v as typeof tab)}>
-            <Tabs.List className="inline-flex items-center gap-1 bg-gray-50 border border-light-gray rounded-md p-1">
+            <Tabs.List className="inline-flex items-center gap-1">
               <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Bilgi</Tabs.Trigger>
               <Tabs.Trigger value="pricing" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Fiyat</Tabs.Trigger>
               <Tabs.Trigger value="stock" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Stok</Tabs.Trigger>
@@ -366,28 +377,34 @@ const AdminProductsPage: React.FC = () => {
               <Tabs.Trigger value="seo" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">SEO</Tabs.Trigger>
             </Tabs.List>
           </Tabs.Root>
-          <div className="ml-auto text-sm text-steel-gray">{selectedId ? 'Düzenle' : 'Yeni Ürün'}</div>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-sm text-steel-gray hidden sm:inline">{selectedId ? 'Düzenle' : 'Yeni Ürün'}</span>
+            <button onClick={saveCurrent} disabled={tab==='images'} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
+            {selectedId && (
+              <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
+            )}
+          </div>
         </div>
 
         {tab === 'info' && (
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Ad</label>
-              <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">SKU</label>
-              <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">Marka</label>
-              <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
             </div>
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Durum</label>
-              <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full px-3 py-2 border rounded">
+              <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
                 <option value="active">Aktif</option>
                 <option value="inactive">Pasif</option>
                 <option value="out_of_stock">Stokta Yok</option>
               </select>
               <label className="text-sm text-steel-gray">Kategori</label>
-              <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full px-3 py-2 border rounded">
+              <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
                 <option value="">(Seçilmemiş)</option>
                 {cats.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
               </select>
@@ -403,9 +420,9 @@ const AdminProductsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Satış Fiyatı</label>
-              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 1999.90" />
+              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 1999.90" />
               <label className="text-sm text-steel-gray">Alış Maliyeti</label>
-              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 1499.50" />
+              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 1499.50" />
             </div>
             <div className="col-span-full flex gap-2">
               <button onClick={savePricing} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
@@ -417,9 +434,9 @@ const AdminProductsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Stok</label>
-              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 50" />
+              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 50" />
               <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
-              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 5" />
+              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 5" />
             </div>
             <div className="col-span-full flex gap-2">
               <button onClick={saveStock} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
@@ -437,7 +454,7 @@ const AdminProductsPage: React.FC = () => {
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border rounded text-sm" placeholder="Alternatif metin" />
+                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Alternatif metin" />
                       <div className="flex gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
@@ -455,11 +472,11 @@ const AdminProductsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Slug</label>
-              <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="ornek-urun" />
+              <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="ornek-urun" />
               <label className="text-sm text-steel-gray">Meta Başlık</label>
-              <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full px-3 py-2 border rounded" />
+              <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">Meta Açıklama</label>
-              <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full px-3 py-2 border rounded" rows={3} />
+              <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full border border-light-gray rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" rows={3} />
             </div>
             <div className="col-span-full flex gap-2">
               <button onClick={saveSeo} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
