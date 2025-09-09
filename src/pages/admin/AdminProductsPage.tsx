@@ -655,11 +655,11 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
                       <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Alternatif metin" />
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>makeCover(img)} disabled={idx===0}>Kapak Yap</button>
-                        <button className="px-2 py-1 border rounded text-xs text-red-600 ml-auto" onClick={()=>deleteImage(img)}>Sil</button>
+                        <button className="px-2 py-1 border rounded text-xs text-red-600" onClick={()=>deleteImage(img)}>Sil</button>
                       </div>
                     </div>
                   ))}
