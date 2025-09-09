@@ -281,8 +281,10 @@ const { error: upErr } = await supabase.storage.from('product-images').upload(pa
           try {
             const ctx = await supabase.rpc('debug_context')
             console.warn('debug_context', ctx.data)
-            const cu = (ctx.data as any)?.current_user
-            const au = (ctx.data as any)?.auth_uid
+            type DebugContext = { current_user?: string; auth_uid?: string | null }
+            const ctxData = (ctx.data ?? null) as DebugContext | null
+            const cu = ctxData?.current_user
+            const au = ctxData?.auth_uid
             throw new Error('DB insert RLS/policy hatası: ' + (dbErr.message || 'unknown') + `\nContext -> current_user: ${cu}, auth_uid: ${au}`)
           } catch (ctxErr) {
             console.warn('debug_context rpc failed', ctxErr)
