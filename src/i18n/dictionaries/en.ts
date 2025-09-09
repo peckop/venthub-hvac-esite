@@ -8,6 +8,7 @@ export const en = {
     about: "About",
     contact: "Contact",
     supportCenter: "Support Center",
+    knowledgeHub: "Knowledge Hub",
     myOrders: "My Orders",
     signOut: "Sign Out",
     signIn: "Sign In",
@@ -682,7 +683,8 @@ export const en = {
       faqDesc: 'Orders, payment, installation and more',
       returnsDesc: 'Right of withdrawal, return process and conditions',
       shippingDesc: 'Delivery time, fees, tracking info',
-      warrantyDesc: 'Warranty coverage and authorized service'
+      warrantyDesc: 'Warranty coverage and authorized service',
+      knowledgeDesc: 'Topic-based guides and soon calculators'
     },
     returns: {
       title: 'Returns & Exchanges',

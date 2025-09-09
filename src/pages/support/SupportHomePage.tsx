@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft } from 'lucide-react'
+import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft, BookOpen } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const SupportHomePage: React.FC = () => {
@@ -10,6 +10,7 @@ const SupportHomePage: React.FC = () => {
     { title: t('support.links.returns'), desc: t('support.home.returnsDesc'), to: '/support/iade-degisim', icon: Package },
     { title: t('support.links.shipping'), desc: t('support.home.shippingDesc'), to: '/support/teslimat-kargo', icon: Truck },
     { title: t('support.links.warranty'), desc: t('support.home.warrantyDesc'), to: '/support/garanti-servis', icon: ShieldCheck },
+    { title: t('common.knowledgeHub'), desc: t('support.home.knowledgeDesc'), to: '/destek/merkez', icon: BookOpen },
   ]
 
   const navigate = useNavigate()
