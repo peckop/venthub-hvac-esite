@@ -278,6 +278,12 @@ const { error: upErr } = await supabase.storage.from('product-images').upload(pa
         const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
         if (dbErr) {
           console.warn('db insert error', dbErr)
+          try {
+            const ctx = await supabase.rpc('debug_context')
+            console.warn('debug_context', ctx.data)
+          } catch (ctxErr) {
+            console.warn('debug_context rpc failed', ctxErr)
+          }
           throw new Error('DB insert RLS/policy hatası: ' + (dbErr.message || 'unknown'))
         }
       }
