@@ -8,6 +8,7 @@ export const tr = {
     about: "Hakkımızda",
     contact: "İletişim",
     supportCenter: "Destek Merkezi",
+    knowledgeHub: "Bilgi Merkezi",
     myOrders: "Siparişlerim",
     signOut: "Çıkış Yap",
     signIn: "Giriş Yap",
@@ -687,7 +688,8 @@ export const tr = {
       faqDesc: 'Sipariş, ödeme, kurulum ve daha fazlası',
       returnsDesc: 'Cayma hakkı, iade süreçleri ve koşullar',
       shippingDesc: 'Kargo süresi, ücretler, takip bilgileri',
-      warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgiler'
+      warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgiler',
+      knowledgeDesc: 'Konu bazlı rehberler ve yakında hesaplayıcılar'
     },
     returns: {
       title: 'İade & Değişim',

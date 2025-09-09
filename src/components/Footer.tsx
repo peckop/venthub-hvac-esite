@@ -82,6 +82,11 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/destek/merkez" className="text-gray-300 hover:text-white transition-colors">
+                  {t('common.knowledgeHub')}
+                </Link>
+              </li>
+              <li>
                 <Link to="/support" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.supportCenter')}
                 </Link>

@@ -2,7 +2,8 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import * as Tabs from '@radix-ui/react-tabs'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface ProductRow {
@@ -326,9 +327,9 @@ const AdminProductsPage: React.FC = () => {
           options: [ { value: '', label: 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name })) ],
         }}
         chips={[
-          { key: 'active', label: 'active', active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
-          { key: 'inactive', label: 'inactive', active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
-          { key: 'out_of_stock', label: 'out_of_stock', active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
+          { key: 'active', label: 'Aktif', active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
+          { key: 'inactive', label: 'Pasif', active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
+          { key: 'out_of_stock', label: 'Stokta Yok', active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
         ]}
         toggles={[{ key: 'featured', label: 'Sadece: Öne Çıkan', checked: featuredOnly, onChange: setFeaturedOnly }]}
         onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false) }}
@@ -353,12 +354,18 @@ const AdminProductsPage: React.FC = () => {
         )}
       />
 
-      {/* Edit Panel */}
+      {/* Düzenleme Paneli */}
       <div className={`${adminCardClass} p-4`}>
-        <div className="flex flex-wrap items-center gap-3 mb-3">
-          {(['info','pricing','stock','images','seo'] as const).map(k => (
-            <button key={k} onClick={()=>setTab(k)} className={`px-3 py-2 text-sm rounded border ${tab===k?'border-primary-navy':'border-light-gray'}`}>{k.toUpperCase()}</button>
-          ))}
+        <div className="flex items-center gap-3 mb-3">
+          <Tabs.Root value={tab} onValueChange={(v)=>setTab(v as typeof tab)}>
+            <Tabs.List className="inline-flex items-center gap-1 bg-gray-50 border border-light-gray rounded-md p-1">
+              <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Bilgi</Tabs.Trigger>
+              <Tabs.Trigger value="pricing" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Fiyat</Tabs.Trigger>
+              <Tabs.Trigger value="stock" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Stok</Tabs.Trigger>
+              <Tabs.Trigger value="images" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Görseller</Tabs.Trigger>
+              <Tabs.Trigger value="seo" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">SEO</Tabs.Trigger>
+            </Tabs.List>
+          </Tabs.Root>
           <div className="ml-auto text-sm text-steel-gray">{selectedId ? 'Düzenle' : 'Yeni Ürün'}</div>
         </div>
 
@@ -375,9 +382,9 @@ const AdminProductsPage: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Durum</label>
               <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full px-3 py-2 border rounded">
-                <option value="active">active</option>
-                <option value="inactive">inactive</option>
-                <option value="out_of_stock">out_of_stock</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Pasif</option>
+                <option value="out_of_stock">Stokta Yok</option>
               </select>
               <label className="text-sm text-steel-gray">Kategori</label>
               <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full px-3 py-2 border rounded">
@@ -387,7 +394,7 @@ const AdminProductsPage: React.FC = () => {
               <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> Öne Çıkan</label>
             </div>
             <div className="col-span-full flex gap-2">
-              <button onClick={saveInfo} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+              <button onClick={saveInfo} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             </div>
           </div>
         )}
@@ -401,7 +408,7 @@ const AdminProductsPage: React.FC = () => {
               <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 1499.50" />
             </div>
             <div className="col-span-full flex gap-2">
-              <button onClick={savePricing} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+              <button onClick={savePricing} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             </div>
           </div>
         )}
@@ -415,7 +422,7 @@ const AdminProductsPage: React.FC = () => {
               <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="örn. 5" />
             </div>
             <div className="col-span-full flex gap-2">
-              <button onClick={saveStock} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+              <button onClick={saveStock} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             </div>
           </div>
         )}
@@ -430,7 +437,7 @@ const AdminProductsPage: React.FC = () => {
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border rounded text-sm" placeholder="alt" />
+                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border rounded text-sm" placeholder="Alternatif metin" />
                       <div className="flex gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
@@ -449,13 +456,13 @@ const AdminProductsPage: React.FC = () => {
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Slug</label>
               <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="ornek-urun" />
-              <label className="text-sm text-steel-gray">Meta Title</label>
+              <label className="text-sm text-steel-gray">Meta Başlık</label>
               <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full px-3 py-2 border rounded" />
-              <label className="text-sm text-steel-gray">Meta Description</label>
+              <label className="text-sm text-steel-gray">Meta Açıklama</label>
               <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full px-3 py-2 border rounded" rows={3} />
             </div>
             <div className="col-span-full flex gap-2">
-              <button onClick={saveSeo} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
+              <button onClick={saveSeo} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             </div>
           </div>
         )}
