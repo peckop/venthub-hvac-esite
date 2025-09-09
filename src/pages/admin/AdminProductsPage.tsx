@@ -325,6 +325,7 @@ await Promise.all([
 
   const saveSeo = async () => {
     if (!selectedId) return
+    if (slugError) { alert(slugError); return }
     try {
       const payload = {
         slug: (slug || slugify(name)).trim() || null,
@@ -404,6 +405,8 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
     return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
   }
 
+  const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string,string>[]; total: number } | null>(null)
+
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
@@ -428,7 +431,18 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
-                <ColumnsMenu
+            <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e)=>{
+              const f = e.target.files?.[0]
+              if (!f) return
+              const text = await f.text()
+              const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l=>l.trim().length>0)
+              const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"'))
+              const header = split(lines[0]).map(h=>h.trim().toLowerCase())
+              const rows = lines.slice(1).map(l=>{ const cells = split(l); const obj: Record<string,string> = {}; header.forEach((h,i)=>obj[h]=cells[i]||''); return obj })
+              setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
+            }} />
+            <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">İçe Aktar (beta)</button>
+            <ColumnsMenu
               columns={[
 { key: 'image', label: 'Görsel', checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
                 { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
@@ -448,7 +462,7 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
                   const cols = ['id','name','sku','category_id','status','price','stock_qty']
                   const header = cols.join(',')
                   const lines = sorted.map(r=>[
-r.id, `"${(r.name||'').replace(/\"/g,'""')}"`, r.sku, r.category_id||'', r.status||'', r.price!=null?String(r.price):'', r.stock_qty!=null?String(r.stock_qty):''
+r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status||'', r.price!=null?String(r.price):'', r.stock_qty!=null?String(r.stock_qty):''
                   ].join(','))
                   const csv = '\ufeff' + [header, ...lines].join('\n')
                   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -464,6 +478,38 @@ r.id, `"${(r.name||'').replace(/\"/g,'""')}"`, r.sku, r.category_id||'', r.statu
           </div>
         )}
       />
+
+      {importPreview && (
+        <div className={`${adminCardClass} p-4`}>
+          <div className="mb-2 text-sm text-industrial-gray">CSV Önizleme (ilk 10 satır) — Toplam: {importPreview.total}</div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-50">
+                <tr>
+                  {importPreview.header.map(h=> (<th key={h} className="p-2 border-b text-left">{h}</th>))}
+                </tr>
+              </thead>
+              <tbody>
+                {importPreview.rows.map((r,idx)=> (
+                  <tr key={idx} className="border-b">
+                    {importPreview.header.map(h=> (<td key={h} className="p-2">{r[h]}</td>))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>setImportPreview(null)}>Kapat</button>
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={()=>{
+              const h = (importPreview?.header||[])
+              const required = ['name','sku']
+              const hasRequired = required.every(k=>h.includes(k))
+              const okCount = (importPreview?.rows||[]).filter(r=>r['name']&&r['sku']).length
+              alert(`Dry-run: zorunlu alanlar ${hasRequired?'tam':'eksik'}. Uygun satır sayısı: ${okCount}/${importPreview?.total||0}`)
+            }}>Dry-run</button>
+          </div>
+        </div>
+      )}
 
       {/* Düzenleme Paneli */}
       <div className={`${adminCardClass} p-4`}>
@@ -569,8 +615,10 @@ r.id, `"${(r.name||'').replace(/\"/g,'""')}"`, r.sku, r.category_id||'', r.statu
               {slugError && <div className="text-xs text-red-600">{slugError}</div>}
               <label className="text-sm text-steel-gray">Meta Başlık</label>
               <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
+              <div className="text-xs text-industrial-gray">{metaTitle.length} karakter</div>
               <label className="text-sm text-steel-gray">Meta Açıklama</label>
               <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full border border-light-gray rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" rows={3} />
+              <div className="text-xs text-industrial-gray">{metaDesc.length} karakter</div>
             </div>
           </div>
         )}
