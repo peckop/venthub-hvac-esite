@@ -2,6 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import ExportMenu from '../../components/admin/ExportMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import * as Tabs from '@radix-ui/react-tabs'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -37,10 +38,11 @@ const AdminProductsPage: React.FC = () => {
   const [featuredOnly, setFeaturedOnly] = React.useState<boolean>(false)
 
   // Columns & density
-  const STORAGE_KEY = 'toolbar:products'
-  const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
+const STORAGE_KEY = 'toolbar:products'
+  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
+const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
+  const [covers, setCovers] = React.useState<Record<string, string>>({})
   React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
@@ -77,7 +79,8 @@ const AdminProductsPage: React.FC = () => {
   // seo
   const [slug, setSlug] = React.useState('')
   const [metaTitle, setMetaTitle] = React.useState('')
-  const [metaDesc, setMetaDesc] = React.useState('')
+const [metaDesc, setMetaDesc] = React.useState('')
+  const [slugError, setSlugError] = React.useState('')
 
   const slugify = (s: string) => s
     .toLowerCase()
@@ -95,9 +98,17 @@ const AdminProductsPage: React.FC = () => {
       ])
       if (p.error) throw p.error
       if (c.error) throw c.error
-      setRows((p.data || []) as ProductRow[])
+const list = (p.data || []) as ProductRow[]
+      setRows(list)
       setCats((c.data || []) as CategoryOpt[])
       if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number|null } | null)?.default_low_stock_threshold ?? null) as number | null)
+      const ids = list.map(x=>x.id)
+      if (ids.length>0) {
+        const { data: imgs } = await supabase.from('product_images').select('product_id,path,sort_order').in('product_id', ids).order('sort_order', { ascending: true })
+        const map: Record<string, string> = {}
+        ;(imgs as {product_id:string;path:string;sort_order:number}[]|null|undefined)?.forEach(r=>{ if(map[r.product_id]==null) map[r.product_id]=r.path })
+        setCovers(map)
+      }
     } catch (e) {
       setError((e as Error).message || 'Yüklenemedi')
       setRows([])
@@ -193,14 +204,19 @@ const AdminProductsPage: React.FC = () => {
         category_id: categoryId || null, is_featured: isFeatured,
       }
       if (!payload.name || !payload.sku) return
-      if (selectedId) {
+if (selectedId) {
+        const before = rows.find(r=>r.id===selectedId) || null
         const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
         if (error) throw error
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveInfo' })
       } else {
         const { data, error } = await supabase.from('products').insert(payload).select('id').maybeSingle()
         if (error) throw error
         const inserted = (data as { id: string } | null)
         setSelectedId(inserted?.id || null)
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, { table_name: 'products', row_pk: inserted?.id || null, action: 'INSERT', before: null, after: payload, comment: 'saveInfo' })
       }
       await load()
     } catch (e) {
@@ -215,8 +231,11 @@ const AdminProductsPage: React.FC = () => {
         price: price === '' ? null : Number(price),
         purchase_price: purchasePrice === '' ? null : Number(purchasePrice),
       }
+const before = rows.find(r=>r.id===selectedId) || null
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'savePricing' })
       await load()
     } catch (e) {
       alert('Fiyat kaydedilemedi: ' + ((e as Error).message || e))
@@ -232,8 +251,11 @@ const AdminProductsPage: React.FC = () => {
         low_stock_threshold: isDefault ? null : Number(lowStock),
         low_stock_override: !isDefault,
       }
+const before = rows.find(r=>r.id===selectedId) || null
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveStock' })
       await load()
     } catch (e) {
       alert('Stok kaydedilemedi: ' + ((e as Error).message || e))
@@ -251,8 +273,10 @@ const AdminProductsPage: React.FC = () => {
         const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
         if (upErr) throw upErr
         // insert DB ref
-        const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
+const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
         if (dbErr) throw dbErr
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, { table_name: 'product_images', row_pk: selectedId, action: 'INSERT', before: null, after: { path }, comment: 'uploadImage' })
       }
       await loadImages(selectedId)
     } catch (e) {
@@ -265,7 +289,9 @@ const AdminProductsPage: React.FC = () => {
   const deleteImage = async (img: ImageRow) => {
     if (!confirm('Görseli silmek istiyor musunuz?')) return
     try {
-      await supabase.from('product_images').delete().eq('id', img.id)
+await supabase.from('product_images').delete().eq('id', img.id)
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'product_images', row_pk: img.id, action: 'DELETE', before: img, after: null, comment: 'deleteImage' })
       // storage’dan da sil (best-effort)
       await supabase.storage.from('product-images').remove([img.path])
       if (selectedId) await loadImages(selectedId)
@@ -282,9 +308,14 @@ const AdminProductsPage: React.FC = () => {
     const a = list[idx]
     const b = list[swapIdx]
     try {
-      await Promise.all([
+await Promise.all([
         supabase.from('product_images').update({ sort_order: b.sort_order }).eq('id', a.id),
         supabase.from('product_images').update({ sort_order: a.sort_order }).eq('id', b.id)
+      ])
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, [
+        { table_name: 'product_images', row_pk: a.id, action: 'UPDATE', before: a, after: { sort_order: b.sort_order }, comment: 'bumpImage' },
+        { table_name: 'product_images', row_pk: b.id, action: 'UPDATE', before: b, after: { sort_order: a.sort_order }, comment: 'bumpImage' },
       ])
       if (selectedId) await loadImages(selectedId)
     } catch (e) {
@@ -300,8 +331,11 @@ const AdminProductsPage: React.FC = () => {
         meta_title: metaTitle || null,
         meta_description: metaDesc || null,
       }
+const before = rows.find(r=>r.id===selectedId) || null
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveSeo' })
       await load()
     } catch (e) {
       alert('SEO kaydedilemedi: ' + ((e as Error).message || e))
@@ -311,8 +345,11 @@ const AdminProductsPage: React.FC = () => {
   const remove = async (id: string) => {
     if (!confirm('Bu ürünü silmek istiyor musunuz?')) return
     try {
+const before = rows.find(r=>r.id===id) || null
       const { error } = await supabase.from('products').delete().eq('id', id)
       if (error) throw error
+      const { logAdminAction } = await import('../../lib/audit')
+      await logAdminAction(supabase, { table_name: 'products', row_pk: id, action: 'DELETE', before, after: null, comment: 'remove product' })
       await load()
       if (selectedId === id) startCreate()
     } catch (e) {
@@ -358,6 +395,15 @@ const AdminProductsPage: React.FC = () => {
     return
   }
 
+const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency', currency:'TRY', maximumFractionDigits:2 }), [])
+  const statusBadge = (s?: string | null) => {
+    const v = (s||'').toLowerCase()
+    if (v==='active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">Aktif</span>
+    if (v==='inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">Pasif</span>
+    if (v==='out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">Stokta Yok</span>
+    return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
+  }
+
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
@@ -382,8 +428,9 @@ const AdminProductsPage: React.FC = () => {
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <ColumnsMenu
+                <ColumnsMenu
               columns={[
+{ key: 'image', label: 'Görsel', checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
                 { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
                 { key: 'sku', label: 'SKU', checked: visibleCols.sku, onChange: (v)=>setVisibleCols(s=>({ ...s, sku: v })) },
                 { key: 'category', label: 'Kategori', checked: visibleCols.category, onChange: (v)=>setVisibleCols(s=>({ ...s, category: v })) },
@@ -394,6 +441,25 @@ const AdminProductsPage: React.FC = () => {
               ]}
               density={density}
               onDensityChange={setDensity}
+            />
+<ExportMenu
+              items={[
+                { key: 'csv', label: 'CSV (UTF-8 BOM)', onSelect: ()=>{
+                  const cols = ['id','name','sku','category_id','status','price','stock_qty']
+                  const header = cols.join(',')
+                  const lines = sorted.map(r=>[
+r.id, `"${(r.name||'').replace(/\"/g,'""')}"`, r.sku, r.category_id||'', r.status||'', r.price!=null?String(r.price):'', r.stock_qty!=null?String(r.stock_qty):''
+                  ].join(','))
+                  const csv = '\ufeff' + [header, ...lines].join('\n')
+                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                  const url = URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = 'products.csv'
+                  a.click()
+                  URL.revokeObjectURL(url)
+                }}
+              ]}
             />
           </div>
         )}
@@ -499,7 +565,8 @@ const AdminProductsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">Slug</label>
-              <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="ornek-urun" />
+<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError('Slug boş olamaz'); return } const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists?'Bu slug zaten kullanılıyor':'') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="ornek-urun" />
+              {slugError && <div className="text-xs text-red-600">{slugError}</div>}
               <label className="text-sm text-steel-gray">Meta Başlık</label>
               <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">Meta Açıklama</label>
@@ -515,6 +582,9 @@ const AdminProductsPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              {visibleCols.image && (
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>
+              )}
               {visibleCols.name && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
                   <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>Ad {sortIndicator('name')}</button>
@@ -555,13 +625,22 @@ const AdminProductsPage: React.FC = () => {
               <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
             ) : (
               sorted.map(r => (
-                <tr key={r.id} className="border-b border-light-gray/60">
+<tr key={r.id} className="border-b border-light-gray/60">
+                  {visibleCols.image && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>
+                      {covers[r.id] ? (
+                        <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`} alt="" className="w-10 h-10 object-cover rounded" />
+                      ) : (
+                        <div className="w-10 h-10 bg-gray-100 rounded" />
+                      )}
+                    </td>
+                  )}
                   {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
                   {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
                   {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>}
-                  {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{r.status || '-'}</td>}
-                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.price!=null?Number(r.price):null) ?? '-'}</td>}
-                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad}`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
+{visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price!=null?fmt.format(Number(r.price)):'-'}</td>}
+                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
