@@ -184,6 +184,18 @@ export const ProductDetailPage: React.FC = () => {
     { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' }
   ]
 
+  // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
+  const mapSlugToTopic = (slug?: string | null): string | null => {
+    if (!slug) return null
+    const s = slug.toLowerCase()
+    if (s.includes('hava-perde')) return 'hava-perdesi'
+    if (s.includes('jet-fan')) return 'jet-fan'
+    if (s.includes('isi-geri-kazanim') || s.includes('hrv')) return 'hrv'
+    return null
+  }
+
+  const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -331,6 +343,21 @@ export const ProductDetailPage: React.FC = () => {
             <p className="text-steel-gray leading-relaxed">
               {product.description || t('pdp.descFallback')}
             </p>
+
+            {/* Related Guide */}
+            {topicSlug && (
+              <div className="pt-2">
+                <div className="text-sm text-steel-gray">
+                  <span className="font-medium text-industrial-gray">{t('pdp.relatedGuide')}:</span>
+                  <Link
+                    to={`/destek/konular/${topicSlug}`}
+                    className="ml-2 text-primary-navy hover:text-secondary-blue underline"
+                  >
+                    {t(`knowledge.topics.${topicSlug}.title`)}
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Quantity & Add to Cart */}
             <div className="space-y-4">

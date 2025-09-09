@@ -2,7 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface CategoryRow { id: string; name: string; slug: string; parent_id: string | null }
@@ -119,39 +119,47 @@ const AdminCategoriesPage: React.FC = () => {
         onClear={()=>setQ('')}
         recordCount={filtered.length}
         rightExtra={(
-          <div className="flex items-center gap-2">
-            <ColumnsMenu
-              columns={[
-                { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
-                { key: 'slug', label: 'Slug', checked: visibleCols.slug, onChange: (v)=>setVisibleCols(s=>({ ...s, slug: v })) },
-                { key: 'parent', label: 'Üst', checked: visibleCols.parent, onChange: (v)=>setVisibleCols(s=>({ ...s, parent: v })) },
-                { key: 'actions', label: 'İşlem', checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
-              ]}
-              density={density}
-              onDensityChange={setDensity}
-            />
-            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
-            <button onClick={save} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Kaydet</button>
-          </div>
+          <ColumnsMenu
+            columns={[
+              { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
+              { key: 'slug', label: 'Slug', checked: visibleCols.slug, onChange: (v)=>setVisibleCols(s=>({ ...s, slug: v })) },
+              { key: 'parent', label: 'Üst', checked: visibleCols.parent, onChange: (v)=>setVisibleCols(s=>({ ...s, parent: v })) },
+              { key: 'actions', label: 'İşlem', checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
+            ]}
+            density={density}
+            onDensityChange={setDensity}
+          />
         )}
       />
 
-      <div className={`${adminCardClass} p-4 grid md:grid-cols-2 gap-4`}>
-        <div className="space-y-2">
-          <label className="text-sm text-steel-gray">Ad</label>
-          <input value={name} onChange={(e)=>{ setName(e.target.value) }} className="w-full px-3 py-2 border rounded" placeholder="Kategori adı" />
-          <label className="text-sm text-steel-gray">Slug</label>
-          <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="ornek-kategori" />
-          <label className="text-sm text-steel-gray">Üst Kategori</label>
-          <select value={parentId} onChange={(e)=>setParentId(e.target.value)} className="w-full px-3 py-2 border rounded">
-            <option value="">(Yok)</option>
-            {rows.map(c=> (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
+      <div className={`${adminCardClass} p-4`}>
+        <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-2">
+          <span className="text-sm text-steel-gray">{editingId ? 'Düzenleniyor' : 'Yeni Kategori'}</span>
+          <div className="ml-auto flex items-center gap-2">
+            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
+            <button onClick={save} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
+            {editingId && (
+              <button onClick={()=>remove(editingId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
+            )}
+          </div>
         </div>
-        <div className="text-sm text-industrial-gray">
-          {editingId ? 'Düzenleniyor' : 'Yeni kategori'}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm text-steel-gray">Ad</label>
+            <input value={name} onChange={(e)=>{ setName(e.target.value) }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Kategori adı" />
+            <label className="text-sm text-steel-gray">Slug</label>
+            <input value={slug} onChange={(e)=>setSlug(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="ornek-kategori" />
+            <label className="text-sm text-steel-gray">Üst Kategori</label>
+            <select value={parentId} onChange={(e)=>setParentId(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
+              <option value="">(Yok)</option>
+              {rows.map(c=> (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="text-sm text-industrial-gray">
+            {editingId ? 'Düzenleniyor' : 'Yeni kategori'}
+          </div>
         </div>
       </div>
 
