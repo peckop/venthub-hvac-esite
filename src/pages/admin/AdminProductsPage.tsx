@@ -650,6 +650,9 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
             {selectedId && (
               <>
                 <input type="file" multiple onChange={(e)=>uploadImages(e.target.files)} disabled={uploading} />
+                {images.length === 0 && (
+                  <div className="text-sm text-industrial-gray">Henüz görsel yok. Dosya seçerek yükleyin.</div>
+                )}
                 <div className="grid md:grid-cols-4 gap-3">
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
