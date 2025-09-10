@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { useCart } from '../hooks/useCart'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
@@ -36,6 +37,7 @@ export const ProductDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [mainCategory, setMainCategory] = useState<Category | null>(null)
   const [subCategory, setSubCategory] = useState<Category | null>(null)
+  const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
@@ -59,6 +61,16 @@ export const ProductDetailPage: React.FC = () => {
         }
 
         setProduct(productData)
+
+        // Fetch product images (cover + gallery)
+        try {
+          const { data: imgs } = await supabase
+            .from('product_images')
+            .select('path, alt, sort_order')
+            .eq('product_id', productData.id)
+            .order('sort_order', { ascending: true })
+          setImages((imgs || []) as { path: string; alt?: string | null }[])
+        } catch {}
 
         // Fetch categories for breadcrumb
         const cats = await getCategories()
@@ -271,21 +283,36 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
           <div>
-            <div className="aspect-square bg-gradient-to-br from-air-blue to-light-gray rounded-xl flex items-center justify-center mb-4">
-              <div className="text-8xl text-secondary-blue/30">
-                🌪️
-              </div>
+            <div className="aspect-square bg-gradient-to-br from-air-blue to-light-gray rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+              {images.length > 0 ? (
+                <img
+                  src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[0].path}`}
+                  alt={images[0].alt || product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="text-8xl text-secondary-blue/30">🌪️</div>
+              )}
             </div>
             
             {/* Thumbnail Gallery */}
             <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square bg-light-gray rounded-lg cursor-pointer hover:ring-2 hover:ring-primary-navy transition-all">
-                  <div className="w-full h-full flex items-center justify-center text-steel-gray">
-                    🌪️
+              {images.length > 0 ? (
+                images.slice(0, 8).map((img, i) => (
+                  <div key={`${img.path}-${i}`} className="aspect-square rounded-lg cursor-pointer hover:ring-2 hover:ring-primary-navy transition-all overflow-hidden bg-light-gray">
+                    <img
+                      src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`}
+                      alt={img.alt || product.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                [1, 2, 3, 4].map((i) => (
+                  <div key={i} className="aspect-square bg-light-gray rounded-lg" />
+                ))
+              )}
             </div>
           </div>
 
