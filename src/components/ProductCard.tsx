@@ -66,9 +66,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           {product.image_url ? (
             <img
               src={product.image_url}
-              alt={product.name}
+              alt={product.image_alt || product.name}
               className={`${isList ? 'w-full h-full' : 'w-full h-full'} object-cover`}
               loading="lazy"
+              decoding="async"
+              width={isList ? 144 : 400}
+              height={isList ? 144 : 400}
             />
           ) : (
             <div className={`${isList ? 'text-3xl md:text-4xl' : 'text-6xl'} text-secondary-blue/30`}>
@@ -84,13 +87,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
             {product.name}
           </h3>
 
-          {/* Brand & SKU */}
+          {/* Brand & Model */}
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-secondary-blue">
               {product.brand}
             </span>
             <span className="text-xs text-steel-gray bg-light-gray px-2 py-1 rounded">
-              {product.sku}
+              {product.model_code ?? product.sku}
             </span>
           </div>
 

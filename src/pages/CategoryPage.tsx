@@ -36,16 +36,16 @@ export const CategoryPage: React.FC = () => {
         const ids = list.map(p => p.id)
         const { data: imgs } = await supabase
           .from('product_images')
-          .select('product_id,path,sort_order')
+          .select('product_id,path,sort_order,alt')
           .in('product_id', ids)
           .order('sort_order', { ascending: true })
-        const firstMap = new Map<string, string>()
-        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number }[]) {
-          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, r.path)
+        const firstMap = new Map<string, { path: string, alt?: string | null }>()
+        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
+          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
         }
         return list.map(p => {
-          const path = firstMap.get(p.id)
-          return path ? { ...p, image_url: buildPublicUrl(path) } : p
+          const cover = firstMap.get(p.id)
+          return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
         })
       } catch {
         return list
