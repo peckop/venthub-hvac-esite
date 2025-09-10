@@ -421,10 +421,21 @@ const before = rows.find(r=>r.id===id) || null
     return arr
   }, [filtered, sortKey, sortDir, cats])
 
+  const saveImages = async () => {
+    if (!selectedId) return
+    try {
+      await Promise.all(images.map(row => supabase.from('product_images').update({ alt: row.alt || '' }).eq('id', row.id)))
+      await loadImages(selectedId)
+    } catch (e) {
+      alert('Görseller kaydedilemedi: ' + ((e as Error).message || e))
+    }
+  }
+
   const saveCurrent = async () => {
     if (tab === 'info') return saveInfo()
     if (tab === 'pricing') return savePricing()
     if (tab === 'stock') return saveStock()
+    if (tab === 'images') return saveImages()
     if (tab === 'seo') return saveSeo()
     return
   }
@@ -601,7 +612,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
           </Tabs.Root>
           <div className="ml-auto flex items-center gap-2">
             <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
-            <button onClick={saveCurrent} disabled={tab==='images'} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
+            <button onClick={saveCurrent} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
             {selectedId && (
               <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
             )}
@@ -671,7 +682,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={async (e)=>{ await supabase.from('product_images').update({ alt: e.target.value }).eq('id', img.id); }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Alternatif metin" />
+                      <input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert('Alternatif metin kaydedilemedi: ' + ((err as Error).message || err)); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Alternatif metin" />
                       <div className="flex flex-wrap gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
