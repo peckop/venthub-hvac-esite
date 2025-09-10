@@ -60,6 +60,7 @@ const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(nu
   const [name, setName] = React.useState('')
   const [sku, setSku] = React.useState('')
   const [brand, setBrand] = React.useState('')
+  const [modelCode, setModelCode] = React.useState('')
   const [status, setStatus] = React.useState('active')
   const [categoryId, setCategoryId] = React.useState('')
   const [isFeatured, setIsFeatured] = React.useState(false)
@@ -158,7 +159,7 @@ const list = (p.data || []) as ProductRow[]
     setImages([])
   }
 
-  type DBProduct = { id: string; name?: string|null; sku?: string|null; brand?: string|null; status?: string|null; category_id?: string|null; is_featured?: boolean|null; price?: number|null; purchase_price?: number|null; stock_qty?: number|null; low_stock_threshold?: number|null; slug?: string|null; meta_title?: string|null; meta_description?: string|null }
+  type DBProduct = { id: string; name?: string|null; sku?: string|null; model_code?: string|null; brand?: string|null; status?: string|null; category_id?: string|null; is_featured?: boolean|null; price?: number|null; purchase_price?: number|null; stock_qty?: number|null; low_stock_threshold?: number|null; slug?: string|null; meta_title?: string|null; meta_description?: string|null }
   const startEdit = async (id: string) => {
     setSelectedId(id)
     setTab('info')
@@ -173,6 +174,7 @@ const list = (p.data || []) as ProductRow[]
       setName(p?.name || '')
       setSku(p?.sku || '')
       setBrand(p?.brand || '')
+      setModelCode(p?.model_code || '')
       setStatus(p?.status || 'active')
       setCategoryId(p?.category_id || '')
       setIsFeatured(!!p?.is_featured)
@@ -210,8 +212,8 @@ const list = (p.data || []) as ProductRow[]
 
   const saveInfo = async () => {
     try {
-      const payload: { name: string; sku: string; brand?: string; status?: string; category_id: string | null; is_featured: boolean } = {
-        name: name.trim(), sku: sku.trim(), brand: brand.trim(), status,
+      const payload: { name: string; sku: string; model_code?: string|null; brand?: string; status?: string; category_id: string | null; is_featured: boolean } = {
+        name: name.trim(), sku: sku.trim(), model_code: modelCode.trim() ? modelCode.trim() : null, brand: brand.trim(), status,
         category_id: categoryId || null, is_featured: isFeatured,
       }
       if (!payload.name || !payload.sku) return
@@ -578,13 +580,15 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                 const found = cats.find(c=>c.name.toLowerCase()===s)
                 return found?.id || null
               }
-              const payloads: { sku: string; name: string; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
+              const payloads: { sku: string; name: string; model_code?: string|null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
               for (const r of importRows) {
                 if (!r['sku'] || !r['name']) continue
-                const p: { sku: string; name: string; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
+                const p: { sku: string; name: string; model_code?: string|null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
                   sku: r['sku'].trim(),
                   name: r['name'].trim(),
                 }
+                if (r['model_code']) p.model_code = r['model_code'].trim()
+                else if (r['model']) p.model_code = r['model'].trim()
                 if (r['brand']) p.brand = r['brand'].trim()
                 if (r['status']) p.status = r['status'].trim()
                 if (r['price']) p.price = Number(r['price'])
@@ -642,6 +646,8 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
               <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">SKU</label>
               <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
+              <label className="text-sm text-steel-gray">Model Kodu (MPN)</label>
+              <input value={modelCode} onChange={(e)=>setModelCode(e.target.value)} placeholder="örn. AD-H-900-T" className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
               <label className="text-sm text-steel-gray">Marka</label>
               <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
             </div>
