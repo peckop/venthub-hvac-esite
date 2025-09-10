@@ -162,16 +162,22 @@ export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 
  */
 export async function listAdminUsers(): Promise<AdminUser[]> {
   try {
-    const { data, error } = await supabase
-      .from('admin_users') // View kullanıyoruz
-      .select('*')
-      
-    if (error) {
-      console.error('listAdminUsers error:', error)
-      return []
+    // Öncelik: Güvenli RPC (SECURITY DEFINER + role kontrolü)
+    const rpcRes = await supabase.rpc('admin_list_users')
+    const rpcErr = (rpcRes as { error?: unknown }).error
+    if (rpcErr) {
+      // Geri dönüş: View (eski uygulamalar için)
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('*')
+      if (error) {
+        console.error('listAdminUsers error:', error)
+        return []
+      }
+      return (data as AdminUser[] | null) || []
     }
-    
-    return data || []
+    const rpcData = (rpcRes as { data?: AdminUser[] | null }).data || []
+    return rpcData as AdminUser[]
   } catch (error) {
     console.error('listAdminUsers exception:', error)
     return []
