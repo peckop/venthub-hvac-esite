@@ -66,7 +66,8 @@ BEGIN
     WHERE n.nspname='public' AND p.polpermissive = true AND p.polroles IS NULL
   ) LOOP
     IF r.using_expr ILIKE '%service_role%' OR r.polname ILIKE '%Service role%' THEN
-      EXECUTE format('ALTER POLICY %I ON %I.%I TO service_role', r.polname, r.nspname, r.relname);
+      -- service role plus authenticated (admins) to preserve existing intent
+      EXECUTE format('ALTER POLICY %I ON %I.%I TO service_role, authenticated', r.polname, r.nspname, r.relname);
     ELSIF r.using_expr ILIKE '%user_profiles.role%admin%' OR r.using_expr ILIKE '%jwt_role()%admin%' OR r.polname ILIKE '%admin%' OR r.polname ILIKE 'Admins can %' THEN
       EXECUTE format('ALTER POLICY %I ON %I.%I TO authenticated', r.polname, r.nspname, r.relname);
     END IF;
