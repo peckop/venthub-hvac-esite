@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getCategories, getProductsByCategory, Category, Product } from '../lib/supabase'
+import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Filter, Grid, List } from 'lucide-react'
@@ -29,6 +29,29 @@ export const CategoryPage: React.FC = () => {
   const [compareOpen, setCompareOpen] = useState(false)
 
   useEffect(() => {
+    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+    async function attachCovers(list: Product[]): Promise<Product[]> {
+      if (!Array.isArray(list) || list.length === 0) return list
+      try {
+        const ids = list.map(p => p.id)
+        const { data: imgs } = await supabase
+          .from('product_images')
+          .select('product_id,path,sort_order')
+          .in('product_id', ids)
+          .order('sort_order', { ascending: true })
+        const firstMap = new Map<string, string>()
+        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number }[]) {
+          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, r.path)
+        }
+        return list.map(p => {
+          const path = firstMap.get(p.id)
+          return path ? { ...p, image_url: buildPublicUrl(path) } : p
+        })
+      } catch {
+        return list
+      }
+    }
+
     async function fetchData() {
       try {
         setLoading(true)
@@ -60,9 +83,10 @@ export const CategoryPage: React.FC = () => {
           setSubCategories(subs)
         }
 
-        // Fetch products
+        // Fetch products + attach cover images
         const productsData = await getProductsByCategory(targetCategory.id)
-        setProducts(productsData)
+        const withCovers = await attachCovers(productsData)
+        setProducts(withCovers)
 
       } catch (error) {
         console.error('Error fetching category data:', error)
