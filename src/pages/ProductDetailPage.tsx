@@ -286,13 +286,56 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
           <div>
-            <div className="aspect-square bg-white rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+            <div
+              className="relative aspect-square bg-white rounded-xl flex items-center justify-center mb-4 overflow-hidden"
+              role="group"
+              aria-label={`Görsel ${Math.min(activeIdx+1, images.length)} / ${images.length}`}
+              tabIndex={0}
+              onKeyDown={(e)=>{
+                if (e.key === 'ArrowLeft') setActiveIdx(i=> (i-1+images.length)%images.length)
+                if (e.key === 'ArrowRight') setActiveIdx(i=> (i+1)%images.length)
+              }}
+              onTouchStart={(e: React.TouchEvent<HTMLDivElement>)=>{
+                (e.currentTarget as unknown as { _ts?: number })._ts = e.changedTouches[0].clientX
+              }}
+              onTouchEnd={(e: React.TouchEvent<HTMLDivElement>)=>{
+                const tsHolder = e.currentTarget as unknown as { _ts?: number }
+                const startX = tsHolder._ts
+                if (typeof startX !== 'number') return
+                const dx = e.changedTouches[0].clientX - startX
+                const TH = 30
+                if (dx > TH) setActiveIdx(i=> (i-1+images.length)%images.length)
+                if (dx < -TH) setActiveIdx(i=> (i+1)%images.length)
+                tsHolder._ts = undefined
+              }}
+            >
               {images.length > 0 ? (
-                <img
-                  src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
-                  alt={images[activeIdx].alt || product.name}
-                  className="w-full h-full object-contain"
-                />
+                <>
+                  <button
+                    type="button"
+                    aria-label="Önceki görsel"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
+                    onClick={()=> setActiveIdx(i=> (i-1+images.length)%images.length)}
+                  >
+                    ◀
+                  </button>
+                  <img
+                    src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
+                    alt={images[activeIdx].alt || product.name}
+                    className="w-full h-full object-contain"
+                    decoding="async"
+                    width={1200}
+                    height={1200}
+                  />
+                  <button
+                    type="button"
+                    aria-label="Sonraki görsel"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
+                    onClick={()=> setActiveIdx(i=> (i+1)%images.length)}
+                  >
+                    ▶
+                  </button>
+                </>
               ) : (
                 <div className="text-8xl text-secondary-blue/30">🌪️</div>
               )}
@@ -315,6 +358,9 @@ export const ProductDetailPage: React.FC = () => {
                       alt={img.alt || product.name}
                       className="w-full h-full object-contain"
                       loading="lazy"
+                      decoding="async"
+                      width={180}
+                      height={180}
                     />
                   </button>
                 ))
@@ -356,7 +402,7 @@ export const ProductDetailPage: React.FC = () => {
             {/* SKU & Status */}
             <div className="flex items-center space-x-4">
               <span className="text-steel-gray">
-{t('pdp.model')}: <span className="font-medium">{product.model_code ?? product.sku}</span>
+                SKU: <span className="font-medium">{product.sku}</span>
               </span>
               {(() => {
                 const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'

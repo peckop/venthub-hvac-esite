@@ -37,6 +37,7 @@ export interface Product {
   description?: string
   technical_specs?: unknown
   image_url?: string
+  image_alt?: string | null
   // Stok alanları (opsiyonel; migration sonrası gelir)
   stock_qty?: number | null
   low_stock_threshold?: number | null
@@ -196,7 +197,7 @@ export async function searchProducts(query: string) {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%`)
+    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%`)
     .eq('status', 'active')
     .limit(20)
 
