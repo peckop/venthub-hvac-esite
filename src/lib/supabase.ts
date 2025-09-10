@@ -29,6 +29,7 @@ export interface Product {
   brand: string
   price: string
   sku: string
+  model_code?: string | null
   category_id: string
   subcategory_id: string
   status: 'active' | 'inactive' | 'out_of_stock'

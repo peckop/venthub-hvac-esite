@@ -350,13 +350,13 @@ export const ProductDetailPage: React.FC = () => {
             {/* Quick technical chips (varsa) */}
             <div className="flex flex-wrap gap-2 pt-2">
               <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.brand')}: {product.brand}</span>
-              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.model')}: {product.sku}</span>
+              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.model')}: {product.model_code ?? product.sku}</span>
             </div>
 
             {/* SKU & Status */}
             <div className="flex items-center space-x-4">
               <span className="text-steel-gray">
-                {t('pdp.model')}: <span className="font-medium">{product.sku}</span>
+{t('pdp.model')}: <span className="font-medium">{product.model_code ?? product.sku}</span>
               </span>
               {(() => {
                 const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
@@ -572,6 +572,7 @@ export const ProductDetailPage: React.FC = () => {
             brand: product.brand,
             sku: product.sku,
             image: product.image_url ? [product.image_url] : [],
+            mpn: product.model_code ?? undefined,
             description: product.description || undefined,
             offers: {
               '@type': 'Offer',
@@ -680,7 +681,7 @@ export const ProductDetailPage: React.FC = () => {
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
                             <span className="text-steel-gray">{t('pdp.model')}</span>
-                            <span className="font-medium text-industrial-gray">{product.sku}</span>
+<span className="font-medium text-industrial-gray">{product.model_code ?? product.sku}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
                             <span className="text-steel-gray">{t('pdp.statusLabel')}</span>
