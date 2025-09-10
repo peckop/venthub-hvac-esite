@@ -27,6 +27,7 @@ export const CategoryPage: React.FC = () => {
   // Karşılaştırma
   const [compareIds, setCompareIds] = useState<string[]>([])
   const [compareOpen, setCompareOpen] = useState(false)
+  const [catSearch, setCatSearch] = useState('')
 
   useEffect(() => {
     const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
@@ -101,6 +102,12 @@ export const CategoryPage: React.FC = () => {
   // Filter and sort products
   const filteredProducts = products
     .filter(product => {
+      const term = catSearch.trim().toLowerCase()
+      if (term) {
+        const modelCode = (product as unknown as { model_code?: string | null }).model_code || ''
+        const hay = [product.name, product.brand, modelCode, product.sku].map(v => String(v||'').toLowerCase())
+        if (!hay.some(h => h.includes(term))) return false
+      }
       const price = parseFloat(product.price)
       const matchesPrice = price >= priceRange[0] && price <= priceRange[1]
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand)
@@ -273,6 +280,18 @@ export const CategoryPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Category local search */}
+        <div className="mb-4">
+          <div className="relative max-w-md">
+            <input
+              type="text"
+              value={catSearch}
+              onChange={(e)=>setCatSearch(e.target.value)}
+              placeholder="Bu kategoride ara (ad/marka/model/SKU)"
+              className="w-full pl-3 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">

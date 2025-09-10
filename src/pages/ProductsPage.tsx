@@ -121,6 +121,13 @@ const ProductsPage: React.FC = () => {
     }
   }, [location.search, hasLoadedAll, featured.length, categories.length, newProducts.length, searchQuery])
 
+  // Sync searchQuery with URL param q (when navigated from header or sticky search)
+  useEffect(() => {
+    const paramsNow = new URLSearchParams(location.search)
+    const nextQ = paramsNow.get('q')?.trim() || ''
+    setSearchQuery(nextQ)
+  }, [location.search])
+
   // Arama sonuçlarını (varsa) yükle
   useEffect(() => {
     let active = true
@@ -207,7 +214,7 @@ const ProductsPage: React.FC = () => {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'ItemList',
-              itemListElement: (isAll ? allProducts : searchResults).map((p, idx) => ({
+              itemListElement: (searchQuery ? searchResults : isAll ? allProducts : []).map((p, idx) => ({
                 '@type': 'ListItem',
                 position: idx + 1,
                 url: `${window.location.origin}/product/${p.id}`,
@@ -251,10 +258,10 @@ const ProductsPage: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-              {isAll ? t('common.allProducts') : t('products.searchResultsTitle')}
+              {searchQuery ? t('products.searchResultsTitle') : isAll ? t('common.allProducts') : t('products.searchResultsTitle')}
             </h1>
             <p className="text-steel-gray">
-              {isAll ? `${allProducts.length} ${t('products.itemsListed')}` : `${searchResults.length} ${t('products.resultsFound')}`}
+              {searchQuery ? `${searchResults.length} ${t('products.resultsFound')}` : isAll ? `${allProducts.length} ${t('products.itemsListed')}` : `${searchResults.length} ${t('products.resultsFound')}`}
             </p>
           </div>
 
@@ -351,8 +358,28 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
         </>
       )}
 
-      {/* All products modu */}
-      {isAll ? (
+      {/* Liste alanı: Arama / Tüm Ürünler / Keşfet bölümleri */}
+      {searchQuery ? (
+        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
+          {searchResults.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-6xl text-light-gray mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
+                {t('common.notFound')}
+              </h3>
+              <button onClick={clearSearch} className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors">
+                {t('common.clearSearch')}
+              </button>
+            </div>
+          ) : (
+            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {searchResults.map((product) => (
+                <ProductCard key={product.id} product={product} layout={viewMode} />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : isAll ? (
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
           {!hasLoadedAll ? (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
@@ -378,26 +405,6 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
                   default: return a.name.localeCompare(b.name, 'tr')
                 }
               })).map((product) => (
-                <ProductCard key={product.id} product={product} layout={viewMode} />
-              ))}
-            </div>
-          )}
-        </div>
-      ) : searchQuery ? (
-        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          {searchResults.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl text-light-gray mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-                {t('common.notFound')}
-              </h3>
-              <button onClick={clearSearch} className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors">
-                {t('common.clearSearch')}
-              </button>
-            </div>
-          ) : (
-            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {searchResults.map((product) => (
                 <ProductCard key={product.id} product={product} layout={viewMode} />
               ))}
             </div>
