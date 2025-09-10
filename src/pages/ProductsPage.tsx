@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import TrustSection from '../components/TrustSection'
@@ -38,6 +39,31 @@ const ProductsPage: React.FC = () => {
     const isAllNow = searchParams.get('all') === '1'
     const hasQuery = (searchQuery ?? '').length > 0
 
+    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+
+    async function attachCovers(list: Product[]): Promise<Product[]> {
+      if (!Array.isArray(list) || list.length === 0) return list
+      try {
+        const ids = list.map(p => p.id)
+        const { data: imgs, error: imgErr } = await supabase
+          .from('product_images')
+          .select('product_id,path,sort_order')
+          .in('product_id', ids)
+          .order('sort_order', { ascending: true })
+        if (imgErr) return list
+        const firstMap = new Map<string, string>()
+        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number }[]) {
+          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, r.path)
+        }
+        return list.map(p => {
+          const path = firstMap.get(p.id)
+          return path ? { ...p, image_url: buildPublicUrl(path) } : p
+        })
+      } catch {
+        return list
+      }
+    }
+
     async function fetchDiscoverLight() {
       try {
         setLoading(true)
@@ -47,9 +73,13 @@ const ProductsPage: React.FC = () => {
           getCategories(),
           getProducts(24),
         ])
-        setFeatured(featuredData)
+        const [featuredWithCovers, limitedWithCovers] = await Promise.all([
+          attachCovers(featuredData),
+          attachCovers(limitedProducts),
+        ])
+        setFeatured(featuredWithCovers)
         // Derive "new" products from non-featured items in the limited list
-        const newItems = limitedProducts.filter((p) => !p.is_featured).slice(0, 12)
+        const newItems = limitedWithCovers.filter((p) => !p.is_featured).slice(0, 12)
         setNewProducts(newItems)
         setCategories(categoriesData)
       } catch (error) {
@@ -65,7 +95,8 @@ const ProductsPage: React.FC = () => {
         // For All Products mode, fetch the complete list only when needed
         setLoading(true)
         const productsData = await getAllProducts()
-        setAllProducts(productsData)
+        const productsWithCovers = await attachCovers(productsData)
+        setAllProducts(productsWithCovers)
         setHasLoadedAll(true)
       } catch (error) {
         console.error('Error fetching all products:', error)
@@ -93,6 +124,28 @@ const ProductsPage: React.FC = () => {
   // Arama sonuçlarını (varsa) yükle
   useEffect(() => {
     let active = true
+    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+    async function attachCovers(list: Product[]): Promise<Product[]> {
+      if (!Array.isArray(list) || list.length === 0) return list
+      try {
+        const ids = list.map(p => p.id)
+        const { data: imgs } = await supabase
+          .from('product_images')
+          .select('product_id,path,sort_order')
+          .in('product_id', ids)
+          .order('sort_order', { ascending: true })
+        const firstMap = new Map<string, string>()
+        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number }[]) {
+          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, r.path)
+        }
+        return list.map(p => {
+          const path = firstMap.get(p.id)
+          return path ? { ...p, image_url: buildPublicUrl(path) } : p
+        })
+      } catch {
+        return list
+      }
+    }
     async function run() {
       if (!searchQuery) {
         setSearchResults([])
@@ -100,7 +153,8 @@ const ProductsPage: React.FC = () => {
       }
       try {
         const results = await searchProducts(searchQuery)
-        if (active) setSearchResults(results)
+        const withCovers = await attachCovers(results)
+        if (active) setSearchResults(withCovers)
       } catch (e) {
         console.error('Search error:', e)
         if (active) setSearchResults([])

@@ -61,12 +61,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           </div>
         </div>
 
-        {/* Product Image Placeholder */}
-        <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg' : 'aspect-square'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
-          <div className={`${isList ? 'text-3xl md:text-4xl' : 'text-6xl'} text-secondary-blue/30`}>
-            {/* HVAC Icon based on category */}
-            🌪️
-          </div>
+        {/* Product Image */}
+        <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg overflow-hidden' : 'aspect-square rounded-t-xl overflow-hidden'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
+          {product.image_url ? (
+            <img
+              src={product.image_url}
+              alt={product.name}
+              className={`${isList ? 'w-full h-full' : 'w-full h-full'} object-cover`}
+              loading="lazy"
+            />
+          ) : (
+            <div className={`${isList ? 'text-3xl md:text-4xl' : 'text-6xl'} text-secondary-blue/30`}>
+              🌪️
+            </div>
+          )}
         </div>
 
         {/* Content */}
