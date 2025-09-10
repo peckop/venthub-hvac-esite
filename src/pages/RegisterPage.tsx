@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { hibpPwnedCount } from '../utils/passwordSecurity'
 
 export const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ export const RegisterPage: React.FC = () => {
       return false
     }
     
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       toast.error(t('auth.passwordMin'))
       return false
     }
@@ -58,6 +59,13 @@ export const RegisterPage: React.FC = () => {
     setLoading(true)
     
     try {
+      // HIBP sızıntı kontrolü (k-Anonymity). Ağ hatasında geçer, sızıntıda engeller.
+      const pwned = await hibpPwnedCount(formData.password)
+      if (pwned > 0) {
+        toast.error(t('auth.passwordPwned') || 'Password appears in known data breaches')
+        setLoading(false)
+        return
+      }
       const { error } = await signUp(formData.email, formData.password, formData.name)
       
       if (error) {
