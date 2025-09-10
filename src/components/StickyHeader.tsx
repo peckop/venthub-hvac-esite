@@ -19,9 +19,6 @@ interface StickyHeaderProps {
 export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const { t } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<Product[]>([])
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [stickySearchQuery, setStickySearchQuery] = useState('')
   const [stickySearchResults, setStickySearchResults] = useState<Product[]>([])
@@ -33,39 +30,14 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
   const navigate = useNavigate()
-  const searchRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const stickySearchRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
   
 
-  // Handle search
-  useEffect(() => {
-    const delayedSearch = setTimeout(async () => {
-      if (searchQuery.trim().length > 2) {
-        try {
-          const results = await searchProducts(searchQuery.trim())
-          setSearchResults(results)
-          setIsSearchOpen(true)
-        } catch (error) {
-          console.error('Search error:', error)
-          setSearchResults([])
-        }
-      } else {
-        setSearchResults([])
-        setIsSearchOpen(false)
-      }
-    }, 300)
-
-    return () => clearTimeout(delayedSearch)
-  }, [searchQuery])
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false)
-      }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
@@ -132,20 +104,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     return () => clearTimeout(delayedSearch)
   }, [stickySearchQuery])
 
-  const handleProductClick = (productId: string) => {
-    navigate(`/product/${productId}`)
-    setSearchQuery('')
-    setIsSearchOpen(false)
-  }
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
-      setIsSearchOpen(false)
-    }
-  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -228,48 +186,15 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </Link>
             </nav>
 
-            {/* Search Bar - Enhanced Design */}
-            <div className="flex-1 max-w-md mx-6 relative" ref={searchRef}>
-              <form onSubmit={handleSearchSubmit}>
-                <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors duration-200" size={18} />
-                  <input
-                    type="text"
-                    placeholder={t('common.searchHeaderPlaceholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-300 shadow-sm hover:shadow-md"
-                  />
-                </div>
-              </form>
-
-              {/* Enhanced Search Results Dropdown */}
-              {isSearchOpen && searchResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
-                  <div className="p-2">
-                    {searchResults.map((product) => (
-                      <button
-                        key={product.id}
-                        onClick={() => handleProductClick(product.id)}
-                        className="w-full flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 rounded-lg transition-all duration-200 text-left group"
-                      >
-                        <BrandIcon brand={product.brand} className="flex-shrink-0 group-hover:scale-110 transition-transform duration-200" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-industrial-gray truncate group-hover:text-primary-navy transition-colors">
-                            {product.name}
-                          </div>
-                          <div className="text-sm text-steel-gray">
-                            {product.brand} • {product.sku}
-                          </div>
-                        </div>
-                        <div className="text-primary-navy font-bold">
-                          ₺{parseFloat(product.price).toLocaleString('tr-TR')}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Search trigger (header input kaldırıldı) */}
+            <div className="mx-2 hidden sm:flex">
+              <button
+                onClick={() => navigate('/products')}
+                aria-label={t('common.search')}
+                className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
+              >
+                <Search size={18} className="text-steel-gray group-hover:text-primary-navy" />
+              </button>
             </div>
 
             {/* Right Actions - Enhanced */}
