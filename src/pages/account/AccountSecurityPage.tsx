@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
+import { hibpPwnedCount } from '../../utils/passwordSecurity'
 
 export default function AccountSecurityPage() {
   const { user } = useAuth()
@@ -18,7 +19,7 @@ export default function AccountSecurityPage() {
       toast.error(t('account.security.currentRequired'))
       return
     }
-    if (password.length < 6) {
+    if (password.length < 8) {
       toast.error(t('account.security.minLength'))
       return
     }
@@ -36,6 +37,13 @@ export default function AccountSecurityPage() {
         return
       }
 
+      // HIBP sızıntı kontrolü (k-Anonymity). Ağ hatasında geçer, sızıntıda engeller.
+      const pwned = await hibpPwnedCount(password)
+      if (pwned > 0) {
+        toast.error(t('account.security.pwned') || 'Password appears in known data breaches')
+        setSaving(false)
+        return
+      }
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
       toast.success(t('account.security.updated'))
