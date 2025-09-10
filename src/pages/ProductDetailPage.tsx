@@ -38,6 +38,7 @@ export const ProductDetailPage: React.FC = () => {
   const [mainCategory, setMainCategory] = useState<Category | null>(null)
   const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
+  const [activeIdx, setActiveIdx] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
@@ -69,7 +70,9 @@ export const ProductDetailPage: React.FC = () => {
             .select('path, alt, sort_order')
             .eq('product_id', productData.id)
             .order('sort_order', { ascending: true })
-          setImages((imgs || []) as { path: string; alt?: string | null }[])
+          const list = (imgs || []) as { path: string; alt?: string | null }[]
+          setImages(list)
+          setActiveIdx(0)
         } catch {}
 
         // Fetch categories for breadcrumb
@@ -283,12 +286,12 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
           <div>
-            <div className="aspect-square bg-gradient-to-br from-air-blue to-light-gray rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+            <div className="aspect-square bg-white rounded-xl flex items-center justify-center mb-4 overflow-hidden">
               {images.length > 0 ? (
                 <img
-                  src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[0].path}`}
-                  alt={images[0].alt || product.name}
-                  className="w-full h-full object-cover"
+                  src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
+                  alt={images[activeIdx].alt || product.name}
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="text-8xl text-secondary-blue/30">🌪️</div>
@@ -299,14 +302,21 @@ export const ProductDetailPage: React.FC = () => {
             <div className="grid grid-cols-4 gap-2">
               {images.length > 0 ? (
                 images.slice(0, 8).map((img, i) => (
-                  <div key={`${img.path}-${i}`} className="aspect-square rounded-lg cursor-pointer hover:ring-2 hover:ring-primary-navy transition-all overflow-hidden bg-light-gray">
+                  <button
+                    type="button"
+                    key={`${img.path}-${i}`}
+                    onClick={() => setActiveIdx(i)}
+                    aria-pressed={activeIdx === i}
+                    className={`aspect-square rounded-lg transition-all overflow-hidden bg-white border ${activeIdx === i ? 'ring-2 ring-primary-navy border-primary-navy' : 'border-light-gray hover:ring-2 hover:ring-primary-navy'}`}
+                    title={(img.alt || product.name) ?? ''}
+                  >
                     <img
                       src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`}
                       alt={img.alt || product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       loading="lazy"
                     />
-                  </div>
+                  </button>
                 ))
               ) : (
                 [1, 2, 3, 4].map((i) => (
