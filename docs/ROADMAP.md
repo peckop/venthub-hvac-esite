@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-09
+Last updated: 2025-09-10
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -315,3 +315,29 @@ Not: Ayrıntılı backlog ve QA başlıkları için docs/HOMEPAGE_ENHANCEMENTS.m
   - [ ] Görseller lazy; kontrast/focus durumları uygun
 - Konsol
   - [ ] Hata/warn yok (dev uyarıları hariç)
+
+## Güncelleme — 2025-09-10: Ürün Arama ve Görsel Yönetimi + RLS Düzeltmeleri
+
+Uygulananlar:
+- Arama (PLP/ProductsPage)
+  - /products sayfasında arama önceliği netleştirildi: query varsa sonuçlar, `all=1` varsa tüm ürünler listelenir.
+  - URL `q` parametresi ile input senkronizasyonu düzeltildi.
+  - Kategori sayfasına lokal arama alanı eklendi (adı/marka/model_code/SKU).
+  - model_code arama kapsamına alındı ("AD-H-900-T" gibi kodlar bulunur).
+  - Header’daki karmaşık arama çubuğu sadeleştirildi: tek arama ikonu → /products. Sticky (scroll sonrası) hızlı arama korundu.
+- SEO
+  - /products için JSON-LD ItemList ve Breadcrumb üretimi arama/all modlarına göre iyileştirildi.
+- Ürün Görselleri (Admin)
+  - RLS hatası ("new row violates row-level security policy") giderildi: product_images ve storage.objects politikaları user_profiles.role + auth.uid() ile yeniden yazıldı; authenticated role INSERT/UPDATE/DELETE yetkileri tanımlandı; admin kullanıcı (recep.varlik@gmail.com) atandı.
+  - Tanılama için RPC’ler eklendi: session context (auth.uid, claims) ve aktif policy listesi; gerekli loglar admin’de görülebiliyor.
+  - Görsel yükleme artık kalıcı olarak çalışıyor; küçük ekranlarda "Kapağı Yap (Make Cover)" butonu görünür.
+  - Alt metin düzenleme UX’i: input controlled hale getirildi, onBlur’da otomatik kaydediyor; ayrıca Görseller sekmesinde toplu Kaydet düğmesi eklendi.
+- Ürün Liste/Detay
+  - Kapak görseli (sort_order=0) otomatik kullanılıyor; `object-contain` ile taşma/croplama önlendi.
+  - Thumbnail tıklaması ana görseli güncelliyor; alt nitelikleri tutarlı.
+
+Sıradaki (özet):
+- Gelişmiş arama mimarisi: Postgres FTS (Turkish dict) + pg_trgm, ağırlıklandırma (name>model_code>sku>brand), typo toleransı.
+- Mobil tam ekran arama paneli: sekmeli öneriler (Ürünler/Kategoriler/Markalar), son/popüler aramalar, "Bunu mu demek istediniz?".
+- /products facet filtreleri: kategori/marka/fiyat aralığı, çoklu seçim ve URL senkronizasyonu; sıralama seçenekleri.
+- Admin Görseller: sürükle-bırak sıralama, toplu işlemler; alt metin doğrulama; lightbox/zoom (opsiyonel).

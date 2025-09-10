@@ -14,6 +14,27 @@
 
 ## High‑priority next tasks (1–2 days)
 
+### Arama Mimarisini Kurumsal Seviyeye Taşıma (Yeni)
+1) Back‑end / DB
+   - [ ] Postgres FTS (Turkish dictionary) + `pg_trgm` ile typo toleranslı arama
+   - [ ] İndeksler: name, brand, model_code, sku üzerinde GIN/GIN+trgm
+   - [ ] Normalizasyon: i/ı dönüşümleri, diakritik ve tire/boşluk insensitivite
+   - [ ] RPC: `fts_search_products(q, limit, filters)` + ağırlıklandırma (name>model_code>sku>brand) ve rank
+2) UX
+   - [ ] Mobil tam ekran arama paneli (ikon veya `/` kısayolu ile)
+   - [ ] Sekmeler: Ürünler | Kategoriler | Markalar (sayım etiketleriyle)
+   - [ ] Öneriler: Son aramalar (localStorage) + popüler aramalar + “Bunu mu demek istediniz?”
+   - [ ] Boş durum: ilgili kategori/marka ve popüler ürün önerileri
+3) /products (PLP)
+   - [ ] Facet filtreleri: Kategori, Marka, Fiyat aralığı (çoklu seçim)
+   - [ ] URL senkronizasyonu ve derin linklenebilirlik
+   - [ ] Sıralama: fiyat (↑/↓), ada göre, yeni, popüler
+4) Performans/SEO/A11y
+   - [ ] Debounce, istek iptal/cancel, sonuç cache
+   - [ ] Prefetch + skeleton/paginate/sonsuz kaydırma
+   - [ ] JSON‑LD SearchAction; noindex/canonical kuralları
+   - [ ] A11y: focus trap, ARIA rolleri, canlı bölge (n sonuç)
+
 ### ✅ TAMAMLANAN GÖREVLER (2025-09-02'ye kadar)
 - [x] **CI: Lint'i "blocking" yap** — CI'da lint adımı bloklayıcı (--max-warnings=0)
 - [x] **Performans: Bundle optimizasyonu** — %87 küçültme sağlandı (1,118kB → 145kB)

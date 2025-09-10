@@ -116,3 +116,26 @@ Açık kalanlar / sıradakiler:
 - Mevcut dağınık admin sayfaları (/account/operations/*) aşamalı olarak /admin altına taşınacak; mükerrerlik kaldırılacak.
 - i18n anahtarları tekilleştirilecek; ortak UI bileşenleri (rozet, tablo) modül dışına alınacak.
 
+---
+
+## Güncellemeler (2025-09-10) — Ürün Görselleri & RLS & Arama
+
+Tamamlananlar:
+- RLS/Policy Düzeltmeleri
+  - product_images ve storage.objects (product-images bucket) için politikalar user_profiles.role ve auth.uid() ile yeniden yazıldı.
+  - authenticated rolüne INSERT/UPDATE/DELETE yetkileri eklendi (gerekli kapsamda).
+  - Admin kullanıcı (recep.varlik@gmail.com) user_profiles.role=admin olarak işaretlendi.
+  - Tanılama RPC’leri: session context (auth.uid, claims) ve aktif policy listesini dönen yardımcılar eklendi.
+- Ürün Görselleri (Admin > Products > Görseller)
+  - “Kapağı Yap (Make Cover)” butonu küçük ekran genişliklerinde de görünür hâle getirildi.
+  - Alt metin girişleri controlled input’a geçirildi; onBlur’da otomatik kayıt; sekmede toplu “Kaydet” butonu eklendi.
+  - CSV içe aktarma ve kapak atama akışı iyileştirildi (buton hizaları ve erişilebilirlik etiketleri).
+- Arama (Header/Sticky)
+  - Header’daki karmaşık arama çubuğu sadeleştirildi; tek arama ikonu /products sayfasına yönlendiriyor.
+  - Sticky (scroll sonrası) hızlı arama korunuyor; ürün detayına hızlı geçiş için kısayol.
+
+Sıradaki (Admin odaklı):
+- Görseller için sürükle-bırak sıralama ve kalıcı sort_order güncellemesi.
+- Toplu işlemler: çoklu silme, alt metin doğrulama/otomatik öneri.
+- Audit log: ürün/kategori + fiyat/görsel değişikliklerinin kaydı.
+

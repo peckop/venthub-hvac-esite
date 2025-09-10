@@ -1,5 +1,23 @@
 # Changelog
 
+## 2025-09-10 (Arama, ProductsPage UX, Görseller RLS ve Alt Metin)
+- Arama
+  - /products: arama önceliği düzeltildi (query → sonuçlar, `all=1` → tüm ürünler).
+  - URL `q` param senkronizasyonu sağlandı; CategoryPage’e lokal arama eklendi.
+  - model_code arama kapsamına alındı (örn. "AD-H-900-T").
+  - Header arama çubuğu sadeleştirildi; tek ikon /products’a yönlendirir. Sticky hızlı arama korunur.
+- SEO
+  - /products için JSON-LD ItemList ve Breadcrumb üretimi modlara göre güncellendi.
+- Ürün Görselleri ve RLS
+  - product_images ve storage.objects (product-images) RLS politikaları user_profiles.role + auth.uid() ile yeniden yazıldı.
+  - authenticated role için INSERT/UPDATE/DELETE yetkileri düzenlendi; admin kullanıcı atandı.
+  - Tanılama RPC’leri: session context ve aktif policy görünürlüğü (admin).
+  - Yükleme sorunu kalıcı olarak çözüldü; "Kapağı Yap" butonu küçük ekranlarda da görünür.
+  - Alt metin girişleri controlled + onBlur kaydet; Görseller sekmesinde toplu “Kaydet”.
+- Ürün Listesi/Detayı
+  - Kapak görseli (sort_order=0) otomatik; `object-contain` ile taşma/croplama önlendi.
+  - Thumbnail tıklaması ana görseli günceller; alt nitelikleri tutarlı.
+
 ## 2025-09-09 (Admin Products/Categories UI standardizasyonu + sıralama + eşik mantığı)
 - Ürünler: Toolbar standardı + kategori filtresi + durum chip’leri + “Sadece: Öne Çıkan” toggle
 - Ürünler: Tablo sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok); başlıklardan tıklanarak
