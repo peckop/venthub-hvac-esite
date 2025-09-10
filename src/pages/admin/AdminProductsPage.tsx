@@ -75,6 +75,7 @@ const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(nu
   // images
   const [images, setImages] = React.useState<ImageRow[]>([])
   const [uploading, setUploading] = React.useState(false)
+  const [savingImages, setSavingImages] = React.useState(false)
 
   // seo
   const [slug, setSlug] = React.useState('')
@@ -194,7 +195,17 @@ const list = (p.data || []) as ProductRow[]
       .select('id, product_id, path, alt, sort_order')
       .eq('product_id', productId)
       .order('sort_order', { ascending: true })
-    if (!error) setImages((data || []) as ImageRow[])
+    if (!error) {
+      const list = (data || []) as ImageRow[]
+      setImages(list)
+      // Ayrıca sol listedeki kapak görselini güncelle
+      const first = list[0]
+      setCovers(prev => {
+        if (first && first.path) return { ...prev, [productId]: first.path }
+        const { [productId]: _removed, ...rest } = prev
+        return rest
+      })
+    }
   }
 
   const saveInfo = async () => {
@@ -293,6 +304,7 @@ const { error: upErr } = await supabase.storage.from('product-images').upload(pa
         }
       }
       await loadImages(selectedId)
+      await load()
     } catch (e) {
       alert(String(e))
     } finally {
@@ -424,10 +436,14 @@ const before = rows.find(r=>r.id===id) || null
   const saveImages = async () => {
     if (!selectedId) return
     try {
+      setSavingImages(true)
       await Promise.all(images.map(row => supabase.from('product_images').update({ alt: row.alt || '' }).eq('id', row.id)))
       await loadImages(selectedId)
+      alert('Görseller kaydedildi')
     } catch (e) {
       alert('Görseller kaydedilemedi: ' + ((e as Error).message || e))
+    } finally {
+      setSavingImages(false)
     }
   }
 
@@ -612,7 +628,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
           </Tabs.Root>
           <div className="ml-auto flex items-center gap-2">
             <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
-            <button onClick={saveCurrent} className={`${adminButtonPrimaryClass} h-11`}>Kaydet</button>
+            <button onClick={saveCurrent} disabled={savingImages} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
             {selectedId && (
               <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
             )}
