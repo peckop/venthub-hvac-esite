@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       if (groupId) {
         await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).catch(()=>{})
       }
-    } catch (_) {
+    } catch {
       // ignore grouping errors
       groupId = null
     }

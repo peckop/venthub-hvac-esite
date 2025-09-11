@@ -70,6 +70,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true, cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0, reconciled, failed }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: String((e as any)?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    const msg = e instanceof Error ? e.message : String(e ?? '')
+    return new Response(JSON.stringify({ ok: false, error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

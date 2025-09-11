@@ -151,7 +151,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({ payment_token: token })
         })
       }
-    } catch (_) {}
+    } catch {}
 
     let result: CheckoutRetrieveResponse | null = null;
     try {

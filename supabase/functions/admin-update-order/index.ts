@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
     } else if (display_code) {
       // display_code: UI'de görünen son 8 hane kodu (id'nin son 8'i)
       const recent = await listRecent(200);
-      const target = recent.find((o: any) => (o?.id || '').toString().toLowerCase().endsWith(String(display_code).toLowerCase()));
+      const target = recent.find((o: { id?: string }) => (o?.id || '').toString().toLowerCase().endsWith(String(display_code).toLowerCase()));
       if (!target) {
         return new Response(JSON.stringify({ ok:false, error:'not_found_by_display_code', tried: display_code }), { status: 404, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
