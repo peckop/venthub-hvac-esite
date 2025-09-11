@@ -153,11 +153,12 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error: any) {
-    console.error('Shipping notification error:', error)
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error ?? 'Unknown error')
+    console.error('Shipping notification error:', msg)
     
     return new Response(JSON.stringify({ 
-      error: error.message || 'Unknown error',
+      error: msg,
       success: false 
     }), {
       status: 500,

@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
           || (url.searchParams.get('debug') === '1')
           || ((req.headers.get('x-debug') || '') === '1');
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
-        const sanitize = (obj: any) => ({
+        const sanitize = (obj: Record<string, any>) => ({
             ...obj,
             buyer: obj?.buyer ? { ...obj.buyer, email: mask(obj.buyer.email), gsmNumber: mask(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
             shippingAddress: obj?.shippingAddress ? { ...obj.shippingAddress, address: '***' } : undefined,
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
         }
 
         // Authoritative server-side validation (prices + stock)
-        let authoritativeItems: any[] = []
+        let authoritativeItems: Array<{ product_id: string; quantity: number; unit_price: number; price_list_id: string | null }> = []
         let authoritativeTotalNum: number = typeof amount === 'number' ? Number(amount) : 0
         try {
             const vHeaders = {

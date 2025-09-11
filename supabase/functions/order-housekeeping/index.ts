@@ -35,8 +35,8 @@ Deno.serve(async (req) => {
 
     const fnHost = (() => { try { const host = new URL(supabaseUrl).host; const ref = host.split('.')[0]; return `https://${ref}.functions.supabase.co`; } catch { return '' } })();
 
-    let reconciled: string[] = []
-    let failed: string[] = []
+    const reconciled: string[] = []
+    const failed: string[] = []
 
     for (const o of pendWithToken as Array<{ id: string }>) {
       try {
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
           }).catch(() => {})
           failed.push(o.id)
         }
-      } catch (_) {
+      } catch {
         // Hata alırsak da failed'a çekelim (pending kalmasın)
         await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(o.id)}&status=eq.pending`, {
           method: 'PATCH',

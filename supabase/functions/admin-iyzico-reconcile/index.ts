@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     // Callback üzerinden doğrula (SDK'yı burada kullanma). Callback hem İyzico ile konuşur hem DB'yi günceller.
     const fnHost = (() => { const su = supabaseUrl!; try { const host = new URL(su).host; const ref = host.split('.')[0]; return `https://${ref}.functions.supabase.co`; } catch { return '' } })();
 
-    const results: any[] = []
+    const results: Array<Record<string, unknown>> = []
     for (const o of orders) {
       const token = o?.payment_token || null
       if (!token) {
@@ -78,8 +78,9 @@ Deno.serve(async (req) => {
         const cbJson = await cbResp.json().catch(()=>({}))
         const st = cbJson?.status || 'pending'
         results.push({ id:o.id, conversation_id:o.conversation_id, status: st, from:'callback' })
-      } catch (e:any) {
-        results.push({ id:o.id, conversation_id:o.conversation_id, error:String(e?.message||e) })
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e ?? '')
+        results.push({ id:o.id, conversation_id:o.conversation_id, error: msg })
       }
     }
 
