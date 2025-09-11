@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'build', 'node_modules', 'supabase/functions/**'],
+    ignores: ['dist', 'build', 'node_modules', 'supabase/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
