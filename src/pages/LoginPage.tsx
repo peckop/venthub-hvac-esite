@@ -202,7 +202,15 @@ export const LoginPage: React.FC = () => {
             aria-label="Google ile giriş"
           >
             <span className="inline-flex items-center justify-center gap-2">
-              <span>🔵</span>
+              {/* Google logo (data URI) */}
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath fill='%234285F4' d='M17.64 9.2045c0-.6381-.0573-1.2518-.1637-1.8364H9v3.4745h4.8445c-.2086 1.125-.842 2.0781-1.796 2.7146v2.2568h2.908C16.98 14.36 17.64 11.955 17.64 9.2045z'/%3E%3Cpath fill='%2334A853' d='M9 18c2.43 0 4.4684-.8055 5.9573-2.191l-2.908-2.2568c-.8085.54-1.8427.8578-3.0493.8578-2.3445 0-4.329-1.5838-5.0358-3.7106H.957v2.33C2.438 15.943 5.482 18 9 18z'/%3E%3Cpath fill='%23FBBC05' d='M3.9642 10.6995C3.7785 10.1595 3.6705 9.582 3.6705 9s.108-1.1595.2937-1.6995v-2.33H.957C.347 6.4065 0 7.6665 0 9s.347 2.5935.957 4.029l3.0072-2.3295z'/%3E%3Cpath fill='%23EA4335' d='M9 3.5455c1.319 0 2.508.4536 3.4413 1.3436l2.581-2.581C13.465.909 11.43 0 9 0 5.482 0 2.438 2.057.957 4.971l3.0072 2.3295C4.671 5.1737 6.6555 3.5455 9 3.5455z'/%3E%3C/svg%3E"
+                width={18}
+                height={18}
+                alt=""
+                aria-hidden="true"
+                style={{ display: 'block' }}
+              />
               <span>Google ile giriş</span>
             </span>
           </button>
