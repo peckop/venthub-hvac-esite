@@ -316,6 +316,37 @@ Not: Ayrıntılı backlog ve QA başlıkları için docs/HOMEPAGE_ENHANCEMENTS.m
 - Konsol
   - [ ] Hata/warn yok (dev uyarıları hariç)
 
+## Güncelleme — 2025-09-11: Güvenlik & Performans İyileştirmeleri + Admin Ürün Yönetimi
+
+Uygulananlar:
+- Güvenlik/Performans (DB Seviyesi)
+  - HIBP sızıntı kontrolü: 8+ karakter parola + HaveIBeenPwned k-Anonymity kontrolü (Register + Parola Değiştir)
+  - RLS policy normalizasyonu: auth.uid(), auth.jwt(), current_setting() çağrıları per-row optimize edildi
+  - Function search_path: güvenlik açığı kapatıldı (public, pg_temp)
+  - Multiple permissive policies: birleştirildi, performans artırıldı
+  - FK indeks eksiklikleri: tüm foreign key'ler indekslendi
+  - Kullanılmayan indeksler: temizlendi, disk alanı kazanıldı
+  - Admin audit log RLS: politikalar düzeltildi
+  - PUBLIC policy kısıtlama: explicit roller tanımlandı
+- UI/UX İyileştirmeleri
+  - Premium brands marquee: sonsuz akış (4x tekrar, motion preference kaldırıldı)
+  - Header arama sadeleştirme: ikon + /products yönlendirme
+  - PDP galeri navigasyonu: ok/klavye/swipe + a11y
+  - Model kodu ayrıştırması: MPN field eklendi
+  - Ürün kartları düzenlendi: model_code > SKU gösterimi
+  - Alt metin bağlantıları: görsel erişilebilirlik
+  - Ana görsel object-contain: taşma/kırpma önlendi
+- Arama & Listeleme
+  - Model kodu aramaya dahil: genişletilmiş arama kapsamı
+  - JSON-LD ItemList: SEO iyileştirmeleri
+  - Arama önceliği düzeltildi: /products sayfasında
+- Admin Panel İyileştirmeleri
+  - Ürün listesi: kolon başlıklarına tıklayarak sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok)
+  - "Öne Çıkan" filtresi: gerçek veritabanı sorgusuna yansıyor (is_featured alanı)
+  - Stok sekmesi: global varsayılan eşik değeri görsel gösterimi ("Varsayılan: 5")
+  - Görsel yönetimi: "Kapağı Yap" butonu, alt metin controlled input, toplu kaydet
+  - CSV içe aktarma v2: write desteği, upsert by SKU, dry-run, chunk işleme
+
 ## Güncelleme — 2025-09-10: Ürün Arama ve Görsel Yönetimi + RLS Düzeltmeleri
 
 Uygulananlar:
