@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // Admin Yapılandırması - Database Tabanlı Role Sistemi
 // Bu dosya artik database'deki user_profiles.role kolunu kullanır
 
@@ -37,10 +38,11 @@ export const FALLBACK_ADMIN_EMAILS: string[] = [
 function isProdEnv(): boolean {
   try {
     // Vite
-    if (typeof import.meta !== 'undefined' && (import.meta as unknown as { env?: Record<string, unknown> }).env) {
-      // @ts-ignore
-      if (import.meta.env.PROD) return true
-    }
+    try {
+      // Vite build flag (vite/client types)
+      if (import.meta?.env?.PROD) return true
+    } catch {}
+    
     // Hostname bazlı koruma (Cloudflare Pages vs)
     if (typeof window !== 'undefined') {
       const h = window.location.hostname
