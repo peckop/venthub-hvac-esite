@@ -1,0 +1,37 @@
+# Güvenlik ve Performans Kontrol Listesi
+
+Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehberdir.
+
+## Güvenlik
+- Leaked Password Protection: Supabase Dashboard → Authentication → Password policy altında “Leaked password protection” özelliğini etkinleştirin.
+  - Referans: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+- Confirm Email: Authentication → Email provider → “Confirm email” açık ve “unverified sign-in” kapalı olmalı.
+- Redirect URL’ler: Authentication → URL config → {PROD_ORIGIN}/auth/callback ve {DEV_ORIGIN}/auth/callback ekli olmalı.
+- Google OAuth: Authentication → Providers → Google → Client ID/Secret girin. Redirect {ORIGIN}/auth/callback.
+- Owner/Superadmin: Kritik işlemler (rol atama, güvenlik ayarları) sadece superadmin tarafından yapılmalı. Uygulandı (20250911_rbac_superadmin.sql).
+
+## Performans
+- Kullanılmayan indeksler (INFO düzeyi): Advisor, “kullanılmadı” olarak işaretlemiş. Üretimde kullanım metrikleri toplanmadan agresif silme önerilmez. Yine de gözden geçirmek için liste:
+  - public.cart_items: idx_cart_items_product_id, idx_cart_items_price_list_id
+  - public.product_images: idx_product_images_product_id
+  - public.product_prices: idx_product_prices_price_list_id
+  - public.user_invoice_profiles: idx_user_invoice_profiles_user_id
+  - public.venthub_order_items: idx_venthub_order_items_product_id
+  - public.venthub_returns: idx_venthub_returns_order_id, idx_venthub_returns_user_id
+  - public.categories: idx_categories_parent_id
+  - public.client_errors: idx_client_errors_group_id
+  - public.error_groups: idx_error_groups_assigned_to
+  - public.inventory_movements: idx_inventory_movements_product_id
+  - public.payment_transactions: idx_payment_transactions_order_id, idx_payment_transactions_user_id
+  - public.products: idx_products_category_id, idx_products_subcategory_id
+
+Öneri: En az 1-2 haftalık gerçek trafiği izleyip index usage istatistiklerine göre tek tek kaldırın. İsteğe bağlı bir SQL script ile (DROP INDEX IF EXISTS ...) kademeli temizlik yapılabilir.
+
+## Test/Lint/Build
+- pnpm lint: Geçti.
+- pnpm test: Tüm testler geçti (HIBP mocklandı, min 8 kuralı ile uyumlu).
+- pnpm run build:ci: Başarılı.
+
+## Notlar
+- Tüm migration’lar idempotent yazıldı (IF EXISTS / DO $$ ... END $$ blokları). Mükerrer/çakışan yapıdan kaçınmak için tekrar çalıştırılabilir.
+
