@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { supabase } from '../lib/supabase'
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -47,6 +48,23 @@ export const LoginPage: React.FC = () => {
     } catch (error) {
       toast.error(t('auth.unexpectedError'))
       console.error('Login error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    try {
+      setLoading(true)
+      const redirectTo = `${window.location.origin}/auth/callback`
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
+      if (error) {
+        console.error('Google sign-in error:', error)
+        toast.error('Google ile giriş başlatılamadı')
+      }
+    } catch (e) {
+      console.error('Google sign-in exception:', e)
+      toast.error('Google ile giriş sırasında beklenmeyen hata')
     } finally {
       setLoading(false)
     }
@@ -159,10 +177,31 @@ export const LoginPage: React.FC = () => {
                   {t('auth.loggingIn')}
                 </div>
               ) : (
-t('auth.login')
+                t('auth.login')
               )}
             </button>
           </form>
+
+          {/* Or divider */}
+          <div className="my-4 flex items-center">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="px-3 text-xs text-steel-gray">veya</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
+          {/* Google Sign-In */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            className="w-full bg-white border border-light-gray text-industrial-gray font-semibold py-3 px-6 rounded-lg transition-colors hover:border-primary-navy disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Google ile giriş"
+          >
+            <span className="inline-flex items-center justify-center gap-2">
+              <span>🔵</span>
+              <span>Google ile giriş</span>
+            </span>
+          </button>
 
           {/* Sign Up Link */}
           <div className="mt-8 text-center">
