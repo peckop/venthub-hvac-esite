@@ -1,5 +1,3 @@
-import Iyzipay from "npm:iyzipay";
-
 Deno.serve(async (req) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -12,10 +10,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    const apiKey = Deno.env.get('IYZICO_API_KEY')
-    const secretKey = Deno.env.get('IYZICO_SECRET_KEY')
-    const baseUrl = 'https://sandbox-api.iyzipay.com'
-    if (!supabaseUrl || !serviceRoleKey || !apiKey || !secretKey) {
+    if (!supabaseUrl || !serviceRoleKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
@@ -35,7 +30,7 @@ Deno.serve(async (req) => {
     let limit = 10
     try { const url = new URL(req.url); const l = url.searchParams.get('limit'); if (l) limit = Math.max(1, Math.min(100, parseInt(l))) } catch {}
     const rpcListUrl = `${supabaseUrl}/rest/v1/rpc/fn_admin_get_orders`
-    const listBody: any = { p_id: id, p_conv: conv, p_limit: limit }
+    const listBody: { p_id: string | null; p_conv: string | null; p_limit: number; p_status?: string | null } = { p_id: id, p_conv: conv, p_limit: limit }
     if (!id && !conv) listBody.p_status = 'pending'; else listBody.p_status = null
 
     const listResp = await fetch(rpcListUrl, {
@@ -86,6 +81,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok:true, processed: results.length, results }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
   } catch (e) {
-    return new Response(JSON.stringify({ error: String((e as any)?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    const msg = e instanceof Error ? e.message : String(e ?? '')
+    return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })

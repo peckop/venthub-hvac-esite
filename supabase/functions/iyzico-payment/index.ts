@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
         let clientOrigin = req.headers.get('origin') || '';
         if (!clientOrigin) {
             const ref = req.headers.get('referer') || '';
-            try { clientOrigin = ref ? new URL(ref).origin : ''; } catch (_) { clientOrigin = ''; }
+            try { clientOrigin = ref ? new URL(ref).origin : ''; } catch { clientOrigin = ''; }
         }
         if (!clientOrigin) {
             const envOrigin = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
@@ -248,7 +248,7 @@ Deno.serve(async (req) => {
                 if (pRes.ok) {
                     const rows = await pRes.json().catch(()=>[])
                     if (Array.isArray(rows)) {
-                        prodMap = new Map(rows.map((p: any) => [p.id, p]))
+                        prodMap = new Map((rows as Array<{ id: string; name?: string; sku?: string; image_url?: string | null }>).map((p) => [p.id, p]))
                     }
                 }
             }
