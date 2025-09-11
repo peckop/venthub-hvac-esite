@@ -105,8 +105,7 @@ Deno.serve(async (req) => {
 
     const sdk = new (Iyzipay as any)({ apiKey: IYZ_API, secretKey: IYZ_SEC, uri: IYZ_URI });
 
-    let refundType: 'cancel' | 'refund' = 'cancel';
-    let targetAmount = amountReq && amountReq > 0 ? amountReq : totalAmount;
+    const targetAmount = amountReq && amountReq > 0 ? amountReq : totalAmount;
 
     // Decide: full cancel vs partial refund
     const epsilon = 0.0001;
@@ -115,7 +114,7 @@ Deno.serve(async (req) => {
     let iyzResult: any = null;
     try {
       if (isFull) {
-        refundType = 'cancel';
+        // full cancel
         iyzResult = await new Promise((resolve, reject) => {
           (sdk as any).cancel.create({
             locale: (Iyzipay as any).LOCALE ? (Iyzipay as any).LOCALE.TR : 'tr',
@@ -124,7 +123,7 @@ Deno.serve(async (req) => {
           }, (err: any, res: any) => err ? reject(err) : resolve(res));
         });
       } else {
-        refundType = 'refund';
+        // partial refund
         // Use first transaction id for partial amount (basic version). Could be extended to map items/amounts.
         const ptx = transactions?.[0]?.paymentTransactionId;
         if (!ptx) {
