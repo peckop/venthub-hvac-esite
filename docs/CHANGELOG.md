@@ -1,5 +1,34 @@
 # Changelog
 
+## 2025-09-11 (Güvenlik, Performans ve Admin Panel İyileştirmeleri)
+- Güvenlik & DB Performans (Supabase Advisor sonuçlarına göre)
+  - HIBP sızıntı kontrolü: 8+ karakter min parola + HaveIBeenPwned k-Anonymity kontrolü (Register/Parola Değiştir)
+  - RLS policy normalizasyonu: auth.uid(), auth.jwt(), current_setting() çağrıları SELECT ile wrap ederek per-row re-eval önlendi
+  - Function search_path güvenlik: tüm fonksiyonlar için 'public, pg_temp' ayarı (mutable search_path riski giderildi)
+  - Multiple permissive RLS policies: aynı tablo/rol/aksiyon için tekleştirildi (performans iyileştirmesi)
+  - Missing FK indexes: tüm foreign key indeksleri eklendi (query performansı)
+  - Unused indexes: kullanılmayan indeksler temizlendi (disk alanı kazancı)
+  - Admin audit log RLS: admin/moderator rolleri için policy düzeltmeleri
+  - PUBLIC policies: explicit roller (authenticated, anon, admin, moderator) ile kısıtlandı
+- UI/UX İyileştirmeleri
+  - Premium HVAC markaları marquee: gerçekten sonsuz akış (4x tekrar, motion preference kaldırıldı)
+  - Header arama sadeleştirme: tek ikon /products'a yönlendirme, sticky hızlı arama korundu
+  - PDP galeri navigasyon: ok tuşları/klavye/swipe desteği + a11y etiketleri
+  - Model kodu (MPN) ayrıştırma: products.model_code alanı + admin UI + PDP/CSV desteği
+  - Ürün kartları: model_code > SKU gösterim önceliği, alt metin entegrasyonu
+  - Ana görsel: object-contain ile taşma/kırpma önleme, thumbnail tıklama ile ana görsel değişimi
+- Arama & Listeleme
+  - Model kodu arama kapsamı: "AD-H-900-T" gibi kodlar aramaya dahil edildi
+  - /products JSON-LD: ItemList ve Breadcrumb üretimi arama/all modlarına göre iyileştirildi
+  - Arama önceliği: query varsa sonuçlar, all=1 varsa tüm ürünler mantighı netlik kazandı
+- Admin Panel Geliştirmeleri
+  - Ürün listesi: kolon başlığına tıklayarak sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok)
+  - "Öne Çıkan" filtresi: is_featured alanı veritabanı sorgusunda gerçek filtreleme
+  - Stok sekmesi: global varsayılan eşik değeri görsel gösterimi ("Varsayılan: X")
+  - Görsel yönetimi: "Kapağı Yap" butonu, alt metin controlled input + onBlur kaydet, toplu kaydet butonu
+  - CSV İçe Aktarma v2: write desteği, SKU ile upsert, dry-run önizleme, chunk işleme (100'lük)
+  - RLS policies: product_images ve storage.objects için admin/moderator CRUD yetkileri düzeltildi
+
 ## 2025-09-10 (Arama, ProductsPage UX, Görseller RLS ve Alt Metin)
 - Arama
   - /products: arama önceliği düzeltildi (query → sonuçlar, `all=1` → tüm ürünler).

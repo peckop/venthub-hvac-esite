@@ -73,17 +73,25 @@ Durum (altyapı taraması):
 
 Tamamlananlar (/admin/products & /admin/categories):
 - [x] Toolbar standardizasyonu (AdminToolbar + ColumnsMenu, density, kalıcılık)
-- [x] Ürünler: arama, kategori filtresi, durum chip’leri, “Sadece: Öne Çıkan” toggle
-- [x] Ürünler: tablo sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok)
+- [x] Ürünler: arama, kategori filtresi, durum chip'leri, "Sadece: Öne Çıkan" toggle
+- [x] Ürünler: tablo sıralama (Ad, SKU, Kategori, Durum, Fiyat, Stok) — kolon başlıklarına tıklayarak sıralama
+- [x] Ürünler: "Sadece: Öne Çıkan" filtresi gerçek veritabanı sorgusuna yansıyor (is_featured alanı)
 - [x] Ürünler: düzenleme paneli — sekmeler (Bilgi, Fiyat, Stok, Görseller, SEO), üstte gri başlık şeridi ve aksiyonlar (Yeni, Kaydet, Sil)
+- [x] Ürünler: Stok sekmesinde global varsayılan eşik değeri görsel gösterimi ("Varsayılan: 5")
 - [x] Ürünler: görsel yükleme/sıralama/silme (storage + product_images)
+- [x] Ürünler: "Kapağı Yap (Make Cover)" butonu — görsel sıralamasında ilk sıraya taşıma
+- [x] Ürünler: CSV içe aktarma v2 (write desteği) — SKU ile upsert, dry-run, chunk işleme
 - [x] Ürünler: düşük stok eşiği override mantığı (boş=varsayılan; dolu=override) — Envanter/Ayarlar ile uyumlu
 - [x] Kategoriler: liste + CRUD (Ad, Slug, Üst Kategori), üstte gri başlık şeridi ve aksiyonlar (Yeni, Kaydet, Sil)
 
 Açık kalanlar / sıradakiler:
-- [ ] RLS: products/product_images/categories için admin/moderator CRUD policy’leri (ince ayar)
-- [ ] Audit log: ürün/kategori + fiyat/görsel değişiklikleri
-- [ ] CSV import/export (ürün/kategori) – opsiyonel, sonraki sprint
+- [x] RLS: products/product_images/categories için admin/moderator CRUD policy'leri (2025-09-10 düzeltildi)
+- [x] CSV import/export (ürün) — v2 tamamlandı (write desteği, upsert by SKU)
+- [x] Audit log: ürün/kategori + fiyat/görsel değişiklikleri (mevcut)
+- [ ] Ürün listesinde server-side sayfalama
+- [ ] Ürün listesinde varsayılan sıralama ve görünür kolon ayarlarının kalıcılığı
+- [ ] Arama kapsamını genişletme (brand ve slug dahil)
+- [ ] Çoklu seçim ve toplu dışa aktarma yetenekleri
 
 ### Görev Listesi (Sprint 3A)
 - [x] Migration: products.purchase_price numeric(12,2) NULL
