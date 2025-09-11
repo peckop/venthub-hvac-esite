@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
         // Coalesce customer/shipping/billing from alternative keys and apply fallbacks
         let ci = requestData?.customerInfo || requestData?.customer || {}
         let shipAddr = requestData?.shippingAddress || requestData?.shipping || requestData?.shipping_address || null
-        let billAddr = requestData?.billingAddress || requestData?.billing || requestData?.billing_address || null
+        const billAddr = requestData?.billingAddress || requestData?.billing || requestData?.billing_address || null
         if (!shipAddr && billAddr) shipAddr = billAddr
         if (!ci?.name || String(ci.name).trim().length===0) {
             const emailStr = String(ci?.email || '')
@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
             if (vResp.ok) {
                 const validation = await vResp.json().catch(() => ({}));
                 const stockIssues = Array.isArray(validation?.stock_issues) ? validation.stock_issues : [];
-                const mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
+                const _mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
                 // Eski davranış: 409 döndürüp akışı durdurmak. Yeni davranış: sunucu otoritesini uygula ve devam et.
                 if ((stockIssues && stockIssues.length > 0)) {
                     // Stok problemi varsa yine durdur (kullanıcı müdahalesi gerekir)

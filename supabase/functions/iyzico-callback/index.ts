@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
             if (conversationId) target.searchParams.set('conversationId', conversationId);
             target.searchParams.set('status', 'pending');
             const t = target.toString();
-            const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
+            const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
             return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
           } catch (_) {}
         }
@@ -145,7 +145,7 @@ Deno.serve(async (req) => {
     }
 
     // İyzico sonucu yorumla
-    let paid = !!(result && result.paymentStatus === "SUCCESS");
+    const paid = !!(result && result.paymentStatus === "SUCCESS");
 
     // Debug bilgisi hazırla
     const debugInfo: any = result ? {
@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
     }
 
     let updateOk = false;
-    let stockResult = null;
+    let _stockResult: unknown = null;
     if (paid) {
       // Önce 'paid' olarak güncellemeyi dene; constraint nedeniyle reddedilirse 'confirmed' ile tekrar dene
       let r = await patchStatus('paid');
@@ -338,13 +338,13 @@ Deno.serve(async (req) => {
         if (conversationId) target.searchParams.set('conversationId', conversationId);
         target.searchParams.set('status', paid ? 'success' : 'failure');
         const t = target.toString();
-        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
     } catch (_) {}
 
     // Yine de base yoksa düz metin yerine bilgilendirici HTML döndür (OK kaldırıldı)
-    const infoHtml = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Ödeme Sonucu</title></head><body style=\"font-family:system-ui,Arial,sans-serif;padding:16px;\"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
+    const infoHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
     return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
   } catch (error: any) {
     console.error("iyzico-callback error:", error);
@@ -371,12 +371,12 @@ Deno.serve(async (req) => {
         if (conversationId) target.searchParams.set('conversationId', conversationId);
         target.searchParams.set('status', 'failure');
         const t = target.toString();
-        const html = `<!doctype html><html><head><meta charset=\"utf-8\"><meta http-equiv=\"refresh\" content=\"0;url=${t}\"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
     } catch (_) {}
     // Yine olmazsa bilgilendirici HTML döndür (OK kaldırıldı)
-    const infoHtml2 = `<!doctype html><html><head><meta charset=\"utf-8\"><title>Ödeme Sonucu</title></head><body style=\"font-family:system-ui,Arial,sans-serif;padding:16px;\"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
+    const infoHtml2 = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
     return new Response(infoHtml2, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
   }
 });
