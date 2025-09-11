@@ -9,8 +9,20 @@
   - Missing FK indexes: tüm foreign key indeksleri eklendi (query performansı)
   - Unused indexes: kullanılmayan indeksler temizlendi (disk alanı kazancı)
   - Admin audit log RLS: admin/moderator rolleri için policy düzeltmeleri
-  - PUBLIC policies: explicit roller (authenticated, anon, admin, moderator) ile kısıtlandı
+- PUBLIC policies: explicit roller (authenticated, anon, admin, moderator) ile kısıtlandı
 - UI/UX İyileştirmeleri
+
+### 2025-09-11 Geç Saat Güncellemeleri
+- CI
+  - App Lint (src) blocking olarak eklendi; Edge Functions lint ayrı ve non‑blocking (uyarı raporlar, pipeline’ı kırmaz)
+  - ESLint ignore kapsamı sadece `supabase/migrations/**` ile sınırlandı; `supabase/functions/**` lint kapsamına alındı (edge için esnek kurallar)
+  - DB Advisor workflow güncellendi: `psql` ile SQL tabanlı denetimler (unindexed FKs, duplicate/unused indexes, multiple permissive RLS) — secrets ile güvenli
+- DB/RLS
+  - user_profiles: INSERT/UPDATE için çoğul public policy’ler tek birer policy altında birleştirildi (idempotent)
+  - venthub_returns: UPDATE için `returns_update_*` politikaları tek policy ile birleştirildi (idempotent)
+- Frontend
+  - LoginPage: Google ikonu inline SVG yerine data‑URI `<img>` ile garanti altına alındı (tema/CSS farklarında görünür)
+  - admin.ts: `@ts-ignore` kaldırıldı; `vite/client` tip referansı ile `import.meta.env.PROD` güvenli kontrol (CI lint hatası giderildi)
   - Premium HVAC markaları marquee: gerçekten sonsuz akış (4x tekrar, motion preference kaldırıldı)
   - Header arama sadeleştirme: tek ikon /products'a yönlendirme, sticky hızlı arama korundu
   - PDP galeri navigasyon: ok tuşları/klavye/swipe desteği + a11y etiketleri

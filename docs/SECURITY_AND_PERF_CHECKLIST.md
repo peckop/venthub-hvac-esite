@@ -11,6 +11,19 @@ Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehber
 - Owner/Superadmin: Kritik işlemler (rol atama, güvenlik ayarları) sadece superadmin tarafından yapılmalı. Uygulandı (20250911_rbac_superadmin.sql).
 
 ## Performans
+
+## CI: DB Advisor
+- Workflow: `.github/workflows/db-advisor.yml`
+- Çalışma şekli: GitHub Secrets’taki `SUPABASE_DB_URL` ile `psql` üzerinden salt‑okunur SQL denetimleri çalışır.
+- Raporlanan başlıklar (job log’larında group olarak görünür):
+  - Unindexed foreign keys
+  - Duplicate indexes
+  - Unused indexes (idx_scan = 0)
+  - Multiple permissive RLS policies (aynı tablo/rol/aksiyon için birden fazla permissive policy)
+- Notlar:
+  - Adım non‑blocking’tir; uyarıları görünür kılar, pipeline’ı kırmaz.
+  - İndeks “unused” olsa bile hemen silmeyin; en az 1–2 hafta gerçek kullanım toplayıp karar verin.
+  - Secrets doğru ise job log’larında sorgu çıktıları tablo halinde görünür. Secrets yoksa “notice” ile kibarca atlar.
 - Kullanılmayan indeksler (INFO düzeyi): Advisor, “kullanılmadı” olarak işaretlemiş. Üretimde kullanım metrikleri toplanmadan agresif silme önerilmez. Yine de gözden geçirmek için liste:
   - public.cart_items: idx_cart_items_product_id, idx_cart_items_price_list_id
   - public.product_images: idx_product_images_product_id

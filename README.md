@@ -1,6 +1,8 @@
 # Venthub HVAC E‑Site
 
 [![Supabase Migrate](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/supabase-migrate.yml)
+[![App Lint](https://github.com/peckop/venthub-hvac-esite/actions/workflows/app-lint.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/app-lint.yml)
+[![DB Advisor](https://github.com/peckop/venthub-hvac-esite/actions/workflows/db-advisor.yml/badge.svg)](https://github.com/peckop/venthub-hvac-esite/actions/workflows/db-advisor.yml)
 
 React + TypeScript + Vite tabanlı e‑ticaret uygulaması.
 
