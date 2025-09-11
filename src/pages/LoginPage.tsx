@@ -56,7 +56,11 @@ export const LoginPage: React.FC = () => {
   async function handleGoogleSignIn() {
     try {
       setLoading(true)
-      const redirectTo = `${window.location.origin}/auth/callback`
+      // Production-origin guard: Cloudflare Pages'ta eski Site URL yüzünden fallback olursa, burada açıkça prod origin'i gönderiyoruz.
+      const isProd = typeof window !== 'undefined' && window.location.hostname.endsWith('pages.dev')
+      const prodOrigin = 'https://venthub-hvac-esite.pages.dev'
+      const origin = isProd ? prodOrigin : window.location.origin
+      const redirectTo = `${origin}/auth/callback`
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
       if (error) {
         console.error('Google sign-in error:', error)
