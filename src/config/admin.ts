@@ -62,7 +62,7 @@ export async function getUserRole(userId: string): Promise<string> {
  */
 export async function isUserAdminAsync(userId: string): Promise<boolean> {
   const role = await getUserRole(userId)
-  return role === 'admin' || role === 'moderator'
+  return role === 'admin' || role === 'moderator' || role === 'superadmin'
 }
 
 /**
@@ -93,7 +93,7 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
   
   // 1. User metadata'dan role kontrolü (Supabase auth)
   const metadataRole = user.user_metadata?.role
-  if (metadataRole === 'admin' || metadataRole === 'moderator') {
+  if (metadataRole === 'admin' || metadataRole === 'moderator' || metadataRole === 'superadmin') {
     return true
   }
   
@@ -137,10 +137,10 @@ export async function checkAdminAccessAsync(user: { id?: string; email?: string 
  * Kullanıcıya admin rolü ata (sadece client tarafında bilgi için)
  * Gerçek database güncellemesi için admin paneli gerekir
  */
-export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 'moderator'): Promise<boolean> {
+export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 'moderator' | 'superadmin'): Promise<boolean> {
   try {
-    // Bu database RPC fonksiyonunu çağırır (sadece service_role yetkisi ile)
-    const { data, error } = await supabase.rpc('set_user_role', {
+    // Database RPC (SECURITY DEFINER) – sunucu tarafında gerçek rol ataması
+    const { data, error } = await supabase.rpc('set_user_admin_role', {
       user_id: userId,
       new_role: role
     }) as { data: unknown; error: unknown }
