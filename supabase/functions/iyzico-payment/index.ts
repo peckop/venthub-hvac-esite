@@ -106,11 +106,12 @@ Deno.serve(async (req) => {
                     authoritativeTotalNum = Number(validation.totals.subtotal)
                 }
             }
-        } catch (_) {
+        } catch {
             // fallback to client-requested cartItems
         }
         if (authoritativeItems.length === 0 && Array.isArray(cartItems)) {
-            authoritativeItems = cartItems.map((ci: any) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price), price_list_id: null }))
+            authoritativeItems = (cartItems as Array<{ product_id: string; quantity: number; price?: number }>)
+              .map((ci) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price ?? 0), price_list_id: null }))
             authoritativeTotalNum = authoritativeItems.reduce((s, it) => s + Number(it.unit_price) * Number(it.quantity), 0)
         }
 
@@ -200,7 +201,7 @@ Deno.serve(async (req) => {
             // Fallback: remove shipping_method if column doesn't exist yet
             const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
             if (mayRetry) {
-                const { shipping_method, ...withoutShipMethod } = orderData as any
+                const { shipping_method: _shipping_method, ...withoutShipMethod } = orderData as Record<string, unknown>
                 orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
                     method: 'POST',
                     headers: {
@@ -340,7 +341,15 @@ Deno.serve(async (req) => {
         }
         const successUrl = clientOrigin ? `${clientOrigin}/payment-success` : '';
         const callbackUrlWithParams = `${callbackBase}?orderId=${encodeURIComponent(dbOrderId)}&conversationId=${encodeURIComponent(conversationId)}${successUrl ? `&successUrl=${encodeURIComponent(successUrl)}` : ''}`;
-        const iyzicoRequest = {
+        const iyzicoRequest: {
+            locale: string; conversationId: string; price: string; paidPrice: string; currency: string;
+            basketId: string; paymentGroup: string; paymentChannel: string; callbackUrl: string;
+            enabledInstallments: number[];
+            buyer: { id: string; name: string; surname: string; gsmNumber: string; email: string; identityNumber: string; lastLoginDate: string; registrationDate: string; registrationAddress: string; ip: string; city: string; country: string; zipCode: string };
+            shippingAddress: { contactName: string; city: string; country: string; address: string; zipCode: string };
+            billingAddress: { contactName: string; city: string; country: string; address: string; zipCode: string };
+            basketItems: Array<{ id: string; name: string; category1: string; category2: string; itemType: string; price: string }>;
+        } = {
             locale: 'tr',
             conversationId: conversationId,
             price: itemsTotal.toFixed(2),
@@ -392,7 +401,7 @@ Deno.serve(async (req) => {
         const IyziCtor = Iyzipay as unknown as { new(args: { apiKey: string; secretKey: string; uri: string }): IyziSdk }
         const sdk = new IyziCtor({ apiKey: iyzicoApiKey, secretKey: iyzicoSecretKey, uri: iyzicoBaseUrl });
 
-        const sdkRequest: any = {
+        const sdkRequest: Record<string, unknown> = {
             locale: iyzicoRequest.locale,
             conversationId: iyzicoRequest.conversationId,
             price: iyzicoRequest.price,
@@ -406,7 +415,7 @@ Deno.serve(async (req) => {
             buyer: iyzicoRequest.buyer,
             shippingAddress: iyzicoRequest.shippingAddress,
             billingAddress: iyzicoRequest.billingAddress,
-            basketItems: iyzicoRequest.basketItems.map((it: any) => ({
+            basketItems: iyzicoRequest.basketItems.map((it) => ({
                 id: it.id,
                 name: it.name,
                 category1: it.category1,

@@ -1,5 +1,17 @@
 import Iyzipay from "npm:iyzipay";
 
+// Minimal types to avoid `any` while keeping integration flexible
+type CheckoutRetrieveResponse = {
+  paymentStatus?: string;
+  conversationId?: string;
+  errorMessage?: string;
+  paymentId?: string;
+  cardFamily?: string;
+  binNumber?: string;
+  lastFourDigits?: string;
+  [k: string]: unknown;
+};
+
 Deno.serve(async (req) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
@@ -37,7 +49,8 @@ Deno.serve(async (req) => {
       conversationId = form.get("conversationId")?.toString();
       orderId = form.get("orderId")?.toString();
     } else {
-      const body = await req.json().catch(() => ({} as any));
+      const bodyJson = await req.json().catch(() => ({} as Record<string, unknown>));
+      const body = bodyJson as { token?: string; conversationId?: string; orderId?: string };
       token = body?.token;
       conversationId = body?.conversationId;
       orderId = body?.orderId;
@@ -49,7 +62,7 @@ Deno.serve(async (req) => {
       if (!orderId) orderId = url.searchParams.get('orderId') || undefined;
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
       successUrl = url.searchParams.get('successUrl');
-    } catch (_) {}
+    } catch {}
 
     // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
     if (!successUrl) {
@@ -74,7 +87,7 @@ Deno.serve(async (req) => {
           const arr = await got.json().catch(()=>[])
           const row = Array.isArray(arr) ? arr[0] : null
           if (row?.payment_token) token = row.payment_token
-        } catch (_) {}
+        } catch {}
       }
       if (!token) {
         // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'e yönlendir (pending)
@@ -89,7 +102,7 @@ Deno.serve(async (req) => {
             const t = target.toString();
             const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
             return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
-          } catch (_) {}
+          } catch {}
         }
         // Son çare
         return new Response(JSON.stringify({ status: 'pending' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -112,10 +125,19 @@ Deno.serve(async (req) => {
       );
     }
 
-    const sdk = new (Iyzipay as any)({ apiKey, secretKey, uri: baseUrl });
+    type IyziCtorCb = new (args: { apiKey: string; secretKey: string; uri: string }) => {
+      checkoutForm: {
+        retrieve: (
+          req: { locale: string; token: string; conversationId?: string },
+          cb: (err: unknown, res: CheckoutRetrieveResponse) => void,
+        ) => void;
+      };
+    };
+    const IyziCb = Iyzipay as unknown as IyziCtorCb;
+    const sdk = new IyziCb({ apiKey, secretKey, uri: baseUrl });
 
-    const retrieveReq: any = {
-      locale: (Iyzipay as any).LOCALE ? (Iyzipay as any).LOCALE.TR : "tr",
+    const retrieveReq: { locale: string; token: string; conversationId?: string } = {
+      locale: "tr",
       token,
     };
     if (conversationId) retrieveReq.conversationId = conversationId;
@@ -131,15 +153,18 @@ Deno.serve(async (req) => {
       }
     } catch (_) {}
 
-    let result: any | null = null;
+    let result: CheckoutRetrieveResponse | null = null;
     try {
-      result = await new Promise<any>((resolve, reject) => {
-        (sdk as any).checkoutForm.retrieve(retrieveReq, (err: any, res: any) => {
-          if (err) return reject(err);
-          resolve(res);
-        });
+      result = await new Promise<CheckoutRetrieveResponse>((resolve, reject) => {
+        (sdk as any).checkoutForm.retrieve(
+          retrieveReq,
+          (err: unknown, res: CheckoutRetrieveResponse) => {
+            if (err) return reject(err);
+            resolve(res);
+          },
+        );
       });
-    } catch (_e) {
+    } catch {
       // retrieve başarısızsa result=null olarak değerlendirilecek (pending)
       result = null;
     }
@@ -148,7 +173,7 @@ Deno.serve(async (req) => {
     const paid = !!(result && result.paymentStatus === "SUCCESS");
 
     // Debug bilgisi hazırla
-    const debugInfo: any = result ? {
+    const debugInfo: Record<string, unknown> = result ? {
       paymentStatus: result.paymentStatus ?? null,
       mdStatus: result.mdStatus ?? null,
       errorCode: result.errorCode ?? null,
@@ -161,7 +186,7 @@ Deno.serve(async (req) => {
     } : { paymentStatus: null }
 
     // Supabase: venthub_orders güncelle (yalnızca kesin durumlarda yaz)
-    async function patchStatus(newStatus: 'paid' | 'failed') {
+    async function patchStatus(newStatus: 'paid' | 'failed' | 'confirmed') {
       const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
@@ -185,7 +210,7 @@ Deno.serve(async (req) => {
       // Önce 'paid' olarak güncellemeyi dene; constraint nedeniyle reddedilirse 'confirmed' ile tekrar dene
       let r = await patchStatus('paid');
       if (!r || !r.ok) {
-        r = await patchStatus('confirmed' as any);
+        r = await patchStatus('confirmed');
       }
       updateOk = !!(r && r.ok);
       
@@ -205,7 +230,7 @@ Deno.serve(async (req) => {
 
           if (rpcResp.ok) {
             const rpcJson = await rpcResp.json().catch(() => ({}));
-            stockResult = rpcJson || { success: true, processed_count: null, order_id: orderId };
+            _stockResult = rpcJson || { success: true, processed_count: null, order_id: orderId };
 
             // Mark stock processed flag and attach RPC summary to payment_debug
             try {
@@ -220,7 +245,7 @@ Deno.serve(async (req) => {
                 },
                 body: JSON.stringify({ payment_debug: updatedDebugInfo })
               });
-            } catch (_) { /* best-effort */ }
+            } catch { /* best-effort */ }
 
             // Optional: trigger low stock alerts after RPC (best-effort, non-blocking)
             try {
@@ -263,8 +288,9 @@ Deno.serve(async (req) => {
             console.warn('process_order_stock_reduction failed', rpcResp.status, errTxt);
           }
         }
-      } catch (e: any) {
-        console.warn('Stock reduction RPC error:', e?.message || e);
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e ?? '')
+        console.warn('Stock reduction RPC error:', msg);
       }
       
       // After a successful payment, clear ALL server carts for this user (defensive against duplicates)
@@ -294,8 +320,10 @@ Deno.serve(async (req) => {
             const cResp = await fetch(`${su}/rest/v1/shopping_carts?user_id=eq.${encodeURIComponent(uid)}&select=id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
             })
-            const carts = await cResp.json().catch(()=>[])
-            const cartIds: string[] = Array.isArray(carts) ? carts.map((c: any) => c?.id).filter(Boolean) : []
+      const carts = await cResp.json().catch(()=>[])
+      const cartIds: string[] = Array.isArray(carts)
+        ? (carts as Array<{ id?: string }>).map((c) => c?.id).filter((v): v is string => Boolean(v))
+        : []
             for (const cid of cartIds) {
               await fetch(`${su}/rest/v1/cart_items?cart_id=eq.${encodeURIComponent(cid)}`, {
                 method: 'DELETE',
@@ -304,7 +332,7 @@ Deno.serve(async (req) => {
             }
           }
         }
-      } catch (_) { /* best-effort */ }
+      } catch { /* best-effort */ }
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
       const r = await patchStatus('failed');
       updateOk = !!(r && r.ok);
@@ -341,12 +369,12 @@ Deno.serve(async (req) => {
         const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
-    } catch (_) {}
+    } catch {}
 
     // Yine de base yoksa düz metin yerine bilgilendirici HTML döndür (OK kaldırıldı)
     const infoHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
     return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("iyzico-callback error:", error);
     // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'e 'pending' ile yönlendir
     const accept = (req.headers.get('accept') || '').toLowerCase()
@@ -374,7 +402,7 @@ Deno.serve(async (req) => {
         const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
       }
-    } catch (_) {}
+    } catch {}
     // Yine olmazsa bilgilendirici HTML döndür (OK kaldırıldı)
     const infoHtml2 = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
     return new Response(infoHtml2, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
