@@ -1,5 +1,5 @@
-# WARP.md
-Last updated: 2025-09-07
+﻿# WARP.md
+Last updated: 2025-09-11
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 ## ℹ️ Overview
@@ -243,6 +243,7 @@ Located in `supabase/functions/`:
 - `iyzico-callback`
 - `iyzico-payment`
 - `iyzico-refund`
+- `log-client-error`
 - `notification-service`
 - `order-housekeeping`
 - `order-validate`
