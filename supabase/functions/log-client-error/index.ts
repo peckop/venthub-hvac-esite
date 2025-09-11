@@ -131,7 +131,7 @@ Deno.serve(async (req) => {
       extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
     }
     // Only include group_id if available; avoid failures if column doesn't exist
-    if (groupId) (row as any).group_id = groupId
+    if (groupId) (row as Record<string, unknown>).group_id = groupId
 
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {

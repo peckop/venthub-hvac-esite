@@ -156,7 +156,7 @@ Deno.serve(async (req) => {
     let result: CheckoutRetrieveResponse | null = null;
     try {
       result = await new Promise<CheckoutRetrieveResponse>((resolve, reject) => {
-        (sdk as any).checkoutForm.retrieve(
+        sdk.checkoutForm.retrieve(
           retrieveReq,
           (err: unknown, res: CheckoutRetrieveResponse) => {
             if (err) return reject(err);
