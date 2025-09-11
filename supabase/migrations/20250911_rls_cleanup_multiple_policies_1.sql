@@ -14,12 +14,12 @@ BEGIN
   ) THEN
     -- Drop SELECT-only duplicates if they exist
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_select_own' AND polcmd='r'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_select_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS cart_items_select_own ON public.cart_items';
     END IF;
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_modify_own' AND polcmd='r'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_modify_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS cart_items_modify_own ON public.cart_items';
     END IF;
@@ -32,12 +32,12 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='merged_shopping_carts_authenticated_select'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_select_own' AND polcmd='r'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_select_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS shopping_carts_select_own ON public.shopping_carts';
     END IF;
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_modify_own' AND polcmd='r'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_modify_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS shopping_carts_modify_own ON public.shopping_carts';
     END IF;
@@ -49,7 +49,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='merged_user_addresses_authenticated_delete'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_delete' AND polcmd='d'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_delete' AND cmd='DELETE'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_addresses_delete ON public.user_addresses';
     END IF;
@@ -59,7 +59,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='merged_user_addresses_authenticated_insert'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_insert' AND polcmd='a'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_insert' AND cmd='INSERT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_addresses_insert ON public.user_addresses';
     END IF;
@@ -69,7 +69,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='merged_user_addresses_authenticated_select'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_select' AND polcmd='r'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_select' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_addresses_select ON public.user_addresses';
     END IF;
@@ -79,7 +79,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='merged_user_addresses_authenticated_update'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_update' AND polcmd='w'
+      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_addresses' AND policyname='user_addresses_update' AND cmd='UPDATE'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_addresses_update ON public.user_addresses';
     END IF;
