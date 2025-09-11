@@ -10,12 +10,12 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='merged_user_profiles_authenticated_select'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_own' AND polcmd='r'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_profiles_select_own ON public.user_profiles';
     END IF;
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_self' AND polcmd='r'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='user_profiles' AND policyname='user_profiles_select_self' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS user_profiles_select_self ON public.user_profiles';
     END IF;
@@ -27,7 +27,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_order_items' AND policyname='merged_venthub_order_items_authenticated_select'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_order_items' AND policyname='select_own_order_items' AND polcmd='r'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_order_items' AND policyname='select_own_order_items' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS select_own_order_items ON public.venthub_order_items';
     END IF;
@@ -38,7 +38,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='merged_venthub_returns_authenticated_select'
   ) THEN
     IF EXISTS (
-      SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_select_own' AND polcmd='r'
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='venthub_returns' AND policyname='returns_select_own' AND cmd='SELECT'
     ) THEN
       EXECUTE 'DROP POLICY IF EXISTS returns_select_own ON public.venthub_returns';
     END IF;
