@@ -34,6 +34,22 @@ export const FALLBACK_ADMIN_EMAILS: string[] = [
   // Acil durum için e-postalar
 ]
 
+function isProdEnv(): boolean {
+  try {
+    // Vite
+    if (typeof import.meta !== 'undefined' && (import.meta as unknown as { env?: Record<string, unknown> }).env) {
+      // @ts-ignore
+      if (import.meta.env.PROD) return true
+    }
+    // Hostname bazlı koruma (Cloudflare Pages vs)
+    if (typeof window !== 'undefined') {
+      const h = window.location.hostname
+      if (h.endsWith('pages.dev') || /venthub-hvac-esite/i.test(h)) return true
+    }
+  } catch {}
+  return false
+}
+
 /**
  * Database'den kullanıcı rolünü getir
  */
@@ -91,16 +107,19 @@ export function isDevAdmin(): boolean {
 export function checkAdminAccess(user: { email?: string; user_metadata?: { role?: string } } | null): boolean {
   if (!user?.email) return false
   
-  // 1. User metadata'dan role kontrolü (Supabase auth)
+  // 1) Supabase metadata rolü
   const metadataRole = user.user_metadata?.role
   if (metadataRole === 'admin' || metadataRole === 'moderator' || metadataRole === 'superadmin') {
     return true
   }
   
-  // 2. Fallback: E-posta tabanlı admin listesi
+  // 2) Prod ortamında email fallback KAPALI
+  if (isProdEnv()) return false
+  
+  // 3) Dev fallback: e-posta listesi
   if (isAdminByEmail(user.email)) return true
   
-  // 3. Geliştirme ortamı fallback (opsiyonel)
+  // 4) Lokal geliştirme ortamı
   if (isDevAdmin()) return true
   
   return false
@@ -113,21 +132,23 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
 export async function checkAdminAccessAsync(user: { id?: string; email?: string } | null): Promise<boolean> {
   if (!user) return false
   
-  // 1. Database'den role kontrolü
+  // 1) DB'den gerçek rol kontrolü
   if (user.id) {
     try {
       const isAdmin = await isUserAdminAsync(user.id)
       if (isAdmin) return true
     } catch (error) {
       console.warn('Database admin check failed:', error)
-      // Continue to fallback methods
     }
   }
   
-  // 2. Fallback: E-posta kontrolü
+  // 2) Prod ortamında fallback yok
+  if (isProdEnv()) return false
+  
+  // 3) Dev fallback: e-posta listesi
   if (user.email && isAdminByEmail(user.email)) return true
   
-  // 3. Development fallback
+  // 4) Lokal dev fallback
   if (isDevAdmin()) return true
   
   return false
