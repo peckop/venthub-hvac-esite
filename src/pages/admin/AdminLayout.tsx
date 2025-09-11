@@ -15,7 +15,7 @@ const AdminLayout: React.FC = () => {
     async function guard() {
       if (loading) return
       const ok = await checkAdminAccessAsync(user)
-      if (!ok && active) navigate('/auth/login', { replace: true })
+      if (!ok && active) navigate('/', { replace: true })
     }
     guard()
     return () => { active = false }
