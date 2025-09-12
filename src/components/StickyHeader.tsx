@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { searchProducts, Product, getCategories, Category } from '../lib/supabase'
-import { checkAdminAccess } from '../config/admin'
+import { checkAdminAccess, getUserRole } from '../config/admin'
 import MegaMenu from './MegaMenu'
 import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
@@ -29,6 +29,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const { getCartCount, syncing, getCartTotal } = useCart()
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
+  const [userRole, setUserRole] = useState<string>('user')
   const navigate = useNavigate()
   const userMenuRef = useRef<HTMLDivElement>(null)
   const stickySearchRef = useRef<HTMLDivElement>(null)
@@ -52,6 +53,27 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Kullanıcı rolünü DB'den çek (giriş yaptığında veya user değiştiğinde)
+  useEffect(() => {
+    let active = true
+    async function loadRole() {
+      try {
+        if (user?.id) {
+          const role = await getUserRole(user.id)
+          if (active) setUserRole(role)
+        } else {
+          if (active) setUserRole('user')
+        }
+      } catch {
+        if (active) setUserRole('user')
+      }
+    }
+    loadRole()
+    return () => { active = false }
+  }, [user?.id])
+
+  const roleLabel = (r: string) => r === 'superadmin' ? 'Superadmin' : r === 'admin' ? 'Admin' : r === 'moderator' ? 'Moderator' : 'Kullanıcı'
 
   // Scroll progress tracker
   useEffect(() => {
@@ -229,6 +251,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       <span className="hidden lg:block text-sm font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">
                         {user.user_metadata?.full_name || user.email?.split('@')[0]}
                       </span>
+                      {(userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderator') && (
+                        <span className={`hidden xl:inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${
+                          userRole === 'superadmin' ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
+                        }`} title={`Yetki: ${roleLabel(userRole)}`}>
+                          {roleLabel(userRole)}
+                        </span>
+                      )}
                       <ChevronDown size={16} className={`hidden lg:block text-steel-gray group-hover:text-primary-navy transition-all duration-300 ${
                         isUserMenuOpen ? 'rotate-180' : ''
                       }`} />
@@ -244,6 +273,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             </div>
                             <div className="text-xs text-steel-gray">
                               {user.email}
+                            </div>
+                            <div className="pt-1 text-xs text-steel-gray/80">
+                              Yetki: <span className="font-medium text-industrial-gray">{roleLabel(userRole)}</span>
                             </div>
                           </div>
                           <Link
