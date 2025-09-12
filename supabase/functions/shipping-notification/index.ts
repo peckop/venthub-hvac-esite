@@ -11,10 +11,15 @@ interface ShippingNotificationRequest {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin') ?? '*'
+  const requestHeaders = req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type'
+  const requestMethod = req.headers.get('access-control-request-method') ?? 'POST, OPTIONS'
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Origin': origin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Headers': requestHeaders,
+    'Access-Control-Allow-Methods': requestMethod,
+    'Access-Control-Max-Age': '86400',
   }
 
   if (req.method === 'OPTIONS') {
