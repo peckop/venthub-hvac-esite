@@ -150,15 +150,6 @@ const AdminOrdersPage: React.FC = () => {
           comment: 'shipment update'
         })
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
-        if (sendEmail && carrier && tracking) {
-          try {
-            const { error: funcErr } = await supabase.functions.invoke('shipping-notification', {
-              body: { order_id: shipId, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
-            })
-            if (funcErr) console.error('shipping-notification error', funcErr)
-            else console.warn('shipping-notification ok')
-          } catch (fnE) { console.error('invoke exception', fnE) }
-        }
         setShipOpen(false)
       } catch (e) {
         console.error('ship error', e)
@@ -201,16 +192,6 @@ const AdminOrdersPage: React.FC = () => {
         comment: 'bulk shipment update'
       })))
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
-      if (sendEmail && carrier && tracking) {
-        try {
-          await Promise.all(targets.map(async (id) => {
-            const { error: funcErr } = await supabase.functions.invoke('shipping-notification', {
-              body: { order_id: id, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
-            })
-            if (funcErr) console.error('shipping-notification bulk error', id, funcErr)
-          }))
-        } catch (fnE) { console.error('invoke bulk exception', fnE) }
-      }
       setShipOpen(false)
       setSelectedIds([])
       setBulkMode(false)
