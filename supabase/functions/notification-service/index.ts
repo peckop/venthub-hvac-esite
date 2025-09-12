@@ -1,15 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
+type TemplateData = Record<string, string | number | boolean>;
+
 interface NotificationRequest {
   type: 'whatsapp' | 'sms' | 'email'
   to: string
   message: string
   priority: 'low' | 'medium' | 'high' | 'critical'
   template?: string
-  data?: Record<string, any>
+  data?: TemplateData
 }
 
-interface StockAlertData {
+interface _StockAlertData {
   productName: string
   currentStock: number
   threshold: number
@@ -47,7 +49,7 @@ serve(async (req) => {
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <noreply@venthub.com>'
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     
-    let result: any = { success: false, note: undefined }
+    let result: unknown = { success: false, note: undefined as unknown }
 
     // Graceful disable per channel if missing config
     const isWhatsAppEnabled = !!(twilioAccountSid && twilioAuthToken && twilioWhatsAppNumber)
@@ -110,11 +112,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Notification service error:', error)
     
+    const msg = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({ 
-      error: error.message || 'Unknown error',
+      error: msg,
       success: false 
     }), {
       status: 500,
@@ -123,7 +126,9 @@ serve(async (req) => {
   }
 })
 
-async function sendWhatsApp(to: string, message: string, template?: string, data?: any, config?: any) {
+interface TwilioConfig { accountSid: string; authToken: string; fromNumber: string }
+
+async function sendWhatsApp(to: string, message: string, template?: string, data?: TemplateData, config?: TwilioConfig) {
   if (!config?.accountSid || !config?.authToken || !config?.fromNumber) {
     throw new Error('WhatsApp configuration missing')
   }
@@ -157,7 +162,7 @@ async function sendWhatsApp(to: string, message: string, template?: string, data
   return await response.json()
 }
 
-async function sendSMS(to: string, message: string, config: any) {
+async function sendSMS(to: string, message: string, config: TwilioConfig) {
   if (!config?.accountSid || !config?.authToken || !config?.fromNumber) {
     throw new Error('SMS configuration missing')
   }
@@ -186,7 +191,7 @@ async function sendSMS(to: string, message: string, config: any) {
   return await response.json()
 }
 
-async function sendEmail(to: string, message: string, template?: string, data?: any, config?: any) {
+async function sendEmail(to: string, message: string, template?: string, data?: TemplateData, config?: { apiKey: string; from?: string }) {
   if (!config?.apiKey) {
     throw new Error('Email configuration missing')
   }
@@ -218,20 +223,21 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
   return await response.json()
 }
 
-function formatTemplate(template: string, data: any): string {
+function formatTemplate(template: string, data: TemplateData): string {
   if (!data) return template
   
   let formatted = template
   Object.keys(data).forEach(key => {
     const placeholder = new RegExp(`{{${key}}}`, 'g')
-    formatted = formatted.replace(placeholder, data[key])
+    const value = String(data[key])
+    formatted = formatted.replace(placeholder, value)
   })
   
   return formatted
 }
 
-// Stock alert template examples
-const stockAlertTemplates = {
+// Stock alert template examples (currently unused)
+const _stockAlertTemplates = {
   whatsapp: {
     low_stock: `🚨 STOK UYARISI 🚨
     

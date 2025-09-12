@@ -39,13 +39,16 @@ function mapCarrierStatus(input?: string): { status?: string; setShipped?: boole
   return { status: s }
 }
 
-function normalizePayload(carrierHint: string, obj: any) {
-  const c = (carrierHint || obj?.carrier || '').toString().trim().toLowerCase()
+function normalizePayload(carrierHint: string, obj: unknown) {
+  const rec = (typeof obj === 'object' && obj !== null) ? (obj as Record<string, unknown>) : {};
+  const c = (carrierHint || (typeof rec.carrier === 'string' ? rec.carrier : '') || '').toString().trim().toLowerCase()
   // Common aliases
   const pick = (...keys: string[]) => {
     for (const k of keys) {
-      const v = obj?.[k]
-      if (v != null) return v
+      if (k in rec) {
+        const v = rec[k]
+        if (v != null) return v
+      }
     }
     return undefined
   }
@@ -83,7 +86,7 @@ Deno.serve(async (req: Request) => {
 
     // Read raw body first for signature verification
     const raw = await req.text()
-    let payload: any = {}
+    let payload: unknown = {}
     try { payload = JSON.parse(raw) } catch { payload = {} }
 
     const secret = Deno.env.get('SHIPPING_WEBHOOK_SECRET') || ''
@@ -130,7 +133,7 @@ Deno.serve(async (req: Request) => {
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
     // Normalize payload (carrier adapters)
-    const carrierHint = (req.headers.get('x-carrier') || payload?.carrier || '') as string
+    const carrierHint = (req.headers.get('x-carrier') || '') as string
     const p = normalizePayload(carrierHint, payload) as {
       order_id?: string
       order_number?: string
@@ -147,7 +150,7 @@ Deno.serve(async (req: Request) => {
     if (eventId) {
       try {
         const { data: existing } = await supabase
-          .from('shipping_webhook_events')
+          .from<{ event_id: string }>('shipping_webhook_events')
           .select('event_id')
           .eq('event_id', eventId)
           .limit(1)
@@ -161,13 +164,13 @@ Deno.serve(async (req: Request) => {
 
     if (!orderId && p.order_number) {
       const { data, error } = await supabase
-        .from('venthub_orders')
+        .from<{ id: string }>('venthub_orders')
         .select('id')
         .eq('order_number', p.order_number)
         .limit(1)
         .single()
       if (error) return jsonResponse({ error: 'Order not found for given order_number' }, { status: 404 })
-      orderId = (data as any)?.id
+      orderId = data?.id as string
     }
 
     if (!orderId) {
@@ -175,21 +178,22 @@ Deno.serve(async (req: Request) => {
     }
 
     // Fetch current to enforce monotonic status progression and for idempotency
+    interface OrderRow { id: string; status?: string; shipped_at?: string | null; delivered_at?: string | null; tracking_number?: string | null; tracking_url?: string | null; carrier?: string | null }
     const { data: current, error: curErr } = await supabase
-      .from('venthub_orders')
+      .from<OrderRow>('venthub_orders')
       .select('id, status, shipped_at, delivered_at, tracking_number, tracking_url, carrier')
       .eq('id', orderId)
       .single()
     if (curErr || !current) return jsonResponse({ error: 'Order not found' }, { status: 404 })
 
-    const patch: Record<string, unknown> = {}
+    const patch: Partial<OrderRow> & Record<string, unknown> = {}
     if (typeof p.carrier === 'string' && p.carrier) patch.carrier = p.carrier
     if (typeof p.tracking_number === 'string' && p.tracking_number) patch.tracking_number = p.tracking_number
     if (typeof p.tracking_url === 'string' && p.tracking_url) patch.tracking_url = p.tracking_url
 
     // Map external status to internal and enforce monotonic upgrade
     const mapped = mapCarrierStatus(p.status)
-    const curStatus = String((current as any).status || 'pending').toLowerCase()
+    const curStatus = String(current.status || 'pending').toLowerCase()
     if (mapped.status) {
       const next = mapped.status.toLowerCase()
       const curRank = RANK[curStatus] ?? 0
@@ -198,10 +202,10 @@ Deno.serve(async (req: Request) => {
         patch.status = next
         // Timestamps: allow explicit dates from payload, otherwise set now if transitioning
         const parseDate = (s?: string) => (s ? new Date(s).toISOString() : undefined)
-        if (next === 'shipped' && !(current as any).shipped_at) {
+        if (next === 'shipped' && !current.shipped_at) {
           patch.shipped_at = parseDate(p.shipped_at) || new Date().toISOString()
         }
-        if (next === 'delivered' && !(current as any).delivered_at) {
+        if (next === 'delivered' && !current.delivered_at) {
           patch.delivered_at = parseDate(p.delivered_at) || new Date().toISOString()
         }
       }
@@ -210,9 +214,9 @@ Deno.serve(async (req: Request) => {
     // If no effective changes, short‑circuit
     const noChange =
       (patch.status == null || patch.status === curStatus) &&
-      (patch.tracking_number == null || patch.tracking_number === (current as any).tracking_number) &&
-      (patch.tracking_url == null || patch.tracking_url === (current as any).tracking_url) &&
-      (patch.carrier == null || patch.carrier === (current as any).carrier) &&
+      (patch.tracking_number == null || patch.tracking_number === current.tracking_number) &&
+      (patch.tracking_url == null || patch.tracking_url === current.tracking_url) &&
+      (patch.carrier == null || patch.carrier === current.carrier) &&
       (patch.shipped_at == null) &&
       (patch.delivered_at == null)
 
@@ -230,20 +234,23 @@ Deno.serve(async (req: Request) => {
             body_hash: bodyHash,
             received_at: new Date().toISOString(),
             processed_at: new Date().toISOString(),
-          }, { onConflict: 'event_id', ignoreDuplicates: true } as any)
+          })
         }
       } catch {}
-      return jsonResponse({ ok: true, order_id: (current as any).id, shipping: current, unchanged: true })
+      return jsonResponse({ ok: true, order_id: current.id, shipping: current, unchanged: true })
     }
 
     const { data, error } = await supabase
-      .from('venthub_orders')
+      .from<OrderRow>('venthub_orders')
       .update(patch)
       .eq('id', orderId)
       .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
       .single()
 
-    if (error) return jsonResponse({ error: (error as any).message || 'Update failed' }, { status: 500 })
+    if (error) {
+      const msg = (typeof (error as { message?: unknown })?.message === 'string') ? (error as { message: string }).message : 'Update failed'
+      return jsonResponse({ error: msg }, { status: 500 })
+    }
 
     // Insert event audit
     try {
@@ -254,15 +261,15 @@ Deno.serve(async (req: Request) => {
           order_id: orderId,
           carrier: p.carrier || null,
           status_raw: p.status || null,
-          status_mapped: (data as any).status,
+          status_mapped: data?.status || undefined,
           body_hash: bodyHash,
           received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
-        }, { onConflict: 'event_id', ignoreDuplicates: true } as any)
+        })
       }
     } catch {}
 
-    return jsonResponse({ ok: true, order_id: (data as any).id, shipping: data })
+    return jsonResponse({ ok: true, order_id: data?.id, shipping: data })
   } catch (e) {
     return jsonResponse({ error: (e as Error).message || 'Unexpected error' }, { status: 500 })
   }

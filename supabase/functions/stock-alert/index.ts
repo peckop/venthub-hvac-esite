@@ -37,11 +37,13 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
-    if (!supabaseUrl || !serviceRoleKey) {
+  if (!supabaseUrl || !serviceRoleKey) {
       throw new Error('Missing Supabase configuration')
     }
 
-    let alertResults: any[] = []
+    interface AlertSendResult { type: 'whatsapp' | 'sms' | 'email'; recipient: string; success: boolean; result?: unknown; error?: string }
+    interface ProductAlertResult { product: string; alertType: string; priority: string; stock: number; threshold: number; notifications: AlertSendResult[]; totalNotifications: number; successfulNotifications: number }
+    let alertResults: ProductAlertResult[] = []
     
     if (req.method === 'GET') {
       // Check all products for stock alerts
@@ -65,11 +67,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Stock alert error:', error)
     
+    const msg = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({
-      error: error.message || 'Unknown error',
+      error: msg,
       success: false
     }), {
       status: 500,
@@ -98,18 +101,24 @@ async function checkAllProducts(supabaseUrl: string, serviceRoleKey: string) {
   const products: Product[] = await productsResp.json()
   console.log(`Found ${products.length} products requiring alerts`)
 
-  const alertResults = []
+  const alertResults: ProductAlertResult[] = []
   
   for (const product of products) {
     try {
       const result = await processProductAlert(product, supabaseUrl, serviceRoleKey)
       alertResults.push(result)
-    } catch (error: any) {
-      console.error(`Failed to process alert for ${product.name}:`, error)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error)
+      console.error(`Failed to process alert for ${product.name}:`, msg)
       alertResults.push({
         product: product.name,
-        success: false,
-        error: error.message
+        alertType: product.stock_qty === 0 ? 'out_of_stock' : 'low_stock',
+        priority: product.stock_qty === 0 ? 'critical' : 'high',
+        stock: product.stock_qty,
+        threshold: product.low_stock_threshold || 5,
+        notifications: [],
+        totalNotifications: 0,
+        successfulNotifications: 0
       })
     }
   }
@@ -154,7 +163,7 @@ async function checkSpecificProduct(productId: string, supabaseUrl: string, serv
   return [result]
 }
 
-async function processProductAlert(product: Product, supabaseUrl: string, serviceRoleKey: string) {
+async function processProductAlert(product: Product, _supabaseUrl: string, _serviceRoleKey: string) {
   // Get alert recipients configuration
   const recipients = getAlertRecipients()
   
@@ -187,13 +196,14 @@ async function processProductAlert(product: Product, supabaseUrl: string, servic
           success: whatsappResult.success,
           result: whatsappResult
         })
-      } catch (error: any) {
-        console.error(`WhatsApp notification failed for ${recipient.name}:`, error)
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error)
+        console.error(`WhatsApp notification failed for ${recipient.name}:`, msg)
         notifications.push({
           type: 'whatsapp',
           recipient: recipient.name,
           success: false,
-          error: error.message
+          error: msg
         })
       }
     }
@@ -208,13 +218,14 @@ async function processProductAlert(product: Product, supabaseUrl: string, servic
           success: smsResult.success,
           result: smsResult
         })
-      } catch (error: any) {
-        console.error(`SMS notification failed for ${recipient.name}:`, error)
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error)
+        console.error(`SMS notification failed for ${recipient.name}:`, msg)
         notifications.push({
           type: 'sms',
           recipient: recipient.name,
           success: false,
-          error: error.message
+          error: msg
         })
       }
     }
@@ -229,13 +240,14 @@ async function processProductAlert(product: Product, supabaseUrl: string, servic
           success: emailResult.success,
           result: emailResult
         })
-      } catch (error: any) {
-        console.error(`Email notification failed for ${recipient.name}:`, error)
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : String(error)
+        console.error(`Email notification failed for ${recipient.name}:`, msg)
         notifications.push({
           type: 'email',
           recipient: recipient.name,
           success: false,
-          error: error.message
+          error: msg
         })
       }
     }
@@ -253,7 +265,8 @@ async function processProductAlert(product: Product, supabaseUrl: string, servic
   }
 }
 
-async function sendNotification(type: 'whatsapp' | 'sms' | 'email', to: string, data: any, priority: string) {
+interface AlertData { productName: string; productId: string; currentStock: number; threshold: number; alertType: 'low_stock' | 'out_of_stock' }
+async function sendNotification(type: 'whatsapp' | 'sms' | 'email', to: string, data: AlertData, priority: string) {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   
   // Template messages
@@ -345,7 +358,7 @@ function getAlertRecipients(): AlertRecipient[] {
   if (recipientsJson) {
     try {
       return JSON.parse(recipientsJson)
-    } catch (error) {
+    } catch {
       console.warn('Failed to parse STOCK_ALERT_RECIPIENTS, using defaults')
     }
   }

@@ -4,13 +4,40 @@
 
 import Iyzipay from "npm:iyzipay";
 
-function parseJwt(token?: string | null): any | null {
+type JwtPayload = { sub?: string } & Record<string, unknown>;
+type PaymentTransaction = { paymentTransactionId?: string };
+type PaymentDebug = {
+  refunded_total?: number;
+  paymentId?: string;
+  raw?: { paymentId?: string; itemTransactions?: PaymentTransaction[] };
+  partial_refunds?: { amount: number; at: string }[];
+  [k: string]: unknown;
+};
+type IyziCancelResponse = { status?: string; [k: string]: unknown };
+type IyziRefundResponse = { status?: string; [k: string]: unknown };
+type IyziSdk = {
+  cancel: {
+    create: (
+      req: { locale?: unknown; paymentId: string | null; ip: string },
+      cb: (err: unknown, res: IyziCancelResponse) => void
+    ) => void;
+  };
+  refund: {
+    create: (
+      req: { locale?: unknown; paymentTransactionId: string; price: string; currency: string; ip: string },
+      cb: (err: unknown, res: IyziRefundResponse) => void
+    ) => void;
+  };
+};
+type IyziCtor = new (args: { apiKey: string; secretKey: string; uri: string }) => IyziSdk;
+
+function parseJwt(token?: string | null): JwtPayload | null {
   if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 3) return null;
   try {
     const payload = atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(payload);
+    return JSON.parse(payload) as JwtPayload;
   } catch {
     return null;
   }
@@ -51,7 +78,7 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const orderId: string | undefined = body?.order_id;
     const amountReq: number | undefined = typeof body?.amount === 'number' ? Number(body.amount) : undefined;
-    const reason: string | undefined = body?.reason || undefined;
+    const _reason: string | undefined = body?.reason || undefined;
 
     if (!orderId) {
       return new Response(JSON.stringify({ error: { code: "VALIDATION_ERROR", message: "order_id gerekli" } }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -60,7 +87,7 @@ Deno.serve(async (req) => {
     // AuthN/AuthZ: allow admin or order owner
     const authHeader = req.headers.get("authorization");
     const jwt = parseJwt(authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
-    const reqUserId: string | null = (jwt?.sub as string) || null;
+    const reqUserId: string | null = typeof jwt?.sub === 'string' ? jwt.sub : null;
 
     // Load order
     const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=id,user_id,status,payment_status,total_amount,payment_debug`, {
@@ -97,13 +124,14 @@ Deno.serve(async (req) => {
     }
 
     const totalAmount = Number(order.total_amount) || 0;
-    const prevDebug: any = order?.payment_debug || {};
+    const prevDebug: PaymentDebug = (order?.payment_debug || {}) as PaymentDebug;
     const refundedTotalPrev = Number(prevDebug?.refunded_total || 0);
 
     const payId = order?.payment_debug?.paymentId || order?.payment_debug?.raw?.paymentId || null;
-    const transactions: any[] = Array.isArray(order?.payment_debug?.raw?.itemTransactions) ? order.payment_debug.raw.itemTransactions : [];
+    const transactions: PaymentTransaction[] = Array.isArray(order?.payment_debug?.raw?.itemTransactions) ? order.payment_debug.raw.itemTransactions as PaymentTransaction[] : [];
 
-    const sdk = new (Iyzipay as any)({ apiKey: IYZ_API, secretKey: IYZ_SEC, uri: IYZ_URI });
+    const Iyzi = Iyzipay as unknown as IyziCtor;
+    const sdk = new Iyzi({ apiKey: IYZ_API, secretKey: IYZ_SEC, uri: IYZ_URI });
 
     const targetAmount = amountReq && amountReq > 0 ? amountReq : totalAmount;
 
@@ -111,16 +139,17 @@ Deno.serve(async (req) => {
     const epsilon = 0.0001;
     const isFull = Math.abs((refundedTotalPrev + targetAmount) - totalAmount) < epsilon && !!targetAmount || (!amountReq && refundedTotalPrev === 0);
 
-    let iyzResult: any = null;
+    let iyzResult: IyziCancelResponse | IyziRefundResponse | null = null;
     try {
+      const LOCALE_TR = ((Iyzipay as unknown as { LOCALE?: { TR?: string } }).LOCALE?.TR) ?? 'tr';
       if (isFull) {
         // full cancel
-        iyzResult = await new Promise((resolve, reject) => {
-          (sdk as any).cancel.create({
-            locale: (Iyzipay as any).LOCALE ? (Iyzipay as any).LOCALE.TR : 'tr',
+        iyzResult = await new Promise<IyziCancelResponse>((resolve, reject) => {
+          sdk.cancel.create({
+            locale: LOCALE_TR,
             paymentId: payId,
             ip: req.headers.get('cf-connecting-ip') || '85.34.78.112'
-          }, (err: any, res: any) => err ? reject(err) : resolve(res));
+          }, (err: unknown, res: IyziCancelResponse) => err ? reject(err) : resolve(res));
         });
       } else {
         // partial refund
@@ -129,18 +158,19 @@ Deno.serve(async (req) => {
         if (!ptx) {
           return new Response(JSON.stringify({ error: { code: "NO_TRANSACTION", message: "Partial refund needs paymentTransactionId" } }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
-        iyzResult = await new Promise((resolve, reject) => {
-          (sdk as any).refund.create({
-            locale: (Iyzipay as any).LOCALE ? (Iyzipay as any).LOCALE.TR : 'tr',
+        iyzResult = await new Promise<IyziRefundResponse>((resolve, reject) => {
+          sdk.refund.create({
+            locale: LOCALE_TR,
             paymentTransactionId: ptx,
             price: String(targetAmount),
             currency: 'TRY',
             ip: req.headers.get('cf-connecting-ip') || '85.34.78.112'
-          }, (err: any, res: any) => err ? reject(err) : resolve(res));
+          }, (err: unknown, res: IyziRefundResponse) => err ? reject(err) : resolve(res));
         });
       }
-    } catch (e: any) {
-      return new Response(JSON.stringify({ error: { code: "IYZICO_ERROR", message: e?.message || String(e) } }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return new Response(JSON.stringify({ error: { code: "IYZICO_ERROR", message: msg } }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const ok = !!(iyzResult && (iyzResult.status === 'success' || iyzResult.status === 'SUCCESS'));
@@ -199,7 +229,7 @@ Deno.serve(async (req) => {
           refund_amount: targetAmount, 
           refunded_total: newRefundedTotal, 
           partial_refunds: [...partials, { amount: targetAmount, at: new Date().toISOString() }]
-        };
+        } as PaymentDebug;
         await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
@@ -207,12 +237,14 @@ Deno.serve(async (req) => {
         });
 
         return new Response(JSON.stringify({ status: newStatusPayment, type: 'refund', amount: targetAmount, refunded_total: newRefundedTotal, order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      } catch (e: any) {
-        return new Response(JSON.stringify({ error: { code: 'DB_UPDATE_FAIL', message: e?.message || String(e) } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return new Response(JSON.stringify({ error: { code: 'DB_UPDATE_FAIL', message: msg } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
     }
-  } catch (e: any) {
-    return new Response(JSON.stringify({ error: { code: 'UNEXPECTED', message: e?.message || String(e) } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: { code: 'UNEXPECTED', message: msg } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
 

@@ -1,3 +1,17 @@
+interface CartItem { product_id: string; quantity: number | string; unit_price?: number | string; price_list_id?: string | null }
+interface Product {
+  id: string;
+  price?: number | string;
+  stock_qty?: number | string; stock?: number | string; quantity_available?: number | string; inventory?: number | string; inventory_quantity?: number | string; available?: number | string; on_hand?: number | string;
+}
+interface UserProfile { id: string; role?: string; organization_id?: string | null }
+interface Organization { id: string; tier_level?: number | null }
+interface PriceList { id: string; allowed_user_roles?: string[] | null; organization_tiers?: number[] | null; is_default?: boolean; effective_from?: string | null }
+interface ProductPrice { base_price?: number | string | null; sale_price?: number | string | null; discount_percentage?: number | string | null; is_active?: boolean; valid_from?: string | null; valid_until?: string | null; price_list_id?: string | null }
+interface RecalcItem { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }
+interface MismatchItem { product_id: string; had: unknown; expected: number; price_list_id: string | null }
+interface StockIssue { product_id: string; requested: number; available: number }
+
 Deno.serve(async (req) => {
   const cors = {
     "Access-Control-Allow-Origin": "*",
@@ -30,11 +44,11 @@ Deno.serve(async (req) => {
     const userId = (body?.user_id || body?.userId || '').toString();
     let cartId = (body?.cart_id || body?.cartId || '').toString();
 
-    async function getJson(path: string) {
+    async function getJson<T>(path: string): Promise<T> {
       const res = await fetch(`${supabaseUrl}${path}`, { headers });
       const txt = await res.text();
       if (!res.ok) throw new Error(`fetch ${path} -> ${res.status}: ${txt}`);
-      try { return JSON.parse(txt); } catch { return null; }
+      try { return JSON.parse(txt) as T; } catch { return null as unknown as T; }
     }
 
     function nowIso() { return new Date().toISOString(); }
@@ -49,57 +63,57 @@ Deno.serve(async (req) => {
     }
 
     // Load cart items
-    const items = await getJson(`/rest/v1/cart_items?select=product_id,quantity,unit_price,price_list_id&cart_id=eq.${encodeURIComponent(cartId)}`) || [];
+    const items = await getJson<CartItem[]>(`/rest/v1/cart_items?select=product_id,quantity,unit_price,price_list_id&cart_id=eq.${encodeURIComponent(cartId)}`) || [];
     if (!Array.isArray(items) || items.length === 0) {
       return new Response(JSON.stringify({ ok: true, items: [], mismatches: [], totals: { subtotal: 0 } }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     // Load products
-    const productIds = Array.from(new Set(items.map((i:any)=>i.product_id)));
-    const prods = await getJson(`/rest/v1/products?select=* &id=in.(${productIds.map(encodeURIComponent).join(',')})`);
-    const pmap = new Map<string, any>();
-    (Array.isArray(prods)?prods:[]).forEach((p:any)=>pmap.set(p.id, p));
+    const productIds = Array.from(new Set(items.map((i)=>i.product_id)));
+    const prods = await getJson<Product[]>(`/rest/v1/products?select=* &id=in.(${productIds.map(encodeURIComponent).join(',')})`);
+    const pmap = new Map<string, Product>();
+    (Array.isArray(prods)?prods:[]).forEach((p: Product)=>pmap.set(p.id, p));
 
     // Load profile + tier
     let role = 'individual';
     let orgId: string | null = null;
     let tier: number | null = null;
     if (userId) {
-      const prof = await getJson(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&limit=1`);
+      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&limit=1`);
       if (Array.isArray(prof) && prof[0]) {
         role = prof[0].role || 'individual';
         orgId = prof[0].organization_id || null;
       }
       if (orgId) {
-        const org = await getJson(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&limit=1`);
+        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&limit=1`);
         if (Array.isArray(org) && org[0]) tier = org[0].tier_level ?? null;
       }
     }
 
     // Load active price lists
     const n = nowIso();
-    const lists = await getJson(`/rest/v1/price_lists?select=* &is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})`);
-    const flists = (Array.isArray(lists)?lists:[]).filter((pl:any)=>{
+    const lists = await getJson<PriceList[]>(`/rest/v1/price_lists?select=* &is_active=eq.true&effective_from=lte.${encodeURIComponent(n)}&or=(effective_to.is.null,effective_to.gte.${encodeURIComponent(n)})`);
+    const flists = (Array.isArray(lists)?lists:[]).filter((pl: PriceList)=>{
       const rs = pl.allowed_user_roles as string[] | null | undefined;
       const ts = pl.organization_tiers as number[] | null | undefined;
       const roleOk = !rs || rs.length===0 || rs.includes(role);
       const tierOk = (tier==null) || !ts || ts.length===0 || ts.includes(tier);
       return roleOk && tierOk;
     });
-    flists.sort((a:any,b:any)=>{
+    flists.sort((a: PriceList, b: PriceList)=>{
       const ad = a.is_default?1:0; const bd=b.is_default?1:0; if (ad!==bd) return ad-bd; // non-default first
       const at=a.effective_from?Date.parse(a.effective_from):0; const bt=b.effective_from?Date.parse(b.effective_from):0; return bt-at;
     });
     const chosenListId = flists[0]?.id ?? null;
 
-    async function priceFor(product:any): Promise<{unit:number, listId:string|null}> {
+    async function priceFor(product: Product): Promise<{unit:number, listId:string|null}> {
       const queries: (string|null)[] = chosenListId? [chosenListId, null] : [null];
       for (const q of queries) {
         const basePath = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true`;
         const path = q===null ? `${basePath}&price_list_id=is.null` : `${basePath}&price_list_id=eq.${encodeURIComponent(q)}`;
-        const rows = await getJson(path);
+        const rows = await getJson<ProductPrice[]>(path);
         if (!Array.isArray(rows) || rows.length===0) continue;
-        const pick = rows.find((r:any)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
+        const pick = rows.find((r: ProductPrice)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
         const base = Number(pick.base_price||0); const sale = pick.sale_price!=null?Number(pick.sale_price):null; const disc = Number(pick.discount_percentage||0);
         if (sale!=null && Number.isFinite(sale) && sale>0) return { unit: sale, listId: q };
         if (Number.isFinite(base) && base>0) {
@@ -112,9 +126,9 @@ Deno.serve(async (req) => {
       return { unit: Number.isFinite(fb)?fb:0, listId: chosenListId };
     }
 
-    const recalculated: any[] = [];
-    const mismatches: any[] = [];
-    const stockIssues: any[] = [];
+    const recalculated: RecalcItem[] = [];
+    const mismatches: MismatchItem[] = [];
+    const stockIssues: StockIssue[] = [];
     const to2 = (n:number)=> Number(Number(n).toFixed(2));
     const toCents = (n:number)=> Math.round(Number(n)*100);
 
