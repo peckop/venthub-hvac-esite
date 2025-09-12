@@ -128,15 +128,17 @@ const AdminOrdersPage: React.FC = () => {
       setSaving(true)
       try {
         const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-        // Call privileged RPC to update + (optionally) send email on server side
-        const { data: ok, error: rpcErr } = await supabase.rpc('admin_mark_shipped', {
-          p_order_id: shipId,
-          p_carrier: carrier.trim(),
-          p_tracking: tracking.trim(),
-          p_tracking_url: tracking_url,
-          p_send_email: !!sendEmail
-        }) as { data: boolean | null, error: unknown }
-        if (rpcErr || ok !== true) throw rpcErr || new Error('RPC failed')
+        // Call server-side edge function (no PostgREST schema/cache dependency)
+        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+          body: {
+            order_id: shipId,
+            carrier: carrier.trim(),
+            tracking_number: tracking.trim(),
+            tracking_url: tracking_url,
+            send_email: !!sendEmail
+          }
+        })
+        if (fnErr) throw fnErr
         const _updRows = [{ id: shipId }]
         // Audit log
         await logAdminAction(supabase, {
@@ -173,20 +175,22 @@ const AdminOrdersPage: React.FC = () => {
     setSaving(true)
     try {
       const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-      // Call RPC per id to ensure email sending per order
+      // Call edge function per id
       const results = await Promise.all(targets.map(async (id) => {
-        const { data: ok, error: rpcErr } = await supabase.rpc('admin_mark_shipped', {
-          p_order_id: id,
-          p_carrier: carrier.trim() || null,
-          p_tracking: tracking.trim() || null,
-          p_tracking_url: tracking_url,
-          p_send_email: !!sendEmail
-        }) as { data: boolean | null, error: unknown }
-        if (rpcErr || ok !== true) return { id, ok: false, error: rpcErr }
+        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+          body: {
+            order_id: id,
+            carrier: carrier.trim() || '',
+            tracking_number: tracking.trim() || '',
+            tracking_url: tracking_url,
+            send_email: !!sendEmail
+          }
+        })
+        if (fnErr) return { id, ok: false, error: fnErr }
         return { id, ok: true }
       }))
       const failed = results.filter(r => !r.ok).map(r => r.id)
-      if (failed.length > 0) throw new Error('RPC failed for: ' + failed.join(','))
+      if (failed.length > 0) throw new Error('FUNC failed for: ' + failed.join(','))
       // Audit log (bulk)
       await logAdminAction(supabase, targets.map(id => ({
         table_name: 'venthub_orders',
