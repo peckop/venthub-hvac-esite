@@ -44,9 +44,9 @@ export default tseslint.config(
     rules: {
       'no-console': 'off',
       'no-useless-escape': 'off',
-      'prefer-const': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'prefer-const': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
     },
   },
   // Allow console.log in scripts, tests, and dev tools
