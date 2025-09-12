@@ -25,7 +25,10 @@ Deno.serve(async (req) => {
           || (url.searchParams.get('debug') === '1')
           || ((req.headers.get('x-debug') || '') === '1');
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
-        const sanitize = (obj: Record<string, any>) => ({
+        type BuyerMin = { email?: string; gsmNumber?: string; registrationAddress?: string; ip?: string }
+        type AddressMin = { address?: string }
+        type PaymentMin = { buyer?: BuyerMin; shippingAddress?: AddressMin; billingAddress?: AddressMin; [k:string]: unknown }
+        const sanitize = (obj: PaymentMin) => ({
             ...obj,
             buyer: obj?.buyer ? { ...obj.buyer, email: mask(obj.buyer.email), gsmNumber: mask(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
             shippingAddress: obj?.shippingAddress ? { ...obj.shippingAddress, address: '***' } : undefined,
@@ -233,9 +236,9 @@ Deno.serve(async (req) => {
 
         // Create order items (order_id olarak veritabanındaki gerçek id kullanılır) using authoritative items
         // Fetch product metadata for snapshots
-        const ids = authoritativeItems.map((it: any) => it.product_id)
+        const ids = authoritativeItems.map((it) => it.product_id)
         const uniqIds = Array.from(new Set(ids))
-        let prodMap = new Map<string, any>()
+        let prodMap = new Map<string, { id: string; name?: string; sku?: string; image_url?: string | null }>()
         try {
             if (uniqIds.length > 0) {
                 const pRes = await fetch(`${supabaseUrl}/rest/v1/products?select=id,name,sku,image_url&id=in.(${uniqIds.map(encodeURIComponent).join(',')})`, {
@@ -270,9 +273,9 @@ Deno.serve(async (req) => {
 
         // Şema uyumlu kolonlar: order_id, product_id, product_name, unit_price, quantity, total_price,
         // opsiyonel: price_at_time, product_image_url
-        const orderItems = authoritativeItems.map((raw: any) => {
-            const productId = raw.product_id ?? raw.productId
-            const unitPrice = Number(raw.unit_price ?? raw.price)
+        const orderItems = authoritativeItems.map((raw) => {
+            const productId = raw.product_id
+            const unitPrice = Number(raw.unit_price)
             const qty = Math.max(1, Number(raw.quantity ?? 1))
             const safeUnit = Number.isFinite(unitPrice) ? unitPrice : 0
             const p = productId ? (prodMap.get(productId) || {}) : {}
@@ -312,7 +315,7 @@ Deno.serve(async (req) => {
         // Fiyat tutarlılığı: price == basketItems toplamı olmalı, paidPrice >= price olabilir.
         const to2 = (n:number)=> Number(Number(n).toFixed(2))
         const toCents = (n:number)=> Math.round(Number(n)*100)
-        const basketItems = authoritativeItems.map((item: any) => ({
+        const basketItems = authoritativeItems.map((item) => ({
             id: item.product_id,
             name: (typeof prodMap.get === 'function' ? (prodMap.get(item.product_id)?.name) : undefined) || 'Ürün',
             category1: 'HVAC',
@@ -321,7 +324,7 @@ Deno.serve(async (req) => {
             price: to2(Number(item.unit_price) * Number(item.quantity)).toFixed(2)
         }));
         // Toplamı kuruş bazında hesapla ve her iki alana da aynı değeri yaz
-        const subtotalCents = authoritativeItems.reduce((s:number, it:any)=> s + toCents(Number(it.unit_price)) * Number(it.quantity), 0)
+        const subtotalCents = authoritativeItems.reduce((s:number, it)=> s + toCents(Number(it.unit_price)) * Number(it.quantity), 0)
         const normalizedTotal = subtotalCents / 100
         const itemsTotal = normalizedTotal
         const paidPriceNumber = normalizedTotal
