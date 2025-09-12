@@ -145,11 +145,9 @@ const AdminOrdersPage: React.FC = () => {
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         if (sendEmail && carrier && tracking) {
           try {
-            const supabaseUrl = ((import.meta as unknown) as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
-            await fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ order_id: shipId, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url })
+            // Prefer supabase.functions.invoke to handle headers (apikey, auth) and CORS automatically
+            await supabase.functions.invoke('shipping-notification', {
+              body: { order_id: shipId, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
             })
           } catch {}
         }
@@ -192,10 +190,8 @@ const AdminOrdersPage: React.FC = () => {
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
       if (sendEmail && carrier && tracking) {
         try {
-          const supabaseUrl = ((import.meta as unknown) as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
-          await Promise.all(targets.map(id => fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order_id: id, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url })
+          await Promise.all(targets.map(id => supabase.functions.invoke('shipping-notification', {
+            body: { order_id: id, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
           })))
         } catch {}
       }

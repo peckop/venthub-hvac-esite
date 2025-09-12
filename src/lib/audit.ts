@@ -23,8 +23,13 @@ export async function logAdminAction(
     // Best-effort: get current user id to set actor if not provided
     let uid: string | null = null
     try {
-      const { data } = await client.auth.getUser()
-      uid = data?.user?.id ?? null
+      // Prefer session for reliability; fall back to getUser
+      const { data: sessData } = await client.auth.getSession()
+      uid = sessData?.session?.user?.id ?? null
+      if (!uid) {
+        const { data } = await client.auth.getUser()
+        uid = data?.user?.id ?? null
+      }
     } catch {
       uid = null
     }
