@@ -74,7 +74,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     `.trim()
 
     // Send email via notification service
-    const notificationRequest = {
+    const _notificationRequest = {
       type: 'email',
       to: customer_email,
       message: emailContent,

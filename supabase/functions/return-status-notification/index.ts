@@ -213,11 +213,12 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Return status notification error:', error)
     
+    const msg = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({ 
-      error: error.message || 'Unknown error',
+      error: msg,
       success: false 
     }), {
       status: 500,
