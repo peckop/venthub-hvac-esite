@@ -137,7 +137,7 @@ const AdminOrdersPage: React.FC = () => {
           p_send_email: !!sendEmail
         }) as { data: boolean | null, error: unknown }
         if (rpcErr || ok !== true) throw rpcErr || new Error('RPC failed')
-        const updRows = [{ id: shipId }]
+        const _updRows = [{ id: shipId }]
         // Audit log
         await logAdminAction(supabase, {
           table_name: 'venthub_orders',
@@ -150,11 +150,11 @@ const AdminOrdersPage: React.FC = () => {
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         if (sendEmail && carrier && tracking) {
           try {
-            const { data: funcData, error: funcErr } = await supabase.functions.invoke('shipping-notification', {
+            const { error: funcErr } = await supabase.functions.invoke('shipping-notification', {
               body: { order_id: shipId, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
             })
             if (funcErr) console.error('shipping-notification error', funcErr)
-            else console.log('shipping-notification ok', funcData)
+            else console.warn('shipping-notification ok')
           } catch (fnE) { console.error('invoke exception', fnE) }
         }
         setShipOpen(false)
