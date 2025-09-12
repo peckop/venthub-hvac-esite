@@ -121,18 +121,23 @@ const AdminOrdersPage: React.FC = () => {
     if (!bulkMode) {
       if (!shipId) return
       const isShipped = rows.find(r => r.id === shipId)?.status === 'shipped'
-      if (!isShipped && (!carrier.trim() || !tracking.trim())) return
+      if (!isShipped && (!carrier.trim() || !tracking.trim())) {
+        alert('Kargo firması ve takip numarası gerekli')
+        return
+      }
       setSaving(true)
       try {
         const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-        type PartialOrderUpdate = { carrier?: string; tracking_number?: string; tracking_url?: string | null; shipped_at?: string; status?: string }
-        const base: PartialOrderUpdate = { carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
-        const updateData: PartialOrderUpdate = isShipped ? base : { ...base, shipped_at: new Date().toISOString(), status: 'shipped' }
-        const { error } = await supabase
-          .from('venthub_orders')
-          .update(updateData)
-          .eq('id', shipId)
-        if (error) throw error
+        // Call privileged RPC to update + (optionally) send email on server side
+        const { data: ok, error: rpcErr } = await supabase.rpc('admin_mark_shipped', {
+          p_order_id: shipId,
+          p_carrier: carrier.trim(),
+          p_tracking: tracking.trim(),
+          p_tracking_url: tracking_url,
+          p_send_email: !!sendEmail
+        }) as { data: boolean | null, error: unknown }
+        if (rpcErr || ok !== true) throw rpcErr || new Error('RPC failed')
+        const updRows = [{ id: shipId }]
         // Audit log
         await logAdminAction(supabase, {
           table_name: 'venthub_orders',
@@ -145,11 +150,12 @@ const AdminOrdersPage: React.FC = () => {
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         if (sendEmail && carrier && tracking) {
           try {
-            // Prefer supabase.functions.invoke to handle headers (apikey, auth) and CORS automatically
-            await supabase.functions.invoke('shipping-notification', {
+            const { data: funcData, error: funcErr } = await supabase.functions.invoke('shipping-notification', {
               body: { order_id: shipId, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
             })
-          } catch {}
+            if (funcErr) console.error('shipping-notification error', funcErr)
+            else console.log('shipping-notification ok', funcData)
+          } catch (fnE) { console.error('invoke exception', fnE) }
         }
         setShipOpen(false)
       } catch (e) {
@@ -167,17 +173,20 @@ const AdminOrdersPage: React.FC = () => {
     setSaving(true)
     try {
       const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-      type PartialOrderUpdate = { carrier?: string; tracking_number?: string; tracking_url?: string | null; shipped_at?: string; status?: string }
-      const base: PartialOrderUpdate = {}
-      if (carrier.trim()) base.carrier = carrier.trim()
-      if (tracking.trim()) base.tracking_number = tracking.trim()
-      if (tracking_url) base.tracking_url = tracking_url
-      const updateData: PartialOrderUpdate = { ...base, shipped_at: new Date().toISOString(), status: 'shipped' }
-      const { error } = await supabase
-        .from('venthub_orders')
-        .update(updateData)
-        .in('id', targets)
-      if (error) throw error
+      // Call RPC per id to ensure email sending per order
+      const results = await Promise.all(targets.map(async (id) => {
+        const { data: ok, error: rpcErr } = await supabase.rpc('admin_mark_shipped', {
+          p_order_id: id,
+          p_carrier: carrier.trim() || null,
+          p_tracking: tracking.trim() || null,
+          p_tracking_url: tracking_url,
+          p_send_email: !!sendEmail
+        }) as { data: boolean | null, error: unknown }
+        if (rpcErr || ok !== true) return { id, ok: false, error: rpcErr }
+        return { id, ok: true }
+      }))
+      const failed = results.filter(r => !r.ok).map(r => r.id)
+      if (failed.length > 0) throw new Error('RPC failed for: ' + failed.join(','))
       // Audit log (bulk)
       await logAdminAction(supabase, targets.map(id => ({
         table_name: 'venthub_orders',
@@ -190,10 +199,13 @@ const AdminOrdersPage: React.FC = () => {
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
       if (sendEmail && carrier && tracking) {
         try {
-          await Promise.all(targets.map(id => supabase.functions.invoke('shipping-notification', {
-            body: { order_id: id, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
-          })))
-        } catch {}
+          await Promise.all(targets.map(async (id) => {
+            const { error: funcErr } = await supabase.functions.invoke('shipping-notification', {
+              body: { order_id: id, customer_email: '', customer_name: '', order_number: '', carrier: carrier.trim(), tracking_number: tracking.trim(), tracking_url }
+            })
+            if (funcErr) console.error('shipping-notification bulk error', id, funcErr)
+          }))
+        } catch (fnE) { console.error('invoke bulk exception', fnE) }
       }
       setShipOpen(false)
       setSelectedIds([])

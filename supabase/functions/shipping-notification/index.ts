@@ -34,21 +34,80 @@ serve(async (req) => {
   }
 
   try {
-    const body = await req.json() as ShippingNotificationRequest
-    const { 
-      order_id, 
-      customer_email, 
-      customer_name, 
-      order_number,
-      carrier, 
-      tracking_number, 
-      tracking_url 
-    } = body
+    // Parse body robustly and support camelCase as well
+    const text = await req.text()
+    let parsed: Record<string, unknown>
+    try { parsed = text ? JSON.parse(text) : {} } catch { parsed = {} }
+    const pick = (keys: string[]): string | null => {
+      for (const k of keys) {
+        const v = parsed[k]
+        if (typeof v === 'string') {
+          const s = v.trim()
+          if (s.length > 0) return s
+        }
+        if (typeof v === 'number' && Number.isFinite(v)) {
+          return String(v)
+        }
+      }
+      return null
+    }
+    let order_id = pick(['order_id','orderId'])
+    let customer_email = pick(['customer_email','customerEmail'])
+    let customer_name = pick(['customer_name','customerName'])
+    let order_number = pick(['order_number','orderNumber'])
+    let carrier = pick(['carrier'])
+    let tracking_number = pick(['tracking_number','trackingNumber'])
+    let tracking_url = pick(['tracking_url','trackingUrl'])
 
-    // Validate required fields
-    if (!order_id || !customer_email || !customer_name || !carrier || !tracking_number) {
+    // Derive fields from DB if not provided
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+      if (order_id && supabaseUrl && serviceKey) {
+        // Load order basics if needed
+        if (!order_number || !customer_email || !customer_name || !carrier || !tracking_number || !tracking_url) {
+          const sel = encodeURIComponent('user_id,order_number,carrier,tracking_number,tracking_url')
+          const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=${sel}`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+          })
+          if (ordResp.ok) {
+            const arr = await ordResp.json().catch(()=>[])
+            const row = Array.isArray(arr) ? arr[0] : null
+            if (row) {
+              if (!order_number && row.order_number) order_number = row.order_number
+              if (!carrier && row.carrier) carrier = String(row.carrier)
+              if (!tracking_number && row.tracking_number) tracking_number = String(row.tracking_number)
+              if (!tracking_url && row.tracking_url) tracking_url = String(row.tracking_url)
+              const uid = row.user_id as string | undefined
+              if ((!customer_email || !customer_name) && uid) {
+                const usrResp = await fetch(`${supabaseUrl}/rest/v1/admin_users?id=eq.${encodeURIComponent(uid)}&select=email,full_name`, {
+                  headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+                })
+                if (usrResp.ok) {
+                  const u = await usrResp.json().catch(()=>[])
+                  const ur = Array.isArray(u) ? u[0] : null
+                  if (ur) {
+                    customer_email = customer_email || ur.email || customer_email
+                    customer_name = customer_name || ur.full_name || customer_name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch { /* best effort */ }
+
+    // Validate required fields (after derivation)
+    if (!order_id || !carrier || !tracking_number) {
+      const missing: string[] = []
+      if (!order_id) missing.push('order_id')
+      if (!carrier) missing.push('carrier')
+      if (!tracking_number) missing.push('tracking_number')
       return new Response(JSON.stringify({ 
-        error: 'Missing required fields: order_id, customer_email, customer_name, carrier, tracking_number' 
+        error: 'missing_fields',
+        missing,
+        received: Object.keys(parsed)
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -56,7 +115,7 @@ serve(async (req) => {
     }
 
     // Create email content
-    const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
+    const prettyOrderNo = order_number ? `#${String(order_number).split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
     
     const emailSubject = `Siparişiniz kargoya verildi - ${prettyOrderNo}`
     
