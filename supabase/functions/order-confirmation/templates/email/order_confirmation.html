@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    .container{font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#111827}
+    .brand{color: {{brand_primary_color}}}
+    .muted{color:#6b7280;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="brand">{{brand_name}} — Siparişiniz alındı</h2>
+    {{#if brand_logo_url}}
+    <p><img src="{{brand_logo_url}}" alt="{{brand_name}}" style="max-height:40px;"/></p>
+    {{/if}}
+    <p>Merhaba <strong>{{customer_name}}</strong>,</p>
+    <p><strong>{{order_number}}</strong> numaralı siparişinizi aldık. Ödeme doğrulandıktan sonra kargoya hazırlanacaktır.</p>
+    <p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>
+    <hr />
+    <p class="muted">Bu otomatik bir e‑postadır. Lütfen yanıtlamayın.</p>
+  </div>
+</body>
+</html>

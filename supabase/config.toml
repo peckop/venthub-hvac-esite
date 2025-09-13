@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions."shipping-notification"]
 verify_jwt = false
+
+[functions."order-confirmation"]
+verify_jwt = false
