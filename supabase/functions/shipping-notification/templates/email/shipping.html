@@ -16,7 +16,10 @@
   </head>
   <body>
     <div class="container">
-      <h2 class="brand">Siparişiniz kargoya verildi! 📦</h2>
+      <h2 class="brand" style="color: {{brand_primary_color}};">{{brand_name}} — Siparişiniz kargoya verildi! 📦</h2>
+      {{#if brand_logo_url}}
+      <p><img src="{{brand_logo_url}}" alt="{{brand_name}}" style="max-height:40px;"/></p>
+      {{/if}}
       <p>Merhaba <strong>{{customer_name}}</strong>,</p>
       <p><strong>{{order_number}}</strong> numaralı siparişiniz kargoya verildi!</p>
 

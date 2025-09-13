@@ -35,14 +35,18 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
   - `VITE_SUPABASE_ANON_KEY` → `<anon key>`
   - `VITE_SHOP_WHATSAPP` → Optional WhatsApp phone (e.g., 90XXXXXXXXXX) for “Stok sor” deeplink
 - Edge Function env (set in Supabase → Functions → Settings → Env Variables):
-  - Resend (Kargo E‑postaları)
+- Resend (Kargo E‑postaları) + Branding
     - `RESEND_API_KEY`
     - `EMAIL_FROM` — doğrulanmış gönderen yoksa geçici: `VentHub Test <onboarding@resend.dev>`
     - `EMAIL_TEST_MODE` — başlangıçta true; gerçek gönderime geçtiğinizde false
     - `EMAIL_TEST_TO` — testte alıcı (varsayılan delivered@resend.dev)
     - `SHIP_EMAIL_BCC` — kopya adres(ler)
     - `NOTIFY_DEBUG` — sunucu tarafı güvenli debug
-  - Twilio (ops.):
+- Branding (opsiyonel)
+  - `BRAND_NAME` (örn. VentHub)
+  - `BRAND_PRIMARY_COLOR` (örn. #2563eb)
+  - `BRAND_LOGO_URL` (doğrulanmış bir logo URL'si; boş bırakılabilir)
+- Twilio (ops.):
     - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER`, `TWILIO_PHONE_NUMBER`
   - `RESEND_API_KEY` (Email provider)
   - `EMAIL_FROM` (e.g., `VentHub <info@venthub.com>`)
