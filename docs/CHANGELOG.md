@@ -2,7 +2,7 @@
 
 ## 2025-09-13
 
-### E‑posta/Notification Altyapısı (Kargo)
+### E‑posta/Notification Altyapısı (Kargo + Sipariş Onayı)
 - Şablonlama
   - templates/email/shipping.html eklendi ve shipping-notification, dosya varsa onu okuyup değişkenleri dolduruyor; yoksa inline HTML’e geri düşüyor.
 - Mimari
