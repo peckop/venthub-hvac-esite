@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-10
+Last updated: 2025-09-13
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -121,6 +121,14 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] Her hesaplayıcı altında 2–3 maddelik standart referans bloğu
 
 ## 3) Operasyonel “Next Steps” (Öncelikli)
+- E‑posta / Bildirim Altyapısı (Resend + Supabase)
+  - [x] Kargo e-postaları: admin-update-shipping → shipping-notification (service-role yetkili invoke)
+  - [x] Auth Admin API ile müşteri e-posta/isim türetme (admin_users view bağımlılığı kaldırıldı)
+  - [x] Test/Retry: EMAIL_TEST_MODE, EMAIL_TEST_TO; from domain doğrulama hatasında onboarding@resend.dev ile otomatik retry
+  - [x] Public function güvenliği: verify_jwt=false (config + supabase.toml), CORS başlıkları net
+  - [ ] Şablon: Markalı HTML (logo, renkler, buton linki). Dosya: templates/email/shipping.html (oluşturulacak)
+  - [ ] From adresi: Kurumsal domain doğrulanınca EMAIL_FROM güncellenecek
+  - [ ] Logs: Resend message id’yi response’a ekleyip sipariş detayında göster (opsiyonel küçük kart)
 - Test stabilizasyonu
   - ~~[ ] Skip’li 3 UI testini aktive et (Orders nav, OrderDetail sekme/track link, Returns modal)~~
 - Lint/CI

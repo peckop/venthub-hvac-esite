@@ -2,6 +2,20 @@
 
 ## 2025-09-13
 
+### E‑posta/Notification Altyapısı (Kargo)
+- Mimari
+  - admin-update-shipping, kargo/güncelleme/iptal akışını yürütür; gerekirse implicit cancel uygular.
+  - E‑posta için shipping-notification çağrılır. Çağrı service-role ile yetkilidir (Authorization+apikey), 401/CORS takılmaz.
+  - Müşteri e‑postası Auth Admin API’den çekilir; admin_users view bağımlılığı kaldırılmıştır.
+  - Domain doğrulaması yoksa Resend “from verify” hatasında otomatik onboarding@resend.dev ile tekrar denenir.
+  - Test için EMAIL_TEST_MODE/EMAIL_TEST_TO; BCC desteği (SHIP_EMAIL_BCC).
+- Konfig/env
+  - RESEND_API_KEY, EMAIL_FROM, SHIP_EMAIL_BCC, (opsiyonel) EMAIL_TEST_MODE, EMAIL_TEST_TO, NOTIFY_DEBUG.
+- Güvenlik
+  - shipping-notification public (verify_jwt=false), admin-update-shipping JWT gerektirir (admin paneli).
+- Sonuç
+  - E‑posta gönderimi Resend üzerinde doğrulandı (Delivered). UI’da kargo akışı yeşil.
+
 ### Kargo akışı (UI + Edge Functions)
 - AdminOrdersPage
   - "Kargo" ve "İptal" butonları eklendi; bağlama göre toast mesajları:

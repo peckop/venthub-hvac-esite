@@ -3,6 +3,9 @@
 Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehberdir.
 
 ## Güvenlik
+- Resend API anahtarı ve e‑posta değişkenleri sadece Edge Functions env’de tutulur (kodda/repoda yok).
+- shipping-notification public olsa da admin panelden çağrı yetkili server-to-server üzerinden yapılır (service role). Doğrudan public POST’lar rate‑limit ve doğrulama ile sınırlandırılabilir (ilerleme kalemi).
+- LPP (Studio) kapalı; yerine app seviyesinde HIBP k‑Anonymity kontrolü uygulanır (passwordSecurity.ts). Advisor WARN bilinçli.
 - Leaked Password Protection (Studio): Supabase Dashboard → Authentication → Password policy altında “Leaked password protection” özelliği varsayılan olarak KAPALI bırakılmıştır.
   - Neden? Bu özellik ücretli olabilir ve proje, eşdeğer korumayı uygulama seviyesinde sağlar.
   - Bizim çözüm: src/utils/passwordSecurity.ts ile HIBP k‑Anonymity (range API) tabanlı özel "compromised password" kontrolü; Register ve Parola Değiştir akışlarına entegredir.
