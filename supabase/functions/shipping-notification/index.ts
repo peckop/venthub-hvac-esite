@@ -59,6 +59,10 @@ serve(async (req) => {
     let tracking_number = pick(['tracking_number','trackingNumber'])
     let tracking_url = pick(['tracking_url','trackingUrl'])
 
+    // Ensure env-derived flags are available before validation branches
+    const testMode = Deno.env.get('EMAIL_TEST_MODE') === 'true'
+    const testTo = Deno.env.get('EMAIL_TEST_TO') || 'delivered@resend.dev'
+
     // Derive fields from DB if not provided
     try {
       const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
@@ -80,15 +84,17 @@ serve(async (req) => {
               if (!tracking_url && row.tracking_url) tracking_url = String(row.tracking_url)
               const uid = row.user_id as string | undefined
               if ((!customer_email || !customer_name) && uid) {
-                const usrResp = await fetch(`${supabaseUrl}/rest/v1/admin_users?id=eq.${encodeURIComponent(uid)}&select=email,full_name`, {
+                // Use Auth Admin API to fetch user email securely with service role
+                const usrResp = await fetch(`${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(uid)}`, {
                   headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
                 })
                 if (usrResp.ok) {
-                  const u = await usrResp.json().catch(()=>[])
-                  const ur = Array.isArray(u) ? u[0] : null
-                  if (ur) {
-                    customer_email = customer_email || ur.email || customer_email
-                    customer_name = customer_name || ur.full_name || customer_name
+                  const u = await usrResp.json().catch(()=>null) as any
+                  if (u) {
+                    customer_email = customer_email || u.email || customer_email
+                    // Try to read name from user_metadata
+                    const metaName = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || null
+                    customer_name = customer_name || metaName || customer_name
                   }
                 }
               }
@@ -99,6 +105,14 @@ serve(async (req) => {
     } catch { /* best effort */ }
 
     // Validate required fields (after derivation)
+    // In test mode, allow missing fields by auto-filling placeholders
+    if (testMode) {
+      if (!order_id) order_id = 'TEST-ORDER'
+      if (!carrier) carrier = 'test-carrier'
+      if (!tracking_number) tracking_number = 'T123'
+      if (!customer_email) customer_email = testTo
+    }
+
     if (!order_id || !carrier || !tracking_number) {
       const missing: string[] = []
       if (!order_id) missing.push('order_id')
@@ -154,7 +168,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     }
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <info@venthub.com>'
+    let emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub Test <onboarding@resend.dev>'
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || 'recep.varlik@gmail.com').split(',').map(s=>s.trim()).filter(Boolean)
     if (!resendApiKey) {
@@ -164,7 +178,11 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
 
     // Build recipients with optional BCC; if no customer email, fall back to first BCC for testing
     const toList: string[] = []
-    if (customer_email) toList.push(customer_email)
+    if (testMode) {
+      toList.push(testTo)
+    } else if (customer_email) {
+      toList.push(customer_email)
+    }
     const bcc = [...bccList]
     if (toList.length === 0 && bcc.length > 0) {
       toList.push(bcc[0])
@@ -172,19 +190,20 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     }
 
     // Direct email sending (bypass notification-service for simplicity)
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: emailFrom,
-        to: toList,
-        bcc: bcc.length > 0 ? bcc : undefined,
-        subject: emailSubject,
-        text: emailContent,
-        html: `
+    async function sendEmail(fromAddr: string, to: string[], bccArr: string[]) {
+      return await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromAddr,
+          to,
+          bcc: bccArr.length > 0 ? bccArr : undefined,
+          subject: emailSubject,
+          text: emailContent,
+          html: `
           <div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">
             <h2 style="color: #2563eb;">Siparişiniz kargoya verildi! 📦</h2>
             <p>Merhaba <strong>${customer_name}</strong>,</p>
@@ -204,12 +223,23 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
             <p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
           </div>
         `,
-      }),
-    })
+        }),
+      })
+    }
 
+    // Try with configured from; if domain not verified, fallback to onboarding@resend.dev
+    let response = await sendEmail(emailFrom, toList, bcc)
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`Email send failed: ${error}`)
+      const errorText = await response.text()
+      const normalized = errorText.toLowerCase()
+      if (normalized.includes('domain') && normalized.includes('verify') || normalized.includes('from address')) {
+        // Retry once with Resend test sender
+        emailFrom = 'VentHub Test <onboarding@resend.dev>'
+        response = await sendEmail(emailFrom, toList, bcc)
+      }
+      if (!response.ok) {
+        throw new Error(`Email send failed: ${errorText}`)
+      }
     }
 
     const result = await response.json()

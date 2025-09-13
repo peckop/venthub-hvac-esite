@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions."shipping-status"]
 verify_jwt = false
+
+[functions."shipping-notification"]
+verify_jwt = false
