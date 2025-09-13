@@ -234,6 +234,19 @@ Deno.serve(async (req) => {
 
         if (debugEnabled) console.log('✅ Order created successfully with id:', dbOrderId);
 
+        // Send order confirmation email (best-effort, non-blocking)
+        try {
+            await fetch(`${supabaseUrl}/functions/v1/order-confirmation`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${serviceRoleKey}`,
+                    'apikey': serviceRoleKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ order_id: dbOrderId })
+            })
+        } catch { /* ignore */ }
+
         // Create order items (order_id olarak veritabanındaki gerçek id kullanılır) using authoritative items
         // Fetch product metadata for snapshots
         const ids = authoritativeItems.map((it) => it.product_id)
