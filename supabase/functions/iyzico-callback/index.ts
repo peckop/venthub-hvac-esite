@@ -214,6 +214,32 @@ Deno.serve(async (req) => {
       }
       updateOk = !!(r && r.ok);
       
+      // Send order confirmation (best-effort, only after payment success)
+      try {
+        let finalOrderId: string | null = orderId || null
+        if (!finalOrderId && (result?.conversationId || conversationId)) {
+          const oResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!) }&select=id`, {
+            headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey }
+          })
+          if (oResp.ok) {
+            const arr = await oResp.json().catch(()=>[])
+            const row = Array.isArray(arr) ? arr[0] : null
+            finalOrderId = row?.id || null
+          }
+        }
+        if (finalOrderId) {
+          await fetch(`${supabaseUrl}/functions/v1/order-confirmation`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${serviceRoleKey}`,
+              'apikey': serviceRoleKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ order_id: finalOrderId })
+          })
+        }
+      } catch { /* ignore */ }
+      
       // Process stock reduction after successful payment - Use DB RPC (idempotent)
       try {
         if (orderId) {
