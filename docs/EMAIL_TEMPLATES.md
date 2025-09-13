@@ -22,6 +22,7 @@ Planned implementation (file-based templates)
   - {{carrier}}
   - {{tracking_number}}
   - {{tracking_url}} (optional)
+  - {{brand_name}}, {{brand_primary_color}}, {{brand_logo_url}} (branding)
 - Strategy options:
   1) Simple string replace in Edge Function (no new deps)
   2) Tiny template helper (e.g., Mustache) bundled into the function

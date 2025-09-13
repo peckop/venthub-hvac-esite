@@ -156,7 +156,11 @@ serve(async (req) => {
     // Create email content
     const prettyOrderNo = order_number ? `#${String(order_number).split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
     
-    const emailSubject = `Siparişiniz kargoya verildi - ${prettyOrderNo}`
+    const brandName = Deno.env.get('BRAND_NAME') || 'VentHub'
+    const brandPrimary = Deno.env.get('BRAND_PRIMARY_COLOR') || '#2563eb'
+    const brandLogoUrl = Deno.env.get('BRAND_LOGO_URL') || ''
+
+    const emailSubject = `${brandName} | Siparişiniz kargoya verildi - ${prettyOrderNo}`
     
     const emailContent = `
 Merhaba ${customer_name},
@@ -225,6 +229,9 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
           carrier,
           tracking_number,
           tracking_url,
+          brand_name: brandName,
+          brand_primary_color: brandPrimary,
+          brand_logo_url: brandLogoUrl,
         })
       }
     } catch {/* ignore */}
@@ -291,6 +298,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       result,
       order_id,
       customer_email,
+      subject: emailSubject,
       timestamp: new Date().toISOString()
     }), {
       status: 200,
