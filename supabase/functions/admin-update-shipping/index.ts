@@ -145,14 +145,15 @@ serve(async (req) => {
         const row = arr[0]
         const uid = row?.user_id
         if (uid) {
-          const usrResp = await fetch(`${supabaseUrl}/rest/v1/admin_users?id=eq.${encodeURIComponent(uid)}&select=email,full_name`, {
+          // Use Auth Admin API to fetch user securely with service role
+          const usrResp = await fetch(`${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(uid)}`, {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
           })
           if (usrResp.ok) {
-            const uarr = await usrResp.json().then(x=>Array.isArray(x)?x:[]).catch(()=>[])
-            const u = uarr[0]
-            customer_email = u?.email || null
-            customer_name = u?.full_name || null
+            const u = await usrResp.json().catch(()=>null) as any
+            customer_email = (u && u.email) || null
+            const metaName = u && u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)
+            customer_name = (customer_name || metaName || null)
           }
         }
       }
@@ -164,7 +165,7 @@ serve(async (req) => {
       try {
         const resp = await fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
           body: JSON.stringify({ order_id, carrier, tracking_number, tracking_url, customer_email, customer_name })
         })
         let j: any = null
