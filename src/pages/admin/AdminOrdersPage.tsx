@@ -7,6 +7,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { logAdminAction } from '../../lib/audit'
 import { useI18n } from '../../i18n/I18nProvider'
+import toast from 'react-hot-toast'
 
 // Minimal order type matching admin-orders-latest edge function response
 interface AdminOrderRow {
@@ -116,6 +117,26 @@ const AdminOrdersPage: React.FC = () => {
   }
   const closeShipModal = () => setShipOpen(false)
 
+  async function cancelShipping(id: string) {
+    if (!id) return
+    const ok = window.confirm('Kargo iptal edilsin mi? Bu işlem durumu "Onaylı" yapar ve takip bilgilerini siler.')
+    if (!ok) return
+    try {
+      setSaving(true)
+      const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+        body: { order_id: id, cancel: true, send_email: false }
+      })
+      if (fnErr) throw fnErr
+      setRows(prev => prev.map(r => r.id === id ? { ...r, status: 'confirmed' } : r))
+      toast.success('Kargo iptal edildi')
+    } catch (e) {
+      console.error('cancel ship error', e)
+      toast.error('Kargo iptali yapılamadı')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const submitShip = async () => {
     // Single or bulk mode submission
     if (!bulkMode) {
@@ -151,9 +172,10 @@ const AdminOrdersPage: React.FC = () => {
         })
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         setShipOpen(false)
+        toast.success(isShipped ? 'Kargo bilgileri kaydedildi' : 'Sipariş kargoya verildi')
       } catch (e) {
         console.error('ship error', e)
-        alert('Kargo güncellenemedi')
+        toast.error('Kargo güncellenemedi')
       } finally {
         setSaving(false)
       }
@@ -193,11 +215,12 @@ const AdminOrdersPage: React.FC = () => {
       })))
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
       setShipOpen(false)
+      toast.success(`${targets.length} sipariş kargolandı`)
       setSelectedIds([])
       setBulkMode(false)
     } catch (e) {
       console.error('bulk ship error', e)
-      alert('Toplu kargo güncellenemedi')
+      toast.error('Toplu kargo güncellenemedi')
     } finally {
       setSaving(false)
     }
@@ -423,12 +446,24 @@ const AdminOrdersPage: React.FC = () => {
                   {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount)}</td>)}
                   {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at)}</td>)}
                   <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
-                    <button
-                      onClick={() => openShipModal(r.id)}
-                      className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"
-                    >
-                      Kargo
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openShipModal(r.id)}
+                        className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"
+                        title="Kargo bilgisi ekle / düzenle"
+                      >
+                        Kargo
+                      </button>
+                      {r.status === 'shipped' && (
+                        <button
+                          onClick={() => cancelShipping(r.id)}
+                          className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+                          title="Kargoyu iptal et"
+                        >
+                          İptal
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))

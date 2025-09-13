@@ -156,9 +156,19 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <info@venthub.com>'
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
+    const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || 'recep.varlik@gmail.com').split(',').map(s=>s.trim()).filter(Boolean)
     if (!resendApiKey) {
       if (notifyDebug) console.warn('[shipping-notification] Email disabled: missing RESEND_API_KEY')
       return new Response(JSON.stringify({ success: true, disabled: true, channel: 'email' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    }
+
+    // Build recipients with optional BCC; if no customer email, fall back to first BCC for testing
+    const toList: string[] = []
+    if (customer_email) toList.push(customer_email)
+    const bcc = [...bccList]
+    if (toList.length === 0 && bcc.length > 0) {
+      toList.push(bcc[0])
+      bcc.shift()
     }
 
     // Direct email sending (bypass notification-service for simplicity)
@@ -170,11 +180,12 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       },
       body: JSON.stringify({
         from: emailFrom,
-        to: [customer_email],
+        to: toList,
+        bcc: bcc.length > 0 ? bcc : undefined,
         subject: emailSubject,
         text: emailContent,
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">
             <h2 style="color: #2563eb;">Siparişiniz kargoya verildi! 📦</h2>
             <p>Merhaba <strong>${customer_name}</strong>,</p>
             <p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verildi!</p>
