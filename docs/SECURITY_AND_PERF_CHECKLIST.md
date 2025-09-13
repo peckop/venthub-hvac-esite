@@ -3,7 +3,10 @@
 Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehberdir.
 
 ## Güvenlik
-- Leaked Password Protection: Supabase Dashboard → Authentication → Password policy altında “Leaked password protection” özelliğini etkinleştirin.
+- Leaked Password Protection (Studio): Supabase Dashboard → Authentication → Password policy altında “Leaked password protection” özelliği varsayılan olarak KAPALI bırakılmıştır.
+  - Neden? Bu özellik ücretli olabilir ve proje, eşdeğer korumayı uygulama seviyesinde sağlar.
+  - Bizim çözüm: src/utils/passwordSecurity.ts ile HIBP k‑Anonymity (range API) tabanlı özel "compromised password" kontrolü; Register ve Parola Değiştir akışlarına entegredir.
+  - Advisor Notu: Supabase Advisor bu özelliğin kapalı olmasını WARN olarak raporlar. Bu uyarı bilinçli olarak kabul edilir.
   - Referans: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 - Confirm Email: Authentication → Email provider → “Confirm email” açık ve “unverified sign-in” kapalı olmalı.
 - Redirect URL’ler: Authentication → URL config → {PROD_ORIGIN}/auth/callback ve {DEV_ORIGIN}/auth/callback ekli olmalı.

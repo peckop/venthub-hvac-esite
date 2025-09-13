@@ -49,6 +49,8 @@
 - UI/UX İyileştirmeleri
 
 ### 2025-09-11 Geç Saat Güncellemeleri
+- Security
+  - Studio “Leaked password protection” ücret ve bağlam sebebiyle kapalı tutulur; eşdeğer koruma uygulama seviyesinde sağlanır (src/utils/passwordSecurity.ts, HIBP k‑Anonymity). Supabase Advisor WARN’ı bilinçli olarak kabul edilir.
 - CI
   - App Lint (src) blocking olarak eklendi; Edge Functions lint ayrı ve non‑blocking (uyarı raporlar, pipeline’ı kırmaz)
   - ESLint ignore kapsamı sadece `supabase/migrations/**` ile sınırlandı; `supabase/functions/**` lint kapsamına alındı (edge için esnek kurallar)
