@@ -1,5 +1,30 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
+// Tiny template renderer for {{var}} and {{#if var}} ... {{/if}}
+function renderTemplate(tpl: string, data: Record<string, unknown>): string {
+  // if-blocks
+  tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
+    const v = data[key]
+    const truthy = !!(typeof v === 'string' ? v : v)
+    return truthy ? inner : ''
+  })
+  // variables
+  tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
+    const v = data[key]
+    return v == null ? '' : String(v)
+  })
+  return tpl
+}
+
+async function loadShippingTemplate(): Promise<string | null> {
+  try {
+    const url = new URL('./templates/email/shipping.html', import.meta.url)
+    return await Deno.readTextFile(url)
+  } catch {
+    return null
+  }
+}
+
 interface ShippingNotificationRequest {
   order_id: string
   customer_email: string
@@ -189,6 +214,40 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
       bcc.shift()
     }
 
+    // Prepare HTML body: try file-based template, fallback to inline
+    let htmlBody = ''
+    try {
+      const tpl = await loadShippingTemplate()
+      if (tpl) {
+        htmlBody = renderTemplate(tpl, {
+          customer_name,
+          order_number: prettyOrderNo,
+          carrier,
+          tracking_number,
+          tracking_url,
+        })
+      }
+    } catch {/* ignore */}
+    if (!htmlBody) {
+      htmlBody = [
+        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
+        '<h2 style="color: #2563eb;">Siparişiniz kargoya verildi! 📦</h2>',
+        `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
+        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verildi!</p>`,
+        '<div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">',
+        '<h3 style="margin-top: 0; color: #374151;">Kargo Bilgileri</h3>',
+        `<p><strong>🚛 Kargo Firması:</strong> ${carrier}</p>`,
+        `<p><strong>📋 Takip Numarası:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tracking_number}</code></p>`,
+        tracking_url ? `<p><strong>🔗 Takip Linki:</strong> <a href="${tracking_url}" target="_blank" style="color: #2563eb;">Kargo takip sayfası</a></p>` : '',
+        '</div>',
+        '<p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>',
+        '<p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>',
+        '<hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">',
+        '<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>',
+        '</div>'
+      ].join('')
+    }
+
     // Direct email sending (bypass notification-service for simplicity)
     async function sendEmail(fromAddr: string, to: string[], bccArr: string[]) {
       return await fetch('https://api.resend.com/emails', {
@@ -203,26 +262,7 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
           bcc: bccArr.length > 0 ? bccArr : undefined,
           subject: emailSubject,
           text: emailContent,
-          html: `
-          <div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">
-            <h2 style="color: #2563eb;">Siparişiniz kargoya verildi! 📦</h2>
-            <p>Merhaba <strong>${customer_name}</strong>,</p>
-            <p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verildi!</p>
-            
-            <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="margin-top: 0; color: #374151;">Kargo Bilgileri</h3>
-              <p><strong>🚛 Kargo Firması:</strong> ${carrier}</p>
-              <p><strong>📋 Takip Numarası:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tracking_number}</code></p>
-              ${tracking_url ? `<p><strong>🔗 Takip Linki:</strong> <a href="${tracking_url}" target="_blank" style="color: #2563eb;">Kargo takip sayfası</a></p>` : ''}
-            </div>
-            
-            <p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>
-            <p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>
-            
-            <hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">
-            <p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
-          </div>
-        `,
+          html: htmlBody,
         }),
       })
     }

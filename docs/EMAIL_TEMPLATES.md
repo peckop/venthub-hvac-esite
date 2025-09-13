@@ -14,6 +14,7 @@ Current implementation (today)
 - Test flags: EMAIL_TEST_MODE / EMAIL_TEST_TO; NOTIFY_DEBUG for safe server logs.
 
 Planned implementation (file-based templates)
+- Status: INITIALIZED (template file added and code reads it if present)
 - Template path: templates/email/shipping.html (see placeholder below)
 - Placeholders:
   - {{customer_name}}

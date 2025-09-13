@@ -126,7 +126,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Auth Admin API ile müşteri e-posta/isim türetme (admin_users view bağımlılığı kaldırıldı)
   - [x] Test/Retry: EMAIL_TEST_MODE, EMAIL_TEST_TO; from domain doğrulama hatasında onboarding@resend.dev ile otomatik retry
   - [x] Public function güvenliği: verify_jwt=false (config + supabase.toml), CORS başlıkları net
-  - [ ] Şablon: Markalı HTML (logo, renkler, buton linki). Dosya: templates/email/shipping.html (oluşturulacak)
+- [x] Şablon: Markalı HTML temel iskelet eklendi. Dosya: templates/email/shipping.html (kod dosyadan okur, yoksa inline’a düşer).
   - [ ] From adresi: Kurumsal domain doğrulanınca EMAIL_FROM güncellenecek
   - [ ] Logs: Resend message id’yi response’a ekleyip sipariş detayında göster (opsiyonel küçük kart)
 - Test stabilizasyonu
