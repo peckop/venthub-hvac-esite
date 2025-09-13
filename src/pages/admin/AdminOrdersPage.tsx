@@ -123,7 +123,7 @@ const AdminOrdersPage: React.FC = () => {
     if (!ok) return
     try {
       setSaving(true)
-      const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+      const { data: cancelData, error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
         body: { order_id: id, cancel: true, send_email: false }
       })
       if (fnErr) throw fnErr
@@ -150,7 +150,7 @@ const AdminOrdersPage: React.FC = () => {
       try {
         const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
         // Call server-side edge function (no PostgREST schema/cache dependency)
-        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+        const { data: shipData, error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
           body: {
             order_id: shipId,
             carrier: carrier.trim(),
