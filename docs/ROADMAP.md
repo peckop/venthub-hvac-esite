@@ -165,6 +165,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - [ ] Build, test: yeşil
 
 ## 6) Komutlar
+- Email Templates: docs/EMAIL_TEMPLATES.md (mevcut durum + planlı HTML şablon)
 - Build: `pnpm run build:ci`
 - Test: `pnpm test -- --run`
 - Lint: `pnpm exec eslint .`
