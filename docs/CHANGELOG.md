@@ -3,6 +3,8 @@
 ## 2025-09-13
 
 ### E‑posta/Notification Altyapısı (Kargo)
+- Şablonlama
+  - templates/email/shipping.html eklendi ve shipping-notification, dosya varsa onu okuyup değişkenleri dolduruyor; yoksa inline HTML’e geri düşüyor.
 - Mimari
   - admin-update-shipping, kargo/güncelleme/iptal akışını yürütür; gerekirse implicit cancel uygular.
   - E‑posta için shipping-notification çağrılır. Çağrı service-role ile yetkilidir (Authorization+apikey), 401/CORS takılmaz.
