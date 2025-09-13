@@ -172,6 +172,23 @@ serve(async (req) => {
         try { j = await resp.json() } catch {}
         if (resp.ok) {
           if (j && j.disabled) emailResult.disabled = true; else emailResult.sent = true
+          // Log shipping email event (best-effort)
+          try {
+            const body = JSON.stringify({
+              order_id,
+              email_to: customer_email || '',
+              subject: (j && j.subject) || 'Kargo bildirimi',
+              provider: 'resend',
+              provider_message_id: (j && j.result && j.result.id) || null,
+              carrier,
+              tracking_number
+            })
+            await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
+              body
+            })
+          } catch {}
         }
       } catch {}
     }

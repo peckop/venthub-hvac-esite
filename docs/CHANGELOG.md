@@ -12,6 +12,9 @@
   - Domain doğrulaması yoksa Resend “from verify” hatasında otomatik onboarding@resend.dev ile tekrar denenir.
   - Test için EMAIL_TEST_MODE/EMAIL_TEST_TO; BCC desteği (SHIP_EMAIL_BCC).
 - Konfig/env
+  - Branding: BRAND_NAME, BRAND_PRIMARY_COLOR, BRAND_LOGO_URL (opsiyonel)
+- Kayıt
+  - shipping_email_events tablosu: gönderilen kargo e‑postaları (order_id, to, subject, provider id) kayıt altına alınır.
   - RESEND_API_KEY, EMAIL_FROM, SHIP_EMAIL_BCC, (opsiyonel) EMAIL_TEST_MODE, EMAIL_TEST_TO, NOTIFY_DEBUG.
 - Güvenlik
   - shipping-notification public (verify_jwt=false), admin-update-shipping JWT gerektirir (admin paneli).
