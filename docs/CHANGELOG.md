@@ -1,5 +1,41 @@
 # Changelog
 
+## 2025-09-13
+
+### Kargo akışı (UI + Edge Functions)
+- AdminOrdersPage
+  - "Kargo" ve "İptal" butonları eklendi; bağlama göre toast mesajları:
+    - İlk kez: "Sipariş kargoya verildi"
+    - Güncelleme: "Kargo bilgileri kaydedildi"
+    - Toplu: "N sipariş kargolandı"
+    - İptal: "Kargo iptal edildi"
+  - İstekler query fallback’lı hale getirildi:
+    - İptal: `admin-update-shipping?order_id={id}&cancel=true` (body: `{ send_email: false }`)
+    - Kargo: `admin-update-shipping?order_id={id}` (body: `{ carrier, tracking_number, tracking_url, send_email }`)
+- Edge Function: `admin-update-shipping`
+  - Body tek kez okunuyor (single parse)
+  - URL query fallback (order_id/cancel/send_email)
+  - Implicit cancel: sipariş shipped ise ve carrier/tracking yoksa iptal kabul edilir
+  - İptal akışında yalnızca order_id ile PATCH: `status='confirmed'`, `shipped_at/carrier/tracking/tracking_url = null`, 200 `{ ok:true, action:'cancel' }`
+  - Kargo/güncelleme yolunda `shipped_at` sadece ilk kargolamada set edilir, sonrasında korunur
+  - Mail sonucu `{ ok:true, email:{ sent, disabled } }` döner
+- Edge Function: `shipping-notification`
+  - RESEND entegrasyonu; BCC desteği (SHIP_EMAIL_BCC)
+  - Test modu desteği: `EMAIL_TEST_MODE=true`, `EMAIL_TEST_TO=delivered@resend.dev`
+  - Domain doğrulaması yokken `EMAIL_FROM="VentHub Test <onboarding@resend.dev>"` önerildi
+
+### Gereken ortam değişkenleri (Supabase Functions)
+- RESEND_API_KEY: Resend secret anahtarı (ör: `re_xxx`)
+- EMAIL_FROM: Gönderen (ör: `VentHub Test <onboarding@resend.dev>`)
+- SHIP_EMAIL_BCC: BCC kopya (ör: `recep.varlik@gmail.com`)
+- (Ops.) EMAIL_TEST_MODE=true
+- (Ops.) EMAIL_TEST_TO=delivered@resend.dev
+
+### Dağıtım notları
+- Supabase Studio → Edge Functions → Settings (Env Vars): yukarıdaki değişkenleri ekleyin
+- Edge Functions → `admin-update-shipping` ve `shipping-notification`: Publish/Deploy
+- Cloudflare Pages: yeni bundle yayınlandıktan sonra AdminOrders sayfasını `Ctrl+F5` ile yenileyin
+
 ## 2025-09-11 (Güvenlik, Performans ve Admin Panel İyileştirmeleri)
 - Güvenlik & DB Performans (Supabase Advisor sonuçlarına göre)
   - HIBP sızıntı kontrolü: 8+ karakter min parola + HaveIBeenPwned k-Anonymity kontrolü (Register/Parola Değiştir)

@@ -20,6 +20,9 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
 (Optional) You can add additional workflows for lint/test/build PR checks and prevent merging when they fail.
 
 ## Cloudflare Pages
+
+- master push sonrası otomatik yayın, gerekirse Pages → Deployments → Retry/Trigger.
+- AdminOrdersPage’de yeni bundle’ı görmek için `Ctrl+F5` ile sert yenileyin (Disable cache açık).
 - Project: Cloudflare Pages (Static site hosting)
 - Build settings:
   - Framework: Vite (static build)
