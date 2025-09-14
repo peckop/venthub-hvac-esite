@@ -107,9 +107,11 @@ Deno.serve(async (req: Request) => {
     }
 
     // Update returns row
+    let updated = false
     if (Object.keys(patch).length > 0) {
       const { error: updErr } = await supabase.from('venthub_returns').update(patch).eq('id', returnId)
       if (updErr) return json({ error: updErr.message || 'DB update failed' }, { status: 500 })
+      updated = true
     }
 
     // Audit event
@@ -131,7 +133,93 @@ Deno.serve(async (req: Request) => {
       }
     } catch {}
 
-    return json({ ok: true, return_id: returnId, status: patch['status'] || cur.status })
+    // Optional email: send only when we progressed to 'received'
+    try {
+      const nextStatus = (patch['status'] as string) || String(cur.status)
+      if (updated && nextStatus === 'received') {
+        // Load full return + order + user for notification payload
+        const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
+        const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+        if (SUPABASE_URL && SERVICE_KEY) {
+          // 1) Return details (reason, description, order_id fallback)
+          let rOrderId = p.order_id || ''
+          let reason = ''
+          let description = ''
+          try {
+            const r = await fetch(`${SUPABASE_URL}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(returnId)}&select=order_id,reason,description,status`, {
+              headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
+            })
+            if (r.ok) {
+              const arr = await r.json().catch(()=>[])
+              const row = Array.isArray(arr) ? arr[0] : null
+              if (row) {
+                rOrderId = rOrderId || String(row.order_id || '')
+                reason = String(row.reason || '')
+                description = String(row.description || '')
+              }
+            }
+          } catch {}
+          // 2) Order details (order_number, user_id)
+          let orderNumber = ''
+          let userId = ''
+          if (rOrderId) {
+            try {
+              const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(rOrderId)}&select=order_number,user_id`, {
+                headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
+              })
+              if (o.ok) {
+                const arr = await o.json().catch(()=>[])
+                const row = Array.isArray(arr) ? arr[0] : null
+                if (row) {
+                  orderNumber = String(row.order_number || '')
+                  userId = String(row.user_id || '')
+                }
+              }
+            } catch {}
+          }
+          // 3) User email/name via Auth Admin API
+          let customerEmail = ''
+          let customerName = ''
+          if (userId) {
+            try {
+              const u = await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`, {
+                headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
+              })
+              if (u.ok) {
+                const ju = await u.json().catch(()=>null) as any
+                if (ju) {
+                  customerEmail = String(ju.email || '')
+                  const meta = (ju.user_metadata || {}) as { full_name?: string; name?: string }
+                  customerName = String(meta.full_name || meta.name || '')
+                }
+              }
+            } catch {}
+          }
+          // 4) Invoke return-status-notification
+          if (customerEmail && customerName) {
+            try {
+              await fetch(`${SUPABASE_URL}/functions/v1/return-status-notification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
+                body: JSON.stringify({
+                  return_id: returnId,
+                  order_id: rOrderId,
+                  order_number: orderNumber,
+                  customer_email: customerEmail,
+                  customer_name: customerName,
+                  old_status: String(cur.status || ''),
+                  new_status: nextStatus,
+                  reason,
+                  description
+                })
+              })
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+
+    return json({ ok: true, return_id: returnId, status: (patch['status'] || cur.status) })
   } catch (e) {
     return json({ error: (e as Error).message || 'Unexpected error' }, { status: 500 })
   }
