@@ -59,6 +59,12 @@ const AdminOrdersPage: React.FC = () => {
   const [bulkMode, setBulkMode] = React.useState(false)
   const [selectedIds, setSelectedIds] = React.useState<string[]>([])
 
+  // Logs modal
+  const [logsOpen, setLogsOpen] = React.useState(false)
+  const [logsLoading, setLogsLoading] = React.useState(false)
+  const [logsOrderId, setLogsOrderId] = React.useState<string>('')
+  const [emailLogs, setEmailLogs] = React.useState<{ subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }[]>([])
+
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300)
     return () => clearTimeout(t)
@@ -116,6 +122,29 @@ const AdminOrdersPage: React.FC = () => {
     setShipOpen(true)
   }
   const closeShipModal = () => setShipOpen(false)
+
+  async function openLogsModal(id: string) {
+    setLogsOrderId(id)
+    setLogsOpen(true)
+    setLogsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('shipping_email_events')
+        .select('subject,email_to,provider_message_id,created_at,carrier,tracking_number')
+        .eq('order_id', id)
+        .order('created_at', { ascending: false })
+        .limit(20)
+      if (error) throw error
+      setEmailLogs(Array.isArray(data) ? (data as { subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }[]) : [])
+    } catch (e) {
+      console.error('load logs error', e)
+      toast.error('E‑posta kayıtları alınamadı')
+      setEmailLogs([])
+    } finally {
+      setLogsLoading(false)
+    }
+  }
+  const closeLogsModal = () => setLogsOpen(false)
 
   async function cancelShipping(id: string) {
     if (!id) return
@@ -280,6 +309,36 @@ const AdminOrdersPage: React.FC = () => {
     return sortDir === 'asc' ? '▲' : '▼'
   }
 
+  async function bulkCancelShipping() {
+    const targets = rows.filter(r => selectedIds.includes(r.id) && r.status === 'shipped').map(r => r.id)
+    if (targets.length === 0) {
+      toast('Kargosu iptal edilebilir seçim yok', { icon: 'ℹ️' })
+      return
+    }
+    const ok = window.confirm(`${targets.length} siparişin kargosunu iptal etmek istediğinize emin misiniz?`)
+    if (!ok) return
+    setSaving(true)
+    try {
+      const results = await Promise.all(targets.map(async (id) => {
+        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+          body: { order_id: id, cancel: true, send_email: false }
+        })
+        if (fnErr) return { id, ok: false, error: fnErr }
+        return { id, ok: true }
+      }))
+      const failed = results.filter(r => !r.ok).map(r => r.id)
+      setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: failed.includes(r.id) ? r.status : 'confirmed' } : r))
+      if (failed.length === 0) toast.success(`${targets.length} sipariş iptal edildi`)
+      else toast.error(`Bazı iptaller başarısız: ${failed.join(',')}`)
+      setSelectedIds([])
+    } catch (e) {
+      console.error('bulk cancel error', e)
+      toast.error('Toplu iptal başarısız')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   // Export helpers
   function exportOrdersCsv() {
     const header = ['Sipariş ID','Durum','Konuşma ID','Tutar','Oluşturulma']
@@ -407,6 +466,13 @@ const AdminOrdersPage: React.FC = () => {
             >
               Seçilenleri Kargoya Ver
             </button>
+            <button
+              onClick={bulkCancelShipping}
+              className="px-3 md:h-12 h-11 rounded-md border border-red-200 bg-red-50 hover:border-red-400 text-sm whitespace-nowrap text-red-700"
+              title="Seçilenlerde kargoyu iptal et (yalnızca kargolanmış siparişler)"
+            >
+              Seçilenlerin Kargosunu İptal Et
+            </button>
             <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">Temizle</button>
           </div>
         </div>
@@ -454,6 +520,13 @@ const AdminOrdersPage: React.FC = () => {
                       >
                         Kargo
                       </button>
+                      <button
+                        onClick={() => openLogsModal(r.id)}
+                        className="text-xs px-2 py-1 rounded bg-amber-500 text-white hover:bg-amber-600"
+                        title="E‑posta loglarını görüntüle"
+                      >
+                        Loglar
+                      </button>
                       {r.status === 'shipped' && (
                         <button
                           onClick={() => cancelShipping(r.id)}
@@ -479,7 +552,20 @@ const AdminOrdersPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-industrial-gray mb-1">Kargo Firması</label>
-                <input value={carrier} onChange={e=>setCarrier(e.target.value)} placeholder="Yurtiçi, Aras, MNG..." className="w-full border border-gray-200 rounded px-3 py-2" />
+                <select value={carrier} onChange={e=>setCarrier(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2">
+                  <option value="">Seçiniz…</option>
+                  <option value="Yurtiçi">Yurtiçi</option>
+                  <option value="Aras">Aras</option>
+                  <option value="MNG">MNG</option>
+                  <option value="PTT">PTT</option>
+                  <option value="UPS">UPS</option>
+                  <option value="FedEx">FedEx</option>
+                  <option value="DHL">DHL</option>
+                  <option value="Diğer">Diğer</option>
+                </select>
+                {carrier === 'Diğer' && (
+                  <input onChange={e=>setCarrier(e.target.value)} placeholder="Diğer (elle yazın)" className="w-full border border-gray-200 rounded px-3 py-2 mt-2" />
+                )}
               </div>
               <div>
                 <label className="block text-xs text-industrial-gray mb-1">Takip Numarası</label>
@@ -493,6 +579,50 @@ const AdminOrdersPage: React.FC = () => {
             <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={closeShipModal} className="px-3 py-2 rounded border border-gray-200">İptal</button>
               <button onClick={submitShip} disabled={saving || !carrier.trim() || !tracking.trim()} className={adminButtonPrimaryClass}>{saving ? 'Kaydediliyor...' : 'Kaydet'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {logsOpen && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className={adminCardPaddedClass + ' w-full max-w-2xl'}>
+            <h3 className="text-lg font-semibold text-industrial-gray mb-2">E‑posta Kayıtları</h3>
+            <div className="text-xs text-industrial-gray mb-3">Sipariş: <span className="font-mono">{logsOrderId}</span></div>
+            <div className="max-h-[60vh] overflow-auto border border-gray-100 rounded">
+              {logsLoading ? (
+                <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+              ) : (emailLogs.length === 0 ? (
+                <div className="p-4 text-sm text-steel-gray">Kayıt yok</div>
+              ) : (
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className={`${adminTableHeadCellClass}`}>Tarih</th>
+                      <th className={`${adminTableHeadCellClass}`}>Kime</th>
+                      <th className={`${adminTableHeadCellClass}`}>Konu</th>
+                      <th className={`${adminTableHeadCellClass}`}>Kargo</th>
+                      <th className={`${adminTableHeadCellClass}`}>Takip No</th>
+                      <th className={`${adminTableHeadCellClass}`}>Mesaj ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {emailLogs.map((l, idx) => (
+                      <tr key={idx} className="border-t border-gray-100">
+                        <td className="px-3 py-2 whitespace-nowrap">{safeDate(l.created_at)}</td>
+                        <td className="px-3 py-2">{l.email_to}</td>
+                        <td className="px-3 py-2">{l.subject}</td>
+                        <td className="px-3 py-2">{l.carrier || '-'}</td>
+                        <td className="px-3 py-2">{l.tracking_number || '-'}</td>
+                        <td className="px-3 py-2 text-xs text-industrial-gray">{l.provider_message_id || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <button onClick={closeLogsModal} className="px-3 py-2 rounded border border-gray-200">Kapat</button>
             </div>
           </div>
         </div>
