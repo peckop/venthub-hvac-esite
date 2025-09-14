@@ -180,7 +180,7 @@ VentHub Ekibi
 Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     `.trim()
 
-    // Send email via notification service
+    // (Info only) notification-service payload kept for reference; direct Resend is used below
     const _notificationRequest = {
       type: 'email',
       to: customer_email,
@@ -290,6 +290,28 @@ Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
     }
 
     const result = await response.json()
+
+    // Best-effort audit insert; silent on failure
+    try {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+      if (supabaseUrl && serviceKey) {
+        const payload = {
+          order_id,
+          email_to: toList[0] || '',
+          subject: emailSubject,
+          provider: 'resend',
+          provider_message_id: (result && result.id) || null,
+          carrier: carrier || null,
+          tracking_number: tracking_number || null
+        }
+        await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
+          body: JSON.stringify(payload)
+        })
+      }
+    } catch {}
 
     console.log(`📧 Shipping notification sent to ${customer_email} for order ${prettyOrderNo}`)
 
