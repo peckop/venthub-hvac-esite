@@ -367,7 +367,7 @@ export default function AdminUsersPage() {
                               {userItem.role !== 'admin' && (
                                 <button
                                   onClick={() => handleRoleChange(userItem.id, 'admin')}
-                                  disabled={updatingRole === userItem.id}
+                                  disabled={updatingRole === userItem.id || (userItem.id === user?.id && actorRole !== 'superadmin')}
                                   className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
                                   title="Admin yap"
                                 >
@@ -391,9 +391,9 @@ export default function AdminUsersPage() {
                               {userItem.role !== 'user' && (
                                 <button
                                   onClick={() => handleRoleChange(userItem.id, 'user')}
-                                  disabled={updatingRole === userItem.id}
+                                  disabled={updatingRole === userItem.id || userItem.id === user?.id}
                                   className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-                                  title="Normal kullanıcı yap"
+                                  title={userItem.id === user?.id ? 'Kendi rolünüzü düşüremezsiniz' : 'Normal kullanıcı yap'}
                                 >
                                   User
                                 </button>
