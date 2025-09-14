@@ -94,11 +94,18 @@ const AdminErrorGroupsPage: React.FC = () => {
   }, [q])
 
   React.useEffect(() => {
-    // load admin/moderator users for assignment
+    // load admin/moderator users for assignment via secure RPC
     ;(async () => {
       try {
-        const { data, error } = await supabase.from('admin_users').select('id,email,full_name')
-        if (!error) setUsers((data || []) as AdminUserOpt[])
+        const { data, error } = await supabase.rpc('admin_list_users')
+        if (!error && Array.isArray(data)) {
+          const list = (data as Array<{ id: string; email: string; full_name?: string | null }>).map(u => ({
+            id: u.id,
+            email: u.email,
+            full_name: u.full_name ?? null,
+          })) as AdminUserOpt[]
+          setUsers(list)
+        }
       } catch {}
     })()
   }, [])

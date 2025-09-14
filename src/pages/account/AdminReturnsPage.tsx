@@ -259,16 +259,8 @@ export default function AdminReturnsPage() {
 
       // Müşteriye e-posta bildirimi gönder
       try {
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-        const functionUrl = `${supabaseUrl}/functions/v1/return-status-notification`
-        
-        await fetch(functionUrl, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-          },
-          body: JSON.stringify({
+        const { error: invokeError } = await supabase.functions.invoke('return-status-notification', {
+          body: {
             return_id: returnId,
             order_id: returnItem.order_id,
             order_number: returnItem.order_number,
@@ -278,9 +270,9 @@ export default function AdminReturnsPage() {
             new_status: newStatus,
             reason: returnItem.reason,
             description: returnItem.description
-          })
+          }
         })
-        
+        if (invokeError) throw invokeError
         toast.success('Müşteriye e-posta bildirimi gönderildi')
       } catch (emailError) {
         console.error('Email notification failed:', emailError)

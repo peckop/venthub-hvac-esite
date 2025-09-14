@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions."order-confirmation"]
 verify_jwt = false
+
+[functions."return-status-notification"]
+verify_jwt = false

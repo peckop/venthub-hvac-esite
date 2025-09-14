@@ -26,8 +26,10 @@
   <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin>
   <link rel="dns-prefetch" href="%VITE_SUPABASE_URL%">
 
-  <!-- Preload key LCP image of the hero for faster rendering -->
-  <link rel="preload" as="image" href="/images/industrial_HVAC_air_handling_unit_warehouse.jpg" fetchpriority="high">
+  <!-- Preload key LCP image of the hero for faster rendering on homepage only -->
+  <!-- Note: to avoid warnings on non-home routes, keep preload only on root path build or remove. Using eager+fetchpriority in HeroSection already covers LCP. -->
+  <!-- Removed to prevent preload-not-used warnings across admin routes. -->
+  <!-- <link rel="preload" as="image" href="/images/industrial_HVAC_air_handling_unit_warehouse.jpg" fetchpriority="high"> -->
   <!-- You can add more preconnects (e.g., CDN) as needed -->
 </head>
 

@@ -2,10 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 interface ReturnStatusNotificationRequest {
   return_id: string
-  order_id: string
+  order_id?: string
   order_number?: string
-  customer_email: string
-  customer_name: string
+  customer_email?: string
+  customer_name?: string
   old_status: string
   new_status: string
   reason: string
@@ -32,22 +32,95 @@ serve(async (req) => {
 
   try {
     const body = await req.json() as ReturnStatusNotificationRequest
-    const { 
+
+    // Extract and then resolve sensitive fields server-side
+    let { 
       return_id,
       order_id, 
       order_number,
-      customer_email, 
-      customer_name, 
       old_status,
       new_status,
       reason,
       description
     } = body
 
-    // Validate required fields
-    if (!return_id || !customer_email || !customer_name || !new_status) {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+
+    let customer_email: string | undefined = undefined
+    let customer_name: string | undefined = undefined
+    let user_id: string | undefined = undefined
+
+    if (!supabaseUrl || !serviceKey) {
+      // Fallback to client-provided values only if server config missing
+      customer_email = body.customer_email
+      customer_name = body.customer_name
+    } else {
+      try {
+        // 1) If order_id not provided, look up from returns
+        if (!order_id && return_id) {
+          const retRes = await fetch(`${supabaseUrl}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(return_id)}&select=order_id,user_id`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+          })
+          if (retRes.ok) {
+            const retArr = await retRes.json().catch(() => [])
+            const ret = Array.isArray(retArr) ? retArr[0] : null
+            if (ret) { order_id = ret.order_id || order_id; user_id = ret.user_id || user_id }
+          }
+        }
+
+        // 2) Load order to get canonical customer info
+        if (order_id) {
+          const ordRes = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=order_number,customer_name,customer_email,user_id`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+          })
+          if (ordRes.ok) {
+            const ordArr = await ordRes.json().catch(() => [])
+            const ord = Array.isArray(ordArr) ? ordArr[0] : null
+            if (ord) {
+              order_number = ord.order_number || order_number
+              customer_email = ord.customer_email || customer_email
+              customer_name = ord.customer_name || customer_name
+              user_id = ord.user_id || user_id
+            }
+          }
+        }
+
+        // 3) Fallback to Auth Admin API if still missing
+        if ((!customer_email || !customer_name) && user_id) {
+          const authRes = await fetch(`${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(user_id)}`, {
+            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json' }
+          })
+          if (authRes.ok) {
+            const u = await authRes.json().catch(() => null)
+            if (u) {
+              customer_email = customer_email || u?.email || undefined
+              const meta = (u?.user_metadata || {}) as { full_name?: string; name?: string }
+              customer_name = customer_name || meta.full_name || meta.name || undefined
+            }
+          }
+        }
+      } catch {
+        // ignore and fallback to client-provided
+      }
+
+      // Final fallback to client-sent values (if any)
+      if (!customer_email) customer_email = body.customer_email
+      if (!customer_name) customer_name = body.customer_name
+    }
+
+    // Validate required fields (after server-side resolution)
+    if (!return_id || !new_status) {
       return new Response(JSON.stringify({ 
-        error: 'Missing required fields: return_id, customer_email, customer_name, new_status' 
+        error: 'Missing required fields: return_id, new_status' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    if (!customer_email || !customer_name) {
+      return new Response(JSON.stringify({ 
+        error: 'Customer info unavailable', code: 'CUSTOMER_INFO_MISSING' 
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
