@@ -58,6 +58,8 @@ const AdminOrdersPage: React.FC = () => {
   const [saving, setSaving] = React.useState(false)
   const [bulkMode, setBulkMode] = React.useState(false)
   const [selectedIds, setSelectedIds] = React.useState<string[]>([])
+  const [advBulk, setAdvBulk] = React.useState(false)
+  const [advRows, setAdvRows] = React.useState<{ id: string; carrier: string; tracking: string }[]>([])
 
   // Logs modal
   const [logsOpen, setLogsOpen] = React.useState(false)
@@ -122,6 +124,14 @@ const AdminOrdersPage: React.FC = () => {
     setShipOpen(true)
   }
   const closeShipModal = () => setShipOpen(false)
+
+  React.useEffect(() => {
+    if (shipOpen && bulkMode) {
+      // Initialize advanced rows with selected ids
+      setAdvRows(selectedIds.map(id => ({ id, carrier: '', tracking: '' })))
+      setAdvBulk(false)
+    }
+  }, [shipOpen, bulkMode, selectedIds])
 
   async function openLogsModal(id: string) {
     setLogsOrderId(id)
@@ -216,37 +226,76 @@ const AdminOrdersPage: React.FC = () => {
     if (targets.length === 0) { setShipOpen(false); return }
     setSaving(true)
     try {
-      const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
-      // Call edge function per id
-      const results = await Promise.all(targets.map(async (id) => {
-        const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-          body: {
-            order_id: id,
-            carrier: carrier.trim() || '',
-            tracking_number: tracking.trim() || '',
-            tracking_url: tracking_url,
-            send_email: !!sendEmail
-          }
+      if (!advBulk) {
+        // Simple mode: same carrier/tracking for all
+        const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
+        const results = await Promise.all(targets.map(async (id) => {
+          const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+            body: {
+              order_id: id,
+              carrier: carrier.trim() || '',
+              tracking_number: tracking.trim() || '',
+              tracking_url: tracking_url,
+              send_email: !!sendEmail
+            }
+          })
+          if (fnErr) return { id, ok: false, error: fnErr }
+          return { id, ok: true }
+        }))
+        const failed = results.filter(r => !r.ok).map(r => r.id)
+        if (failed.length > 0) throw new Error('FUNC failed for: ' + failed.join(','))
+        await logAdminAction(supabase, targets.map(id => ({
+          table_name: 'venthub_orders', row_pk: id, action: 'UPDATE',
+          before: { status: rows.find(r => r.id === id)?.status },
+          after: { status: 'shipped', carrier: carrier || undefined, tracking_number: tracking || undefined },
+          comment: 'bulk shipment update'
+        })))
+        setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
+        setShipOpen(false)
+        toast.success(`${targets.length} sipariş kargolandı`)
+        setSelectedIds([])
+        setBulkMode(false)
+      } else {
+        // Advanced mode: per-order values
+        const mapById = new Map(advRows.map(x => [x.id, x]))
+        const invalid = targets.filter(id => {
+          const row = mapById.get(id)
+          return !row || !row.carrier.trim() || !row.tracking.trim()
         })
-        if (fnErr) return { id, ok: false, error: fnErr }
-        return { id, ok: true }
-      }))
-      const failed = results.filter(r => !r.ok).map(r => r.id)
-      if (failed.length > 0) throw new Error('FUNC failed for: ' + failed.join(','))
-      // Audit log (bulk)
-      await logAdminAction(supabase, targets.map(id => ({
-        table_name: 'venthub_orders',
-        row_pk: id,
-        action: 'UPDATE',
-        before: { status: rows.find(r => r.id === id)?.status },
-        after: { status: 'shipped', carrier: carrier || undefined, tracking_number: tracking || undefined },
-        comment: 'bulk shipment update'
-      })))
-      setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
-      setShipOpen(false)
-      toast.success(`${targets.length} sipariş kargolandı`)
-      setSelectedIds([])
-      setBulkMode(false)
+        if (invalid.length > 0) {
+          alert(`Eksik alanlar var: ${invalid.length} satır`)
+          setSaving(false)
+          return
+        }
+        const results = await Promise.all(targets.map(async (id) => {
+          const row = mapById.get(id)!
+          const turl = generateTrackingUrl(row.carrier, row.tracking)
+          const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
+            body: {
+              order_id: id,
+              carrier: row.carrier.trim(),
+              tracking_number: row.tracking.trim(),
+              tracking_url: turl,
+              send_email: !!sendEmail
+            }
+          })
+          if (fnErr) return { id, ok: false, error: fnErr }
+          return { id, ok: true }
+        }))
+        const failed = results.filter(r => !r.ok).map(r => r.id)
+        if (failed.length > 0) throw new Error('FUNC failed for: ' + failed.join(','))
+        await logAdminAction(supabase, targets.map(id => ({
+          table_name: 'venthub_orders', row_pk: id, action: 'UPDATE',
+          before: { status: rows.find(r => r.id === id)?.status },
+          after: { status: 'shipped' },
+          comment: 'bulk shipment update (advanced)'
+        })))
+        setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
+        setShipOpen(false)
+        toast.success(`${targets.length} sipariş kargolandı`)
+        setSelectedIds([])
+        setBulkMode(false)
+      }
     } catch (e) {
       console.error('bulk ship error', e)
       toast.error('Toplu kargo güncellenemedi')
@@ -576,9 +625,39 @@ const AdminOrdersPage: React.FC = () => {
               <input type="checkbox" checked={sendEmail} onChange={e=>setSendEmail(e.target.checked)} />
               Müşteriye e-posta bildirimi gönder
             </label>
+            {bulkMode && (
+              <div className="mt-3">
+                <label className="inline-flex items-center gap-2 text-sm text-steel-gray">
+                  <input type="checkbox" checked={advBulk} onChange={e=>setAdvBulk(e.target.checked)} />
+                  Gelişmiş: sipariş bazlı carrier/tracking gir
+                </label>
+                {advBulk && (
+                  <div className="mt-3 border border-gray-100 rounded overflow-auto max-h-[40vh]">
+                    <table className="min-w-full text-xs">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-2 py-2 text-left">Sipariş ID</th>
+                          <th className="px-2 py-2 text-left">Kargo</th>
+                          <th className="px-2 py-2 text-left">Takip</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {advRows.map((r,i)=>(
+                          <tr key={r.id} className="border-t">
+                            <td className="px-2 py-1 font-mono">{r.id}</td>
+                            <td className="px-2 py-1"><input value={r.carrier} onChange={e=>setAdvRows(rows=>{ const c=[...rows]; c[i]={...c[i], carrier:e.target.value}; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
+                            <td className="px-2 py-1"><input value={r.tracking} onChange={e=>setAdvRows(rows=>{ const c=[...rows]; c[i]={...c[i], tracking:e.target.value}; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={closeShipModal} className="px-3 py-2 rounded border border-gray-200">İptal</button>
-              <button onClick={submitShip} disabled={saving || !carrier.trim() || !tracking.trim()} className={adminButtonPrimaryClass}>{saving ? 'Kaydediliyor...' : 'Kaydet'}</button>
+              <button onClick={submitShip} disabled={saving || (!bulkMode && (!carrier.trim() || !tracking.trim()))} className={adminButtonPrimaryClass}>{saving ? 'Kaydediliyor...' : 'Kaydet'}</button>
             </div>
           </div>
         </div>

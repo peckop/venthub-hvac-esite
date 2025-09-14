@@ -2,6 +2,21 @@
 
 ## 2025-09-14
 
+### Returns Yönetimi v2 (mock)
+- refund-order-mock Edge Function: PSP olmadan iade simülasyonu (tam/kısmi). payment_status ve payment_debug güncellenir, tam iade durumunda sipariş status (shipped/delivered değilse) cancelled yapılır.
+- order_refund_events audit tablosu eklendi (RLS: INSERT service_role, SELECT admin/superadmin).
+- AdminReturnsPage: refunded durumuna geçerken otomatik refund-order-mock çağrısı yapılır, ardından müşteriye e‑posta bildirimi gönderilir.
+
+### Webhook Olayları Paneli
+- Yeni sayfa: Admin > Webhook Olayları (/admin/webhook-events).
+- Returns sekmesi: returns_webhook_events listesi (event_id, order_id, return_id, carrier, status_mapped, received_at).
+- Kargo E‑postaları sekmesi: shipping_email_events listesi (order_id, email_to, subject, provider, created_at).
+- Arama, yenile, kolon/density kalıcılığı.
+
+### Admin Orders Gelişmiş Toplu Kargolama
+- Toplu “Kargoya ver” moduna gelişmiş giriş: seçili siparişler için sipariş bazlı carrier/tracking girilebilen grid eklendi.
+- Basit modda tüm seçilenlere aynı carrier/tracking uygulanmaya devam eder.
+
 ### İade Webhookları ve Rol Güvenliği
 - returns-webhook Edge Function: HMAC/Token doğrulamalı, delivered/returned/completed → venthub_returns.status='received'.
 - Audit/dedup: returns_webhook_events tablosu eklendi.

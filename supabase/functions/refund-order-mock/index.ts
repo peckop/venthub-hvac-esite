@@ -100,6 +100,27 @@ serve(async (req) => {
       partial_refunds: isFull ? (dbg?.partial_refunds || []) : ([...(Array.isArray(dbg?.partial_refunds) ? dbg.partial_refunds : []), { amount: target, at: new Date().toISOString() }])
     }
 
+    // Stock restore on full refund (mock)
+    if (isFull) {
+      try {
+        const itemsResp = await fetch(`${supabaseUrl}/rest/v1/venthub_order_items?order_id=eq.${encodeURIComponent(order_id)}&select=product_id,quantity`, {
+          headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
+        })
+        if (itemsResp.ok) {
+          const items = await itemsResp.json().catch(()=>[])
+          for (const it of (Array.isArray(items) ? items : [])) {
+            try {
+              await fetch(`${supabaseUrl}/rest/v1/products?id=eq.${encodeURIComponent(it.product_id)}`, {
+                method: 'PATCH',
+                headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+                body: JSON.stringify({ stock_qty: { "increment": Number(it.quantity||0) } })
+              })
+            } catch {}
+          }
+        }
+      } catch {}
+    }
+
     const upd = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
