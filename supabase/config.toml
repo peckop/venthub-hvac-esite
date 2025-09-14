@@ -9,6 +9,9 @@ verify_jwt = false
 [functions."returns-webhook"]
 verify_jwt = false
 
+[functions."refund-order-mock"]
+verify_jwt = false
+
 [functions."admin-update-order"]
 verify_jwt = false
 
