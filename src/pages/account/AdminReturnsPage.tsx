@@ -257,6 +257,19 @@ export default function AdminReturnsPage() {
 
       toast.success(`İade durumu "${getStatusLabel(newStatus)}" olarak güncellendi`)
 
+      // Mock refund integration: when new_status = refunded, call refund-order-mock
+      if (newStatus === 'refunded') {
+        try {
+          const { error: refundErr } = await supabase.functions.invoke('refund-order-mock', {
+            body: { order_id: returnItem.order_id, reason: `return:${returnId}` }
+          })
+          if (refundErr) throw refundErr
+        } catch (re) {
+          console.error('Mock refund failed:', re)
+          // Devam: iade statüsü yine de güncel kaldı
+        }
+      }
+
       // Müşteriye e-posta bildirimi gönder
       try {
         const { error: invokeError } = await supabase.functions.invoke('return-status-notification', {
