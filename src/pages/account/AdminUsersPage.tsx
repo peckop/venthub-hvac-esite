@@ -158,8 +158,7 @@ export default function AdminUsersPage() {
 
     loadAllUsers()
   }, [isAdmin, user, activeTab])
-
-  const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'moderator') => {
+  const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'moderator' | 'superadmin') => {
     if (!isAdmin) return
     
     try {
@@ -189,7 +188,7 @@ export default function AdminUsersPage() {
         ))
         
         // Admin listesini yeniden yükle
-        if (newRole === 'admin' || newRole === 'moderator') {
+        if (newRole === 'admin' || newRole === 'moderator' || newRole === 'superadmin') {
           const data = await listAdminUsers()
           setAdminUsers(data)
         }
