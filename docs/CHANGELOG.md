@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-09-14
+
+### İade Webhookları ve Rol Güvenliği
+- returns-webhook Edge Function: HMAC/Token doğrulamalı, delivered/returned/completed → venthub_returns.status='received'.
+- Audit/dedup: returns_webhook_events tablosu eklendi.
+- Supabase config: [functions."returns-webhook"].verify_jwt=false (HMAC/Token ile korunur).
+- Rol güvenliği: Kullanıcılar kendi rolünü düşüremez (DB trigger enforce_role_change + UI guard AdminUsersPage). Superadmin her şeyi yapabilir.
+- Hesap Güvenliği: Google hesabını mevcut hesaba bağlama/ayırma UI (AccountSecurityPage) — linkIdentity ve güvenli unlink guard.
+
 ## 2025-09-13
 
 ### E‑posta/Notification Altyapısı (Kargo + Sipariş Onayı)

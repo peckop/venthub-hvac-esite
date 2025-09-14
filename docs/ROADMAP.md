@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-13
+Last updated: 2025-09-14
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -95,6 +95,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Kargo Operasyonları (minimal)
   - [x] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
   - [x] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
+  - [x] İade webhooks: returns-webhook (HMAC/Token) ile delivered→received otomasyonu; returns_webhook_events audit/dedup
 
 ### Sprint 3 — Planlı
 - Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
@@ -121,6 +122,10 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] Her hesaplayıcı altında 2–3 maddelik standart referans bloğu
 
 ## 3) Operasyonel “Next Steps” (Öncelikli)
+- Rol Güvenliği
+  - [x] Kullanıcının kendi rolünü düşürmesini engelle (DB trigger + UI guard)
+- Kimlik Bağlama (Hesap → Güvenlik)
+  - [x] Google hesabı bağlama/ayırma UI (supabase.auth.linkIdentity / unlinkIdentity guard)
 - E‑posta / Bildirim Altyapısı (Resend + Supabase)
   - [x] Kargo e-postaları: admin-update-shipping → shipping-notification (service-role yetkili invoke)
   - [x] Auth Admin API ile müşteri e-posta/isim türetme (admin_users view bağımlılığı kaldırıldı)

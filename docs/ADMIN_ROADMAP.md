@@ -45,6 +45,11 @@ Tarih: 2025-09-08
   - [x] CI/CD: Cloudflare Pages dağıtımı; index.html için no-store (public/_headers) ile bayat UI önlendi
 
 ## Devam Eden (Sprint 2 – Orders Modülü)
+
+### Yeni (2025-09-14)
+- [x] Rol güvenliği: self‑demotion engeli (DB trigger + UI guard)
+- [x] İade teslim otomasyonu: returns-webhook (HMAC/Token), delivered→received
+- [x] Hesap → Güvenlik: Google kimliği bağlama/ayırma UI (linkIdentity)
 - /admin/orders işlevleri
   - Liste ve veri modeli: status rozetleri, toplam, tarih (mevcut)
   - Filtreler: durum, tarih aralığı, arama (mevcut)
