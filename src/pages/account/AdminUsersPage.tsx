@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { checkAdminAccess, listAdminUsers, setUserAdminRole } from '../../config/admin'
+import { checkAdminAccess, listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -39,11 +39,28 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'admins' | 'all'>('admins')
+  const [actorRole, setActorRole] = useState<'user'|'moderator'|'admin'|'superadmin'>('user')
 
   // Admin kontrolü
   useEffect(() => {
     setIsAdmin(checkAdminAccess(user))
   }, [user])
+
+  // Aktör rolünü yükle (yetki kontrolleri için)
+  useEffect(() => {
+    (async () => {
+      try {
+        if (user?.id) {
+          const role = await getUserRole(user.id)
+          if (role === 'superadmin' || role === 'admin' || role === 'moderator') {
+            setActorRole(role as 'user'|'moderator'|'admin'|'superadmin')
+          } else {
+            setActorRole('user')
+          }
+        }
+      } catch {}
+    })()
+  }, [user?.id])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -198,6 +215,7 @@ export default function AdminUsersPage() {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
+      case 'superadmin': return <Crown className="text-purple-700" size={16} />
       case 'admin': return <Crown className="text-yellow-600" size={16} />
       case 'moderator': return <CheckCircle className="text-blue-600" size={16} />
       default: return <Users className="text-gray-600" size={16} />
@@ -206,6 +224,7 @@ export default function AdminUsersPage() {
 
   const getRoleColor = (role: string): string => {
     switch (role) {
+      case 'superadmin': return 'bg-purple-100 text-purple-800 border-purple-200'
       case 'admin': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       case 'moderator': return 'bg-blue-100 text-blue-800 border-blue-200'
       default: return 'bg-gray-100 text-gray-600 border-gray-200'
@@ -333,39 +352,54 @@ export default function AdminUsersPage() {
                     {activeTab === 'all' && visibleCols.actions && (
                       <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
                         <div className="flex gap-1">
-                          {userItem.role !== 'admin' && (
-                            <button
-                              onClick={() => handleRoleChange(userItem.id, 'admin')}
-                              disabled={updatingRole === userItem.id}
-                              className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
-                              title="Admin yap"
-                            >
-                              {updatingRole === userItem.id ? (
-                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                'Admin'
+                          {/* Süperadmin'i yalnızca süperadmin değiştirebilir; kendi rolünü değiştiremeyecek */}
+                          {!(userItem.role === 'superadmin' && (actorRole !== 'superadmin' || userItem.id === user?.id)) && (
+                            <>
+                              {userItem.role !== 'superadmin' && actorRole === 'superadmin' && userItem.id !== user?.id && (
+                                <button
+                                  onClick={() => handleRoleChange(userItem.id, 'superadmin')}
+                                  disabled={updatingRole === userItem.id}
+                                  className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
+                                  title="Superadmin yap"
+                                >
+                                  Superadmin
+                                </button>
                               )}
-                            </button>
-                          )}
-                          {userItem.role !== 'moderator' && (
-                            <button
-                              onClick={() => handleRoleChange(userItem.id, 'moderator')}
-                              disabled={updatingRole === userItem.id}
-                              className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                              title="Moderator yap"
-                            >
-                              Mod
-                            </button>
-                          )}
-                          {userItem.role !== 'user' && (
-                            <button
-                              onClick={() => handleRoleChange(userItem.id, 'user')}
-                              disabled={updatingRole === userItem.id}
-                              className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-                              title="Normal kullanıcı yap"
-                            >
-                              User
-                            </button>
+                              {userItem.role !== 'admin' && (
+                                <button
+                                  onClick={() => handleRoleChange(userItem.id, 'admin')}
+                                  disabled={updatingRole === userItem.id}
+                                  className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
+                                  title="Admin yap"
+                                >
+                                  {updatingRole === userItem.id ? (
+                                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                                  ) : (
+                                    'Admin'
+                                  )}
+                                </button>
+                              )}
+                              {userItem.role !== 'moderator' && (
+                                <button
+                                  onClick={() => handleRoleChange(userItem.id, 'moderator')}
+                                  disabled={updatingRole === userItem.id}
+                                  className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                                  title="Moderator yap"
+                                >
+                                  Mod
+                                </button>
+                              )}
+                              {userItem.role !== 'user' && (
+                                <button
+                                  onClick={() => handleRoleChange(userItem.id, 'user')}
+                                  disabled={updatingRole === userItem.id}
+                                  className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+                                  title="Normal kullanıcı yap"
+                                >
+                                  User
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
@@ -397,6 +431,7 @@ export default function AdminUsersPage() {
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-1">Kullanıcı Role Sistemi</p>
             <ul className="space-y-1 text-xs">
+              <li><strong>Superadmin:</strong> Tüm yetkiler + rol atamaları (güvenlik amaçlı sınırlı görünürlük)</li>
               <li><strong>Admin:</strong> Tüm operasyon paneline erişim (stok, iadeler, kargo, kullanıcılar)</li>
               <li><strong>Moderator:</strong> Sınırlı admin yetkisi (stok ve iadeler)</li>
               <li><strong>User:</strong> Normal kullanıcı (sadece kendi hesap yönetimi)</li>
