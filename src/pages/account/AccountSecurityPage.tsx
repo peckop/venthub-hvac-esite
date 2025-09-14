@@ -134,13 +134,14 @@ export default function AccountSecurityPage() {
                     toast.error('Google kimliği bulunamadı')
                     return
                   }
-                  // Typings may vary across versions; use any to call unlinkIdentity when available
-                  const anyAuth: any = supabase.auth as any
-                  if (typeof anyAuth.unlinkIdentity !== 'function') {
+                  // Typings may vary across versions; narrow to a minimal interface at runtime
+                  type AuthWithUnlink = { unlinkIdentity?: (args: { identity_id: string }) => Promise<{ error?: unknown }> }
+                  const authMaybe = supabase.auth as unknown as AuthWithUnlink
+                  if (typeof authMaybe.unlinkIdentity !== 'function') {
                     toast.error('unlinkIdentity API desteklenmiyor')
                     return
                   }
-                  const { error } = await anyAuth.unlinkIdentity({ identity_id: google.id })
+                  const { error } = await authMaybe.unlinkIdentity({ identity_id: google.id })
                   if (error) throw error
                   toast.success('Google bağlantısı kaldırıldı')
                   await refreshIdentities()
