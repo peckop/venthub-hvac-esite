@@ -72,6 +72,9 @@ Tarih: 2025-09-08
 - Movements: Export menüsüne Excel (.xls) eklendi
 - Returns: Export menüsüne CSV ve Excel (.xls) eklendi
   - [ ] Last Message yanında ilk stack frame özeti (hızlı kök neden ipucu)
+- Webhook Olayları: Admin > Webhook Olayları sayfası eklendi (returns_webhook_events + shipping_email_events)
+- Orders: Gelişmiş toplu kargolama (sipariş bazlı carrier/tracking girişi) eklendi
+- Returns: refunded adımında refund-order-mock çağrısı ile mock iade akışı tamamlandı
 
 ## Sıradaki (Sprint 3A – Products & Categories & Pricing)
 
