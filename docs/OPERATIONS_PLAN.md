@@ -96,7 +96,7 @@ Shipping operations (minimal)
   - Test flags: EMAIL_TEST_MODE/EMAIL_TEST_TO; BCC: SHIP_EMAIL_BCC
   - From fallback: onboarding@resend.dev if custom domain not verified yet
 - Future: branded HTML template + per‑carrier tracking CTA (Initialized)
-- Persist email logs: shipping_email_events (kargo) ve order_email_events (sipariş onayı) — order_id, to, subject, provider id (ve kargo için carrier/tracking)
+- Persist email logs: shipping_email_events (kargo) ve order_email_events (sipariş onayı) — order_id, to, subject, provider id (ve kargo için carrier/tracking); RLS ENABLE + policy (INSERT: service_role, SELECT: admin/superadmin)
 - Order detail/admin operations allow entering/updating: carrier_name, tracking_number, shipped_at
 - Status transition to shipped triggers optional email notification
 - Future: shipments table with shipment_items; carrier webhooks/polling moves status automatically

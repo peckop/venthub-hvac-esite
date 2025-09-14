@@ -8,6 +8,8 @@
 - Supabase config: [functions."returns-webhook"].verify_jwt=false (HMAC/Token ile korunur).
 - Rol güvenliği: Kullanıcılar kendi rolünü düşüremez (DB trigger enforce_role_change + UI guard AdminUsersPage). Superadmin her şeyi yapabilir.
 - Hesap Güvenliği: Google hesabını mevcut hesaba bağlama/ayırma UI (AccountSecurityPage) — linkIdentity ve güvenli unlink guard.
+- İade e-postası: ‘received’ durumuna geçildiğinde return-status-notification fonksiyonu tetiklenerek müşteriye e‑posta gönderilir.
+- Güvenlik sertleştirme: shipping_email_events ve order_email_events tablolarında RLS ENABLE + policy (INSERT: service_role, SELECT: admin/superadmin); returns_webhook_events için admin SELECT + service INSERT; enforce_role_change() search_path = pg_catalog, public.
 
 ## 2025-09-13
 

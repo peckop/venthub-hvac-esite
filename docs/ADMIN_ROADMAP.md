@@ -50,6 +50,9 @@ Tarih: 2025-09-08
 - [x] Rol güvenliği: self‑demotion engeli (DB trigger + UI guard)
 - [x] İade teslim otomasyonu: returns-webhook (HMAC/Token), delivered→received
 - [x] Hesap → Güvenlik: Google kimliği bağlama/ayırma UI (linkIdentity)
+- [x] İade e-postası: ‘received’ durumunda return-status-notification tetiklenir (müşteri bildirimi)
+- [x] Email audit tabloları (shipping_email_events, order_email_events): RLS ENABLE + policy (INSERT: service_role, SELECT: admin/superadmin)
+- [x] enforce_role_change() search_path = pg_catalog, public (security hardening)
 - /admin/orders işlevleri
   - Liste ve veri modeli: status rozetleri, toplam, tarih (mevcut)
   - Filtreler: durum, tarih aralığı, arama (mevcut)

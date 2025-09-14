@@ -95,7 +95,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Kargo Operasyonları (minimal)
   - [x] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
   - [x] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
-  - [x] İade webhooks: returns-webhook (HMAC/Token) ile delivered→received otomasyonu; returns_webhook_events audit/dedup
+  - [x] İade webhooks: returns-webhook (HMAC/Token) ile delivered→received otomasyonu; received’de e‑posta tetikleme; returns_webhook_events audit/dedup
 
 ### Sprint 3 — Planlı
 - Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
