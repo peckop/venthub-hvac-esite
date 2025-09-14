@@ -258,7 +258,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signOut,
     resetPassword
-  };
+  } as const;
 
   return (
     <AuthContext.Provider value={value}>
