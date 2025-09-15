@@ -94,14 +94,23 @@ const AdminCouponsPage: React.FC = () => {
         usage_limit: form.usage_limit ?? null,
         used_count: 0,
       }
-      const { data, error } = await supabase
-        .from('coupons')
-        .insert(payload)
-        .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
-        .single()
+      // RLS sorunlarında edge function üzerinden oluştur
+      const { data, error } = await supabase.functions.invoke('admin-create-coupon', {
+        body: {
+          code: payload.code,
+          type: (form.type as 'percent' | 'fixed'),
+          value: payload.discount_value,
+          starts_at: payload.valid_from,
+          ends_at: payload.valid_until,
+          active: payload.is_active,
+          usage_limit: payload.usage_limit,
+        }
+      }) as unknown as { data: DbCouponRow | null, error: any | null }
       if (error) throw error
+      if (!data) throw new Error('No data')
       const ui = dbToUi(data as DbCouponRow)
       setRows(prev => [ui, ...prev])
+      if (error) throw error
       setForm({ type: 'percent', active: true })
     } catch (e) {
       console.error('save coupon error', e)
