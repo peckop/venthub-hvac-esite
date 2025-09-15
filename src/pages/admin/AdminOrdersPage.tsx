@@ -67,6 +67,13 @@ const AdminOrdersPage: React.FC = () => {
   const [logsOrderId, setLogsOrderId] = React.useState<string>('')
   const [emailLogs, setEmailLogs] = React.useState<{ subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }[]>([])
 
+  // Notes modal
+  const [notesOpen, setNotesOpen] = React.useState(false)
+  const [notesLoading, setNotesLoading] = React.useState(false)
+  const [notesOrderId, setNotesOrderId] = React.useState<string>('')
+  const [noteInput, setNoteInput] = React.useState('')
+  const [notes, setNotes] = React.useState<{ id: string; note: string; created_at: string; user_id: string | null }[]>([])
+
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300)
     return () => clearTimeout(t)
@@ -155,6 +162,49 @@ const AdminOrdersPage: React.FC = () => {
     }
   }
   const closeLogsModal = () => setLogsOpen(false)
+
+  async function openNotesModal(id: string) {
+    setNotesOrderId(id)
+    setNotesOpen(true)
+    setNotesLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('order_notes')
+        .select('id,note,created_at,user_id')
+        .eq('order_id', id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      setNotes(Array.isArray(data) ? (data as { id: string; note: string; created_at: string; user_id: string | null }[]) : [])
+    } catch (e) {
+      console.error('load notes error', e)
+      toast.error('Notlar alınamadı')
+      setNotes([])
+    } finally {
+      setNotesLoading(false)
+    }
+  }
+  const closeNotesModal = () => setNotesOpen(false)
+
+  async function addNote() {
+    if (!notesOrderId || !noteInput.trim()) return
+    try {
+      setNotesLoading(true)
+      const { data, error } = await supabase
+        .from('order_notes')
+        .insert({ order_id: notesOrderId, note: noteInput.trim() })
+        .select('id,note,created_at,user_id')
+        .single()
+      if (error) throw error
+      setNotes(prev => [data as { id: string; note: string; created_at: string; user_id: string | null }, ...prev])
+      setNoteInput('')
+    } catch (e) {
+      console.error('add note error', e)
+      toast.error('Not eklenemedi')
+    } finally {
+      setNotesLoading(false)
+    }
+  }
 
   async function cancelShipping(id: string) {
     if (!id) return
@@ -561,7 +611,7 @@ const AdminOrdersPage: React.FC = () => {
                   {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount)}</td>)}
                   {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at)}</td>)}
                   <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
-                    <div className="flex gap-2">
+                        <div className="flex gap-2">
                       <button
                         onClick={() => openShipModal(r.id)}
                         className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"
@@ -575,6 +625,13 @@ const AdminOrdersPage: React.FC = () => {
                         title="E‑posta loglarını görüntüle"
                       >
                         Loglar
+                      </button>
+                      <button
+                        onClick={() => openNotesModal(r.id)}
+                        className="text-xs px-2 py-1 rounded bg-gray-700 text-white hover:bg-gray-800"
+                        title="Sipariş notlarını görüntüle/ekle"
+                      >
+                        Notlar
                       </button>
                       {r.status === 'shipped' && (
                         <button
@@ -702,6 +759,37 @@ const AdminOrdersPage: React.FC = () => {
             </div>
             <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={closeLogsModal} className="px-3 py-2 rounded border border-gray-200">Kapat</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {notesOpen && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className={adminCardPaddedClass + ' w-full max-w-xl'}>
+            <h3 className="text-lg font-semibold text-industrial-gray mb-2">Sipariş Notları</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <input value={noteInput} onChange={e=>setNoteInput(e.target.value)} placeholder="Yeni not yazın" className="flex-1 border border-gray-200 rounded px-3 py-2" />
+              <button onClick={addNote} disabled={notesLoading || !noteInput.trim()} className={adminButtonPrimaryClass}>{notesLoading ? 'Kaydediliyor…' : 'Ekle'}</button>
+            </div>
+            <div className="max-h-[50vh] overflow-auto border border-gray-100 rounded">
+              {notesLoading ? (
+                <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+              ) : (notes.length === 0 ? (
+                <div className="p-4 text-sm text-steel-gray">Kayıt yok</div>
+              ) : (
+                <ul className="divide-y">
+                  {notes.map((n) => (
+                    <li key={n.id} className="px-3 py-2">
+                      <div className="text-sm text-industrial-gray">{n.note}</div>
+                      <div className="text-xs text-steel-gray">{safeDate(n.created_at)}</div>
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <button onClick={closeNotesModal} className="px-3 py-2 rounded border border-gray-200">Kapat</button>
             </div>
           </div>
         </div>
