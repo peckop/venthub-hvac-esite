@@ -1,5 +1,5 @@
 ﻿# WARP.md
-Last updated: 2025-09-11
+Last updated: 2025-09-15
 
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 ## ℹ️ Overview
@@ -162,6 +162,8 @@ All environment variables use `VITE_` prefix for Vite bundling:
 - `VITE_DEBUG` - Enable debug logging (dev only)
 - `VITE_SHOP_WHATSAPP` - (Optional) WhatsApp phone for wa.me deeplink (e.g., 90XXXXXXXXXX)
 - Edge Functions (set in platform, not local): `RESEND_API_KEY`, `EMAIL_FROM`, `TWILIO_*`, `NOTIFY_DEBUG`
+- Additional Edge Function env (optional): `EMAIL_TEST_MODE`, `EMAIL_TEST_TO`, `SHIP_EMAIL_BCC`, `BRAND_NAME`, `BRAND_PRIMARY_COLOR`, `BRAND_LOGO_URL`, `IYZICO_DEBUG` (for iyzico-payment)
+- See docs/DEPLOYMENT.md for full list and details
 
 ## ⚙️ Environment Setup
 
@@ -214,6 +216,11 @@ $env:SUPABASE_DB_URL="postgresql://..."
 
 ## 📦 Deployment
 
+TL;DR (Quick Reference):
+- Cloudflare Pages: Node 18+, pnpm enabled, build: `pnpm run build:ci`, output: `dist`
+- Required Env Vars (Prod + Preview): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (optional: `VITE_SHOP_WHATSAPP`)
+- Full details and troubleshooting: see docs/DEPLOYMENT.md
+
 ### Cloudflare Pages
 - **Build Command:** `pnpm run build:ci`
 - **Output Directory:** `dist`
@@ -223,8 +230,10 @@ $env:SUPABASE_DB_URL="postgresql://..."
   - `VITE_SUPABASE_ANON_KEY`
 
 ### GitHub Actions
-- **Workflows:**
+- Workflows:
   - `ci.yml`
+  - `app-lint.yml`
+  - `db-advisor.yml`
   - `deploy-cloudflare-pages.yml`
   - `deploy-functions.yml`
   - `supabase-migrate.yml`
@@ -240,14 +249,19 @@ Located in `supabase/functions/`:
 - `admin-order-inspect`
 - `admin-orders-latest`
 - `admin-update-order`
+- `admin-update-shipping`
+- `delivery-notification`
 - `iyzico-callback`
 - `iyzico-payment`
 - `iyzico-refund`
 - `log-client-error`
 - `notification-service`
+- `order-confirmation`
 - `order-housekeeping`
 - `order-validate`
+- `refund-order-mock`
 - `return-status-notification`
+- `returns-webhook`
 - `shipping-notification`
 - `shipping-status`
 - `shipping-webhook`

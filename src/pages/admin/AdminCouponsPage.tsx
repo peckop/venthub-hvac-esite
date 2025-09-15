@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 
+// Uygulama içi kullanım için UI modeli
 interface CouponRow {
   id: string
   code: string
@@ -14,6 +15,35 @@ interface CouponRow {
   usage_limit?: number | null
   used_count?: number | null
   created_at: string
+}
+
+// Veritabanından dönen satır modeli
+type DbCouponRow = {
+  id: string
+  code: string
+  discount_type: 'percentage' | 'fixed_amount' | string
+  discount_value: number
+  valid_from?: string | null
+  valid_until?: string | null
+  is_active: boolean
+  usage_limit?: number | null
+  used_count?: number | null
+  created_at: string
+}
+
+function dbToUi(row: DbCouponRow): CouponRow {
+  return {
+    id: row.id,
+    code: row.code,
+    type: row.discount_type === 'percentage' ? 'percent' : 'fixed',
+    value: Number(row.discount_value),
+    starts_at: row.valid_from ?? null,
+    ends_at: row.valid_until ?? null,
+    active: !!row.is_active,
+    usage_limit: row.usage_limit ?? null,
+    used_count: row.used_count ?? 0,
+    created_at: row.created_at,
+  }
 }
 
 const AdminCouponsPage: React.FC = () => {
@@ -29,11 +59,12 @@ const AdminCouponsPage: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('coupons')
-        .select('*')
+        .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
         .order('created_at', { ascending: false })
         .limit(200)
       if (error) throw error
-      setRows((data || []) as CouponRow[])
+      const mapped = (data || []).map(d => dbToUi(d as DbCouponRow))
+      setRows(mapped)
     } catch (e) {
       console.error('fetch coupons error', e)
     } finally {
@@ -53,23 +84,24 @@ const AdminCouponsPage: React.FC = () => {
     if (!form.code || !form.type || !form.value) return
     try {
       setSaving(true)
-      const payload: Omit<CouponRow, 'id' | 'created_at' | 'used_count'> & { used_count?: number } = {
+      const payload = {
         code: String(form.code as string).trim(),
-        type: form.type as 'percent' | 'fixed',
-        value: Number(form.value),
-        starts_at: (form.starts_at as string) || null,
-        ends_at: (form.ends_at as string) || null,
-        active: !!form.active,
+        discount_type: (form.type as 'percent' | 'fixed') === 'percent' ? 'percentage' : 'fixed_amount',
+        discount_value: Number(form.value),
+        valid_from: (form.starts_at as string) || null,
+        valid_until: (form.ends_at as string) || null,
+        is_active: !!form.active,
         usage_limit: form.usage_limit ?? null,
         used_count: 0,
       }
       const { data, error } = await supabase
         .from('coupons')
         .insert(payload)
-        .select('*')
+        .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
         .single()
       if (error) throw error
-      setRows(prev => [data as CouponRow, ...prev])
+      const ui = dbToUi(data as DbCouponRow)
+      setRows(prev => [ui, ...prev])
       setForm({ type: 'percent', active: true })
     } catch (e) {
       console.error('save coupon error', e)
@@ -82,12 +114,12 @@ const AdminCouponsPage: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('coupons')
-        .update({ active: !active })
+        .update({ is_active: !active })
         .eq('id', id)
-        .select('id, active')
+        .select('id, is_active')
         .single()
       if (error) throw error
-      setRows(prev => prev.map(r => r.id === id ? { ...r, active: (data as { id: string; active: boolean }).active } : r))
+      setRows(prev => prev.map(r => r.id === id ? { ...r, active: (data as { id: string; is_active: boolean }).is_active } : r))
     } catch (e) {
       console.error('toggle active error', e)
     }

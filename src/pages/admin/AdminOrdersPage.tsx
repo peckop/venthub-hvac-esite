@@ -206,6 +206,25 @@ const AdminOrdersPage: React.FC = () => {
     }
   }
 
+  async function deleteNote(noteId: string) {
+    if (!noteId) return
+    try {
+      setNotesLoading(true)
+      const { error } = await supabase
+        .from('order_notes')
+        .delete()
+        .eq('id', noteId)
+      if (error) throw error
+      setNotes(prev => prev.filter(n => n.id !== noteId))
+      toast.success('Not silindi')
+    } catch (e) {
+      console.error('delete note error', e)
+      toast.error('Not silinemedi')
+    } finally {
+      setNotesLoading(false)
+    }
+  }
+
   async function cancelShipping(id: string) {
     if (!id) return
     const ok = window.confirm('Kargo iptal edilsin mi? Bu işlem durumu "Onaylı" yapar ve takip bilgilerini siler.')
@@ -781,7 +800,10 @@ const AdminOrdersPage: React.FC = () => {
                 <ul className="divide-y">
                   {notes.map((n) => (
                     <li key={n.id} className="px-3 py-2">
-                      <div className="text-sm text-industrial-gray">{n.note}</div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="text-sm text-industrial-gray">{n.note}</div>
+                        <button onClick={() => deleteNote(n.id)} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">Sil</button>
+                      </div>
                       <div className="text-xs text-steel-gray">{safeDate(n.created_at)}</div>
                     </li>
                   ))}
