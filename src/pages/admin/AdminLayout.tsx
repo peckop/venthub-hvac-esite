@@ -33,7 +33,7 @@ const AdminLayout: React.FC = () => {
             <NavLink to="/admin/movements" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.movements')}</NavLink>
             <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.inventorySettings')}</NavLink>
             <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.returns')}</NavLink>
-            <NavLink to="/admin/webhook-events" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.webhookEvents') ?? 'Webhook Olayları'}</NavLink>
+            <NavLink to="/admin/webhook-events" className={({isActive})=>adminNavClass(isActive)}>Webhook Olayları</NavLink>
             <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.users')}</NavLink>
             <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.logs')}</NavLink>
             <NavLink to="/admin/errors" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errors')}</NavLink>
