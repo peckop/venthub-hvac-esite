@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Teslimat Tamamlandı</title>
+    <style>
+      body { font-family: Arial, Helvetica, sans-serif; background:#f6f7fb; margin:0; padding:0; }
+      .container { max-width: 640px; margin: 0 auto; padding: 24px; }
+      .card { background:#ffffff; border-radius:12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow:hidden; }
+      .header { background: #2563eb; color: #fff; padding: 20px 24px; display:flex; align-items:center; gap:12px; }
+      .brand { font-size: 18px; font-weight: 700; margin: 0; }
+      .content { padding: 24px; color:#111827; }
+      .content h2 { margin: 0 0 12px; color:#111827; font-size: 20px; }
+      .content p { margin: 8px 0; color:#374151; line-height:1.5; }
+      .footer { color:#6b7280; font-size: 12px; text-align:center; margin-top: 18px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <h1 class="brand">VentHub</h1>
+        </div>
+        <div class="content">
+          <h2>Teslimat Tamamlandı</h2>
+          <p>Merhaba <strong>{{customer_name}}</strong>,</p>
+          <p><strong>{{order_number}}</strong> numaralı siparişiniz başarıyla teslim edilmiştir.</p>
+          <p>Herhangi bir sorunuz olursa bizimle iletişime geçebilirsiniz.</p>
+          <p>Teşekkürler,<br /><strong>VentHub Ekibi</strong></p>
+        </div>
+      </div>
+      <p class="footer">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>
+    </div>
+  </body>
+</html>

@@ -132,6 +132,7 @@ const AdminWebhookEventsPage: React.FC = () => {
 
       {tab === 'returns' ? (
         <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
+          <div className="p-2 text-xs text-steel-gray">Satıra tıklayarak detay ve yeniden işlem menüsünü açabilirsiniz.</div>
           <table className="min-w-full text-sm">
             <thead>
               <tr>
