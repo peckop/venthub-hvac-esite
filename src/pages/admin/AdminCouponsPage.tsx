@@ -2,6 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import toast from 'react-hot-toast'
 
 // Uygulama içi kullanım için UI modeli
 interface CouponRow {
@@ -15,6 +16,12 @@ interface CouponRow {
   usage_limit?: number | null
   used_count?: number | null
   created_at: string
+}
+
+// Tip koruması için yardımcı
+type AllowedCouponType = 'percent' | 'fixed'
+function isAllowedCouponType(x: unknown): x is AllowedCouponType {
+  return x === 'percent' || x === 'fixed'
 }
 
 // Veritabanından dönen satır modeli
@@ -81,13 +88,19 @@ const AdminCouponsPage: React.FC = () => {
   }
 
   async function saveCoupon() {
-    if (!form.code || !form.type || !form.value) return
+    const codeTrim = String(form.code || '').trim()
+    const issues: string[] = []
+    if (codeTrim.length < 3 || codeTrim.length > 50) issues.push('Kod 3-50 karakter olmalı')
+    if (!isAllowedCouponType(form.type)) issues.push('Tip (Yüzde/Sabit) seçilmeli')
+    const val = Number(form.value)
+    if (!val || val <= 0) issues.push('Değer 0\'dan büyük olmalı')
+    if (issues.length > 0) { toast.error(issues.join(' • ')); return }
     try {
       setSaving(true)
       const payload = {
-        code: String(form.code as string).trim(),
-        discount_type: (form.type as 'percent' | 'fixed') === 'percent' ? 'percentage' : 'fixed_amount',
-        discount_value: Number(form.value),
+        code: codeTrim,
+        discount_type: (form.type as AllowedCouponType) === 'percent' ? 'percentage' : 'fixed_amount',
+        discount_value: val,
         valid_from: (form.starts_at as string) || null,
         valid_until: (form.ends_at as string) || null,
         is_active: !!form.active,
@@ -98,7 +111,7 @@ const AdminCouponsPage: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('admin-create-coupon', {
         body: {
           code: payload.code,
-          type: (form.type as 'percent' | 'fixed'),
+          type: (form.type as AllowedCouponType),
           value: payload.discount_value,
           starts_at: payload.valid_from,
           ends_at: payload.valid_until,
@@ -111,8 +124,10 @@ const AdminCouponsPage: React.FC = () => {
       const ui = dbToUi(data as DbCouponRow)
       setRows(prev => [ui, ...prev])
       setForm({ type: 'percent', active: true })
+      toast.success('Kupon eklendi')
     } catch (e) {
       console.error('save coupon error', e)
+      toast.error('Kupon eklenemedi')
     } finally {
       setSaving(false)
     }
@@ -162,7 +177,7 @@ const AdminCouponsPage: React.FC = () => {
             <input type="checkbox" checked={!!form.active} onChange={e=>setForm(f=>({ ...f, active: e.target.checked }))} /> Aktif
           </div>
           <input type="number" value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e=>setForm(f=>({ ...f, usage_limit: e.target.value ? Number(e.target.value) : null }))} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
-          <button onClick={saveCoupon} disabled={saving || !form.code || !form.type || !form.value} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
+          <button onClick={saveCoupon} disabled={saving || !(String(form.code||'').trim().length >= 3 && (form.type==='percent' || form.type==='fixed') && Number(form.value)>0)} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
         </div>
       </section>
 
