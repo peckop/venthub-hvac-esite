@@ -244,7 +244,7 @@ Deno.serve(async (req: Request) => {
       .from<OrderRow>('venthub_orders')
       .update(patch)
       .eq('id', orderId)
-      .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at')
+      .select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at, order_number, customer_email, customer_name')
       .single()
 
     if (error) {
@@ -265,6 +265,22 @@ Deno.serve(async (req: Request) => {
           body_hash: bodyHash,
           received_at: new Date().toISOString(),
           processed_at: new Date().toISOString(),
+        })
+      }
+    } catch {}
+
+    // On delivered, send delivery notification (best effort)
+    try {
+      if ((data?.status || '').toLowerCase() === 'delivered') {
+        await fetch(`${SUPABASE_URL}/functions/v1/delivery-notification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
+          body: JSON.stringify({
+            order_id: data?.id,
+            order_number: (data as any)?.order_number,
+            customer_email: (data as any)?.customer_email,
+            customer_name: (data as any)?.customer_name,
+          })
         })
       }
     } catch {}

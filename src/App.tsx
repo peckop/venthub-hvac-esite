@@ -57,6 +57,7 @@ const AdminErrorGroupsPage = lazy(() => import('./pages/admin/AdminErrorGroupsPa
 const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'))
 const AdminCategoriesPage = lazy(() => import('./pages/admin/AdminCategoriesPage'))
 const AdminWebhookEventsPage = lazy(() => import('./pages/admin/AdminWebhookEventsPage'))
+const AdminCouponsPage = lazy(() => import('./pages/admin/AdminCouponsPage'))
 
 // Brand pages
 const BrandsPage = lazy(() => import('./pages/BrandsPage'))
@@ -150,6 +151,7 @@ function App() {
                   {/* Geçici: mevcut admin sayfalarına geçiş */}
                   <Route path="returns" element={<AdminReturnsPage />} />
                   <Route path="webhook-events" element={<AdminWebhookEventsPage />} />
+                  <Route path="coupons" element={<AdminCouponsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />
                 </Route>
 
