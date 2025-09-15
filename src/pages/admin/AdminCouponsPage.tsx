@@ -105,12 +105,11 @@ const AdminCouponsPage: React.FC = () => {
           active: payload.is_active,
           usage_limit: payload.usage_limit,
         }
-      }) as unknown as { data: DbCouponRow | null, error: any | null }
+      }) as unknown as { data: DbCouponRow | null, error: unknown | null }
       if (error) throw error
       if (!data) throw new Error('No data')
       const ui = dbToUi(data as DbCouponRow)
       setRows(prev => [ui, ...prev])
-      if (error) throw error
       setForm({ type: 'percent', active: true })
     } catch (e) {
       console.error('save coupon error', e)
