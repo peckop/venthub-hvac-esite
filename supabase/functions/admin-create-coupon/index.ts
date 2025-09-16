@@ -63,7 +63,13 @@ Deno.serve(async (req: Request) => {
     const starts_at = body.starts_at ? String(body.starts_at) : null
     const ends_at = body.ends_at ? String(body.ends_at) : null
     const is_active = Boolean(body.active ?? true)
-    const usage_limit = body.usage_limit === null || body.usage_limit === undefined || body.usage_limit === '' ? null : Number(body.usage_limit)
+    let usage_limit: number | null
+    if (body.usage_limit === null || body.usage_limit === undefined || body.usage_limit === '') {
+      usage_limit = null
+    } else {
+      const ul = Number(body.usage_limit)
+      usage_limit = (!Number.isFinite(ul) || ul < 1) ? null : ul
+    }
 
     const errs: string[] = []
     if (!code || code.length < 3 || code.length > 50) errs.push('code')
