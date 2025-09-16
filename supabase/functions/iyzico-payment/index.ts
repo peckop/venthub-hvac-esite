@@ -184,7 +184,9 @@ Deno.serve(async (req) => {
             invoice_type: invoiceType || null,
             invoice_info: invoiceInfo || null,
             legal_consents: legalConsents || null,
-            shipping_method: (typeof shippingMethod === 'string' && shippingMethod) ? shippingMethod : 'standard'
+            shipping_method: (typeof shippingMethod === 'string' && shippingMethod) ? shippingMethod : 'standard',
+            coupon_code: (requestData?.couponCode && typeof requestData.couponCode === 'string') ? requestData.couponCode : null,
+            coupon_discount: 0
         };
 
         // Try creating order; if schema drift (shipping_method column missing), retry without it
