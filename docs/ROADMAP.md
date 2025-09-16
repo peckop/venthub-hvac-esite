@@ -125,6 +125,46 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [ ] Her hesaplayıcı altında 2–3 maddelik standart referans bloğu
 
 ## 3) Operasyonel “Next Steps” (Öncelikli)
+
+### Prod Öncesi Kontrol Listesi (Öncelik sırasıyla)
+1) Hata İzleme ve Uyarı (Prod güvenliği ve stabilite)
+- Sentry entegrasyonu (Frontend + Edge): DSN env, release/commit etiketi, user context; PII maskeleme
+- Health checks: /healthz (Edge) — DB bağlantısı ve bağımlılık testi (opsiyonel)
+- Slack/Email uyarıları: kritik hata/edge failure için webhook
+
+2) Güvenlik ve RLS Sertleştirme
+- Storage bucket policy teyidi (product-images: public read, write sadece admin/moderator)
+- SECURITY DEFINER fonksiyonlarda sabit search_path (pg_catalog, public)
+- CORS sıkılaştırma ve Rate Limiting: public uçlar için origin whitelist + rpm sınırı
+
+3) Ödeme ve Sipariş Operasyonları
+- PSP başarısız/iptal geri dönüşlerinde status/notes akışları
+- Idempotency keys: ödeme çağrıları için sipariş bazında
+- Kargo link doğrulama ve whitelist
+- E‑posta metinleri (tr) ve plain‑text fallback QA
+
+4) Performans ve İzleme
+- Top sorgular için EXPLAIN ANALYZE (products, cart, orders)
+- Edge soğuk başlangıç ölçümü ve gerekirse ön ısıtma cron’u
+
+5) CI/CD Sağlamlaştırma
+- Preview/Prod ayrımı ve feature flag listesi
+- Deploy sonrası smoke test job (status 200 + edge invoke dry‑run)
+- DB migration guard ve rollback notları
+
+6) Yasal ve İçerik
+- KVKK/Aydınlatma/KVYA linkleri ve footer görünürlüğü
+- Mesafeli satış/Ön bilgilendirme/İade‑İptal/Kargo metinleri
+- Çerez bildirimi/politika
+
+7) Admin Rötuşlar
+- Orders: toplu kargolamada doğrulama ve inline hata gösterimi
+- Returns: received sonrası idempotent bildirim gardı
+- Products: server‑side sayfalama ve görünüm kalıcılığı
+
+8) Arama ve PLP
+- Basit FTS/pg_trgm ve ağırlıklandırma
+- PLP facet filtreleri (kategori/marka/fiyat) + URL senkron
 - Rol Güvenliği
   - [x] Kullanıcının kendi rolünü düşürmesini engelle (DB trigger + UI guard)
 - Kimlik Bağlama (Hesap → Güvenlik)
