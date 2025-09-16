@@ -104,7 +104,7 @@ const AdminCouponsPage: React.FC = () => {
         valid_from: (form.starts_at as string) || null,
         valid_until: (form.ends_at as string) || null,
         is_active: !!form.active,
-        usage_limit: form.usage_limit ?? null,
+        usage_limit: (form.usage_limit && form.usage_limit > 0) ? form.usage_limit : null,
         used_count: 0,
       }
       // RLS sorunlarında edge function üzerinden oluştur
@@ -176,7 +176,7 @@ const AdminCouponsPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <input type="checkbox" checked={!!form.active} onChange={e=>setForm(f=>({ ...f, active: e.target.checked }))} /> Aktif
           </div>
-          <input type="number" value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e=>setForm(f=>({ ...f, usage_limit: e.target.value ? Number(e.target.value) : null }))} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
+          <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e=>setForm(f=>{ const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
           <button onClick={saveCoupon} disabled={saving || !(String(form.code||'').trim().length >= 3 && (form.type==='percent' || form.type==='fixed') && Number(form.value)>0)} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
         </div>
       </section>
