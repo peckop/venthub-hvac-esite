@@ -240,6 +240,56 @@ Deno.serve(async (req) => {
         }
       } catch { /* ignore */ }
       
+      // Kuponu finalize et: order row'dan coupon_code'yi al, varsa usage increment ve discount hesapla (best-effort)
+      try {
+        if (orderId) {
+          const su = Deno.env.get('SUPABASE_URL') || ''
+          const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+          if (su && sk) {
+            const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=id,total_amount,coupon_code,coupon_discount`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+            if (oResp.ok) {
+              const arr = await oResp.json().catch(()=>[])
+              const row = Array.isArray(arr) ? arr[0] as { id?: string; total_amount?: number; coupon_code?: string|null; coupon_discount?: number|null } : null
+              const code = (row?.coupon_code || '').trim()
+              const total = Number(row?.total_amount || 0)
+              if (code && total > 0) {
+                // Get coupon details
+                const cRes = await fetch(`${su}/rest/v1/coupons?code=eq.${encodeURIComponent(code)}&select=discount_type,discount_value,minimum_order_amount,is_active,valid_from,valid_until,usage_limit,used_count`, { headers: { Authorization: `Bearer ${sk}`, apikey: sk } })
+                if (cRes.ok) {
+                  const carr = await cRes.json().catch(()=>[])
+                  const c = Array.isArray(carr) ? carr[0] as { discount_type?: string; discount_value?: number; minimum_order_amount?: number|null; is_active?: boolean; valid_from?: string|null; valid_until?: string|null; usage_limit?: number|null; used_count?: number|null } : null
+                  if (c && c.is_active !== false) {
+                    const now = Date.now()
+                    const startsOk = !c.valid_from || new Date(c.valid_from).getTime() <= now
+                    const endsOk = !c.valid_until || new Date(c.valid_until).getTime() > now
+                    const minOk = (c.minimum_order_amount == null) || (total >= Number(c.minimum_order_amount))
+                    const limitOk = (c.usage_limit == null) || (Number(c.used_count||0) < Number(c.usage_limit))
+                    if (startsOk && endsOk && minOk && limitOk) {
+                      let disc = 0
+                      if (c.discount_type === 'percentage') disc = (total * Number(c.discount_value||0))/100
+                      else disc = Number(c.discount_value||0)
+                      if (disc > total) disc = total
+                      const disc2 = Number(Number(disc).toFixed(2))
+                      // Patch order with computed discount
+                      await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}`, {
+                        method: 'PATCH',
+                        headers: { Authorization: `Bearer ${sk}`, apikey: sk, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+                        body: JSON.stringify({ coupon_discount: disc2 })
+                      }).catch(()=>{})
+                      // Increment usage (best-effort)
+                      await fetch(`${su}/rest/v1/rpc/increment_coupon_usage`, {
+                        method: 'POST', headers: { Authorization: `Bearer ${sk}`, apikey: sk, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ p_code: code })
+                      }).catch(()=>{})
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch { /* ignore */ }
+
       // Process stock reduction after successful payment - Use DB RPC (idempotent)
       try {
         if (orderId) {

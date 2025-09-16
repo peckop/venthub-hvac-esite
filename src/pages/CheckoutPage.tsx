@@ -190,6 +190,9 @@ export const CheckoutPage: React.FC = () => {
   const [showHelp, setShowHelp] = useState(false)
   const [formReady, setFormReady] = useState(false)
   const [progressPct, setProgressPct] = useState(20)
+  // Coupon state
+  const [couponCode, setCouponCode] = useState<string>('')
+  const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number } | null>(null)
 
   // Validation functions
   const validateCustomerInfo = () => {
@@ -349,6 +352,7 @@ export const CheckoutPage: React.FC = () => {
         invoiceInfo,
         legalConsents,
         shippingMethod,
+        couponCode: couponApplied?.code || null,
       })
       lastRequestData = requestData
 
@@ -698,7 +702,7 @@ export const CheckoutPage: React.FC = () => {
   const totalAmount = getCartTotal()
   // KDV dahil fiyat varsayımı: brüt = net * 1.20 => KDV payı = brüt - (brüt / 1.20)
   const vatAmount = Number((totalAmount - totalAmount / 1.2).toFixed(2))
-  const finalAmount = totalAmount // Toplam zaten KDV dahil
+  const finalAmount = Number((totalAmount - (couponApplied?.discount || 0)).toFixed(2)) // Toplam - kupon indirimi (KDV dahil varsayımı)
 
   // Overlay görünürlüğü ve adımları (1: başlatılıyor, 2: form yükleniyor, 3: banka 3D)
   const overlayVisible = step === 4 && !formReady
@@ -1578,6 +1582,50 @@ export const CheckoutPage: React.FC = () => {
                 <div className="flex justify-between text-steel-gray">
                   <span>{t('cart.shipping')}</span>
                   <span className="text-success-green">{t('cart.free')}</span>
+                </div>
+                {couponApplied ? (
+                  <div className="flex justify-between text-success-green">
+                    <span>Kupon indirimi ({couponApplied.code})</span>
+                    <span>-₺{couponApplied.discount.toLocaleString('tr-TR')}</span>
+                  </div>
+                ) : null}
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e)=>setCouponCode(e.target.value)}
+                    placeholder="Kupon kodu"
+                    className="flex-1 border border-light-gray rounded px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    className="px-3 py-2 rounded bg-primary-navy text-white text-sm"
+                    onClick={async ()=>{
+                      const code = couponCode.trim();
+                      if (code.length < 3) { toast.error('Kupon kodu geçersiz'); return }
+                      try {
+                        const base = ((import.meta as unknown as { env?: Record<string,string> }).env?.VITE_SUPABASE_URL) || ''
+                        const resp = await fetch(`${base}/functions/v1/apply-coupon`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ code, subtotal: totalAmount })
+                        });
+                        const json = await resp.json().catch(()=>({}));
+                        if (!resp.ok || !json?.valid) {
+                          toast.error('Kupon uygulanamadı');
+                          setCouponApplied(null)
+                          return;
+                        }
+                        setCouponApplied({ code: json.normalized_code || code, discount: Number(json.discount_amount || 0) })
+                        toast.success('Kupon uygulandı');
+                      } catch (e) {
+                        console.error(e); toast.error('Kupon doğrulanamadı');
+                      }
+                    }}
+                  >Uygula</button>
+                  {couponApplied ? (
+                    <button type="button" className="px-3 py-2 rounded border text-sm" onClick={()=>{ setCouponApplied(null); setCouponCode(''); }}>Kaldır</button>
+                  ) : null}
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg font-semibold text-industrial-gray">

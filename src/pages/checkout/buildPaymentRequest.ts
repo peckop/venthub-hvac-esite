@@ -22,6 +22,7 @@ export interface BuildPaymentArgs {
   invoiceInfo: InvoiceInfo
   legalConsents: LegalConsentsInput
   shippingMethod?: 'standard' | 'express' | string | null
+  couponCode?: string | null
 }
 
 export function buildPaymentRequest(args: BuildPaymentArgs) {
@@ -66,6 +67,7 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
       marketing: { accepted: !!legalConsents.marketing, ts: legalConsents.marketing ? new Date().toISOString() : null },
     },
     shippingMethod: shippingMethod || 'standard',
+    couponCode: args.couponCode || null,
   }
 
   return req
