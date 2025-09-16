@@ -18,6 +18,21 @@ Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehber
 
 ## Performans
 
+### 2025-09-16 — Uygulananlar
+- FK indeksleri eklendi (kaplayıcı btree):
+  - coupons.created_by, order_attachments.created_by, order_notes.user_id
+  - venthub_order_items.order_id, venthub_order_items.product_id, venthub_orders.user_id
+- Mükerrer indeks kaldırıldı:
+  - public.cart_items_cart_product_uniq (cart_items_cart_product_unique bırakıldı)
+- RLS initplan düzeltmeleri ve sadeleştirme:
+  - cart_items ve shopping_carts: modify_own ALL → INSERT/UPDATE/DELETE ayrıştırıldı; auth.uid() çağrıları (select ...) ile sarıldı
+  - user_profiles ve venthub_returns: auth.* çağrıları (select ...) ile sarıldı
+  - products: admin DML ayrı policy; SELECT public policy ile yönetiliyor (Advisor authenticated+SELECT için uyarı gösterebilir)
+
+Açık kalemler
+- products tablosunda authenticated için SELECT politikasını ayrı tanımlayıp public policy’den ayırarak Advisor “multiple permissive” uyarısını susturmak (isteğe bağlı)
+- Unused index’ler: gerçek trafik toplandıktan sonra kademeli temizlik
+
 ## CI: DB Advisor
 - Workflow: `.github/workflows/db-advisor.yml`
 - Çalışma şekli: GitHub Secrets’taki `SUPABASE_DB_URL` ile `psql` üzerinden salt‑okunur SQL denetimleri çalışır.
