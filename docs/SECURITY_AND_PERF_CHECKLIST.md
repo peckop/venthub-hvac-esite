@@ -27,10 +27,9 @@ Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehber
 - RLS initplan düzeltmeleri ve sadeleştirme:
   - cart_items ve shopping_carts: modify_own ALL → INSERT/UPDATE/DELETE ayrıştırıldı; auth.uid() çağrıları (select ...) ile sarıldı
   - user_profiles ve venthub_returns: auth.* çağrıları (select ...) ile sarıldı
-  - products: admin DML ayrı policy; SELECT public policy ile yönetiliyor (Advisor authenticated+SELECT için uyarı gösterebilir)
+- products: admin DML ayrı policy (INSERT/UPDATE/DELETE); SELECT public policy ile yönetiliyor — Advisor “authenticated+SELECT” uyarısı giderildi
 
 Açık kalemler
-- products tablosunda authenticated için SELECT politikasını ayrı tanımlayıp public policy’den ayırarak Advisor “multiple permissive” uyarısını susturmak (isteğe bağlı)
 - Unused index’ler: gerçek trafik toplandıktan sonra kademeli temizlik
 
 ## CI: DB Advisor
