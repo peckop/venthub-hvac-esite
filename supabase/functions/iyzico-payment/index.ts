@@ -1,22 +1,39 @@
 import Iyzipay from "npm:iyzipay";
 
 Deno.serve(async (req) => {
+    const origin = req.headers.get('origin') || '';
+    const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean);
+    const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin));
+    const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now());
     const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
         'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-debug',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Max-Age': '86400'
-    };
+    } as Record<string,string>;
 
     if (req.method === 'OPTIONS') {
         return new Response(null, { status: 200, headers: corsHeaders });
     }
 
+    if (!okOrigin && req.method !== 'OPTIONS') {
+        return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method not allowed' }), {
             status: 405,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
         });
+    }
+    // Content-Type & size checks
+    const ct = (req.headers.get('content-type') || '').toLowerCase();
+    if (!ct.includes('application/json')) {
+        return new Response(JSON.stringify({ error: 'unsupported_media_type' }), { status: 415, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+    const max = parseInt(Deno.env.get('MAX_BODY_KB') || '200', 10) * 1024;
+    const cl = parseInt(req.headers.get('content-length') || '0', 10) || 0;
+    if (cl > max) {
+        return new Response(JSON.stringify({ error: 'payload_too_large' }), { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
 
     try {
@@ -63,7 +80,7 @@ Deno.serve(async (req) => {
                 error: { code: 'VALIDATION_ERROR', message: 'Eksik alanlar', details: missing }
             }), {
                 status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
             });
         }
 
@@ -76,7 +93,7 @@ Deno.serve(async (req) => {
                 error: { code: 'CONFIG_ERROR', message: 'Sunucu yapılandırma hatası' }
             }), {
                 status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
             });
         }
 
@@ -128,7 +145,7 @@ Deno.serve(async (req) => {
                 error: { code: 'CONFIG_ERROR', message: 'IYZICO_API_KEY / IYZICO_SECRET_KEY eksik' }
             }), {
                 status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId }
             });
         }
 
