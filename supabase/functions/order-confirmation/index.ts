@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { sentryCaptureException } from "../_shared/sentry.ts"
 
 function renderTemplate(tpl: string, data: Record<string, unknown>): string {
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
@@ -21,13 +22,19 @@ async function loadTemplate(): Promise<string | null> {
 }
 
 serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '*'
+  // CORS: origin whitelist (ALLOWED_ORIGINS), yoksa sadece gelen Origin'e vary başlığı ile cevap ver
+  const requestOrigin = req.headers.get('origin') || ''
+  const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
+  const originAllowed = allowedOrigins.length === 0 || (requestOrigin && allowedOrigins.includes(requestOrigin))
   const cors = {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': originAllowed ? (requestOrigin || '*') : 'null',
     'Vary': 'Origin',
     'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': req.headers.get('access-control-request-method') ?? 'POST, OPTIONS',
     'Access-Control-Max-Age': '86400',
+  }
+  if (!originAllowed && req.method !== 'OPTIONS') {
+    return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
@@ -154,6 +161,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ success: true, subject, result }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
   } catch (e) {
+    try { await sentryCaptureException(e as unknown, { fn: 'order-confirmation' }) } catch {}
     const msg = e instanceof Error ? e.message : String(e)
     return new Response(JSON.stringify({ error: 'unexpected', message: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
