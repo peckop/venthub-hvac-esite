@@ -3,6 +3,15 @@
 Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehberdir.
 
 ## Güvenlik
+
+### Prod Öncesi Güvenlik ve İzleme (Öncelikli)
+- Sentry DSN / release / environment env değişkenleri; Edge + Frontend kurulum rehberi
+- /healthz Edge Function: DB bağlantısı opsiyonel kontrol; 200/503 durumları
+- Slack/Webhook uyarıları: kritik hata veya Edge Function çöküşlerinde bildirim
+- CORS sıkılaştırma: ALLOWED_ORIGINS env ile origin whitelist; referer fallback
+- Rate limiting: public uçlar için rpm sınırı; HMAC/token uçlar hariç
+- Storage policy gözden geçirme: product-images yazma sadece admin/moderator
+- SECURITY DEFINER fonksiyonlarda search_path sabit (pg_catalog, public)
 - Resend API anahtarı ve e‑posta değişkenleri sadece Edge Functions env’de tutulur (kodda/repoda yok).
 - shipping-notification public olsa da admin panelden çağrı yetkili server-to-server üzerinden yapılır (service role). Doğrudan public POST’lar rate‑limit ve doğrulama ile sınırlandırılabilir (ilerleme kalemi).
 - LPP (Studio) kapalı; yerine app seviyesinde HIBP k‑Anonymity kontrolü uygulanır (passwordSecurity.ts). Advisor WARN bilinçli.
