@@ -11,7 +11,7 @@
 - RLS / Politika Düzenlemeleri
   - cart_items ve shopping_carts: modify_own ALL → INSERT/UPDATE/DELETE olarak ayrıştırıldı; auth.uid() çağrıları (select auth.uid()) biçimine alındı (initplan optimizasyonu)
   - user_profiles ve venthub_returns: auth.* çağrıları (select ...) ile sarıldı; mevcut erişim mantığı korunarak performans iyileştirildi
-  - products: products_admin_all → products_admin_dml (SELECT yine public policy ile yönetilir); Advisor authenticated+SELECT için “multiple permissive” uyarısı tasarımsal olarak görülebilir
+- products: admin DML politikaları ayrı tanımlandı (INSERT/UPDATE/DELETE); SELECT public policy ile ayrıldı — Advisor “authenticated + SELECT” çoklu policy uyarısı giderildi
 - E‑posta (Order Confirmation)
   - order-confirmation Edge Function metni Türkçe olarak netleştirildi (ödeme başarı bilgisi + kargoya hazırlık vurgusu); HTML/text fallback korunur
 - Advisor (güncel durum)

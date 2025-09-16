@@ -16,6 +16,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
 - Ürün Görünürlüğü & RLS: Products/Categories tablolarına herkese SELECT politikası eklendi; user_profiles üzerindeki RLS sonsuz döngü hatası kalıcı olarak giderildi (SECURITY DEFINER fonksiyonları ile). Ürün istekleri 500 → 200.
 - Sipariş Onayı E-postası: Ödeme başarı sonrası metin netleştirildi; order-confirmation Edge Function canlıda güncellendi.
 - DB Performansı & RLS: Eksik FK indeksleri eklendi; cart_items üzerindeki mükerrer indeks kaldırıldı; cart_items ve shopping_carts RLS politikaları sadeleştirildi; user_profiles ve venthub_returns için auth.* çağrıları (SELECT ile sarım) initplan açısından optimize edildi.
+- Products RLS: SELECT ayrıştırması tamamlandı; admin DML politikaları ayrı (INSERT/UPDATE/DELETE).
 
 ## 2) Sprint Planı
 
