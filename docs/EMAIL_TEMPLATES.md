@@ -1,6 +1,6 @@
-# Email Templates (Shipping Notifications)
+# Email Templates (Shipping + Order Confirmation)
 
-Last updated: 2025-09-13
+Last updated: 2025-09-16
 
 Purpose
 - Define a consistent, branded HTML template for shipping emails.
@@ -45,6 +45,22 @@ Notes
 - Keep RESEND_API_KEY only in Supabase Functions env (never in repo).
 - Keep the plain-text part (text) in addition to HTML for deliverability and a11y.
 
+Order Confirmation (Payment Success)
+- Status: UPDATED (copy clarified in Turkish)
+- Sender: EMAIL_FROM (same policy as shipping)
+- Generator: order-confirmation Edge Function builds an inline HTML string (text fallback included).
+- Copy (tr): Ödemeniz başarıyla alınmıştır. Siparişiniz kargoya hazırlanmaya alınacaktır. Sipariş detaylarını aşağıda bulabilirsiniz.
+- Placeholders:
+  - {{customer_name}}
+  - {{order_number}}
+  - {{order_date}}
+  - {{payment_method}}
+  - {{shipping_address}} (optional summary)
+  - {{brand_name}}, {{brand_primary_color}}, {{brand_logo_url}}
+- File-based template (optional, future): templates/email/order-confirmation.html (similar strategy to shipping template)
+- Testing: trigger order-confirmation after a successful payment in sandbox; verify Delivered in Resend dashboard.
+
 Related docs
 - docs/DEPLOYMENT.md → Resend env vars and flows
 - docs/ROADMAP.md → E‑posta / Bildirim altyapısı
+- docs/CHANGELOG.md → 2025-09-16 entry

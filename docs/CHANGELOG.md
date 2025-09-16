@@ -1,5 +1,23 @@
 # Changelog
 
+## 2025-09-16
+
+### DB Performans & RLS İyileştirmeleri + Order Confirmation E-postası
+- Veritabanı (FK İndeksleri)
+  - Eklendi: coupons.created_by, order_attachments.created_by, order_notes.user_id
+  - Eklendi: venthub_order_items.order_id, venthub_order_items.product_id, venthub_orders.user_id
+- Veritabanı (Mükerrer İndeks)
+  - Kaldırıldı: cart_items_cart_product_uniq (cart_items_cart_product_unique bırakıldı)
+- RLS / Politika Düzenlemeleri
+  - cart_items ve shopping_carts: modify_own ALL → INSERT/UPDATE/DELETE olarak ayrıştırıldı; auth.uid() çağrıları (select auth.uid()) biçimine alındı (initplan optimizasyonu)
+  - user_profiles ve venthub_returns: auth.* çağrıları (select ...) ile sarıldı; mevcut erişim mantığı korunarak performans iyileştirildi
+  - products: products_admin_all → products_admin_dml (SELECT yine public policy ile yönetilir); Advisor authenticated+SELECT için “multiple permissive” uyarısı tasarımsal olarak görülebilir
+- E‑posta (Order Confirmation)
+  - order-confirmation Edge Function metni Türkçe olarak netleştirildi (ödeme başarı bilgisi + kargoya hazırlık vurgusu); HTML/text fallback korunur
+- Advisor (güncel durum)
+  - Duplicate index uyarısı giderildi; FK uyarılarının cache temizliği sonrası kaybolması bekleniyor
+  - Bilinen tek güvenlik uyarısı: “Leaked Password Protection Disabled” (bilinçli)
+
 ## 2025-09-14
 
 ### Returns Yönetimi v2 (mock)

@@ -115,11 +115,10 @@ serve(async (req) => {
     if (!html) {
       html = [
         '<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;">',
-        `<h2 style="color:${brandPrimary}">${brandName} — Siparişiniz alındı</h2>`,
+        `<h2 style=\"color:${brandPrimary}\">${brandName} — Siparişiniz alındı</h2>`,
         `<p>Merhaba <strong>${customer_name || ''}</strong>,</p>`,
-        `<p><strong>${prettyOrderNo}</strong> numaralı siparişinizi aldık.</p>`,
-        '<p>Ödeme doğrulandıktan sonra kargoya hazırlanacaktır.</p>',
-        '<p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>',
+        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz için ödemeniz başarıyla alındı ve siparişiniz kargoya hazırlanmaya alındı. Hazır olur olmaz kargo ve takip bilgilerini ayrıca ileteceğiz.</p>`,
+        `<p>Teşekkürler,<br><strong>${brandName} Ekibi</strong></p>`,
         '</div>'
       ].join('')
     }
