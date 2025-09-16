@@ -17,6 +17,9 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
 
+    const release = Deno.env.get('SENTRY_RELEASE') || Deno.env.get('RELEASE') || ''
+    const commit = Deno.env.get('GITHUB_SHA') || Deno.env.get('COMMIT_SHA') || (Deno.env.get('VITE_COMMIT_SHA') || '')
+
     if (supabaseUrl && serviceKey) {
       // Try a minimal REST call: request 1 row from a small table or use RPC ping if available
       const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/now`, {
@@ -25,10 +28,10 @@ Deno.serve(async (req: Request) => {
         body: '{}'
       })
       if (!resp.ok) throw new Error(`db_unhealthy: status=${resp.status}`)
-      return new Response(JSON.stringify({ ok: true, db: 'ok' }), { status: 200, headers })
+      return new Response(JSON.stringify({ ok: true, db: 'ok', release: release || null, commit: commit || null, time: new Date().toISOString() }), { status: 200, headers })
     }
 
-    return new Response(JSON.stringify({ ok: true }), { status: 200, headers })
+    return new Response(JSON.stringify({ ok: true, release: release || null, commit: commit || null, time: new Date().toISOString() }), { status: 200, headers })
   } catch (e) {
     try {
       const { sentryCaptureException } = await import('../_shared/sentry.ts')

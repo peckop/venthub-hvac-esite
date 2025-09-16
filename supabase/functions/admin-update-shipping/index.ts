@@ -1,17 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '*'
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
+  const origin = req.headers.get('origin') || ''
+  const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
+  const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
   const cors = {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
     'Vary': 'Origin',
-    'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type, x-idempotency-key',
     'Access-Control-Allow-Methods': req.headers.get('access-control-request-method') ?? 'POST, OPTIONS',
     'Access-Control-Max-Age': '86400',
   }
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json' } })
+  if (!okOrigin) return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+
+  // Content-Type & size
+  const ct = (req.headers.get('content-type') || '').toLowerCase()
+  if (!ct.includes('application/json')) {
+    return new Response(JSON.stringify({ error: 'unsupported_media_type' }), { status: 415, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+  }
+  const max = parseInt(Deno.env.get('MAX_BODY_KB') || '200', 10) * 1024
+  const cl = parseInt(req.headers.get('content-length') || '0', 10) || 0
+  if (cl > max) {
+    return new Response(JSON.stringify({ error: 'payload_too_large' }), { status: 413, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+  }
 
   try {
     const text = await req.text()
@@ -112,6 +127,14 @@ serve(async (req) => {
       }
     } catch {}
 
+    // Idempotency key (optional but recommended)
+    async function computeIdemKey(action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null) {
+      const raw = [action, orderId || '', carrier || '', tn || ''].join('|')
+      const bytes = new TextEncoder().encode(raw)
+      const hash = await crypto.subtle.digest('SHA-256', bytes)
+      return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('')
+    }
+
     // patch order (only set shipped_at if first time)
     const patchBody: Record<string, unknown> = {
       carrier,
@@ -130,8 +153,22 @@ serve(async (req) => {
 
     if (!upd.ok) {
       const txt = await upd.text()
-      return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }
+
+    // Record idempotency after successful update (best-effort)
+    try {
+      const headerKey = req.headers.get('x-idempotency-key') || ''
+      const derivedKey = await computeIdemKey(isFirstShip ? 'ship':'ship', order_id, carrier || null, tracking_number || null)
+      const idemKey = headerKey || derivedKey
+      if (idemKey) {
+        await fetch(`${supabaseUrl}/rest/v1/shipping_idempotency`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'resolution=ignore-duplicates' },
+          body: JSON.stringify({ key: idemKey, scope: 'admin-update-shipping' })
+        })
+      }
+    } catch {}
 
     // Derive customer email/name for notification
     let customer_email: string | null = null
@@ -193,9 +230,9 @@ serve(async (req) => {
       } catch {}
     }
 
-    return new Response(JSON.stringify({ ok: true, email: emailResult }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ ok: true, email: emailResult }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
-    return new Response(JSON.stringify({ error: 'unexpected', message: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ error: 'unexpected', message: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })
