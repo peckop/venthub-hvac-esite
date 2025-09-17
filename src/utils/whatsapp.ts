@@ -5,9 +5,12 @@ import { buildWhatsAppLink } from '../lib/utils'
  */
 export function getWhatsAppNumber(): string | null {
   // Vite: production build'da değişkenleri build-time inline eder.
-  // Bu nedenle doğrudan import.meta.env.VITE_SHOP_WHATSAPP kullanıyoruz.
-  const whatsapp = (import.meta as unknown as { env: Record<string, string> }).env.VITE_SHOP_WHATSAPP
-  return (typeof whatsapp === 'string' && whatsapp.trim()) ? whatsapp : null
+  // Öncelik: ENV → yoksa, kullanıcı talebiyle belirlenmiş varsayılan numarayı kullan.
+  const envWa = (import.meta as unknown as { env: Record<string, string> }).env.VITE_SHOP_WHATSAPP
+  const FALLBACK_WA = '905313441813' // Kullanıcı talebi: 05313441813 → wa.me formatı
+  const raw = (typeof envWa === 'string' && envWa.trim()) ? envWa : FALLBACK_WA
+  const normalized = raw.replace(/[^\d]/g, '')
+  return normalized.length >= 10 ? normalized : null
 }
 
 /**
