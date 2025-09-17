@@ -1,4 +1,7 @@
 import React from 'react'
+import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
+import { WhatsAppIcon } from '../components/HVACIcons'
+import { getSupportLink, isWhatsAppAvailable } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
   return (
@@ -13,21 +16,63 @@ const ContactPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <h2 className="font-semibold text-industrial-gray mb-2">Adres</h2>
+            <div className="flex items-center gap-3 mb-3">
+              <MapPin className="text-primary-navy" size={20} />
+              <h2 className="font-semibold text-industrial-gray">Adres</h2>
+            </div>
             <p className="text-steel-gray text-sm leading-relaxed">
               Teknokent Mah. Teknopark Blv.<br />
               No: 1/4A 34906 Pendik/İstanbul
             </p>
           </div>
           <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <h2 className="font-semibold text-industrial-gray mb-2">Telefon</h2>
-            <p className="text-steel-gray text-sm">+90 (216) 123-45-67</p>
+            <div className="flex items-center gap-3 mb-3">
+              <Phone className="text-primary-navy" size={20} />
+              <h2 className="font-semibold text-industrial-gray">Telefon</h2>
+            </div>
+            <a href="tel:+902161234567" className="text-steel-gray text-sm hover:text-primary-navy transition-colors">
+              +90 (216) 123-45-67
+            </a>
           </div>
           <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <h2 className="font-semibold text-industrial-gray mb-2">E‑posta</h2>
-            <p className="text-steel-gray text-sm">info@venthub.com.tr</p>
+            <div className="flex items-center gap-3 mb-3">
+              <Mail className="text-primary-navy" size={20} />
+              <h2 className="font-semibold text-industrial-gray">E‑posta</h2>
+            </div>
+            <a href="mailto:info@venthub.com.tr" className="text-steel-gray text-sm hover:text-primary-navy transition-colors">
+              info@venthub.com.tr
+            </a>
           </div>
         </div>
+
+        {/* WhatsApp Quick Contact */}
+        {isWhatsAppAvailable() && (() => {
+          const whatsappLink = getSupportLink('İletişim formu')
+          if (!whatsappLink) return null
+          
+          return (
+            <div className="mb-8 whatsapp-container">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0">
+                  <WhatsAppIcon size={48} />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold whatsapp-text mb-2">Hızlı İletişim</h2>
+                  <p className="whatsapp-subtext mb-4">Acil durumlar ve hızlı yanıt gereken konular için WhatsApp'tan direkt ulaşın.</p>
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="whatsapp-btn"
+                  >
+                    <MessageCircle size={20} />
+                    WhatsApp'tan Yaz
+                  </a>
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         <div className="rounded-xl border border-light-gray p-6 bg-gradient-to-br from-gray-50 to-white">
           <h2 className="text-xl font-semibold text-industrial-gray mb-3">Teklif/İletişim Formu</h2>

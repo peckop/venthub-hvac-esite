@@ -1,5 +1,33 @@
 # Changelog
 
+## 2025-09-17
+
+### WhatsApp wa.me Konfigürasyonu - Tam Entegrasyon
+- WhatsApp Utility Fonksiyonları
+  - src/utils/whatsapp.ts oluşturuldu: getWhatsAppNumber(), formatPhoneNumber(), createWhatsAppLink()
+  - Template mesaj generatörleri: stok sorgulama, genel destek, SSS desteği için
+  - isWhatsAppAvailable() kontrol fonksiyonu ve hızlı link oluşturucular
+- Ürün Sayfaları Entegrasyonu
+  - ProductDetailPage: Stok sorgulama bölümü yeni utility'leri kullanacak şekilde güncellendi
+  - ProductCard: Stokta olmayan ürünler için WhatsApp linkleri merkezi fonksiyonlarla yönetiliyor
+  - Bağlamsal mesaj şablonları: ürün adı ve SKU bilgileri otomatik mesajlara dahil ediliyor
+- Destek Sayfaları Entegrasyonu
+  - SupportHomePage: Öne çıkan WhatsApp destek kartı eklendi
+  - ContactPage: Hızlı WhatsApp iletişim bölümü, telefon/e-posta kartlarıyla birlikte
+  - FAQPage: "Aradığınız cevabı bulamadınız mı?" WhatsApp destek bölümü
+- WhatsApp İkonu ve Stillendirme
+  - HVACIcons.tsx'e resmi WhatsApp renkleriyle WhatsAppIcon bileşeni eklendi
+  - index.css'e kapsamlı WhatsApp özel CSS sınıfları:
+    - .whatsapp-container, .whatsapp-btn, .whatsapp-text, .whatsapp-subtext
+    - .whatsapp-float (gelecekteki yüzen buton için)
+    - .whatsapp-pulse animasyon efekti
+  - Tutarlı yeşil gradyan arka planlar ve hover efektleri
+- Özellikler
+  - Akıllı fallback: WhatsApp yoksa e-posta iletişime geçer
+  - Mobil optimize: wa.me linkleri mobil cihazlarda mükemmel çalışır
+  - Erişilebilirlik: ARIA etiketleri ve odak durumları
+  - Bağlam farkında mesajlar: her sayfa için özel template mesajlar
+
 ## 2025-09-16
 
 ### DB Performans & RLS İyileştirmeleri + Order Confirmation E-postası

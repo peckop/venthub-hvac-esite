@@ -5,7 +5,7 @@ import { ShoppingCart, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
-import { buildWhatsAppLink } from '../lib/utils'
+import { getStockInquiryLink } from '../utils/whatsapp'
 
 interface ProductCardProps {
   product: Product
@@ -165,13 +165,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>
             {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
-              const env = (import.meta as unknown as { env?: Record<string, string> }).env
-              const wa = env?.VITE_SHOP_WHATSAPP
-              if (typeof wa === 'string' && wa.trim()) {
-                const href = buildWhatsAppLink(wa, `Stok bilgisi: ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''}`)
+              const whatsappLink = getStockInquiryLink(product.name, product.sku)
+              if (whatsappLink) {
                 return (
                   <a
-                    href={href}
+                    href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => { e.stopPropagation() }}

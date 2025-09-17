@@ -15,27 +15,41 @@ Aşağıdaki değişkenler build sırasında gereklidir:
 
 - VITE_SUPABASE_URL
 - VITE_SUPABASE_ANON_KEY
+- VITE_SHOP_WHATSAPP (opsiyonel, WhatsApp desteği için)
 
 Örnek dosya: `.env.example`. Üretime secret koymayın; dağıtım ortamınızın (Vercel/Netlify/Render/Actions) env yönetimini kullanın.
+
+### WhatsApp Konfigürasyonu (Opsiyonel)
+`VITE_SHOP_WHATSAPP` ortam değişkeni ayarlanırsa, WhatsApp desteği otomatik olarak aktif hale gelir:
+
+- **Format**: `905551234567` (ülke kodu + telefon numarası, özel karakter yok)
+- **Kullanım Alanları**: 
+  - Stokta olmayan ürünlerde "Stok sor" butonu
+  - Destek sayfalarında hızlı WhatsApp iletişimi
+  - FAQ sayfasında "Bulamadınız mı?" desteği
+  - İletişim sayfasında WhatsApp hızlı erişim
+- **Fallback**: Değişken ayarlı değilse sistem e-posta iletişime geçer
 
 ### Vercel
 - Project Settings → Environment Variables
 - Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
 - Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
+- Name: VITE_SHOP_WHATSAPP, Value: 905551234567 (opsiyonel)
 - Environments: Production + Preview
 - Redeploy
 
 ### Netlify
 - Site settings → Environment variables → Add variable
-- Names: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+- Names: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_SHOP_WHATSAPP (opsiyonel)
 - Production + Deploy Previews için ekleyip yeniden yayınlayın
 
 ### Cloudflare Pages
 - Project → Settings → Environment Variables
 - Name: VITE_SUPABASE_URL, Value: https://<project-ref>.supabase.co
 - Name: VITE_SUPABASE_ANON_KEY, Value: <anon key>
+- Name: VITE_SHOP_WHATSAPP, Value: 905551234567 (opsiyonel)
 - Node version: 18+ (Pages defaults uygundur)
-- Package manager: pnpm (Pages “Enable pnpm” veya corepack)
+- Package manager: pnpm (Pages "Enable pnpm" veya corepack)
 - Build command: pnpm run build:ci
 - Output directory: dist
 - Preview ve Production ortamlarına aynı değişkenleri ekleyin
@@ -44,6 +58,7 @@ Aşağıdaki değişkenler build sırasında gereklidir:
 Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets ekleyin:
 - VITE_SUPABASE_URL
 - VITE_SUPABASE_ANON_KEY
+- VITE_SHOP_WHATSAPP (opsiyonel)
 
 ## Supabase Migrations (Otomatik)
 - `supabase/migrations/*.sql` push edildiğinde CI, Supabase CLI (v2.39.2) ile otomatik uygular.

@@ -143,8 +143,10 @@ const AdminCouponsPage: React.FC = () => {
         .single()
       if (error) throw error
       setRows(prev => prev.map(r => r.id === id ? { ...r, active: (data as { id: string; is_active: boolean }).is_active } : r))
+      toast.success(!active ? 'Kupon aktif edildi' : 'Kupon pasif edildi')
     } catch (e) {
       console.error('toggle active error', e)
+      toast.error('Durum değiştirilemedi')
     }
   }
 

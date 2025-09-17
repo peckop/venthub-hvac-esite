@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-16
+Last updated: 2025-09-17
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -94,7 +94,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] İyzico callback entegrasyonu: ödeme sonrası stok uyarısı tetikleyicisi
   - [ ] Environment variables: Twilio + Resend API keys
   - [ ] Kurumsal numara: WhatsApp Business onayı
-  - [x] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP)
+  - [x] Faz 1: wa.me bağlantısı için config (örn. VITE_SHOP_WHATSAPP) — Tamamlandı: utility fonksiyonları, ürün/destek sayfalarında entegrasyon, WhatsApp ikonu ve CSS stilleri
 - Kargo Operasyonları (minimal)
   - [x] OrderDetail/Operasyon: Kargo firması + takip no girme/güncelleme
   - [x] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)

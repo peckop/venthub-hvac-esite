@@ -44,7 +44,7 @@ async function postStore(dsn: string, body: unknown): Promise<void> {
 }
 
 export async function sentryCaptureMessage(message: string, level: SentryLevel = 'error', extra?: Record<string, unknown>) {
-  const dsn = (globalThis as any).Deno?.env?.get?.('SENTRY_DSN') || ''
+  const dsn = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_DSN') || ''
   if (!dsn) return
   const event = {
     platform: 'javascript',
@@ -53,14 +53,14 @@ export async function sentryCaptureMessage(message: string, level: SentryLevel =
     level,
     message,
     extra,
-    environment: (globalThis as any).Deno?.env?.get?.('SENTRY_ENV') || undefined,
-    release: (globalThis as any).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,
+    environment: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_ENV') || undefined,
+    release: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,
   }
   await postStore(dsn, event)
 }
 
 export async function sentryCaptureException(e: unknown, extra?: Record<string, unknown>) {
-  const dsn = (globalThis as any).Deno?.env?.get?.('SENTRY_DSN') || ''
+  const dsn = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_DSN') || ''
   if (!dsn) return
   const isErr = e instanceof Error
   const message = isErr ? (e.message || String(e)) : String(e)
@@ -71,10 +71,10 @@ export async function sentryCaptureException(e: unknown, extra?: Record<string, 
     timestamp: Date.now() / 1000,
     level: 'error' as const,
     message,
-    exception: stack ? { values: [{ type: e && (e as any).name || 'Error', value: message, stacktrace: { frames: [{ function: '<edge>', filename: '<edge>', lineno: 0, colno: 0 }] } }] } : undefined,
+    exception: stack ? { values: [{ type: e && (e as Error).name || 'Error', value: message, stacktrace: { frames: [{ function: '<edge>', filename: '<edge>', lineno: 0, colno: 0 }] } }] } : undefined,
     extra,
-    environment: (globalThis as any).Deno?.env?.get?.('SENTRY_ENV') || undefined,
-    release: (globalThis as any).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,
+    environment: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_ENV') || undefined,
+    release: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,
   }
   await postStore(dsn, event)
 }
