@@ -9,14 +9,15 @@ const WhatsAppFloat: React.FC = () => {
 
   return (
     <a
+      id="whatsapp-float"
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="whatsapp-float whatsapp-pulse"
+      className="whatsapp-float"
       aria-label="WhatsApp ile yaz"
       title="WhatsApp ile yaz"
     >
-      <WhatsAppIcon size={36} />
+      <WhatsAppIcon size={24} />
     </a>
   )
 }
