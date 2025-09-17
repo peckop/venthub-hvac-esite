@@ -21,6 +21,15 @@ This document explains how our CI (GitHub Actions) and deployments (Cloudflare P
 
 ## Cloudflare Pages
 
+WhatsApp değişkenini eklemek için:
+
+1) Project → Settings → Environment Variables
+2) Add Variable:
+   - Name: `VITE_SHOP_WHATSAPP`
+   - Value: `905313441813`
+   - Environments: Production ve Preview
+3) Save & Redeploy (son commit'i yeniden yayınlayın)
+
 - master push sonrası otomatik yayın, gerekirse Pages → Deployments → Retry/Trigger.
 - AdminOrdersPage’de yeni bundle’ı görmek için `Ctrl+F5` ile sert yenileyin (Disable cache açık).
 - Project: Cloudflare Pages (Static site hosting)
