@@ -4,8 +4,9 @@ import { buildWhatsAppLink } from '../lib/utils'
  * Get WhatsApp phone number from environment variables
  */
 export function getWhatsAppNumber(): string | null {
-  const env = (import.meta as unknown as { env?: Record<string, string> }).env
-  const whatsapp = env?.VITE_SHOP_WHATSAPP
+  // Vite: production build'da değişkenleri build-time inline eder.
+  // Bu nedenle doğrudan import.meta.env.VITE_SHOP_WHATSAPP kullanıyoruz.
+  const whatsapp = (import.meta as unknown as { env: Record<string, string> }).env.VITE_SHOP_WHATSAPP
   return (typeof whatsapp === 'string' && whatsapp.trim()) ? whatsapp : null
 }
 
