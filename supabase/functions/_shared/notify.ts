@@ -5,14 +5,14 @@
 export type NotifyField = { title: string; value: string; short?: boolean };
 
 function getSlackWebhook(): string | null {
-  const url = (globalThis as any).Deno?.env?.get?.('SLACK_WEBHOOK_URL') || ''
+  const url = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SLACK_WEBHOOK_URL') || ''
   return url && /^https:\/\//.test(url) ? url : null
 }
 
 function getEmailConfig() {
-  const to = (globalThis as any).Deno?.env?.get?.('NOTIFY_EMAIL') || ''
-  const supabaseUrl = (globalThis as any).Deno?.env?.get?.('SUPABASE_URL') || ''
-  const serviceKey = (globalThis as any).Deno?.env?.get?.('SUPABASE_SERVICE_ROLE_KEY') || ''
+  const to = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('NOTIFY_EMAIL') || ''
+  const supabaseUrl = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SUPABASE_URL') || ''
+  const serviceKey = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SUPABASE_SERVICE_ROLE_KEY') || ''
   return { to, supabaseUrl, serviceKey }
 }
 
@@ -20,7 +20,7 @@ async function sendSlack(text: string, fields?: NotifyField[]) {
   const url = getSlackWebhook()
   if (!url) return false
   
-  const payload: any = { text }
+  const payload: Record<string, unknown> = { text }
   if (Array.isArray(fields) && fields.length > 0) {
     payload.attachments = [{
       color: '#e01e5a',
@@ -79,7 +79,7 @@ async function sendEmail(subject: string, text: string, fields?: NotifyField[]) 
 }
 
 export async function notify(text: string, fields?: NotifyField[]) {
-  const debug = ((globalThis as any).Deno?.env?.get?.('NOTIFY_DEBUG') || '').toLowerCase() === 'true'
+  const debug = ((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('NOTIFY_DEBUG') || '').toLowerCase() === 'true'
   const subject = text.slice(0, 50) // First 50 chars as subject
   
   let sent = false

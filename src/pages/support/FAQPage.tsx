@@ -1,7 +1,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, MessageCircle } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
+import { WhatsAppIcon } from '../../components/HVACIcons'
+import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
 
 const FAQPage: React.FC = () => {
   const { t } = useI18n()
@@ -27,6 +29,33 @@ const FAQPage: React.FC = () => {
           </details>
         ))}
       </div>
+
+      {/* WhatsApp Support for unresolved questions */}
+      {isWhatsAppAvailable() && (() => {
+        const whatsappLink = getSupportLink('SSS sayfasında bulamadığım bilgi')
+        if (!whatsappLink) return null
+        
+        return (
+          <div className="mt-10 whatsapp-container">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <WhatsAppIcon size={48} />
+              </div>
+              <h3 className="text-xl font-semibold whatsapp-text mb-2">Aradığınız cevabı bulamadınız mı?</h3>
+              <p className="whatsapp-subtext mb-6">WhatsApp üzerinden direkt bizimle iletişime geçin, size yardımcı olalım.</p>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="whatsapp-btn"
+              >
+                <MessageCircle size={20} />
+                WhatsApp'tan Sorun
+              </a>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
