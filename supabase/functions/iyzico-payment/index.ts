@@ -9,7 +9,8 @@ Deno.serve(async (req) => {
         'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
         'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-debug',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Max-Age': '86400'
+        'Access-Control-Max-Age': '86400',
+        'X-Request-Id': requestId,
     } as Record<string,string>;
 
     if (req.method === 'OPTIONS') {
@@ -41,6 +42,26 @@ Deno.serve(async (req) => {
         const debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
           || (url.searchParams.get('debug') === '1')
           || ((req.headers.get('x-debug') || '') === '1');
+
+        // Per-IP rate limiting
+        try {
+            const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+            const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+            if (supabaseUrl && serviceRoleKey) {
+                const forwarded = req.headers.get('x-forwarded-for') || ''
+                const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
+                const key = `iyzico:${ip}`
+                const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
+                const { result, limit, windowSec } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { limit: Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), windowSec: Number(Deno.env.get('PAYMENT_RATE_LIMIT_WINDOW_SEC') || 60) })
+                if (!result.allowed) {
+                    const rl = rateLimitHeaders(Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)
+                    return new Response(JSON.stringify({ error: { code: 'RATE_LIMITED', message: 'Çok fazla istek' } }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', ...rl } })
+                }
+            }
+        } catch (e) {
+            if (debugEnabled) console.warn('rate_limit skipped:', e)
+        }
+
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
         type BuyerMin = { email?: string; gsmNumber?: string; registrationAddress?: string; ip?: string }
         type AddressMin = { address?: string }
@@ -240,6 +261,13 @@ Deno.serve(async (req) => {
         }
 
         if (!orderResponse.ok) {
+            try {
+                const { slackNotify } = await import('../_shared/notify.ts')
+                await slackNotify('DB error while creating order', [
+                  { title: 'Request-Id', value: requestId, short: true },
+                  { title: 'Status', value: String(orderResponse.status), short: true },
+                ])
+            } catch {}
             return new Response(JSON.stringify({
                 error: { code: 'DATABASE_ERROR', message: 'Sipariş oluşturulamadı' }
             }), {
@@ -496,6 +524,13 @@ Deno.serve(async (req) => {
             });
         } else {
             console.error('İyzico checkout form creation failed:', iyzicoResult);
+            try {
+                const { slackNotify } = await import('../_shared/notify.ts')
+                await slackNotify('İyzico checkout form creation failed', [
+                  { title: 'Request-Id', value: requestId, short: true },
+                  { title: 'Details', value: String(iyzicoResult?.errorMessage || 'unknown'), short: false },
+                ])
+            } catch {}
             
             return new Response(JSON.stringify({
                 error: { 
@@ -511,12 +546,19 @@ Deno.serve(async (req) => {
 
     } catch (error) {
         console.error('Critical Error:', error);
+        try {
+            const { slackNotify } = await import('../_shared/notify.ts')
+            await slackNotify('iyzico-payment crashed', [
+              { title: 'Request-Id', value: requestId, short: true },
+              { title: 'Error', value: String((error as any)?.message || error), short: false },
+            ])
+        } catch {}
         
         return new Response(JSON.stringify({
             error: {
                 code: 'INTERNAL_ERROR',
                 message: 'Sunucu hatası oluştu',
-                details: error.message
+                details: (error as any)?.message
             }
         }), {
             status: 500,
