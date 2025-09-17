@@ -66,9 +66,22 @@ Deno.serve(async (req: Request) => {
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      return new Response(JSON.stringify({ error: 'missing_env' }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      return new Response(JSON.stringify({ error: 'missing_env' }), { status: 500, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId } })
     }
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+
+    // Basic per-IP + route rate limit
+    try {
+      const forwarded = req.headers.get('x-forwarded-for') || ''
+      const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
+      const key = `coupon:${ip}`
+      const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
+      const { result } = await checkRateLimit(key, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { limit: Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), windowSec: Number(Deno.env.get('COUPON_RATE_LIMIT_WINDOW_SEC') || 60) })
+      if (!result.allowed) {
+        const rl = rateLimitHeaders(Number(Deno.env.get('COUPON_RATE_LIMIT_PER_MINUTE') || 60), result.remaining, result.resetAt)
+        return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429, headers: { 'Content-Type': 'application/json', ...cors.headers, 'X-Request-Id': requestId, ...rl } })
+      }
+    } catch {}
 
     const body = (await req.json().catch(()=>({}))) as ApplyCouponReq
     const code = String(body?.code || '').trim()

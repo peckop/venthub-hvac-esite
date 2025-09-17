@@ -1,10 +1,12 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 Deno.serve(async (req) => {
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'X-Request-Id': requestId,
   } as Record<string,string>
 
   if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
@@ -139,8 +141,35 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
+    // Slack notification for critical levels or first occurrence
+    try {
+      const level = String(payload.level || 'error').toLowerCase()
+      const env = String(payload.env || '')
+      const notifyEnabled = ((Deno.env.get('SLACK_WEBHOOK_URL') || '') !== '')
+      const isCritical = (level === 'fatal' || level === 'error')
+      if (notifyEnabled && isCritical) {
+        const { slackNotify } = await import('../_shared/notify.ts')
+        const shortMsg = String(payload.msg || '').slice(0, 200)
+        const fields = [
+          { title: 'Signature', value: signature, short: false },
+          { title: 'Level', value: level, short: true },
+          { title: 'Env', value: env || '-', short: true },
+          { title: 'URL', value: String(payload.url || '-').slice(0, 180), short: false },
+          { title: 'Request-Id', value: requestId, short: true },
+        ]
+        await slackNotify(`Client error reported${env ? ` (${env})` : ''}: ${shortMsg}`, fields)
+      }
+    } catch {}
+
     return new Response('ok', { status: 200, headers: cors })
   } catch (e) {
+    try {
+      const { slackNotify } = await import('../_shared/notify.ts')
+      await slackNotify('log-client-error failed', [
+        { title: 'Error', value: String((e as any)?.message || e), short: false },
+        { title: 'Request-Id', value: requestId, short: true },
+      ])
+    } catch {}
     return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })
