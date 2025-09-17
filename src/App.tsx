@@ -12,6 +12,7 @@ import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
 import AddToCartToast from './components/AddToCartToast'
 import LoadingSpinner from './components/LoadingSpinner'
+import WhatsAppFloat from './components/WhatsAppFloat'
 import { prefetchProductsPage } from './utils/prefetch'
 
 // Keep HomePage as direct import for fastest initial load
@@ -205,6 +206,9 @@ function App() {
               </main>
 
               <Footer />
+
+              {/* Global WhatsApp floater */}
+              <WhatsAppFloat />
               
               {/* Global cart toast */}
               <AddToCartToast />
