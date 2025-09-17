@@ -196,14 +196,15 @@ textarea:focus-visible {
 /* WhatsApp floating button (if needed) */
 .whatsapp-float {
   @apply fixed z-40 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-xl transition-all duration-300;
-  bottom: max(env(safe-area-inset-bottom), 84px);
+  bottom: max(env(safe-area-inset-bottom), 96px);
   right: max(env(safe-area-inset-right), 20px);
   width: 56px;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid white;
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 /* Avoid overlap with BackToTop and Language Switcher */
