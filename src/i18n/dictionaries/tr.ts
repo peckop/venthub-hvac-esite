@@ -15,6 +15,7 @@ export const tr = {
     signUp: "Kayıt Ol",
     skipToContent: "Ana içeriğe geç",
     searchHeaderPlaceholder: "Ürün, marka veya model ara...",
+    search: "Ara",
     quickSearch: "Hızlı ara...",
 
     // Existing
@@ -185,6 +186,23 @@ export const tr = {
     subcategories: 'alt kategori',
     more: 'daha fazla',
   },
+  header: {
+    syncing: 'Senkronize ediliyor',
+    roleLabel: 'Yetki',
+    account: 'Hesabım',
+    adminPanel: 'Admin Paneli',
+    menu: 'Menü',
+    quickOrder: 'Hızlı Sipariş',
+    recentlyViewed: 'Son Görüntülenen',
+    favorites: 'Favoriler',
+    cart: 'Sepet'
+  },
+  roles: {
+    superadmin: 'Superadmin',
+    admin: 'Admin',
+    moderator: 'Moderatör',
+    user: 'Kullanıcı'
+  },
   legalLinks: {
     kvkk: 'KVKK Aydınlatma Metni',
     distanceSales: 'Mesafeli Satış Sözleşmesi',
@@ -224,7 +242,30 @@ export const tr = {
       errors: 'Hata Kayıtları',
       errorGroups: 'Hata Grupları',
       products: 'Ürünler',
-      categories: 'Kategoriler'
+      categories: 'Kategoriler',
+      coupons: 'Kuponlar'
+    },
+    ui: {
+      prev: 'Önceki',
+      next: 'Sonraki',
+      refresh: 'Yenile',
+      loading: 'Yükleniyor…',
+      loadingShort: 'Yükleniyor…',
+      noRecords: 'Kayıt yok',
+      apply: 'Uygula',
+      clear: 'Temizle',
+      close: 'Kapat',
+      save: 'Kaydet',
+      add: 'Ekle',
+      delete: 'Sil',
+      details: 'Detay',
+      hide: 'Gizle'
+    },
+    search: {
+      audit: 'Tablo adı, PK veya not ara',
+      coupons: 'Kod veya tip ile ara',
+      movements: 'Ürün adı/SKU ara',
+      orders: 'Sipariş ID veya Conversation ID'
     }
   },
   footer: {
@@ -383,7 +424,8 @@ export const tr = {
     total: 'Toplam',
     checkout: 'Siparişi Tamamla',
     continueShopping: 'Alışverişe Devam Et',
-    securePayment: '🔒 Güvenli ödeme sistemi ile korunmaktadır'
+    securePayment: '🔒 Güvenli ödeme sistemi ile korunmaktadır',
+    itemTotal: 'Toplam'
   },
   orders: {
     title: 'Siparişlerim',

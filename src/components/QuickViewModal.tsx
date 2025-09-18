@@ -4,6 +4,7 @@ import { X, ShoppingCart, Eye } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 
 interface QuickViewModalProps {
   product: Product | null
@@ -12,7 +13,7 @@ interface QuickViewModalProps {
 }
 
 const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { addToCart } = useCart()
 
   if (!open || !product) return null
@@ -40,7 +41,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
           <div className="flex flex-col">
             <h4 className="font-semibold text-industrial-gray mb-1 line-clamp-2">{product.name}</h4>
             <div className="text-sm text-steel-gray mb-2">{product.brand} • {product.sku}</div>
-            <div className="text-2xl font-bold text-primary-navy mb-4">₺{price.toLocaleString('tr-TR')}</div>
+            <div className="text-2xl font-bold text-primary-navy mb-4">{formatCurrency(price, lang, { maximumFractionDigits: 0 })}</div>
             <p className="text-sm text-steel-gray line-clamp-4 mb-6">
               {product.description || t('quickView.descFallback')}
             </p>

@@ -4,6 +4,7 @@ import { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 
 interface CartToastProps {
   isVisible: boolean
@@ -12,7 +13,7 @@ interface CartToastProps {
 }
 
 export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClose }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [showChoiceModal, setShowChoiceModal] = useState(false)
 
   useEffect(() => {
@@ -108,7 +109,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                       {product.name}
                     </p>
                     <p className="text-sm text-steel-gray">
-                      {product.brand} • ₺{parseFloat(product.price).toLocaleString('tr-TR')}
+                      {product.brand} • {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
                     </p>
                   </div>
                 </div>

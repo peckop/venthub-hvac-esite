@@ -99,9 +99,9 @@ Açık kalanlar / sıradakiler:
 - [x] RLS: products/product_images/categories için admin/moderator CRUD policy'leri (2025-09-10 düzeltildi)
 - [x] CSV import/export (ürün) — v2 tamamlandı (write desteği, upsert by SKU)
 - [x] Audit log: ürün/kategori + fiyat/görsel değişiklikleri (mevcut)
-- [ ] Ürün listesinde server-side sayfalama
-- [ ] Ürün listesinde varsayılan sıralama ve görünür kolon ayarlarının kalıcılığı
-- [ ] Arama kapsamını genişletme (brand ve slug dahil)
+- [x] Ürün listesinde server-side sayfalama
+- [x] Ürün listesinde varsayılan sıralama ve görünür kolon ayarlarının kalıcılığı (localStorage)
+- [x] Arama kapsamını genişletme (brand ve slug dahil)
 - [ ] Çoklu seçim ve toplu dışa aktarma yetenekleri
 
 ### Görev Listesi (Sprint 3A)

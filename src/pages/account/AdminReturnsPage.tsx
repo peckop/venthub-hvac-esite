@@ -10,7 +10,8 @@ import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, a
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-
+import { formatDateTime, formatDate, formatTime } from '../../i18n/datetime'
+import { formatCurrency } from '../../i18n/format'
 interface ReturnWithOrder {
   id: string
   order_id: string
@@ -34,7 +35,7 @@ type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
 export default function AdminReturnsPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
-  const { t: _t } = useI18n()
+  const { t: _t, lang } = useI18n()
   
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
@@ -389,8 +390,8 @@ export default function AdminReturnsPage() {
       r.customer_email || '',
       r.reason || '',
       getStatusLabel(r.status),
-      new Date(r.created_at).toLocaleString('tr-TR'),
-      typeof r.total_amount === 'number' ? new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(r.total_amount) : ''
+      formatDateTime(r.created_at, lang),
+      typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''
     ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',') )
     const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
@@ -406,14 +407,14 @@ export default function AdminReturnsPage() {
   function exportXls() {
     const rowsHtml = filteredReturns.map(r => {
       const orderNo = r.order_number ? `#${r.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
-      const amount = typeof r.total_amount === 'number' ? new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(r.total_amount) : ''
+      const amount = typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''
       return `<tr>`+
         `<td>${orderNo}</td>`+
         `<td>${r.customer_name||''}</td>`+
         `<td>${r.customer_email||''}</td>`+
         `<td>${r.reason||''}</td>`+
         `<td>${getStatusLabel(r.status)}</td>`+
-        `<td>${new Date(r.created_at).toLocaleString('tr-TR')}</td>`+
+        `<td>${formatDateTime(r.created_at, lang)}</td>`+
         `<td>${amount}</td>`+
       `</tr>`
     }).join('')
@@ -513,7 +514,7 @@ export default function AdminReturnsPage() {
                             </button>
                             {returnItem.total_amount && (
                               <span className="text-xs text-steel-gray">
-                                {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(returnItem.total_amount))}
+                                {formatCurrency(Number(returnItem.total_amount), lang)}
                               </span>
                             )}
                           </div>
@@ -550,8 +551,8 @@ export default function AdminReturnsPage() {
                       {visibleCols.date && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col">
-                            <span className="font-medium">{new Date(returnItem.created_at).toLocaleDateString('tr-TR')}</span>
-                            <span className="text-xs text-steel-gray">{new Date(returnItem.created_at).toLocaleTimeString('tr-TR')}</span>
+                            <span className="font-medium">{formatDate(returnItem.created_at, lang)}</span>
+                            <span className="text-xs text-steel-gray">{formatTime(returnItem.created_at, lang)}</span>
                           </div>
                         </td>
                       )}

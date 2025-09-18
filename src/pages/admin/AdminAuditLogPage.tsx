@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatDateTime } from '../../i18n/datetime'
 
 interface AuditRow {
   id: string
@@ -19,7 +20,7 @@ interface AuditRow {
 const PAGE_SIZE = 50
 
 const AdminAuditLogPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [rows, setRows] = React.useState<AuditRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -106,9 +107,9 @@ const AdminAuditLogPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Önceki</button>
+        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Sonraki</button>
+        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -119,24 +120,24 @@ const AdminAuditLogPage: React.FC = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className={`${adminTableHeadCellClass}`}>Tarih</th>
-                <th className={`${adminTableHeadCellClass}`}>Aksiyon</th>
-                <th className={`${adminTableHeadCellClass}`}>Tablo</th>
-                <th className={`${adminTableHeadCellClass}`}>PK</th>
-                <th className={`${adminTableHeadCellClass}`}>Not</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.date') || 'Tarih'}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.action') || 'Aksiyon'}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.table') || 'Tablo'}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.pk') || 'PK'}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.note') || 'Not'}</th>
                 <th className={`${adminTableHeadCellClass}`}></th>
               </tr>
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={6}>Yükleniyor…</td></tr>
+                <tr><td className="p-4" colSpan={6}>{t('admin.ui.loading')}</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={6}>Kayıt yok</td></tr>
+                <tr><td className="p-4" colSpan={6}>{t('admin.ui.noRecords')}</td></tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
                     <tr className="border-b border-light-gray/60">
-                      <td className={`${adminTableCellClass}`}>{new Date(r.at).toLocaleString('tr-TR')}</td>
+                      <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
                       <td className={`${adminTableCellClass}`}><span className="inline-block px-2 py-1 rounded border text-xs" title={r.action}>{r.action}</span></td>
                       <td className={`${adminTableCellClass}`}>{r.table_name}</td>
                       <td className={`${adminTableCellClass}`}>{r.row_pk || '-'}</td>
@@ -145,7 +146,7 @@ const AdminAuditLogPage: React.FC = () => {
                         <button
                           className="px-2 py-1 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs"
                           onClick={()=> setExpandedId(id => id === r.id ? null : r.id)}
-                        >{expandedId === r.id ? 'Gizle' : 'Detay'}</button>
+> {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
                     {expandedId === r.id && (

@@ -7,6 +7,7 @@ import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 import LeadModal from '../components/LeadModal'
 import legalConfig from '../config/legal'
 import { getStockInquiryLink } from '../utils/whatsapp'
@@ -187,7 +188,7 @@ export const ProductDetailPage: React.FC = () => {
     }
   }
 
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
@@ -416,7 +417,7 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Price */}
             <div className="text-4xl font-bold text-primary-navy">
-              ₺{parseFloat(product.price).toLocaleString('tr-TR')}
+              {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
               <span className="text-sm text-steel-gray font-normal ml-2">
                 {t('pdp.vatIncluded')}
               </span>
@@ -744,7 +745,7 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="flex justify-between py-2">
                             <span className="text-steel-gray">{t('pdp.labels.price')}</span>
                             <span className="font-bold text-primary-navy">
-                              ₺{parseFloat(product.price).toLocaleString('tr-TR')}
+                              {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
                             </span>
                           </div>
                         </div>
@@ -769,7 +770,7 @@ export const ProductDetailPage: React.FC = () => {
                                 {t('pdp.variantDetails')}
                               </p>
                               <div className="text-primary-navy font-semibold">
-                                ₺{(parseFloat(product.price) + (variant - 1) * 200).toLocaleString('tr-TR')}
+                                {formatCurrency((parseFloat(product.price) + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}
                               </div>
                             </div>
                           ))}

@@ -3,6 +3,8 @@ import { adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adm
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { Density } from '../../components/admin/ColumnsMenu'
+import { useI18n } from '../../i18n/I18nProvider'
+import { formatDateTime } from '../../i18n/datetime'
 
 interface ReturnEventRow {
   id: number | string
@@ -37,6 +39,7 @@ const AdminWebhookEventsPage: React.FC = () => {
 
   const [returnsRows, setReturnsRows] = React.useState<ReturnEventRow[]>([])
   const [emailsRows, setEmailsRows] = React.useState<EmailEventRow[]>([])
+  const { lang } = useI18n()
 
   const STORAGE_KEY = 'toolbar:webhook-events'
   const [colsRet, setColsRet] = React.useState({ event: true, order: true, carrier: true, status: true, received: true })
@@ -153,7 +156,7 @@ const AdminWebhookEventsPage: React.FC = () => {
                     {colsRet.order && (<td className="px-3 py-2 font-mono text-xs">{r.order_id || '-'}</td>)}
                     {colsRet.carrier && (<td className="px-3 py-2">{r.carrier || '-'}</td>)}
                     {colsRet.status && (<td className="px-3 py-2">{r.status_mapped || r.status_raw || '-'}</td>)}
-                    {colsRet.received && (<td className="px-3 py-2 whitespace-nowrap">{new Date(r.received_at).toLocaleString('tr-TR')}</td>)}
+                    {colsRet.received && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.received_at, lang)}</td>)}
                   </tr>
                 ))
               )}
@@ -182,7 +185,7 @@ const AdminWebhookEventsPage: React.FC = () => {
                     {colsMail.to && (<td className="px-3 py-2">{e.email_to}</td>)}
                     {colsMail.subject && (<td className="px-3 py-2">{e.subject}</td>)}
                     {colsMail.provider && (<td className="px-3 py-2">{e.provider || '-'}</td>)}
-                    {colsMail.created && (<td className="px-3 py-2 whitespace-nowrap">{new Date(e.created_at).toLocaleString('tr-TR')}</td>)}
+                    {colsMail.created && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(e.created_at, lang)}</td>)}
                   </tr>
                 ))
               )}

@@ -6,6 +6,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import * as Tabs from '@radix-ui/react-tabs'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
 
 interface ProductRow {
   id: string
@@ -25,12 +26,18 @@ interface CategoryOpt { id: string; name: string }
 interface ImageRow { id: string; product_id: string; path: string; alt?: string | null; sort_order: number }
 
 const AdminProductsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [rows, setRows] = React.useState<ProductRow[]>([])
   const [cats, setCats] = React.useState<CategoryOpt[]>([])
   const [q, setQ] = React.useState('')
+  const [debouncedQ, setDebouncedQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+
+  // Pagination
+  const PAGE_SIZE = 50
+  const [page, setPage] = React.useState(1)
+  const [total, setTotal] = React.useState(0)
 
   // Toolbar filtreleri (stok özetine uyum)
   const [selectedCategoryFilter, setSelectedCategoryFilter] = React.useState<string>('')
@@ -38,16 +45,31 @@ const AdminProductsPage: React.FC = () => {
   const [featuredOnly, setFeaturedOnly] = React.useState<boolean>(false)
 
   // Columns & density
-const STORAGE_KEY = 'toolbar:products'
+  const STORAGE_KEY = 'toolbar:products'
   const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
+  const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
   const [covers, setCovers] = React.useState<Record<string, string>>({})
   React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
   React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
   const headPad = density==='compact' ? 'px-2 py-2' : ''
   const cellPad = density==='compact' ? 'px-2 py-2' : ''
+
+  // Persist sort settings
+  type SortKey = 'name'|'sku'|'category'|'status'|'price'|'stock'
+  const SORT_KEY_STORAGE = `${STORAGE_KEY}:sortKey`
+  const SORT_DIR_STORAGE = `${STORAGE_KEY}:sortDir`
+  const [sortKey, setSortKey] = React.useState<SortKey>(()=>{
+    try { const v = localStorage.getItem(SORT_KEY_STORAGE) as SortKey | null; if (v==='name'||v==='sku'||v==='category'||v==='status'||v==='price'||v==='stock') return v; } catch {}
+    return 'name'
+  })
+  const [sortDir, setSortDir] = React.useState<'asc'|'desc'>(()=>{
+    try { const v = localStorage.getItem(SORT_DIR_STORAGE) as 'asc'|'desc' | null; if (v==='asc'||v==='desc') return v } catch {}
+    return 'asc'
+  })
+  React.useEffect(()=>{ try { localStorage.setItem(SORT_KEY_STORAGE, sortKey) } catch{} }, [sortKey, SORT_KEY_STORAGE])
+  React.useEffect(()=>{ try { localStorage.setItem(SORT_DIR_STORAGE, sortDir) } catch{} }, [sortDir, SORT_DIR_STORAGE])
 
   // selection & form state
   const [selectedId, setSelectedId] = React.useState<string | null>(null)
@@ -93,17 +115,54 @@ const [metaDesc, setMetaDesc] = React.useState('')
     setLoading(true)
     setError(null)
     try {
-      const [p, c, s] = await Promise.all([
-        supabase.from('products').select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured').order('name', { ascending: true }),
+      // Build products query with server-side filters and pagination
+      let query = supabase
+        .from('products')
+        .select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
+
+      // Filters
+      if (selectedCategoryFilter) query = query.eq('category_id', selectedCategoryFilter)
+      if (featuredOnly) query = query.eq('is_featured', true)
+      const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
+      if (anyStatus) {
+        const statuses: string[] = []
+        if (statusFilter.active) statuses.push('active')
+        if (statusFilter.inactive) statuses.push('inactive')
+        if (statusFilter.out_of_stock) statuses.push('out_of_stock')
+        if (statuses.length === 1) query = query.eq('status', statuses[0])
+        else if (statuses.length > 1) query = query.in('status', statuses)
+      }
+      const term = debouncedQ.trim()
+      if (term) {
+        const like = `%${term}%`
+        query = query.or(`name.ilike.${like},sku.ilike.${like},brand.ilike.${like},slug.ilike.${like}`)
+      }
+
+      // Sorting (only supported keys)
+      const sortableMap: Record<SortKey, string | null> = { name: 'name', sku: 'sku', category: null, status: 'status', price: 'price', stock: 'stock_qty' }
+      const col = sortableMap[sortKey]
+      if (col) query = query.order(col, { ascending: sortDir === 'asc' })
+      else query = query.order('name', { ascending: true })
+
+      // Pagination
+      const from = (page - 1) * PAGE_SIZE
+      const to = from + PAGE_SIZE - 1
+      const { data, error, count } = await query.range(from, to)
+      if (error) throw error
+      const list = (data || []) as ProductRow[]
+      setRows(list)
+      setTotal(typeof count === 'number' ? count : 0)
+
+      // Categories + settings
+      const [c, s] = await Promise.all([
         supabase.from('categories').select('id,name').order('name', { ascending: true }),
         supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
       ])
-      if (p.error) throw p.error
       if (c.error) throw c.error
-const list = (p.data || []) as ProductRow[]
-      setRows(list)
       setCats((c.data || []) as CategoryOpt[])
       if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number|null } | null)?.default_low_stock_threshold ?? null) as number | null)
+
+      // Cover images for current page
       const ids = list.map(x=>x.id)
       if (ids.length>0) {
         const { data: imgs } = await supabase.from('product_images').select('product_id,path,sort_order').in('product_id', ids).order('sort_order', { ascending: true })
@@ -114,31 +173,21 @@ const list = (p.data || []) as ProductRow[]
     } catch (e) {
       setError((e as Error).message || 'Yüklenemedi')
       setRows([])
+      setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page])
 
   React.useEffect(()=>{ load() }, [load])
 
-  const filtered = React.useMemo(()=>{
-    const term = q.trim().toLowerCase()
-    let base = rows
-    if (term) {
-      base = base.filter(r => [r.name, r.sku, r.brand || ''].some(v => (v||'').toLowerCase().includes(term)))
-    }
-    if (selectedCategoryFilter) {
-      base = base.filter(r => (r.category_id || '') === selectedCategoryFilter)
-    }
-    const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
-    if (anyStatus) {
-      base = base.filter(r => (statusFilter as Record<string, boolean>)[(r.status || '').toLowerCase()])
-    }
-    if (featuredOnly) {
-      base = base.filter(r => !!r.is_featured)
-    }
-    return base
-  }, [rows, q, selectedCategoryFilter, statusFilter, featuredOnly])
+  React.useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
+    return () => clearTimeout(t)
+  }, [q])
+
+  // Server-side filtered rows already; keep as identity
+  const filtered = React.useMemo(()=> rows, [rows])
 
   const startCreate = () => {
     setSelectedId(null)
@@ -405,12 +454,10 @@ const before = rows.find(r=>r.id===id) || null
     }
   }
 
-  type SortKey = 'name'|'sku'|'category'|'status'|'price'|'stock'
-  const [sortKey, setSortKey] = React.useState<SortKey>('name')
-  const [sortDir, setSortDir] = React.useState<'asc'|'desc'>('asc')
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d==='asc'?'desc':'asc')
     else { setSortKey(key); setSortDir('asc') }
+    setPage(1)
   }
   const sortIndicator = (key: SortKey) => sortKey!==key ? '' : (sortDir==='asc'?'▲':'▼')
 
@@ -458,7 +505,6 @@ const before = rows.find(r=>r.id===id) || null
     return
   }
 
-const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency', currency:'TRY', maximumFractionDigits:2 }), [])
   const statusBadge = (s?: string | null) => {
     const v = (s||'').toLowerCase()
     if (v==='active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">Aktif</span>
@@ -477,7 +523,7 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
       <AdminToolbar
         storageKey="toolbar:products"
         sticky
-        search={{ value: q, onChange: setQ, placeholder: 'ürün adı/SKU/marka ara', focusShortcut: '/' }}
+        search={{ value: q, onChange: (v)=>{ setQ(v); setPage(1) }, placeholder: 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
         select={{
           value: selectedCategoryFilter,
           onChange: setSelectedCategoryFilter,
@@ -490,8 +536,8 @@ const fmt = React.useMemo(()=> new Intl.NumberFormat('tr-TR', { style:'currency'
           { key: 'out_of_stock', label: 'Stokta Yok', active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
         ]}
         toggles={[{ key: 'featured', label: 'Sadece: Öne Çıkan', checked: featuredOnly, onChange: setFeaturedOnly }]}
-        onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false) }}
-        recordCount={filtered.length}
+        onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false); setPage(1) }}
+        recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
             <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e)=>{
@@ -739,6 +785,14 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
       {/* Table */}
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
+        <div className="p-2 flex items-center justify-between text-sm text-steel-gray">
+          <div>Toplam: {total}</div>
+          <div className="flex items-center gap-2">
+            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">Önceki</button>
+            <span>Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
+            <button onClick={()=>setPage(p=>p+1)} disabled={page>=Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">Sonraki</button>
+          </div>
+        </div>
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -799,7 +853,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
                   {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>}
 {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
-                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price!=null?fmt.format(Number(r.price)):'-'}</td>}
+{visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price!=null?formatCurrency(Number(r.price), lang):'-'}</td>}
                   {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>

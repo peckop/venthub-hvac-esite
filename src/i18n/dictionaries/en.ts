@@ -15,6 +15,8 @@ export const en = {
     signUp: "Sign Up",
     skipToContent: "Skip to main content",
     searchHeaderPlaceholder: "Search product, brand or model...",
+    search: "Search",
+    quickSearch: "Quick search...",
 
     // Existing
     discover: "Discover",
@@ -184,6 +186,23 @@ export const en = {
     subcategories: 'subcategories',
     more: 'more',
   },
+  header: {
+    syncing: 'Syncing',
+    roleLabel: 'Role',
+    account: 'My Account',
+    adminPanel: 'Admin Panel',
+    menu: 'Menu',
+    quickOrder: 'Quick Order',
+    recentlyViewed: 'Recently Viewed',
+    favorites: 'Favorites',
+    cart: 'Cart'
+  },
+  roles: {
+    superadmin: 'Superadmin',
+    admin: 'Admin',
+    moderator: 'Moderator',
+    user: 'User'
+  },
   legalLinks: {
     kvkk: 'KVKK Privacy Notice',
     distanceSales: 'Distance Sales Agreement',
@@ -219,7 +238,30 @@ export const en = {
       users: 'User Management',
       audit: 'Audit Logs',
       errors: 'Error Logs',
-      errorGroups: 'Error Groups'
+      errorGroups: 'Error Groups',
+      coupons: 'Coupons'
+    },
+    ui: {
+      prev: 'Previous',
+      next: 'Next',
+      refresh: 'Refresh',
+      loading: 'Loading…',
+      loadingShort: 'Loading…',
+      noRecords: 'No records',
+      apply: 'Apply',
+      clear: 'Clear',
+      close: 'Close',
+      save: 'Save',
+      add: 'Add',
+      delete: 'Delete',
+      details: 'Details',
+      hide: 'Hide'
+    },
+    search: {
+      audit: 'Search by table, PK or note',
+      coupons: 'Search by code or type',
+      movements: 'Search by product name/SKU',
+      orders: 'Search by Order ID or Conversation ID'
     }
   },
   footer: {
@@ -378,7 +420,8 @@ export const en = {
     total: 'Total',
     checkout: 'Proceed to Checkout',
     continueShopping: 'Continue Shopping',
-    securePayment: 'Protected by a secure payment system'
+    securePayment: 'Protected by a secure payment system',
+    itemTotal: 'Total'
   },
   orders: {
     title: 'My Orders',

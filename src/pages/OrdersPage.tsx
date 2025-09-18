@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
+import { formatDateTime } from '../i18n/datetime'
 
 
 interface Order {
@@ -85,7 +87,7 @@ export const OrdersPage: React.FC = () => {
   const [productFilter, setProductFilter] = useState<string>('')
 
   // const { addToCart: _addToCart } = useCart() // Not used in this component
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   const fetchOrders = React.useCallback(async () => {
     try {
@@ -164,20 +166,11 @@ export const OrdersPage: React.FC = () => {
   }, [user, authLoading, navigate, fetchOrders])
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    return formatDateTime(dateString, lang)
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'currency',
-      currency: 'TRY'
-    }).format(price)
+    return formatCurrency(price, lang, { maximumFractionDigits: 0 })
   }
 
   const getStatusColor = (status: string) => {

@@ -11,13 +11,14 @@ import { BrandIcon } from './HVACIcons'
 import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import { formatCurrency } from '../i18n/format'
 
 interface StickyHeaderProps {
   isScrolled: boolean
 }
 
 export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [stickySearchQuery, setStickySearchQuery] = useState('')
@@ -73,7 +74,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     return () => { active = false }
   }, [user?.id])
 
-  const roleLabel = (r: string) => r === 'superadmin' ? 'Superadmin' : r === 'admin' ? 'Admin' : r === 'moderator' ? 'Moderator' : 'Kullanıcı'
+  const roleLabel = (r: string) => r === 'superadmin' ? t('roles.superadmin') : r === 'admin' ? t('roles.admin') : r === 'moderator' ? t('roles.moderator') : t('roles.user')
 
   // Scroll progress tracker
   useEffect(() => {
@@ -228,7 +229,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   >
                 <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
                 {syncing && (
-                  <span title="Senkronize ediliyor" className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
+                  <span title={t('header.syncing')} className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
                 )}
                 {getCartCount() > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-lg">
@@ -254,7 +255,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       {(userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderator') && (
                         <span className={`hidden xl:inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${
                           userRole === 'superadmin' ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
-                        }`} title={`Yetki: ${roleLabel(userRole)}`}>
+                        }`} title={`${t('header.roleLabel')}: ${roleLabel(userRole)}`}>
                           {roleLabel(userRole)}
                         </span>
                       )}
@@ -275,7 +276,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                               {user.email}
                             </div>
                             <div className="pt-1 text-xs text-steel-gray/80">
-                              Yetki: <span className="font-medium text-industrial-gray">{roleLabel(userRole)}</span>
+                              {t('header.roleLabel')}: <span className="font-medium text-industrial-gray">{roleLabel(userRole)}</span>
                             </div>
                           </div>
                           <Link
@@ -284,7 +285,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
                           >
                             <User size={16} />
-                            <span>Hesabım</span>
+                            <span>{t('header.account')}</span>
                           </Link>
                           {isAdmin && (
                             <Link
@@ -293,7 +294,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                               className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
                             >
                               <Crown size={16} />
-                              <span>Admin Paneli</span>
+                              <span>{t('header.adminPanel')}</span>
                             </Link>
                           )}
                           <button
@@ -335,7 +336,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               {/* Mobile menu button */}
               <button
                 onClick={() => setIsMenuOpen(true)}
-                aria-label="Menü"
+                aria-label={t('header.menu')}
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 xl:hidden group"
               >
                 <Menu size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
@@ -463,7 +464,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             <div className="text-xs text-steel-gray">{product.brand}</div>
                           </div>
                           <div className="text-sm font-bold text-primary-navy">
-                            ₺{parseFloat(product.price).toLocaleString('tr-TR')}
+                            {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
                           </div>
                         </button>
                       ))}
@@ -477,11 +478,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   <button
                     onClick={() => navigate('/products?sort=bestsellers')}
                     className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
-                    title="Hızlı Sipariş"
-                    aria-label="Hızlı Sipariş"
+                    title={t('header.quickOrder')}
+                    aria-label={t('header.quickOrder')}
                   >
                     <Zap size={16} className="text-warning-orange group-hover:animate-pulse" />
-                    <span className="hidden 2xl:block">Hızlı Sipariş</span>
+                    <span className="hidden 2xl:block">{t('header.quickOrder')}</span>
                   </button>
 
                   {/* Recent Products */}
@@ -492,8 +493,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                         if (recent.length > 0) navigate(`/product/${recent[0]}`)
                       }}
                       className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                      title="Son Görüntülenen"
-                      aria-label="Son Görüntülenen"
+                      title={t('header.recentlyViewed')}
+                      aria-label={t('header.recentlyViewed')}
                     >
                       <Clock size={16} className="text-steel-gray group-hover:text-primary-navy" />
                     </button>
@@ -503,8 +504,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   <button
                     onClick={() => navigate('/account/favorites')}
                     className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                    title="Favoriler"
-                    aria-label="Favoriler"
+                      title={t('header.favorites')}
+                      aria-label={t('header.favorites')}
                   >
                     <Star size={16} className="text-steel-gray group-hover:text-gold-accent" />
                   </button>
@@ -512,7 +513,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {/* Menu Button */}
                   <button
                     onClick={() => setIsMenuOpen(true)}
-                    aria-label="Menü"
+                    aria-label={t('header.menu')}
                     className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                   >
                     <Menu size={18} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
@@ -521,7 +522,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {/* Cart with Total */}
                   <Link
                     to="/cart"
-                    aria-label="Sepet"
+                    aria-label={t('header.cart')}
                     className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
                   >
                     <div className="relative">
@@ -534,7 +535,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     </div>
                     {getCartTotal && getCartTotal() > 0 && (
                       <span className="hidden xl:block text-sm font-bold text-success-green">
-                        ₺{getCartTotal().toLocaleString('tr-TR')}
+                        {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
                       </span>
                     )}
                   </Link>
@@ -543,7 +544,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {user ? (
                     <Link
                       to="/account"
-                      aria-label="Hesabım"
+                      aria-label={t('header.account')}
                       className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     >
                       <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />

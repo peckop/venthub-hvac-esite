@@ -35,6 +35,13 @@ function interpolate(str: string, params?: Record<string, unknown>): string {
 
 function detectDefaultLang(): Lang {
   if (typeof window === 'undefined') return 'tr'
+  try {
+    const params = new URLSearchParams(window.location.search)
+    const fromUrl = params.get('lang')
+    if (fromUrl === 'tr' || fromUrl === 'en') {
+      return fromUrl
+    }
+  } catch {}
   const saved = window.localStorage.getItem('lang')
   if (saved === 'tr' || saved === 'en') return saved
   const nav = navigator.language?.toLowerCase() || 'tr'
@@ -49,6 +56,16 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     try { window.localStorage.setItem('lang', lang) } catch {}
+  }, [lang])
+
+  // Keep <html lang> and dir in sync with current language for a11y & SEO
+  useEffect(() => {
+    try {
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('lang', lang)
+        document.documentElement.setAttribute('dir', 'ltr')
+      }
+    } catch {}
   }, [lang])
 
   const setLang = React.useCallback((l: Lang) => setLangState(l), [])
@@ -68,4 +85,3 @@ export function useI18n() {
   if (!ctx) throw new Error('useI18n must be used within I18nProvider')
   return ctx
 }
-

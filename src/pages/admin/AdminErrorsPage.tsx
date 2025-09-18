@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatDateTime } from '../../i18n/datetime'
 
 interface ErrorRow {
   id: string
@@ -19,7 +20,7 @@ interface ErrorRow {
 const PAGE_SIZE = 50
 
 const AdminErrorsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   // Default date range: last 7 days (including today)
   const fmt = (d: Date) => {
     const y = d.getFullYear()
@@ -168,7 +169,7 @@ const AdminErrorsPage: React.FC = () => {
                 rows.map(r => (
                   <React.Fragment key={r.id}>
                     <tr className="border-b border-light-gray/60">
-                      <td className={`${adminTableCellClass}`}>{new Date(r.at).toLocaleString('tr-TR')}</td>
+<td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
                       <td className={`${adminTableCellClass}`}>{r.level || 'error'}</td>
                       <td className={`${adminTableCellClass}`}>{r.message}</td>
                       <td className={`${adminTableCellClass}`}>{r.url || '-'}</td>
