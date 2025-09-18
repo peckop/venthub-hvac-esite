@@ -511,6 +511,9 @@ const AdminInventoryPage: React.FC = () => {
       // Her ürün için stok güncelleme işlemi yap
       let successCount = 0
       const applied: Array<{ productId: string; delta: number }> = []
+      const batchId = (globalThis?.crypto && typeof (crypto as any).randomUUID === 'function')
+        ? (crypto as any).randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2,10)}`
       for (const item of csvPreview) {
         const productId = skuToId.get(item.sku)
         if (!productId || item.delta === 0) continue
@@ -520,7 +523,8 @@ const AdminInventoryPage: React.FC = () => {
           const { error } = await supabase.rpc('adjust_stock', {
             p_product_id: productId,
             p_delta: item.delta,
-            p_reason: reason
+            p_reason: reason,
+            p_batch_id: batchId as string
           })
           
           if (error) throw error
@@ -555,13 +559,9 @@ const AdminInventoryPage: React.FC = () => {
               if (csvUndoingRef.current) return
               csvUndoingRef.current = true
               try {
-                let undone = 0
-                for (const a of applied) {
-                  const inv = -Number(a.delta || 0)
-                  if (inv === 0) continue
-                  const { error } = await supabase.rpc('adjust_stock', { p_product_id: a.productId, p_delta: inv, p_reason: 'undo:csv' })
-                  if (!error) undone++
-                }
+                const { data, error } = await supabase.rpc('reverse_inventory_batch', { p_batch_id: batchId as string })
+                if (error) throw error
+                const undone = Number(data || 0)
                 toast.success(`${undone} hareket geri alındı`)
                 load()
               } catch (e) {

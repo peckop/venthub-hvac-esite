@@ -107,6 +107,7 @@ const AdminOrdersPage: React.FC = () => {
       if (fromDate) params.set('from', fromDate)
       if (toDate) params.set('to', toDate)
       if (debouncedQuery) params.set('q', debouncedQuery)
+      if (presetPendingShipments && !status) params.set('preset', 'pendingShipments')
       params.set('limit', String(PAGE_SIZE))
       params.set('page', String(page))
       const url = `${supabaseUrl}/functions/v1/admin-orders-latest?${params.toString()}`

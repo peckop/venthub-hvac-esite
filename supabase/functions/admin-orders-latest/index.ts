@@ -25,6 +25,7 @@ Deno.serve(async (req) => {
     const from = url.searchParams.get('from')?.trim() || ''
     const to = url.searchParams.get('to')?.trim() || ''
     const q = url.searchParams.get('q')?.trim() || ''
+    const preset = url.searchParams.get('preset')?.trim() || ''
     const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100)
     const pageParam = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1)
     const offset = (pageParam - 1) * limitParam
@@ -33,7 +34,14 @@ Deno.serve(async (req) => {
     params.set('select', 'id,status,conversation_id,total_amount,created_at')
     params.set('order', 'created_at.desc')
 
-    if (status) params.set('status', `eq.${status}`)
+    const isPendingShipments = preset === 'pendingShipments'
+    if (isPendingShipments) {
+      // Show orders awaiting shipment: confirmed or processing and not shipped yet
+      params.append('status', 'in.(confirmed,processing)')
+      params.append('shipped_at', 'is.null')
+    } else if (status) {
+      params.set('status', `eq.${status}`)
+    }
 
     function normalizeDateStart(d: string) {
       // accepts YYYY-MM-DD or ISO; returns ISO start of day Z
