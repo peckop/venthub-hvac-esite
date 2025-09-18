@@ -5,11 +5,12 @@ import { Link } from 'react-router-dom'
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 
 export const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
 
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   if (items.length === 0) {
     return (
@@ -80,11 +81,11 @@ export const CartPage: React.FC = () => {
                     </p>
                     <div className="flex items-center space-x-4">
                       <span className="text-lg font-bold text-primary-navy">
-                        ₺{Number(item.unitPrice ?? parseFloat(item.product.price)).toLocaleString('tr-TR')}
+                        {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)), lang, { maximumFractionDigits: 0 })}
                       </span>
                       {item.quantity > 1 && (
                         <span className="text-sm text-steel-gray">
-                          Toplam: ₺{(Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity).toLocaleString('tr-TR')}
+                          {t('cart.itemTotal')}: {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity, lang, { maximumFractionDigits: 0 })}
                         </span>
                       )}
                     </div>
@@ -147,7 +148,7 @@ export const CartPage: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-steel-gray">{t('cart.subtotal')}</span>
                   <span className="font-medium text-industrial-gray">
-                    ₺{getCartTotal().toLocaleString('tr-TR')}
+                    {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -157,14 +158,14 @@ export const CartPage: React.FC = () => {
                 <div className="flex justify-between">
                   <span className="text-steel-gray">{t('cart.vatIncluded')}</span>
                   <span className="font-medium text-industrial-gray">
-                    ₺{(getCartTotal() - getCartTotal() / 1.2).toLocaleString('tr-TR')}
+                    {formatCurrency(getCartTotal() - getCartTotal() / 1.2, lang, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
                 <hr className="border-light-gray" />
                 <div className="flex justify-between text-lg">
                   <span className="font-semibold text-industrial-gray">{t('cart.total')}</span>
                   <span className="font-bold text-primary-navy">
-                    ₺{getCartTotal().toLocaleString('tr-TR')}
+                    {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
               </div>

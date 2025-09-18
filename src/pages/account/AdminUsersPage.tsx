@@ -9,6 +9,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatDate } from '../../i18n/datetime'
 
 interface AdminUser {
   id: string
@@ -30,7 +31,7 @@ interface AllUser {
 export default function AdminUsersPage() {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
-  const { t: _t } = useI18n()
+  const { t: _t, lang } = useI18n()
   
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
@@ -344,7 +345,7 @@ export default function AdminUsersPage() {
                     {visibleCols.created && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <span className="text-steel-gray">
-                          {new Date(userItem.created_at).toLocaleDateString('tr-TR')}
+{formatDate(userItem.created_at, lang)}
                         </span>
                       </td>
                     )}

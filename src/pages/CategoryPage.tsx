@@ -6,6 +6,7 @@ import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Filter, Grid, List } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
@@ -146,7 +147,7 @@ export const CategoryPage: React.FC = () => {
     )
   }
 
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   if (loading) {
     return (
@@ -330,10 +331,11 @@ export const CategoryPage: React.FC = () => {
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full"
+                    aria-label={t('category.priceRange') as string}
                   />
                   <div className="flex justify-between text-sm text-steel-gray">
-                    <span>₺0</span>
-                    <span>₺{priceRange[1].toLocaleString('tr-TR')}</span>
+                    <span>{formatCurrency(0, lang, { maximumFractionDigits: 0 })}</span>
+                    <span>{formatCurrency(priceRange[1], lang, { maximumFractionDigits: 0 })}</span>
                   </div>
                 </div>
               </div>
@@ -520,7 +522,7 @@ export const CategoryPage: React.FC = () => {
                   {[
                     {label: t('category.labelBrand'), key:'brand'},
                     {label: t('category.labelModel'), key:'sku'},
-{label: t('category.labelPrice'), key:'price', render:(v: unknown)=> `₺${parseFloat(String(v ?? '0')).toLocaleString('tr-TR')}`},
+                    {label: t('category.labelPrice'), key:'price', render:(v: unknown)=> formatCurrency(parseFloat(String(v ?? '0')), lang, { maximumFractionDigits: 0 })},
                     {label: t('category.airflow'), key:'airflow_capacity'},
                     {label: t('category.pressure'), key:'pressure_rating'},
                     {label: t('category.noise'), key:'noise_level'},

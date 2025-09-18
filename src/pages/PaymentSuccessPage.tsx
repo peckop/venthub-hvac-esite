@@ -5,12 +5,14 @@ import { useCart } from '../hooks/useCart'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
+import { formatDateTime } from '../i18n/datetime'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
 export const PaymentSuccessPage: React.FC = () => {
   const [searchParams] = useSearchParams()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
@@ -231,7 +233,7 @@ export const PaymentSuccessPage: React.FC = () => {
           {orderSummary.createdAt && (
             <div className="flex justify-between text-sm text-steel-gray">
               <span>{t('payment.dateLabel')}</span>
-              <span>{new Date(orderSummary.createdAt).toLocaleString('tr-TR')}</span>
+              <span>{formatDateTime(orderSummary.createdAt, lang)}</span>
             </div>
           )}
           {typeof orderSummary.items === 'number' && (
@@ -243,7 +245,7 @@ export const PaymentSuccessPage: React.FC = () => {
           {typeof orderSummary.amount === 'number' && (
             <div className="flex justify-between text-sm font-semibold text-industrial-gray">
               <span>{t('orders.totalAmount')}</span>
-              <span>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(orderSummary.amount)}</span>
+              <span>{formatCurrency(orderSummary.amount, lang, { maximumFractionDigits: 0 })}</span>
             </div>
           )}
         </div>

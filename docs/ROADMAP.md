@@ -75,8 +75,8 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Satır içi “Eşik” düzenleme (varsayılanı kullan/override)
   - [x] Satır içi stok düzenleme sütunu (− / miktar / + / Kaydet) ve anlık “Satılabilir” güncellemesi
   - [x] “Ürün seç” dropdown kaldırıldı; satır tıklama ile seçim ve bağlam paneli (Hızlı Eşik Ayarları) sadece seçim olduğunda görünür
-  - [ ] Toplu işlem ve CSV içe/dışa aktar (SKU, qty)
-  - [ ] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo) özelliği (opsiyonel)
+  - [x] Toplu işlem ve CSV içe/dışa aktar (SKU, qty) — dry‑run + önizleme + audit log
+  - [x] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo)
   - [x] Account menüsünde admin’e özel “Operasyon” sekmesi görünür
 - Müşteri UX
   - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)

@@ -5,7 +5,7 @@ import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
 import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
-
+import { formatDateTime } from '../../i18n/datetime'
 interface ErrorGroup {
   id: string
   signature: string
@@ -39,7 +39,7 @@ interface ClientErrorRow {
 const PAGE_SIZE = 50
 
 const AdminErrorGroupsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   // Columns & density (like Inventory)
   const STORAGE_KEY = 'toolbar:errorgroups'
   const [visibleCols, setVisibleCols] = React.useState<{ lastSeen: boolean; level: boolean; signature: boolean; lastMsg: boolean; count: boolean; status: boolean; assigned: boolean; actions: boolean }>({ lastSeen: true, level: true, signature: true, lastMsg: true, count: true, status: true, assigned: true, actions: true })
@@ -396,9 +396,9 @@ const AdminErrorGroupsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Önceki</button>
+        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">Sayfa {page} / {pageCount}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Sonraki</button>
+        <button onClick={()=>setPage(p=>p+1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk action bar */}
@@ -412,8 +412,8 @@ const AdminErrorGroupsPage: React.FC = () => {
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
-            <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? 'Uygulanıyor…' : 'Uygula'}</button>
-            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">Temizle</button>
+            <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
+            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.ui.clear')}</button>
           </div>
         </div>
       )}
@@ -460,9 +460,9 @@ const AdminErrorGroupsPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={8}>Yükleniyor…</td></tr>
+                <tr><td className="p-4" colSpan={8}>{t('admin.ui.loading')}</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={8}>Kayıt yok</td></tr>
+                <tr><td className="p-4" colSpan={8}>{t('admin.ui.noRecords')}</td></tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
@@ -470,7 +470,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>toggleSelect(r.id, e.target.checked)} />
                       </td>
-                      {visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{new Date(r.last_seen).toLocaleString('tr-TR')}</td>}
+{visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{formatDateTime(r.last_seen, lang)}</td>}
                       {visibleCols.level && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{r.level || 'error'}</td>}
                       {visibleCols.signature && <td className={`${adminTableCellClass} ${cellPad} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>}
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
@@ -496,7 +496,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                         <button className={adminButtonPrimaryClass + ' !px-2 !py-1 text-xs'} onClick={() => {
                           setExpandedId(id => id === r.id ? null : r.id)
                           if (expandedId !== r.id) loadLatestClientErrors(r.id)
-                        }}>{expandedId === r.id ? 'Gizle' : 'Detay'}</button>
+                        }}>{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>}
                     </tr>
                     {expandedId === r.id && (
@@ -508,7 +508,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                               <div className="space-y-2 max-h-72 overflow-auto overscroll-y-contain bg-white p-2 rounded border">
                                 {(latestClientErrors[r.id] || []).map((e: ClientErrorRow) => (
                                   <div key={e.id} className="border-b last:border-b-0 pb-1">
-                                    <div className="text-steel-gray">{new Date(e.at).toLocaleString('tr-TR')} • {e.level || 'error'}</div>
+<div className="text-steel-gray">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
                                     <div className="text-steel-gray break-words">{e.message}</div>
                                     <div className="text-industrial-gray break-all">{e.url || '-'}</div>
                                     {e.stack && <details className="mt-1"><summary className="cursor-pointer">stack</summary><pre className="text-[10px] overflow-auto max-h-40">{String(e.stack).slice(0,4000)}</pre></details>}

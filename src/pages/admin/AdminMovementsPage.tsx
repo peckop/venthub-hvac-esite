@@ -5,6 +5,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatDateTime } from '../../i18n/datetime'
 
 type Movement = {
   id: string
@@ -192,7 +193,7 @@ const AdminMovementsPage: React.FC = () => {
     const lines = filtered.map(m => {
       const p = productMap[m.product_id]
       return [
-        new Date(m.created_at).toLocaleString('tr-TR'),
+        formatDateTime(m.created_at, 'tr'),
         p?.name || m.product_id,
         p?.sku || '',
         m.delta,
@@ -214,7 +215,7 @@ const AdminMovementsPage: React.FC = () => {
   function exportXls() {
     const rowsHtml = filtered.map(m => {
       const p = productMap[m.product_id]
-      const date = new Date(m.created_at).toLocaleString('tr-TR')
+      const date = formatDateTime(m.created_at, 'tr')
       const prod = p?.name || m.product_id
       const sku = p?.sku || ''
       const delta = m.delta

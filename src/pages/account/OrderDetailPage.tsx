@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
+import { formatDateTime } from '../../i18n/datetime'
 import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, RefreshCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
@@ -96,7 +98,7 @@ export default function OrderDetailPage() {
   const { id } = useParams()
   const { user, loading: authLoading } = useAuth()
   const navigate = useNavigate()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { addToCart } = useCart()
 
   const [order, setOrder] = useState<Order | null>(null)
@@ -222,8 +224,8 @@ const mapped: Order = {
     if (user && id) load()
   }, [user, id, t])
 
-  const formatDate = (d?: string | null) => (d ? new Date(d).toLocaleString('tr-TR') : '-')
-  const formatPrice = (n: number | string) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(Number(n) || 0)
+  const formatDate = (d?: string | null) => (d ? formatDateTime(d, lang) : '-')
+  const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { maximumFractionDigits: 0 })
 
   const handleCopy = async (text?: string) => {
     try { if (!text) return; await navigator.clipboard.writeText(text); toast.success(t('orders.copied')) } catch { toast.error(t('orders.copyFailed')) }
@@ -232,13 +234,13 @@ const mapped: Order = {
   const handleInvoicePdf = (o: Order) => {
     try {
       const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-      const nf = new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'})
+      const nf = new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US',{style:'currency',currency:'TRY'})
       const orderNo = o.order_number ? o.order_number.split('-')[1] : o.id.slice(-8).toUpperCase()
       doc.setFont('helvetica','bold'); doc.setFontSize(16)
       doc.text('PROFORMA', 40, 40)
       doc.setFont('helvetica','normal'); doc.setFontSize(10)
       doc.text(`Proforma No: ${orderNo}`, 40, 58)
-      doc.text(`Tarih: ${new Date(o.created_at).toLocaleString('tr-TR')}`, 40, 72)
+      doc.text(`Tarih: ${formatDateTime(o.created_at, lang)}`, 40, 72)
       doc.setFont('helvetica','bold'); doc.text('Müşteri', 350, 40)
       doc.setFont('helvetica','normal')
       doc.text(`${o.customer_name}`, 350, 58)
@@ -338,7 +340,7 @@ const mapped: Order = {
               <div>
                 <h1 className="text-xl font-semibold text-industrial-gray">{t('orders.title')} {prettyNo}</h1>
                 <div className="flex items-center space-x-4 text-sm text-steel-gray mt-1">
-                  <div className="flex items-center space-x-1"><Calendar size={16} /><span>{new Date(order.created_at).toLocaleDateString('tr-TR')}</span></div>
+                  <div className="flex items-center space-x-1"><Calendar size={16} /><span>{formatDate(order.created_at)}</span></div>
                   <div className="flex items-center space-x-1"><CreditCard size={16} /><span>{formatPrice(order.total_amount)}</span></div>
                 </div>
               </div>
@@ -561,7 +563,7 @@ const mapped: Order = {
                       const row = (label: string, k: string) => {
                         const c = cons?.[k]
                         const ok = !!c?.accepted
-                        const ts = c?.ts ? new Date(c.ts).toLocaleString('tr-TR') : '-'
+                        const ts = c?.ts ? formatDateTime(c.ts, lang) : '-'
                         return (
                           <div key={k} className="flex items-center justify-between">
                             <span className="text-steel-gray">{label}</span>

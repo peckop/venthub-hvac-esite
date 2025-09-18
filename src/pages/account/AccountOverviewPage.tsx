@@ -3,6 +3,8 @@ import { useAuth } from '../../hooks/useAuth'
 import { listAddresses, UserAddress, supabase } from '../../lib/supabase'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
+import { formatDate } from '../../i18n/datetime'
 
 interface OrderRecord {
   id: string
@@ -20,7 +22,7 @@ interface SupabaseError {
 
 export default function AccountOverviewPage() {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [addresses, setAddresses] = useState<UserAddress[]>([])
   const [lastOrders, setLastOrders] = useState<OrderRecord[]>([])
 
@@ -84,10 +86,10 @@ export default function AccountOverviewPage() {
               <li key={o.id} className="py-2 flex items-center justify-between text-sm">
                 <div>
                   <div className="font-medium text-industrial-gray">{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`}</div>
-                  <div className="text-steel-gray">{new Date(o.created_at).toLocaleDateString('tr-TR')}</div>
+                  <div className="text-steel-gray">{formatDate(o.created_at, lang)}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-industrial-gray font-medium">{new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(o.total_amount)}</div>
+                  <div className="text-industrial-gray font-medium">{formatCurrency(o.total_amount, lang, { maximumFractionDigits: 0 })}</div>
                   <Link to={`/account/orders/${o.id}`} className="text-primary-navy hover:underline">{t('orders.details') || 'Detay'}</Link>
                 </div>
               </li>

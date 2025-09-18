@@ -8,6 +8,7 @@ import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-r
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
+import { formatCurrency } from '../i18n/format'
 import ReviewSummary from './checkout/ReviewSummary'
 import { validateServerCart } from '../lib/order'
 
@@ -43,7 +44,7 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   // i18n fallback helper (if missing key, t(key) returns key string)
   const tf = (key: string, fallback: string) => {
     try {
@@ -1559,11 +1560,11 @@ export const CheckoutPage: React.FC = () => {
                         {item.product.name}
                       </p>
                       <p className="text-xs text-steel-gray">
-                        {item.quantity} {t('orders.qtyCol')} x ₺{Number(item.unitPrice ?? parseFloat(item.product.price)).toLocaleString('tr-TR')}
+                        {item.quantity} {t('orders.qtyCol')} x {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)), lang, { maximumFractionDigits: 0 })}
                       </p>
                     </div>
                     <div className="text-sm font-medium text-industrial-gray">
-                      ₺{(Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity).toLocaleString('tr-TR')}
+                      {formatCurrency((Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity), lang, { maximumFractionDigits: 0 })}
                     </div>
                   </div>
                 ))}
@@ -1573,11 +1574,11 @@ export const CheckoutPage: React.FC = () => {
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-steel-gray">
                   <span>{t('cart.subtotal')}</span>
-                  <span>₺{totalAmount.toLocaleString('tr-TR')}</span>
+                  <span>{formatCurrency(totalAmount, lang, { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
                   <span>{t('cart.vatIncluded')}</span>
-                  <span>₺{vatAmount.toLocaleString('tr-TR')}</span>
+                  <span>{formatCurrency(vatAmount, lang, { maximumFractionDigits: 0 })}</span>
                 </div>
                 <div className="flex justify-between text-steel-gray">
                   <span>{t('cart.shipping')}</span>
@@ -1586,7 +1587,7 @@ export const CheckoutPage: React.FC = () => {
                 {couponApplied ? (
                   <div className="flex justify-between text-success-green">
                     <span>Kupon indirimi ({couponApplied.code})</span>
-                    <span>-₺{couponApplied.discount.toLocaleString('tr-TR')}</span>
+                    <span>-{formatCurrency(couponApplied.discount, lang, { maximumFractionDigits: 0 })}</span>
                   </div>
                 ) : null}
                 <div className="mt-3 flex items-center gap-2">
@@ -1631,7 +1632,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="flex justify-between text-lg font-semibold text-industrial-gray">
                   <span>{t('cart.total')}</span>
                   <span className="text-primary-navy">
-                    ₺{finalAmount.toLocaleString('tr-TR')}
+                    {formatCurrency(finalAmount, lang, { maximumFractionDigits: 0 })}
                   </span>
                 </div>
               </div>

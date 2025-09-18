@@ -4,11 +4,9 @@ import { buildWhatsAppLink } from '../lib/utils'
  * Get WhatsApp phone number from environment variables
  */
 export function getWhatsAppNumber(): string | null {
-  // Vite: production build'da değişkenleri build-time inline eder.
-  // Öncelik: ENV → yoksa, kullanıcı talebiyle belirlenmiş varsayılan numarayı kullan.
-  const envWa = (import.meta as unknown as { env: Record<string, string> }).env.VITE_SHOP_WHATSAPP
-  const FALLBACK_WA = '905313441813' // Kullanıcı talebi: 05313441813 → wa.me formatı
-  const raw = (typeof envWa === 'string' && envWa.trim()) ? envWa : FALLBACK_WA
+  // Not: Pre-live aşamasında fallback numarası kullanmayız. ENV yoksa WhatsApp öğeleri gizlenir.
+  const envWa = (import.meta as unknown as { env: Record<string, string> }).env?.VITE_SHOP_WHATSAPP
+  const raw = (typeof envWa === 'string' && envWa.trim()) ? envWa : ''
   const normalized = raw.replace(/[^\d]/g, '')
   return normalized.length >= 10 ? normalized : null
 }

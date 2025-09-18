@@ -3,6 +3,9 @@ import { supabase } from '../../lib/supabase'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import toast from 'react-hot-toast'
+import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
+import { formatDateTime } from '../../i18n/datetime'
 
 // Uygulama içi kullanım için UI modeli
 interface CouponRow {
@@ -54,6 +57,7 @@ function dbToUi(row: DbCouponRow): CouponRow {
 }
 
 const AdminCouponsPage: React.FC = () => {
+  const { lang, t } = useI18n()
   const [rows, setRows] = React.useState<CouponRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [q, setQ] = React.useState('')
@@ -153,8 +157,8 @@ const AdminCouponsPage: React.FC = () => {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className={adminSectionTitleClass}>Kuponlar</h1>
-        <button onClick={fetchCoupons} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
+        <h1 className={adminSectionTitleClass}>{t('admin.titles.coupons')}</h1>
+        <button onClick={fetchCoupons} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
       </header>
 
       <AdminToolbar
@@ -206,16 +210,16 @@ const AdminCouponsPage: React.FC = () => {
                 <tr key={r.id} className="border-t border-gray-100">
                   <td className="px-3 py-2 font-mono text-xs">{r.code}</td>
                   <td className="px-3 py-2">{r.type}</td>
-                  <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(r.value)}`}</td>
+                  <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}</td>
                   <td className="px-3 py-2">
                     <label className="inline-flex items-center gap-2 text-xs">
                       <input type="checkbox" checked={!!r.active} onChange={()=>toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
                     </label>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? new Date(r.starts_at).toLocaleString('tr-TR') : '-'}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? new Date(r.ends_at).toLocaleString('tr-TR') : '-'}</td>
+                  <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</td>
+                  <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : '-'}</td>
                   <td className="px-3 py-2">{r.used_count || 0}{r.usage_limit ? ` / ${r.usage_limit}` : ''}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString('tr-TR')}</td>
+                  <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.created_at, lang as 'tr' | 'en')}</td>
                   <td className="px-3 py-2 text-xs text-steel-gray">—</td>
                 </tr>
               ))

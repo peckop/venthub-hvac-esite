@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
 import { getStockInquiryLink } from '../utils/whatsapp'
+import { formatCurrency } from '../i18n/format'
 
 interface ProductCardProps {
   product: Product
@@ -19,7 +20,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const isList = layout === 'list'
   const { addToCart } = useCart()
   const price = parseFloat(product.price)
@@ -100,7 +101,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           {/* Price + Stock badge */}
           <div className="flex items-center justify-between mb-2">
             <div className="text-xl font-bold text-primary-navy">
-              ₺{price.toLocaleString('tr-TR')}
+              {formatCurrency(price, lang, { maximumFractionDigits: 0 })}
             </div>
             {(() => {
               const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'

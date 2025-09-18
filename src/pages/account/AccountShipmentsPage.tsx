@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
+import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { useNavigate } from 'react-router-dom'
 import { Package, Link as LinkIcon, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -27,7 +29,7 @@ interface SupabaseError {
 
 export default function AccountShipmentsPage() {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const navigate = useNavigate()
   const [rows, setRows] = useState<ShipmentRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -74,12 +76,12 @@ export default function AccountShipmentsPage() {
 
   const formatDate = (d?: string | null) => {
     if (!d) return '-'
-    return new Date(d).toLocaleString('tr-TR')
+    return formatOnlyDate(d, lang)
   }
 
   const formatPrice = (price: number | string) => {
     const n = Number(price) || 0
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(n)
+    return formatCurrency(n, lang, { maximumFractionDigits: 0 })
   }
 
   const handleCopy = async (text?: string | null) => {
@@ -118,7 +120,7 @@ export default function AccountShipmentsPage() {
                     <div className="font-semibold text-industrial-gray">
                       {o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`}
                     </div>
-                    <div className="text-xs text-steel-gray">{new Date(o.created_at).toLocaleDateString('tr-TR')} • {formatPrice(o.total_amount)}</div>
+                    <div className="text-xs text-steel-gray">{formatDate(o.created_at)} • {formatPrice(o.total_amount)}</div>
                   </div>
                 </div>
                 <button

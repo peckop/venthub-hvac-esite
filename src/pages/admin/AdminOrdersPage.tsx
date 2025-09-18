@@ -1,5 +1,5 @@
 import React from 'react'
-import { format } from 'date-fns'
+import { format as _format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -7,6 +7,8 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { logAdminAction } from '../../lib/audit'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatCurrency } from '../../i18n/format'
+import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 
 // Minimal order type matching admin-orders-latest edge function response
@@ -31,7 +33,7 @@ const STATUSES: { value: string; label: string }[] = [
 ]
 
 const AdminOrdersPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [rows, setRows] = React.useState<AdminOrderRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -465,8 +467,8 @@ const AdminOrdersPage: React.FC = () => {
         r.id,
         r.status,
         r.conversation_id || '',
-        formatAmount(r.total_amount),
-        safeDate(r.created_at),
+        formatAmount(r.total_amount, lang),
+        safeDate(r.created_at, lang),
       ]
       return cols.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
     })
@@ -488,8 +490,8 @@ const AdminOrdersPage: React.FC = () => {
         `<td>${r.id}</td>`+
         `<td>${r.status}</td>`+
         `<td>${r.conversation_id || ''}</td>`+
-        `<td>${formatAmount(r.total_amount)}</td>`+
-        `<td>${safeDate(r.created_at)}</td>`+
+        `<td>${formatAmount(r.total_amount, lang)}</td>`+
+        `<td>${safeDate(r.created_at, lang)}</td>`+
       `</tr>`
     )).join('')
     const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Sipariş ID</th><th>Durum</th><th>Konuşma ID</th><th>Tutar</th><th>Oluşturulma</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
@@ -627,8 +629,8 @@ const AdminOrdersPage: React.FC = () => {
                   {visibleCols.id && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} font-mono text-xs`}>{r.id}</td>)}
                   {visibleCols.status && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status)}</span></td>)}
                   {visibleCols.conversation && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} text-xs text-industrial-gray`}>{r.conversation_id || '-'}</td>)}
-                  {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount)}</td>)}
-                  {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at)}</td>)}
+                  {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount, lang)}</td>)}
+                  {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at, lang)}</td>)}
                   <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
                         <div className="flex gap-2">
                       <button
@@ -820,13 +822,13 @@ const AdminOrdersPage: React.FC = () => {
   )
 }
 
-function formatAmount(v?: number | null) {
-  if (typeof v === 'number') return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(v)
+function formatAmount(v?: number | null, lang: 'tr' | 'en' = 'tr') {
+  if (typeof v === 'number') return formatCurrency(v, lang, { maximumFractionDigits: 0 })
   return '-'
 }
 
-function safeDate(iso: string) {
-  try { return format(new Date(iso), 'dd.MM.yyyy HH:mm') } catch { return iso }
+function safeDate(iso: string, lang: 'tr' | 'en' = 'tr') {
+  try { return formatDateTime(iso, lang) } catch { return iso }
 }
 
 function prettyStatus(s: string) {
