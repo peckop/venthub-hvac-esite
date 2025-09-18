@@ -139,14 +139,14 @@ const AdminDashboardPage: React.FC = () => {
           <div className="text-xs text-industrial-gray">Satış Toplamı</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (salesTotal != null ? formatCurrency(salesTotal, lang) : '-')}</div>
         </div>
-        <div className={adminCardPaddedClass}>
+        <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
           <div className="text-xs text-industrial-gray">Bekleyen İade</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingReturns ?? '-')}</div>
-        </div>
-        <div className={adminCardPaddedClass}>
+        </Link>
+        <Link to="/admin/orders?preset=pendingShipments" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
           <div className="text-xs text-industrial-gray">Bekleyen Kargo</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingShipments ?? '-')}</div>
-        </div>
+        </Link>
         <div className={adminCardPaddedClass}>
           <div className="text-xs text-industrial-gray">Ortalama Sepet</div>
           <div className="text-2xl font-semibold">{loading ? '…' : ((ordersCount && ordersCount > 0 && salesTotal != null) ? formatCurrency(salesTotal / ordersCount, lang) : '-')}</div>
