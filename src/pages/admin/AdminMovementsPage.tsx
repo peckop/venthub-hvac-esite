@@ -42,7 +42,7 @@ function reasonLabel(key: string | null | undefined): string {
 type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -335,7 +335,7 @@ const AdminMovementsPage: React.FC = () => {
             {sorted.map(m => (
               <tr key={m.id} className="border-b">
                 {visibleCols.date && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>{new Date(m.created_at).toLocaleString('tr-TR')}</td>
+                  <td className={`${adminTableCellClass} ${cellPad}`}>{formatDateTime(m.created_at, lang)}</td>
                 )}
                 {visibleCols.product && (
                   <td className={`${adminTableCellClass} ${cellPad}`}>
