@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useRef } from 'react'
 import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
@@ -18,7 +19,9 @@ const ProductsPage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
   const params = new URLSearchParams(location.search)
   const q = params.get('q')?.trim() || ''
+  const appParam = params.get('app') || ''
   const { t } = useI18n()
+  const appSectionRef = useRef<HTMLDivElement | null>(null)
 
   // Teklif/lead modalını global tetikleyiciye bağla (sayfa içinde kullanılacak)
   ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
@@ -103,6 +106,14 @@ const ProductsPage: React.FC = () => {
       } finally {
         setLoading(false)
       }
+    }
+
+    // Scroll to application section if deep-linked via app param
+    const targetApp = searchParams.get('app')
+    if (targetApp && appSectionRef.current) {
+      try {
+        appSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } catch {}
     }
 
     // Decide what to fetch based on URL and query
@@ -413,16 +424,19 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
       ) : (
         <>
           {/* Uygulama alanına göre keşfet - öne alındı */}
-          <section id="by-application" className="mb-12">
+          <section id="by-application" ref={appSectionRef} className="mb-12">
             <div className="flex items-center mb-4">
               <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.applicationTitle')}</h2>
             </div>
             <div className={`${gridColsClass(applicationCards.length)}`}>
-              {applicationCards.map((card) => (
+              {applicationCards.map((card) => {
+                const selected = card.key === appParam
+                return (
                 <Link
                   key={card.key}
                   to={card.href}
-                  className="group relative overflow-hidden rounded-xl border border-light-gray bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition"
+                  className={`group relative overflow-hidden rounded-xl border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition ${selected ? 'border-primary-navy ring-2 ring-primary-navy' : 'border-light-gray'}`}
+                  aria-current={selected ? 'true' : undefined}
 onClick={() => {
                     trackEvent('application_click', { key: card.key, source: 'products' })
                   }}
@@ -437,7 +451,7 @@ onClick={() => {
                     <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
                   </div>
                 </Link>
-              ))}
+              )})}
             </div>
           </section>
 
