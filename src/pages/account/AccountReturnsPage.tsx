@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
+import { formatDate } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Clock, CheckCircle, XCircle, Truck, Package, RefreshCw } from 'lucide-react'
@@ -25,7 +26,7 @@ interface SupabaseError {
 
 export default function AccountReturnsPage() {
   const { user } = useAuth()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [rows, setRows] = useState<ReturnRow[]>([])
   const [orders, setOrders] = useState<OrderLite[]>([])
   const [loading, setLoading] = useState(true)
@@ -231,7 +232,7 @@ export default function AccountReturnsPage() {
                       >
                         {code}
                       </button>
-                      <div className="text-xs text-steel-gray">{new Date(r.created_at).toLocaleDateString('tr-TR')}</div>
+                      <div className="text-xs text-steel-gray">{formatDate(r.created_at, lang)}</div>
                     </div>
                   </div>
                   <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${statusClass(r.status)}`}>
@@ -308,7 +309,7 @@ export default function AccountReturnsPage() {
                 <select value={form.order_id} onChange={e=>setForm(s=>({ ...s, order_id: e.target.value }))} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
                   <option value="">{t('returns.selectOrder')}</option>
                   {orders.map(o => (
-                    <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {new Date(o.created_at).toLocaleDateString('tr-TR')}</option>
+                    <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {formatDate(o.created_at, lang)}</option>
                   ))}
                 </select>
               </div>

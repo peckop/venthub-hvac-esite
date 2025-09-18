@@ -108,9 +108,14 @@ const AdminInventoryPage: React.FC = () => {
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: selected.product_id, p_delta: inverse, p_reason: reason })
       if (error) throw error
       toast.success('Hareket geri alındı')
-      // reload
+      // reload movements and update local stocks
       await loadMovements(selected.product_id)
-      await load()
+      setRows(prev => prev.map(r => r.product_id === selected.product_id ? ({
+        ...r,
+        physical_stock: Math.max(0, r.physical_stock + inverse),
+        available_stock: Math.max(0, (r.physical_stock + inverse) - r.reserved_stock)
+      }) : r))
+      setSelectedStock(s => (s == null ? null : Math.max(0, s + inverse)))
     } catch {
       toast.error('Geri alma başarısız')
     } finally {
