@@ -1,5 +1,5 @@
 import React from 'react'
-import { WHATSAPP_ICON_URL } from '@/lib/brand'
+import { WHATSAPP_ICON_URL } from '../lib/brand'
 
 interface IconProps {
   className?: string
