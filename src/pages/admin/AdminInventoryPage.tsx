@@ -511,9 +511,15 @@ const AdminInventoryPage: React.FC = () => {
       // Her ürün için stok güncelleme işlemi yap
       let successCount = 0
       const applied: Array<{ productId: string; delta: number }> = []
-      const batchId = (globalThis?.crypto && typeof (crypto as any).randomUUID === 'function')
-        ? (crypto as any).randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2,10)}`
+      const genBatchId = (): string => {
+        try {
+          if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID()
+          }
+        } catch {}
+        return `${Date.now()}-${Math.random().toString(36).slice(2,10)}`
+      }
+      const batchId = genBatchId()
       for (const item of csvPreview) {
         const productId = skuToId.get(item.sku)
         if (!productId || item.delta === 0) continue
@@ -553,6 +559,10 @@ const AdminInventoryPage: React.FC = () => {
       toast.custom((t) => (
         <div className="rounded-lg border border-light-gray bg-white shadow px-3 py-2 text-sm flex items-center gap-3">
           <span>{successCount} ürün güncellendi.</span>
+          <a
+            href={`/admin/movements?batch=${batchId}`}
+            className="px-2 py-1 text-xs rounded border border-light-gray hover:border-primary-navy text-primary-navy"
+          >Hareketleri Gör</a>
           <button
             className="px-2 py-1 text-xs rounded bg-warning-orange/10 text-warning-orange hover:bg-warning-orange hover:text-white"
             onClick={async () => {

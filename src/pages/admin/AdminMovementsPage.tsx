@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -14,6 +15,7 @@ type Movement = {
   reason: string | null
   order_id?: string | null
   created_at: string
+  batch_id?: string | null
 }
 
 type Product = { id: string; name: string; sku?: string; category_id?: string | null }
@@ -45,6 +47,8 @@ type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -60,6 +64,7 @@ const AdminMovementsPage: React.FC = () => {
   )
   const [sortKey, setSortKey] = React.useState<SortKey>('date')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
+  const [batchFilter, setBatchFilter] = React.useState<string>('')
 
   const load = React.useCallback(async(pageNum: number)=>{
     try {
@@ -68,10 +73,12 @@ const AdminMovementsPage: React.FC = () => {
       const from = (pageNum - 1) * PAGE_SIZE
       const to = from + PAGE_SIZE - 1
 
-      // Her zaman hareketleri getir (server-side reason filtresi kaldırıldı; client-side çoklu filtre kullanılacak)
-      const { data, error, count } = await supabase
+      // Sorgu
+      let query = supabase
         .from('inventory_movements')
-        .select('id, product_id, delta, reason, order_id, created_at', { count: 'exact' })
+        .select('id, product_id, delta, reason, order_id, created_at, batch_id', { count: 'exact' })
+      if (batchFilter) query = query.eq('batch_id', batchFilter)
+      const { data, error, count } = await query
         .order('created_at', { ascending: false })
         .range(from, to)
       if (error) throw error
@@ -111,9 +118,16 @@ const AdminMovementsPage: React.FC = () => {
       setHasMore(false)
       setLoading(LoadState.Error)
     }
-  }, [])
+  }, [batchFilter])
 
   React.useEffect(()=>{ load(page) }, [load, page])
+
+  // URL'den batch filtresi
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const b = (params.get('batch') || '').trim()
+    setBatchFilter(b)
+  }, [location.search])
 
   // Görünür kategoriler: sadece listelenen hareketlerde geçen kategori id’leri
   const visibleCategories = React.useMemo(() => {
@@ -255,6 +269,16 @@ const AdminMovementsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.movements')}</h1>
+
+      {batchFilter && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
+          <span>Filtre: Batch <span className="font-mono">{batchFilter}</span></span>
+          <button
+            className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
+            onClick={() => { setBatchFilter(''); const url = new URL(window.location.href); url.searchParams.delete('batch'); navigate(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { replace: true }) }}
+          >Temizle</button>
+        </div>
+      )}
 
       <AdminToolbar
         storageKey="toolbar:movements"

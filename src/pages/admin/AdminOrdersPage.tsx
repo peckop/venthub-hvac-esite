@@ -123,7 +123,7 @@ const AdminOrdersPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [status, fromDate, toDate, debouncedQuery, page])
+  }, [status, fromDate, toDate, debouncedQuery, page, presetPendingShipments])
 
   React.useEffect(() => { fetchOrders() }, [fetchOrders])
 
@@ -559,7 +559,8 @@ const AdminOrdersPage: React.FC = () => {
           title: 'Durum',
           options: STATUSES.map(s => ({ value: s.value, label: s.label }))
         }}
-        onClear={()=>{ setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
+        toggles={[{ key: 'pendingShipments', label: 'Kargolanmamışlar', checked: presetPendingShipments, onChange: (v: boolean)=>{ setPresetPendingShipments(v); if (v) setStatus('') } }]}
+        onClear={()=>{ setPresetPendingShipments(false); setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
