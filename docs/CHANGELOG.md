@@ -1,5 +1,19 @@
 # Changelog
 
+## 2025-09-18
+
+### i18n ve SEO (hreflang) Standardizasyonu — Frontend & Admin
+- SEO
+  - Seo bileşeni: hreflang alternates güncellendi (tr-TR, en-US, x-default). x-default dil parametresiz canonical’a işaret eder.
+  - Open Graph: `og:locale` mevcut dile göre, `og:locale:alternate` olarak karşı dil etiketleri dinamik eklendi.
+- Para/Tarih Formatı
+  - Yardımcılar: formatCurrency, formatDate, formatDateTime; yeni formatTime eklendi.
+  - Admin sayfaları: AdminErrorGroupsPage, AdminErrorsPage, AdminWebhookEventsPage, AdminMovementsPage, AdminProductsPage, AdminUsersPage — tüm tarih/para gösterimleri dil‑duyarlı hale getirildi.
+  - Hesap sayfaları: AccountShipmentsPage ve AccountReturnsPage — tarih/para formatları standardize edildi.
+  - CSV/XLS export’lar: AdminReturnsPage ve AdminOrdersPage’de export çıktılarında format helper’ları kullanıldı (locale-aware).
+- Kapsam
+  - Kalan toLocaleString/Intl.NumberFormat sabit kullanımlar tarandı ve temizlendi (uygun olduğu yerlerde helper’lara geçirildi).
+
 ## 2025-09-17
 
 ### WhatsApp wa.me Konfigürasyonu - Tam Entegrasyon
