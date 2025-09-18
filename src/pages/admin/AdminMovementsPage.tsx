@@ -26,7 +26,9 @@ const PAGE_SIZE = 50
 const ALL_REASONS = ['sale','po_receipt','manual_in','manual_out','adjust','return_in','transfer_out','transfer_in'] as const
 
 function reasonLabel(key: string | null | undefined): string {
-  switch (String(key || '')) {
+  const val = String(key || '')
+  if (val.startsWith('undo')) return 'Geri Alma'
+  switch (val) {
     case 'sale': return 'Satış'
     case 'po_receipt': return 'Satın Alma Kabul'
     case 'manual_in': return 'Manuel Giriş'

@@ -104,7 +104,8 @@ const AdminInventoryPage: React.FC = () => {
       setUndoing(true)
       const inverse = -Number(last.delta || 0)
       if (inverse === 0) return
-      const reason = `undo:${last.id}`
+      const shortId = String(last.id).slice(0, 8)
+      const reason = `undo:${shortId}`
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: selected.product_id, p_delta: inverse, p_reason: reason })
       if (error) throw error
       toast.success('Hareket geri alındı')
