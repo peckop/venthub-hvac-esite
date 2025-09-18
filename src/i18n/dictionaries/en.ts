@@ -194,6 +194,8 @@ export const en = {
   homeGallery: {
     title: 'Application Showcase',
     subtitle: 'Quick look at real-world use cases',
+    productsCta: 'View Products',
+    guideCta: 'Open Guide',
     items: {
       parking: { title: 'Parking Ventilation', subtitle: 'Jet fan / CO control' },
       airCurtain: { title: 'Air Curtain', subtitle: 'Entrance comfort' },

@@ -194,6 +194,8 @@ export const tr = {
   homeGallery: {
     title: 'Uygulama Vitrini',
     subtitle: 'Gerçek kullanım senaryolarına hızlı bakış',
+    productsCta: 'Ürünlere Git',
+    guideCta: 'Kılavuzu Aç',
     items: {
       parking: { title: 'Otopark Havalandırma', subtitle: 'Jet fan / CO kontrol' },
       airCurtain: { title: 'Hava Perdesi', subtitle: 'Giriş konforu' },
