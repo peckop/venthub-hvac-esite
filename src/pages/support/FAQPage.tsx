@@ -49,7 +49,7 @@ const FAQPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="whatsapp-btn"
               >
-                <WhatsAppIcon size={18} variant="solid" />
+                <WhatsAppIcon size={18} />
                 WhatsApp'tan Sorun
               </a>
             </div>
