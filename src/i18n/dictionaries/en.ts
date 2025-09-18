@@ -134,7 +134,9 @@ export const en = {
       productTypes: "Product Types",
       yearsExperience: "Years Experience",
       happyCustomers: "Happy Customers",
-    }
+    },
+    galleryTitle: 'Product Gallery',
+    gallerySubtitle: 'Browse featured products'
   },
   homeCta: {
     title: 'Let’s Talk About Your Project',
@@ -189,13 +191,26 @@ export const en = {
       smokeExhaust: { title: 'Smoke Exhaust', desc: 'Emergency management' }
     }
   },
+  homeGallery: {
+    title: 'Application Showcase',
+    subtitle: 'Quick look at real-world use cases',
+    items: {
+      parking: { title: 'Parking Ventilation', subtitle: 'Jet fan / CO control' },
+      airCurtain: { title: 'Air Curtain', subtitle: 'Entrance comfort' },
+      heatRecovery: { title: 'Heat Recovery', subtitle: 'Energy efficiency' },
+      industrialKitchen: { title: 'Industrial Kitchen', subtitle: 'Hood and duct' },
+      smokeExhaust: { title: 'Smoke Exhaust', subtitle: 'Emergency' },
+      hvac: { title: 'Heating/Cooling', subtitle: 'Comfort HVAC' }
+    }
+  },
   homeShowcase: {
     slide1: { title: 'Expertise in Industrial Ventilation', subtitle: 'Solutions tailored to your project and the right product selection' },
     slide2: { title: 'Energy Efficiency & Comfort', subtitle: 'Better performance at lower cost with proper engineering' },
     slide3: { title: 'Guided by Your Needs', subtitle: 'Explore by application and quickly reach the right category' },
     prevAria: 'Previous',
     playAria: 'Play',
-    pauseAria: 'Pause'
+    pauseAria: 'Pause',
+    nextAria: 'Next'
   },
   products: {
     breadcrumbDiscover: "Discover",
@@ -335,6 +350,39 @@ export const en = {
     saturday: 'Saturday',
     rights: 'All rights reserved.'
   },
+  contactPage: {
+    title: 'Contact',
+    subtitle: 'Contact us for your project or product questions. We will get back to you as soon as possible.',
+    addressLabel: 'Address',
+    addressLine1: 'Teknokent Mah. Teknopark Blvd.',
+    addressLine2: 'No: 1/4A 34906 Pendik/Istanbul',
+    phoneLabel: 'Phone',
+    emailLabel: 'Email',
+    quickTitle: 'Quick Contact',
+    quickDesc: 'For urgent matters and quick responses, reach us directly via WhatsApp.',
+    quickButton: 'Message on WhatsApp',
+    formTitle: 'Quote/Contact Form',
+    namePh: 'Full Name',
+    emailPh: 'Email',
+    subjectPh: 'Subject',
+    messagePh: 'Your message / Project details',
+    submit: 'Send'
+  },
+  aboutPage: {
+    title: 'About VentHub',
+    subtitle: 'Your trusted partner for premium HVAC solutions. Corporate supply, engineering-assisted selection and fast quote processes.',
+    stats: {
+      premiumBrands: 'Premium Brands',
+      productTypes: 'Product Types',
+      yearsExperience: 'Years Experience'
+    },
+    whyTitle: 'Why VentHub?',
+    bullets: {
+      bullet1: 'Engineering-focused selection support and proper product guidance',
+      bullet2: 'Transparent communication in stock, delivery and after-sales',
+      bullet3: 'KVKK/iyzico compliant, secure payment and data protection'
+    }
+  },
   category: {
     loading: 'Loading category... ',
     notFound: 'Category Not Found',
@@ -363,6 +411,12 @@ export const en = {
     labelBrand: 'Brand',
     labelModel: 'Model',
     labelPrice: 'Price',
+    localSearchPlaceholder: 'Search within this category (name/brand/model/SKU)',
+    gridViewAria: 'Grid view',
+    listViewAria: 'List view',
+    minPlaceholder: 'Min',
+    maxPlaceholder: 'Max',
+    ltePlaceholder: '≤'
   },
   pdp: {
     loading: 'Loading product...',
