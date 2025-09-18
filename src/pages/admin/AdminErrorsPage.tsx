@@ -113,11 +113,11 @@ const AdminErrorsPage: React.FC = () => {
     <div className="space-y-4">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.errors')}</h1>
 
-      <AdminToolbar
+        <AdminToolbar
         storageKey="toolbar:errors"
-        search={{ value: q, onChange: setQ, placeholder: 'URL veya mesaj ara', focusShortcut: '/' }}
-        select={{ value: level, onChange: setLevel, title: 'Seviye', options: [
-          { value: '', label: 'Tümü' },
+        search={{ value: q, onChange: setQ, placeholder: t('admin.search.errors'), focusShortcut: '/' }}
+        select={{ value: level, onChange: setLevel, title: t('admin.errors.levelTitle'), options: [
+          { value: '', label: t('admin.ui.all') },
           { value: 'error', label: 'error' },
           { value: 'warn', label: 'warn' },
           { value: 'info', label: 'info' },
@@ -126,23 +126,23 @@ const AdminErrorsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={env} onChange={(e)=>setEnv(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Ortam">
+            <select value={env} onChange={(e)=>setEnv(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.errors.envTitle') as string}>
               <option value="production">production</option>
               <option value="preview">preview</option>
               <option value="development">development</option>
-              <option value="">(tümü)</option>
+              <option value="">({t('admin.ui.all')})</option>
             </select>
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
           </div>
         )}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Önceki</button>
-        <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">Sonraki</button>
+        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -153,18 +153,18 @@ const AdminErrorsPage: React.FC = () => {
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className={`${adminTableHeadCellClass}`}>Tarih</th>
-                <th className={`${adminTableHeadCellClass}`}>Seviye</th>
-                <th className={`${adminTableHeadCellClass}`}>Mesaj</th>
-                <th className={`${adminTableHeadCellClass}`}>URL</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.date')}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.level')}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.message')}</th>
+                <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.url')}</th>
                 <th className={`${adminTableHeadCellClass}`}></th>
               </tr>
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={5}>Yükleniyor…</td></tr>
+                <tr><td className="p-4" colSpan={5}>{t('admin.ui.loading')}</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={5}>Kayıt yok</td></tr>
+                <tr><td className="p-4" colSpan={5}>{t('admin.ui.noRecords')}</td></tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
@@ -177,7 +177,7 @@ const AdminErrorsPage: React.FC = () => {
                         <button
                           className="px-2 py-1 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs"
                           onClick={()=> setExpandedId(id => id === r.id ? null : r.id)}
-                        >{expandedId === r.id ? 'Gizle' : 'Detay'}</button>
+                        >{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
                     {expandedId === r.id && (
@@ -189,7 +189,7 @@ const AdminErrorsPage: React.FC = () => {
                               <pre className="bg-white p-2 rounded border overflow-auto max-h-64">{String(r.stack || '').slice(0, 8000)}</pre>
                             </div>
                             <div>
-                              <div className="font-medium text-industrial-gray mb-1">Detaylar</div>
+                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errors.detailsTitle')}</div>
                               <div className="space-y-1">
                                 <div><span className="text-industrial-gray">UA: </span>{r.user_agent || '-'}</div>
                                 <div><span className="text-industrial-gray">Release: </span>{r.release || '-'}</div>

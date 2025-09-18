@@ -1,23 +1,25 @@
 import React from 'react'
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { useI18n } from '../../i18n/I18nProvider'
 
 type TabItem = { to: string; label: string; end?: boolean }
 
-const baseTabs: TabItem[] = [
-  { to: '/account', label: 'Özet', end: true },
-  { to: '/account/orders', label: 'Siparişler' },
-  { to: '/account/shipments', label: 'Kargo Takibi' },
-  { to: '/account/addresses', label: 'Adresler' },
-  { to: '/account/invoices', label: 'Faturalar' },
-  { to: '/account/returns', label: 'İadeler' },
-  { to: '/account/profile', label: 'Profil' },
-  { to: '/account/security', label: 'Güvenlik' },
-]
-
 export default function AccountLayout() {
+  const { t } = useI18n()
   const { user, loading } = useAuth()
   const location = useLocation()
+
+  const baseTabs: TabItem[] = [
+    { to: '/account', label: t('account.tabs.overview'), end: true },
+    { to: '/account/orders', label: t('account.tabs.orders') },
+    { to: '/account/shipments', label: t('account.tabs.shipments') },
+    { to: '/account/addresses', label: t('account.tabs.addresses') },
+    { to: '/account/invoices', label: t('account.tabs.invoices') },
+    { to: '/account/returns', label: t('account.tabs.returns') },
+    { to: '/account/profile', label: t('account.tabs.profile') },
+    { to: '/account/security', label: t('account.tabs.security') },
+  ]
 
   if (!loading && !user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />
@@ -28,7 +30,7 @@ export default function AccountLayout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <h1 className="text-2xl font-bold text-industrial-gray mb-4">Hesabım</h1>
+      <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('header.account')}</h1>
       <div className="sticky top-[60px] z-10 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <nav className="flex gap-2 overflow-x-auto no-scrollbar pb-2 border-b border-gray-100">
           {tabs.map((tab) => (

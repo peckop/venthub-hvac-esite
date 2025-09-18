@@ -99,25 +99,25 @@ export default function AccountOverviewPage() {
       </section>
 
       <section className="bg-white border border-gray-100 rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-industrial-gray mb-3">Varsayılan Adresler</h2>
+        <h2 className="text-lg font-semibold text-industrial-gray mb-3">{t('account.overview.defaultAddressesTitle')}</h2>
         <div className="space-y-3 text-sm text-steel-gray">
           <div>
-            <div className="font-medium text-industrial-gray">Kargo Adresi</div>
+            <div className="font-medium text-industrial-gray">{t('account.overview.shippingAddress')}</div>
             {defaultShipping ? (
               <div className="mt-1 whitespace-pre-line">{defaultShipping.full_address}</div>
             ) : (
-              <div className="mt-1">Varsayılan kargo adresi ayarlanmamış.</div>
+              <div className="mt-1">{t('account.overview.notSetShipping')}</div>
             )}
           </div>
           <div>
-            <div className="font-medium text-industrial-gray">Fatura Adresi</div>
+            <div className="font-medium text-industrial-gray">{t('account.overview.billingAddress')}</div>
             {defaultBilling ? (
               <div className="mt-1 whitespace-pre-line">{defaultBilling.full_address}</div>
             ) : (
-              <div className="mt-1">Varsayılan fatura adresi ayarlanmamış.</div>
+              <div className="mt-1">{t('account.overview.notSetBilling')}</div>
             )}
           </div>
-          <Link to="/account/addresses" className="inline-block mt-2 text-primary-navy hover:underline text-sm">Adresleri yönet</Link>
+          <Link to="/account/addresses" className="inline-block mt-2 text-primary-navy hover:underline text-sm">{t('account.overview.manageAddresses')}</Link>
         </div>
       </section>
     </div>
