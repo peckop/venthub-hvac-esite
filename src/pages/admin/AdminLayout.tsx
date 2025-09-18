@@ -26,21 +26,21 @@ const AdminLayout: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-12 gap-6">
         <aside className="col-span-12 md:col-span-3">
           <nav className="bg-white rounded-lg shadow-hvac-md p-4 space-y-2">
-            <h2 className="text-sm font-semibold text-industrial-gray mb-2">Admin</h2>
+            <h2 className="text-sm font-semibold text-industrial-gray mb-2">{t('header.adminPanel')}</h2>
             <NavLink to="/admin" end className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.dashboard')}</NavLink>
             <NavLink to="/admin/orders" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.orders')}</NavLink>
             <NavLink to="/admin/inventory" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.inventory')}</NavLink>
             <NavLink to="/admin/movements" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.movements')}</NavLink>
             <NavLink to="/admin/inventory/settings" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.inventorySettings')}</NavLink>
             <NavLink to="/admin/returns" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.returns')}</NavLink>
-            <NavLink to="/admin/webhook-events" className={({isActive})=>adminNavClass(isActive)}>Webhook Olayları</NavLink>
+            <NavLink to="/admin/webhook-events" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.webhookEvents')}</NavLink>
             <NavLink to="/admin/users" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.users')}</NavLink>
             <NavLink to="/admin/logs" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.logs')}</NavLink>
             <NavLink to="/admin/errors" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errors')}</NavLink>
             <NavLink to="/admin/error-groups" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.errorGroups') ?? 'Hata Grupları'}</NavLink>
             <NavLink to="/admin/products" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.products') ?? 'Ürünler'}</NavLink>
             <NavLink to="/admin/categories" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.categories') ?? 'Kategoriler'}</NavLink>
-            <NavLink to="/admin/coupons" className={({isActive})=>adminNavClass(isActive)}>Kuponlar</NavLink>
+            <NavLink to="/admin/coupons" className={({isActive})=>adminNavClass(isActive)}>{t('admin.menu.coupons')}</NavLink>
           </nav>
         </aside>
         <section className="col-span-12 md:col-span-9">

@@ -7,7 +7,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import { Link } from 'react-router-dom'
 
 const AdminDashboardPage: React.FC = () => {
-  const { lang } = useI18n()
+  const { t, lang } = useI18n()
 
   type Range = 'today' | '7d' | '30d'
   const [range, setRange] = React.useState<Range>('today')
@@ -93,7 +93,7 @@ const AdminDashboardPage: React.FC = () => {
       setPendingReturns(returnsRes.count ?? 0)
       setPendingShipments(shipRes.count ?? 0)
     } catch (e) {
-      setError((e as Error).message || 'Yüklenemedi')
+      setError((e as Error).message || t('admin.ui.failed'))
       setOrdersCount(null)
       setSalesTotal(null)
       setPendingReturns(null)
@@ -101,7 +101,7 @@ const AdminDashboardPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [rangeStartISO, range])
+  }, [rangeStartISO, range, t])
 
   React.useEffect(() => { loadKPIs() }, [loadKPIs])
 
@@ -116,13 +116,13 @@ const AdminDashboardPage: React.FC = () => {
     <div className="space-y-4">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className={adminSectionTitleClass}>Dashboard</h1>
-          <p className="text-industrial-gray text-sm">Hızlı bakış ve son hareketler</p>
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
+          <p className="text-industrial-gray text-sm">{t('admin.dashboard.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <RangeButton value="today" label="Bugün" />
-          <RangeButton value="7d" label="7 Gün" />
-          <RangeButton value="30d" label="30 Gün" />
+          <RangeButton value="today" label={t('admin.dashboard.rangeToday')} />
+          <RangeButton value="7d" label={t('admin.dashboard.range7d')} />
+          <RangeButton value="30d" label={t('admin.dashboard.range30d')} />
         </div>
       </header>
 
@@ -132,29 +132,29 @@ const AdminDashboardPage: React.FC = () => {
 
       <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">Sipariş Adedi</div>
+          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.ordersCount')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (ordersCount ?? '-')}</div>
         </div>
         <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">Satış Toplamı</div>
+          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.salesTotal')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (salesTotal != null ? formatCurrency(salesTotal, lang) : '-')}</div>
         </div>
         <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
-          <div className="text-xs text-industrial-gray">Bekleyen İade</div>
+          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingReturns')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingReturns ?? '-')}</div>
         </Link>
         <Link to="/admin/orders?preset=pendingShipments" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
-          <div className="text-xs text-industrial-gray">Bekleyen Kargo</div>
+          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingShipments')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingShipments ?? '-')}</div>
         </Link>
         <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">Ortalama Sepet</div>
+          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.avgBasket')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : ((ordersCount && ordersCount > 0 && salesTotal != null) ? formatCurrency(salesTotal / ordersCount, lang) : '-')}</div>
         </div>
       </section>
 
       <section className="bg-white rounded-lg shadow-hvac-md p-4">
-        <div className="text-sm text-industrial-gray mb-3">Son {range === 'today' ? '1' : (range === '7d' ? '7' : '30')} gün sipariş trendi</div>
+        <div className="text-sm text-industrial-gray mb-3">{t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}</div>
         <div className="space-y-2">
           {dailyCounts.map(({ date, count }) => {
             const max = Math.max(1, ...dailyCounts.map(d => d.count))
@@ -169,36 +169,36 @@ const AdminDashboardPage: React.FC = () => {
               </div>
             )
           })}
-          {dailyCounts.length === 0 && <div className="text-sm text-steel-gray">Kayıt yok.</div>}
+          {dailyCounts.length === 0 && <div className="text-sm text-steel-gray">{t('admin.ui.noRecords')}</div>}
         </div>
       </section>
 
       <section className="bg-white rounded-lg shadow-hvac-md p-4">
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-industrial-gray">Son Siparişler</div>
-          <Link to="/account/orders" className="text-sm text-primary-navy">Tümü</Link>
+          <div className="text-sm text-industrial-gray">{t('admin.dashboard.recent.title')}</div>
+          <Link to="/account/orders" className="text-sm text-primary-navy">{t('common.viewAll')}</Link>
         </div>
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2 text-left text-industrial-gray">Sipariş</th>
-                <th className="px-3 py-2 text-left text-industrial-gray">Tarih</th>
-                <th className="px-3 py-2 text-right text-industrial-gray">Tutar</th>
-                <th className="px-3 py-2 text-left text-industrial-gray">Durum</th>
+                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.order')}</th>
+                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.date')}</th>
+                <th className="px-3 py-2 text-right text-industrial-gray">{t('admin.dashboard.table.amount')}</th>
+                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.status')}</th>
                 <th className="px-3 py-2 text-left"></th>
               </tr>
             </thead>
             <tbody>
               {recentOrders.length === 0 ? (
-                <tr><td className="px-3 py-3" colSpan={5}>Kayıt yok</td></tr>
+                <tr><td className="px-3 py-3" colSpan={5}>{t('admin.ui.noRecords')}</td></tr>
               ) : recentOrders.map(r => (
                 <tr key={r.id} className="border-t">
                   <td className="px-3 py-2 font-mono text-xs">#{(r.order_number || r.id).toString().slice(-8).toUpperCase()}</td>
                   <td className="px-3 py-2 text-steel-gray">{formatDateTime(r.created_at, lang)}</td>
                   <td className="px-3 py-2 text-right">{formatCurrency(r.total_amount, lang)}</td>
                   <td className="px-3 py-2 text-steel-gray">{r.status}</td>
-                  <td className="px-3 py-2"><Link to={`/account/orders/${r.id}`} className="text-primary-navy hover:underline">Detay</Link></td>
+                  <td className="px-3 py-2"><Link to={`/account/orders/${r.id}`} className="text-primary-navy hover:underline">{t('admin.ui.details')}</Link></td>
                 </tr>
               ))}
             </tbody>
