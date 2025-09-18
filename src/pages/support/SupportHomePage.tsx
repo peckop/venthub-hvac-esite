@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft, BookOpen, MessageCircle } from 'lucide-react'
+import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft, BookOpen } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { WhatsAppIcon } from '../../components/HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
@@ -52,7 +52,7 @@ const SupportHomePage: React.FC = () => {
           <div className="mt-8 whatsapp-container">
             <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
-                <WhatsAppIcon size={48} variant="solid" className="" />
+                <WhatsAppIcon size={48} className="" />
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-semibold whatsapp-text mb-2">Hızlı WhatsApp Desteği</h2>
@@ -63,7 +63,7 @@ const SupportHomePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="whatsapp-btn"
                 >
-                  <WhatsAppIcon size={18} variant="solid" />
+                  <WhatsAppIcon size={18} />
                   WhatsApp'tan Yaz
                 </a>
               </div>
