@@ -134,7 +134,9 @@ export const tr = {
       productTypes: "Ürün Çeşidi",
       yearsExperience: "Yıl Deneyim",
       happyCustomers: "Mutlu Müşteri",
-    }
+    },
+    galleryTitle: 'Ürün Galerisi',
+    gallerySubtitle: 'Öne çıkan ürünlere göz atın'
   },
   homeCta: {
     title: 'Projenizi Konuşalım',
@@ -189,13 +191,26 @@ export const tr = {
       smokeExhaust: { title: 'Duman Egzozu', desc: 'Acil durum yönetimi' }
     }
   },
+  homeGallery: {
+    title: 'Uygulama Vitrini',
+    subtitle: 'Gerçek kullanım senaryolarına hızlı bakış',
+    items: {
+      parking: { title: 'Otopark Havalandırma', subtitle: 'Jet fan / CO kontrol' },
+      airCurtain: { title: 'Hava Perdesi', subtitle: 'Giriş konforu' },
+      heatRecovery: { title: 'Isı Geri Kazanım', subtitle: 'Enerji verimliliği' },
+      industrialKitchen: { title: 'Endüstriyel Mutfak', subtitle: 'Davlumbaz ve kanal' },
+      smokeExhaust: { title: 'Duman Egzozu', subtitle: 'Acil durum' },
+      hvac: { title: 'Isıtma/Soğutma', subtitle: 'Konfor iklimi' }
+    }
+  },
   homeShowcase: {
     slide1: { title: 'Endüstriyel Havalandırmada Uzmanlık', subtitle: 'Projenize uygun çözümler ve doğru ürün seçimi' },
     slide2: { title: 'Enerji Verimliliği ve Konfor', subtitle: 'Doğru mühendislik ile daha düşük maliyet, daha iyi performans' },
     slide3: { title: 'İhtiyacına Göre Yönlendirme', subtitle: 'Uygulamaya göre keşfet, hızlıca doğru kategoriye ilerle' },
     prevAria: 'Önceki',
     playAria: 'Oynat',
-    pauseAria: 'Durdur'
+    pauseAria: 'Durdur',
+    nextAria: 'Sonraki'
   },
   products: {
     itemsListed: "ürün listeleniyor",
@@ -339,6 +354,39 @@ export const tr = {
     saturday: 'Cumartesi',
     rights: 'Tüm hakları saklıdır.'
   },
+  contactPage: {
+    title: 'İletişim',
+    subtitle: 'Projeniz veya ürünlerle ilgili sorularınız için bize ulaşın. En kısa sürede dönüş yaparız.',
+    addressLabel: 'Adres',
+    addressLine1: 'Teknokent Mah. Teknopark Blv.',
+    addressLine2: 'No: 1/4A 34906 Pendik/İstanbul',
+    phoneLabel: 'Telefon',
+    emailLabel: 'E‑posta',
+    quickTitle: 'Hızlı İletişim',
+    quickDesc: "Acil durumlar ve hızlı yanıt gereken konular için WhatsApp'tan direkt ulaşın.",
+    quickButton: "WhatsApp'tan Yaz",
+    formTitle: 'Teklif/İletişim Formu',
+    namePh: 'Ad Soyad',
+    emailPh: 'E‑posta',
+    subjectPh: 'Konu',
+    messagePh: 'Mesajınız / Proje bilgileri',
+    submit: 'Gönder'
+  },
+  aboutPage: {
+    title: 'VentHub Hakkında',
+    subtitle: 'Premium HVAC çözümlerinde güvenilir iş ortağınız. Kurumsal tedarik, mühendislik destekli seçim ve hızlı teklif süreçleriyle yanınızdayız.',
+    stats: {
+      premiumBrands: 'Premium Marka',
+      productTypes: 'Ürün Çeşidi',
+      yearsExperience: 'Yıl Deneyim'
+    },
+    whyTitle: 'Neden VentHub?',
+    bullets: {
+      bullet1: 'Mühendislik odaklı seçim desteği ve doğru ürün yönlendirmesi',
+      bullet2: 'Stok, teslimat ve satış sonrası süreçlerde şeffaf iletişim',
+      bullet3: 'KVKK/iyzico uyumlu, güvenli ödeme ve veri koruması'
+    }
+  },
   category: {
     loading: 'Kategori yükleniyor...',
     notFound: 'Kategori Bulunamadı',
@@ -367,6 +415,12 @@ export const tr = {
     labelBrand: 'Marka',
     labelModel: 'Model',
     labelPrice: 'Fiyat',
+    localSearchPlaceholder: 'Bu kategoride ara (ad/marka/model/SKU)',
+    gridViewAria: 'Izgara görünümü',
+    listViewAria: 'Liste görünümü',
+    minPlaceholder: 'Min',
+    maxPlaceholder: 'Maks',
+    ltePlaceholder: '≤'
   },
   pdp: {
     loading: 'Ürün yükleniyor...',

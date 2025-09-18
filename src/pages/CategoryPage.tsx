@@ -288,7 +288,7 @@ export const CategoryPage: React.FC = () => {
               type="text"
               value={catSearch}
               onChange={(e)=>setCatSearch(e.target.value)}
-              placeholder="Bu kategoride ara (ad/marka/model/SKU)"
+              placeholder={t('category.localSearchPlaceholder') as string}
               className="w-full pl-3 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
             />
           </div>
@@ -367,20 +367,20 @@ export const CategoryPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.airflow')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder="Min" value={airflowMin} onChange={e=>setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder="Max" value={airflowMax} onChange={e=>setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e=>setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e=>setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.pressure')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder="Min" value={pressureMin} onChange={e=>setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder="Max" value={pressureMax} onChange={e=>setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e=>setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e=>setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.noise')}</label>
-                    <input type="number" placeholder="≤" value={noiseMax} onChange={e=>setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e=>setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
                   </div>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export const CategoryPage: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setViewMode('grid')}
-                    aria-label="Izgara görünümü"
+                    aria-label={t('category.gridViewAria') as string}
                     aria-pressed={viewMode === 'grid'}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'grid' 
@@ -431,7 +431,7 @@ export const CategoryPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    aria-label="Liste görünümü"
+                    aria-label={t('category.listViewAria') as string}
                     aria-pressed={viewMode === 'list'}
                     className={`p-2 rounded transition-colors ${
                       viewMode === 'list' 

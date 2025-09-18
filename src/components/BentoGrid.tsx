@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface BentoItem {
   title: string
@@ -6,15 +7,6 @@ interface BentoItem {
   image: string
   video?: string
 }
-
-const ITEMS: BentoItem[] = [
-  { title: 'Otopark Havalandırma', subtitle: 'Jet fan / CO kontrol', image: '/images/bento/parking.jpg', video: '/videos/parking.mp4' },
-  { title: 'Hava Perdesi', subtitle: 'Giriş konforu', image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4' },
-  { title: 'Isı Geri Kazanım', subtitle: 'Enerji verimliliği', image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4' },
-  { title: 'Endüstriyel Mutfak', subtitle: 'Davlumbaz ve kanal', image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4' },
-  { title: 'Duman Egzozu', subtitle: 'Acil durum', image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4' },
-  { title: 'Isıtma/Soğutma', subtitle: 'Konfor iklimi', image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4' },
-]
 
 const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -46,21 +38,30 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
 }
 
 const BentoGrid: React.FC = () => {
+  const { t } = useI18n()
+  const items: BentoItem[] = [
+    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4' },
+    { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4' },
+    { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4' },
+    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4' },
+    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4' },
+    { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4' },
+  ]
   // 2x3 grid, bir büyük karo
   return (
     <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Uygulama Vitrini</h2>
-          <p className="text-steel-gray">Gerçek kullanım senaryolarına hızlı bakış</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('homeGallery.title')}</h2>
+          <p className="text-steel-gray">{t('homeGallery.subtitle')}</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-[140px] sm:auto-rows-[160px] md:auto-rows-[180px]">
-          <BentoCard item={ITEMS[0]} large />
-          <BentoCard item={ITEMS[1]} />
-          <BentoCard item={ITEMS[2]} />
-          <BentoCard item={ITEMS[3]} />
-          <BentoCard item={ITEMS[4]} />
-          <BentoCard item={ITEMS[5]} />
+          <BentoCard item={items[0]} large />
+          <BentoCard item={items[1]} />
+          <BentoCard item={items[2]} />
+          <BentoCard item={items[3]} />
+          <BentoCard item={items[4]} />
+          <BentoCard item={items[5]} />
         </div>
       </div>
     </section>
