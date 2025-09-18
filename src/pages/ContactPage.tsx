@@ -1,5 +1,5 @@
 import React from 'react'
-import { MessageCircle, Phone, Mail, MapPin } from 'lucide-react'
+import { Phone, Mail, MapPin } from 'lucide-react'
 import { WhatsAppIcon } from '../components/HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../utils/whatsapp'
 
@@ -65,7 +65,7 @@ const ContactPage: React.FC = () => {
                     rel="noopener noreferrer"
                     className="whatsapp-btn"
                   >
-                    <MessageCircle size={20} />
+                  <WhatsAppIcon size={18} variant="solid" />
                     WhatsApp'tan Yaz
                   </a>
                 </div>
