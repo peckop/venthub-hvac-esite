@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
-
-const STEPS = [
-  { key: 'need', title: 'İhtiyacınızı Anlıyoruz', desc: 'Kısa bir görüşme veya form ile kullanım senaryosunu netleştiriyoruz.' },
-  { key: 'analysis', title: 'Analiz ve Hesap', desc: 'Debi, basınç, akustik, enerji verimliliği ve yönetmelikleri gözden geçiriyoruz.' },
-  { key: 'proposal', title: 'Çözüm / Teklif', desc: 'Uygun ürün aileleri, alternatifler ve teslim süresiyle teklif sunuyoruz.' },
-  { key: 'implementation', title: 'Uygulama Desteği', desc: 'Montaj kılavuzları, devreye alma ve teknik destekle süreci kolaylaştırıyoruz.' },
-  { key: 'support', title: 'Destek', desc: 'Satış sonrası eğitim, yedek parça ve servis ağı ile sürdürülebilir çözüm.' },
-] as const
+import { useI18n } from '../i18n/I18nProvider'
 
 const ScrollLinkedProcess: React.FC = () => {
+  const { t } = useI18n()
   const [active, setActive] = useState(0)
   const refs = useRef<(HTMLDivElement | null)[]>([])
+  const STEPS = [
+    { key: 'need', title: t('homeProcess.steps.need.title'), desc: t('homeProcess.steps.need.desc') },
+    { key: 'analysis', title: t('homeProcess.steps.analysis.title'), desc: t('homeProcess.steps.analysis.desc') },
+    { key: 'proposal', title: t('homeProcess.steps.proposal.title'), desc: t('homeProcess.steps.proposal.desc') },
+    { key: 'implementation', title: t('homeProcess.steps.implementation.title'), desc: t('homeProcess.steps.implementation.desc') },
+    { key: 'support', title: t('homeProcess.steps.support.title'), desc: t('homeProcess.steps.support.desc') },
+  ] as const
 
   useEffect(() => {
     const sections = refs.current.filter(Boolean) as HTMLDivElement[]
@@ -34,8 +35,8 @@ const ScrollLinkedProcess: React.FC = () => {
     <section className="py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Nasıl Çalışırız?</h2>
-          <p className="text-steel-gray">Başlangıçtan teslimata, şeffaf ve öngörülebilir bir süreç</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('homeProcess.title')}</h2>
+          <p className="text-steel-gray">{t('homeProcess.subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1">
@@ -55,7 +56,7 @@ const ScrollLinkedProcess: React.FC = () => {
           <main className="lg:col-span-3 space-y-6">
             {STEPS.map((s, i) => (
               <div key={s.key} ref={el => refs.current[i] = el} className="rounded-2xl border border-light-gray bg-white p-6 shadow-sm">
-                <div className="text-sm text-primary-navy font-semibold mb-1">Adım {i+1}</div>
+                <div className="text-sm text-primary-navy font-semibold mb-1">{t('homeProcess.stepPrefix')} {i+1}</div>
                 <h3 className="text-xl font-bold text-industrial-gray mb-2">{s.title}</h3>
                 <p className="text-steel-gray">{s.desc}</p>
               </div>

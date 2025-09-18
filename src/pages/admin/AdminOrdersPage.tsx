@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLocation } from 'react-router-dom'
 import { format as _format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
@@ -80,6 +81,17 @@ const AdminOrdersPage: React.FC = () => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300)
     return () => clearTimeout(t)
   }, [query])
+
+  // Dashboard'tan preset uygula (pendingShipments)
+  const location = useLocation()
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const preset = params.get('preset')
+    if (preset === 'pendingShipments') {
+      setStatus('confirmed')
+      // not shipped filter UI'da yok; endpoint tarafında shipped_at IS NULL filtreli bir preset yoksa status ile kısıtlanır
+    }
+  }, [location.search])
 
   // Fetch orders from edge function with server-side filters
   const fetchOrders = React.useCallback(async () => {

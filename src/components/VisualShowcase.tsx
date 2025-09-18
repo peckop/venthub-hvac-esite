@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
+import { useI18n } from '../i18n/I18nProvider'
 
 // Hafif bir görsel akış/slider (kütüphane kullanmadan)
 // - Otomatik geçiş (pause on hover veya manuel)
@@ -7,26 +8,7 @@ import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 // - Swipe (touch) desteği (basit)
 // - Parallax arka plan + hafif canvas parçacıkları (prefers-reduced-motion uyumlu)
 
-const SLIDES = [
-  {
-    title: 'Endüstriyel Havalandırmada Uzmanlık',
-    subtitle: 'Projenize uygun çözümler ve doğru ürün seçimi',
-    colorFrom: 'from-primary-navy',
-    colorTo: 'to-secondary-blue',
-  },
-  {
-    title: 'Enerji Verimliliği ve Konfor',
-    subtitle: 'Doğru mühendislik ile daha düşük maliyet, daha iyi performans',
-    colorFrom: 'from-emerald-600',
-    colorTo: 'to-cyan-500',
-  },
-  {
-    title: 'İhtiyacına Göre Yönlendirme',
-    subtitle: 'Uygulamaya göre keşfet, hızlıca doğru kategoriye ilerle',
-    colorFrom: 'from-indigo-600',
-    colorTo: 'to-sky-400',
-  },
-] as const
+// Slide metinleri i18n'den alınır; renkler sabit
 
 const AUTOPLAY_MS = 6000
 
@@ -43,6 +25,7 @@ function usePrefersReducedMotion() {
 }
 
 const VisualShowcase: React.FC = () => {
+  const { t } = useI18n()
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(true)
   const startXRef = useRef<number | null>(null)
@@ -52,15 +35,21 @@ const VisualShowcase: React.FC = () => {
   const disableFancy = reducedMotion || isCoarse || (typeof window !== 'undefined' && window.innerWidth < 640)
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
 
-  // Autoplay
+  const slides = useMemo(() => ([
+    { title: t('homeShowcase.slide1.title'), subtitle: t('homeShowcase.slide1.subtitle'), colorFrom: 'from-primary-navy', colorTo: 'to-secondary-blue' },
+    { title: t('homeShowcase.slide2.title'), subtitle: t('homeShowcase.slide2.subtitle'), colorFrom: 'from-emerald-600', colorTo: 'to-cyan-500' },
+    { title: t('homeShowcase.slide3.title'), subtitle: t('homeShowcase.slide3.subtitle'), colorFrom: 'from-indigo-600', colorTo: 'to-sky-400' },
+  ] as const), [t])
+  const slidesCount = slides.length
+
   useEffect(() => {
     if (!playing) return
-    const id = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), AUTOPLAY_MS)
+    const id = setInterval(() => setIndex((i) => (i + 1) % slidesCount), AUTOPLAY_MS)
     return () => clearInterval(id)
-  }, [playing])
+  }, [playing, slidesCount])
 
-  const prev = () => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
-  const next = () => setIndex((i) => (i + 1) % SLIDES.length)
+  const prev = React.useCallback(() => setIndex((i) => (i - 1 + slidesCount) % slidesCount), [slidesCount])
+  const next = React.useCallback(() => setIndex((i) => (i + 1) % slidesCount), [slidesCount])
 
   // Klavye desteği
   useEffect(() => {
@@ -71,7 +60,7 @@ const VisualShowcase: React.FC = () => {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [prev, next])
 
   const onTouchStart = (e: React.TouchEvent) => {
     startXRef.current = e.touches[0].clientX
@@ -165,7 +154,7 @@ const VisualShowcase: React.FC = () => {
 
           {/* Slides */}
           <div className="relative h-48 sm:h-64 lg:h-72 z-10">
-            {SLIDES.map((s, i) => (
+            {slides.map((s, i) => (
               <div
                 key={s.title}
                 className={`absolute inset-0 transition-opacity duration-700 ease-out bg-gradient-to-br ${s.colorFrom} ${s.colorTo} ${i === index ? 'opacity-100' : 'opacity-0'}`}
@@ -187,7 +176,7 @@ const VisualShowcase: React.FC = () => {
             <button
               onClick={prev}
               className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
-              aria-label="Önceki"
+              aria-label={t('homeShowcase.prevAria')}
             >
               <ChevronLeft size={18} />
             </button>
@@ -195,14 +184,14 @@ const VisualShowcase: React.FC = () => {
               <button
                 onClick={() => setPlaying(p=>!p)}
                 className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
-                aria-label={playing ? 'Durdur' : 'Oynat'}
+                aria-label={playing ? t('homeShowcase.pauseAria') : t('homeShowcase.playAria')}
               >
                 {playing ? <Pause size={18} /> : <Play size={18} />}
               </button>
               <button
                 onClick={next}
                 className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
-                aria-label="Sonraki"
+                aria-label={t('homeShowcase.nextAria')}
               >
                 <ChevronRight size={18} />
               </button>
@@ -211,7 +200,7 @@ const VisualShowcase: React.FC = () => {
 
           {/* Dots */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-            {SLIDES.map((_, i) => (
+            {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setIndex(i)}

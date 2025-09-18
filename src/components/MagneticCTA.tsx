@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
+import { useI18n } from '../i18n/I18nProvider'
 
 const MagneticCTA: React.FC = () => {
+  const { t } = useI18n()
   const ref = useRef<HTMLDivElement | null>(null)
   const [hover, setHover] = useState(false)
 
@@ -28,8 +30,8 @@ const MagneticCTA: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-2xl border border-light-gray bg-gradient-to-r from-primary-navy to-secondary-blue p-8 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-2xl font-bold">Projenizi Konuşalım</h3>
-            <p className="text-white/90">Kısa bir bilgi verin, doğru çözümü birlikte şekillendirelim.</p>
+            <h3 className="text-2xl font-bold">{t('homeCta.title')}</h3>
+            <p className="text-white/90">{t('homeCta.subtitle')}</p>
           </div>
           <div
             ref={ref}
@@ -43,7 +45,7 @@ const MagneticCTA: React.FC = () => {
               className="inline-flex items-center justify-center rounded-xl bg-white text-primary-navy font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-transform"
               style={{ transform: 'translate(var(--dx, 0px), var(--dy, 0px))' }}
             >
-              Teklif / Uzman Desteği
+              {t('homeCta.button')}
             </button>
           </div>
         </div>

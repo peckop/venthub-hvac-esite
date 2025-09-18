@@ -2,32 +2,22 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { HelpCircle } from 'lucide-react'
 import { trackEvent } from '../utils/analytics'
+import { useI18n } from '../i18n/I18nProvider'
 
 const FAQShortSection: React.FC = () => {
+  const { t } = useI18n()
   const items = [
-    {
-      q: 'Hava perdesi hangi durumlarda kullanılır?',
-      a: 'Girişlerde konforu artırmak ve enerji kaybını azaltmak için kullanılır. Kapı açıklığında hava bariyeri oluşturur.',
-      href: '/support/sss',
-    },
-    {
-      q: 'Jet fan seçimi nasıl yapılır?',
-      a: 'Otopark hacmi, CO/NOx sensörleri, hava değişim sayısı ve yerleşim planına göre hesap yapılır.',
-      href: '/support/sss',
-    },
-    {
-      q: 'HRV seçerken nelere dikkat etmeliyim?',
-      a: 'Hava debisi, ısı geri kazanım verimi, basınç kaybı ve ses seviyeleri ana kriterlerdir.',
-      href: '/support/sss',
-    },
+    { q: t('homeFaq.items.airCurtain.q'), a: t('homeFaq.items.airCurtain.a'), href: '/support/sss' },
+    { q: t('homeFaq.items.jetFan.q'), a: t('homeFaq.items.jetFan.a'), href: '/support/sss' },
+    { q: t('homeFaq.items.hrv.q'), a: t('homeFaq.items.hrv.a'), href: '/support/sss' },
   ] as const
 
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Sık Sorulanlar (Kısa)</h2>
-          <p className="text-steel-gray mt-1">Temel konulara hızlı cevaplar — daha fazla bilgi için destek sayfamıza göz atın.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('homeFaq.title')}</h2>
+          <p className="text-steel-gray mt-1">{t('homeFaq.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -44,7 +34,7 @@ const FAQShortSection: React.FC = () => {
                       onClick={() => trackEvent('faq_click', { q: it.q })}
                       className="text-sm font-medium text-primary-navy hover:underline"
                     >
-                      Daha fazla oku →
+                      {t('homeFaq.readMore')}
                     </Link>
                   </div>
                 </div>

@@ -43,6 +43,7 @@ export const tr = {
   resources: {
     title: 'Kaynaklar ve Kılavuzlar',
     allGuides: 'Tüm kılavuzlar',
+    teaser: 'Hızlı başlangıç için pratik ipuçları',
     items: {
       jetFan: 'Otopark Jet Fan seçimi',
       airCurtain: 'Hava perdesi seçimi',
@@ -134,6 +135,67 @@ export const tr = {
       yearsExperience: "Yıl Deneyim",
       happyCustomers: "Mutlu Müşteri",
     }
+  },
+  homeCta: {
+    title: 'Projenizi Konuşalım',
+    subtitle: 'Kısa bir bilgi verin, doğru çözümü birlikte şekillendirelim.',
+    button: 'Teklif / Uzman Desteği'
+  },
+  homeProcess: {
+    title: 'Nasıl Çalışırız?',
+    subtitle: 'Başlangıçtan teslimata, şeffaf ve öngörülebilir bir süreç',
+    stepPrefix: 'Adım',
+    steps: {
+      need: { title: 'İhtiyacınızı Anlıyoruz', desc: 'Kısa bir görüşme veya form ile kullanım senaryosunu netleştiriyoruz.' },
+      analysis: { title: 'Analiz ve Hesap', desc: 'Debi, basınç, akustik, enerji verimliliği ve yönetmelikleri gözden geçiriyoruz.' },
+      proposal: { title: 'Çözüm / Teklif', desc: 'Uygun ürün aileleri, alternatifler ve teslim süresiyle teklif sunuyoruz.' },
+      implementation: { title: 'Uygulama Desteği', desc: 'Montaj kılavuzları, devreye alma ve teknik destekle süreci kolaylaştırıyoruz.' },
+      support: { title: 'Destek', desc: 'Satış sonrası eğitim, yedek parça ve servis ağı ile sürdürülebilir çözüm.' }
+    }
+  },
+  homeTrust: {
+    title: 'Güven ve Uygunluk',
+    subtitle: 'Altyapı, güvenlik ve süreçlerimiz şeffaf ve standartlara uygundur.',
+    kvkk: { title: 'KVKK Uyumlu', desc: 'Kişisel veriler güvenle saklanır, yalnızca gerekli süreçlerde kullanılır.' },
+    payment: { title: 'Güvenli Ödeme (iyzico)', desc: '3D Secure ve ileri dolandırıcılık önleme kontrolleri.' },
+    returns: { title: 'İade/Değişim Kolaylığı', desc: 'Şeffaf prosedür ve hızlı sonuç odaklı destek.' }
+  },
+  homeFaq: {
+    title: 'Sık Sorulanlar (Kısa)',
+    subtitle: 'Temel konulara hızlı cevaplar — daha fazla bilgi için destek sayfamıza göz atın.',
+    readMore: 'Daha fazla oku →',
+    items: {
+      airCurtain: {
+        q: 'Hava perdesi hangi durumlarda kullanılır?',
+        a: 'Girişlerde konforu artırmak ve enerji kaybını azaltmak için kullanılır. Kapı açıklığında hava bariyeri oluşturur.'
+      },
+      jetFan: {
+        q: 'Jet fan seçimi nasıl yapılır?',
+        a: 'Otopark hacmi, CO/NOx sensörleri, hava değişim sayısı ve yerleşim planına göre hesap yapılır.'
+      },
+      hrv: {
+        q: 'HRV seçerken nelere dikkat etmeliyim?',
+        a: 'Hava debisi, ısı geri kazanım verimi, basınç kaybı ve ses seviyeleri ana kriterlerdir.'
+      }
+    }
+  },
+  homeSpotlight: {
+    title: 'Öne Çıkan Uygulamalar',
+    subtitle: 'İmleci gezdirin; odak içeriği vurgulayın',
+    items: {
+      parkingJetFan: { title: 'Otopark Jet Fan', desc: 'CO sensörlü kontrol ve enerji tasarrufu' },
+      airCurtain: { title: 'Hava Perdesi', desc: 'Giriş konforu ve ısı kaybı azaltımı' },
+      hrv: { title: 'Isı Geri Kazanım (HRV)', desc: 'İç hava kalitesi ve verimlilik' },
+      smokeExhaust: { title: 'Duman Egzozu', desc: 'Acil durum yönetimi' }
+    }
+  },
+  homeShowcase: {
+    slide1: { title: 'Endüstriyel Havalandırmada Uzmanlık', subtitle: 'Projenize uygun çözümler ve doğru ürün seçimi' },
+    slide2: { title: 'Enerji Verimliliği ve Konfor', subtitle: 'Doğru mühendislik ile daha düşük maliyet, daha iyi performans' },
+    slide3: { title: 'İhtiyacına Göre Yönlendirme', subtitle: 'Uygulamaya göre keşfet, hızlıca doğru kategoriye ilerle' },
+    prevAria: 'Önceki',
+    playAria: 'Oynat',
+    pauseAria: 'Durdur'
   },
   products: {
     itemsListed: "ürün listeleniyor",

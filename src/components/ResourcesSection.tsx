@@ -33,7 +33,7 @@ const ResourcesSection: React.FC = () => {
               </div>
               <div>
                 <div className="font-semibold text-industrial-gray group-hover:text-primary-navy">{it.title}</div>
-                <div className="text-sm text-steel-gray">Hızlı başlangıç için pratik ipuçları</div>
+                <div className="text-sm text-steel-gray">{t('resources.teaser')}</div>
               </div>
             </Link>
           ))}

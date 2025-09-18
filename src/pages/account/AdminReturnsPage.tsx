@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
@@ -104,6 +104,20 @@ export default function AdminReturnsPage() {
       return
     }
   }, [user, loading, navigate])
+
+  // Dashboard'tan gelen status parametresini uygula
+  const location = useLocation()
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const stParam = params.get('status')
+    if (stParam) {
+      const next = { ...statusFilter }
+      Object.keys(next).forEach(k => { next[k] = false })
+      stParam.split(',').forEach(s => { const key = s.trim(); if (key in next) (next as Record<string, boolean>)[key] = true })
+      setStatusFilter(next)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search])
 
   // İade taleplerini yükle
   useEffect(() => {
