@@ -1,14 +1,15 @@
 import React, { useRef } from 'react'
-
-const ITEMS = [
-  { title: 'Otopark Jet Fan', desc: 'CO sensörlü kontrol ve enerji tasarrufu', href: '/products?all=1' },
-  { title: 'Hava Perdesi', desc: 'Giriş konforu ve ısı kaybı azaltımı', href: '/products?all=1' },
-  { title: 'Isı Geri Kazanım (HRV)', desc: 'İç hava kalitesi ve verimlilik', href: '/products?all=1' },
-  { title: 'Duman Egzozu', desc: 'Acil durum yönetimi', href: '/products?all=1' },
-] as const
+import { useI18n } from '../i18n/I18nProvider'
 
 const SpotlightList: React.FC = () => {
+  const { t } = useI18n()
   const ref = useRef<HTMLDivElement | null>(null)
+  const ITEMS = [
+    { title: t('homeSpotlight.items.parkingJetFan.title'), desc: t('homeSpotlight.items.parkingJetFan.desc'), href: '/products?all=1' },
+    { title: t('homeSpotlight.items.airCurtain.title'), desc: t('homeSpotlight.items.airCurtain.desc'), href: '/products?all=1' },
+    { title: t('homeSpotlight.items.hrv.title'), desc: t('homeSpotlight.items.hrv.desc'), href: '/products?all=1' },
+    { title: t('homeSpotlight.items.smokeExhaust.title'), desc: t('homeSpotlight.items.smokeExhaust.desc'), href: '/products?all=1' },
+  ] as const
 
   const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const el = ref.current
@@ -24,8 +25,8 @@ const SpotlightList: React.FC = () => {
     <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Öne Çıkan Uygulamalar</h2>
-          <p className="text-steel-gray">İmleci gezdirin; odak içeriği vurgulayın</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('homeSpotlight.title')}</h2>
+          <p className="text-steel-gray">{t('homeSpotlight.subtitle')}</p>
         </div>
         <div
           ref={ref}

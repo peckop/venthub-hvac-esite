@@ -43,6 +43,7 @@ export const en = {
   resources: {
     title: 'Resources & Guides',
     allGuides: 'All guides',
+    teaser: 'Quick tips to get started',
     items: {
       jetFan: 'Parking Jet Fan selection',
       airCurtain: 'Air curtain selection',
@@ -134,6 +135,67 @@ export const en = {
       yearsExperience: "Years Experience",
       happyCustomers: "Happy Customers",
     }
+  },
+  homeCta: {
+    title: 'Let’s Talk About Your Project',
+    subtitle: 'Give us brief info, we’ll shape the right solution together.',
+    button: 'Get Quote / Expert Support'
+  },
+  homeProcess: {
+    title: 'How We Work',
+    subtitle: 'A transparent and predictable process from kickoff to delivery',
+    stepPrefix: 'Step',
+    steps: {
+      need: { title: 'Understanding Your Needs', desc: 'We clarify the use case via a short call or form.' },
+      analysis: { title: 'Analysis & Calculation', desc: 'We review airflow, pressure, acoustics, energy efficiency and regulations.' },
+      proposal: { title: 'Solution / Proposal', desc: 'We propose suitable product families, alternatives and lead times.' },
+      implementation: { title: 'Implementation Support', desc: 'We streamline with install guides, commissioning and technical support.' },
+      support: { title: 'Support', desc: 'After-sales training, spare parts and service network for sustainability.' }
+    }
+  },
+  homeTrust: {
+    title: 'Trust & Compliance',
+    subtitle: 'Our infrastructure, security and processes are transparent and standards-compliant.',
+    kvkk: { title: 'KVKK Compliant', desc: 'Personal data is stored securely and used only where necessary.' },
+    payment: { title: 'Secure Payment (iyzico)', desc: '3D Secure and advanced anti-fraud checks.' },
+    returns: { title: 'Easy Returns/Exchanges', desc: 'Transparent procedures and fast, result-focused support.' }
+  },
+  homeFaq: {
+    title: 'FAQs (Short)',
+    subtitle: 'Quick answers to essentials — see our support page for more.',
+    readMore: 'Read more →',
+    items: {
+      airCurtain: {
+        q: 'When should I use an air curtain?',
+        a: 'Used at entrances to improve comfort and reduce energy loss; creates an air barrier at the opening.'
+      },
+      jetFan: {
+        q: 'How is jet fan selection done?',
+        a: 'Calculated by parking volume, CO/NOx sensors, air change rate and layout plan.'
+      },
+      hrv: {
+        q: 'What should I consider when choosing HRV?',
+        a: 'Airflow, heat recovery efficiency, pressure loss and noise levels are key.'
+      }
+    }
+  },
+  homeSpotlight: {
+    title: 'Featured Applications',
+    subtitle: 'Move the pointer to spotlight content',
+    items: {
+      parkingJetFan: { title: 'Parking Jet Fan', desc: 'CO sensor control and energy saving' },
+      airCurtain: { title: 'Air Curtain', desc: 'Entrance comfort and reduced heat loss' },
+      hrv: { title: 'Heat Recovery (HRV)', desc: 'Indoor air quality and efficiency' },
+      smokeExhaust: { title: 'Smoke Exhaust', desc: 'Emergency management' }
+    }
+  },
+  homeShowcase: {
+    slide1: { title: 'Expertise in Industrial Ventilation', subtitle: 'Solutions tailored to your project and the right product selection' },
+    slide2: { title: 'Energy Efficiency & Comfort', subtitle: 'Better performance at lower cost with proper engineering' },
+    slide3: { title: 'Guided by Your Needs', subtitle: 'Explore by application and quickly reach the right category' },
+    prevAria: 'Previous',
+    playAria: 'Play',
+    pauseAria: 'Pause'
   },
   products: {
     breadcrumbDiscover: "Discover",
