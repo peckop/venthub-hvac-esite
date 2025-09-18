@@ -34,8 +34,8 @@ export const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen">
       <Seo
-        title="VentHub | HVAC Ürünleri ve Çözümleri"
-        description="Endüstriyel havalandırma (HVAC) ürünleri ve çözümlerini keşfedin. Hızlı teslimat, 2 yıl garanti ve uzman desteği."
+        title={t('home.seoTitle')}
+        description={t('home.seoDesc')}
         canonical={`${window.location.origin}/`}
       />
       {/* Hero Section */}
@@ -124,7 +124,7 @@ export const HomePage: React.FC = () => {
         <BeforeAfterSlider
           beforeSrc="/images/before_parking_jet_fan.jpg"
           afterSrc="/images/after_parking_jet_fan.jpg"
-          alt="Otopark jet fan uygulaması öncesi/sonrası"
+          alt={t('home.beforeAfterAlt')}
         />
       </Suspense>
 
@@ -136,8 +136,8 @@ export const HomePage: React.FC = () => {
       {/* Ürün Galerisi başlık + akış */}
       <section className="pt-8 pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">Ürün Galerisi</h2>
-          <p className="text-steel-gray mt-2">Portföyümüzden seçilmiş ürün görselleri</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('home.galleryTitle')}</h2>
+          <p className="text-steel-gray mt-2">{t('home.gallerySubtitle')}</p>
         </div>
       </section>
       <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
