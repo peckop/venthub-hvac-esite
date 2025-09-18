@@ -84,12 +84,15 @@ const AdminOrdersPage: React.FC = () => {
 
   // Dashboard'tan preset uygula (pendingShipments)
   const location = useLocation()
+  const [presetPendingShipments, setPresetPendingShipments] = React.useState(false)
   React.useEffect(() => {
     const params = new URLSearchParams(location.search)
     const preset = params.get('preset')
-    if (preset === 'pendingShipments') {
-      setStatus('confirmed')
-      // not shipped filter UI'da yok; endpoint tarafında shipped_at IS NULL filtreli bir preset yoksa status ile kısıtlanır
+    const isPending = preset === 'pendingShipments'
+    setPresetPendingShipments(isPending)
+    if (isPending) {
+      // UI'daki tekli status seçicisini zorlamadan, client-side olarak hem confirmed hem processing'i göstereceğiz
+      setStatus('')
     }
   }, [location.search])
 
@@ -390,6 +393,12 @@ const AdminOrdersPage: React.FC = () => {
   // Also apply client-side filtering as a fallback (until function is deployed everywhere)
   const filtered = React.useMemo(() => {
     return rows.filter((r) => {
+      // Preset: pending shipments -> confirmed veya processing
+      if (!status && presetPendingShipments) {
+        const ok = r.status === 'confirmed' || r.status === 'processing'
+        if (!ok) return false
+      }
+      // Normal tekli status filtresi
       if (status && r.status !== status) return false
       if (fromDate) {
         const from = new Date(fromDate)
@@ -407,7 +416,7 @@ const AdminOrdersPage: React.FC = () => {
       }
       return true
     })
-  }, [rows, status, fromDate, toDate, debouncedQuery])
+  }, [rows, status, fromDate, toDate, debouncedQuery, presetPendingShipments])
 
   const sorted = React.useMemo(() => {
     const arr = [...filtered]
