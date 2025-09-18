@@ -52,7 +52,7 @@ const SupportHomePage: React.FC = () => {
           <div className="mt-8 whatsapp-container">
             <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
-                <WhatsAppIcon size={48} className="" />
+                <WhatsAppIcon size={48} variant="solid" className="" />
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-semibold whatsapp-text mb-2">Hızlı WhatsApp Desteği</h2>
@@ -63,7 +63,7 @@ const SupportHomePage: React.FC = () => {
                   rel="noopener noreferrer"
                   className="whatsapp-btn"
                 >
-                  <MessageCircle size={20} />
+                  <WhatsAppIcon size={18} variant="solid" />
                   WhatsApp'tan Yaz
                 </a>
               </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, MessageCircle } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { WhatsAppIcon } from '../../components/HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../../utils/whatsapp'
@@ -49,7 +49,7 @@ const FAQPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="whatsapp-btn"
               >
-                <MessageCircle size={20} />
+                <WhatsAppIcon size={18} variant="solid" />
                 WhatsApp'tan Sorun
               </a>
             </div>
