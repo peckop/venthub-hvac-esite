@@ -71,6 +71,7 @@ const AdminInventoryPage: React.FC = () => {
   const [csvPreview, setCsvPreview] = React.useState<{ sku: string; name: string; current: number; new: number; delta: number }[]>([])
   const [csvProcessing, setCsvProcessing] = React.useState<boolean>(false)
   const [dryRun, setDryRun] = React.useState<boolean>(true)
+  const csvUndoingRef = React.useRef(false)
 
   // Inventory movement history states
   const [movements, setMovements] = React.useState<Array<{ id: string; delta: number; reason: string; created_at: string }>>([])
@@ -94,6 +95,10 @@ const AdminInventoryPage: React.FC = () => {
     if (!selected) return
     const last = movements[0]
     if (!last) return
+    if (String((last as { reason?: string } | null)?.reason || '').startsWith('undo')) {
+      toast.error('Undo hareketi geri alınamaz')
+      return
+    }
     const tenMinMs = 10 * 60 * 1000
     const age = Date.now() - new Date(last.created_at).getTime()
     if (age > tenMinMs) {
@@ -505,6 +510,7 @@ const AdminInventoryPage: React.FC = () => {
       
       // Her ürün için stok güncelleme işlemi yap
       let successCount = 0
+      const applied: Array<{ productId: string; delta: number }> = []
       for (const item of csvPreview) {
         const productId = skuToId.get(item.sku)
         if (!productId || item.delta === 0) continue
@@ -529,15 +535,47 @@ const AdminInventoryPage: React.FC = () => {
             comment: 'CSV import'
           })
           
+          applied.push({ productId, delta: item.delta })
           successCount++
         } catch (err) {
           console.error(`Error updating stock for SKU ${item.sku}:`, err)
         }
       }
       
-      toast.success(`${successCount} ürün başarıyla güncellendi`)
       setCsvImportOpen(false)
       load() // Tüm listeyi yenile
+
+      // Geri Al butonlu toast
+      toast.custom((t) => (
+        <div className="rounded-lg border border-light-gray bg-white shadow px-3 py-2 text-sm flex items-center gap-3">
+          <span>{successCount} ürün güncellendi.</span>
+          <button
+            className="px-2 py-1 text-xs rounded bg-warning-orange/10 text-warning-orange hover:bg-warning-orange hover:text-white"
+            onClick={async () => {
+              if (csvUndoingRef.current) return
+              csvUndoingRef.current = true
+              try {
+                let undone = 0
+                for (const a of applied) {
+                  const inv = -Number(a.delta || 0)
+                  if (inv === 0) continue
+                  const { error } = await supabase.rpc('adjust_stock', { p_product_id: a.productId, p_delta: inv, p_reason: 'undo:csv' })
+                  if (!error) undone++
+                }
+                toast.success(`${undone} hareket geri alındı`)
+                load()
+              } catch (e) {
+                console.error('csv undo error', e)
+                toast.error('Geri alma başarısız')
+              } finally {
+                csvUndoingRef.current = false
+                toast.dismiss(t.id)
+              }
+            }}
+          >Geri Al</button>
+        </div>
+      ), { duration: 8000 })
+      
     } catch (err) {
       console.error('CSV processing error:', err)
       toast.error('CSV işlenirken hata oluştu')
@@ -884,7 +922,7 @@ const AdminInventoryPage: React.FC = () => {
               <section className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-industrial-gray">Hareket Geçmişi (Son 5)</h3>
-                  <button onClick={undoLastMovement} disabled={undoing || movements.length===0} className="px-3 py-1 rounded border text-xs disabled:opacity-50">Geri Al (10 dk)</button>
+                  <button onClick={undoLastMovement} disabled={undoing || movements.length===0 || String((movements[0] as { reason?: string } | undefined)?.reason || '').startsWith('undo')} className="px-3 py-1 rounded border text-xs disabled:opacity-50">Geri Al (10 dk)</button>
                 </div>
                 {movements.length === 0 ? (
                   <div className="text-sm text-steel-gray">Hareket yok.</div>
