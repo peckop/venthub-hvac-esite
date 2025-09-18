@@ -224,7 +224,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             <div className="flex items-center space-x-2">
                   <Link
                     to="/cart"
-                    aria-label="Sepet"
+                    aria-label={t('header.cart')}
                     className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
                   >
                 <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
