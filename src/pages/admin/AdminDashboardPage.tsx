@@ -22,6 +22,8 @@ const AdminDashboardPage: React.FC = () => {
   const [recentOrders, setRecentOrders] = React.useState<Array<{ id: string; created_at: string; total_amount: number; status: string; order_number?: string | null }>>([])
   const [carrierDist, setCarrierDist] = React.useState<Array<{ key: string; count: number }>>([])
   const [returnsByStatus, setReturnsByStatus] = React.useState<Array<{ status: string; count: number }>>([])
+  const [shipAges, setShipAges] = React.useState<Array<{ bucket: string; count: number }>>([])
+  const [returnsWeekly, setReturnsWeekly] = React.useState<Array<{ week: string; count: number }>>([])
 
   const rangeStartISO = React.useMemo(() => {
     const now = new Date()
@@ -47,7 +49,7 @@ const AdminDashboardPage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(500)
 
-      const [ordersRes, returnsRes, shipRes, shipListRes, returnsListRes] = await Promise.all([
+      const [ordersRes, returnsRes, shipRes, shipListRes, returnsListRes, shipAgeRes, returnsWeeklyRes] = await Promise.all([
         ordersQuery,
         // Pending returns (not time-bound): requested/approved/in_transit/received
         supabase
@@ -71,7 +73,21 @@ const AdminDashboardPage: React.FC = () => {
           .from('venthub_returns')
           .select('status')
           .in('status', ['requested', 'approved', 'in_transit', 'received'])
-          .limit(1000)
+          .limit(1000),
+        // For age buckets
+        supabase
+          .from('venthub_orders')
+          .select('created_at')
+          .is('shipped_at', null)
+          .in('status', ['confirmed', 'processing'])
+          .limit(2000),
+        // For weekly returns trend
+        supabase
+          .from('venthub_returns')
+          .select('requested_at')
+          .in('status', ['requested', 'approved', 'in_transit', 'received'])
+          .gte('requested_at', new Date(Date.now() - 60*24*60*60*1000).toISOString())
+          .limit(5000)
       ])
 
       if (ordersRes.error) throw ordersRes.error
@@ -105,6 +121,8 @@ const AdminDashboardPage: React.FC = () => {
       if (shipRes.error) throw shipRes.error
       if (shipListRes.error) throw shipListRes.error
       if (returnsListRes.error) throw returnsListRes.error
+      if (shipAgeRes.error) throw shipAgeRes.error
+      if (returnsWeeklyRes.error) throw returnsWeeklyRes.error
 
       setPendingReturns(returnsRes.count ?? 0)
       setPendingShipments(shipRes.count ?? 0)
@@ -126,6 +144,40 @@ const AdminDashboardPage: React.FC = () => {
         byStatus.set(key, (byStatus.get(key) || 0) + 1)
       })
       setReturnsByStatus(Array.from(byStatus.entries()).map(([status, count]) => ({ status, count })).sort((a,b)=>b.count-a.count))
+
+      // Build shipments age buckets (0–1g, 2–3g, 4g+)
+      const ageList = (shipAgeRes.data || []) as Array<{ created_at: string }>
+      const now = Date.now()
+      const ages = { '0–1g': 0, '2–3g': 0, '4g+': 0 }
+      ageList.forEach(x => {
+        const d = new Date(x.created_at).getTime()
+        const diffDays = Math.floor((now - d) / (24*60*60*1000))
+        if (diffDays <= 1) ages['0–1g']++
+        else if (diffDays <= 3) ages['2–3g']++
+        else ages['4g+']++
+      })
+      setShipAges(Object.entries(ages).map(([bucket, count]) => ({ bucket, count })))
+
+      // Weekly returns trend (by requested_at, last ~8 weeks)
+      const rw = (returnsWeeklyRes.data || []) as Array<{ requested_at: string | null }>
+      const byWeek = new Map<string, number>()
+      const weeks = 8
+      for (let i=weeks-1;i>=0;i--) {
+        const start = new Date()
+        start.setUTCDate(start.getUTCDate() - i*7)
+        start.setUTCHours(0,0,0,0)
+        const key = start.toISOString().slice(0,10)
+        byWeek.set(key, 0)
+      }
+      rw.forEach(r => {
+        if (!r.requested_at) return
+        const d = new Date(r.requested_at)
+        d.setUTCDate(d.getUTCDate() - d.getUTCDay()) // hafta başına yuvarla (Pazar)
+        d.setUTCHours(0,0,0,0)
+        const key = d.toISOString().slice(0,10)
+        if (byWeek.has(key)) byWeek.set(key, (byWeek.get(key) || 0) + 1)
+      })
+      setReturnsWeekly(Array.from(byWeek.entries()).map(([week, count]) => ({ week, count })))
     } catch (e) {
       setError((e as Error).message || t('admin.ui.failed'))
       setOrdersCount(null)
@@ -244,6 +296,52 @@ const AdminDashboardPage: React.FC = () => {
                   <div className="w-32 text-steel-gray truncate" title={status}>{status}</div>
                   <div className="flex-1 bg-light-gray h-3 rounded">
                     <div className="bg-warning-orange h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                  </div>
+                  <div className="w-10 text-right text-industrial-gray">{count}</div>
+                </div>
+              )) })()}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Age buckets + weekly returns trend */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow-hvac-md p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-industrial-gray">Bekleyen Kargo - Yaş Kırılımı</div>
+            <Link to="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+          </div>
+          {shipAges.length === 0 ? (
+            <div className="text-sm text-steel-gray">Kayıt yok.</div>
+          ) : (
+            <div className="space-y-2">
+              {(() => { const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
+                <div key={bucket} className="flex items-center gap-2 text-sm">
+                  <div className="w-20 text-steel-gray truncate" title={bucket}>{bucket}</div>
+                  <div className="flex-1 bg-light-gray h-3 rounded">
+                    <div className="bg-indigo-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                  </div>
+                  <div className="w-10 text-right text-industrial-gray">{count}</div>
+                </div>
+              )) })()}
+            </div>
+          )}
+        </div>
+        <div className="bg-white rounded-lg shadow-hvac-md p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-industrial-gray">İadeler - Haftalık Trend</div>
+            <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+          </div>
+          {returnsWeekly.length === 0 ? (
+            <div className="text-sm text-steel-gray">Kayıt yok.</div>
+          ) : (
+            <div className="space-y-2">
+              {(() => { const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
+                <div key={week} className="flex items-center gap-2 text-sm">
+                  <div className="w-24 text-steel-gray truncate" title={week}>{week}</div>
+                  <div className="flex-1 bg-light-gray h-3 rounded">
+                    <div className="bg-emerald-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
                   </div>
                   <div className="w-10 text-right text-industrial-gray">{count}</div>
                 </div>
