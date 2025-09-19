@@ -588,7 +588,7 @@ const AdminInventoryPage: React.FC = () => {
       const downloadErrors = () => {
         if (errors.length === 0) return
         const header = ['sku','message']
-        const lines = errors.map(e => [`"${e.sku.replace(/"/g,'""')}"`, `"${e.message.replace(/"/g,'""')}"`].join(','))
+        const lines = errors.map(e => ['"' + e.sku.replace(/"/g,'""') + '"', '"' + e.message.replace(/"/g,'""') + '"'].join(','))
         const csv = '\ufeff' + [header.join(','), ...lines].join('\n')
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
         const url = URL.createObjectURL(blob)
@@ -677,8 +677,8 @@ const AdminInventoryPage: React.FC = () => {
     const csvContent = [
       header.join(','),
       ...exportRows.map(row => [
-        `"${row.sku.replace(/"/g,'""')}"`,
-        `"${row.name.replace(/"/g,'""')}"`,
+        '"' + row.sku.replace(/"/g,'""') + '"',
+        '"' + row.name.replace(/"/g,'""') + '"',
         row.physical_stock,
         row.reserved_stock,
         row.available_stock
