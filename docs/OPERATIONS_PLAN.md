@@ -1,6 +1,6 @@
 # OPERATIONS & STOCK PLAN — VentHub HVAC
 
-Last updated: 2025-09-02
+Last updated: 2025-09-19
 
 Scope
 - Minimal, user-friendly stock management for you (admin) and clear stock UX for customers.
@@ -26,6 +26,11 @@ Milestones
   - Advanced Admin (bulk ops, labels, roles), Carriers API integrations
 
 Database changes (SQL outline)
+
+Batch Undo Extensions (Migrations)
+- inventory_movements: `batch_id` (uuid), metadata columns `original_movement_id`, `reversed_by_movement_id`, `undo_by_user_id`, `undo_at`
+- RPC: `reverse_inventory_batch(p_batch_id uuid, p_max_minutes int default 30)` — creates compensating movements and reverts stock; enforces a default 30‑minute window
+- Grants: execute to authenticated/service_role
 - Columns and tables
   - venthub_products
     - stock_qty int not null default 0
@@ -57,6 +62,16 @@ RPCs (security definer)
   - Within payment success flow, perform atomic deduction per order with idempotent guard (unique key)
 
 Admin UI — Operasyon > Stok (UX spec)
+
+CSV Import Flow (with Batch Undo)
+1) Import modal: select CSV (SKU,Qty). Preview renders current/new/delta and a Status column (OK/Kritik/Tükenecek) per row.
+2) Dry‑run: validate without writing.
+3) Apply: a single `batch_id` is generated; each movement written with this batch.
+4) Success toast: “Hareketleri Gör” (opens /admin/movements?batch=...) and “Geri Al” (invokes reverse_inventory_batch) actions.
+5) Time window: reverse allowed by default for 30 minutes after batch creation; after that, function raises UNDO_WINDOW_EXPIRED.
+
+Single Undo (Last Movement)
+- In the right drawer, a “Geri Al (10 dk)” button reverts the very latest movement (if younger than 10 minutes and not itself an “undo”).
 - List/table
   - Columns: Image, Name, SKU, Stock, Threshold (effective), Status badge (Low stock)
   - Search by name; pagination and virtualization for performance
@@ -65,11 +80,14 @@ Admin UI — Operasyon > Stok (UX spec)
   - Set quantity (direct number) ve Kaydet; optimistic update ile “Satılabilir” anında güncellenir
   - Inline threshold edit: use default or override per product (rozet + input + Kaydet + Varsayılan)
   - Row click = select; selection context panel (Hızlı Eşik Ayarları) yalnızca seçim olduğunda görünür
-  - Mini movement history: last 5 changes (collapsed panel)
-  - Undo: allow revert of last change within 10 minutes (optional, via inverse movement)
+- Mini movement history: last 5 changes (enabled)
+- Undo (single): revert the latest change within 10 minutes (enabled)
+  - Safeguard: “undo” movements themselves cannot be undone
+  - Reason format: `undo:<shortId>` to respect DB reason length
+- CSV preview: shows delta and status warnings (will become 0 → “Out”, or <= effective threshold → “Critical”)
 - Bulk actions
   - Multi-select rows for bulk adjust/set
-  - CSV import/export (SKU, qty)
+- CSV import/export (SKU, qty) + batch undo
 - Settings
   - Global default_low_stock_threshold input
 

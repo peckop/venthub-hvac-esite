@@ -59,6 +59,14 @@ Tarih: 2025-09-08
   - Aksiyon: Kargoya Ver (tekil ve toplu) (kısmen mevcut; bulk akışı sırada)
   - Dışa Aktar: CSV + Excel (.xls) (mevcut)
 
+## Güncellemeler (2025-09-18–19)
+- Dashboard: KPI kartları tıklanabilir (Bekleyen İade, Bekleyen Kargo). Orders’a preset=pendingShipments ile hızlı geçiş.
+- Orders: `admin-orders-latest` fonksiyonuna `preset=pendingShipments` eklendi (server‑side shipped_at IS NULL + status ∈ confirmed/processing).
+- Inventory: Mini hareket geçmişi (son 5) ve tek hareket geri al (10 dk, "undo" geri alınamaz, reason `undo:<shortId>`).
+- CSV: Önizlemede durum uyarıları (Tükenecek/Kritik). Toplu geri al için `batch_id` eklendi ve `reverse_inventory_batch` RPC yazıldı (varsayılan 30 dk pencere, metadata: original/reversed_by/undo_* sütunları).
+- Movements: `?batch=` filtresi eklendi; üst barda filtre çubuğu ve temizleme.
+- Audit Log: `?batch=` filtresi eklendi; “Hareketleri Gör” kısayolu.
+
 ## Sıradaki (Sprint 3 – Returns & Movements & Errors)
 - Toolbar durumlarının kalıcılığı (localStorage; sayfa bazlı anahtarlar)
 - Gelişmiş filtre çekmecesi (Orders)
