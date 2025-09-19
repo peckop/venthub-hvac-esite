@@ -27,18 +27,18 @@ enum LoadState { Idle, Loading, Error }
 const PAGE_SIZE = 50
 const ALL_REASONS = ['sale','po_receipt','manual_in','manual_out','adjust','return_in','transfer_out','transfer_in'] as const
 
-function reasonLabel(key: string | null | undefined): string {
+function reasonLabel(key: string | null | undefined, t: (k: string) => string): string {
   const val = String(key || '')
-  if (val.startsWith('undo')) return 'Geri Alma'
+  if (val.startsWith('undo')) return t('admin.movements.reasons.undo')
   switch (val) {
-    case 'sale': return 'Satış'
-    case 'po_receipt': return 'Satın Alma Kabul'
-    case 'manual_in': return 'Manuel Giriş'
-    case 'manual_out': return 'Manuel Çıkış'
-    case 'adjust': return 'Düzeltme'
-    case 'return_in': return 'İade Girişi'
-    case 'transfer_out': return 'Transfer Çıkış'
-    case 'transfer_in': return 'Transfer Giriş'
+    case 'sale': return t('admin.movements.reasons.sale')
+    case 'po_receipt': return t('admin.movements.reasons.po_receipt')
+    case 'manual_in': return t('admin.movements.reasons.manual_in')
+    case 'manual_out': return t('admin.movements.reasons.manual_out')
+    case 'adjust': return t('admin.movements.reasons.adjust')
+    case 'return_in': return t('admin.movements.reasons.return_in')
+    case 'transfer_out': return t('admin.movements.reasons.transfer_out')
+    case 'transfer_in': return t('admin.movements.reasons.transfer_in')
     default: return '-'
   }
 }
@@ -112,13 +112,13 @@ const AdminMovementsPage: React.FC = () => {
       setError('')
       setLoading(LoadState.Idle)
     } catch {
-      setError('Hareketler yüklenemedi')
+      setError(t('admin.ui.failed'))
       setRows([])
       setProductMap({})
       setHasMore(false)
       setLoading(LoadState.Error)
     }
-  }, [batchFilter])
+  }, [batchFilter, t])
 
   React.useEffect(()=>{ load(page) }, [load, page])
 
@@ -205,15 +205,15 @@ const AdminMovementsPage: React.FC = () => {
   }
 
   function exportCsv() {
-    const header = ['Tarih','Ürün','SKU','Delta','Sebep','Referans']
+    const header = [t('admin.movements.export.headers.date'), t('admin.movements.export.headers.product'), 'SKU', t('admin.movements.export.headers.delta'), t('admin.movements.export.headers.reason'), t('admin.movements.export.headers.ref')]
     const lines = filtered.map(m => {
       const p = productMap[m.product_id]
       return [
-        formatDateTime(m.created_at, 'tr'),
+        formatDateTime(m.created_at, lang),
         p?.name || m.product_id,
         p?.sku || '',
         m.delta,
-        reasonLabel(m.reason),
+        reasonLabel(m.reason, t),
         m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
       ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
     })
@@ -231,15 +231,15 @@ const AdminMovementsPage: React.FC = () => {
   function exportXls() {
     const rowsHtml = filtered.map(m => {
       const p = productMap[m.product_id]
-      const date = formatDateTime(m.created_at, 'tr')
+      const date = formatDateTime(m.created_at, lang)
       const prod = p?.name || m.product_id
       const sku = p?.sku || ''
       const delta = m.delta
-      const reason = reasonLabel(m.reason)
+      const reason = reasonLabel(m.reason, t)
       const ref = m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
       return `<tr><td>${date}</td><td>${prod}</td><td>${sku}</td><td>${delta}</td><td>${reason}</td><td>${ref}</td></tr>`
     }).join('')
-    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Tarih</th><th>Ürün</th><th>SKU</th><th>Delta</th><th>Sebep</th><th>Referans</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${t('admin.movements.export.headers.date')}</th><th>${t('admin.movements.export.headers.product')}</th><th>SKU</th><th>${t('admin.movements.export.headers.delta')}</th><th>${t('admin.movements.export.headers.reason')}</th><th>${t('admin.movements.export.headers.ref')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -272,29 +272,29 @@ const AdminMovementsPage: React.FC = () => {
 
       {batchFilter && (
         <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
-          <span>Filtre: Batch <span className="font-mono">{batchFilter}</span></span>
+          <span>{t('admin.movements.batchFilterPrefix')} <span className="font-mono">{batchFilter}</span></span>
           <button
             className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
             onClick={() => { setBatchFilter(''); const url = new URL(window.location.href); url.searchParams.delete('batch'); navigate(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { replace: true }) }}
-          >Temizle</button>
+          >{t('admin.ui.clear')}</button>
         </div>
       )}
 
       <AdminToolbar
         storageKey="toolbar:movements"
-        search={{ value: q, onChange: setQ, placeholder: 'Ürün adı/SKU ara', focusShortcut: '/' }}
+        search={{ value: q, onChange: setQ, placeholder: t('admin.search.movements'), focusShortcut: '/' }}
         select={{
           value: selectedCategory,
           onChange: (v)=>{ setPage(1); setSelectedCategory(v) },
-          title: 'Kategori',
+          title: t('admin.movements.toolbar.categoryTitle'),
           options: [
-            { value: '', label: 'Tüm Kategoriler' },
+            { value: '', label: t('admin.movements.toolbar.allCategories') },
             ...visibleCategories.map(c => ({ value: c.id, label: c.name }))
           ]
         }}
         chips={ALL_REASONS.map(r => ({
           key: r,
-          label: reasonLabel(r),
+          label: reasonLabel(r, t),
           active: !!reasonFilter[r],
           onToggle: ()=>setReasonFilter(prev=>({ ...prev, [r]: !prev[r] }))
         }))}
@@ -308,16 +308,16 @@ const AdminMovementsPage: React.FC = () => {
         rightExtra={(
           <div className="flex items-center gap-2">
             <ExportMenu items={[
-              { key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv },
-              { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportXls }
+              { key: 'csv', label: t('admin.movements.export.csvLabel'), onSelect: exportCsv },
+              { key: 'xls', label: t('admin.orders.export.xlsLabel'), onSelect: exportXls }
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
-                { key: 'product', label: 'Ürün', checked: visibleCols.product, onChange: (v)=>setVisibleCols(s=>({ ...s, product: v })) },
-                { key: 'delta', label: 'Delta', checked: visibleCols.delta, onChange: (v)=>setVisibleCols(s=>({ ...s, delta: v })) },
-                { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
-                { key: 'ref', label: 'Referans', checked: visibleCols.ref, onChange: (v)=>setVisibleCols(s=>({ ...s, ref: v })) },
+                { key: 'date', label: t('admin.movements.table.date'), checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+                { key: 'product', label: t('admin.movements.table.product'), checked: visibleCols.product, onChange: (v)=>setVisibleCols(s=>({ ...s, product: v })) },
+                { key: 'delta', label: t('admin.movements.table.delta'), checked: visibleCols.delta, onChange: (v)=>setVisibleCols(s=>({ ...s, delta: v })) },
+                { key: 'reason', label: t('admin.movements.table.reason'), checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
+                { key: 'ref', label: t('admin.movements.table.ref'), checked: visibleCols.ref, onChange: (v)=>setVisibleCols(s=>({ ...s, ref: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -332,27 +332,27 @@ const AdminMovementsPage: React.FC = () => {
             <tr>
               {visibleCols.date && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
                 </th>
               )}
               {visibleCols.product && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('product')}>Ürün {sortIndicator('product')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
                 </th>
               )}
               {visibleCols.delta && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('delta')}>Delta {sortIndicator('delta')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
                 </th>
               )}
               {visibleCols.reason && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
                 </th>
               )}
               {visibleCols.ref && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('ref')}>Referans {sortIndicator('ref')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
                 </th>
               )}
             </tr>
@@ -377,7 +377,7 @@ const AdminMovementsPage: React.FC = () => {
                   <td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right font-mono`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
                 )}
                 {visibleCols.reason && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason)}</td>
+                  <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
                 )}
                 {visibleCols.ref && (
                   <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
@@ -387,7 +387,7 @@ const AdminMovementsPage: React.FC = () => {
           </tbody>
         </table>
         {loading === LoadState.Loading && (
-          <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+          <div className="p-4 text-sm text-steel-gray">{t('admin.ui.loadingShort')}</div>
         )}
         {loading === LoadState.Error && (
           <div className="p-4 text-sm text-red-600">{error}</div>
@@ -395,9 +395,9 @@ const AdminMovementsPage: React.FC = () => {
       </div>
 
       <div className="flex items-center justify-between">
-        <button className="px-3 py-2 border rounded text-sm" disabled={page===1} onClick={()=>setPage(p=>Math.max(1, p-1))}>Önceki</button>
-        <span className="text-sm text-steel-gray">Sayfa {page}</span>
-        <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={()=>setPage(p=>p+1)}>Sonraki</button>
+        <button className="px-3 py-2 border rounded text-sm" disabled={page===1} onClick={()=>setPage(p=>Math.max(1, p-1))}>{t('admin.ui.prev')}</button>
+        <span className="text-sm text-steel-gray">{t('admin.movements.pageLabel', { page: String(page) })}</span>
+        <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={()=>setPage(p=>p+1)}>{t('admin.ui.next')}</button>
       </div>
     </div>
   )

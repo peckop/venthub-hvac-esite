@@ -376,6 +376,36 @@ export const tr = {
       movements: 'Ürün adı/SKU ara',
       orders: 'Sipariş ID veya Conversation ID'
     },
+    movements: {
+      toolbar: {
+        categoryTitle: 'Kategori',
+        allCategories: 'Tüm Kategoriler'
+      },
+      table: {
+        date: 'Tarih',
+        product: 'Ürün',
+        delta: 'Delta',
+        reason: 'Sebep',
+        ref: 'Referans'
+      },
+      export: {
+        csvLabel: 'CSV (görünür filtrelerle)',
+        headers: { date: 'Tarih', product: 'Ürün', sku: 'SKU', delta: 'Delta', reason: 'Sebep', ref: 'Referans' }
+      },
+      batchFilterPrefix: 'Filtre: Batch',
+      pageLabel: 'Sayfa {{page}}',
+      reasons: {
+        undo: 'Geri Alma',
+        sale: 'Satış',
+        po_receipt: 'Satın Alma Kabul',
+        manual_in: 'Manuel Giriş',
+        manual_out: 'Manuel Çıkış',
+        adjust: 'Düzeltme',
+        return_in: 'İade Girişi',
+        transfer_out: 'Transfer Çıkış',
+        transfer_in: 'Transfer Giriş'
+      }
+    },
     orders: {
       statusLabels: {
         all: 'Tümü',
