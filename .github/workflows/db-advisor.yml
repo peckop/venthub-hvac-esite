@@ -65,6 +65,34 @@ jobs:
           ORDER BY 1,2;" || true
           echo "::endgroup::"
 
+          echo "::group::[Debug] Identity & Environment"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT current_database() AS db, current_user AS user_name, version() AS pg_version;" || true
+          echo "::endgroup::"
+
+          echo "::group::[Debug] cart_items indexes (full)"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT indexname, indexdef FROM pg_indexes WHERE schemaname='public' AND tablename='cart_items' ORDER BY 1;" || true
+          echo "::endgroup::"
+
+          echo "::group::[Debug] cart_items constraints (full)"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "SELECT conname, contype, pg_get_constraintdef(oid) AS def, conindid::regclass AS backing_index FROM pg_constraint WHERE conrelid='public.cart_items'::regclass ORDER BY 1;" || true
+          echo "::endgroup::"
+
+          echo "::group::[Debug] cart_items duplicate check (normalized)"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "\
+          WITH idx AS (\
+            SELECT i.relname AS index_name, regexp_replace(pg_get_indexdef(i.oid), '\\s+', ' ', 'g') AS indexdef_norm\
+            FROM pg_class c\
+            JOIN pg_index ix ON ix.indrelid = c.oid\
+            JOIN pg_class i ON i.oid = ix.indexrelid\
+            JOIN pg_namespace n ON n.oid = c.relnamespace\
+            WHERE n.nspname='public' AND c.relname='cart_items'\
+          )\
+          SELECT indexdef_norm, array_agg(index_name) AS indexes\
+          FROM idx\
+          GROUP BY indexdef_norm\
+          HAVING COUNT(*) > 1;" || true
+          echo "::endgroup::"
+
           echo "::group::[Advisor] Unused indexes (idx_scan=0)"
           psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off -c "\
           SELECT schemaname, relname AS table_name, indexrelname AS index_name, idx_scan\
