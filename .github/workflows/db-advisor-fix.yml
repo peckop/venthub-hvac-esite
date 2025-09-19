@@ -1,0 +1,174 @@
+name: DB Advisor Fixes
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  apply_fixes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Postgres client (psql)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Apply advisor fixes (idempotent)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::notice title=DB Fixes::Secret SUPABASE_DB_URL not set. Skipping fixes."
+            exit 0
+          fi
+          export PGSSLMODE=require
+
+          echo "::group::[Fix] Harden function search_path"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$ BEGIN
+            BEGIN EXECUTE 'ALTER FUNCTION public.bump_rate_limit(text, integer, integer) SET search_path = pg_catalog, public'; EXCEPTION WHEN others THEN NULL; END;
+            BEGIN EXECUTE 'ALTER FUNCTION public.enforce_role_change() SET search_path = pg_catalog, public'; EXCEPTION WHEN others THEN NULL; END;
+            BEGIN EXECUTE 'ALTER FUNCTION public.update_updated_at_column() SET search_path = pg_catalog, public'; EXCEPTION WHEN others THEN NULL; END;
+            BEGIN EXECUTE 'ALTER FUNCTION public.reverse_inventory_batch(uuid, integer) SET search_path = pg_catalog, public'; EXCEPTION WHEN others THEN NULL; END;
+          END $$;
+          SQL
+          echo "::endgroup::"
+
+          echo "::group::[Fix] FK covering indexes"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          CREATE INDEX IF NOT EXISTS idx_cart_items_product_id ON public.cart_items(product_id);
+          CREATE INDEX IF NOT EXISTS idx_product_prices_price_list_id ON public.product_prices(price_list_id);
+          CREATE INDEX IF NOT EXISTS idx_venthub_order_items_order_id ON public.venthub_order_items(order_id);
+          CREATE INDEX IF NOT EXISTS idx_venthub_order_items_product_id ON public.venthub_order_items(product_id);
+          CREATE INDEX IF NOT EXISTS idx_venthub_orders_user_id ON public.venthub_orders(user_id);
+          SQL
+          echo "::endgroup::"
+
+          echo "::group::[Fix] Duplicate index/constraint cleanup (cart_items)"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          DO $$ BEGIN
+            IF EXISTS (
+              SELECT 1 FROM pg_constraint
+              WHERE conname = 'cart_items_cart_product_uniq'
+                AND conrelid = 'public.cart_items'::regclass
+            ) THEN
+              EXECUTE 'ALTER TABLE public.cart_items DROP CONSTRAINT cart_items_cart_product_uniq';
+            END IF;
+          END $$;
+          DO $$ BEGIN
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_indexes
+              WHERE schemaname='public' AND tablename='cart_items' AND indexname='cart_items_cart_product_unique'
+            ) THEN
+              EXECUTE 'CREATE UNIQUE INDEX cart_items_cart_product_unique ON public.cart_items (cart_id, product_id)';
+            END IF;
+          END $$;
+          SQL
+          echo "::endgroup::"
+
+          echo "::group::[Fix] RLS consolidation (cart_items, shopping_carts)"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -P pager=off <<'SQL'
+          -- cart_items: drop broad ALL policy if exists; create split write policies
+          DO $$ BEGIN
+            IF EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_modify_own'
+            ) THEN
+              EXECUTE 'DROP POLICY cart_items_modify_own ON public.cart_items';
+            END IF;
+          END $$;
+          DO $$ BEGIN
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_insert_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY cart_items_insert_own ON public.cart_items
+                FOR INSERT TO authenticated
+                WITH CHECK (
+                  EXISTS (
+                    SELECT 1 FROM public.shopping_carts c
+                    WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
+                  )
+                );
+              $$;
+            END IF;
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_update_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY cart_items_update_own ON public.cart_items
+                FOR UPDATE TO authenticated
+                USING (
+                  EXISTS (
+                    SELECT 1 FROM public.shopping_carts c
+                    WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
+                  )
+                )
+                WITH CHECK (
+                  EXISTS (
+                    SELECT 1 FROM public.shopping_carts c
+                    WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
+                  )
+                );
+              $$;
+            END IF;
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='cart_items' AND policyname='cart_items_delete_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY cart_items_delete_own ON public.cart_items
+                FOR DELETE TO authenticated
+                USING (
+                  EXISTS (
+                    SELECT 1 FROM public.shopping_carts c
+                    WHERE c.id = cart_items.cart_id AND c.user_id = auth.uid()
+                  )
+                );
+              $$;
+            END IF;
+          END $$;
+
+          -- shopping_carts: drop broad ALL policy; create split write policies
+          DO $$ BEGIN
+            IF EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_modify_own'
+            ) THEN
+              EXECUTE 'DROP POLICY shopping_carts_modify_own ON public.shopping_carts';
+            END IF;
+          END $$;
+          DO $$ BEGIN
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_insert_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY shopping_carts_insert_own ON public.shopping_carts
+                FOR INSERT TO authenticated
+                WITH CHECK (user_id = auth.uid());
+              $$;
+            END IF;
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_update_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY shopping_carts_update_own ON public.shopping_carts
+                FOR UPDATE TO authenticated
+                USING (user_id = auth.uid())
+                WITH CHECK (user_id = auth.uid());
+              $$;
+            END IF;
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='shopping_carts' AND policyname='shopping_carts_delete_own'
+            ) THEN
+              EXECUTE $$
+                CREATE POLICY shopping_carts_delete_own ON public.shopping_carts
+                FOR DELETE TO authenticated
+                USING (user_id = auth.uid());
+              $$;
+            END IF;
+          END $$;
+          SQL
+          echo "::endgroup::"
