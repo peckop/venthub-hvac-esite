@@ -8,6 +8,13 @@
   - "Bekleyen Kargo" → `/admin/orders?preset=pendingShipments`
 - Edge Function: `admin-orders-latest` artık `preset=pendingShipments` parametresini destekler; server‑side olarak `status in (confirmed, processing)` ve `shipped_at IS NULL` filtreleri uygulanır.
 
+### Admin Dashboard Kırılım Kartları
+- Bekleyen Kargo – Kargo Dağılımı: `carrier`/`shipping_carrier` alanlarına göre grup dağılım grafiği
+- Bekleyen İade – Durum Kırılımı: `requested`, `approved`, `in_transit`, `received` durumlarına göre sayım
+
+### Envanter CSV Export Düzeltmesi
+- CSV dışa aktarma dosyasında SKU sütunu artık gerçek SKU yazar (önceden `product_id` idi)
+
 ### Envanter: Mini Geçmiş + Geri Al (Undo)
 - AdminInventoryPage: sağ çekmecede son 5 stok hareketi gösterilir.
 - "Geri Al (10 dk)": son hareket 10 dakika içinde tersine çevrilebilir; "undo" hareketleri geri alınamaz (koruma).

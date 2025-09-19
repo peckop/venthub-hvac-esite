@@ -34,6 +34,7 @@ Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehber
 - FK indeksleri: danışmanın işaret ettiği eksik kaplayıcı indeksler garanti altına alındı (idempotent CREATE INDEX IF NOT EXISTS ile).
 - Duplicate index: cart_items üzerindeki duplicate unique constraint temizlendi (`cart_items_cart_product_uniq` kaldırıldı; `cart_items_cart_product_unique` korundu). `coupons` üzerindeki `idx_coupons_code` de `coupons_code_key` ile redundant olduğundan kaldırıldı.
 - İndeks kullanımı: `pg_stat_user_indexes` ile mini okuma testinde kritik indekslerde `idx_scan>0` doğrulandı. Gerçek trafik geldikçe metrikler artacaktır.
+- Advisor (security): Mutable search_path uyarıları temiz; kalan tek uyarı LPP (bilinçli olarak kapalı tutuluyor).
 
 #### İndeks kullanım raporu (okuma güvenli)
 

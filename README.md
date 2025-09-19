@@ -75,9 +75,11 @@ Tarih: 2025-09-19
 - Admin Dashboard ve Orders
   - KPI kartları tıklanabilir hale getirildi (Bekleyen İade, Bekleyen Kargo)
   - `admin-orders-latest` fonksiyonu `preset=pendingShipments` desteği ile sunucu tarafı filtre uyguluyor (status ∈ confirmed/processing ve shipped_at IS NULL)
+  - Dashboard kırılımları: Bekleyen Kargo — kargo dağılımı; Bekleyen İade — durum kırılımı
 - Envanter: Geri Al (Undo) ve Toplu Geri Al (Batch Undo)
   - Ürün sağ panelinde mini hareket geçmişi (son 5) ve tek hareket için 10 dk içinde geri al
   - `inventory_movements.batch_id` ile CSV import’larına toplu geri al desteği; `reverse_inventory_batch(uuid, int)` RPC eklendi
+  - CSV export: SKU sütunu artık gerçek SKU yazar (önceden product_id idi)
   - UI: Movements ve Audit Log sayfalarında `?batch=<uuid>` filtresi ve hızlı bağlantılar
 - Güvenlik ve Veritabanı
   - Fonksiyonlarda `search_path=pg_catalog, public` sabitlendi (mutable search_path uyarıları giderildi)
