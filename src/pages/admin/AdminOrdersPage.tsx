@@ -23,18 +23,19 @@ interface AdminOrderRow {
 
 type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
-const STATUSES: { value: string; label: string }[] = [
-  { value: '', label: 'Tümü' },
-  { value: 'paid', label: 'Ödendi' },
-  { value: 'confirmed', label: 'Onaylı' },
-  { value: 'shipped', label: 'Kargolandı' },
-  { value: 'cancelled', label: 'İptal' },
-  { value: 'refunded', label: 'İade' },
-  { value: 'partial_refunded', label: 'Kısmi İade' },
-]
 
 const AdminOrdersPage: React.FC = () => {
   const { t, lang } = useI18n()
+  // Localized statuses
+  const STATUSES: { value: string; label: string }[] = React.useMemo(() => ([
+    { value: '', label: t('admin.orders.statusLabels.all') },
+    { value: 'paid', label: t('admin.orders.statusLabels.paid') },
+    { value: 'confirmed', label: t('admin.orders.statusLabels.confirmed') },
+    { value: 'shipped', label: t('admin.orders.statusLabels.shipped') },
+    { value: 'cancelled', label: t('admin.orders.statusLabels.cancelled') },
+    { value: 'refunded', label: t('admin.orders.statusLabels.refunded') },
+    { value: 'partial_refunded', label: t('admin.orders.statusLabels.partialRefunded') },
+  ]), [t])
   const [rows, setRows] = React.useState<AdminOrderRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -122,12 +123,12 @@ const AdminOrdersPage: React.FC = () => {
       setRows(list)
       setTotal(Number(data?.total || 0))
     } catch (e) {
-      const msg = (e as Error).message || 'Yüklenemedi'
+      const msg = (e as Error).message || t('admin.orders.toasts.loadError')
       setError(msg)
     } finally {
       setLoading(false)
     }
-  }, [status, fromDate, toDate, debouncedQuery, page, presetPendingShipments])
+  }, [status, fromDate, toDate, debouncedQuery, page, presetPendingShipments, t])
 
   React.useEffect(() => { fetchOrders() }, [fetchOrders])
 
@@ -177,7 +178,7 @@ const AdminOrdersPage: React.FC = () => {
       setEmailLogs(Array.isArray(data) ? (data as { subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }[]) : [])
     } catch (e) {
       console.error('load logs error', e)
-      toast.error('E‑posta kayıtları alınamadı')
+      toast.error(t('admin.orders.toasts.emailLogsFailed'))
       setEmailLogs([])
     } finally {
       setLogsLoading(false)
@@ -200,7 +201,7 @@ const AdminOrdersPage: React.FC = () => {
       setNotes(Array.isArray(data) ? (data as { id: string; note: string; created_at: string; user_id: string | null }[]) : [])
     } catch (e) {
       console.error('load notes error', e)
-      toast.error('Notlar alınamadı')
+      toast.error(t('admin.orders.toasts.notesFailed'))
       setNotes([])
     } finally {
       setNotesLoading(false)
@@ -222,7 +223,7 @@ const AdminOrdersPage: React.FC = () => {
       setNoteInput('')
     } catch (e) {
       console.error('add note error', e)
-      toast.error('Not eklenemedi')
+      toast.error(t('admin.orders.toasts.noteAddFailed'))
     } finally {
       setNotesLoading(false)
     }
@@ -238,10 +239,10 @@ const AdminOrdersPage: React.FC = () => {
         .eq('id', noteId)
       if (error) throw error
       setNotes(prev => prev.filter(n => n.id !== noteId))
-      toast.success('Not silindi')
+      toast.success(t('admin.orders.toasts.noteDeleteSuccess'))
     } catch (e) {
       console.error('delete note error', e)
-      toast.error('Not silinemedi')
+      toast.error(t('admin.orders.toasts.noteDeleteFailed'))
     } finally {
       setNotesLoading(false)
     }
@@ -249,7 +250,7 @@ const AdminOrdersPage: React.FC = () => {
 
   async function cancelShipping(id: string) {
     if (!id) return
-    const ok = window.confirm('Kargo iptal edilsin mi? Bu işlem durumu "Onaylı" yapar ve takip bilgilerini siler.')
+    const ok = window.confirm(t('admin.orders.toasts.shippingCancelConfirm'))
     if (!ok) return
     try {
       setSaving(true)
@@ -258,10 +259,10 @@ const AdminOrdersPage: React.FC = () => {
       })
       if (fnErr) throw fnErr
       setRows(prev => prev.map(r => r.id === id ? { ...r, status: 'confirmed' } : r))
-      toast.success('Kargo iptal edildi')
+      toast.success(t('admin.orders.toasts.shippingCancelSuccess'))
     } catch (e) {
       console.error('cancel ship error', e)
-      toast.error('Kargo iptali yapılamadı')
+      toast.error(t('admin.orders.toasts.shippingCancelFailed'))
     } finally {
       setSaving(false)
     }
@@ -273,7 +274,7 @@ const AdminOrdersPage: React.FC = () => {
       if (!shipId) return
       const isShipped = rows.find(r => r.id === shipId)?.status === 'shipped'
       if (!isShipped && (!carrier.trim() || !tracking.trim())) {
-        alert('Kargo firması ve takip numarası gerekli')
+        alert(t('admin.orders.toasts.missingFields'))
         return
       }
       setSaving(true)
@@ -302,10 +303,10 @@ const AdminOrdersPage: React.FC = () => {
         })
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         setShipOpen(false)
-        toast.success(isShipped ? 'Kargo bilgileri kaydedildi' : 'Sipariş kargoya verildi')
+        toast.success(isShipped ? t('admin.orders.toasts.shippingUpdateSuccess') : t('admin.orders.toasts.shippingCreateSuccess'))
       } catch (e) {
         console.error('ship error', e)
-        toast.error('Kargo güncellenemedi')
+        toast.error(t('admin.orders.toasts.shippingUpdateFailed'))
       } finally {
         setSaving(false)
       }
@@ -343,7 +344,7 @@ const AdminOrdersPage: React.FC = () => {
         })))
         setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
         setShipOpen(false)
-        toast.success(`${targets.length} sipariş kargolandı`)
+        toast.success(t('admin.orders.toasts.bulkShippingSuccess', { count: String(targets.length) }))
         setSelectedIds([])
         setBulkMode(false)
       } else {
@@ -354,7 +355,7 @@ const AdminOrdersPage: React.FC = () => {
           return !row || !row.carrier.trim() || !row.tracking.trim()
         })
         if (invalid.length > 0) {
-          alert(`Eksik alanlar var: ${invalid.length} satır`)
+          alert(t('admin.orders.toasts.missingAdvancedFields', { count: String(invalid.length) }))
           setSaving(false)
           return
         }
@@ -383,13 +384,13 @@ const AdminOrdersPage: React.FC = () => {
         })))
         setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: 'shipped' } : r))
         setShipOpen(false)
-        toast.success(`${targets.length} sipariş kargolandı`)
+        toast.success(t('admin.orders.toasts.bulkShippingSuccess', { count: String(targets.length) }))
         setSelectedIds([])
         setBulkMode(false)
       }
     } catch (e) {
       console.error('bulk ship error', e)
-      toast.error('Toplu kargo güncellenemedi')
+      toast.error(t('admin.orders.toasts.bulkShippingFailed'))
     } finally {
       setSaving(false)
     }
@@ -458,10 +459,10 @@ const AdminOrdersPage: React.FC = () => {
   async function bulkCancelShipping() {
     const targets = rows.filter(r => selectedIds.includes(r.id) && r.status === 'shipped').map(r => r.id)
     if (targets.length === 0) {
-      toast('Kargosu iptal edilebilir seçim yok', { icon: 'ℹ️' })
+      toast(t('admin.orders.bulk.noShippableSelected'), { icon: 'ℹ️' })
       return
     }
-    const ok = window.confirm(`${targets.length} siparişin kargosunu iptal etmek istediğinize emin misiniz?`)
+    const ok = window.confirm(t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }))
     if (!ok) return
     setSaving(true)
     try {
@@ -474,12 +475,12 @@ const AdminOrdersPage: React.FC = () => {
       }))
       const failed = results.filter(r => !r.ok).map(r => r.id)
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: failed.includes(r.id) ? r.status : 'confirmed' } : r))
-      if (failed.length === 0) toast.success(`${targets.length} sipariş iptal edildi`)
-      else toast.error(`Bazı iptaller başarısız: ${failed.join(',')}`)
+      if (failed.length === 0) toast.success(t('admin.orders.bulk.cancelSuccess', { count: String(targets.length) }))
+      else toast.error(t('admin.orders.bulk.cancelPartialFail', { failed: failed.join(',') }))
       setSelectedIds([])
     } catch (e) {
       console.error('bulk cancel error', e)
-      toast.error('Toplu iptal başarısız')
+      toast.error(t('admin.orders.bulk.cancelFailed'))
     } finally {
       setSaving(false)
     }
@@ -487,7 +488,13 @@ const AdminOrdersPage: React.FC = () => {
 
   // Export helpers
   function exportOrdersCsv() {
-    const header = ['Sipariş ID','Durum','Konuşma ID','Tutar','Oluşturulma']
+    const header = [
+      t('admin.orders.export.headers.orderId'),
+      t('admin.orders.export.headers.status'),
+      t('admin.orders.export.headers.conversationId'),
+      t('admin.orders.export.headers.amount'),
+      t('admin.orders.export.headers.created')
+    ]
     const lines = filtered.map(r => {
       const cols = [
         r.id,
@@ -520,7 +527,7 @@ const AdminOrdersPage: React.FC = () => {
         `<td>${safeDate(r.created_at, lang)}</td>`+
       `</tr>`
     )).join('')
-    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Sipariş ID</th><th>Durum</th><th>Konuşma ID</th><th>Tutar</th><th>Oluşturulma</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${t('admin.orders.export.headers.orderId')}</th><th>${t('admin.orders.export.headers.status')}</th><th>${t('admin.orders.export.headers.conversationId')}</th><th>${t('admin.orders.export.headers.amount')}</th><th>${t('admin.orders.export.headers.created')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -556,33 +563,33 @@ const AdminOrdersPage: React.FC = () => {
       {/* Filters - AdminToolbar */}
       <AdminToolbar
         storageKey="toolbar:orders"
-        search={{ value: query, onChange: setQuery, placeholder: 'Order ID veya Conversation ID', focusShortcut: '/' }}
+        search={{ value: query, onChange: setQuery, placeholder: t('admin.search.orders'), focusShortcut: '/' }}
         select={{
           value: status,
           onChange: setStatus,
-          title: 'Durum',
+          title: t('admin.orders.filters.status'),
           options: STATUSES.map(s => ({ value: s.value, label: s.label }))
         }}
-        toggles={[{ key: 'pendingShipments', label: 'Kargolanmamışlar', checked: presetPendingShipments, onChange: (v: boolean)=>{ setPresetPendingShipments(v); if (v) setStatus('') } }]}
+        toggles={[{ key: 'pendingShipments', label: t('admin.orders.filters.pendingShipments'), checked: presetPendingShipments, onChange: (v: boolean)=>{ setPresetPendingShipments(v); if (v) setStatus('') } }]}
         onClear={()=>{ setPresetPendingShipments(false); setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
-            <ExportMenu items={[{ key: 'csv', label: 'CSV (Excel uyumlu UTF‑8 BOM)', onSelect: exportOrdersCsv }, { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportOrdersXls }]} />
+            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate')} />
+            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate')} />
+            <ExportMenu items={[{ key: 'csv', label: t('admin.orders.export.csvLabel'), onSelect: exportOrdersCsv }, { key: 'xls', label: t('admin.orders.export.xlsLabel'), onSelect: exportOrdersXls }]} />
             <ColumnsMenu
               columns={[
-                { key: 'id', label: 'Sipariş ID', checked: visibleCols.id, onChange: (v)=>setVisibleCols(s=>({ ...s, id: v })) },
-                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'conversation', label: 'Konuşma ID', checked: visibleCols.conversation, onChange: (v)=>setVisibleCols(s=>({ ...s, conversation: v })) },
-                { key: 'amount', label: 'Tutar', checked: visibleCols.amount, onChange: (v)=>setVisibleCols(s=>({ ...s, amount: v })) },
-                { key: 'created', label: 'Oluşturulma', checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
+                { key: 'id', label: t('admin.orders.columns.orderId'), checked: visibleCols.id, onChange: (v)=>setVisibleCols(s=>({ ...s, id: v })) },
+                { key: 'status', label: t('admin.orders.columns.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'conversation', label: t('admin.orders.columns.conversationId'), checked: visibleCols.conversation, onChange: (v)=>setVisibleCols(s=>({ ...s, conversation: v })) },
+                { key: 'amount', label: t('admin.orders.columns.amount'), checked: visibleCols.amount, onChange: (v)=>setVisibleCols(s=>({ ...s, amount: v })) },
+                { key: 'created', label: t('admin.orders.columns.created'), checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
             />
-            <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
+            <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
           </div>
         )}
       />
@@ -593,34 +600,34 @@ const AdminOrdersPage: React.FC = () => {
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={page <= 1}
           className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
-        >Önceki</button>
-        <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
+>{t('admin.ui.prev')}</button>
+        <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
         <button
           onClick={() => setPage(p => p + 1)}
           disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))}
           className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
-        >Sonraki</button>
+>{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk actions */}
       {selectedIds.length > 0 && (
         <div className={adminCardPaddedClass + ' flex items-center justify-between'}>
-          <div className="text-sm text-industrial-gray">Seçili: {selectedIds.length}</div>
+          <div className="text-sm text-industrial-gray">{t('admin.orders.bulk.selected', { count: String(selectedIds.length) })}</div>
           <div className="flex items-center gap-2">
             <button
               onClick={()=>{ setBulkMode(true); setShipOpen(true) }}
               className={adminButtonPrimaryClass}
             >
-              Seçilenleri Kargoya Ver
+              {t('admin.orders.bulk.shipSelected')}
             </button>
             <button
               onClick={bulkCancelShipping}
               className="px-3 md:h-12 h-11 rounded-md border border-red-200 bg-red-50 hover:border-red-400 text-sm whitespace-nowrap text-red-700"
-              title="Seçilenlerde kargoyu iptal et (yalnızca kargolanmış siparişler)"
+              title={t('admin.orders.tooltips.cancelBulkShipping')}
             >
-              Seçilenlerin Kargosunu İptal Et
+              {t('admin.orders.bulk.cancelShipping')}
             </button>
-            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">Temizle</button>
+            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.bulk.clearSelection')}</button>
           </div>
         </div>
       )}
@@ -634,19 +641,19 @@ const AdminOrdersPage: React.FC = () => {
           <thead>
             <tr>
               <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
-              {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>Sipariş ID {sortIndicator('id')}</button></th>)}
-              {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>)}
-              {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>Konuşma ID {sortIndicator('conversation')}</button></th>)}
-              {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>Tutar {sortIndicator('amount')}</button></th>)}
-              {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>Oluşturma Tarihi {sortIndicator('created')}</button></th>)}
-              <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>
+              {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
+              {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
+              {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
+              {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
+              {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
+              <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
             {loading && rows.length === 0 ? (
-              <tr><td className="px-4 py-6" colSpan={colCount}>Yükleniyor...</td></tr>
+              <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.loading')}</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td className="px-4 py-6" colSpan={colCount}>Kayıt bulunamadı</td></tr>
+              <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.noRecords')}</td></tr>
             ) : (
               sorted.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
@@ -654,7 +661,7 @@ const AdminOrdersPage: React.FC = () => {
                     setSelectedIds(prev => e.target.checked ? [...new Set([...prev, r.id])] : prev.filter(x=>x!==r.id))
                   }} /></td>
                   {visibleCols.id && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} font-mono text-xs`}>{r.id}</td>)}
-                  {visibleCols.status && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status)}</span></td>)}
+                  {visibleCols.status && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
                   {visibleCols.conversation && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} text-xs text-industrial-gray`}>{r.conversation_id || '-'}</td>)}
                   {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount, lang)}</td>)}
                   {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at, lang)}</td>)}
@@ -663,31 +670,31 @@ const AdminOrdersPage: React.FC = () => {
                       <button
                         onClick={() => openShipModal(r.id)}
                         className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"
-                        title="Kargo bilgisi ekle / düzenle"
+                        title={t('admin.orders.tooltips.shipping')}
                       >
-                        Kargo
+                        {t('admin.orders.actions.shipping')}
                       </button>
                       <button
                         onClick={() => openLogsModal(r.id)}
                         className="text-xs px-2 py-1 rounded bg-amber-500 text-white hover:bg-amber-600"
-                        title="E‑posta loglarını görüntüle"
+                        title={t('admin.orders.tooltips.logs')}
                       >
-                        Loglar
+                        {t('admin.orders.actions.logs')}
                       </button>
                       <button
                         onClick={() => openNotesModal(r.id)}
                         className="text-xs px-2 py-1 rounded bg-gray-700 text-white hover:bg-gray-800"
-                        title="Sipariş notlarını görüntüle/ekle"
+                        title={t('admin.orders.tooltips.notes')}
                       >
-                        Notlar
+                        {t('admin.orders.actions.notes')}
                       </button>
                       {r.status === 'shipped' && (
                         <button
                           onClick={() => cancelShipping(r.id)}
                           className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
-                          title="Kargoyu iptal et"
+                          title={t('admin.orders.tooltips.cancelShipping')}
                         >
-                          İptal
+                          {t('admin.orders.actions.cancel')}
                         </button>
                       )}
                     </div>
@@ -702,48 +709,48 @@ const AdminOrdersPage: React.FC = () => {
       {shipOpen && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className={adminCardPaddedClass + ' w-full max-w-lg'}>
-            <h3 className="text-lg font-semibold text-industrial-gray mb-2">{bulkMode ? 'Toplu: Kargoya Ver' : 'Kargoya Ver / Takip No'}</h3>
+            <h3 className="text-lg font-semibold text-industrial-gray mb-2">{bulkMode ? t('admin.orders.modals.shipping.bulkTitle') : t('admin.orders.modals.shipping.title')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-industrial-gray mb-1">Kargo Firması</label>
+                <label className="block text-xs text-industrial-gray mb-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                 <select value={carrier} onChange={e=>setCarrier(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2">
-                  <option value="">Seçiniz…</option>
-                  <option value="Yurtiçi">Yurtiçi</option>
-                  <option value="Aras">Aras</option>
-                  <option value="MNG">MNG</option>
-                  <option value="PTT">PTT</option>
-                  <option value="UPS">UPS</option>
-                  <option value="FedEx">FedEx</option>
-                  <option value="DHL">DHL</option>
-                  <option value="Diğer">Diğer</option>
+                  <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
+                  <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+                  <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+                  <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+                  <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+                  <option value="UPS">{t('admin.orders.modals.shipping.carriers.ups')}</option>
+                  <option value="FedEx">{t('admin.orders.modals.shipping.carriers.fedex')}</option>
+                  <option value="DHL">{t('admin.orders.modals.shipping.carriers.dhl')}</option>
+                  <option value="Diğer">{t('admin.orders.modals.shipping.carriers.other')}</option>
                 </select>
                 {carrier === 'Diğer' && (
-                  <input onChange={e=>setCarrier(e.target.value)} placeholder="Diğer (elle yazın)" className="w-full border border-gray-200 rounded px-3 py-2 mt-2" />
+                  <input onChange={e=>setCarrier(e.target.value)} placeholder={t('admin.orders.modals.shipping.otherPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2 mt-2" />
                 )}
               </div>
               <div>
-                <label className="block text-xs text-industrial-gray mb-1">Takip Numarası</label>
-                <input value={tracking} onChange={e=>setTracking(e.target.value)} placeholder="Takip numarası" className="w-full border border-gray-200 rounded px-3 py-2" />
+                <label className="block text-xs text-industrial-gray mb-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
+                <input value={tracking} onChange={e=>setTracking(e.target.value)} placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2" />
               </div>
             </div>
             <label className="mt-3 inline-flex items-center gap-2 text-sm text-steel-gray">
               <input type="checkbox" checked={sendEmail} onChange={e=>setSendEmail(e.target.checked)} />
-              Müşteriye e-posta bildirimi gönder
+              {t('admin.orders.modals.shipping.sendEmailLabel')}
             </label>
             {bulkMode && (
               <div className="mt-3">
                 <label className="inline-flex items-center gap-2 text-sm text-steel-gray">
                   <input type="checkbox" checked={advBulk} onChange={e=>setAdvBulk(e.target.checked)} />
-                  Gelişmiş: sipariş bazlı carrier/tracking gir
+                  {t('admin.orders.modals.shipping.advancedLabel')}
                 </label>
                 {advBulk && (
                   <div className="mt-3 border border-gray-100 rounded overflow-auto max-h-[40vh]">
                     <table className="min-w-full text-xs">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-2 py-2 text-left">Sipariş ID</th>
-                          <th className="px-2 py-2 text-left">Kargo</th>
-                          <th className="px-2 py-2 text-left">Takip</th>
+                          <th className="px-2 py-2 text-left">{t('admin.orders.modals.shipping.advancedTable.orderId')}</th>
+                          <th className="px-2 py-2 text-left">{t('admin.orders.modals.shipping.advancedTable.carrier')}</th>
+                          <th className="px-2 py-2 text-left">{t('admin.orders.modals.shipping.advancedTable.tracking')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -761,8 +768,8 @@ const AdminOrdersPage: React.FC = () => {
               </div>
             )}
             <div className="mt-4 flex items-center justify-end gap-2">
-              <button onClick={closeShipModal} className="px-3 py-2 rounded border border-gray-200">İptal</button>
-              <button onClick={submitShip} disabled={saving || (!bulkMode && (!carrier.trim() || !tracking.trim()))} className={adminButtonPrimaryClass}>{saving ? 'Kaydediliyor...' : 'Kaydet'}</button>
+              <button onClick={closeShipModal} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.modals.shipping.cancel')}</button>
+              <button onClick={submitShip} disabled={saving || (!bulkMode && (!carrier.trim() || !tracking.trim()))} className={adminButtonPrimaryClass}>{saving ? t('admin.orders.modals.shipping.saving') : t('admin.orders.modals.shipping.save')}</button>
             </div>
           </div>
         </div>
@@ -771,23 +778,23 @@ const AdminOrdersPage: React.FC = () => {
       {logsOpen && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className={adminCardPaddedClass + ' w-full max-w-2xl'}>
-            <h3 className="text-lg font-semibold text-industrial-gray mb-2">E‑posta Kayıtları</h3>
-            <div className="text-xs text-industrial-gray mb-3">Sipariş: <span className="font-mono">{logsOrderId}</span></div>
+            <h3 className="text-lg font-semibold text-industrial-gray mb-2">{t('admin.orders.modals.logs.title')}</h3>
+            <div className="text-xs text-industrial-gray mb-3">{t('admin.orders.modals.logs.orderLabel')} <span className="font-mono">{logsOrderId}</span></div>
             <div className="max-h-[60vh] overflow-auto border border-gray-100 rounded">
               {logsLoading ? (
-                <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+                <div className="p-4 text-sm text-steel-gray">{t('admin.ui.loadingShort')}</div>
               ) : (emailLogs.length === 0 ? (
-                <div className="p-4 text-sm text-steel-gray">Kayıt yok</div>
+                <div className="p-4 text-sm text-steel-gray">{t('admin.orders.modals.logs.noRecords')}</div>
               ) : (
                 <table className="min-w-full text-sm">
                   <thead>
                     <tr>
-                      <th className={`${adminTableHeadCellClass}`}>Tarih</th>
-                      <th className={`${adminTableHeadCellClass}`}>Kime</th>
-                      <th className={`${adminTableHeadCellClass}`}>Konu</th>
-                      <th className={`${adminTableHeadCellClass}`}>Kargo</th>
-                      <th className={`${adminTableHeadCellClass}`}>Takip No</th>
-                      <th className={`${adminTableHeadCellClass}`}>Mesaj ID</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.date')}</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.to')}</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.subject')}</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.carrier')}</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.tracking')}</th>
+                      <th className={`${adminTableHeadCellClass}`}>{t('admin.orders.modals.logs.table.messageId')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -806,7 +813,7 @@ const AdminOrdersPage: React.FC = () => {
               ))}
             </div>
             <div className="mt-4 flex items-center justify-end gap-2">
-              <button onClick={closeLogsModal} className="px-3 py-2 rounded border border-gray-200">Kapat</button>
+              <button onClick={closeLogsModal} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.modals.logs.close')}</button>
             </div>
           </div>
         </div>
@@ -815,23 +822,23 @@ const AdminOrdersPage: React.FC = () => {
       {notesOpen && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className={adminCardPaddedClass + ' w-full max-w-xl'}>
-            <h3 className="text-lg font-semibold text-industrial-gray mb-2">Sipariş Notları</h3>
+            <h3 className="text-lg font-semibold text-industrial-gray mb-2">{t('admin.orders.modals.notes.title')}</h3>
             <div className="flex items-center gap-2 mb-3">
-              <input value={noteInput} onChange={e=>setNoteInput(e.target.value)} placeholder="Yeni not yazın" className="flex-1 border border-gray-200 rounded px-3 py-2" />
-              <button onClick={addNote} disabled={notesLoading || !noteInput.trim()} className={adminButtonPrimaryClass}>{notesLoading ? 'Kaydediliyor…' : 'Ekle'}</button>
+              <input value={noteInput} onChange={e=>setNoteInput(e.target.value)} placeholder={t('admin.orders.modals.notes.inputPlaceholder')} className="flex-1 border border-gray-200 rounded px-3 py-2" />
+              <button onClick={addNote} disabled={notesLoading || !noteInput.trim()} className={adminButtonPrimaryClass}>{notesLoading ? t('admin.orders.modals.notes.adding') : t('admin.orders.modals.notes.add')}</button>
             </div>
             <div className="max-h-[50vh] overflow-auto border border-gray-100 rounded">
               {notesLoading ? (
-                <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+                <div className="p-4 text-sm text-steel-gray">{t('admin.ui.loadingShort')}</div>
               ) : (notes.length === 0 ? (
-                <div className="p-4 text-sm text-steel-gray">Kayıt yok</div>
+                <div className="p-4 text-sm text-steel-gray">{t('admin.orders.modals.notes.noRecords')}</div>
               ) : (
                 <ul className="divide-y">
                   {notes.map((n) => (
                     <li key={n.id} className="px-3 py-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="text-sm text-industrial-gray">{n.note}</div>
-                        <button onClick={() => deleteNote(n.id)} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">Sil</button>
+                        <button onClick={() => deleteNote(n.id)} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700">{t('admin.orders.modals.notes.delete')}</button>
                       </div>
                       <div className="text-xs text-steel-gray">{safeDate(n.created_at)}</div>
                     </li>
@@ -840,7 +847,7 @@ const AdminOrdersPage: React.FC = () => {
               ))}
             </div>
             <div className="mt-4 flex items-center justify-end gap-2">
-              <button onClick={closeNotesModal} className="px-3 py-2 rounded border border-gray-200">Kapat</button>
+              <button onClick={closeNotesModal} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.modals.notes.close')}</button>
             </div>
           </div>
         </div>
@@ -858,14 +865,14 @@ function safeDate(iso: string, lang: 'tr' | 'en' = 'tr') {
   try { return formatDateTime(iso, lang) } catch { return iso }
 }
 
-function prettyStatus(s: string) {
+function prettyStatus(s: string, t: (key: string, params?: Record<string, string>) => string) {
   switch (s) {
-    case 'paid': return 'Ödendi'
-    case 'confirmed': return 'Onaylı'
-    case 'shipped': return 'Kargolandı'
-    case 'cancelled': return 'İptal'
-    case 'refunded': return 'İade'
-    case 'partial_refunded': return 'Kısmi İade'
+    case 'paid': return t('admin.orders.statusLabels.paid')
+    case 'confirmed': return t('admin.orders.statusLabels.confirmed')
+    case 'shipped': return t('admin.orders.statusLabels.shipped')
+    case 'cancelled': return t('admin.orders.statusLabels.cancelled')
+    case 'refunded': return t('admin.orders.statusLabels.refunded')
+    case 'partial_refunded': return t('admin.orders.statusLabels.partialRefunded')
     default: return s
   }
 }

@@ -375,6 +375,149 @@ export const tr = {
       coupons: 'Kod veya tip ile ara',
       movements: 'Ürün adı/SKU ara',
       orders: 'Sipariş ID veya Conversation ID'
+    },
+    orders: {
+      statusLabels: {
+        all: 'Tümü',
+        paid: 'Ödendi',
+        confirmed: 'Onaylı',
+        shipped: 'Kargolandı',
+        cancelled: 'İptal',
+        refunded: 'İade',
+        partialRefunded: 'Kısmi İade'
+      },
+      table: {
+        orderId: 'Sipariş ID',
+        status: 'Durum',
+        conversationId: 'Konuşma ID',
+        amount: 'Tutar',
+        created: 'Oluşturma Tarihi',
+        actions: 'İşlemler'
+      },
+      filters: {
+        status: 'Durum',
+        pendingShipments: 'Kargolanmamışlar',
+        startDate: 'Başlangıç',
+        endDate: 'Bitiş'
+      },
+      bulk: {
+        selected: 'Seçili: {{count}}',
+        shipSelected: 'Seçilenleri Kargoya Ver',
+        cancelShipping: 'Seçilenlerin Kargosunu İptal Et',
+        clearSelection: 'Temizle',
+        noShippableSelected: 'Kargosu iptal edilebilir seçim yok',
+        confirmCancelShipping: '{{count}} siparişin kargosunu iptal etmek istediğinize emin misiniz?',
+        cancelSuccess: '{{count}} sipariş iptal edildi',
+        cancelPartialFail: 'Bazı iptaller başarısız: {{failed}}',
+        cancelFailed: 'Toplu iptal başarısız'
+      },
+      export: {
+        csvLabel: 'CSV (Excel uyumlu UTF‑8 BOM)',
+        xlsLabel: 'Excel (.xls — HTML tablo)',
+        headers: {
+          orderId: 'Sipariş ID',
+          status: 'Durum',
+          conversationId: 'Konuşma ID',
+          amount: 'Tutar',
+          created: 'Oluşturulma'
+        }
+      },
+      columns: {
+        orderId: 'Sipariş ID',
+        status: 'Durum',
+        conversationId: 'Konuşma ID',
+        amount: 'Tutar',
+        created: 'Oluşturma'
+      },
+      actions: {
+        shipping: 'Kargo',
+        logs: 'Loglar',
+        notes: 'Notlar',
+        cancel: 'İptal'
+      },
+      tooltips: {
+        shipping: 'Kargo bilgisi ekle / düzenle',
+        logs: 'E‑posta loglarını görüntüle',
+        notes: 'Sipariş notlarını görüntüle/ekle',
+        cancelShipping: 'Kargoyu iptal et',
+        cancelBulkShipping: 'Seçilenlerde kargoyu iptal et (yalnızca kargolanmış siparişler)'
+      },
+      modals: {
+        shipping: {
+          title: 'Kargoya Ver / Takip No',
+          bulkTitle: 'Toplu: Kargoya Ver',
+          carrierLabel: 'Kargo Firması',
+          carrierSelect: 'Seçiniz…',
+          trackingLabel: 'Takip Numarası',
+          trackingPlaceholder: 'Takip numarası',
+          sendEmailLabel: 'Müşteriye e-posta bildirimi gönder',
+          advancedLabel: 'Gelişmiş: sipariş bazlı carrier/tracking gir',
+          advancedTable: {
+            orderId: 'Sipariş ID',
+            carrier: 'Kargo',
+            tracking: 'Takip'
+          },
+          carriers: {
+            yurtici: 'Yurtiçi',
+            aras: 'Aras',
+            mng: 'MNG',
+            ptt: 'PTT',
+            ups: 'UPS',
+            fedex: 'FedEx',
+            dhl: 'DHL',
+            other: 'Diğer'
+          },
+          otherPlaceholder: 'Diğer (elle yazın)',
+          cancel: 'İptal',
+          save: 'Kaydet',
+          saving: 'Kaydediliyor...'
+        },
+        logs: {
+          title: 'E‑posta Kayıtları',
+          orderLabel: 'Sipariş:',
+          table: {
+            date: 'Tarih',
+            to: 'Kime',
+            subject: 'Konu',
+            carrier: 'Kargo',
+            tracking: 'Takip No',
+            messageId: 'Mesaj ID'
+          },
+          noRecords: 'Kayıt yok',
+          close: 'Kapat'
+        },
+        notes: {
+          title: 'Sipariş Notları',
+          inputPlaceholder: 'Yeni not yazın',
+          add: 'Ekle',
+          adding: 'Kaydediliyor…',
+          delete: 'Sil',
+          noRecords: 'Kayıt yok',
+          close: 'Kapat'
+        }
+      },
+      toasts: {
+        loadError: 'Yüklenemedi',
+        emailLogsFailed: 'E‑posta kayıtları alınamadı',
+        notesFailed: 'Notlar alınamadı',
+        noteAddFailed: 'Not eklenemedi',
+        noteDeleteSuccess: 'Not silindi',
+        noteDeleteFailed: 'Not silinemedi',
+        shippingCancelConfirm: 'Kargo iptal edilsin mi? Bu işlem durumu "Onaylı" yapar ve takip bilgilerini siler.',
+        shippingCancelSuccess: 'Kargo iptal edildi',
+        shippingCancelFailed: 'Kargo iptali yapılamadı',
+        shippingUpdateSuccess: 'Kargo bilgileri kaydedildi',
+        shippingCreateSuccess: 'Sipariş kargoya verildi',
+        shippingUpdateFailed: 'Kargo güncellenemedi',
+        bulkShippingSuccess: '{{count}} sipariş kargolandı',
+        bulkShippingFailed: 'Toplu kargo güncellenemedi',
+        missingFields: 'Kargo firması ve takip numarası gerekli',
+        missingAdvancedFields: 'Eksik alanlar var: {{count}} satır'
+      },
+      states: {
+        loading: 'Yükleniyor...',
+        noRecords: 'Kayıt bulunamadı'
+      }
     }
   },
   footer: {
