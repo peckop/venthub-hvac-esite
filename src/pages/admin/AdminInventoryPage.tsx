@@ -600,29 +600,46 @@ const AdminInventoryPage: React.FC = () => {
     }
   }
   
-  const exportCsv = () => {
+  const exportCsv = async () => {
+    // Görünür satırlardaki ürün ID'lerinden SKU haritasını oluştur
+    const ids = Array.from(new Set(sortedRows.map(r => r.product_id)))
+    let idToSku = new Map<string, string>()
+    try {
+      if (ids.length > 0) {
+        const { data, error } = await supabase
+          .from('products')
+          .select('id, sku')
+          .in('id', ids)
+        if (!error && data) {
+          idToSku = new Map((data as Array<{ id: string; sku: string }>).map(p => [p.id, p.sku]))
+        }
+      }
+    } catch {
+      // no-op, fallback to product_id if SKU alınamazsa
+    }
+
     // Sadece görünür satırlar için CSV oluştur
     const exportRows = sortedRows.map(r => ({
-      sku: r.product_id, // Normalde SKU olmalı ama basit örnek için
+      sku: idToSku.get(r.product_id) || r.product_id,
       name: r.name,
       physical_stock: r.physical_stock,
       reserved_stock: r.reserved_stock,
       available_stock: r.available_stock
     }))
-    
+
     // CSV içeriği oluştur
     const header = ['SKU', 'Ürün Adı', 'Fiziksel Stok', 'Rezerve Stok', 'Satılabilir Stok']
     const csvContent = [
       header.join(','),
       ...exportRows.map(row => [
         `"${row.sku}"`,
-        `"${row.name}"`, 
-        row.physical_stock, 
-        row.reserved_stock, 
+        `"${row.name}"`,
+        row.physical_stock,
+        row.reserved_stock,
         row.available_stock
       ].join(','))
     ].join('\n')
-    
+
     // Dosyayı indir
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -726,7 +743,7 @@ const AdminInventoryPage: React.FC = () => {
               CSV İçe Aktar
             </button>
             <ExportMenu items={[
-              { key: 'csv', label: 'CSV İndir', onSelect: exportCsv }
+              { key: 'csv', label: 'CSV İndir', onSelect: () => { void exportCsv() } }
             ]} />
             <ColumnsMenu
               columns={[
