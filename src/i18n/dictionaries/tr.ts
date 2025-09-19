@@ -348,6 +348,95 @@ export const tr = {
       categories: 'Kategoriler',
       coupons: 'Kuponlar'
     },
+    products: {
+      toolbar: {
+        categoryTitle: 'Kategori',
+        allCategories: 'Tüm Kategoriler'
+      },
+      toggles: { featuredOnly: 'Sadece: Öne Çıkan' },
+      statusLabels: { active: 'Aktif', inactive: 'Pasif', out_of_stock: 'Stokta Yok' },
+      table: { image: 'Görsel', name: 'Ad', sku: 'SKU', category: 'Kategori', status: 'Durum', price: 'Fiyat', stock: 'Stok', actions: 'İşlem' },
+      export: { csvLabel: 'CSV (UTF-8 BOM)' },
+      import: {
+        button: 'İçe Aktar (beta)',
+        previewTitle: 'CSV Önizleme (ilk 10 satır) — Toplam: {{total}}',
+        close: 'Kapat',
+        dryRun: 'Dry-run',
+        dryRunResult: 'Dry-run: zorunlu alanlar {{status}}. Uygun satır sayısı: {{ok}}/{{total}}',
+        statusComplete: 'tam',
+        statusMissing: 'eksik',
+        writeButton: 'Yaz (upsert by SKU)',
+        needCsv: 'Önce CSV seçin',
+        minColumns: 'En az sku ve name kolonları gerekli',
+        noneFound: 'Uygun satır bulunamadı',
+        done: 'İçe aktarım tamam: {{ok}} satır işlendi, {{fail}} satır hata',
+        error: 'İçe aktarım hatası: {{msg}}'
+      },
+      edit: {
+        editing: 'Düzenleniyor',
+        new: 'Yeni Ürün',
+        tabs: { info: 'Bilgi', pricing: 'Fiyat', stock: 'Stok', images: 'Görseller', seo: 'SEO' },
+        actions: { new: 'Yeni', save: 'Kaydet', delete: 'Sil' },
+        info: {
+          name: 'Ad',
+          sku: 'SKU',
+          modelCode: 'Model Kodu (MPN)',
+          modelPlaceholder: 'örn. AD-H-900-T',
+          brand: 'Marka',
+          status: 'Durum',
+          category: 'Kategori',
+          categoryUnset: '(Seçilmemiş)',
+          featured: 'Öne Çıkan'
+        },
+        pricing: {
+          salePrice: 'Satış Fiyatı',
+          purchasePrice: 'Alış Maliyeti',
+          salePlaceholder: 'örn. 1999.90',
+          purchasePlaceholder: 'örn. 1499.50'
+        },
+        stock: {
+          stock: 'Stok',
+          lowThreshold: 'Düşük Stok Eşiği',
+          stockPlaceholder: 'örn. 50',
+          lowPlaceholder: 'örn. 5',
+          hintBase: 'Boş bırakılırsa Ayarlar’daki varsayılan eşik kullanılır',
+          defaultSuffix: ' (Varsayılan: {{default}})'
+        },
+        images: {
+          saveFirst: 'Önce ürünü kaydedin.',
+          none: 'Henüz görsel yok. Dosya seçerek yükleyin.',
+          altPlaceholder: 'Alternatif metin',
+          up: 'Yukarı',
+          down: 'Aşağı',
+          makeCover: 'Kapak Yap',
+          delete: 'Sil'
+        },
+        seo: {
+          slug: 'Slug',
+          slugPlaceholder: 'ornek-urun',
+          slugRequired: 'Slug boş olamaz',
+          slugInUse: 'Bu slug zaten kullanılıyor',
+          metaTitle: 'Meta Başlık',
+          metaDesc: 'Meta Açıklama',
+          chars: '{{count}} karakter'
+        }
+      },
+      toasts: {
+        loadFailed: 'Yüklenemedi',
+        altSaveFailed: 'Alternatif metin kaydedilemedi: {{msg}}',
+        orderNotChanged: 'Sıralama değişmedi',
+        seoSaveFailed: 'SEO kaydedilemedi: {{msg}}',
+        productLoadFailed: 'Ürün yüklenemedi: {{msg}}',
+        saveFailed: 'Kaydedilemedi: {{msg}}',
+        priceSaveFailed: 'Fiyat kaydedilemedi: {{msg}}',
+        stockSaveFailed: 'Stok kaydedilemedi: {{msg}}',
+        deleteFailed: 'Silinemedi: {{msg}}'
+      },
+      confirm: {
+        deleteImage: 'Görseli silmek istiyor musunuz?',
+        deleteProduct: 'Bu ürünü silmek istiyor musunuz?'
+      }
+    },
     ui: {
       prev: 'Önceki',
       next: 'Sonraki',
@@ -361,9 +450,11 @@ export const tr = {
       save: 'Kaydet',
       add: 'Ekle',
       delete: 'Sil',
+      edit: 'Düzenle',
       details: 'Detay',
       hide: 'Gizle',
       all: 'Tümü',
+      total: 'Toplam',
       pageLabel: 'Sayfa {{page}} / {{pages}}',
       startDate: 'Başlangıç',
       endDate: 'Bitiş',
@@ -374,7 +465,8 @@ export const tr = {
       errors: 'URL veya mesaj ara',
       coupons: 'Kod veya tip ile ara',
       movements: 'Ürün adı/SKU ara',
-      orders: 'Sipariş ID veya Conversation ID'
+      orders: 'Sipariş ID veya Conversation ID',
+      products: 'Ürün adı/SKU/marka/slug ara'
     },
     movements: {
       toolbar: {
