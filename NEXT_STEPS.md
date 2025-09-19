@@ -12,6 +12,11 @@
 - CI: GitHub Actions build/test SUCCESS; lint blocking (max‑warnings=0) — ci.yml lint adımı eklendi.
 - Git remote: SSH (no token needed). Push/pull with your SSH key is ready.
 
+### 2025-09-19 — İş Paketi Kapatıldı
+- Admin Dashboard: Bekleyen Kargo — kargo dağılımı; Bekleyen İade — durum kırılımı kartları eklendi
+- Envanter: CSV export artık SKU yazar; CSV import/undo akışı uçtan uca test edildi (batch undo)
+- Güvenlik: enforce_role_change, bump_rate_limit, update_updated_at_column için search_path sabitlendi; Advisor(Security) sadece LPP WARN ile kaldı (bilinçli)
+
 ## High‑priority next tasks (1–2 days)
 
 ### Güvenlik & Performans (kritik takip)
