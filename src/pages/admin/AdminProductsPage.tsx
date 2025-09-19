@@ -488,9 +488,9 @@ const before = rows.find(r=>r.id===id) || null
       setSavingImages(true)
       await Promise.all(images.map(row => supabase.from('product_images').update({ alt: row.alt || '' }).eq('id', row.id)))
       await loadImages(selectedId)
-      alert('Görseller kaydedildi')
+      alert(t('admin.products.toasts.imagesSaved'))
     } catch (e) {
-      alert('Görseller kaydedilemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.imagesSaveFailed', { msg: ((e as Error).message || String(e)) }))
     } finally {
       setSavingImages(false)
     }

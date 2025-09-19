@@ -424,6 +424,8 @@ export const tr = {
       toasts: {
         loadFailed: 'Yüklenemedi',
         altSaveFailed: 'Alternatif metin kaydedilemedi: {{msg}}',
+        imagesSaved: 'Görseller kaydedildi',
+        imagesSaveFailed: 'Görseller kaydedilemedi: {{msg}}',
         orderNotChanged: 'Sıralama değişmedi',
         seoSaveFailed: 'SEO kaydedilemedi: {{msg}}',
         productLoadFailed: 'Ürün yüklenemedi: {{msg}}',

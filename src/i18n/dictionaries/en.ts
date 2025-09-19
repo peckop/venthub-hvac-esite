@@ -420,6 +420,8 @@ export const en = {
       toasts: {
         loadFailed: 'Could not load',
         altSaveFailed: 'Could not save alt text: {{msg}}',
+        imagesSaved: 'Images saved',
+        imagesSaveFailed: 'Could not save images: {{msg}}',
         orderNotChanged: 'Order not changed',
         seoSaveFailed: 'Could not save SEO: {{msg}}',
         productLoadFailed: 'Could not load product: {{msg}}',
