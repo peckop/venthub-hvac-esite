@@ -36,7 +36,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         setError(null)
         const rows = await ftsSearchProducts(debounced, 20)
         if (active) setResults(rows)
-      } catch (e) {
+      } catch {
         if (active) setError('Arama sırasında hata oluştu')
       } finally {
         if (active) setLoading(false)
