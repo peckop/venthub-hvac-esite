@@ -171,13 +171,13 @@ const [metaDesc, setMetaDesc] = React.useState('')
         setCovers(map)
       }
     } catch (e) {
-      setError((e as Error).message || 'Yüklenemedi')
+      setError((e as Error).message || t('admin.products.toasts.loadFailed'))
       setRows([])
       setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page])
+  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page, t])
 
   React.useEffect(()=>{ load() }, [load])
 
@@ -236,7 +236,7 @@ const [metaDesc, setMetaDesc] = React.useState('')
       setMetaDesc(p?.meta_description || '')
       await loadImages(id)
     } catch (e) {
-      alert('Ürün yüklenemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.productLoadFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -282,7 +282,7 @@ if (selectedId) {
       }
       await load()
     } catch (e) {
-      alert('Kaydedilemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.saveFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -300,7 +300,7 @@ const before = rows.find(r=>r.id===selectedId) || null
       await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'savePricing' })
       await load()
     } catch (e) {
-      alert('Fiyat kaydedilemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.priceSaveFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -320,7 +320,7 @@ const before = rows.find(r=>r.id===selectedId) || null
       await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveStock' })
       await load()
     } catch (e) {
-      alert('Stok kaydedilemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.stockSaveFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -364,7 +364,7 @@ const { error: upErr } = await supabase.storage.from('product-images').upload(pa
   }
 
   const deleteImage = async (img: ImageRow) => {
-    if (!confirm('Görseli silmek istiyor musunuz?')) return
+    if (!confirm(t('admin.products.confirm.deleteImage'))) return
     try {
 await supabase.from('product_images').delete().eq('id', img.id)
       const { logAdminAction } = await import('../../lib/audit')
@@ -373,7 +373,7 @@ await supabase.from('product_images').delete().eq('id', img.id)
       await supabase.storage.from('product-images').remove([img.path])
       if (selectedId) await loadImages(selectedId)
     } catch (e) {
-      alert('Görsel silinemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.deleteFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -392,7 +392,7 @@ await supabase.from('product_images').delete().eq('id', img.id)
       ])
       if (selectedId) await loadImages(selectedId)
     } catch (e) {
-      alert('Kapak ayarlanamadı: '+((e as Error).message||e))
+      alert(t('admin.ui.failed') + ': ' + ((e as Error).message || String(e)))
     }
   }
 
@@ -414,8 +414,8 @@ await Promise.all([
         { table_name: 'product_images', row_pk: b.id, action: 'UPDATE', before: b, after: { sort_order: a.sort_order }, comment: 'bumpImage' },
       ])
       if (selectedId) await loadImages(selectedId)
-    } catch (e) {
-      alert('Sıralama değişmedi: ' + ((e as Error).message || e))
+    } catch {
+      alert(t('admin.products.toasts.orderNotChanged'))
     }
   }
 
@@ -435,12 +435,12 @@ const before = rows.find(r=>r.id===selectedId) || null
       await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveSeo' })
       await load()
     } catch (e) {
-      alert('SEO kaydedilemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.seoSaveFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
   const remove = async (id: string) => {
-    if (!confirm('Bu ürünü silmek istiyor musunuz?')) return
+    if (!confirm(t('admin.products.confirm.deleteProduct'))) return
     try {
 const before = rows.find(r=>r.id===id) || null
       const { error } = await supabase.from('products').delete().eq('id', id)
@@ -450,7 +450,7 @@ const before = rows.find(r=>r.id===id) || null
       await load()
       if (selectedId === id) startCreate()
     } catch (e) {
-      alert('Silinemedi: ' + ((e as Error).message || e))
+      alert(t('admin.products.toasts.deleteFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
@@ -507,9 +507,9 @@ const before = rows.find(r=>r.id===id) || null
 
   const statusBadge = (s?: string | null) => {
     const v = (s||'').toLowerCase()
-    if (v==='active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">Aktif</span>
-    if (v==='inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">Pasif</span>
-    if (v==='out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">Stokta Yok</span>
+    if (v==='active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">{t('admin.products.statusLabels.active')}</span>
+    if (v==='inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{t('admin.products.statusLabels.inactive')}</span>
+    if (v==='out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">{t('admin.products.statusLabels.out_of_stock')}</span>
     return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
   }
 
@@ -523,19 +523,19 @@ const before = rows.find(r=>r.id===id) || null
       <AdminToolbar
         storageKey="toolbar:products"
         sticky
-        search={{ value: q, onChange: (v)=>{ setQ(v); setPage(1) }, placeholder: 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
+        search={{ value: q, onChange: (v)=>{ setQ(v); setPage(1) }, placeholder: t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
         select={{
           value: selectedCategoryFilter,
           onChange: setSelectedCategoryFilter,
-          title: 'Kategori',
-          options: [ { value: '', label: 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name })) ],
+          title: t('admin.products.toolbar.categoryTitle') ?? 'Kategori',
+          options: [ { value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name })) ],
         }}
         chips={[
-          { key: 'active', label: 'Aktif', active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
-          { key: 'inactive', label: 'Pasif', active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
-          { key: 'out_of_stock', label: 'Stokta Yok', active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
+          { key: 'active', label: t('admin.products.statusLabels.active'), active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
+          { key: 'inactive', label: t('admin.products.statusLabels.inactive'), active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
+          { key: 'out_of_stock', label: t('admin.products.statusLabels.out_of_stock'), active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
         ]}
-        toggles={[{ key: 'featured', label: 'Sadece: Öne Çıkan', checked: featuredOnly, onChange: setFeaturedOnly }]}
+        toggles={[{ key: 'featured', label: t('admin.products.toggles.featuredOnly'), checked: featuredOnly, onChange: setFeaturedOnly }]}
         onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false); setPage(1) }}
         recordCount={total}
         rightExtra={(
@@ -551,24 +551,24 @@ const before = rows.find(r=>r.id===id) || null
               setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
-            <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">İçe Aktar (beta)</button>
+            <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
             <ColumnsMenu
               columns={[
-{ key: 'image', label: 'Görsel', checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
-                { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
-                { key: 'sku', label: 'SKU', checked: visibleCols.sku, onChange: (v)=>setVisibleCols(s=>({ ...s, sku: v })) },
-                { key: 'category', label: 'Kategori', checked: visibleCols.category, onChange: (v)=>setVisibleCols(s=>({ ...s, category: v })) },
-                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'price', label: 'Fiyat', checked: visibleCols.price, onChange: (v)=>setVisibleCols(s=>({ ...s, price: v })) },
-                { key: 'stock', label: 'Stok', checked: visibleCols.stock, onChange: (v)=>setVisibleCols(s=>({ ...s, stock: v })) },
-                { key: 'actions', label: 'İşlem', checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
+{ key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
+                { key: 'name', label: t('admin.products.table.name'), checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
+                { key: 'sku', label: t('admin.products.table.sku'), checked: visibleCols.sku, onChange: (v)=>setVisibleCols(s=>({ ...s, sku: v })) },
+                { key: 'category', label: t('admin.products.table.category'), checked: visibleCols.category, onChange: (v)=>setVisibleCols(s=>({ ...s, category: v })) },
+                { key: 'status', label: t('admin.products.table.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'price', label: t('admin.products.table.price'), checked: visibleCols.price, onChange: (v)=>setVisibleCols(s=>({ ...s, price: v })) },
+                { key: 'stock', label: t('admin.products.table.stock'), checked: visibleCols.stock, onChange: (v)=>setVisibleCols(s=>({ ...s, stock: v })) },
+                { key: 'actions', label: t('admin.products.table.actions'), checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
             />
 <ExportMenu
               items={[
-                { key: 'csv', label: 'CSV (UTF-8 BOM)', onSelect: ()=>{
+                { key: 'csv', label: t('admin.products.export.csvLabel'), onSelect: ()=>{
                   const cols = ['id','name','sku','category_id','status','price','stock_qty']
                   const header = cols.join(',')
                   const lines = sorted.map(r=>[
@@ -591,7 +591,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
 
       {importPreview && (
         <div className={`${adminCardClass} p-4`}>
-          <div className="mb-2 text-sm text-industrial-gray">CSV Önizleme (ilk 10 satır) — Toplam: {importPreview.total}</div>
+          <div className="mb-2 text-sm text-industrial-gray">{t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}</div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
@@ -609,18 +609,18 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
             </table>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>{ setImportPreview(null); setImportRows(null); }}>Kapat</button>
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>{ setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
             <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={()=>{
               const h = (importPreview?.header||[])
               const required = ['name','sku']
               const hasRequired = required.every(k=>h.includes(k))
               const okCount = (importPreview?.rows||[]).filter(r=>r['name']&&r['sku']).length
-              alert(`Dry-run: zorunlu alanlar ${hasRequired?'tam':'eksik'}. Uygun satır sayısı: ${okCount}/${importPreview?.total||0}`)
-            }}>Dry-run</button>
+              alert(t('admin.products.import.dryRunResult', { status: t(`admin.products.import.${hasRequired ? 'statusComplete' : 'statusMissing'}`), ok: okCount, total: importPreview?.total || 0 }))
+            }}>{t('admin.products.import.dryRun')}</button>
             <button className="px-3 h-10 rounded-md bg-primary-navy text-white text-xs" onClick={async ()=>{
-              if (!importRows || !importPreview) return alert('Önce CSV seçin')
+              if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
               const h = importPreview.header
-              if (!h.includes('sku') || !h.includes('name')) { alert('En az sku ve name kolonları gerekli'); return }
+              if (!h.includes('sku') || !h.includes('name')) { alert(t('admin.products.import.minColumns')); return }
               const mapCategorySlugToId = (slug: string)=>{
                 const s = (slug||'').toLowerCase().trim()
                 const found = cats.find(c=>c.name.toLowerCase()===s)
@@ -644,7 +644,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                 else if (r['category_slug']||r['category']) p.category_id = mapCategorySlugToId(r['category_slug']||r['category'])
                 payloads.push(p)
               }
-              if (payloads.length===0) { alert('Uygun satır bulunamadı'); return }
+              if (payloads.length===0) { alert(t('admin.products.import.noneFound')); return }
               try {
                 // chunked upsert by sku
                 let ok=0, fail=0
@@ -653,12 +653,12 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
                   if (error) { console.warn('import upsert error', error); fail+=chunk.length } else ok+=chunk.length
                 }
-                alert(`İçe aktarım tamam: ${ok} satır işlendi, ${fail} satır hata`)
+                alert(t('admin.products.import.done', { ok, fail }))
                 await load()
               } catch (e) {
-                alert('İçe aktarım hatası: '+((e as Error).message||e))
+                alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }))
               }
-            }}>Yaz (upsert by SKU)</button>
+}}>{t('admin.products.import.writeButton')}</button>
           </div>
         </div>
       )}
@@ -666,21 +666,21 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
       {/* Düzenleme Paneli */}
       <div className={`${adminCardClass} p-4`}>
         <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-3">
-          <span className="text-sm text-steel-gray">{selectedId ? 'Düzenleniyor' : 'Yeni Ürün'}</span>
+          <span className="text-sm text-steel-gray">{selectedId ? t('admin.products.edit.editing') : t('admin.products.edit.new')}</span>
           <Tabs.Root value={tab} onValueChange={(v)=>setTab(v as typeof tab)}>
             <Tabs.List className="inline-flex items-center gap-1">
-              <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Bilgi</Tabs.Trigger>
-              <Tabs.Trigger value="pricing" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Fiyat</Tabs.Trigger>
-              <Tabs.Trigger value="stock" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Stok</Tabs.Trigger>
-              <Tabs.Trigger value="images" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">Görseller</Tabs.Trigger>
-              <Tabs.Trigger value="seo" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">SEO</Tabs.Trigger>
+              <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.info')}</Tabs.Trigger>
+              <Tabs.Trigger value="pricing" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.pricing')}</Tabs.Trigger>
+              <Tabs.Trigger value="stock" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.stock')}</Tabs.Trigger>
+              <Tabs.Trigger value="images" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.images')}</Tabs.Trigger>
+              <Tabs.Trigger value="seo" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.seo')}</Tabs.Trigger>
             </Tabs.List>
           </Tabs.Root>
           <div className="ml-auto flex items-center gap-2">
-            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">Yeni</button>
-            <button onClick={saveCurrent} disabled={savingImages} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>Kaydet</button>
+            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">{t('admin.products.edit.actions.new')}</button>
+            <button onClick={saveCurrent} disabled={savingImages} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>{t('admin.products.edit.actions.save')}</button>
             {selectedId && (
-              <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">Sil</button>
+              <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">{t('admin.products.edit.actions.delete')}</button>
             )}
           </div>
         </div>
@@ -688,28 +688,28 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
         {tab === 'info' && (
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm text-steel-gray">Ad</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.name')}</label>
               <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">SKU</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.sku')}</label>
               <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">Model Kodu (MPN)</label>
-              <input value={modelCode} onChange={(e)=>setModelCode(e.target.value)} placeholder="örn. AD-H-900-T" className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">Marka</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.modelCode')}</label>
+              <input value={modelCode} onChange={(e)=>setModelCode(e.target.value)} placeholder={t('admin.products.edit.info.modelPlaceholder') ?? 'örn. AD-H-900-T'} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.brand')}</label>
               <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-steel-gray">Durum</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.status')}</label>
               <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
-                <option value="active">Aktif</option>
-                <option value="inactive">Pasif</option>
-                <option value="out_of_stock">Stokta Yok</option>
+                <option value="active">{t('admin.products.statusLabels.active')}</option>
+                <option value="inactive">{t('admin.products.statusLabels.inactive')}</option>
+                <option value="out_of_stock">{t('admin.products.statusLabels.out_of_stock')}</option>
               </select>
-              <label className="text-sm text-steel-gray">Kategori</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.category')}</label>
               <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
-                <option value="">(Seçilmemiş)</option>
+                <option value="">{t('admin.products.edit.info.categoryUnset')}</option>
                 {cats.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
               </select>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> Öne Çıkan</label>
+              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> {t('admin.products.edit.info.featured')}</label>
             </div>
           </div>
         )}
@@ -717,10 +717,10 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
         {tab === 'pricing' && (
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm text-steel-gray">Satış Fiyatı</label>
-              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 1999.90" />
-              <label className="text-sm text-steel-gray">Alış Maliyeti</label>
-              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 1499.50" />
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.pricing.salePrice')}</label>
+              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.pricing.salePlaceholder') ?? 'örn. 1999.90'} />
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.pricing.purchasePrice')}</label>
+              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.pricing.purchasePlaceholder') ?? 'örn. 1499.50'} />
             </div>
           </div>
         )}
@@ -728,34 +728,34 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
         {tab === 'stock' && (
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm text-steel-gray">Stok</label>
-              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 50" />
-              <label className="text-sm text-steel-gray">Düşük Stok Eşiği</label>
-              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="örn. 5" />
-              <div className="text-xs text-industrial-gray">Boş bırakılırsa Ayarlar’daki varsayılan eşik kullanılır{defaultThreshold!=null?` (Varsayılan: ${defaultThreshold})`:''}.</div>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.stock.stock')}</label>
+              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.stock.stockPlaceholder') ?? 'örn. 50'} />
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.stock.lowThreshold')}</label>
+              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.stock.lowPlaceholder') ?? 'örn. 5'} />
+              <div className="text-xs text-industrial-gray">{t('admin.products.edit.stock.hintBase')}{defaultThreshold!=null ? t('admin.products.edit.stock.defaultSuffix', { default: defaultThreshold }) : ''}.</div>
             </div>
           </div>
         )}
 
         {tab === 'images' && (
           <div className="space-y-3">
-            {!selectedId && <div className="text-sm text-steel-gray">Önce ürünü kaydedin.</div>}
+            {!selectedId && <div className="text-sm text-steel-gray">{t('admin.products.edit.images.saveFirst')}</div>}
             {selectedId && (
               <>
                 <input type="file" multiple onChange={(e)=>uploadImages(e.target.files)} disabled={uploading} />
                 {images.length === 0 && (
-                  <div className="text-sm text-industrial-gray">Henüz görsel yok. Dosya seçerek yükleyin.</div>
+                  <div className="text-sm text-industrial-gray">{t('admin.products.edit.images.none')}</div>
                 )}
                 <div className="grid md:grid-cols-4 gap-3">
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert('Alternatif metin kaydedilemedi: ' + ((err as Error).message || err)); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="Alternatif metin" />
+                      <input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert(t('admin.products.toasts.altSaveFailed', { msg: ((err as Error).message || String(err)) })); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.images.altPlaceholder') ?? 'Alternatif metin'} />
                       <div className="flex flex-wrap gap-2">
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>Yukarı</button>
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>Aşağı</button>
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>makeCover(img)} disabled={idx===0}>Kapak Yap</button>
-                        <button className="px-2 py-1 border rounded text-xs text-red-600" onClick={()=>deleteImage(img)}>Sil</button>
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>{t('admin.products.edit.images.up')}</button>
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>{t('admin.products.edit.images.down')}</button>
+                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>makeCover(img)} disabled={idx===0}>{t('admin.products.edit.images.makeCover')}</button>
+                        <button className="px-2 py-1 border rounded text-xs text-red-600" onClick={()=>deleteImage(img)}>{t('admin.products.edit.images.delete')}</button>
                       </div>
                     </div>
                   ))}
@@ -768,15 +768,15 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
         {tab === 'seo' && (
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm text-steel-gray">Slug</label>
-<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError('Slug boş olamaz'); return } const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists?'Bu slug zaten kullanılıyor':'') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder="ornek-urun" />
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.slug')}</label>
+<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError(t('admin.products.edit.seo.slugRequired')); return } const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists ? t('admin.products.edit.seo.slugInUse') : '') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.seo.slugPlaceholder') ?? 'ornek-urun'} />
               {slugError && <div className="text-xs text-red-600">{slugError}</div>}
-              <label className="text-sm text-steel-gray">Meta Başlık</label>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.metaTitle')}</label>
               <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <div className="text-xs text-industrial-gray">{metaTitle.length} karakter</div>
-              <label className="text-sm text-steel-gray">Meta Açıklama</label>
+              <div className="text-xs text-industrial-gray">{t('admin.products.edit.seo.chars', { count: metaTitle.length })}</div>
+              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.metaDesc')}</label>
               <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full border border-light-gray rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" rows={3} />
-              <div className="text-xs text-industrial-gray">{metaDesc.length} karakter</div>
+              <div className="text-xs text-industrial-gray">{t('admin.products.edit.seo.chars', { count: metaDesc.length })}</div>
             </div>
           </div>
         )}
@@ -786,57 +786,57 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
         <div className="p-2 flex items-center justify-between text-sm text-steel-gray">
-          <div>Toplam: {total}</div>
+          <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
           <div className="flex items-center gap-2">
-            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">Önceki</button>
-            <span>Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-            <button onClick={()=>setPage(p=>p+1)} disabled={page>=Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">Sonraki</button>
+            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
+            <span>{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+            <button onClick={()=>setPage(p=>p+1)} disabled={page>=Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
           </div>
         </div>
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
               {visibleCols.image && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>
+                <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
               )}
               {visibleCols.name && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>Ad {sortIndicator('name')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
                 </th>
               )}
               {visibleCols.sku && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('sku')}>SKU {sortIndicator('sku')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
                 </th>
               )}
               {visibleCols.category && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('category')}>Kategori {sortIndicator('category')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
                 </th>
               )}
               {visibleCols.status && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
                 </th>
               )}
               {visibleCols.price && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('price')}>Fiyat {sortIndicator('price')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
                 </th>
               )}
               {visibleCols.stock && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('stock')}>Stok {sortIndicator('stock')}</button>
+                  <button type="button" className="hover:underline" onClick={()=>toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
                 </th>
               )}
-              {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
+              {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.actions')}</th>}
             </tr>
           </thead>
           <tbody>
             {loading && rows.length === 0 ? (
-              <tr><td className="p-4" colSpan={7}>Yükleniyor…</td></tr>
+              <tr><td className="p-4" colSpan={7}>{t('admin.ui.loading')}</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
+              <tr><td className="p-4" colSpan={7}>{t('admin.ui.noRecords')}</td></tr>
             ) : (
               sorted.map(r => (
 <tr key={r.id} className="border-b border-light-gray/60">
@@ -858,8 +858,8 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
-                        <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>Düzenle</button>
-                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>Sil</button>
+                        <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>{t('admin.ui.edit')}</button>
+                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>{t('admin.ui.delete')}</button>
                       </div>
                     </td>
                   )}
