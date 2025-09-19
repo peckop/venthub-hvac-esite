@@ -4,6 +4,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface AuditRow {
   id: string
@@ -21,6 +22,8 @@ const PAGE_SIZE = 50
 
 const AdminAuditLogPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [rows, setRows] = React.useState<AuditRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -33,6 +36,7 @@ const AdminAuditLogPage: React.FC = () => {
   const [fromDate, setFromDate] = React.useState('')
   const [toDate, setToDate] = React.useState('')
   const [action, setAction] = React.useState('')
+  const [batch, setBatch] = React.useState('')
 
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
@@ -61,6 +65,10 @@ const AdminAuditLogPage: React.FC = () => {
         const like = `%${debouncedQ}%`
         query = query.or(`table_name.ilike.${like},row_pk.ilike.${like},comment.ilike.${like}`)
       }
+      if (batch) {
+        // Exact match on batch_id present in 'after' JSON or in comment
+        query = query.or(`after->>batch_id.eq.${batch},comment.ilike.%${batch}%`)
+      }
 
       const from = (page - 1) * PAGE_SIZE
       const to = from + PAGE_SIZE - 1
@@ -75,15 +83,34 @@ const AdminAuditLogPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [fromDate, toDate, action, debouncedQ, page])
+  }, [fromDate, toDate, action, debouncedQ, page, batch])
 
   React.useEffect(() => { fetchLogs() }, [fetchLogs])
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const b = (params.get('batch') || '').trim()
+    setBatch(b)
+  }, [location.search])
 
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
 
   return (
     <div className="space-y-4">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.audit')}</h1>
+
+      {batch && (
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
+          <span>Filtre: Batch <span className="font-mono">{batch}</span></span>
+          <div className="flex items-center gap-2">
+            <a href={`/admin/movements?batch=${batch}`} className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100">Hareketleri Gör</a>
+            <button
+              className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
+              onClick={() => { setBatch(''); const url = new URL(window.location.href); url.searchParams.delete('batch'); navigate(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { replace: true }) }}
+            >Temizle</button>
+          </div>
+        </div>
+      )}
 
       <AdminToolbar
         storageKey="toolbar:audit"
@@ -95,7 +122,7 @@ const AdminAuditLogPage: React.FC = () => {
           { value: 'DELETE', label: 'DELETE' },
           { value: 'CUSTOM', label: 'CUSTOM' },
         ] }}
-        onClear={() => { setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
+        onClear={() => { setBatch(''); setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">

@@ -68,7 +68,7 @@ const AdminInventoryPage: React.FC = () => {
   // CSV import/export states
   const [csvImportOpen, setCsvImportOpen] = React.useState<boolean>(false)
   const [_csvFile, setCsvFile] = React.useState<File | null>(null)
-  const [csvPreview, setCsvPreview] = React.useState<{ sku: string; name: string; current: number; new: number; delta: number }[]>([])
+  const [csvPreview, setCsvPreview] = React.useState<{ sku: string; name: string; current: number; new: number; delta: number; status: 'out' | 'critical' | null }[]>([])
   const [csvProcessing, setCsvProcessing] = React.useState<boolean>(false)
   const [dryRun, setDryRun] = React.useState<boolean>(true)
   const csvUndoingRef = React.useRef(false)
@@ -424,7 +424,7 @@ const AdminInventoryPage: React.FC = () => {
       }
       
       // Önizleme hazırla
-      const preview: Array<{ sku: string; name: string; current: number; new: number; delta: number }> = []
+      const preview: Array<{ sku: string; name: string; current: number; new: number; delta: number; status: 'out' | 'critical' | null }> = []
       // const skuMap = new Map(rows.map(r => [r.product_id, { name: r.name, stock: r.physical_stock }]))
       
       // SKU'dan product_id'ye eşleme için DB sorgusu gerekiyor
@@ -440,7 +440,7 @@ const AdminInventoryPage: React.FC = () => {
       // SKU -> product_id eşlemesi
       const { data: products } = await supabase
         .from('products')
-        .select('id, sku, name, stock_qty')
+        .select('id, sku, name, stock_qty, low_stock_threshold, low_stock_override')
         .in('sku', skus)
       
       if (!products || products.length === 0) {
@@ -449,7 +449,8 @@ const AdminInventoryPage: React.FC = () => {
       }
       
       // Her bir satır için önizleme bilgisi hazırla
-      const skuToProduct = new Map((products as Array<{ sku: string; id: string; name: string; stock_qty: number | null }>).map((p) => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }]))
+      const skuToProduct = new Map((products as Array<{ sku: string; id: string; name: string; stock_qty: number | null; low_stock_threshold?: number | null; low_stock_override?: boolean | null }>).
+        map((p) => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }]))
       
       for (let i = 1; i < lines.length; i++) {
         const fields = parseCSV(lines[i])
@@ -463,12 +464,17 @@ const AdminInventoryPage: React.FC = () => {
         const product = skuToProduct.get(sku)
         if (!product) continue
         
+        const th = effectiveThreshold(product.id)
+        const status: 'out' | 'critical' | null = (newQty <= 0)
+          ? 'out'
+          : (th != null && newQty <= Number(th)) ? 'critical' : null
         preview.push({
           sku,
           name: product.name,
           current: product.stock,
           new: newQty,
-          delta: newQty - product.stock
+          delta: newQty - product.stock,
+          status
         })
       }
       
@@ -541,8 +547,8 @@ const AdminInventoryPage: React.FC = () => {
             row_pk: productId,
             action: 'INSERT',
             before: null,
-            after: { delta: item.delta, reason },
-            comment: 'CSV import'
+            after: { delta: item.delta, reason, batch_id: batchId },
+            comment: `CSV import (batch:${batchId})`
           })
           
           applied.push({ productId, delta: item.delta })
@@ -1017,6 +1023,7 @@ const AdminInventoryPage: React.FC = () => {
                               <th className="px-2 py-1 text-right">Mevcut</th>
                               <th className="px-2 py-1 text-right">Yeni</th>
                               <th className="px-2 py-1 text-right">Delta</th>
+                              <th className="px-2 py-1 text-left">Durum</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1031,6 +1038,15 @@ const AdminInventoryPage: React.FC = () => {
                                   item.delta < 0 ? 'text-red-600' : 'text-steel-gray'
                                 }`}>
                                   {item.delta > 0 ? '+' : ''}{item.delta}
+                                </td>
+                                <td className="px-2 py-1">
+                                  {item.status === 'out' ? (
+                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded bg-gray-200 text-gray-700">Tükenecek</span>
+                                  ) : item.status === 'critical' ? (
+                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded bg-warning-orange/10 text-warning-orange">Kritik</span>
+                                  ) : (
+                                    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded bg-green-50 text-green-700">OK</span>
+                                  )}
                                 </td>
                               </tr>
                             ))}
