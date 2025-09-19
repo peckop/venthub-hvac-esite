@@ -26,6 +26,26 @@
 ### Lint/CI
 - ESLint uyarıları giderildi (React hooks bağımlılıkları, TS `any` kaldırma).
 
+### DB & Güvenlik Sertleştirme
+- Fonksiyonlarda `search_path=pg_catalog, public` sabitlendi (mutable search_path uyarıları giderildi).
+- View güvenliği: `reserved_orders`, `inventory_summary`, `admin_users` için `security_invoker=on`; `admin_users` view’ına anon/auth erişimi kaldırıldı.
+- FK indeksleri eklendi ve duplicate indeksler temizlendi (cart_items_cart_product_uniq, idx_coupons_code kaldırıldı).
+
+### RLS Konsolidasyonu
+- cart_items, shopping_carts, products, user_profiles, venthub_returns tablolarında aynı rol/aksiyon için tekilleştirilmiş politikalar uygulandı.
+
+### Danışman ve İndeks Kullanım Ölçümü
+- Supabase Advisor uyarıları (security/performance) tekrar çalıştırıldı; kritik uyarılar giderildi.
+- `pg_stat_user_indexes` ile mini okuma testi yapıldı, kritik indekslerde `idx_scan>0` doğrulandı.
+
+### i18n & SEO — Final Sweep (2025-09-19)
+- TR/EN iki dilli yapı uygulama ve admin genelinde tamamlandı. Aşağıdaki sayfalarda tüm başlıklar, butonlar, yer tutucular, tablo başlıkları, toasts ve modallar i18n'e geçirildi: AdminUsersPage, AdminWebhookEventsPage, AdminErrorsPage, AdminErrorGroupsPage, AdminReturnsPage, AdminOrdersPage, AdminProductsPage, AccountOverview/Shipments/Returns.
+- Kalan tüm `toLocaleString`, `toLocaleDateString`/`toLocaleTimeString` ve doğrudan `Intl.NumberFormat` kullanımları `src/i18n/format.ts` (formatCurrency) ve `src/i18n/datetime.ts` (formatDate/formatDateTime/formatTime) helper’larına taşındı.
+- Seo.tsx: hreflang alternates netleştirildi (tr-TR, en-US, x-default → canonical’da dil parametresi yok). `og:locale` ve `og:locale:alternate` dinamik.
+- Sözlükler genişletildi (tr/en): admin UI metinleri, durum/etiketler, export menüleri, boş durumlar, pagination/loader metinleri.
+- Dokümantasyon güncellendi: docs/SEO_I18N.md (kılavuz + örnekler), docs/README.md (bağlantılar). Ana README’ye kısa i18n özeti eklendi.
+- Lint ve build yeşil.
+
 ## 2025-09-18
 
 ### i18n ve SEO (hreflang) Standardizasyonu — Frontend & Admin

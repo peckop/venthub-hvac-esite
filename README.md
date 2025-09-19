@@ -70,6 +70,26 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 ## Değişiklik Özeti (Son Çalışmalar)
 Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
 
+Tarih: 2025-09-19
+
+- Admin Dashboard ve Orders
+  - KPI kartları tıklanabilir hale getirildi (Bekleyen İade, Bekleyen Kargo)
+  - `admin-orders-latest` fonksiyonu `preset=pendingShipments` desteği ile sunucu tarafı filtre uyguluyor (status ∈ confirmed/processing ve shipped_at IS NULL)
+- Envanter: Geri Al (Undo) ve Toplu Geri Al (Batch Undo)
+  - Ürün sağ panelinde mini hareket geçmişi (son 5) ve tek hareket için 10 dk içinde geri al
+  - `inventory_movements.batch_id` ile CSV import’larına toplu geri al desteği; `reverse_inventory_batch(uuid, int)` RPC eklendi
+  - UI: Movements ve Audit Log sayfalarında `?batch=<uuid>` filtresi ve hızlı bağlantılar
+- Güvenlik ve Veritabanı
+  - Fonksiyonlarda `search_path=pg_catalog, public` sabitlendi (mutable search_path uyarıları giderildi)
+  - `reserved_orders`, `inventory_summary`, `admin_users` gibi view’lar `security_invoker=on`; `admin_users` erişimleri (anon/auth) kaldırıldı
+  - RLS konsolidasyonu: cart_items, shopping_carts, products, user_profiles, venthub_returns tablolarında aynı rol/aksiyon için tekleştirilmiş politikalar
+  - Performans: kritik FK indeksleri eklendi; mükerrer indeksler temizlendi; danışman uyarıları doğrulandı
+  - İndeks kullanım ölçümü: pg_stat_user_indexes ile mini yük testinde tüm kritik indeksler için `idx_scan>0` doğrulandı
+
+- i18n & SEO: TR/EN iki dilli yapı son hâline getirildi. Para/tarih saat formatları helper’lar ile (src/i18n/format.ts, src/i18n/datetime.ts), Seo.tsx hreflang (tr-TR, en-US, x-default) ve OG locale dinamik. Dokümantasyon güncellendi (docs/SEO_I18N.md).
+
+Detaylar için `docs/CHANGELOG.md` ve `docs/SECURITY_AND_PERF_CHECKLIST.md` dosyalarına bakın.
+
 Tarih: 2025-09-07
 
 - **Ana Sayfa Konsolidasyonu**

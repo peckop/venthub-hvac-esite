@@ -9,7 +9,7 @@ Bu klasörde projeye ait tüm dokümantasyon dosyaları bulunmaktadır.
 - Proje yol haritası ve sprint planları
 - Operasyonel görev listesi
 - QA kontrol listeleri
-- Son güncelleme: 2025-09-16
+- Son güncelleme: 2025-09-19
 
 ### 🛠️ **OPERATIONS_PLAN.md**
 Stok yönetimi ve operasyonel süreçler
@@ -47,7 +47,9 @@ proje/
 └── docs/
     ├── README.md                  # 📚 Bu dosya
     ├── ROADMAP.md                 # 🎯 Ana yol haritası
-    ├── OPERATIONS_PLAN.md         # 🛠️ Operasyon planı
+    ├── OPERATIONS_PLAN.md         # 🛠️ Operasyon planı (Undo/Batch Undo dâhil)
+    ├── SECURITY_AND_PERF_CHECKLIST.md # 🔐 Güvenlik ve performans rehberi (Advisor, RLS, indeksler)
+    ├── SEO_I18N.md               # 🌐 SEO ve i18n standartları + format helper kullanımı
     ├── DEPLOYMENT.md              # 🚀 Dağıtım rehberi
     ├── WHATSAPP_SETUP_GUIDE.md    # 📱 WhatsApp kurulum
     ├── CHANGELOG.md               # 📝 Değişiklik günlüğü
@@ -60,7 +62,9 @@ proje/
 
 - **Mevcut durumu öğrenmek**: `ROADMAP.md` → "Durum Özeti"
 - **Yeni özellik eklemek**: `ROADMAP.md` → Sprint planları
-- **Stok sistemi kurulum**: `OPERATIONS_PLAN.md`
+- **Stok sistemi & Undo/Batch Undo**: `OPERATIONS_PLAN.md`
+- **Güvenlik & Performans**: `SECURITY_AND_PERF_CHECKLIST.md`
+- **i18n/SEO standartları**: `SEO_I18N.md`
 - **WhatsApp kurulumu**: `WHATSAPP_SETUP_GUIDE.md`
 - **Deploy işlemi**: `DEPLOYMENT.md`
 - **Son değişiklikleri görmek**: `CHANGELOG.md`
@@ -84,4 +88,4 @@ Bu dosya otomatik güncellenmez. Yeni dokümantasyon eklendiğinde veya yapı de
 
 Not: Admin UI standardizasyonu ve toolbar entegrasyonlarının detayları için CHANGELOG.md ve ADMIN_ROADMAP.md dosyalarına bakınız.
 
-Son güncelleme: 2025-09-16
+Son güncelleme: 2025-09-19

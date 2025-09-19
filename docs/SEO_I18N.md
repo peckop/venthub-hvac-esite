@@ -1,6 +1,6 @@
 # SEO ve i18n Standartları (VentHub)
 
-Son güncelleme: 2025-09-18
+Son güncelleme: 2025-09-19
 
 Bu belge; dil ve SEO metadatalarının uygulama genelinde nasıl üretildiğini ve geliştirici rehberini içerir.
 
@@ -34,4 +34,51 @@ Bu belge; dil ve SEO metadatalarının uygulama genelinde nasıl üretildiğini 
 ## 6) Geliştirici Notları
 - Yeni stringler için i18n sözlüğüne anahtar ekleyin (tr/en).
 - Tarih/saat için backend ISO 8601 tercih edilir; helper’lar Date’e dönüştürüp güvenli biçimler.
-- OG görseli verilmezse `/images/hvac_heat_recovery_7.png` varsayılanıdır.
+- OG görseli verilmezse `/images/hvac_heat_recovery_7.png` varsayılandır.
+
+## 7) Dosya Konumları ve Kullanım Örnekleri (TR/EN)
+- Sözlük dosyaları: `src/i18n/dictionaries/tr.ts`, `src/i18n/dictionaries/en.ts`
+- Para formatı: `src/i18n/format.ts` → `formatCurrency(value, lang, options?)`
+- Tarih/Saat formatı: `src/i18n/datetime.ts` → `formatDate`, `formatDateTime`, `formatTime`
+
+Örnek kullanım (bileşen içinde):
+```tsx path=null start=null
+import { useI18n } from '@/i18n/I18nProvider'
+import { formatCurrency } from '@/i18n/format'
+import { formatDateTime } from '@/i18n/datetime'
+
+export function PriceAndDate({ total, createdAt }: { total: number; createdAt: string }) {
+  const { lang, t } = useI18n()
+  return (
+    <div>
+      <span>{t('orders.total')}: {formatCurrency(total, lang)}</span>
+      <span>{formatDateTime(createdAt, lang)}</span>
+    </div>
+  )
+}
+```
+
+Seo bileşeni (hreflang + OG locale):
+```tsx path=null start=null
+import { Seo } from '@/components/Seo'
+import { useI18n } from '@/i18n/I18nProvider'
+
+export default function Page() {
+  const { lang, t } = useI18n()
+  return (
+    <Seo
+      title={t('seo.home.title')}
+      description={t('seo.home.description')}
+      lang={lang}
+    />
+  )
+}
+```
+
+## 8) QA/Checklist
+- [x] HTML `<html lang>` dinamik: tr/en
+- [x] Hreflang: tr-TR, en-US, x-default (x-default → dil parametresiz canonical)
+- [x] OG locale ve `og:locale:alternate` set ediliyor
+- [x] Tüm `toLocaleString` / `Intl.NumberFormat` doğrudan kullanımları kaldırıldı (helper’lara geçirildi)
+- [x] Admin ve Hesap sayfalarındaki metinler sözlüğe taşındı (butonlar, tablo başlıkları, durumlar, toasts)
+- [x] CSV/XLS export’larda görünür sütunlar locale-aware; gerekiyorsa `*_raw` ham değer ek kolonu

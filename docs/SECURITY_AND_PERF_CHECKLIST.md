@@ -27,6 +27,47 @@ Bu dosya Supabase Advisor çıktıları ve operasyonel düzeltmeler için rehber
 
 ## Performans
 
+### 2025-09-19 — Uygulananlar
+- Fonksiyon güvenliği: Tüm kritik fonksiyonlar için `search_path=pg_catalog, public` sabitlendi (mutable search_path uyarıları giderildi). Örnekler: enforce_role_change, bump_rate_limit, update_updated_at_column, reverse_inventory_batch, set_updated_at, adjust_stock (tüm overload’lar), set_stock (tüm overload’lar), is_admin_user, is_user_admin, get_user_role, update_user_profiles_updated_at, process_order_stock_reduction, set_user_admin_role, increment_error_group_count, jwt_role, _normalize_rls_expr.
+- View güvenliği: `reserved_orders`, `inventory_summary`, `admin_users` dahil tüm kritik view’ler `security_invoker=on`. `admin_users` için anon/authenticated rollerinden yetkiler kaldırıldı (REVOKE).
+- RLS konsolidasyonu: cart_items, shopping_carts, products, user_profiles, venthub_returns tablolarında aynı rol/aksiyon için tekilleştirme; performans ve okunabilirlik iyileştirildi.
+- FK indeksleri: danışmanın işaret ettiği eksik kaplayıcı indeksler garanti altına alındı (idempotent CREATE INDEX IF NOT EXISTS ile).
+- Duplicate index: cart_items üzerindeki duplicate unique constraint temizlendi (`cart_items_cart_product_uniq` kaldırıldı; `cart_items_cart_product_unique` korundu). `coupons` üzerindeki `idx_coupons_code` de `coupons_code_key` ile redundant olduğundan kaldırıldı.
+- İndeks kullanımı: `pg_stat_user_indexes` ile mini okuma testinde kritik indekslerde `idx_scan>0` doğrulandı. Gerçek trafik geldikçe metrikler artacaktır.
+
+#### İndeks kullanım raporu (okuma güvenli)
+
+```sql path=null start=null
+SELECT
+  t.relname  AS table_name,
+  i.relname  AS index_name,
+  s.idx_scan,
+  s.idx_tup_read,
+  s.idx_tup_fetch
+FROM pg_stat_user_indexes s
+JOIN pg_class i ON i.oid = s.indexrelid
+JOIN pg_class t ON t.oid = s.relid
+ORDER BY s.idx_scan, i.relname;
+```
+
+#### Kullanım sayısı 0 ve constraint desteklemeyen indeks adayları
+
+```sql path=null start=null
+SELECT
+  t.relname  AS table_name,
+  i.relname  AS index_name,
+  s.idx_scan
+FROM pg_stat_user_indexes s
+JOIN pg_class i ON i.oid = s.indexrelid
+JOIN pg_class t ON t.oid = s.relid
+LEFT JOIN pg_constraint con ON con.conindid = s.indexrelid
+WHERE s.idx_scan = 0
+  AND con.oid IS NULL
+ORDER BY 1, 2;
+```
+
+Not: Yeni projelerde “Unused index” uyarıları doğaldır; gerçek trafikten sonra yeniden değerlendirin.
+
 ### 2025-09-16 — Uygulananlar
 - FK indeksleri eklendi (kaplayıcı btree):
   - coupons.created_by, order_attachments.created_by, order_notes.user_id
