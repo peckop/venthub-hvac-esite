@@ -72,7 +72,7 @@ const AdminInventoryPage: React.FC = () => {
   const [csvProcessing, setCsvProcessing] = React.useState<boolean>(false)
   const [dryRun, setDryRun] = React.useState<boolean>(true)
   const csvUndoingRef = React.useRef(false)
-  const [csvErrors, setCsvErrors] = React.useState<Array<{ line: number; sku: string; message: string }>>([])
+  const [_csvErrors, setCsvErrors] = React.useState<Array<{ line: number; sku: string; message: string }>>([])
   const [csvProgress, setCsvProgress] = React.useState<number>(0)
 
   // Inventory movement history states
@@ -415,7 +415,7 @@ const AdminInventoryPage: React.FC = () => {
       }
 
       const split = (s: string) =>
-        s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(v => v.replace(/^\"|\"$/g, '').replace(/\"\"/g, '\"'))
+        s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
 
       const headerRaw = split(lines[0]).map(h => h.trim().toLowerCase())
       // Desteklenen başlıklar: sku,qty | sku,quantity | sku,stock | sku,new_stock
@@ -588,7 +588,7 @@ const AdminInventoryPage: React.FC = () => {
       const downloadErrors = () => {
         if (errors.length === 0) return
         const header = ['sku','message']
-        const lines = errors.map(e => [`\"${e.sku.replace(/\"/g,'\"\"')}\"`, `\"${e.message.replace(/\"/g,'\"\"')}\"`].join(','))
+        const lines = errors.map(e => [`"${e.sku.replace(/"/g,'""')}"`, `"${e.message.replace(/"/g,'""')}"`].join(','))
         const csv = '\ufeff' + [header.join(','), ...lines].join('\n')
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
         const url = URL.createObjectURL(blob)
@@ -677,8 +677,8 @@ const AdminInventoryPage: React.FC = () => {
     const csvContent = [
       header.join(','),
       ...exportRows.map(row => [
-        `\"${row.sku.replace(/\"/g,'\"\"')}\"`,
-        `\"${row.name.replace(/\"/g,'\"\"')}\"`,
+        `"${row.sku.replace(/"/g,'""')}"`,
+        `"${row.name.replace(/"/g,'""')}"`,
         row.physical_stock,
         row.reserved_stock,
         row.available_stock
