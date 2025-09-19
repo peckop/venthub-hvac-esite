@@ -12,6 +12,7 @@ import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
+import SearchOverlay from './SearchOverlay'
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -27,6 +28,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
   const { getCartCount, syncing, getCartTotal } = useCart()
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
@@ -212,7 +214,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             {/* Search trigger (header input kaldırıldı) */}
             <div className="mx-2 hidden sm:flex">
               <button
-                onClick={() => navigate('/products')}
+                onClick={() => setIsSearchOverlayOpen(true)}
                 aria-label={t('common.search')}
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
               >
@@ -334,6 +336,14 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </div>
 
               {/* Mobile menu button */}
+              {/* Mobile search trigger */}
+              <button
+                onClick={() => setIsSearchOverlayOpen(true)}
+                aria-label={t('common.search')}
+                className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 xl:hidden group"
+              >
+                <Search size={22} className="text-steel-gray group-hover:text-primary-navy" />
+              </button>
               <button
                 onClick={() => setIsMenuOpen(true)}
                 aria-label={t('header.menu')}
@@ -345,6 +355,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
           </div>
         </div>
       </header>
+
+      {/* Full-screen search overlay */}
+      <SearchOverlay open={isSearchOverlayOpen} onClose={() => setIsSearchOverlayOpen(false)} />
 
       {/* Enhanced Full-Featured Sticky Header */}
       {isScrolled && (
