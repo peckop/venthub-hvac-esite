@@ -20,6 +20,8 @@ const AdminDashboardPage: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null)
   const [dailyCounts, setDailyCounts] = React.useState<Array<{ date: string; count: number }>>([])
   const [recentOrders, setRecentOrders] = React.useState<Array<{ id: string; created_at: string; total_amount: number; status: string; order_number?: string | null }>>([])
+  const [carrierDist, setCarrierDist] = React.useState<Array<{ key: string; count: number }>>([])
+  const [returnsByStatus, setReturnsByStatus] = React.useState<Array<{ status: string; count: number }>>([])
 
   const rangeStartISO = React.useMemo(() => {
     const now = new Date()
@@ -45,9 +47,9 @@ const AdminDashboardPage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(500)
 
-      const [ordersRes, returnsRes, shipRes] = await Promise.all([
+      const [ordersRes, returnsRes, shipRes, shipListRes, returnsListRes] = await Promise.all([
         ordersQuery,
-        // Pending returns (not time-bound): requested/approved/in_transit/received (refund bekleniyor olabilir)
+        // Pending returns (not time-bound): requested/approved/in_transit/received
         supabase
           .from('venthub_returns')
           .select('id', { count: 'exact', head: true })
@@ -57,7 +59,19 @@ const AdminDashboardPage: React.FC = () => {
           .from('venthub_orders')
           .select('id', { count: 'exact', head: true })
           .is('shipped_at', null)
+          .in('status', ['confirmed', 'processing']),
+        // Lists for breakdowns
+        supabase
+          .from('venthub_orders')
+          .select('carrier, shipping_carrier')
+          .is('shipped_at', null)
           .in('status', ['confirmed', 'processing'])
+          .limit(1000),
+        supabase
+          .from('venthub_returns')
+          .select('status')
+          .in('status', ['requested', 'approved', 'in_transit', 'received'])
+          .limit(1000)
       ])
 
       if (ordersRes.error) throw ordersRes.error
@@ -89,9 +103,29 @@ const AdminDashboardPage: React.FC = () => {
 
       if (returnsRes.error) throw returnsRes.error
       if (shipRes.error) throw shipRes.error
+      if (shipListRes.error) throw shipListRes.error
+      if (returnsListRes.error) throw returnsListRes.error
 
       setPendingReturns(returnsRes.count ?? 0)
       setPendingShipments(shipRes.count ?? 0)
+
+      // Build carrier distribution
+      const shipList = (shipListRes.data || []) as Array<{ carrier: string | null; shipping_carrier: string | null }>
+      const dist = new Map<string, number>()
+      shipList.forEach(s => {
+        const key = (s.carrier || s.shipping_carrier || 'Bilinmiyor').toString()
+        dist.set(key, (dist.get(key) || 0) + 1)
+      })
+      setCarrierDist(Array.from(dist.entries()).map(([key, count]) => ({ key, count })).sort((a,b)=>b.count-a.count))
+
+      // Build returns status breakdown
+      const rlist = (returnsListRes.data || []) as Array<{ status: string | null }>
+      const byStatus = new Map<string, number>()
+      rlist.forEach(r => {
+        const key = (r.status || 'unknown').toString()
+        byStatus.set(key, (byStatus.get(key) || 0) + 1)
+      })
+      setReturnsByStatus(Array.from(byStatus.entries()).map(([status, count]) => ({ status, count })).sort((a,b)=>b.count-a.count))
     } catch (e) {
       setError((e as Error).message || t('admin.ui.failed'))
       setOrdersCount(null)
@@ -170,6 +204,52 @@ const AdminDashboardPage: React.FC = () => {
             )
           })}
           {dailyCounts.length === 0 && <div className="text-sm text-steel-gray">{t('admin.ui.noRecords')}</div>}
+        </div>
+      </section>
+
+      {/* Breakdown sections */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow-hvac-md p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-industrial-gray">Bekleyen Kargo - Kargo Dağılımı</div>
+            <Link to="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+          </div>
+          {carrierDist.length === 0 ? (
+            <div className="text-sm text-steel-gray">Kayıt yok.</div>
+          ) : (
+            <div className="space-y-2">
+              {(() => { const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
+                <div key={key} className="flex items-center gap-2 text-sm">
+                  <div className="w-32 text-steel-gray truncate" title={key}>{key}</div>
+                  <div className="flex-1 bg-light-gray h-3 rounded">
+                    <div className="bg-primary-navy h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                  </div>
+                  <div className="w-10 text-right text-industrial-gray">{count}</div>
+                </div>
+              )) })()}
+            </div>
+          )}
+        </div>
+        <div className="bg-white rounded-lg shadow-hvac-md p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-industrial-gray">Bekleyen İade - Durum Kırılımı</div>
+            <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+          </div>
+          {returnsByStatus.length === 0 ? (
+            <div className="text-sm text-steel-gray">Kayıt yok.</div>
+          ) : (
+            <div className="space-y-2">
+              {(() => { const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
+                <div key={status} className="flex items-center gap-2 text-sm">
+                  <div className="w-32 text-steel-gray truncate" title={status}>{status}</div>
+                  <div className="flex-1 bg-light-gray h-3 rounded">
+                    <div className="bg-warning-orange h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                  </div>
+                  <div className="w-10 text-right text-industrial-gray">{count}</div>
+                </div>
+              )) })()}
+            </div>
+          )}
         </div>
       </section>
 
