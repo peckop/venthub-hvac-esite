@@ -14,6 +14,13 @@
 
 ## High‑priority next tasks (1–2 days)
 
+### Güvenlik & Performans (kritik takip)
+- Üretim/preview trafiği toplandıktan sonra indeks kullanım raporu: `pg_stat_user_indexes` (0 kalan ve constraint/FK desteklemeyen indeksler aday)
+- Haftalık ANALYZE/VACUUM planı (low-traffic pencere): tablo bazlı plan çıkar
+- Advisor (security/perf) CI çıktılarının düzenli takibi ve aksiyon listesi (GitHub Issues)
+- RLS duman testleri: örnek JWT ile SELECT/INSERT/UPDATE/DELETE senaryoları (beklenen izinler)
+- Migrations runbook: yeni fonksiyon/search_path ve policy değişiklikleri için kısa kılavuz
+
 ### Arama Mimarisini Kurumsal Seviyeye Taşıma (Yeni)
 1) Back‑end / DB
    - [ ] Postgres FTS (Turkish dictionary) + `pg_trgm` ile typo toleranslı arama
