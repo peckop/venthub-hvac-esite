@@ -205,6 +205,15 @@ export async function searchProducts(query: string) {
   return data as Product[]
 }
 
+// Full‑text search (Turkish) via RPC; returns lightweight fields + rank
+export interface FtsProductResult { id: string; name: string; sku: string; brand: string | null; price: number | string | null; rank: number | null }
+export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
+  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as unknown }
+  const { data, error } = await supabase.rpc('fts_search_products', payload)
+  if (error) throw error
+  return (data || []) as FtsProductResult[]
+}
+
 // ========== Account: Address Book ==========
 export interface UserAddress {
   id: string
