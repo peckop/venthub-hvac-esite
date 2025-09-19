@@ -291,6 +291,28 @@ export const en = {
     terms: 'Terms of Use'
   },
   admin: {
+    dashboard: {
+      subtitle: 'Quick glance and latest activity',
+      rangeToday: 'Today',
+      range7d: '7 Days',
+      range30d: '30 Days',
+      kpis: {
+        ordersCount: 'Orders Count',
+        salesTotal: 'Sales Total',
+        pendingReturns: 'Pending Returns',
+        pendingShipments: 'Pending Shipments',
+        avgBasket: 'Average Basket'
+      },
+      trend: 'Order trend for last {{days}} days',
+      recent: { title: 'Recent Orders' },
+      table: { order: 'Order', date: 'Date', amount: 'Amount', status: 'Status' }
+    },
+    errors: {
+      levelTitle: 'Level',
+      envTitle: 'Environment',
+      detailsTitle: 'Details',
+      table: { date: 'Date', level: 'Level', message: 'Message', url: 'URL' }
+    },
     toolbar: {
       searchPlaceholder: 'Search',
       clear: 'Clear',
@@ -298,6 +320,8 @@ export const en = {
     },
     menu: {
       dashboard: 'Dashboard',
+      coupons: 'Coupons',
+      webhookEvents: 'Webhook Events',
       orders: 'Orders',
       inventory: 'Inventory',
       movements: 'Movements',
@@ -334,10 +358,16 @@ export const en = {
       add: 'Add',
       delete: 'Delete',
       details: 'Details',
-      hide: 'Hide'
+      hide: 'Hide',
+      all: 'All',
+      pageLabel: 'Page {{page}} / {{pages}}',
+      startDate: 'Start Date',
+      endDate: 'End Date',
+      failed: 'Operation failed'
     },
     search: {
       audit: 'Search by table, PK or note',
+      errors: 'Search by URL or message',
       coupons: 'Search by code or type',
       movements: 'Search by product name/SKU',
       orders: 'Search by Order ID or Conversation ID'
@@ -872,6 +902,65 @@ export const en = {
     }
   },
   account: {
+    tabs: {
+      overview: 'Overview',
+      orders: 'Orders',
+      shipments: 'Shipments',
+      addresses: 'Addresses',
+      invoices: 'Invoices',
+      returns: 'Returns',
+      profile: 'Profile',
+      security: 'Security'
+    },
+    overview: {
+      defaultAddressesTitle: 'Default Addresses',
+      shippingAddress: 'Shipping Address',
+      billingAddress: 'Billing Address',
+      notSetShipping: 'Default shipping address is not set.',
+      notSetBilling: 'Default billing address is not set.',
+      manageAddresses: 'Manage addresses'
+    },
+    addresses: {
+      title: 'My Addresses',
+      addressLabel: 'Address',
+      defaultShippingTag: 'Default shipping',
+      defaultBillingTag: 'Default billing',
+      makeDefaultShipping: 'Set default for shipping',
+      makeDefaultBilling: 'Set default for billing',
+      noItems: 'No addresses added yet.',
+      formTitleEdit: 'Edit Address',
+      formTitleNew: 'New Address',
+      ph: {
+        label: 'Label (Home, Office)',
+        fullName: 'Full Name',
+        phone: 'Phone',
+        address: 'Address',
+        city: 'City',
+        district: 'District',
+        postalCode: 'Postal Code'
+      },
+      toggle: {
+        shippingDefault: 'Default for shipping',
+        billingDefault: 'Default for billing'
+      },
+      submit: {
+        update: 'Update',
+        add: 'Add'
+      },
+      toasts: {
+        loadError: 'Failed to load addresses',
+        requiredFields: 'Please fill in required fields',
+        updated: 'Address updated',
+        created: 'Address created',
+        saveError: 'Error while saving',
+        confirmDelete: 'Are you sure you want to delete this address?',
+        deleted: 'Address deleted',
+        deleteError: 'Error while deleting',
+        defaultSetShipping: 'Default shipping address set',
+        defaultSetBilling: 'Default billing address set',
+        updateError: 'Error while updating'
+      }
+    },
     invoices: {
       title: 'Invoice Profiles',
       addNew: 'Add New Profile',
