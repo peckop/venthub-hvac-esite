@@ -72,6 +72,8 @@ const AdminInventoryPage: React.FC = () => {
   const [csvProcessing, setCsvProcessing] = React.useState<boolean>(false)
   const [dryRun, setDryRun] = React.useState<boolean>(true)
   const csvUndoingRef = React.useRef(false)
+  const [csvErrors, setCsvErrors] = React.useState<Array<{ line: number; sku: string; message: string }>>([])
+  const [csvProgress, setCsvProgress] = React.useState<number>(0)
 
   // Inventory movement history states
   const [movements, setMovements] = React.useState<Array<{ id: string; delta: number; reason: string; created_at: string }>>([])
@@ -402,83 +404,103 @@ const AdminInventoryPage: React.FC = () => {
   const handleCsvImport = async (file: File) => {
     setCsvFile(file)
     setCsvPreview([])
+    setCsvErrors([])
     try {
-      const text = await file.text()
-      const lines = text.split(/\r?\n/)
+      const textRaw = await file.text()
+      const text = textRaw.replace(/^\ufeff/, '')
+      const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0)
       if (lines.length < 2) {
         toast.error('CSV dosyası en az bir başlık satırı ve bir veri satırı içermelidir')
         return
       }
-      
-      // CSV'den ürün SKU ve stok değerlerini oku
-      const skuCol = 0 // SKU sütunu (ilk sütun)
-      const qtyCol = 1 // Miktar sütunu (ikinci sütun)
-      const parseCSV = (line: string) => {
-        return line.split(',').map(field => field.trim().replace(/^"(.*)"$/, '$1'))
-      }
-      
-      const header = parseCSV(lines[0])
-      if (header.length < 2) {
-        toast.error('CSV dosyası en az SKU ve miktar sütunları içermelidir')
+
+      const split = (s: string) =>
+        s.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(v => v.replace(/^\"|\"$/g, '').replace(/\"\"/g, '\"'))
+
+      const headerRaw = split(lines[0]).map(h => h.trim().toLowerCase())
+      // Desteklenen başlıklar: sku,qty | sku,quantity | sku,stock | sku,new_stock
+      const skuIdx = headerRaw.indexOf('sku')
+      let qtyIdx = headerRaw.indexOf('qty')
+      if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('quantity')
+      if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('stock')
+      if (qtyIdx === -1) qtyIdx = headerRaw.indexOf('new_stock')
+
+      if (skuIdx === -1 || qtyIdx === -1) {
+        toast.error('Başlık satırında sku ve qty/quantity/stock sütunları bulunmalı')
         return
       }
-      
-      // Önizleme hazırla
-      const preview: Array<{ sku: string; name: string; current: number; new: number; delta: number; status: 'out' | 'critical' | null }> = []
-      // const skuMap = new Map(rows.map(r => [r.product_id, { name: r.name, stock: r.physical_stock }]))
-      
-      // SKU'dan product_id'ye eşleme için DB sorgusu gerekiyor
-      const skus = lines.slice(1)
-        .map(line => parseCSV(line)[skuCol])
-        .filter(Boolean)
-      
-      if (skus.length === 0) {
-        toast.error('Geçerli SKU bulunamadı')
+
+      // Satırları ayrıştır
+      const parsedRows: Array<{ line: number; sku: string; newQty: number }> = []
+      const errors: Array<{ line: number; sku: string; message: string }> = []
+
+      for (let i = 1; i < lines.length; i++) {
+        const cells = split(lines[i])
+        if (cells.every(c => (c ?? '').trim() === '')) continue
+        const sku = String(cells[skuIdx] || '').trim()
+        const qtyStr = String(cells[qtyIdx] || '').trim()
+        const newQty = qtyStr === '' ? NaN : Number(qtyStr)
+        if (!sku) {
+          errors.push({ line: i + 1, sku: '', message: 'SKU eksik' })
+          continue
+        }
+        if (!Number.isFinite(newQty)) {
+          errors.push({ line: i + 1, sku, message: 'Miktar sayı olmalı' })
+          continue
+        }
+        parsedRows.push({ line: i + 1, sku, newQty: Math.max(0, Math.trunc(newQty)) })
+      }
+
+      if (parsedRows.length === 0) {
+        setCsvErrors(errors)
+        toast.error('Geçerli satır bulunamadı')
         return
       }
-      
+
       // SKU -> product_id eşlemesi
+      const skus = Array.from(new Set(parsedRows.map(r => r.sku)))
       const { data: products } = await supabase
         .from('products')
         .select('id, sku, name, stock_qty, low_stock_threshold, low_stock_override')
-        .in('sku', skus)
-      
+        .in('sku', skus as string[])
+
       if (!products || products.length === 0) {
         toast.error('Eşleşen SKU bulunamadı')
         return
       }
-      
-      // Her bir satır için önizleme bilgisi hazırla
-      const skuToProduct = new Map((products as Array<{ sku: string; id: string; name: string; stock_qty: number | null; low_stock_threshold?: number | null; low_stock_override?: boolean | null }>).
-        map((p) => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }]))
-      
-      for (let i = 1; i < lines.length; i++) {
-        const fields = parseCSV(lines[i])
-        if (fields.length < 2) continue
-        
-        const sku = fields[skuCol]
-        const newQty = parseInt(fields[qtyCol], 10)
-        
-        if (!sku || isNaN(newQty)) continue
-        
-        const product = skuToProduct.get(sku)
-        if (!product) continue
-        
+
+      const skuToProduct = new Map(
+        (products as Array<{ sku: string; id: string; name: string; stock_qty: number | null }>)
+          .map(p => [p.sku, { id: p.id, name: p.name, stock: Number(p.stock_qty || 0) }])
+      )
+
+      const preview: Array<{ sku: string; name: string; current: number; new: number; delta: number; status: 'out' | 'critical' | null }> = []
+
+      for (const row of parsedRows) {
+        const product = skuToProduct.get(row.sku)
+        if (!product) {
+          errors.push({ line: row.line, sku: row.sku, message: 'SKU eşleşmedi' })
+          continue
+        }
         const th = effectiveThreshold(product.id)
-        const status: 'out' | 'critical' | null = (newQty <= 0)
+        const status: 'out' | 'critical' | null = (row.newQty <= 0)
           ? 'out'
-          : (th != null && newQty <= Number(th)) ? 'critical' : null
+          : (th != null && row.newQty <= Number(th)) ? 'critical' : null
         preview.push({
-          sku,
+          sku: row.sku,
           name: product.name,
           current: product.stock,
-          new: newQty,
-          delta: newQty - product.stock,
+          new: row.newQty,
+          delta: row.newQty - product.stock,
           status
         })
       }
-      
+
+      setCsvErrors(errors)
       setCsvPreview(preview)
+      if (errors.length > 0) {
+        toast('Bazı satırlar atlandı; önizlemeyi kontrol edin')
+      }
     } catch (err) {
       console.error('CSV parse error:', err)
       toast.error('CSV dosyası işlenirken hata oluştu')
@@ -490,8 +512,9 @@ const AdminInventoryPage: React.FC = () => {
       toast.error('İşlenecek veri yok')
       return
     }
-    
+
     setCsvProcessing(true)
+    setCsvProgress(0)
     try {
       // SKU -> product_id eşlemesi için tekrar sorgu
       const skus = csvPreview.map(item => item.sku)
@@ -499,24 +522,23 @@ const AdminInventoryPage: React.FC = () => {
         .from('products')
         .select('id, sku')
         .in('sku', skus as string[])
-      
+
       if (!products || products.length === 0) {
         throw new Error('Eşleşen ürün bulunamadı')
       }
-      
+
       const skuToId = new Map((products as Array<{ sku: string; id: string }>).map((p) => [p.sku, p.id]))
-      const { logAdminAction } = await import('../../lib/audit')
-      
+
       // Dry run modunda gerçek işlem yapma
       if (dryRun) {
         toast.success('Kuru çalıştırma başarılı, işlem yapılmadı')
         setCsvImportOpen(false)
         return
       }
-      
-      // Her ürün için stok güncelleme işlemi yap
+
+      // Chunked & parallel processing
       let successCount = 0
-      const applied: Array<{ productId: string; delta: number }> = []
+      const errors: Array<{ sku: string; message: string }> = []
       const genBatchId = (): string => {
         try {
           if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -526,42 +548,58 @@ const AdminInventoryPage: React.FC = () => {
         return `${Date.now()}-${Math.random().toString(36).slice(2,10)}`
       }
       const batchId = genBatchId()
-      for (const item of csvPreview) {
-        const productId = skuToId.get(item.sku)
-        if (!productId || item.delta === 0) continue
-        
-        try {
-          const reason = `CSV import: ${item.delta > 0 ? 'add' : 'remove'} ${Math.abs(item.delta)}`
-          const { error } = await supabase.rpc('adjust_stock', {
-            p_product_id: productId,
-            p_delta: item.delta,
-            p_reason: reason,
-            p_batch_id: batchId as string
-          })
-          
-          if (error) throw error
-          
-          // Audit log
-          await logAdminAction(supabase, {
-            table_name: 'inventory_movements',
-            row_pk: productId,
-            action: 'INSERT',
-            before: null,
-            after: { delta: item.delta, reason, batch_id: batchId },
-            comment: `CSV import (batch:${batchId})`
-          })
-          
-          applied.push({ productId, delta: item.delta })
-          successCount++
-        } catch (err) {
-          console.error(`Error updating stock for SKU ${item.sku}:`, err)
-        }
-      }
-      
-      setCsvImportOpen(false)
-      load() // Tüm listeyi yenile
 
-      // Geri Al butonlu toast
+      const BATCH_SIZE = 20
+      for (let i = 0; i < csvPreview.length; i += BATCH_SIZE) {
+        const chunk = csvPreview.slice(i, i + BATCH_SIZE)
+        await Promise.all(chunk.map(async (item) => {
+          const productId = skuToId.get(item.sku)
+          if (!productId || item.delta === 0) return
+          try {
+            const reason = `CSV import: ${item.delta > 0 ? 'add' : 'remove'} ${Math.abs(item.delta)}`
+            const { error } = await supabase.rpc('adjust_stock', {
+              p_product_id: productId,
+              p_delta: item.delta,
+              p_reason: reason,
+              p_batch_id: batchId as string
+            })
+            if (error) throw error
+            const { logAdminAction } = await import('../../lib/audit')
+            await logAdminAction(supabase, {
+              table_name: 'inventory_movements',
+              row_pk: productId,
+              action: 'INSERT',
+              before: null,
+              after: { delta: item.delta, reason, batch_id: batchId },
+              comment: `CSV import (batch:${batchId})`
+            })
+            successCount++
+          } catch (err) {
+            console.error(`Error updating stock for SKU ${item.sku}:`, err)
+            errors.push({ sku: item.sku, message: (err as Error)?.message || 'Bilinmeyen hata' })
+          }
+        }))
+        setCsvProgress(Math.min(1, (i + chunk.length) / csvPreview.length))
+      }
+
+      setCsvImportOpen(false)
+      await load() // Tüm listeyi yenile
+
+      const downloadErrors = () => {
+        if (errors.length === 0) return
+        const header = ['sku','message']
+        const lines = errors.map(e => [`\"${e.sku.replace(/\"/g,'\"\"')}\"`, `\"${e.message.replace(/\"/g,'\"\"')}\"`].join(','))
+        const csv = '\ufeff' + [header.join(','), ...lines].join('\n')
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `inventory_errors_${new Date().toISOString().split('T')[0]}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+
+      // Geri Al + Hata indirme butonlu toast
       toast.custom((t) => (
         <div className="rounded-lg border border-light-gray bg-white shadow px-3 py-2 text-sm flex items-center gap-3">
           <span>{successCount} ürün güncellendi.</span>
@@ -569,6 +607,12 @@ const AdminInventoryPage: React.FC = () => {
             href={`/admin/movements?batch=${batchId}`}
             className="px-2 py-1 text-xs rounded border border-light-gray hover:border-primary-navy text-primary-navy"
           >Hareketleri Gör</a>
+          {errors.length > 0 && (
+            <button
+              className="px-2 py-1 text-xs rounded border border-light-gray hover:border-primary-navy"
+              onClick={() => { downloadErrors(); toast.dismiss(t.id) }}
+            >Hataları İndir</button>
+          )}
           <button
             className="px-2 py-1 text-xs rounded bg-warning-orange/10 text-warning-orange hover:bg-warning-orange hover:text-white"
             onClick={async () => {
@@ -590,13 +634,14 @@ const AdminInventoryPage: React.FC = () => {
             }}
           >Geri Al</button>
         </div>
-      ), { duration: 8000 })
-      
+      ), { duration: 10000 })
+
     } catch (err) {
       console.error('CSV processing error:', err)
       toast.error('CSV işlenirken hata oluştu')
     } finally {
       setCsvProcessing(false)
+      setCsvProgress(0)
     }
   }
   
@@ -632,8 +677,8 @@ const AdminInventoryPage: React.FC = () => {
     const csvContent = [
       header.join(','),
       ...exportRows.map(row => [
-        `"${row.sku}"`,
-        `"${row.name}"`,
+        `\"${row.sku.replace(/\"/g,'\"\"')}\"`,
+        `\"${row.name.replace(/\"/g,'\"\"')}\"`,
         row.physical_stock,
         row.reserved_stock,
         row.available_stock
@@ -649,6 +694,18 @@ const AdminInventoryPage: React.FC = () => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const exportCsvTemplate = () => {
+    const header = ['sku','qty']
+    const csv = '\ufeff' + header.join(',') + '\n' + ['"PRD001"', '10'].join(',') + '\n'
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'inventory_template.csv'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   async function adjustStock(productId: string, delta: number, reason: string) {
@@ -743,7 +800,8 @@ const AdminInventoryPage: React.FC = () => {
               CSV İçe Aktar
             </button>
             <ExportMenu items={[
-              { key: 'csv', label: 'CSV İndir', onSelect: () => { void exportCsv() } }
+              { key: 'csv', label: 'CSV İndir', onSelect: () => { void exportCsv() } },
+              { key: 'template', label: 'CSV Şablonu (sku,qty)', onSelect: () => { void exportCsvTemplate() } }
             ]} />
             <ColumnsMenu
               columns={[
@@ -1086,7 +1144,7 @@ const AdminInventoryPage: React.FC = () => {
                     disabled={csvPreview.length === 0 || csvProcessing}
                     className="px-4 py-2 text-sm bg-primary-navy text-white rounded-md hover:bg-primary-navy/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {csvProcessing ? 'İşleniyor...' : (dryRun ? 'Kuru Çalıştır' : 'İçe Aktar')}
+                    {csvProcessing ? `İşleniyor... ${Math.round(csvProgress*100)}%` : (dryRun ? 'Kuru Çalıştır' : 'İçe Aktar')}
                   </button>
                 </div>
               </div>
