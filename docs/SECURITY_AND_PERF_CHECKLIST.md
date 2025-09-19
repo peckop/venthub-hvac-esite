@@ -95,7 +95,20 @@ Açık kalemler
   - Adım non‑blocking’tir; uyarıları görünür kılar, pipeline’ı kırmaz.
   - İndeks “unused” olsa bile hemen silmeyin; en az 1–2 hafta gerçek kullanım toplayıp karar verin.
   - Secrets doğru ise job log’larında sorgu çıktıları tablo halinde görünür. Secrets yoksa “notice” ile kibarca atlar.
-- Kullanılmayan indeksler (INFO düzeyi): Advisor, “kullanılmadı” olarak işaretlemiş. Üretimde kullanım metrikleri toplanmadan agresif silme önerilmez. Yine de gözden geçirmek için liste:
+
+### DB Advisor Playbook
+- Debug çıktıları (eklendi):
+  - Identity & Env: current_database(), current_user, version()
+  - cart_items index/constraint dökümü ve normalize duplicate kontrolü
+  - Gerekirse diğer tablolar için de aynı debug kalıbı genişletilebilir
+- Otomatik düzeltmeler (Fix workflow): `.github/workflows/db-advisor-fix.yml`
+  - search_path sabitleme (SECURITY DEFINER fonksiyonlar)
+  - FK kaplayıcı indeksler (idempotent)
+  - Duplicate index/constraint cleanup (cart_items)
+  - RLS konsolidasyonu (cart_items, shopping_carts; gerekirse user_profiles, venthub_returns ek adımlar)
+- Bilinçli istisna: Leaked Password Protection (LPP) WARN — uygulama içi HIBP kontrolü kullanılıyor (bu uyarı kabul edilir)
+
+- Kullanılmayan indeksler (INFO düzeyi): Advisor, “kullanılmadı” olarak işaretler. Üretimde kullanım metrikleri toplanmadan agresif silme önerilmez. Yine de gözden geçirmek için liste:
   - public.cart_items: idx_cart_items_product_id, idx_cart_items_price_list_id
   - public.product_images: idx_product_images_product_id
   - public.product_prices: idx_product_prices_price_list_id
