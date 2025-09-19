@@ -111,7 +111,11 @@ const AdminOrdersPage: React.FC = () => {
       params.set('limit', String(PAGE_SIZE))
       params.set('page', String(page))
       const url = `${supabaseUrl}/functions/v1/admin-orders-latest?${params.toString()}`
-      const resp = await fetch(url, { method: 'GET' })
+      // Include user session token so Edge Function (verify_jwt=true) authorizes the request
+      const { data: sess } = await supabase.auth.getSession()
+      const headers: Record<string, string> = {}
+      if (sess?.session?.access_token) headers['Authorization'] = `Bearer ${sess.session.access_token}`
+      const resp = await fetch(url, { method: 'GET', headers })
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
       const data = (await resp.json()) as { rows?: AdminOrderRow[]; total?: number }
       const list = Array.isArray(data?.rows) ? data.rows as AdminOrderRow[] : []
