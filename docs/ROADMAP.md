@@ -1,6 +1,6 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-17
+Last updated: 2025-09-19
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
@@ -76,7 +76,11 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] Satır içi stok düzenleme sütunu (− / miktar / + / Kaydet) ve anlık “Satılabilir” güncellemesi
   - [x] “Ürün seç” dropdown kaldırıldı; satır tıklama ile seçim ve bağlam paneli (Hızlı Eşik Ayarları) sadece seçim olduğunda görünür
   - [x] Toplu işlem ve CSV içe/dışa aktar (SKU, qty) — dry‑run + önizleme + audit log
-  - [x] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo)
+- [x] Son 5 hareket mini paneli ve 10 dk “Geri al” (undo)
+- [x] CSV batch undo: `batch_id` + `reverse_inventory_batch` (varsayılan 30 dk pencere); telafi hareketlerinde metadata (original/reversed_by/undo_*)
+- [x] Movements & Audit: `?batch=<uuid>` ile batch filtreleri ve Movements’a kısayol
+- [x] Orders preset: `pendingShipments` (server‑side `shipped_at IS NULL` + status ∈ confirmed/processing)
+- [x] Dashboard KPI kartları: “Bekleyen İade” ve “Bekleyen Kargo” linkli navigasyon
   - [x] Account menüsünde admin’e özel “Operasyon” sekmesi görünür
 - Müşteri UX
   - [x] PDP/PLP rozet: “Stokta” / “Stokta yok” (stok_qty>0)

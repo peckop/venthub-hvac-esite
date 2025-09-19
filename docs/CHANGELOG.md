@@ -1,5 +1,31 @@
 # Changelog
 
+## 2025-09-19
+
+### Admin Dashboard Navigasyon & Filtreler
+- KPI kartları tıklanabilir hale getirildi:
+  - "Bekleyen İade" → `/account/AdminReturnsPage` (requested, approved, in_transit, received durum filtreleri)
+  - "Bekleyen Kargo" → `/admin/orders?preset=pendingShipments`
+- Edge Function: `admin-orders-latest` artık `preset=pendingShipments` parametresini destekler; server‑side olarak `status in (confirmed, processing)` ve `shipped_at IS NULL` filtreleri uygulanır.
+
+### Envanter: Mini Geçmiş + Geri Al (Undo)
+- AdminInventoryPage: sağ çekmecede son 5 stok hareketi gösterilir.
+- "Geri Al (10 dk)": son hareket 10 dakika içinde tersine çevrilebilir; "undo" hareketleri geri alınamaz (koruma).
+- Reason formatı kısaltıldı: `undo:<shortId>` (veritabanı reason uzunluk sınırına uyumlu).
+
+### CSV İçe/Dışa Aktarma + Toplu Geri Al (Batch Undo)
+- CSV önizleme tablosuna durum uyarıları eklendi: Tükenecek (0) / Kritik (eşik altında) uyarıları.
+- inventory_movements satırlarına `batch_id` eklendi; yeni RPC: `reverse_inventory_batch(p_batch_id, p_max_minutes=30)` — tüm batch’i telafi hareketleriyle geri alır.
+- Undo penceresi: varsayılan 30 dakika; metadata: `original_movement_id`, `reversed_by_movement_id`, `undo_by_user_id`, `undo_at` tutulur.
+- UI: CSV başarı toast’ında “Hareketleri Gör” (Movements’ı `?batch=` ile açar) ve “Geri Al” (batch’i geri alır) butonları.
+
+### Audit & Movements İyileştirmeleri
+- Movements (/admin/movements): `?batch=<uuid>` ile batch filtresi; üst bardan temizlenebilir.
+- Audit Log (/admin/logs): URL `?batch=<uuid>` ile filtre; `after->>batch_id` ve/veya yorumdan eşleşir; “Hareketleri Gör” kısayolu eklendi.
+
+### Lint/CI
+- ESLint uyarıları giderildi (React hooks bağımlılıkları, TS `any` kaldırma).
+
 ## 2025-09-18
 
 ### i18n ve SEO (hreflang) Standardizasyonu — Frontend & Admin
