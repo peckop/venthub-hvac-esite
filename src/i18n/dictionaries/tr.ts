@@ -291,6 +291,28 @@ export const tr = {
     terms: 'Kullanım Koşulları'
   },
   admin: {
+    dashboard: {
+      subtitle: 'Hızlı bakış ve son hareketler',
+      rangeToday: 'Bugün',
+      range7d: '7 Gün',
+      range30d: '30 Gün',
+      kpis: {
+        ordersCount: 'Sipariş Adedi',
+        salesTotal: 'Satış Toplamı',
+        pendingReturns: 'Bekleyen İade',
+        pendingShipments: 'Bekleyen Kargo',
+        avgBasket: 'Ortalama Sepet'
+      },
+      trend: 'Son {{days}} gün sipariş trendi',
+      recent: { title: 'Son Siparişler' },
+      table: { order: 'Sipariş', date: 'Tarih', amount: 'Tutar', status: 'Durum' }
+    },
+    errors: {
+      levelTitle: 'Seviye',
+      envTitle: 'Ortam',
+      detailsTitle: 'Detaylar',
+      table: { date: 'Tarih', level: 'Seviye', message: 'Mesaj', url: 'URL' }
+    },
     toolbar: {
       searchPlaceholder: 'Ara',
       clear: 'Temizle',
@@ -298,6 +320,8 @@ export const tr = {
     },
     menu: {
       dashboard: 'Dashboard',
+      coupons: 'Kuponlar',
+      webhookEvents: 'Webhook Olayları',
       orders: 'Siparişler',
       inventory: 'Stok Özeti',
       movements: 'Hareket Defteri',
@@ -338,10 +362,16 @@ export const tr = {
       add: 'Ekle',
       delete: 'Sil',
       details: 'Detay',
-      hide: 'Gizle'
+      hide: 'Gizle',
+      all: 'Tümü',
+      pageLabel: 'Sayfa {{page}} / {{pages}}',
+      startDate: 'Başlangıç',
+      endDate: 'Bitiş',
+      failed: 'İşlem başarısız'
     },
     search: {
       audit: 'Tablo adı, PK veya not ara',
+      errors: 'URL veya mesaj ara',
       coupons: 'Kod veya tip ile ara',
       movements: 'Ürün adı/SKU ara',
       orders: 'Sipariş ID veya Conversation ID'
@@ -876,6 +906,65 @@ export const tr = {
     }
   },
   account: {
+    tabs: {
+      overview: 'Özet',
+      orders: 'Siparişler',
+      shipments: 'Kargo Takibi',
+      addresses: 'Adresler',
+      invoices: 'Faturalar',
+      returns: 'İadeler',
+      profile: 'Profil',
+      security: 'Güvenlik'
+    },
+    overview: {
+      defaultAddressesTitle: 'Varsayılan Adresler',
+      shippingAddress: 'Kargo Adresi',
+      billingAddress: 'Fatura Adresi',
+      notSetShipping: 'Varsayılan kargo adresi ayarlanmamış.',
+      notSetBilling: 'Varsayılan fatura adresi ayarlanmamış.',
+      manageAddresses: 'Adresleri yönet'
+    },
+    addresses: {
+      title: 'Adreslerim',
+      addressLabel: 'Adres',
+      defaultShippingTag: 'Kargo varsayılan',
+      defaultBillingTag: 'Fatura varsayılan',
+      makeDefaultShipping: 'Kargoda varsayılan yap',
+      makeDefaultBilling: 'Faturada varsayılan yap',
+      noItems: 'Henüz adres eklenmemiş.',
+      formTitleEdit: 'Adresi Düzenle',
+      formTitleNew: 'Yeni Adres',
+      ph: {
+        label: 'Etiket (Ev, Ofis)',
+        fullName: 'Ad Soyad',
+        phone: 'Telefon',
+        address: 'Adres',
+        city: 'İl',
+        district: 'İlçe',
+        postalCode: 'Posta Kodu'
+      },
+      toggle: {
+        shippingDefault: 'Kargoda varsayılan',
+        billingDefault: 'Faturada varsayılan'
+      },
+      submit: {
+        update: 'Güncelle',
+        add: 'Ekle'
+      },
+      toasts: {
+        loadError: 'Adresler yüklenemedi',
+        requiredFields: 'Zorunlu alanları doldurun',
+        updated: 'Adres güncellendi',
+        created: 'Adres eklendi',
+        saveError: 'Kaydetme sırasında hata',
+        confirmDelete: 'Bu adresi silmek istediğinize emin misiniz?',
+        deleted: 'Adres silindi',
+        deleteError: 'Silme sırasında hata',
+        defaultSetShipping: 'Varsayılan kargo adresi ayarlandı',
+        defaultSetBilling: 'Varsayılan fatura adresi ayarlandı',
+        updateError: 'Güncelleme sırasında hata'
+      }
+    },
     invoices: {
       title: 'Fatura Profilleri',
       addNew: 'Yeni Profil Ekle',
