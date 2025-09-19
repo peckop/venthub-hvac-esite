@@ -311,6 +311,7 @@ export const en = {
       levelTitle: 'Level',
       envTitle: 'Environment',
       detailsTitle: 'Details',
+      labels: { stack: 'Stack', ua: 'UA', release: 'Release', env: 'Env' },
       table: { date: 'Date', level: 'Level', message: 'Message', url: 'URL' }
     },
     toolbar: {
@@ -456,7 +457,9 @@ export const en = {
       pageLabel: 'Page {{page}} / {{pages}}',
       startDate: 'Start Date',
       endDate: 'End Date',
-      failed: 'Operation failed'
+      failed: 'Operation failed',
+      accessDeniedTitle: 'Access Denied',
+      accessDeniedDesc: 'Admin privileges are required to access this page.'
     },
     search: {
       audit: 'Search by table, PK or note',
@@ -637,6 +640,86 @@ export const en = {
       states: {
         loading: 'Loading...',
         noRecords: 'No records found'
+      }
+    },
+    webhooks: {
+      title: 'Webhook Events',
+      tabs: { returns: 'Returns', shipping: 'Shipping Emails' },
+      search: { returns: 'event_id, order_id, return_id, carrier, status_mapped', shipping: 'order_id, email, subject, provider' },
+      tip: { rowAction: 'Click a row to open details and reprocess menu.' },
+      returnsTable: { eventId: 'Event ID', order: 'Order', carrier: 'Carrier', statusMapped: 'Status (mapped)', received: 'Received' },
+      emailsTable: { order: 'Order', to: 'To', subject: 'Subject', provider: 'Provider', date: 'Date' }
+    },
+    errorGroups: {
+      searchPlaceholder: 'search signature/message',
+      filter: { statusAll: 'Status: All', assignedAll: 'Assigned: All', unassigned: '(unassigned)' },
+      export: { csvLabel: 'CSV (UTF-8 BOM)' },
+      table: { lastSeen: 'Last Seen', level: 'Level', signature: 'Signature', lastMsg: 'Last Message', count: 'Count', status: 'Status', assigned: 'Assigned', actions: 'Actions' },
+      bulk: { selected: 'Selected groups: {{count}}', statusTitle: 'Status:' },
+      assigned: { none: '(none)' },
+      details: {
+        latest: 'Latest Records',
+        notes: 'Notes',
+        notesPlaceholder: 'Leave a note about this group...',
+        sampleUrl: 'Sample URL',
+        top5: 'Top‑5 Distributions',
+        urlTitle: 'URL',
+        releaseTitle: 'Release',
+        envTitle: 'Env',
+        userAgentTitle: 'User Agent',
+        stackSummary: 'stack'
+      }
+    },
+    returns: {
+      total: 'Total: {{count}} return requests',
+      searchPlaceholder: 'Search by order no, customer name, email or reason',
+      export: {
+        csvLabel: 'CSV (with visible filters)',
+        xlsLabel: 'Excel (.xls — HTML table)',
+        headers: { order: 'Order', customer: 'Customer', email: 'Email', reason: 'Reason', status: 'Status', date: 'Date', amount: 'Amount' }
+      },
+      table: { order: 'Order', customer: 'Customer', reason: 'Reason', status: 'Status', date: 'Date', actions: 'Actions' },
+      empty: { filtered: 'No return requests match the filters.', none: 'No return requests yet.' },
+      actions: { markAs: 'Mark as {{status}}' },
+      toasts: {
+        returnsLoadFailed: 'Could not load return requests',
+        statusUpdated: 'Return status updated to "{{status}}"',
+        emailNotifySent: 'Customer notification email sent',
+        emailNotifyFailed: 'Email could not be sent, but the status was updated',
+        statusUpdateFailed: 'Could not update return status'
+      },
+      statusLabels: {
+        requested: 'Requested',
+        approved: 'Approved',
+        rejected: 'Rejected',
+        in_transit: 'In transit',
+        received: 'Received',
+        refunded: 'Refunded',
+        cancelled: 'Cancelled'
+      }
+    },
+    users: {
+      tabs: { admins: 'Admin Users ({{count}})', all: 'All Users ({{count}})' },
+      searchPlaceholder: 'Search by email or name',
+      table: { user: 'User', role: 'Role', created: 'Created', actions: 'Actions' },
+      empty: { filtered: 'No users match your search.', admins: 'No admin users yet.', all: 'User list is empty.' },
+      actions: { superadmin: 'Superadmin', admin: 'Admin', moderator: 'Mod', user: 'User' },
+      actionTitles: { superadmin: 'Make superadmin', admin: 'Make admin', moderator: 'Make moderator', user: 'Make user', cannotDemoteSelf: "You can't demote yourself" },
+      toasts: {
+        adminsLoadFailed: 'Failed to load admin users',
+        allLoadFailed: 'Failed to load users',
+        roleUpdated: 'User role updated to "{{role}}"',
+        roleNotUpdated: 'Role could not be updated',
+        roleUpdateError: 'Role update error'
+      },
+      info: {
+        title: 'User Role System',
+        items: {
+          superadmin: 'Superadmin: All privileges + role assignments (limited visibility for security)',
+          admin: 'Admin: Access to operations panel (inventory, returns, shipping, users)',
+          moderator: 'Moderator: Limited admin privilege (inventory and returns)',
+          user: 'User: Regular user (only manages own account)'
+        }
       }
     }
   },

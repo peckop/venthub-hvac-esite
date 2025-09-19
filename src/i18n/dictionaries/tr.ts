@@ -311,6 +311,7 @@ export const tr = {
       levelTitle: 'Seviye',
       envTitle: 'Ortam',
       detailsTitle: 'Detaylar',
+      labels: { stack: 'Stack', ua: 'UA', release: 'Sürüm', env: 'Ortam' },
       table: { date: 'Tarih', level: 'Seviye', message: 'Mesaj', url: 'URL' }
     },
     toolbar: {
@@ -460,7 +461,9 @@ export const tr = {
       pageLabel: 'Sayfa {{page}} / {{pages}}',
       startDate: 'Başlangıç',
       endDate: 'Bitiş',
-      failed: 'İşlem başarısız'
+      failed: 'İşlem başarısız',
+      accessDeniedTitle: 'Erişim Reddedildi',
+      accessDeniedDesc: 'Bu sayfaya erişmek için admin yetkisi gerekiyor.'
     },
     search: {
       audit: 'Tablo adı, PK veya not ara',
@@ -641,6 +644,86 @@ export const tr = {
       states: {
         loading: 'Yükleniyor...',
         noRecords: 'Kayıt bulunamadı'
+      }
+    },
+    webhooks: {
+      title: 'Webhook Olayları',
+      tabs: { returns: 'İade Webhookları', shipping: 'Kargo E‑postaları' },
+      search: { returns: 'event_id, order_id, return_id, carrier, status_mapped', shipping: 'order_id, email, subject, provider' },
+      tip: { rowAction: 'Satıra tıklayarak detay ve yeniden işlem menüsünü açabilirsiniz.' },
+      returnsTable: { eventId: 'Event ID', order: 'Sipariş', carrier: 'Kargo', statusMapped: 'Durum (map)', received: 'Alındı' },
+      emailsTable: { order: 'Sipariş', to: 'Kime', subject: 'Konu', provider: 'Provider', date: 'Tarih' }
+    },
+    errorGroups: {
+      searchPlaceholder: 'signature/mesaj ara',
+      filter: { statusAll: 'Durum: Tümü', assignedAll: 'Atanan: Tümü', unassigned: '(atanmamış)' },
+      export: { csvLabel: 'CSV (UTF-8 BOM)' },
+      table: { lastSeen: 'Son Görülme', level: 'Seviye', signature: 'İmza', lastMsg: 'Son Mesaj', count: 'Adet', status: 'Durum', assigned: 'Atanan', actions: 'İşlemler' },
+      bulk: { selected: 'Seçili grup: {{count}}', statusTitle: 'Durum:' },
+      assigned: { none: '(kimse)' },
+      details: {
+        latest: 'Son Kayıtlar',
+        notes: 'Notlar',
+        notesPlaceholder: 'Bu grup hakkında not bırakın...',
+        sampleUrl: 'Örnek URL',
+        top5: 'Top‑5 Dağılımlar',
+        urlTitle: 'URL',
+        releaseTitle: 'Sürüm',
+        envTitle: 'Ortam',
+        userAgentTitle: 'User Agent',
+        stackSummary: 'stack'
+      }
+    },
+    returns: {
+      total: 'Toplam {{count}} iade talebi',
+      searchPlaceholder: 'Sipariş no, müşteri adı, email veya sebep ile ara',
+      export: {
+        csvLabel: 'CSV (görünür filtrelerle)',
+        xlsLabel: 'Excel (.xls — HTML tablo)',
+        headers: { order: 'Sipariş', customer: 'Müşteri', email: 'E-posta', reason: 'Sebep', status: 'Durum', date: 'Tarih', amount: 'Tutar' }
+      },
+      table: { order: 'Sipariş', customer: 'Müşteri', reason: 'Sebep', status: 'Durum', date: 'Tarih', actions: 'İşlemler' },
+      empty: { filtered: 'Filtrelere uygun iade talebi bulunamadı.', none: 'Henüz iade talebi yok.' },
+      actions: { markAs: '{{status}} olarak işaretle' },
+      toasts: {
+        returnsLoadFailed: 'İade talepleri yüklenemedi',
+        statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',
+        emailNotifySent: 'Müşteriye e-posta bildirimi gönderildi',
+        emailNotifyFailed: 'E-posta bildirimi gönderilemedi, ancak durum güncellendi',
+        statusUpdateFailed: 'İade durumu güncellenemedi'
+      },
+      statusLabels: {
+        requested: 'Talep Alındı',
+        approved: 'Onaylandı',
+        rejected: 'Reddedildi',
+        in_transit: 'Kargoda (İade)',
+        received: 'İade Teslim Alındı',
+        refunded: 'İade Ücreti Ödendi',
+        cancelled: 'İptal Edildi'
+      }
+    },
+    users: {
+      tabs: { admins: 'Admin Kullanıcılar ({{count}})', all: 'Tüm Kullanıcılar ({{count}})' },
+      searchPlaceholder: 'E-posta veya isim ile ara',
+      table: { user: 'Kullanıcı', role: 'Rol', created: 'Kayıt Tarihi', actions: 'İşlemler' },
+      empty: { filtered: 'Arama kriterine uygun kullanıcı bulunamadı.', admins: 'Henüz admin kullanıcı yok.', all: 'Kullanıcı listesi boş.' },
+      actions: { superadmin: 'Superadmin', admin: 'Admin', moderator: 'Mod', user: 'User' },
+      actionTitles: { superadmin: 'Superadmin yap', admin: 'Admin yap', moderator: 'Moderator yap', user: 'Normal kullanıcı yap', cannotDemoteSelf: 'Kendi rolünüzü düşüremezsiniz' },
+      toasts: {
+        adminsLoadFailed: 'Admin kullanıcıları yüklenemedi',
+        allLoadFailed: 'Kullanıcı listesi yüklenemedi',
+        roleUpdated: 'Kullanıcı rolü "{{role}}" olarak güncellendi',
+        roleNotUpdated: 'Rol güncellenemedi',
+        roleUpdateError: 'Rol güncelleme hatası'
+      },
+      info: {
+        title: 'Kullanıcı Rol Sistemi',
+        items: {
+          superadmin: 'Superadmin: Tüm yetkiler + rol atamaları (güvenlik amaçlı sınırlı görünürlük)',
+          admin: 'Admin: Operasyon paneline erişim (stok, iadeler, kargo, kullanıcılar)',
+          moderator: 'Moderator: Sınırlı admin yetkisi (stok ve iadeler)',
+          user: 'User: Normal kullanıcı (sadece kendi hesap yönetimi)'
+        }
       }
     }
   },

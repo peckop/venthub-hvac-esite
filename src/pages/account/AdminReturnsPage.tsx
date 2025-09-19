@@ -117,7 +117,7 @@ export default function AdminReturnsPage() {
       setStatusFilter(next)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search])
+  }, [location.search, _t])
 
   // İade taleplerini yükle
   useEffect(() => {
@@ -162,7 +162,7 @@ export default function AdminReturnsPage() {
         }
       } catch (error) {
         console.error('Returns load error:', error)
-        toast.error('İade talepleri yüklenemedi')
+        toast.error(_t('admin.returns.toasts.returnsLoadFailed') as string)
       } finally {
         if (mounted) setIsLoading(false)
       }
@@ -170,7 +170,7 @@ export default function AdminReturnsPage() {
 
     loadReturns()
     return () => { mounted = false }
-  }, [isAdmin, user])
+  }, [isAdmin, user, _t])
 
   // Filtreleme
   useEffect(() => {
@@ -270,7 +270,7 @@ export default function AdminReturnsPage() {
         r.id === returnId ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
       ))
 
-      toast.success(`İade durumu "${getStatusLabel(newStatus)}" olarak güncellendi`)
+      toast.success(_t('admin.returns.toasts.statusUpdated', { status: getStatusLabel(newStatus) }) as string)
 
       // Mock refund integration: when new_status = refunded, call refund-order-mock
       if (newStatus === 'refunded') {
@@ -301,31 +301,22 @@ export default function AdminReturnsPage() {
           }
         })
         if (invokeError) throw invokeError
-        toast.success('Müşteriye e-posta bildirimi gönderildi')
+        toast.success(_t('admin.returns.toasts.emailNotifySent') as string)
       } catch (emailError) {
         console.error('Email notification failed:', emailError)
-        toast.error('E-posta bildirimi gönderilemedi, ancak durum güncellendi')
+        toast.error(_t('admin.returns.toasts.emailNotifyFailed') as string)
       }
       
     } catch (error) {
       console.error('Status update error:', error)
-      toast.error('İade durumu güncellenemedi')
+      toast.error(_t('admin.returns.toasts.statusUpdateFailed') as string)
     } finally {
       setUpdatingStatus(null)
     }
   }
 
   const getStatusLabel = (status: string): string => {
-    const labels: Record<string, string> = {
-      requested: 'Talep Alındı',
-      approved: 'Onaylandı', 
-      rejected: 'Reddedildi',
-      in_transit: 'Kargoda (İade)',
-      received: 'İade Teslim Alındı',
-      refunded: 'İade Ücreti Ödendi',
-      cancelled: 'İptal Edildi'
-    }
-    return labels[status] || status
+    return (_t(`admin.returns.statusLabels.${status}`) as string) || status
   }
 
   const getStatusIcon = (status: string) => {
@@ -355,14 +346,14 @@ export default function AdminReturnsPage() {
   }
 
   const statusOptions = [
-    { value: 'all', label: 'Tüm Durumlar' },
-    { value: 'requested', label: 'Talep Alındı' },
-    { value: 'approved', label: 'Onaylandı' },
-    { value: 'rejected', label: 'Reddedildi' },
-    { value: 'in_transit', label: 'Kargoda (İade)' },
-    { value: 'received', label: 'İade Teslim Alındı' },
-    { value: 'refunded', label: 'İade Ücreti Ödendi' },
-    { value: 'cancelled', label: 'İptal Edildi' },
+    { value: 'all', label: _t('admin.ui.all') },
+    { value: 'requested', label: _t('admin.returns.statusLabels.requested') },
+    { value: 'approved', label: _t('admin.returns.statusLabels.approved') },
+    { value: 'rejected', label: _t('admin.returns.statusLabels.rejected') },
+    { value: 'in_transit', label: _t('admin.returns.statusLabels.in_transit') },
+    { value: 'received', label: _t('admin.returns.statusLabels.received') },
+    { value: 'refunded', label: _t('admin.returns.statusLabels.refunded') },
+    { value: 'cancelled', label: _t('admin.returns.statusLabels.cancelled') },
   ]
 
   const nextStatuses: Record<string, string[]> = {
@@ -389,15 +380,23 @@ export default function AdminReturnsPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="text-center py-8">
-          <h2 className="text-xl font-semibold text-red-600">Erişim Reddedildi</h2>
-          <p className="text-steel-gray mt-2">Bu sayfaya erişmek için admin yetkisi gerekiyor.</p>
+          <h2 className="text-xl font-semibold text-red-600">{_t('admin.ui.accessDeniedTitle')}</h2>
+          <p className="text-steel-gray mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
         </div>
       </div>
     )
   }
 
   function exportCsv() {
-    const header = ['Sipariş','Müşteri','E-posta','Sebep','Durum','Tarih','Tutar']
+    const header = [
+      _t('admin.returns.export.headers.order'),
+      _t('admin.returns.export.headers.customer'),
+      _t('admin.returns.export.headers.email'),
+      _t('admin.returns.export.headers.reason'),
+      _t('admin.returns.export.headers.status'),
+      _t('admin.returns.export.headers.date'),
+      _t('admin.returns.export.headers.amount'),
+    ] as string[]
     const lines = filteredReturns.map(r => [
       r.order_number ? `#${r.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`,
       r.customer_name || '',
@@ -432,7 +431,7 @@ export default function AdminReturnsPage() {
         `<td>${amount}</td>`+
       `</tr>`
     }).join('')
-    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>Sipariş</th><th>Müşteri</th><th>E-posta</th><th>Sebep</th><th>Durum</th><th>Tarih</th><th>Tutar</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${_t('admin.returns.export.headers.order')}</th><th>${_t('admin.returns.export.headers.customer')}</th><th>${_t('admin.returns.export.headers.email')}</th><th>${_t('admin.returns.export.headers.reason')}</th><th>${_t('admin.returns.export.headers.status')}</th><th>${_t('admin.returns.export.headers.date')}</th><th>${_t('admin.returns.export.headers.amount')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -446,26 +445,26 @@ export default function AdminReturnsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h2>
-        <div className="text-sm text-steel-gray">Toplam {returns.length} iade talebi</div>
+        <div className="text-sm text-steel-gray">{_t('admin.returns.total', { count: returns.length })}</div>
       </div>
 
       {/* Filtreler */}
       <AdminToolbar
         storageKey="toolbar:returns"
-        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'Sipariş no, müşteri adı, email veya sebep ile ara', focusShortcut: '/' }}
+        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: _t('admin.returns.searchPlaceholder'), focusShortcut: '/' }}
         rightExtra={(
           <div className="flex items-center gap-2">
             <ExportMenu items={[
-              { key: 'csv', label: 'CSV (görünür filtrelerle)', onSelect: exportCsv },
-              { key: 'xls', label: 'Excel (.xls — HTML tablo)', onSelect: exportXls }
+              { key: 'csv', label: _t('admin.returns.export.csvLabel'), onSelect: exportCsv },
+              { key: 'xls', label: _t('admin.returns.export.xlsLabel'), onSelect: exportXls }
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'order', label: 'Sipariş', checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
-                { key: 'customer', label: 'Müşteri', checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
-                { key: 'reason', label: 'Sebep', checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
-                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'date', label: 'Tarih', checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+                { key: 'order', label: _t('admin.returns.table.order'), checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
+                { key: 'customer', label: _t('admin.returns.table.customer'), checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
+                { key: 'reason', label: _t('admin.returns.table.reason'), checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
+                { key: 'status', label: _t('admin.returns.table.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'date', label: _t('admin.returns.table.date'), checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -490,9 +489,9 @@ export default function AdminReturnsPage() {
       ) : filteredReturns.length === 0 ? (
         <div className={`${adminCardClass} text-center py-8`}>
           <div className="text-steel-gray">
-{searchQuery || !Object.values(statusFilter).every(Boolean)
-              ? 'Filtrelere uygun iade talebi bulunamadı.' 
-              : 'Henüz iade talebi yok.'}
+            {searchQuery || !Object.values(statusFilter).every(Boolean)
+              ? _t('admin.returns.empty.filtered')
+              : _t('admin.returns.empty.none')}
           </div>
         </div>
       ) : (
@@ -501,12 +500,12 @@ export default function AdminReturnsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>Sipariş {sortIndicator('order')}</button></th>)}
-                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>Müşteri {sortIndicator('customer')}</button></th>)}
-                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>Sebep {sortIndicator('reason')}</button></th>)}
-                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>Durum {sortIndicator('status')}</button></th>)}
-                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>Tarih {sortIndicator('date')}</button></th>)}
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>
+                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
+                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
+                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
+                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
+                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.returns.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -578,7 +577,7 @@ export default function AdminReturnsPage() {
                               onClick={() => handleStatusUpdate(returnItem.id, status)}
                               disabled={updatingStatus === returnItem.id}
                               className="px-2 py-1 text-xs bg-primary-navy text-white rounded hover:bg-primary-navy/90 disabled:opacity-50"
-                              title={`${getStatusLabel(status)} olarak işaretle`}
+                              title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
                             >
                               {updatingStatus === returnItem.id ? (
                                 <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />

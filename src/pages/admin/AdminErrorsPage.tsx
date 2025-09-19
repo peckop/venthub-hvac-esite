@@ -74,13 +74,13 @@ const AdminErrorsPage: React.FC = () => {
       setRows((data || []) as ErrorRow[])
       setTotal(typeof count === 'number' ? count : 0)
     } catch (e) {
-      setError((e as Error).message || 'Yüklenemedi')
+      setError((e as Error).message || t('admin.ui.failed'))
       setRows([])
       setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [fromDate, toDate, level, env, debouncedQ, page])
+  }, [fromDate, toDate, level, env, debouncedQ, page, t])
 
   React.useEffect(() => { fetchErrors() }, [fetchErrors])
 
@@ -185,15 +185,15 @@ const AdminErrorsPage: React.FC = () => {
                         <td colSpan={5} className="p-3">
                           <div className="grid md:grid-cols-2 gap-3 text-xs">
                             <div>
-                              <div className="font-medium text-industrial-gray mb-1">Stack</div>
+                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errors.labels.stack')}</div>
                               <pre className="bg-white p-2 rounded border overflow-auto max-h-64">{String(r.stack || '').slice(0, 8000)}</pre>
                             </div>
                             <div>
                               <div className="font-medium text-industrial-gray mb-1">{t('admin.errors.detailsTitle')}</div>
                               <div className="space-y-1">
-                                <div><span className="text-industrial-gray">UA: </span>{r.user_agent || '-'}</div>
-                                <div><span className="text-industrial-gray">Release: </span>{r.release || '-'}</div>
-                                <div><span className="text-industrial-gray">Env: </span>{r.env || '-'}</div>
+                                <div><span className="text-industrial-gray">{t('admin.errors.labels.ua')}: </span>{r.user_agent || '-'}</div>
+                                <div><span className="text-industrial-gray">{t('admin.errors.labels.release')}: </span>{r.release || '-'}</div>
+                                <div><span className="text-industrial-gray">{t('admin.errors.labels.env')}: </span>{r.env || '-'}</div>
                               </div>
                             </div>
                           </div>
