@@ -61,14 +61,14 @@ export default function AdminUsersPage() {
         }
       } catch {}
     })()
-  }, [user?.id])
+  }, [user?.id, _t])
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth/login', { replace: true, state: { from: { pathname: '/admin/users' } } })
       return
     }
-  }, [user, loading, navigate])
+  }, [user, loading, navigate, _t])
 
   // Admin kullanıcıları yükle
   useEffect(() => {
@@ -81,14 +81,14 @@ export default function AdminUsersPage() {
         setAdminUsers(data)
       } catch (error) {
         console.error('Admin users load error:', error)
-        toast.error('Admin kullanıcıları yüklenemedi')
+        toast.error(_t('admin.users.toasts.adminsLoadFailed') as string)
       } finally {
         setIsLoading(false)
       }
     }
 
     loadAdminUsers()
-  }, [isAdmin, user])
+  }, [isAdmin, user, _t])
 
   // Tüm kullanıcıları yükle
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
         }
       } catch (error) {
         console.error('All users load error:', error)
-        toast.error('Kullanıcı listesi yüklenemedi')
+        toast.error(_t('admin.users.toasts.allLoadFailed') as string)
         setAllUsers([])
       } finally {
         setIsLoading(false)
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
     }
 
     loadAllUsers()
-  }, [isAdmin, user, activeTab])
+  }, [isAdmin, user, activeTab, _t])
   const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'moderator' | 'superadmin') => {
     if (!isAdmin) return
     
@@ -181,7 +181,7 @@ export default function AdminUsersPage() {
           })
         } catch {}
 
-        toast.success(`Kullanıcı rolü "${newRole}" olarak güncellendi`)
+        toast.success(_t('admin.users.toasts.roleUpdated', { role: newRole }) as string)
         
         // Local state güncelle
         setAllUsers(prev => prev.map(u => 
@@ -194,11 +194,11 @@ export default function AdminUsersPage() {
           setAdminUsers(data)
         }
       } else {
-        toast.error('Role güncellenemedi')
+        toast.error(_t('admin.users.toasts.roleNotUpdated') as string)
       }
     } catch (error) {
       console.error('Role update error:', error)
-      toast.error('Role güncelleme hatası')
+      toast.error(_t('admin.users.toasts.roleUpdateError') as string)
     } finally {
       setUpdatingRole(null)
     }
@@ -245,8 +245,8 @@ export default function AdminUsersPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="text-center py-8">
-          <h2 className="text-xl font-semibold text-red-600">Erişim Reddedildi</h2>
-          <p className="text-steel-gray mt-2">Bu sayfaya erişmek için admin yetkisi gerekiyor.</p>
+          <h2 className="text-xl font-semibold text-red-600">{_t('admin.ui.accessDeniedTitle')}</h2>
+          <p className="text-steel-gray mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
         </div>
       </div>
     )
@@ -267,8 +267,8 @@ export default function AdminUsersPage() {
               ? 'bg-primary-navy text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
-        >
-          Admin Kullanıcılar ({adminUsers.length})
+>
+          {_t('admin.users.tabs.admins', { count: adminUsers.length })}
         </button>
         <button
           onClick={() => setActiveTab('all')}
@@ -277,23 +277,23 @@ export default function AdminUsersPage() {
               ? 'bg-primary-navy text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
-        >
-          Tüm Kullanıcılar ({allUsers.length})
+>
+          {_t('admin.users.tabs.all', { count: allUsers.length })}
         </button>
       </div>
 
       {/* Arama */}
       <AdminToolbar
         storageKey="toolbar:users"
-        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: 'E-posta veya isim ile ara', focusShortcut: '/' }}
+        search={{ value: searchQuery, onChange: setSearchQuery, placeholder: _t('admin.users.searchPlaceholder'), focusShortcut: '/' }}
         recordCount={(activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length}
         rightExtra={(
           <ColumnsMenu
             columns={[
-              { key: 'user', label: 'Kullanıcı', checked: visibleCols.user, onChange: (v)=>setVisibleCols(s=>({ ...s, user: v })) },
-              { key: 'role', label: 'Role', checked: visibleCols.role, onChange: (v)=>setVisibleCols(s=>({ ...s, role: v })) },
-              { key: 'created', label: 'Kayıt Tarihi', checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
-              ...(activeTab==='all' ? [{ key: 'actions', label: 'İşlemler', checked: visibleCols.actions, onChange: (v: boolean)=>setVisibleCols(s=>({ ...s, actions: v })) }] : [])
+              { key: 'user', label: _t('admin.users.table.user'), checked: visibleCols.user, onChange: (v)=>setVisibleCols(s=>({ ...s, user: v })) },
+              { key: 'role', label: _t('admin.users.table.role'), checked: visibleCols.role, onChange: (v)=>setVisibleCols(s=>({ ...s, role: v })) },
+              { key: 'created', label: _t('admin.users.table.created'), checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
+              ...(activeTab==='all' ? [{ key: 'actions', label: _t('admin.users.table.actions'), checked: visibleCols.actions, onChange: (v: boolean)=>setVisibleCols(s=>({ ...s, actions: v })) }] : [])
             ]}
             density={density}
             onDensityChange={setDensity}
@@ -312,10 +312,10 @@ export default function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kullanıcı</th>)}
-                  {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Role</th>)}
-                  {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kayıt Tarihi</th>)}
-                  {activeTab === 'all' && visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlemler</th>}
+                  {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user')}</th>)}
+                  {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.role')}</th>)}
+                  {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.created')}</th>)}
+                  {activeTab === 'all' && visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.actions')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -338,7 +338,7 @@ export default function AdminUsersPage() {
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getRoleColor(userItem.role || 'user')}`}>
                           {getRoleIcon(userItem.role || 'user')}
-                          {userItem.role || 'user'}
+                          {_t(`roles.${userItem.role || 'user'}`)}
                         </div>
                       </td>
                     )}
@@ -360,9 +360,9 @@ export default function AdminUsersPage() {
                                   onClick={() => handleRoleChange(userItem.id, 'superadmin')}
                                   disabled={updatingRole === userItem.id}
                                   className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50"
-                                  title="Superadmin yap"
+                                  title={_t('admin.users.actionTitles.superadmin') as string}
                                 >
-                                  Superadmin
+                                  {_t('admin.users.actions.superadmin')}
                                 </button>
                               )}
                               {userItem.role !== 'admin' && (
@@ -370,12 +370,12 @@ export default function AdminUsersPage() {
                                   onClick={() => handleRoleChange(userItem.id, 'admin')}
                                   disabled={updatingRole === userItem.id || (userItem.id === user?.id && actorRole !== 'superadmin')}
                                   className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
-                                  title="Admin yap"
+                                  title={_t('admin.users.actionTitles.admin') as string}
                                 >
                                   {updatingRole === userItem.id ? (
                                     <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
                                   ) : (
-                                    'Admin'
+                                    _t('admin.users.actions.admin') as string
                                   )}
                                 </button>
                               )}
@@ -384,9 +384,9 @@ export default function AdminUsersPage() {
                                   onClick={() => handleRoleChange(userItem.id, 'moderator')}
                                   disabled={updatingRole === userItem.id}
                                   className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                                  title="Moderator yap"
+                                  title={_t('admin.users.actionTitles.moderator') as string}
                                 >
-                                  Mod
+                                  {_t('admin.users.actions.moderator')}
                                 </button>
                               )}
                               {userItem.role !== 'user' && (
@@ -394,9 +394,9 @@ export default function AdminUsersPage() {
                                   onClick={() => handleRoleChange(userItem.id, 'user')}
                                   disabled={updatingRole === userItem.id || userItem.id === user?.id}
                                   className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-                                  title={userItem.id === user?.id ? 'Kendi rolünüzü düşüremezsiniz' : 'Normal kullanıcı yap'}
+                                  title={userItem.id === user?.id ? (_t('admin.users.actionTitles.cannotDemoteSelf') as string) : (_t('admin.users.actionTitles.user') as string)}
                                 >
-                                  User
+                                  {_t('admin.users.actions.user')}
                                 </button>
                               )}
                             </>
@@ -414,10 +414,10 @@ export default function AdminUsersPage() {
             <div className={`${adminCardClass} text-center py-8`}>
               <div className="text-steel-gray">
                 {searchQuery 
-                  ? 'Arama kriterine uygun kullanıcı bulunamadı.' 
+                  ? _t('admin.users.empty.filtered') 
                   : activeTab === 'admins' 
-                    ? 'Henüz admin kullanıcı yok.'
-                    : 'Kullanıcı listesi boş.'}
+                    ? _t('admin.users.empty.admins')
+                    : _t('admin.users.empty.all')}
               </div>
             </div>
           )}
@@ -429,12 +429,12 @@ export default function AdminUsersPage() {
         <div className="flex items-start gap-3">
           <AlertCircle className="text-blue-600 mt-0.5" size={16} />
           <div className="text-sm text-blue-800">
-            <p className="font-medium mb-1">Kullanıcı Role Sistemi</p>
+            <p className="font-medium mb-1">{_t('admin.users.info.title')}</p>
             <ul className="space-y-1 text-xs">
-              <li><strong>Superadmin:</strong> Tüm yetkiler + rol atamaları (güvenlik amaçlı sınırlı görünürlük)</li>
-              <li><strong>Admin:</strong> Tüm operasyon paneline erişim (stok, iadeler, kargo, kullanıcılar)</li>
-              <li><strong>Moderator:</strong> Sınırlı admin yetkisi (stok ve iadeler)</li>
-              <li><strong>User:</strong> Normal kullanıcı (sadece kendi hesap yönetimi)</li>
+              <li>{_t('admin.users.info.items.superadmin')}</li>
+              <li>{_t('admin.users.info.items.admin')}</li>
+              <li>{_t('admin.users.info.items.moderator')}</li>
+              <li>{_t('admin.users.info.items.user')}</li>
             </ul>
           </div>
         </div>

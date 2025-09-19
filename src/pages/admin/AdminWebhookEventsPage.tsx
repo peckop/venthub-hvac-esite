@@ -39,7 +39,7 @@ const AdminWebhookEventsPage: React.FC = () => {
 
   const [returnsRows, setReturnsRows] = React.useState<ReturnEventRow[]>([])
   const [emailsRows, setEmailsRows] = React.useState<EmailEventRow[]>([])
-  const { lang } = useI18n()
+  const { t, lang } = useI18n()
 
   const STORAGE_KEY = 'toolbar:webhook-events'
   const [colsRet, setColsRet] = React.useState({ event: true, order: true, carrier: true, status: true, received: true })
@@ -118,37 +118,37 @@ const AdminWebhookEventsPage: React.FC = () => {
   return (
     <div className="space-y-4">
       <header className="flex items-center justify-between">
-        <h1 className={adminSectionTitleClass}>Webhook Olayları</h1>
+        <h1 className={adminSectionTitleClass}>{t('admin.webhooks.title')}</h1>
         <div className="flex items-center gap-2">
-          <button onClick={()=>setTab('returns')} className={`px-3 py-2 rounded ${tab==='returns'?'bg-primary-navy text-white':'border border-gray-200'}`}>Returns</button>
-          <button onClick={()=>setTab('shipping')} className={`px-3 py-2 rounded ${tab==='shipping'?'bg-primary-navy text-white':'border border-gray-200'}`}>Kargo E‑postaları</button>
-          <button onClick={fetchData} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? 'Yükleniyor…' : 'Yenile'}</button>
+          <button onClick={()=>setTab('returns')} className={`px-3 py-2 rounded ${tab==='returns'?'bg-primary-navy text-white':'border border-gray-200'}`}>{t('admin.webhooks.tabs.returns')}</button>
+          <button onClick={()=>setTab('shipping')} className={`px-3 py-2 rounded ${tab==='shipping'?'bg-primary-navy text-white':'border border-gray-200'}`}>{t('admin.webhooks.tabs.shipping')}</button>
+          <button onClick={fetchData} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
         </div>
       </header>
 
       <AdminToolbar
         storageKey="toolbar:webhook-events"
-        search={{ value: q, onChange: setQ, placeholder: tab==='returns' ? 'event_id, order_id, return_id, carrier, status_mapped' : 'order_id, email, subject, provider', focusShortcut: '/' }}
+        search={{ value: q, onChange: setQ, placeholder: tab==='returns' ? t('admin.webhooks.search.returns') : t('admin.webhooks.search.shipping'), focusShortcut: '/' }}
         rightExtra={null}
         recordCount={(tab==='returns'? filteredReturns.length : filteredEmails.length)}
       />
 
       {tab === 'returns' ? (
         <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
-          <div className="p-2 text-xs text-steel-gray">Satıra tıklayarak detay ve yeniden işlem menüsünü açabilirsiniz.</div>
+          <div className="p-2 text-xs text-steel-gray">{t('admin.webhooks.tip.rowAction')}</div>
           <table className="min-w-full text-sm">
             <thead>
               <tr>
-                {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Event ID</th>)}
-                {colsRet.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Order</th>)}
-                {colsRet.carrier && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kargo</th>)}
-                {colsRet.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Durum (map)</th>)}
-                {colsRet.received && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Received</th>)}
+                {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
+                {colsRet.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.order')}</th>)}
+                {colsRet.carrier && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.carrier')}</th>)}
+                {colsRet.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.statusMapped')}</th>)}
+                {colsRet.received && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.received')}</th>)}
               </tr>
             </thead>
             <tbody>
               {filteredReturns.length === 0 ? (
-                <tr><td className="px-4 py-6">Kayıt yok</td></tr>
+                <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
               ) : (
                 filteredReturns.map((r) => (
                   <tr key={String(r.id)} className="border-t border-gray-100">
@@ -168,16 +168,16 @@ const AdminWebhookEventsPage: React.FC = () => {
           <table className="min-w-full text-sm">
             <thead>
               <tr>
-                {colsMail.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Order</th>)}
-                {colsMail.to && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Kime</th>)}
-                {colsMail.subject && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Konu</th>)}
-                {colsMail.provider && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Provider</th>)}
-                {colsMail.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>Tarih</th>)}
+                {colsMail.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.order')}</th>)}
+                {colsMail.to && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.to')}</th>)}
+                {colsMail.subject && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.subject')}</th>)}
+                {colsMail.provider && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.provider')}</th>)}
+                {colsMail.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.date')}</th>)}
               </tr>
             </thead>
             <tbody>
               {filteredEmails.length === 0 ? (
-                <tr><td className="px-4 py-6">Kayıt yok</td></tr>
+                <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
               ) : (
                 filteredEmails.map((e, idx) => (
                   <tr key={idx} className="border-t border-gray-100">
