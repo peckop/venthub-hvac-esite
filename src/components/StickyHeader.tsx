@@ -28,6 +28,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
   const { getCartCount, syncing, getCartTotal } = useCart()
   const { user, signOut } = useAuth()
@@ -116,24 +117,17 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isScrolled])
 
-  // Fetch categories for quick access - sadece bir kere
-  useEffect(() => {
-    let mounted = true
-    async function fetchCategories() {
-      try {
-        const data = await getCategories()
-        if (mounted) {
-          setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
-        }
-      } catch (error) {
-        if (mounted) {
-          console.error('Error fetching categories:', error)
-        }
-      }
+  // Defer categories fetch until dropdown first open (reduce initial header churn)
+  const ensureCategories = useCallback(async () => {
+    if (categoriesLoaded) return
+    try {
+      const data = await getCategories()
+      setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+      setCategoriesLoaded(true)
+    } catch (error) {
+      console.error('Error fetching categories:', error)
     }
-    fetchCategories()
-    return () => { mounted = false }
-  }, [])
+  }, [categoriesLoaded])
 
   // Handle sticky search - optimized debounce
   useEffect(() => {
@@ -437,7 +431,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   {/* Categories Dropdown */}
                   <div className="relative" ref={categoriesRef}>
                     <button
-                      onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                      onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
                       className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
                     >
                       <Grid3X3 size={16} />
@@ -448,6 +442,12 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     {isCategoriesOpen && (
                       <div className="absolute top-full left-0 mt-1 w-64 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl overflow-hidden">
                         <div className="p-2 max-h-96 overflow-y-auto">
+                          {categoriesLoaded && categories.length === 0 && (
+                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
+                          )}
+                          {!categoriesLoaded && (
+                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.loading')}</div>
+                          )}
                           {categories.map((cat) => (
                             <Link
                               key={cat.id}
