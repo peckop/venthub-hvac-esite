@@ -406,13 +406,15 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
       {/* Enhanced Full-Featured Sticky Header (always mounted to avoid flicker) */}
       <>
-        {/* Progress Bar */}
-        <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50 pointer-events-none" aria-hidden={!isScrolled}>
-          <div 
-            className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
-            style={{ width: `${scrollProgress}%`, opacity: isScrolled ? 1 : 0 }}
-          />
-        </div>
+        {/* Progress Bar (only when sticky visible) */}
+        {isScrolled && (
+          <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50 pointer-events-none">
+            <div 
+              className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
+        )}
         
         <div className={`fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-opacity duration-200 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
