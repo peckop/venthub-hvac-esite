@@ -138,8 +138,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   // Handle sticky search - optimized debounce
   useEffect(() => {
     if (stickySearchQuery.trim().length === 0) {
-      setStickySearchResults([])
-      setIsStickySearchOpen(false)
+      // Avoid unnecessary re-renders when already empty/closed
+      setStickySearchResults(prev => (prev.length ? [] : prev))
+      setIsStickySearchOpen(prev => (prev ? false : prev))
       return
     }
     
@@ -154,8 +155,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         setIsStickySearchOpen(true)
       } catch (error) {
         console.error('Sticky search error:', error)
-        setStickySearchResults([])
-        setIsStickySearchOpen(false)
+        setStickySearchResults(prev => (prev.length ? [] : prev))
+        setIsStickySearchOpen(prev => (prev ? false : prev))
       }
     }, 400) // Slightly longer delay to reduce API calls
 
@@ -408,18 +409,17 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       {/* Full-screen search overlay */}
       <SearchOverlay open={isSearchOverlayOpen} onClose={() => setIsSearchOverlayOpen(false)} />
 
-      {/* Enhanced Full-Featured Sticky Header */}
-      {isScrolled && (
-        <>
-          {/* Progress Bar */}
-          <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50">
-            <div 
-              className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
-              style={{ width: `${scrollProgress}%` }}
-            />
-          </div>
-          
-          <div className="fixed top-1 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-all duration-500 animate-slideDown">
+      {/* Enhanced Full-Featured Sticky Header (always mounted to avoid flicker) */}
+      <>
+        {/* Progress Bar */}
+        <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50 pointer-events-none" aria-hidden={!isScrolled}>
+          <div 
+            className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
+            style={{ width: `${scrollProgress}%`, opacity: isScrolled ? 1 : 0 }}
+          />
+        </div>
+        
+        <div className={`fixed top-1 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-transform duration-300 transform-gpu ${isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
@@ -616,8 +616,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </div>
             </div>
           </div>
-        </>
-      )}
+      </>
 
       {/* Mega Menu */}
       <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
