@@ -31,7 +31,8 @@ const ProductsPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [allProducts, setAllProducts] = useState<Product[]>([])
   const [searchResults, setSearchResults] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [_loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy] = useState('name')
   const [searchQuery, setSearchQuery] = useState(q)
@@ -167,15 +168,19 @@ const ProductsPage: React.FC = () => {
     async function run() {
       if (!searchQuery) {
         setSearchResults([])
+        setSearchLoading(false)
         return
       }
       try {
+        setSearchLoading(true)
         const results = await searchProducts(searchQuery)
         const withCovers = await attachCovers(results)
         if (active) setSearchResults(withCovers)
       } catch (e) {
         console.error('Search error:', e)
         if (active) setSearchResults([])
+      } finally {
+        if (active) setSearchLoading(false)
       }
     }
     run()
@@ -189,20 +194,6 @@ const ProductsPage: React.FC = () => {
   const mainCategories = categories.filter(cat => cat.level === 0)
   const applicationCards = getActiveApplicationCards()
 
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-light-gray rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="bg-light-gray rounded-lg h-80"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const isAll = params.get('all') === '1'
   const canonicalUrl = `${window.location.origin}/products`
@@ -372,7 +363,13 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
       {/* Liste alanı: Arama / Tüm Ürünler / Keşfet bölümleri */}
       {searchQuery ? (
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          {searchResults.length === 0 ? (
+          {searchLoading ? (
+            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {[1,2,3,4,5,6,7,8,9].map((i) => (
+                <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
+              ))}
+            </div>
+          ) : searchResults.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl text-light-gray mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-industrial-gray mb-2">
@@ -384,7 +381,7 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
             </div>
           ) : (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-{searchResults.map((product, i) => (
+              {searchResults.map((product, i) => (
                 <ProductCard key={product.id} product={product} layout={viewMode} priority={i === 0} />
               ))}
             </div>
