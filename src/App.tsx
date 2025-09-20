@@ -117,7 +117,7 @@ function App() {
               
               <StickyHeader isScrolled={isScrolled} />
               
-              <main id="main-content" className={isScrolled ? 'pt-12' : ''}>
+              <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
                 <BackToTopButton />
                 <PaymentWatcher />
                 <LanguageSwitcher />
