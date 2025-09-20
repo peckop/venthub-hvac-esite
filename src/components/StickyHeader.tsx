@@ -227,40 +227,40 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center"
               >
                 <Menu size={18} className="group-hover:rotate-180 transition-transform duration-300" />
-                <span className="font-medium">{t('common.categories')}</span>
+<span className="font-medium whitespace-nowrap">{t('common.categories')}</span>
               </button>
               <Link
                 to="/products"
                 onMouseEnter={() => prefetchProductsPage()}
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative min-w-[88px] text-center"
+className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative min-w-[88px] text-center whitespace-nowrap"
               >
                 {t('common.products')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/destek/merkez"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
+className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
               >
                 {t('common.knowledgeHub')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/brands"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group min-w-[84px] text-center"
+className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group min-w-[84px] text-center whitespace-nowrap"
               >
                 {t('common.brands')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/about"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
+className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
               >
                 {t('common.about')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
               </Link>
               <Link
                 to="/contact"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
+className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
               >
                 {t('common.contact')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
@@ -307,7 +307,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       <div className="bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                         <User size={18} />
                       </div>
-                      <span className="hidden lg:block text-sm font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">
+<span className="hidden lg:block text-sm font-medium text-industrial-gray group-hover:text-primary-navy transition-colors max-w-[160px] truncate whitespace-nowrap overflow-hidden">
                         {user.user_metadata?.full_name || user.email?.split('@')[0]}
                       </span>
                       <span className="hidden xl:inline-flex min-w-[96px] justify-center">
@@ -441,7 +441,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 <nav className="hidden lg:flex items-center space-x-1 mx-4">
                   <Link
                     to="/products"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center"
+className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center whitespace-nowrap"
                   >
                     {t('common.products')}
                   </Link>
@@ -450,7 +450,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   <div className="relative" ref={categoriesRef}>
                     <button
                       onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center"
+className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap"
                     >
                       <Grid3X3 size={16} />
                       <span>{t('common.categories')}</span>
@@ -488,7 +488,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   
                   <Link
                     to="/brands"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center"
+className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center whitespace-nowrap"
                   >
                     {t('common.brands')}
                   </Link>
