@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { CartProvider } from './hooks/useCart'
 import { AuthProvider } from './contexts/AuthContext'
@@ -93,9 +93,10 @@ const TermsOfUsePage = lazy(() => import('./pages/legal/TermsOfUsePage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 
-function App() {
-  // Performance optimize edilmiş scroll handling
-  const isScrolled = useScrollThrottle(100, 16)
+function AppShell() {
+  const location = useLocation()
+  // Performance optimize edilmiş scroll handling + sync with route
+  const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: location.pathname })
 
   // Prefetch ProductsPage chunk on idle so first navigation is instant
   React.useEffect(() => {
@@ -105,24 +106,18 @@ function App() {
   }, [])
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true
-        }}>
-            <div className="min-h-screen bg-white">
-              {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
-              <ScrollToTop />
-              
-              <StickyHeader isScrolled={isScrolled} />
-              
-              <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
-                <BackToTopButton />
-                <PaymentWatcher />
-                <LanguageSwitcher />
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
+    <div className="min-h-screen bg-white">
+      {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
+      <ScrollToTop />
+      
+      <StickyHeader isScrolled={isScrolled} />
+      
+      <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
+        <BackToTopButton />
+        <PaymentWatcher />
+        <LanguageSwitcher />
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/cart" element={<CartPage />} />
@@ -201,45 +196,57 @@ function App() {
                 <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
                 <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
                 <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
-                  </Routes>
-                </Suspense>
-              </main>
+          </Routes>
+        </Suspense>
+      </main>
 
-              <Footer />
+      <Footer />
 
-              {/* Global WhatsApp floater */}
-              <WhatsAppFloat />
-              
-              {/* Global cart toast */}
-              <AddToCartToast />
-              
-              {/* Toast Container */}
-              <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: '#FFFFFF',
-                  color: '#374151',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '0.75rem',
-                  fontSize: '14px',
-                },
-                success: {
-                  iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#FFFFFF',
-                  },
-                },
-                error: {
-                  iconTheme: {
-                    primary: '#EF4444',
-                    secondary: '#FFFFFF',
-                  },
-                },
-              }}
-            />
-            </div>
+      {/* Global WhatsApp floater */}
+      <WhatsAppFloat />
+      
+      {/* Global cart toast */}
+      <AddToCartToast />
+      
+      {/* Toast Container */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#FFFFFF',
+            color: '#374151',
+            border: '1px solid #E5E7EB',
+            borderRadius: '0.75rem',
+            fontSize: '14px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <Router future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}>
+          <AppShell />
         </Router>
       </CartProvider>
     </AuthProvider>
