@@ -452,7 +452,7 @@ export const CategoryPage: React.FC = () => {
                   ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
                   : 'space-y-4'
                 }>
-                  {filteredProducts.map((product) => (
+{filteredProducts.map((product, i) => (
                     <ProductCard 
                       key={product.id} 
                       product={product} 
@@ -464,6 +464,7 @@ export const CategoryPage: React.FC = () => {
                       }}
                       layout={viewMode}
                       relatedTopicSlug={relatedTopicSlug || undefined}
+                      priority={i === 0}
                     />
                   ))}
                 </div>

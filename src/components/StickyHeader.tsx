@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Star, Clock, Zap, Grid3X3 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
@@ -72,71 +72,132 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         if (active) setUserRole('user')
       }
     }
-    loadRole()
+
+    if (user?.id) {
+      loadRole()
+    } else {
+      // previous state üzerinden set ederek dependency ihtiyacını kaldır
+      setUserRole(prev => (prev === 'user' ? prev : 'user'))
+    }
+
     return () => { active = false }
   }, [user?.id])
 
-  const roleLabel = (r: string) => r === 'superadmin' ? t('roles.superadmin') : r === 'admin' ? t('roles.admin') : r === 'moderator' ? t('roles.moderator') : t('roles.user')
+  const roleLabel = useCallback((r: string) => {
+    switch(r) {
+      case 'superadmin': return t('roles.superadmin')
+      case 'admin': return t('roles.admin')
+      case 'moderator': return t('roles.moderator')
+      default: return t('roles.user')
+    }
+  }, [t])
 
-  // Scroll progress tracker
+  // Scroll progress tracker - throttled
   useEffect(() => {
+    if (!isScrolled) return
+    
+    let ticking = false
     const handleScroll = () => {
-      const winScroll = document.documentElement.scrollTop
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
-      const scrolled = (winScroll / height) * 100
-      setScrollProgress(scrolled)
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const winScroll = document.documentElement.scrollTop
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
+          const scrolled = height > 0 ? (winScroll / height) * 100 : 0
+          setScrollProgress(scrolled)
+          ticking = false
+        })
+        ticking = true
+      }
     }
 
-    if (isScrolled) {
-      window.addEventListener('scroll', handleScroll)
-      handleScroll()
-    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Initial call
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isScrolled])
 
-  // Fetch categories for quick access
+  // Fetch categories for quick access - sadece bir kere
   useEffect(() => {
+    let mounted = true
     async function fetchCategories() {
       try {
         const data = await getCategories()
-        setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+        if (mounted) {
+          setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+        }
       } catch (error) {
-        console.error('Error fetching categories:', error)
+        if (mounted) {
+          console.error('Error fetching categories:', error)
+        }
       }
     }
     fetchCategories()
+    return () => { mounted = false }
   }, [])
 
-  // Handle sticky search
+  // Handle sticky search - optimized debounce
   useEffect(() => {
+    if (stickySearchQuery.trim().length === 0) {
+      setStickySearchResults([])
+      setIsStickySearchOpen(false)
+      return
+    }
+    
+    if (stickySearchQuery.trim().length < 3) {
+      return // Don't search for less than 3 characters
+    }
+
     const delayedSearch = setTimeout(async () => {
-      if (stickySearchQuery.trim().length > 2) {
-        try {
-          const results = await searchProducts(stickySearchQuery.trim())
-          setStickySearchResults(results.slice(0, 5)) // Max 5 results in sticky
-          setIsStickySearchOpen(true)
-        } catch (error) {
-          console.error('Sticky search error:', error)
-          setStickySearchResults([])
-        }
-      } else {
+      try {
+        const results = await searchProducts(stickySearchQuery.trim())
+        setStickySearchResults(results.slice(0, 5)) // Max 5 results in sticky
+        setIsStickySearchOpen(true)
+      } catch (error) {
+        console.error('Sticky search error:', error)
         setStickySearchResults([])
         setIsStickySearchOpen(false)
       }
-    }, 300)
+    }, 400) // Slightly longer delay to reduce API calls
 
     return () => clearTimeout(delayedSearch)
   }, [stickySearchQuery])
 
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     await signOut()
     setIsUserMenuOpen(false)
     navigate('/')
-  }
+  }, [signOut, navigate])
 
   // Logo click handler kaldırıldı - navigasyon sorunlarını önlemek için
+
+  // Memoized static logo fragments to avoid re-renders (declared unconditionally per hooks rules)
+  const MainLogo = useMemo(() => (
+    <Link to="/" className="flex items-center space-x-3 group">
+      <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-3 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
+        <div className="text-white font-bold text-xl">VH</div>
+      </div>
+      <div className="hidden sm:block">
+        <div className="text-2xl font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
+          VentHub
+        </div>
+        <div className="text-xs text-steel-gray font-medium tracking-wider">
+          HVAC PREMIUM
+        </div>
+      </div>
+    </Link>
+  ), [])
+
+  const StickyLogo = useMemo(() => (
+    <Link to="/" className="flex items-center space-x-2 group flex-shrink-0">
+      <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+        <div className="text-white font-bold text-sm">VH</div>
+      </div>
+      <span className="hidden sm:block font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
+        VentHub
+      </span>
+    </Link>
+  ), [])
 
   return (
     <>
@@ -150,19 +211,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-3 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300">
-                <div className="text-white font-bold text-xl">VH</div>
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-2xl font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
-                  VentHub
-                </div>
-                <div className="text-xs text-steel-gray font-medium tracking-wider">
-                  HVAC PREMIUM
-                </div>
-              </div>
-            </Link>
+            {MainLogo}
 
             {/* Desktop Navigation - Reordered per requirements */}
             <nav className="hidden xl:flex items-center space-x-1">
@@ -374,14 +423,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
-                <Link to="/" className="flex items-center space-x-2 group flex-shrink-0">
-                  <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-                    <div className="text-white font-bold text-sm">VH</div>
-                  </div>
-                  <span className="hidden sm:block font-bold text-industrial-gray group-hover:text-primary-navy transition-colors">
-                    VentHub
-                  </span>
-                </Link>
+                {StickyLogo}
 
                 {/* Quick Navigation */}
                 <nav className="hidden lg:flex items-center space-x-1 mx-4">
