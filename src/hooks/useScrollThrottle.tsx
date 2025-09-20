@@ -13,6 +13,7 @@ export type ScrollThrottleOptions = {
   hideBelow?: number
   throttleMs?: number
   initialDelayMs?: number
+  syncKey?: unknown
 }
 
 export const useScrollThrottle = (
@@ -35,10 +36,15 @@ export const useScrollThrottle = (
     ? 180
     : (thresholdOrOptions.initialDelayMs ?? 180)
 
+  const syncKey = typeof thresholdOrOptions === 'number'
+    ? undefined
+    : thresholdOrOptions.syncKey
+
   const [isScrolled, setIsScrolled] = useState(false)
   const tickingRef = useRef(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const initialTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hasMountedRef = useRef(false)
 
   const handleScroll = useCallback(() => {
     if (tickingRef.current) return
@@ -71,7 +77,7 @@ export const useScrollThrottle = (
   }, [handleScroll, throttleMs])
 
   useEffect(() => {
-    // İlk yüklemede minik bir gecikmeden sonra görünürlüğü değerlendir (ilk flicker'ı önler)
+    // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon
     const initialScrollTop = window.scrollY
 
     if (initialTimerRef.current) {
@@ -79,18 +85,22 @@ export const useScrollThrottle = (
       initialTimerRef.current = null
     }
 
-    if (initialScrollTop > showAt) {
-      if (initialDelayMs > 0) {
-        initialTimerRef.current = setTimeout(() => {
-          if (window.scrollY > showAt) {
-            setIsScrolled(true)
-          }
-        }, initialDelayMs)
+    if (!hasMountedRef.current) {
+      if (initialScrollTop > showAt) {
+        if (initialDelayMs > 0) {
+          initialTimerRef.current = setTimeout(() => {
+            if (window.scrollY > showAt) setIsScrolled(true)
+          }, initialDelayMs)
+        } else {
+          setIsScrolled(true)
+        }
       } else {
-        setIsScrolled(true)
+        setIsScrolled(false)
       }
+      hasMountedRef.current = true
     } else {
-      setIsScrolled(false)
+      // syncKey değişimlerinde mevcut scroll konumuna göre hemen ayarla
+      setIsScrolled(initialScrollTop > showAt)
     }
 
     window.addEventListener('scroll', throttledScroll, { passive: true })
@@ -100,7 +110,7 @@ export const useScrollThrottle = (
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
       if (initialTimerRef.current) clearTimeout(initialTimerRef.current)
     }
-  }, [showAt, initialDelayMs, throttledScroll])
+  }, [showAt, initialDelayMs, throttledScroll, syncKey])
 
   return isScrolled
 }
