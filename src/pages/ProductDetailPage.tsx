@@ -320,10 +320,12 @@ export const ProductDetailPage: React.FC = () => {
                   >
                     ◀
                   </button>
-                  <img
+<img
                     src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
                     alt={images[activeIdx].alt || product.name}
                     className="w-full h-full object-contain"
+                    {...{ fetchpriority: 'high' }}
+                    loading="eager"
                     decoding="async"
                     width={1200}
                     height={1200}

@@ -17,9 +17,14 @@ interface ProductCardProps {
   onToggleCompare?: (productId: string) => void
   layout?: 'grid' | 'list'
   relatedTopicSlug?: string
+  /**
+   * LCP adayı olan ilk ürün görseli için öncelikli yükleme.
+   * true ise loading="eager" ve fetchpriority="high" kullanılır.
+   */
+  priority?: boolean
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false }) => {
   const { t, lang } = useI18n()
   const isList = layout === 'list'
   const { addToCart } = useCart()
@@ -64,12 +69,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
         {/* Product Image */}
         <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg overflow-hidden' : 'aspect-square rounded-t-xl overflow-hidden'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
-          {product.image_url ? (
+{product.image_url ? (
             <img
               src={product.image_url}
               alt={product.image_alt || product.name}
               className={`${isList ? 'w-full h-full' : 'w-full h-full'} object-cover`}
-              loading="lazy"
+              {...(priority ? { fetchpriority: 'high' } : {})}
+              loading={priority ? 'eager' : 'lazy'}
               decoding="async"
               width={isList ? 144 : 400}
               height={isList ? 144 : 400}

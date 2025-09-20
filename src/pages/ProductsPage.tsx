@@ -384,8 +384,8 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
             </div>
           ) : (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {searchResults.map((product) => (
-                <ProductCard key={product.id} product={product} layout={viewMode} />
+{searchResults.map((product, i) => (
+                <ProductCard key={product.id} product={product} layout={viewMode} priority={i === 0} />
               ))}
             </div>
           )}
@@ -408,15 +408,15 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
             </div>
           ) : (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {([...allProducts].sort((a,b)=>{
+{([...allProducts].sort((a,b)=>{
                 switch (sortBy) {
                   case 'price-low': return parseFloat(a.price)-parseFloat(b.price)
                   case 'price-high': return parseFloat(b.price)-parseFloat(a.price)
                   case 'name':
                   default: return a.name.localeCompare(b.name, 'tr')
                 }
-              })).map((product) => (
-                <ProductCard key={product.id} product={product} layout={viewMode} />
+              })).map((product, i) => (
+                <ProductCard key={product.id} product={product} layout={viewMode} priority={i === 0} />
               ))}
             </div>
           )}
