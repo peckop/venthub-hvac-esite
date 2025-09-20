@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useLayoutEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 /**
  * Scroll event'lerini throttle ederek optimize eden hook.
@@ -45,6 +45,8 @@ export const useScrollThrottle = (
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const initialTimerRef = useRef<NodeJS.Timeout | null>(null)
   const hasMountedRef = useRef(false)
+  const lastAboveRef = useRef(false)
+  const lastBelowRef = useRef(true)
 
   const handleScroll = useCallback(() => {
     if (tickingRef.current) return
@@ -53,17 +55,24 @@ export const useScrollThrottle = (
     requestAnimationFrame(() => {
       const scrollTop = window.scrollY
 
+      // iki ardışık örneklemede doğrula
+      const nowAbove = scrollTop > showAt
+      const nowBelow = scrollTop < hideBelow
+
       if (isScrolled) {
-        // Gizleme eşik altına inince kapat (histerezis)
-        if (scrollTop < hideBelow) {
+        // gizlemek için iki kez below gerek
+        if (nowBelow && lastBelowRef.current) {
           setIsScrolled(false)
         }
       } else {
-        // Gösterme eşiğini aşınca aç
-        if (scrollTop > showAt) {
+        // göstermek için iki kez above gerek
+        if (nowAbove && lastAboveRef.current) {
           setIsScrolled(true)
         }
       }
+
+      lastAboveRef.current = nowAbove
+      lastBelowRef.current = nowBelow
 
       tickingRef.current = false
     })
@@ -76,8 +85,8 @@ export const useScrollThrottle = (
     timeoutRef.current = setTimeout(handleScroll, throttleMs)
   }, [handleScroll, throttleMs])
 
-  useLayoutEffect(() => {
-    // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon (paint öncesi)
+  useEffect(() => {
+    // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon
     const initialScrollTop = window.scrollY
 
     if (initialTimerRef.current) {
