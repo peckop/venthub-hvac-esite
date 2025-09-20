@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useLayoutEffect } from 'react'
 
 /**
  * Scroll event'lerini throttle ederek optimize eden hook.
@@ -76,8 +76,8 @@ export const useScrollThrottle = (
     timeoutRef.current = setTimeout(handleScroll, throttleMs)
   }, [handleScroll, throttleMs])
 
-  useEffect(() => {
-    // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon
+  useLayoutEffect(() => {
+    // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon (paint öncesi)
     const initialScrollTop = window.scrollY
 
     if (initialTimerRef.current) {

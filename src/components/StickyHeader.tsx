@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Star, Clock, Zap, Grid3X3 } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { searchProducts, Product, getCategories, Category } from '../lib/supabase'
@@ -35,6 +35,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const isAdmin = checkAdminAccess(user)
   const [userRole, setUserRole] = useState<string>('user')
   const navigate = useNavigate()
+  const location = useLocation()
+  const [uiReady, setUiReady] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const stickySearchRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
@@ -165,6 +167,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   }, [signOut, navigate])
 
   // Logo click handler kaldırıldı - navigasyon sorunlarını önlemek için
+
+  // Disable transition on the first frame after navigation to avoid flash
+  useEffect(() => {
+    setUiReady(false)
+    const id = requestAnimationFrame(() => setUiReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [location.pathname])
 
   // Memoized static logo fragments to avoid re-renders (declared unconditionally per hooks rules)
   const MainLogo = useMemo(() => (
@@ -413,7 +422,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
           />
         </div>
         
-        <div className={`fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-transform duration-300 transform-gpu ${isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
+        <div className={`fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg ${uiReady ? 'transition-transform duration-300' : 'transition-none'} transform-gpu ${isScrolled ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
