@@ -31,6 +31,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
   const { getCartCount, syncing, getCartTotal } = useCart()
+  const [showSyncPulse, setShowSyncPulse] = useState(false)
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
   const [userRole, setUserRole] = useState<string>('user')
@@ -129,6 +130,16 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     }
   }, [categoriesLoaded])
 
+  // Delay showing syncing pulse to avoid early flicker
+  useEffect(() => {
+    if (syncing) {
+      const id = setTimeout(() => setShowSyncPulse(true), 500)
+      return () => clearTimeout(id)
+    } else {
+      setShowSyncPulse(false)
+    }
+  }, [syncing])
+
   // Handle sticky search - optimized debounce
   useEffect(() => {
     if (stickySearchQuery.trim().length === 0) {
@@ -213,7 +224,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             <nav className="hidden xl:flex items-center space-x-1">
               <button
                 onClick={() => { trackEvent('nav_click', { target: 'categories' }); setIsMenuOpen(true) }}
-                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30"
+                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center"
               >
                 <Menu size={18} className="group-hover:rotate-180 transition-transform duration-300" />
                 <span className="font-medium">{t('common.categories')}</span>
@@ -221,7 +232,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               <Link
                 to="/products"
                 onMouseEnter={() => prefetchProductsPage()}
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative"
+                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative min-w-[88px] text-center"
               >
                 {t('common.products')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
@@ -235,7 +246,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
               </Link>
               <Link
                 to="/brands"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group"
+                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group min-w-[84px] text-center"
               >
                 {t('common.brands')}
                 <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
@@ -275,7 +286,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
                   >
                 <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
-                {syncing && (
+                {showSyncPulse && syncing && (
                   <span title={t('header.syncing')} className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
                 )}
                 {getCartCount() > 0 && (
@@ -299,13 +310,17 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                       <span className="hidden lg:block text-sm font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">
                         {user.user_metadata?.full_name || user.email?.split('@')[0]}
                       </span>
-                      {(userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderator') && (
-                        <span className={`hidden xl:inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${
-                          userRole === 'superadmin' ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
-                        }`} title={`${t('header.roleLabel')}: ${roleLabel(userRole)}`}>
-                          {roleLabel(userRole)}
-                        </span>
-                      )}
+                      <span className="hidden xl:inline-flex min-w-[96px] justify-center">
+                        {(userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderator') ? (
+                          <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${
+                            userRole === 'superadmin' ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
+                          }`} title={`${t('header.roleLabel')}: ${roleLabel(userRole)}`}>
+                            {roleLabel(userRole)}
+                          </span>
+                        ) : (
+                          <span className="inline-flex px-2 py-0.5 text-[11px] rounded-full border border-transparent opacity-0">&nbsp;</span>
+                        )}
+                      </span>
                       <ChevronDown size={16} className={`hidden lg:block text-steel-gray group-hover:text-primary-navy transition-all duration-300 ${
                         isUserMenuOpen ? 'rotate-180' : ''
                       }`} />
@@ -426,7 +441,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 <nav className="hidden lg:flex items-center space-x-1 mx-4">
                   <Link
                     to="/products"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center"
                   >
                     {t('common.products')}
                   </Link>
@@ -435,7 +450,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   <div className="relative" ref={categoriesRef}>
                     <button
                       onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center"
                     >
                       <Grid3X3 size={16} />
                       <span>{t('common.categories')}</span>
@@ -473,7 +488,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   
                   <Link
                     to="/brands"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center"
                   >
                     {t('common.brands')}
                   </Link>
