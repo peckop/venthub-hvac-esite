@@ -5,6 +5,8 @@
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+  /* Stabilize layout width when vertical scrollbar appears */
+  scrollbar-gutter: stable;
 }
 
 /* Scroll behavior optimization for better performance */
