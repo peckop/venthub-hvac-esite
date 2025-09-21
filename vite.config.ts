@@ -19,7 +19,9 @@ export default defineConfig({
         manualChunks: {
           // Core vendor libraries
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': ['lucide-react', 'react-hot-toast', 'framer-motion'],
+          'icons': ['lucide-react'],
+          'toast': ['react-hot-toast'],
+          'motion': ['framer-motion'],
           'vendor-radix': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu', 
