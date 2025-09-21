@@ -3,14 +3,27 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import AppWrapper from './AppWrapper.tsx'
 import { installErrorReporter } from './lib/errorReporter'
-import { supabase } from './lib/supabase'
 
-// Sentry init (yalnızca DSN varsa)
+// Sentry init (yalnızca DSN varsa) ve Supabase origin için preconnect
 try {
   const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
-  // Install lightweight error reporter to Supabase Edge Function
   const supaUrl = viteEnv.VITE_SUPABASE_URL
   if (supaUrl) {
+    // 1) Runtime preconnect/dns-prefetch (env'e göre)
+    try {
+      const origin = new URL(supaUrl).origin
+      const link1 = document.createElement('link')
+      link1.rel = 'preconnect'
+      link1.href = origin
+      link1.crossOrigin = 'anonymous'
+      document.head.appendChild(link1)
+      const link2 = document.createElement('link')
+      link2.rel = 'dns-prefetch'
+      link2.href = origin
+      document.head.appendChild(link2)
+    } catch {}
+
+    // 2) Lightweight error reporter to Supabase Edge Function
     const isLocal = /localhost|127\.0\.0\.1/.test(supaUrl)
     const endpoint = isLocal
       ? `${supaUrl}/functions/v1/log-client-error`
@@ -44,9 +57,10 @@ try {
       setTimeout(() => {
         throw new Error('VH TEST ' + new Date().toISOString())
       }, 300)
-      // 2) Also call the Edge Function directly to guarantee a row
+      // 2) Also call the Edge Function directly to guarantee a row (lazy import Supabase)
       setTimeout(async () => {
         try {
+          const { supabase } = await import('./lib/supabase')
           await supabase.functions.invoke('log-client-error', {
             body: {
               msg: 'VH SELF-TEST ' + new Date().toISOString(),

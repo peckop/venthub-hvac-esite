@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
-import { ftsSearchProducts, FtsProductResult } from '../lib/supabase'
+import type { FtsProductResult } from '../lib/supabase'
 import { formatCurrency } from '../i18n/format'
 
 interface SearchOverlayProps {
@@ -34,6 +34,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       try {
         setLoading(true)
         setError(null)
+        const { ftsSearchProducts } = await import('../lib/supabase')
         const rows = await ftsSearchProducts(debounced, 20)
         if (active) setResults(rows)
       } catch {

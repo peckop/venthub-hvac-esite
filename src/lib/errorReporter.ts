@@ -1,5 +1,3 @@
-import { supabase } from './supabase'
-
 export function installErrorReporter(_endpoint: string, options?: { sample?: number; release?: string; env?: string; ttlMs?: number }) {
   const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
   const force = (() => {
@@ -42,7 +40,8 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
       if (!force && Math.random() > sample) return
       const key = JSON.stringify([payload.msg, payload.url, payload.stack]).slice(0, 256)
       if (!shouldSend(key)) return
-      // Use Supabase client to include Authorization/apikey headers automatically
+      // Lazy import Supabase to avoid pulling it into initial render
+      const { supabase } = await import('./supabase')
       const { error } = await supabase.functions.invoke('log-client-error', { body: payload })
       if (error) {
         // Best-effort: surface in console for quick diagnosis during tests

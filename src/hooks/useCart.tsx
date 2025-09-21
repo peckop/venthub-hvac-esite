@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
-import { Product, getOrCreateShoppingCart, upsertCartItem, removeCartItem as removeDbCartItem, clearCartItems as clearDbCartItems, listCartItemsWithProducts, getEffectivePriceInfo, supabase } from '../lib/supabase'
+import type { Product } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
@@ -147,6 +147,7 @@ useEffect(() => {
       mergingRef.current = true
       setSyncing(true)
       try {
+        const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, getEffectivePriceInfo, upsertCartItem, supabase } = await import('../lib/supabase')
         const cart = await getOrCreateShoppingCart(user.id)
         if (cancelled) return
         setServerCartId(cart.id)
@@ -303,14 +304,16 @@ useEffect(() => {
     // If logged in, also sync to server (optimistic)
     if (CART_SERVER_SYNC && user && serverCartId) {
       // compute effective price and upsert optimistically, also reflect locally
-      getEffectivePriceInfo(product)
-        .then(info => {
-          upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
-            .catch(err => console.error('server addToCart error', err))
-          // Update local snapshot unit price
-          setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
-        })
-        .catch(err => console.error('server addToCart error', err))
+      import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
+        getEffectivePriceInfo(product)
+          .then(info => {
+            upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+              .catch(err => console.error('server addToCart error', err))
+            // Update local snapshot unit price
+            setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
+          })
+          .catch(err => console.error('server addToCart error', err))
+      }).catch(() => {})
     }
 
     // Dispatch a global event so UI can present a rich toast/modal
@@ -333,7 +336,9 @@ useEffect(() => {
     })
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      removeDbCartItem(serverCartId, productId).catch(err => console.error('server removeFromCart error', err))
+      import('../lib/supabase').then(({ removeCartItem }) => {
+        return removeCartItem(serverCartId, productId)
+      }).catch(err => console.error('server removeFromCart error', err))
     }
   }
 
@@ -354,14 +359,16 @@ useEffect(() => {
     if (CART_SERVER_SYNC && user && serverCartId) {
       const product = items.find(i => i.product.id === productId)?.product
       if (product) {
-        getEffectivePriceInfo(product)
-          .then(info => {
-            upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
-              .catch(err => console.error('server updateQuantity error', err))
-            // Ensure local snapshot unit price is present
-            setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
-          })
-          .catch(err => console.error('server updateQuantity error', err))
+        import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
+          getEffectivePriceInfo(product)
+            .then(info => {
+              upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+                .catch(err => console.error('server updateQuantity error', err))
+              // Ensure local snapshot unit price is present
+              setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
+            })
+            .catch(err => console.error('server updateQuantity error', err))
+        }).catch(()=>{})
       }
     }
   }
@@ -392,7 +399,9 @@ useEffect(() => {
     }
     
     if (CART_SERVER_SYNC && user && serverCartId) {
-      clearDbCartItems(serverCartId).catch(err => console.error('server clearCart error', err))
+      import('../lib/supabase').then(({ clearCartItems }) => {
+        return clearCartItems(serverCartId)
+      }).catch(err => console.error('server clearCart error', err))
     }
   }
 
@@ -443,14 +452,16 @@ useEffect(() => {
     // Sunucuya da yalnızca değişenleri yansıt (varsa)
     if (changedIds.size > 0 && CART_SERVER_SYNC && user && serverCartId) {
       try {
-        const tasks = items.map(it => {
-          if (!changedIds.has(it.product.id)) return Promise.resolve()
-          const up = pmap.get(it.product.id)
-          if (up == null) return Promise.resolve()
-          return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
-            .catch(e => console.warn('applyServerPricing upsert error', e))
-        })
-        Promise.allSettled(tasks).catch(()=>{})
+        import('../lib/supabase').then(({ upsertCartItem }) => {
+          const tasks = items.map(it => {
+            if (!changedIds.has(it.product.id)) return Promise.resolve()
+            const up = pmap.get(it.product.id)
+            if (up == null) return Promise.resolve()
+            return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
+              .catch(e => console.warn('applyServerPricing upsert error', e))
+          })
+          Promise.allSettled(tasks).catch(()=>{})
+        }).catch(()=>{})
       } catch { /* no-op */ }
     }
   }
