@@ -31,18 +31,6 @@ export const HomePage: React.FC = () => {
   ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
 
-  React.useEffect(() => {
-    // Sadece ana sayfada hero görselini preload et (başka rotalarda uyarı çıkmasın diye runtime ekliyoruz)
-    try {
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.as = 'image'
-      link.href = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
-      document.head.appendChild(link)
-      return () => { try { document.head.removeChild(link) } catch {} }
-    } catch {}
-  }, [])
-
   return (
     <div className="min-h-screen">
       <Seo
