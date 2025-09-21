@@ -6,16 +6,16 @@ import InViewCounter from './InViewCounter'
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=45&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=60&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&srcset'
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=75&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=80'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
@@ -56,7 +56,7 @@ export const HeroSection: React.FC = () => {
     >
       {/* Background (decorative) moved to CSS to keep it out of LCP */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-20"
+        className="absolute inset-0 pointer-events-none opacity-20 hidden md:block"
         aria-hidden="true"
         role="presentation"
       >
