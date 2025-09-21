@@ -3,6 +3,41 @@ import { useI18n } from '../i18n/I18nProvider'
 import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
 import SpotlightHeroOverlay from './SpotlightHeroOverlay'
 import InViewCounter from './InViewCounter'
+// Responsive hero variants generated at build-time via vite-imagetools
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg'
+
+const HeroPicture: React.FC = () => {
+  const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
+  return (
+    <picture>
+      <source type="image/avif" srcSet={avifSet as unknown as string} sizes={sizes} />
+      <source type="image/webp" srcSet={webpSet as unknown as string} sizes={sizes} />
+      <img
+        src={hero1200 as unknown as string}
+        srcSet={jpgSet as unknown as string}
+        sizes={sizes}
+        alt="HVAC Equipment"
+        width={1200}
+        height={800}
+        loading="eager"
+        {...({ fetchpriority: 'high' } as Record<string, string>)}
+        decoding="async"
+        className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
+      />
+    </picture>
+  )
+}
 
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
@@ -103,16 +138,8 @@ export const HeroSection: React.FC = () => {
 
             {/* Featured Image */}
             <div className="relative">
-              <img
-                src="/images/industrial_HVAC_air_handling_unit_warehouse.jpg"
-                alt="HVAC Equipment"
-                width={1200}
-                height={800}
-                loading="eager"
-                {...({ fetchpriority: 'high' } as Record<string, string>)}
-                decoding="async"
-                className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
-              />
+              {/* Responsive picture with AVIF/WebP/JPEG via vite-imagetools */}
+              <HeroPicture />
               <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
             </div>
           </div>
