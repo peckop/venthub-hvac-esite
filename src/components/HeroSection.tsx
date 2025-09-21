@@ -1,6 +1,5 @@
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
 import SpotlightHeroOverlay from './SpotlightHeroOverlay'
 import InViewCounter from './InViewCounter'
 // Responsive hero variants generated at build-time via vite-imagetools
@@ -42,10 +41,18 @@ const HeroPicture: React.FC = () => {
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement | null>(null)
+  const enableParallax = (() => {
+    try {
+      const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const coarse = window.matchMedia('(pointer: coarse)').matches
+      return !rm && !coarse
+    } catch { return false }
+  })()
   return (
     <div
       ref={heroRef}
       onMouseMove={(e) => {
+        if (!enableParallax) return
         const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
         const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
@@ -90,19 +97,19 @@ export const HeroSection: React.FC = () => {
             {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
-                <CheckCircle className="text-success-green flex-shrink-0" size={20} />
+                <CheckIcon className="text-success-green flex-shrink-0" />
                 <span className="text-steel-gray">{t('home.features.euQuality')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Truck className="text-success-green flex-shrink-0" size={20} />
+                <TruckIcon className="text-success-green flex-shrink-0" />
                 <span className="text-steel-gray">{t('home.features.fastDelivery')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Shield className="text-success-green flex-shrink-0" size={20} />
+                <ShieldIcon className="text-success-green flex-shrink-0" />
                 <span className="text-steel-gray">{t('home.features.warranty')}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="text-success-green flex-shrink-0" size={20} />
+                <PhoneIcon className="text-success-green flex-shrink-0" />
                 <span className="text-steel-gray">{t('home.features.support')}</span>
               </div>
             </div>
@@ -114,7 +121,7 @@ export const HeroSection: React.FC = () => {
                 className="inline-flex items-center justify-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
               >
                 <span>{t('common.exploreProducts')}</span>
-                <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRightIcon className="ml-2 group-hover:translate-x-1 transition-transform" />
               </a>
               <button
                 type="button"
@@ -156,6 +163,48 @@ export const HeroSection: React.FC = () => {
         </svg>
       </div>
     </div>
+  )
+}
+
+// Minimal inline icons to avoid loading lucide-react on initial load
+function ArrowRightIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+function CheckIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+      <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+function TruckIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="1" y="7" width="13" height="8" stroke="currentColor" strokeWidth="2"/>
+      <path d="M14 9h4l3 3v3h-7" stroke="currentColor" strokeWidth="2" fill="none"/>
+      <circle cx="6" cy="17" r="2" fill="currentColor"/>
+      <circle cx="18" cy="17" r="2" fill="currentColor"/>
+    </svg>
+  )
+}
+function ShieldIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z" stroke="currentColor" strokeWidth="2" fill="none"/>
+    </svg>
+  )
+}
+function PhoneIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.16 9.81 19.8 19.8 0 0 1 .09 1.18 2 2 0 0 1 2.07-.99h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.62a2 2 0 0 1-.45 2.11L6.5 7.5a16 16 0 0 0 6 6l1.99-1.74a2 2 0 0 1 2.11-.45c.84.29 1.72.5 2.62.62A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="1.5"/>
+    </svg>
   )
 }
 
