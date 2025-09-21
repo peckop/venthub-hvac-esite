@@ -277,6 +277,11 @@ img {
   contain-intrinsic-size: 320px 420px;
 }
 
+/* Generic content-visibility helpers for below-the-fold sections */
+.cv-320 { content-visibility: auto; contain-intrinsic-size: 1px 320px; }
+.cv-400 { content-visibility: auto; contain-intrinsic-size: 1px 400px; }
+.cv-600 { content-visibility: auto; contain-intrinsic-size: 1px 600px; }
+
 .fixed {
   position: fixed;
 }
