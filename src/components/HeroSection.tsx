@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { ArrowRight, CheckCircle, Truck, Shield, Phone } from 'lucide-react'
 import SpotlightHeroOverlay from './SpotlightHeroOverlay'
@@ -7,43 +7,21 @@ import InViewCounter from './InViewCounter'
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement | null>(null)
-  const [enableParallax, setEnableParallax] = useState(false)
-
-  useEffect(() => {
-    try {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)')
-      const pointerFine = window.matchMedia('(pointer: fine)')
-      const update = () => setEnableParallax(!reduce.matches && pointerFine.matches)
-      update()
-      reduce.addEventListener?.('change', update)
-      pointerFine.addEventListener?.('change', update)
-      return () => {
-        reduce.removeEventListener?.('change', update)
-        pointerFine.removeEventListener?.('change', update)
-      }
-    } catch { setEnableParallax(false) }
-  }, [])
-
-  const onMouseMove = useMemo(() => {
-    return (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!enableParallax) return
-      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
-      const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
-      const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
-      ;(e.currentTarget as HTMLDivElement).style.setProperty('--mx', `${x}%`)
-      ;(e.currentTarget as HTMLDivElement).style.setProperty('--my', `${y}%`)
-    }
-  }, [enableParallax])
-
   return (
     <div
       ref={heroRef}
-      onMouseMove={onMouseMove}
+      onMouseMove={(e) => {
+        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+        const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
+        const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
+        ;(e.currentTarget as HTMLDivElement).style.setProperty('--mx', `${x}%`)
+        ;(e.currentTarget as HTMLDivElement).style.setProperty('--my', `${y}%`)
+      }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
       {/* Background (decorative) moved to CSS to keep it out of LCP */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-20 hidden md:block"
+        className="absolute inset-0 pointer-events-none opacity-20"
         aria-hidden="true"
         role="presentation"
       >
@@ -113,8 +91,8 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Content - Featured Product/Stats (mobilde görseli gizle) */}
-          <div className="space-y-6 hidden md:block">
+          {/* Right Content - Featured Product/Stats */}
+          <div className="space-y-6">
             {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-4">
               <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
