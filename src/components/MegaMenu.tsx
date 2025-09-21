@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getCategories, Category } from '../lib/supabase'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { ChevronRight, Menu, X, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { trackEvent } from '../utils/analytics'
@@ -45,7 +44,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm transition-all duration-300" 
+      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm motion-safe:transition-all motion-safe:duration-300"
       onClick={onClose}
     >
       <div 
@@ -56,7 +55,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200/30 bg-gradient-to-r from-primary-navy/5 to-secondary-blue/5">
           <div className="flex items-center space-x-3">
             <div className="bg-gradient-to-r from-primary-navy to-secondary-blue p-2 rounded-lg shadow-md">
-              <Menu size={20} className="text-white" />
+              <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </div>
             <h3 className="text-xl font-bold text-industrial-gray">
               {t('megamenu.navigation')}
@@ -64,9 +65,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-300 group"
+            className="p-2 hover:bg-red-50 hover:text-red-600 rounded-xl motion-safe:transition-all motion-safe:duration-300 group"
           >
-            <X size={22} className="text-steel-gray group-hover:text-red-600 group-hover:rotate-90 transition-all duration-300" />
+            <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-red-600 motion-safe:group-hover:rotate-90 motion-safe:transition-all motion-safe:duration-300">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
         </div>
 
@@ -83,50 +86,68 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
               onClick={(_e) => {
                 onClose()
               }}
-              className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-xl hover:from-secondary-blue hover:to-primary-navy transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-xl hover:from-secondary-blue hover:to-primary-navy motion-safe:transition-all motion-safe:duration-300 shadow-lg hover:shadow-xl motion-safe:transform motion-safe:hover:scale-105"
             >
               <span className="font-bold">{t('common.products')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
             <Link
               to="/brands"
               onClick={onClose}
-              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-primary-navy/20 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
+              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-primary-navy/20 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy motion-safe:transition-all motion-safe:duration-300 shadow-sm hover:shadow-md"
             >
               <span className="font-bold">{t('common.brands')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
             <Link
               to="/destek/merkez"
               onClick={onClose}
-              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
+              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy motion-safe:transition-all motion-safe:duration-300 shadow-sm hover:shadow-md"
             >
               <span className="font-bold">{t('common.knowledgeHub')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
             <Link
               to="/about"
               onClick={onClose}
-              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
+              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy motion-safe:transition-all motion-safe:duration-300 shadow-sm hover:shadow-md"
             >
               <span className="font-bold">{t('common.about')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
             <Link
               to="/contact"
               onClick={onClose}
-              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy transition-all duration-300 shadow-sm hover:shadow-md"
+              className="group flex items-center justify-center space-x-3 p-4 bg-white border-2 border-gray-200 text-industrial-gray rounded-xl hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 hover:border-primary-navy motion-safe:transition-all motion-safe:duration-300 shadow-sm hover:shadow-md"
             >
               <span className="font-bold">{t('common.contact')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
             <Link
               to="/cart"
               onClick={onClose}
-              className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="group flex items-center justify-center space-x-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 motion-safe:transition-all motion-safe:duration-300 shadow-lg hover:shadow-xl motion-safe:transform motion-safe:hover:scale-105"
             >
               <span className="font-bold">{t('megamenu.myCart')}</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="motion-safe:group-hover:translate-x-1 motion-safe:transition-transform motion-safe:duration-300">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
             </Link>
           </div>
         </div>
@@ -181,7 +202,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                             {subs.length} {t('megamenu.subcategories')}
                           </p>
                         </div>
-                        <ChevronRight size={16} className="text-steel-gray group-hover/item:text-primary-navy group-hover/item:translate-x-1 transition-all duration-300" />
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover/item:text-primary-navy group-hover/item:translate-x-1 transition-all duration-300">
+                          <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="9,18 15,12 9,6" />
+                        </svg>
                       </div>
                     </Link>
 
@@ -196,7 +219,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
                             className="group/sub flex items-center justify-between px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 rounded-lg transition-all duration-200"
                           >
                             <span className="font-medium">{sub.name}</span>
-                            <ChevronRight size={14} className="opacity-0 group-hover/sub:opacity-100 group-hover/sub:translate-x-1 transition-all duration-200" />
+                            <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="opacity-0 group-hover/sub:opacity-100 group-hover/sub:translate-x-1 transition-all duration-200">
+                              <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="9,18 15,12 9,6" />
+                            </svg>
                           </Link>
                         ))}
                         {subs.length > 4 && (

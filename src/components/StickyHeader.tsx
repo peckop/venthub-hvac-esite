@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Star, Clock, Zap, Grid3X3 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
@@ -228,7 +227,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 onClick={() => { trackEvent('nav_click', { target: 'categories' }); setIsMenuOpen(true) }}
                 className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center"
               >
-                <Menu size={18} className="group-hover:rotate-180 transition-transform duration-300" />
+                <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-180 transition-transform duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
 <span className="font-medium whitespace-nowrap">{t('common.categories')}</span>
               </button>
               <Link
@@ -276,7 +277,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                 aria-label={t('common.search')}
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
               >
-                <Search size={18} className="text-steel-gray group-hover:text-primary-navy" />
+                <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
               </button>
             </div>
 
@@ -287,7 +290,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                     aria-label={t('header.cart')}
                     className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
                   >
-                <ShoppingCart size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300" />
+                <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
+                </svg>
                 {showSyncPulse && syncing && (
                   <span title={t('header.syncing')} className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
                 )}
@@ -307,7 +312,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                       className="flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
                     >
                       <div className="bg-gradient-to-r from-primary-navy to-secondary-blue text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                        <User size={18} />
+                        <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                        </svg>
                       </div>
 <span className="hidden lg:block text-sm font-medium text-industrial-gray group-hover:text-primary-navy transition-colors max-w-[160px] truncate whitespace-nowrap overflow-hidden">
                         {user.user_metadata?.full_name || user.email?.split('@')[0]}
@@ -323,9 +330,11 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                           <span className="inline-flex px-2 py-0.5 text-[11px] rounded-full border border-transparent opacity-0">&nbsp;</span>
                         )}
                       </span>
-                      <ChevronDown size={16} className={`hidden lg:block text-steel-gray group-hover:text-primary-navy transition-all duration-300 ${
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`hidden lg:block text-steel-gray group-hover:text-primary-navy transition-all duration-300 ${
                         isUserMenuOpen ? 'rotate-180' : ''
-                      }`} />
+                      }`}>
+                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
+                      </svg>
                     </button>
 
                     {/* Enhanced User Dropdown */}
@@ -348,7 +357,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                             onClick={() => setIsUserMenuOpen(false)}
                             className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
                           >
-                            <User size={16} />
+                            <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                            </svg>
                             <span>{t('header.account')}</span>
                           </Link>
                           {isAdmin && (
@@ -357,7 +368,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                               onClick={() => setIsUserMenuOpen(false)}
                               className="flex items-center space-x-3 px-4 py-3 text-sm text-steel-gray hover:text-primary-navy hover:bg-gradient-to-r hover:from-air-blue/20 hover:to-light-gray/20 transition-all duration-200 rounded-lg m-1"
                             >
-                              <Crown size={16} />
+                              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l6 6 6-6M2 9l10 12L22 9" />
+                              </svg>
                               <span>{t('header.adminPanel')}</span>
                             </Link>
                           )}
@@ -365,7 +378,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                             onClick={handleSignOut}
                             className="flex items-center space-x-3 w-full px-4 py-3 text-sm text-steel-gray hover:text-red-600 hover:bg-red-50/50 transition-all duration-200 rounded-lg m-1"
                           >
-                            <LogOut size={16} />
+                            <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+                            </svg>
                             <span>{t('common.signOut')}</span>
                           </button>
                         </div>
@@ -391,7 +406,9 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                       aria-label={t('common.signIn')}
                       className="lg:hidden p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300"
                     >
-                      <User size={22} className="text-steel-gray" />
+                      <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                      </svg>
                     </Link>
                   </div>
                 )}
@@ -404,14 +421,18 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                 aria-label={t('common.search')}
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 xl:hidden group"
               >
-                <Search size={22} className="text-steel-gray group-hover:text-primary-navy" />
+                <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
               </button>
               <button
                 onClick={() => setIsMenuOpen(true)}
                 aria-label={t('header.menu')}
                 className="p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 xl:hidden group"
               >
-                <Menu size={22} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
+                <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
             </div>
           </div>
@@ -454,9 +475,13 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                       onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
 className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap"
                     >
-                      <Grid3X3 size={16} />
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="6" height="6"/>
+                      </svg>
                       <span>{t('common.categories')}</span>
-                      <ChevronDown size={14} className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                      <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`}>
+                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
+                      </svg>
                     </button>
                     
                     {isCategoriesOpen && (
@@ -507,7 +532,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                     }
                   }}>
                     <div className="relative group">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors" size={16} />
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                      </svg>
                       <input
                         type="text"
                         placeholder={t('common.quickSearch')}
@@ -556,7 +583,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                     title={t('header.quickOrder')}
                     aria-label={t('header.quickOrder')}
                   >
-                    <Zap size={16} className="text-warning-orange group-hover:animate-pulse" />
+                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-warning-orange group-hover:animate-pulse">
+                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
+                    </svg>
                     <span className="hidden 2xl:block">{t('header.quickOrder')}</span>
                   </button>
 
@@ -571,7 +600,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                       title={t('header.recentlyViewed')}
                       aria-label={t('header.recentlyViewed')}
                     >
-                      <Clock size={16} className="text-steel-gray group-hover:text-primary-navy" />
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy">
+                        <circle cx="12" cy="12" r="10"/><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" />
+                      </svg>
                     </button>
                   )}
 
@@ -582,7 +613,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                       title={t('header.favorites')}
                       aria-label={t('header.favorites')}
                   >
-                    <Star size={16} className="text-steel-gray group-hover:text-gold-accent" />
+                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-gold-accent">
+                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
+                    </svg>
                   </button>
 
                   {/* Menu Button */}
@@ -591,7 +624,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                     aria-label={t('header.menu')}
                     className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                   >
-                    <Menu size={18} className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300" />
+                    <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                   </button>
 
                   {/* Cart with Total */}
@@ -601,7 +636,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                     className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
                   >
                     <div className="relative">
-                      <ShoppingCart size={18} className="text-steel-gray group-hover:text-success-green transition-all duration-300" />
+                      <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-success-green transition-all duration-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
+                      </svg>
                       {getCartCount() > 0 && (
                         <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
                           {getCartCount()}
@@ -622,7 +659,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
                       aria-label={t('header.account')}
                       className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     >
-                      <User size={18} className="text-steel-gray group-hover:text-primary-navy transition-all duration-300" />
+                      <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy transition-all duration-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                      </svg>
                     </Link>
                   ) : (
                     <Link

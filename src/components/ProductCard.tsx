@@ -1,7 +1,6 @@
 import React from 'react'
 import { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
-import { ShoppingCart, Star } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
@@ -68,14 +67,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
   return (
     <Link to={`/product/${product.id}`}>
-      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 transition-all duration-200 overflow-hidden border ${
+      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${
         highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
       } ${isList ? 'md:flex items-stretch' : ''}`}>
         {/* Featured Badge */}
         {product.is_featured && (
           <div className="absolute top-3 left-3 z-10">
             <div className="bg-gold-accent text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
-              <Star size={12} fill="currentColor" />
+              <svg width={12} height={12} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
+                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
+              </svg>
               <span>{t('pdp.featured')}</span>
             </div>
           </div>
@@ -114,7 +115,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         {/* Content */}
         <div className={`p-4 ${isList ? 'flex-1' : ''}`}>
           {/* Product Name */}
-          <h3 className="font-semibold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-2 mb-2">
+          <h3 className="font-semibold text-industrial-gray motion-safe:group-hover:text-primary-navy motion-safe:transition-colors line-clamp-2 mb-2">
             {product.name}
           </h3>
 
@@ -190,9 +191,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
             <button
               onClick={handleAddToCart}
               disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-              className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ShoppingCart size={16} />
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
+              </svg>
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>
             {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
