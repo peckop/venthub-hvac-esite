@@ -3,9 +3,8 @@ import { Search, ShoppingCart, Menu, User, ChevronDown, LogOut, Crown, Star, Clo
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
-import { searchProducts, Product, getCategories, Category } from '../lib/supabase'
+import type { Product, Category } from '../lib/supabase'
 import { checkAdminAccess, getUserRole } from '../config/admin'
-import MegaMenu from './MegaMenu'
 import { useI18n } from '../i18n/I18nProvider'
 import { BrandIcon } from './HVACIcons'
 import { trackEvent } from '../utils/analytics'
@@ -13,6 +12,7 @@ import { prefetchProductsPage } from '../utils/prefetch'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
 import SearchOverlay from './SearchOverlay'
+const MegaMenu = React.lazy(() => import('./MegaMenu'))
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -122,6 +122,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const ensureCategories = useCallback(async () => {
     if (categoriesLoaded) return
     try {
+      const { getCategories } = await import('../lib/supabase')
       const data = await getCategories()
       setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
       setCategoriesLoaded(true)
@@ -155,6 +156,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
     const delayedSearch = setTimeout(async () => {
       try {
+        const { searchProducts } = await import('../lib/supabase')
         const results = await searchProducts(stickySearchQuery.trim())
         setStickySearchResults(results.slice(0, 5)) // Max 5 results in sticky
         setIsStickySearchOpen(true)
@@ -637,7 +639,9 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
       </>
 
       {/* Mega Menu */}
-      <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      <React.Suspense fallback={null}>
+        <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      </React.Suspense>
     </>
   )
 }

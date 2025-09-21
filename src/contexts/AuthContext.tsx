@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState, ReactNode } from 'react'
-import { supabase } from '../lib/supabase'
 import { User, Session } from '@supabase/supabase-js'
 import toast from 'react-hot-toast'
 
@@ -28,70 +27,74 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Enhanced session initialization
+  // Oturum başlatmayı başlangıç LCP sonrasına ertele (gerektiğinde hemen yükle)
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
+    let unsubscribe: (() => void) | null = null
 
     async function initializeAuth() {
       try {
-        
-        // Get initial session
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        
+        const { supabase } = await import('../lib/supabase')
+        // İlk oturumu al
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession()
         if (sessionError) {
-          console.error('Session error:', sessionError);
+          console.error('Session error:', sessionError)
         } else {
           if (isMounted) {
-            setSession(initialSession);
-            setUser(initialSession?.user || null);
+            setSession(initialSession)
+            setUser(initialSession?.user || null)
           }
         }
+        // Dinleyici kur
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+          if (!isMounted) return
+          setSession(newSession)
+          setUser(newSession?.user || null)
+          switch (event) {
+            case 'SIGNED_IN':
+              if (newSession?.user?.email) {
+                toast.success(`Hoş geldiniz, ${newSession.user.user_metadata?.full_name || newSession.user.email}!`)
+              }
+              break
+            case 'SIGNED_OUT':
+              toast.success('Çıkış yaptınız')
+              break
+            case 'USER_UPDATED':
+              toast.success('Bilgileriniz güncellendi')
+              break
+            default:
+          }
+        })
+        unsubscribe = () => subscription.unsubscribe()
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('Auth initialization error:', error)
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false)
       }
     }
 
-    initializeAuth();
+    // /account, /admin, /checkout gibi sayfalarda gecikme yapma
+    const path = (typeof window !== 'undefined' ? window.location.pathname : '/') || '/'
+    const needImmediate = /^(\/account|\/admin|\/checkout)/.test(path)
 
-    // Enhanced auth listener with better error handling
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, newSession) => {
-        
-        if (!isMounted) return;
-        
-        // Update state synchronously to avoid race conditions
-        setSession(newSession);
-        setUser(newSession?.user || null);
-        
-        // Handle auth events with improved user feedback
-        switch (event) {
-          case 'SIGNED_IN':
-            if (newSession?.user?.email) {
-              toast.success(`Hoş geldiniz, ${newSession.user.user_metadata?.full_name || newSession.user.email}!`);
-            }
-            break;
-          case 'SIGNED_OUT':
-            toast.success('Çıkış yaptınız');
-            break;
-          case 'TOKEN_REFRESHED':
-            break;
-          case 'USER_UPDATED':
-            toast.success('Bilgileriniz güncellendi');
-            break;
-          default:
-        }
-      }
-    );
+    let idleHandle: number | null = null
+    if (!needImmediate && typeof (window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback === 'function') {
+      idleHandle = (window as unknown as { requestIdleCallback: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback(() => { initializeAuth() }, { timeout: 1500 })
+    } else {
+      // Küçük bir gecikme ile başlat (ilk boyama sonrasına bırakmak için)
+      setTimeout(() => { initializeAuth() }, needImmediate ? 0 : 800)
+    }
 
     return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+      isMounted = false
+      if (unsubscribe) unsubscribe()
+      try {
+        if (idleHandle && typeof (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback === 'function') {
+          (window as unknown as { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleHandle)
+        }
+      } catch {}
+    }
+  }, [])
 
   // Enhanced auth methods with better error handling
   function removePersistedSessions() {
@@ -111,11 +114,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function signIn(email: string, password: string, rememberMe = true) {
     try {
-      setLoading(true);
+      setLoading(true)
+      const { supabase } = await import('../lib/supabase')
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password
-      });
+      })
 
       if (error) {
         console.error('Sign in error:', error);
@@ -144,20 +148,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
         removePersistedSessions()
       }
 
-      return { data };
+      return { data }
     } catch (error: unknown) {
-      console.error('Sign in catch error:', error);
-      const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu';
-      toast.error(errorMessage);
-      return { error: { message: errorMessage } };
+      console.error('Sign in catch error:', error)
+      const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu'
+      toast.error(errorMessage)
+      return { error: { message: errorMessage } }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   async function signUp(email: string, password: string, name: string) {
     try {
-      setLoading(true);
+      setLoading(true)
+      const { supabase } = await import('../lib/supabase')
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -168,7 +173,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`
         }
-      });
+      })
 
       if (error) {
         console.error('Sign up error:', error);
@@ -196,35 +201,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
         toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın');
       }
 
-      return { data };
+      return { data }
     } catch (error: unknown) {
-      console.error('Sign up catch error:', error);
-      const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu';
-      toast.error(errorMessage);
-      return { error: { message: errorMessage } };
+      console.error('Sign up catch error:', error)
+      const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu'
+      toast.error(errorMessage)
+      return { error: { message: errorMessage } }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   async function signOut() {
     try {
-      const { error } = await supabase.auth.signOut();
+      const { supabase } = await import('../lib/supabase')
+      const { error } = await supabase.auth.signOut()
       if (error) {
-        console.error('Sign out error:', error);
-        toast.error('Çıkış sırasında hata oluştu');
+        console.error('Sign out error:', error)
+        toast.error('Çıkış sırasında hata oluştu')
       }
     } catch (error: unknown) {
-      console.error('Sign out catch error:', error);
-      toast.error('Çıkış sırasında beklenmeyen hata oluştu');
+      console.error('Sign out catch error:', error)
+      toast.error('Çıkış sırasında beklenmeyen hata oluştu')
     }
   }
 
   async function resetPassword(email: string) {
     try {
+      const { supabase } = await import('../lib/supabase')
       const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/auth/reset-password`
-      });
+      })
 
       if (error) {
         console.error('Reset password error:', error);

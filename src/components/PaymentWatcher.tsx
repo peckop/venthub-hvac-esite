@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 
 const STORAGE_KEY = 'vh_pending_order'
 
@@ -19,6 +18,7 @@ export const PaymentWatcher: React.FC = () => {
       const data = JSON.parse(raw || '{}') as { orderId?: string, conversationId?: string }
       const orderId = data.orderId
       if (!orderId) return
+      const { supabase } = await import('../lib/supabase')
       const { data: row, error } = await supabase
         .from('venthub_orders')
         .select('status')
