@@ -1,4 +1,4 @@
 declare module '*?*' {
-  const src: any
+  const src: string
   export default src
 }
