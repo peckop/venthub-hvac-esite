@@ -271,6 +271,12 @@ img {
   object-position: top;
 }
 
+/* Improve initial render cost for product cards */
+.product-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 320px 420px;
+}
+
 .fixed {
   position: fixed;
 }
