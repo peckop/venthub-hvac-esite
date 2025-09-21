@@ -83,14 +83,18 @@ export const HomePage: React.FC = () => {
       />
 
       {/* Bento Grid (hover video önizleme) */}
-      <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
-        <BentoGrid />
-      </Suspense>
+      <div className="cv-600">
+        <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
+          <BentoGrid />
+        </Suspense>
+      </div>
 
       {/* Premium HVAC Markaları (BentoGrid sonrası) */}
-      <Suspense fallback={<div className="min-h-[120px]" aria-hidden="true" />}> 
-        <BrandsShowcase />
-      </Suspense>
+      <div className="cv-320">
+        <Suspense fallback={<div className="min-h-[120px]" aria-hidden="true" />}> 
+          <BrandsShowcase />
+        </Suspense>
+      </div>
 
 
       {/* Uygulamaya Göre Çözümler */}
@@ -132,13 +136,15 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* Before/After Slider (Uygulamaya göre çözümler altı) */}
-      <Suspense fallback={<div className="min-h-[160px]" aria-hidden="true" />}> 
-        <BeforeAfterSlider
-          beforeSrc="/images/before_parking_jet_fan.jpg"
-          afterSrc="/images/after_parking_jet_fan.jpg"
-          alt={t('home.beforeAfterAlt')}
-        />
-      </Suspense>
+      <div className="cv-400">
+        <Suspense fallback={<div className="min-h-[160px]" aria-hidden="true" />}> 
+          <BeforeAfterSlider
+            beforeSrc="/images/before_parking_jet_fan.jpg"
+            afterSrc="/images/after_parking_jet_fan.jpg"
+            alt={t('home.beforeAfterAlt')}
+          />
+        </Suspense>
+      </div>
 
 
 
@@ -152,24 +158,32 @@ export const HomePage: React.FC = () => {
           <p className="text-steel-gray mt-2">{t('home.gallerySubtitle')}</p>
         </div>
       </section>
-      <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
-        <ProductFlow />
-      </Suspense>
+      <div className="cv-600">
+        <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
+          <ProductFlow />
+        </Suspense>
+      </div>
 
       {/* Resources (Ürün görsel akışının altında) */}
-      <Suspense fallback={null}> 
-        <ResourcesSection />
-      </Suspense>
+      <div className="cv-320">
+        <Suspense fallback={null}> 
+          <ResourcesSection />
+        </Suspense>
+      </div>
 
       {/* Scroll-Linked Process */}
-      <Suspense fallback={null}> 
-        <ScrollLinkedProcess />
-      </Suspense>
+      <div className="cv-400">
+        <Suspense fallback={null}> 
+          <ScrollLinkedProcess />
+        </Suspense>
+      </div>
 
       {/* Magnetic CTA */}
-      <Suspense fallback={null}> 
-        <MagneticCTA />
-      </Suspense>
+      <div className="cv-320">
+        <Suspense fallback={null}> 
+          <MagneticCTA />
+        </Suspense>
+      </div>
 
 
 

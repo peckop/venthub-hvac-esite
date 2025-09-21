@@ -11,8 +11,32 @@ const InViewCounter: React.FC<CounterProps> = ({ label, to, suffix = '', duratio
   const ref = useRef<HTMLDivElement | null>(null)
   const [value, setValue] = useState(0)
   const [started, setStarted] = useState(false)
+  const [shouldAnimate, setShouldAnimate] = useState(true)
+
+  // Respect reduced motion and avoid animation on coarse pointers (mobile) to reduce CPU/TBT
+  useEffect(() => {
+    try {
+      const rm = window.matchMedia('(prefers-reduced-motion: reduce)')
+      const coarse = window.matchMedia('(pointer: coarse)')
+      const update = () => setShouldAnimate(!(rm.matches || coarse.matches))
+      update()
+      rm.addEventListener?.('change', update)
+      coarse.addEventListener?.('change', update)
+      return () => {
+        rm.removeEventListener?.('change', update)
+        coarse.removeEventListener?.('change', update)
+      }
+    } catch {
+      setShouldAnimate(true)
+    }
+  }, [])
 
   useEffect(() => {
+    if (!shouldAnimate) {
+      setValue(to)
+      setStarted(false)
+      return
+    }
     const el = ref.current
     if (!el) return
     const io = new IntersectionObserver((entries) => {
@@ -22,10 +46,10 @@ const InViewCounter: React.FC<CounterProps> = ({ label, to, suffix = '', duratio
     }, { threshold: 0.6 })
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [shouldAnimate, to])
 
   useEffect(() => {
-    if (!started) return
+    if (!shouldAnimate || !started) return
     let raf = 0
     const t0 = performance.now()
     const animate = (t: number) => {
@@ -36,7 +60,7 @@ const InViewCounter: React.FC<CounterProps> = ({ label, to, suffix = '', duratio
     }
     raf = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(raf)
-  }, [started, to, durationMs])
+  }, [shouldAnimate, started, to, durationMs])
 
   return (
     <div ref={ref} className="rounded-2xl border border-light-gray bg-white p-6 text-center">
