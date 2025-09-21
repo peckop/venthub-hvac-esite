@@ -29,6 +29,7 @@ export const CategoryPage: React.FC = () => {
   const [compareIds, setCompareIds] = useState<string[]>([])
   const [compareOpen, setCompareOpen] = useState(false)
   const [catSearch, setCatSearch] = useState('')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   useEffect(() => {
     const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
@@ -281,8 +282,8 @@ export const CategoryPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Category local search */}
-        <div className="mb-4">
+        {/* Category local search (desktop only) */}
+        <div className="mb-4 hidden sm:block">
           <div className="relative max-w-md">
             <input
               type="text"
@@ -294,8 +295,8 @@ export const CategoryPage: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Filters Sidebar (hidden on mobile) */}
+          <div className="lg:col-span-1 hidden lg:block">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 sticky top-8">
               <h3 className="font-semibold text-industrial-gray mb-4 flex items-center">
                 <Filter size={20} className="mr-2" />
@@ -404,6 +405,14 @@ export const CategoryPage: React.FC = () => {
             {/* Toolbar */}
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-4 mb-6">
               <div className="flex items-center justify-between">
+                {/* Mobile filter button */}
+                <button
+                  type="button"
+                  onClick={()=>setIsFilterOpen(true)}
+                  className="lg:hidden inline-flex items-center gap-2 px-3 py-2 border border-light-gray rounded-lg text-sm text-industrial-gray hover:bg-light-gray"
+                >
+                  <Filter size={16} /> {t('category.filters')}
+                </button>
                 <div className="flex items-center space-x-4">
                   <select
                     value={sortBy}
@@ -539,6 +548,124 @@ export const CategoryPage: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Mobile Filter Drawer */}
+      {isFilterOpen && (
+        <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/40" onClick={()=>setIsFilterOpen(false)} />
+          <div className="absolute inset-y-0 right-0 w-full sm:w-[420px] bg-white shadow-2xl p-5 animate-slideDown overflow-y-auto" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-industrial-gray">{t('category.filters')}</h3>
+              <button onClick={()=>setIsFilterOpen(false)} className="text-steel-gray hover:text-primary-navy">{t('category.close')}</button>
+            </div>
+            {/* Local search (mobile) */}
+            <div className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={catSearch}
+                  onChange={(e)=>setCatSearch(e.target.value)}
+                  placeholder={t('category.localSearchPlaceholder') as string}
+                  className="w-full pl-3 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
+                />
+              </div>
+            </div>
+            <div className="space-y-6">
+              {/* Sub-categories */}
+              {subCategories.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-industrial-gray mb-3">{t('category.subcategories')}</h4>
+                  <div className="space-y-2">
+                    {subCategories.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        to={`/category/${category.slug}/${sub.slug}`}
+                        className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
+                        onClick={()=>setIsFilterOpen(false)}
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Price Range */}
+              <div>
+                <h4 className="font-medium text-industrial-gray mb-3">{t('category.priceRange')}</h4>
+                <div className="space-y-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="10000"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                    className="w-full"
+                    aria-label={t('category.priceRange') as string}
+                  />
+                  <div className="flex justify-between text-sm text-steel-gray">
+                    <span>{formatCurrency(0, lang, { maximumFractionDigits: 0 })}</span>
+                    <span>{formatCurrency(priceRange[1], lang, { maximumFractionDigits: 0 })}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Brands */}
+              {availableBrands.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-industrial-gray mb-3">{t('category.brands')}</h4>
+                  <div className="space-y-2">
+                    {availableBrands.map((brand) => (
+                      <label key={brand} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedBrands.includes(brand)}
+                          onChange={() => toggleBrand(brand)}
+                          className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                        />
+                        <span className="text-sm text-steel-gray">{brand}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Teknik Filtreler */}
+              <div>
+                <h4 className="font-medium text-industrial-gray mb-3">{t('category.techFilters')}</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm text-industrial-gray mb-1">{t('category.airflow')}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e=>setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e=>setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-industrial-gray mb-1">{t('category.pressure')}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e=>setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e=>setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-industrial-gray mb-1">{t('category.noise')}</label>
+                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e=>setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={()=>setIsFilterOpen(false)}
+                  className="w-full bg-primary-navy hover:bg-secondary-blue text-white rounded-lg px-4 py-2 text-sm"
+                >
+                  {t('category.applyFilters')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
