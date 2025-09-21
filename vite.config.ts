@@ -17,11 +17,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core vendor libraries
+          // Core vendor libraries - highest priority
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'icons': ['lucide-react'],
-          'toast': ['react-hot-toast'],
-          'motion': ['framer-motion'],
+          
+          // Split UI libraries for better caching
           'vendor-radix': [
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu', 
@@ -30,18 +29,40 @@ export default defineConfig({
             '@radix-ui/react-accordion'
           ],
           
-          // App-specific chunks
+          // Utility libraries - medium priority 
+          'utils': ['clsx', 'date-fns'],
+          'toast': ['react-hot-toast'],
+          
+          // Feature-specific - lazy loaded
           'supabase': ['@supabase/supabase-js'],
+          'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'motion': ['framer-motion'],
           'charts': ['recharts'],
           'pdf': ['jspdf', 'jspdf-autotable'],
-          'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
           
-          // Feature-based chunks will be handled by dynamic imports
+          // Icons - now split to optimize initial load (since we inlined most critical ones)
+          'icons': ['lucide-react'],
         },
+      },
+      // Enable aggressive tree shaking
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
       },
     },
     // Increase chunk size warning limit since we're optimizing
     chunkSizeWarningLimit: 1000,
+    
+    // Enable minification and compression
+    minify: 'esbuild',
+    sourcemap: false, // Disable sourcemaps in production for smaller bundles
+    
+    // CSS code splitting for better caching
+    cssCodeSplit: true,
+    
+    // Optimize asset handling
+    assetsInlineLimit: 4096, // Inline assets smaller than 4KB
   },
 })
 

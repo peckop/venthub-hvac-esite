@@ -4,6 +4,22 @@ import './index.css'
 import AppWrapper from './AppWrapper.tsx'
 import { installErrorReporter } from './lib/errorReporter'
 
+// Add critical resource preloads
+const criticalPreloads = [
+  // Preload critical fonts if they were local
+  // { href: '/fonts/inter.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' }
+]
+
+criticalPreloads.forEach(({ href, as, type, crossOrigin }) => {
+  const link = document.createElement('link')
+  link.rel = 'preload'
+  link.href = href
+  link.as = as
+  if (type) link.type = type
+  if (crossOrigin) link.crossOrigin = crossOrigin
+  document.head.appendChild(link)
+})
+
 // Sentry init (yalnızca DSN varsa) ve Supabase origin için preconnect
 try {
   const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
