@@ -320,16 +320,26 @@ export const ProductDetailPage: React.FC = () => {
                   >
                     ◀
                   </button>
-<img
-                    src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
-                    alt={images[activeIdx].alt || product.name}
-                    className="w-full h-full object-contain"
-                    {...{ fetchpriority: 'high' }}
-                    loading="eager"
-                    decoding="async"
-                    width={1200}
-                    height={1200}
-                  />
+<picture>
+                    <source
+                      srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}?format=avif&quality=85`}
+                      type="image/avif"
+                    />
+                    <source
+                      srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}?format=webp&quality=85`}
+                      type="image/webp"
+                    />
+                    <img
+                      src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
+                      alt={images[activeIdx].alt || product.name}
+                      className="w-full h-full object-contain"
+                      {...{ fetchpriority: 'high' }}
+                      loading="eager"
+                      decoding="async"
+                      width={1200}
+                      height={1200}
+                    />
+                  </picture>
                   <button
                     type="button"
                     aria-label="Sonraki görsel"
@@ -356,15 +366,25 @@ export const ProductDetailPage: React.FC = () => {
                     className={`aspect-square rounded-lg transition-all overflow-hidden bg-white border ${activeIdx === i ? 'ring-2 ring-primary-navy border-primary-navy' : 'border-light-gray hover:ring-2 hover:ring-primary-navy'}`}
                     title={(img.alt || product.name) ?? ''}
                   >
-                    <img
-                      src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`}
-                      alt={img.alt || product.name}
-                      className="w-full h-full object-contain"
-                      loading="lazy"
-                      decoding="async"
-                      width={180}
-                      height={180}
-                    />
+                    <picture>
+                      <source
+                        srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?format=avif&quality=80&width=180&height=180`}
+                        type="image/avif"
+                      />
+                      <source
+                        srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?format=webp&quality=80&width=180&height=180`}
+                        type="image/webp"
+                      />
+                      <img
+                        src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?width=180&height=180`}
+                        alt={img.alt || product.name}
+                        className="w-full h-full object-contain"
+                        loading="lazy"
+                        decoding="async"
+                        width={180}
+                        height={180}
+                      />
+                    </picture>
                   </button>
                 ))
               ) : (

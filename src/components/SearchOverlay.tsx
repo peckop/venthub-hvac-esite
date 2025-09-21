@@ -1,6 +1,5 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, X } from 'lucide-react'
 import type { FtsProductResult } from '../lib/supabase'
 import { formatCurrency } from '../i18n/format'
 
@@ -59,7 +58,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     <div className="fixed inset-0 z-[70] bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center gap-2 mb-4">
-          <Search size={18} className="text-steel-gray" />
+          <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
           <input
             autoFocus
             value={q}
@@ -69,7 +70,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             type="text"
           />
           <button aria-label="Kapat" onClick={onClose} className="p-2 rounded hover:bg-gray-100">
-            <X size={18} />
+            <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
         </div>
 
