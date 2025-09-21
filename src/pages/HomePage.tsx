@@ -7,7 +7,7 @@ import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import TiltCard from '../components/TiltCard'
 import { trackEvent } from '../utils/analytics'
-import LeadModal from '../components/LeadModal'
+const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
 
 // Kritik olmayan blokları tembel yükleme
@@ -247,7 +247,9 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
+      <Suspense fallback={null}>
+        <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
+      </Suspense>
     </div>
   )
 }

@@ -7,10 +7,10 @@ import { useScrollThrottle } from './hooks/useScrollThrottle'
 import StickyHeader from './components/StickyHeader'
 import ScrollToTop from './components/ScrollToTop'
 import LanguageSwitcher from './components/LanguageSwitcher'
-import Footer from './components/Footer'
+const Footer = lazy(() => import('./components/Footer'))
 import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
-import AddToCartToast from './components/AddToCartToast'
+const AddToCartToast = lazy(() => import('./components/AddToCartToast'))
 import LoadingSpinner from './components/LoadingSpinner'
 import WhatsAppFloat from './components/WhatsAppFloat'
 import { prefetchProductsPage } from './utils/prefetch'
@@ -200,13 +200,17 @@ function AppShell() {
         </Suspense>
       </main>
 
-      <Footer />
+      <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
+        <Footer />
+      </Suspense>
 
       {/* Global WhatsApp floater */}
       <WhatsAppFloat />
       
       {/* Global cart toast */}
-      <AddToCartToast />
+      <Suspense fallback={null}>
+        <AddToCartToast />
+      </Suspense>
       
       {/* Toast Container */}
       <Toaster
