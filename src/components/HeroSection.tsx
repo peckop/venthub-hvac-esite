@@ -1,20 +1,20 @@
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import SpotlightHeroOverlay from './SpotlightHeroOverlay'
-import InViewCounter from './InViewCounter'
+const InViewCounter = React.lazy(() => import('./InViewCounter'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=50&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=40&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=65&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=55&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=75&srcset'
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=65&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=75'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=65'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
@@ -137,10 +137,18 @@ export const HeroSection: React.FC = () => {
           <div className="space-y-6">
             {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-4">
-              <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
-              <InViewCounter label={t('home.stats.productTypes') as string} to={50} suffix="+" />
-              <InViewCounter label={t('home.stats.yearsExperience') as string} to={15} suffix="+" />
-              <InViewCounter label={t('home.stats.happyCustomers') as string} to={1000} suffix="+" />
+              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
+                <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
+              </React.Suspense>
+              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
+                <InViewCounter label={t('home.stats.productTypes') as string} to={50} suffix="+" />
+              </React.Suspense>
+              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
+                <InViewCounter label={t('home.stats.yearsExperience') as string} to={15} suffix="+" />
+              </React.Suspense>
+              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
+                <InViewCounter label={t('home.stats.happyCustomers') as string} to={1000} suffix="+" />
+              </React.Suspense>
             </div>
 
             {/* Featured Image */}

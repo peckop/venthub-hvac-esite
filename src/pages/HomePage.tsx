@@ -5,7 +5,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { Star, TrendingUp, Clock } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
-import TiltCard from '../components/TiltCard'
+const TiltCard = React.lazy(() => import('../components/TiltCard'))
 import { trackEvent } from '../utils/analytics'
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
@@ -97,25 +97,27 @@ export const HomePage: React.FC = () => {
             return (
               <div className={`${gridColsClass(appCards.length)}`}>
                 {appCards.map(card => (
-                  <TiltCard key={card.key}>
-                    <Link
-                      to={card.href}
-                      className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
-                      onClick={() => {
-                        trackEvent('application_click', { key: card.key, source: 'home' })
-                      }}
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
-                      <div className="p-5 relative z-10">
-                        <div className="flex items-center gap-2 text-primary-navy">
-                          {iconFor(card.icon, 18)}
-                          <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                  <Suspense key={card.key} fallback={<div className="rounded-xl border border-light-gray bg-white h-32 animate-pulse" />}>
+                    <TiltCard>
+                      <Link
+                        to={card.href}
+                        className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
+                        onClick={() => {
+                          trackEvent('application_click', { key: card.key, source: 'home' })
+                        }}
+                      >
+                        <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
+                        <div className="p-5 relative z-10">
+                          <div className="flex items-center gap-2 text-primary-navy">
+                            {iconFor(card.icon, 18)}
+                            <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                          </div>
+                          <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
+                          <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
                         </div>
-                        <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
-                        <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
-                      </div>
-                    </Link>
-                  </TiltCard>
+                      </Link>
+                    </TiltCard>
+                  </Suspense>
                 ))}
               </div>
             )
