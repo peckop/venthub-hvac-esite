@@ -44,9 +44,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
     }
   }
 
+  // Build responsive image URLs (Supabase Image Transform if available)
+  const buildImage = (url: string, w?: number, q: number = 70, format: 'webp' | 'jpeg' = 'webp') => {
+    const base = url.split('?')[0]
+    const renderUrl = base.includes('/object/')
+      ? base.replace('/object/', '/render/image/')
+      : base
+    const params = new URLSearchParams()
+    if (w) params.set('width', String(w))
+    params.set('quality', String(q))
+    params.set('format', format)
+    const query = params.toString()
+    return `${renderUrl}?${query}`
+  }
+
+  const src = product.image_url ? buildImage(product.image_url, isList ? 288 : 400) : undefined
+  const srcSet = product.image_url
+    ? [320, 480, 640, 768, 1024].map(w => `${buildImage(product.image_url, w)} ${w}w`).join(', ')
+    : undefined
+  const sizes = isList
+    ? '(max-width: 768px) 25vw, 144px'
+    : '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px'
+
   return (
     <Link to={`/product/${product.id}`}>
-      <div className={`group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 transition-all duration-200 overflow-hidden border ${
+      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 transition-all duration-200 overflow-hidden border ${
         highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
       } ${isList ? 'md:flex items-stretch' : ''}`}>
         {/* Featured Badge */}
@@ -71,7 +93,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg overflow-hidden' : 'aspect-square rounded-t-xl overflow-hidden'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
 {product.image_url ? (
             <img
-              src={product.image_url}
+              src={src}
+              srcSet={srcSet}
+              sizes={sizes}
               alt={product.image_alt || product.name}
               className={`${isList ? 'w-full h-full' : 'w-full h-full'} object-cover`}
               {...(priority ? { fetchpriority: 'high' } : {})}
