@@ -5,25 +5,25 @@ const InViewCounter = React.lazy(() => import('./InViewCounter'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=60&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=60&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=75&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=80&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=85&srcset'
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=85'
+import hero1600 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1600&format=jpg&quality=88'
 
 const HeroPicture: React.FC = () => {
-  const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
+  const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 95vw, 1600px'
   return (
     <picture>
       <source type="image/avif" srcSet={avifSet as unknown as string} sizes={sizes} />
       <source type="image/webp" srcSet={webpSet as unknown as string} sizes={sizes} />
       <img
-        src={hero1200 as unknown as string}
+        src={hero1600 as unknown as string}
         srcSet={jpgSet as unknown as string}
         sizes={sizes}
         alt="HVAC Equipment"
@@ -41,16 +41,6 @@ const HeroPicture: React.FC = () => {
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement | null>(null)
-  // Preload hero image at runtime (only when this component mounts)
-  React.useEffect(() => {
-    try {
-      const link = document.createElement('link')
-      link.rel = 'preload'
-      link.as = 'image'
-      link.href = (hero1200 as unknown as string)
-      document.head.appendChild(link)
-    } catch {}
-  }, [])
   const enableParallax = (() => {
     try {
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -111,7 +101,7 @@ export const HeroSection: React.FC = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8">
+          <div className="space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-industrial-gray leading-tight">
                 {t('home.heroTitle')}
@@ -161,7 +151,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Right Content - Featured Product/Stats */}
-          <div className="space-y-6">
+          <div className="space-y-6 order-1 lg:order-2">
             {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-4">
               <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>

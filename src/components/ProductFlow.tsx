@@ -60,6 +60,7 @@ const map = new Map<string, LiteProduct>()
 const ProductFlow: React.FC = () => {
   const { items, allItems, loading, reduced } = useProductsWithImages()
   const urls = useMemo(() => items.map(p => p.image_url!).filter(Boolean), [items])
+  const isCoarse = (() => { try { return window.matchMedia('(pointer: coarse)').matches } catch { return false } })()
   const rotateProducts = (arr: LiteProduct[], n: number) => {
     if (!arr.length) return arr
     const k = ((n % arr.length) + arr.length) % arr.length
@@ -99,6 +100,18 @@ const ProductFlow: React.FC = () => {
     )
   }
 
+  if (!loading && items.length === 0 && allItems.length === 0) {
+    return (
+      <section className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="rounded-2xl border border-light-gray bg-white p-8">
+            <p className="text-sm text-steel-gray">Ürün akışı şu anda yüklenemedi. Lütfen sayfayı yenileyin.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (urls.length === 0) {
     // Görsel yoksa: ürün kartlarıyla Splide AutoScroll ticker
     const { A: FA, B: FB, C: FC } = (() => {
@@ -117,9 +130,9 @@ const ProductFlow: React.FC = () => {
           <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
           <div className="space-y-4">
-            <TickerCardLane items={FA} speed={1.0} gap={14} width={300} height={140} pauseOnHover />
-            <TickerCardLane items={FB} speed={-1.2} gap={14} width={300} height={140} pauseOnHover />
-            <TickerCardLane items={FC} speed={0.9} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FA} speed={isCoarse ? 0.7 : 1.0} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FB} speed={isCoarse ? -0.8 : -1.2} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FC} speed={isCoarse ? 0.6 : 0.9} gap={14} width={300} height={140} pauseOnHover />
           </div>
         </div>
       </section>
@@ -136,11 +149,11 @@ const ProductFlow: React.FC = () => {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
         <div className="space-y-3">
           {/* Üst (daha yavaş, okunabilir geçiş) */}
-          <TickerLane items={toTickerItems(AProds)} speed={1.0} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(AProds)} speed={isCoarse ? 0.6 : 1.0} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
           {/* Orta (ters yön, biraz daha hızlı) */}
-          <TickerLane items={toTickerItems(BProds)} speed={-1.2} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(BProds)} speed={isCoarse ? -0.7 : -1.2} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
           {/* Alt (en yavaş, görsel ritim farklılığı) */}
-          <TickerLane items={toTickerItems(CProds)} speed={0.9} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(CProds)} speed={isCoarse ? 0.5 : 0.9} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
         </div>
       </div>
     </section>
