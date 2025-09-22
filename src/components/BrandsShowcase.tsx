@@ -4,9 +4,11 @@ import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 
-// CSS-only marquee lane to minimize main-thread JS work
+// CSS-only marquee lane to minimize main-thread JS work (seamless)
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 40 }) => {
-  const REPEAT = 3
+  // Duplicate content exactly twice and scroll -50% so the second half
+  // seamlessly continues the first half without a visible jump.
+  const REPEAT = 2
   const repeated = useMemo(() => Array.from({ length: REPEAT }).flatMap(() => items), [items])
 
   const isCoarse = (() => {
@@ -17,12 +19,12 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
   return (
     <div className="relative overflow-hidden group">
       <style>{`
-        @keyframes brands-scroll-left { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
-        .brands-track { animation: brands-scroll-left ${dur}s linear infinite; will-change: transform; }
+        @keyframes brands-scroll-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+        .brands-track { animation: brands-scroll-left ${dur}s linear infinite; will-change: transform; backface-visibility: hidden; }
         .brands-lane:hover .brands-track { animation-play-state: paused; }
       `}</style>
       <div className="brands-lane">
-        <div className="brands-track flex items-stretch gap-0">
+        <div className="brands-track flex items-stretch gap-0 w-max">
           {repeated.map((brand, idx) => (
             <Link key={brand.slug + '-' + idx} to={`/brands/${brand.slug}`} className="group block">
               <div className="w-44 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 bg-white shadow-sm overflow-hidden flex items-center justify-center p-3 sm:p-4 rounded-none flex-shrink-0">
