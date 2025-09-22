@@ -41,6 +41,16 @@ const HeroPicture: React.FC = () => {
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement | null>(null)
+  // Preload hero image at runtime (only when this component mounts)
+  React.useEffect(() => {
+    try {
+      const link = document.createElement('link')
+      link.rel = 'preload'
+      link.as = 'image'
+      link.href = (hero1200 as unknown as string)
+      document.head.appendChild(link)
+    } catch {}
+  }, [])
   const enableParallax = (() => {
     try {
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
