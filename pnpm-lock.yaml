@@ -137,6 +137,9 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      preact:
+        specifier: ^10.22.1
+        version: 10.27.2
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -3158,6 +3161,9 @@ packages:
   postman-request@2.88.1-postman.43:
     resolution: {integrity: sha512-5ivoZnMvnX47/HA7mk2GQubZsnXptlJGVyO0hLV3MTK/MDgJVnB/q3bUgzU4KhwG8OBxe2L8uqv3ZpK6mp+RdA==}
     engines: {node: '>= 16'}
+
+  preact@10.27.2:
+    resolution: {integrity: sha512-5SYSgFKSyhCbk6SrXyMpqjb5+MQBgfvEKE/OC+PujcY34sOpqtr+0AZQtPYx5IA6VxynQ7rUPCtKzyovpj9Bpg==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -6706,6 +6712,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  preact@10.27.2: {}
+
   prelude-ls@1.2.1: {}
 
   pretty-format@27.5.1:
@@ -6888,6 +6896,7 @@ snapshots:
       jspdf-autotable: 5.0.2(jspdf@3.0.2)
       lucide-react: 0.364.0(react@18.3.1)
       next-themes: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      preact: 10.27.2
       react: 18.3.1
       react-day-picker: 8.10.1(date-fns@3.6.0)(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
