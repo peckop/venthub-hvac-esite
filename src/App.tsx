@@ -98,11 +98,23 @@ function AppShell() {
   // Performance optimize edilmiş scroll handling + sync with route
   const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: location.pathname })
 
-  // Prefetch ProductsPage chunk on idle so first navigation is instant
+  // Prefetch ProductsPage chunk yalnızca ilk kullanıcı etkileşiminden sonra veya uzun idle sonrası
   React.useEffect(() => {
+    let done = false
+    const run = () => { if (!done) { done = true; prefetchProductsPage() } }
     const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
-    const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 600))
-    idle(() => prefetchProductsPage())
+    const idleLong = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 4000))
+    // Öncelik: kullanıcı etkileşimi
+    window.addEventListener('pointerdown', run, { once: true })
+    window.addEventListener('keydown', run, { once: true })
+    window.addEventListener('touchstart', run, { once: true })
+    // Yedek: uzun idle
+    idleLong(run)
+    return () => {
+      window.removeEventListener('pointerdown', run)
+      window.removeEventListener('keydown', run)
+      window.removeEventListener('touchstart', run)
+    }
   }, [])
 
   // Mount Toaster only after first user interaction to avoid impacting TBT
