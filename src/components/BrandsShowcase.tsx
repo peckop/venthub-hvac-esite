@@ -6,9 +6,9 @@ import { useI18n } from '../i18n/I18nProvider'
 
 // CSS-only marquee lane to minimize main-thread JS work (seamless)
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 40 }) => {
-  // Duplicate content exactly twice and scroll -50% so the second half
-  // seamlessly continues the first half without a visible jump.
-  const REPEAT = 2
+  // Duplicate content multiple times; first half and second half are identical
+  // (sets 1-2 vs 3-4) so -50% scroll is seamless even on very wide screens.
+  const REPEAT = 4
   const repeated = useMemo(() => Array.from({ length: REPEAT }).flatMap(() => items), [items])
 
   const isCoarse = (() => {
