@@ -446,240 +446,240 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
         </React.Suspense>
       )}
 
-      {/* Enhanced Full-Featured Sticky Header (always mounted to avoid flicker) */}
-      <>
-        {/* Progress Bar (only when sticky visible) */}
-        {isScrolled && (
+      {/* Sticky Header block: yalnızca scroll sonrası mount edilir */}
+      {isScrolled && (
+        <>
+          {/* Progress Bar (only when sticky visible) */}
           <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-gray-200/50 pointer-events-none">
             <div 
               className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300"
               style={{ width: `${scrollProgress}%` }}
             />
           </div>
-        )}
-        
-        <div className={`fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg transition-opacity duration-200 ${isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between h-16">
-                {/* Logo */}
-                {StickyLogo}
-
-                {/* Quick Navigation */}
-                <nav className="hidden lg:flex items-center space-x-1 mx-4">
-                  <Link
-                    to="/products"
-className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center whitespace-nowrap"
-                  >
-                    {t('common.products')}
-                  </Link>
-                  
-                  {/* Categories Dropdown */}
-                  <div className="relative" ref={categoriesRef}>
-                    <button
-                      onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
-className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap"
+          
+          <div className="fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                  {/* Logo */}
+                  {StickyLogo}
+  
+                  {/* Quick Navigation */}
+                  <nav className="hidden lg:flex items-center space-x-1 mx-4">
+                    <Link
+                      to="/products"
+                      className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center whitespace-nowrap"
                     >
-                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="6" height="6"/>
-                      </svg>
-                      <span>{t('common.categories')}</span>
-                      <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`}>
-                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
-                      </svg>
-                    </button>
+                      {t('common.products')}
+                    </Link>
                     
-                    {isCategoriesOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-64 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl overflow-hidden">
-                        <div className="p-2 max-h-96 overflow-y-auto">
-                          {categoriesLoaded && categories.length === 0 && (
-                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
-                          )}
-                          {!categoriesLoaded && (
-                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.loading')}</div>
-                          )}
-                          {categories.map((cat) => (
-                            <Link
-                              key={cat.id}
-                              to={`/category/${cat.slug}`}
-                              onClick={() => setIsCategoriesOpen(false)}
-                              className="flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200"
-                            >
-                              <div className="text-primary-navy">
-                                {getCategoryIcon(cat.slug, { size: 18 })}
-                              </div>
-                              <span className="text-sm font-medium text-industrial-gray hover:text-primary-navy">
-                                {cat.name}
-                              </span>
-                            </Link>
-                          ))}
+                    {/* Categories Dropdown */}
+                    <div className="relative" ref={categoriesRef}>
+                      <button
+                        onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
+                        className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap"
+                      >
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="6" height="6"/>
+                        </svg>
+                        <span>{t('common.categories')}</span>
+                        <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`}>
+                          <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
+                        </svg>
+                      </button>
+                      
+                      {isCategoriesOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-64 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl overflow-hidden">
+                          <div className="p-2 max-h-96 overflow-y-auto">
+                            {categoriesLoaded && categories.length === 0 && (
+                              <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
+                            )}
+                            {!categoriesLoaded && (
+                              <div className="px-3 py-2 text-sm text-steel-gray">{t('common.loading')}</div>
+                            )}
+                            {categories.map((cat) => (
+                              <Link
+                                key={cat.id}
+                                to={`/category/${cat.slug}`}
+                                onClick={() => setIsCategoriesOpen(false)}
+                                className="flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200"
+                              >
+                                <div className="text-primary-navy">
+                                  {getCategoryIcon(cat.slug, { size: 18 })}
+                                </div>
+                                <span className="text-sm font-medium text-industrial-gray hover:text-primary-navy">
+                                  {cat.name}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
+                      )}
+                    </div>
+                    
+                    <Link
+                      to="/brands"
+                      className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center whitespace-nowrap"
+                    >
+                      {t('common.brands')}
+                    </Link>
+                  </nav>
+  
+                  {/* Sticky Search Bar */}
+                  <div className="flex-1 max-w-sm mx-2 relative" ref={stickySearchRef}>
+                    <form onSubmit={(e) => {
+                      e.preventDefault()
+                      if (stickySearchQuery.trim()) {
+                        navigate(`/products?q=${encodeURIComponent(stickySearchQuery.trim())}`)
+                        setStickySearchQuery('')
+                        setIsStickySearchOpen(false)
+                      }
+                    }}>
+                      <div className="relative group">
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors">
+                          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input
+                          type="text"
+                          placeholder={t('common.quickSearch')}
+                          value={stickySearchQuery}
+                          onChange={(e) => setStickySearchQuery(e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
+                        />
+                        {/* Quick search hint */}
+                        <kbd className="hidden lg:block absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-steel-gray/50 font-mono">/</kbd>
+                      </div>
+                    </form>
+  
+                    {/* Sticky Search Results */}
+                    {isStickySearchOpen && stickySearchResults.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+                        {stickySearchResults.map((product) => (
+                          <button
+                            key={product.id}
+                            onClick={() => {
+                              navigate(`/product/${product.id}`)
+                              setStickySearchQuery('')
+                              setIsStickySearchOpen(false)
+                            }}
+                            className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 text-left transition-all duration-200"
+                          >
+                            <BrandIcon brand={product.brand} />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-industrial-gray truncate">{product.name}</div>
+                              <div className="text-xs text-steel-gray">{product.brand}</div>
+                            </div>
+                            <div className="text-sm font-bold text-primary-navy">
+                              {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                            </div>
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>
-                  
-                  <Link
-                    to="/brands"
-className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center whitespace-nowrap"
-                  >
-                    {t('common.brands')}
-                  </Link>
-                </nav>
-
-                {/* Sticky Search Bar */}
-                <div className="flex-1 max-w-sm mx-2 relative" ref={stickySearchRef}>
-                  <form onSubmit={(e) => {
-                    e.preventDefault()
-                    if (stickySearchQuery.trim()) {
-                      navigate(`/products?q=${encodeURIComponent(stickySearchQuery.trim())}`)
-                      setStickySearchQuery('')
-                      setIsStickySearchOpen(false)
-                    }
-                  }}>
-                    <div className="relative group">
-                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors">
-                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                      </svg>
-                      <input
-                        type="text"
-                        placeholder={t('common.quickSearch')}
-                        value={stickySearchQuery}
-                        onChange={(e) => setStickySearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
-                      />
-                      {/* Quick search hint */}
-                      <kbd className="hidden lg:block absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-steel-gray/50 font-mono">/</kbd>
-                    </div>
-                  </form>
-
-                  {/* Sticky Search Results */}
-                  {isStickySearchOpen && stickySearchResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
-                      {stickySearchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          onClick={() => {
-                            navigate(`/product/${product.id}`)
-                            setStickySearchQuery('')
-                            setIsStickySearchOpen(false)
-                          }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 text-left transition-all duration-200"
-                        >
-                          <BrandIcon brand={product.brand} />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-industrial-gray truncate">{product.name}</div>
-                            <div className="text-xs text-steel-gray">{product.brand}</div>
-                          </div>
-                          <div className="text-sm font-bold text-primary-navy">
-                            {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Smart Actions & Right Icons */}
-                <div className="flex items-center space-x-1">
-                  {/* Quick Order Button */}
-                  <button
-                    onClick={() => navigate('/products?sort=bestsellers')}
-                    className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
-                    title={t('header.quickOrder')}
-                    aria-label={t('header.quickOrder')}
-                  >
-                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-warning-orange group-hover:animate-pulse">
-                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
-                    </svg>
-                    <span className="hidden 2xl:block">{t('header.quickOrder')}</span>
-                  </button>
-
-                  {/* Recent Products */}
-                  {typeof window !== 'undefined' && window.localStorage.getItem('recentProducts') && (
+  
+                  {/* Smart Actions & Right Icons */}
+                  <div className="flex items-center space-x-1">
+                    {/* Quick Order Button */}
                     <button
-                      onClick={() => {
-                        const recent = JSON.parse(window.localStorage.getItem('recentProducts') || '[]')
-                        if (recent.length > 0) navigate(`/product/${recent[0]}`)
-                      }}
-                      className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                      title={t('header.recentlyViewed')}
-                      aria-label={t('header.recentlyViewed')}
+                      onClick={() => navigate('/products?sort=bestsellers')}
+                      className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
+                      title={t('header.quickOrder')}
+                      aria-label={t('header.quickOrder')}
                     >
-                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy">
-                        <circle cx="12" cy="12" r="10"/><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" />
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-warning-orange group-hover:animate-pulse">
+                        <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
+                      </svg>
+                      <span className="hidden 2xl:block">{t('header.quickOrder')}</span>
+                    </button>
+  
+                    {/* Recent Products */}
+                    {typeof window !== 'undefined' && window.localStorage.getItem('recentProducts') && (
+                      <button
+                        onClick={() => {
+                          const recent = JSON.parse(window.localStorage.getItem('recentProducts') || '[]')
+                          if (recent.length > 0) navigate(`/product/${recent[0]}`)
+                        }}
+                        className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                        title={t('header.recentlyViewed')}
+                        aria-label={t('header.recentlyViewed')}
+                      >
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy">
+                          <circle cx="12" cy="12" r="10"/><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" />
+                        </svg>
+                      </button>
+                    )}
+  
+                    {/* Favorites (placeholder for future) */}
+                    <button
+                      onClick={() => navigate('/account/favorites')}
+                      className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                        title={t('header.favorites')}
+                        aria-label={t('header.favorites')}
+                    >
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-gold-accent">
+                        <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
                       </svg>
                     </button>
-                  )}
-
-                  {/* Favorites (placeholder for future) */}
-                  <button
-                    onClick={() => navigate('/account/favorites')}
-                    className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                      title={t('header.favorites')}
-                      aria-label={t('header.favorites')}
-                  >
-                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-gold-accent">
-                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
-                    </svg>
-                  </button>
-
-                  {/* Menu Button */}
-                  <button
-                    onClick={() => setIsMenuOpen(true)}
-                    aria-label={t('header.menu')}
-                    className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                  >
-                    <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
-
-                  {/* Cart with Total */}
-                  <Link
-                    to="/cart"
-                    aria-label={t('header.cart')}
-                    className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
-                  >
-                    <div className="relative">
-                      <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-success-green transition-all duration-300">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
-                      </svg>
-                      {getCartCount() > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                          {getCartCount()}
-                        </span>
-                      )}
-                    </div>
-                    {getCartTotal && getCartTotal() > 0 && (
-                      <span className="hidden xl:block text-sm font-bold text-success-green">
-                        {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
-                      </span>
-                    )}
-                  </Link>
-
-                  {/* User Menu */}
-                  {user ? (
-                    <Link
-                      to="/account"
-                      aria-label={t('header.account')}
+  
+                    {/* Menu Button */}
+                    <button
+                      onClick={() => setIsMenuOpen(true)}
+                      aria-label={t('header.menu')}
                       className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                     >
-                      <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy transition-all duration-300">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                      <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                       </svg>
-                    </Link>
-                  ) : (
+                    </button>
+  
+                    {/* Cart with Total */}
                     <Link
-                      to="/auth/login"
-                      className="px-3 py-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-300"
+                      to="/cart"
+                      aria-label={t('header.cart')}
+                      className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
                     >
-                      {t('common.signIn')}
+                      <div className="relative">
+                        <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-success-green transition-all duration-300">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
+                        </svg>
+                        {getCartCount() > 0 && (
+                          <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">
+                            {getCartCount()}
+                          </span>
+                        )}
+                      </div>
+                      {getCartTotal && getCartTotal() > 0 && (
+                        <span className="hidden xl:block text-sm font-bold text-success-green">
+                          {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
+                        </span>
+                      )}
                     </Link>
-                  )}
+  
+                    {/* User Menu */}
+                    {user ? (
+                      <Link
+                        to="/account"
+                        aria-label={t('header.account')}
+                        className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
+                      >
+                        <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy transition-all duration-300">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                        </svg>
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/auth/login"
+                        className="px-3 py-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-300"
+                      >
+                        {t('common.signIn')}
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-      </>
+        </>
+      )}
 
       {/* Mega Menu (render only when open to avoid loading chunk on first paint) */}
       {isMenuOpen && (
