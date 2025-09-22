@@ -11,9 +11,9 @@ import Seo from '../components/Seo'
 
 // Kritik olmayan blokları tembel yükleme
 const BentoGrid = React.lazy(() => import('../components/BentoGrid'))
-const BrandsShowcase = React.lazy(() => import('../components/BrandsShowcase'))
+import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
 const ResourcesSection = React.lazy(() => import('../components/ResourcesSection'))
-const ProductFlow = React.lazy(() => import('../components/ProductFlow'))
+import LazyProductFlow from '../components/LazyProductFlow'
 const BeforeAfterSlider = React.lazy(() => import('../components/BeforeAfterSlider'))
 const ScrollLinkedProcess = React.lazy(() => import('../components/ScrollLinkedProcess'))
 const MagneticCTA = React.lazy(() => import('../components/MagneticCTA'))
@@ -78,9 +78,7 @@ export const HomePage: React.FC = () => {
 
       {/* Premium HVAC Markaları (BentoGrid sonrası) */}
       <div className="cv-320">
-        <Suspense fallback={<div className="min-h-[120px]" aria-hidden="true" />}> 
-          <BrandsShowcase />
-        </Suspense>
+        <LazyBrandsShowcase />
       </div>
 
 
@@ -148,9 +146,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
       <div className="cv-600">
-        <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
-          <ProductFlow />
-        </Suspense>
+        <LazyProductFlow />
       </div>
 
       {/* Resources (Ürün görsel akışının altında) */}
