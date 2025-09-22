@@ -105,25 +105,48 @@ function AppShell() {
     idle(() => prefetchProductsPage())
   }, [])
 
-  // Mount Toaster on idle to avoid blocking initial render
+  // Mount Toaster only after first user interaction to avoid impacting TBT
   const [enableToaster, setEnableToaster] = React.useState(false)
   React.useEffect(() => {
-    const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
-    const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 1200))
-    idle(() => setEnableToaster(true))
-  }, [])
+    if (enableToaster) return
+    const enable = () => {
+      setEnableToaster(true)
+      window.removeEventListener('pointerdown', enable)
+      window.removeEventListener('keydown', enable)
+      window.removeEventListener('touchstart', enable)
+    }
+    window.addEventListener('pointerdown', enable, { once: true })
+    window.addEventListener('keydown', enable, { once: true })
+    window.addEventListener('touchstart', enable, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', enable)
+      window.removeEventListener('keydown', enable)
+      window.removeEventListener('touchstart', enable)
+    }
+  }, [enableToaster])
 
-  // WhatsApp: sadece pointer:coarse ve idle sonrasında yükle
+  // WhatsApp: sadece pointer:coarse ve ilk etkileşim/scroll sonrasında yükle
   const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
   React.useEffect(() => {
     try {
       const coarse = window.matchMedia('(pointer: coarse)').matches
-      if (!coarse) return
-      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
-      const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 1500))
-      idle(() => setEnableWhatsApp(true))
+      if (!coarse || enableWhatsApp) return
+      const enable = () => {
+        setEnableWhatsApp(true)
+        window.removeEventListener('scroll', enable)
+        window.removeEventListener('pointerdown', enable)
+        window.removeEventListener('touchstart', enable)
+      }
+      window.addEventListener('scroll', enable, { once: true, passive: true })
+      window.addEventListener('pointerdown', enable, { once: true })
+      window.addEventListener('touchstart', enable, { once: true })
+      return () => {
+        window.removeEventListener('scroll', enable)
+        window.removeEventListener('pointerdown', enable)
+        window.removeEventListener('touchstart', enable)
+      }
     } catch {}
-  }, [])
+  }, [enableWhatsApp])
 
   return (
     <div className="min-h-screen bg-white">

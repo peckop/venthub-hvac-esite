@@ -78,21 +78,42 @@ case 'USER_UPDATED':
     const path = (typeof window !== 'undefined' ? window.location.pathname : '/') || '/'
     const needImmediate = /^(\/account|\/admin|\/checkout)/.test(path)
 
-    let idleHandle: number | null = null
-    if (!needImmediate && typeof (window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback === 'function') {
-      idleHandle = (window as unknown as { requestIdleCallback: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback(() => { initializeAuth() }, { timeout: 1500 })
+    let started = false
+    const start = () => {
+      if (started) return
+      started = true
+      try { initializeAuth() } catch {}
+      cleanup()
+    }
+    const cleanup = () => {
+      try {
+        window.removeEventListener('load', start)
+        window.removeEventListener('pointerdown', start)
+        window.removeEventListener('keydown', start)
+        window.removeEventListener('touchstart', start)
+      } catch {}
+    }
+
+    if (needImmediate) {
+      start()
     } else {
-      // Küçük bir gecikme ile başlat (ilk boyama sonrasına bırakmak için)
-      setTimeout(() => { initializeAuth() }, needImmediate ? 0 : 2000)
+      const ricb = (window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback
+      if (typeof ricb === 'function') {
+        ricb(() => start(), { timeout: 5000 })
+      } else {
+        // Başlatmayı yükleme sonrasına veya ilk kullanıcı etkileşimine bırak
+        window.addEventListener('load', start, { once: true })
+        window.addEventListener('pointerdown', start, { once: true })
+        window.addEventListener('keydown', start, { once: true })
+        window.addEventListener('touchstart', start, { once: true })
+      }
     }
 
     return () => {
       isMounted = false
       if (unsubscribe) unsubscribe()
       try {
-        if (idleHandle && typeof (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback === 'function') {
-          (window as unknown as { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(idleHandle)
-        }
+        cleanup()
       } catch {}
     }
   }, [])
