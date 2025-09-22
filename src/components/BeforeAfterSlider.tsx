@@ -35,9 +35,9 @@ const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterS
           className="relative w-full h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden border border-light-gray shadow"
           aria-label="Öncesi / sonrası karşılaştırma"
         >
-          <img src={afterSrc} alt={alt} className="absolute inset-0 w-full h-full object-cover object-center" />
+          <img src={afterSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="absolute inset-0 w-full h-full object-cover object-center" />
           <div className="absolute inset-0" style={{ width: `${pos}%`, overflow: 'hidden' }}>
-            <img src={beforeSrc} alt={alt} className="w-full h-full object-cover object-center" />
+            <img src={beforeSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="w-full h-full object-cover object-center" />
           </div>
           {/* Divider */}
           <div className="absolute top-0" style={{ left: `${pos}%` }}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getCategories, Category } from '../lib/supabase'
+import type { Category } from '../lib/supabase'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
@@ -19,6 +19,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     async function fetchCategories() {
       try {
+        const { getCategories } = await import('../lib/supabase')
         const data = await getCategories()
         setCategories(data)
       } catch (error) {

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useRef } from 'react'
 import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
-import { supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import TrustSection from '../components/TrustSection'
@@ -49,6 +48,7 @@ const ProductsPage: React.FC = () => {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
         const ids = list.map(p => p.id)
+        const { supabase } = await import('../lib/supabase')
         const { data: imgs, error: imgErr } = await supabase
           .from('product_images')
           .select('product_id,path,sort_order,alt')
@@ -148,6 +148,7 @@ const ProductsPage: React.FC = () => {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
         const ids = list.map(p => p.id)
+        const { supabase } = await import('../lib/supabase')
         const { data: imgs } = await supabase
           .from('product_images')
           .select('product_id,path,sort_order,alt')
