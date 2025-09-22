@@ -27,7 +27,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
           src={item.video}
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
           onMouseEnter={() => videoRef.current?.play().catch(()=>{})}
           onMouseLeave={() => { videoRef.current?.pause(); if (videoRef.current) videoRef.current.currentTime = 0 }}
