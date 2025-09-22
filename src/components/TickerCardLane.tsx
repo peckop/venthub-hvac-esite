@@ -3,7 +3,8 @@ import { Splide, SplideSlide } from '@splidejs/react-splide'
 import '@splidejs/react-splide/css'
 import { AutoScroll } from '@splidejs/splide-extension-auto-scroll'
 import { Link } from 'react-router-dom'
-import { Product } from '../lib/supabase'
+// Lightweight product shape to avoid importing supabase module at runtime
+interface Product { id: string; name: string; brand?: string | null; sku?: string | null }
 import { BrandIcon } from './HVACIcons'
 
 interface Props {

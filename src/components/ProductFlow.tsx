@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, startTransition } from 'react'
-import { getFeaturedProducts, getProducts, Product } from '../lib/supabase'
+import { fetchHomeProducts, LiteProduct } from '../lib/productsApi'
 import TickerLane from './TickerLane'
 import TickerCardLane from './TickerCardLane'
 
@@ -16,8 +16,8 @@ function usePrefersReducedMotion() {
 }
 
 const useProductsWithImages = () => {
-  const [items, setItems] = useState<Product[]>([])
-  const [allItems, setAllItems] = useState<Product[]>([])
+  const [items, setItems] = useState<LiteProduct[]>([])
+  const [allItems, setAllItems] = useState<LiteProduct[]>([])
   const [loading, setLoading] = useState(true)
   const reduced = usePrefersReducedMotion()
 
@@ -26,15 +26,12 @@ const useProductsWithImages = () => {
     async function run() {
       try {
         setLoading(true)
-        const [featured, some] = await Promise.all([
-          getFeaturedProducts(),
-          getProducts(36),
-        ])
-        const merged = [...featured, ...some]
-        const map = new Map<string, Product>()
+        const { featured, list } = await fetchHomeProducts(36)
+        const merged = [...featured, ...list]
+const map = new Map<string, LiteProduct>()
         merged.forEach(p => {
           if (!p.image_url) return
-          map.set(p.id, p)
+          map.set(p.id, p as LiteProduct)
         })
         const arr = Array.from(map.values())
         startTransition(() => {
@@ -63,7 +60,7 @@ const useProductsWithImages = () => {
 const ProductFlow: React.FC = () => {
   const { items, allItems, loading, reduced } = useProductsWithImages()
   const urls = useMemo(() => items.map(p => p.image_url!).filter(Boolean), [items])
-  const rotateProducts = (arr: Product[], n: number) => {
+  const rotateProducts = (arr: LiteProduct[], n: number) => {
     if (!arr.length) return arr
     const k = ((n % arr.length) + arr.length) % arr.length
     return arr.slice(k).concat(arr.slice(0, k))
@@ -105,7 +102,7 @@ const ProductFlow: React.FC = () => {
   if (urls.length === 0) {
     // Görsel yoksa: ürün kartlarıyla Splide AutoScroll ticker
     const { A: FA, B: FB, C: FC } = (() => {
-      const A: Product[] = [], B: Product[] = [], C: Product[] = []
+      const A: LiteProduct[] = [], B: LiteProduct[] = [], C: LiteProduct[] = []
       allItems.forEach((p, i) => {
         if (i % 3 === 0) A.push(p)
         else if (i % 3 === 1) B.push(p)
@@ -129,7 +126,7 @@ const ProductFlow: React.FC = () => {
     )
   }
 
-  const toTickerItems = (prods: Product[]) =>
+  const toTickerItems = (prods: LiteProduct[]) =>
     prods.map(p => ({ src: p.image_url!, href: `/product/${p.id}` as const, alt: p.name }))
 
   return (
