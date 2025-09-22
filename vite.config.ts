@@ -61,14 +61,8 @@ export default defineConfig({
     // CSS code splitting for better caching
     cssCodeSplit: true,
     
-    // Optimize asset handling more aggressively
-    assetsInlineLimit: 2048, // Inline assets smaller than 2KB (more aggressive)
-    
-    // Experimental optimizations
-    target: 'es2020',
-    
-    // CSS optimization
-    cssMinify: 'esbuild',
+    // Optimize asset handling
+    assetsInlineLimit: 4096, // Inline assets smaller than 4KB
   },
 })
 

@@ -32,62 +32,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
   
   <!-- Preload critical fonts -->
-  <style>
-    /* Critical CSS for immediate font display - async load fonts */
-    .async-font { font-display: swap; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    
-    /* Critical above-the-fold styles to prevent layout shift */
-    body { 
-      font-display: swap; 
-      margin: 0;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      line-height: 1.6;
-      overflow-x: hidden;
-      color: #374151;
-    }
-    
-    /* Critical layout and utility classes */
-    .min-h-screen { min-height: 100vh; }
-    .bg-white { background-color: #ffffff; }
-    .relative { position: relative; }
-    .flex { display: flex; }
-    .grid { display: grid; }
-    .hidden { display: none; }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
-    .max-w-7xl { max-width: 80rem; }
-    .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-    .font-bold { font-weight: 700; }
-    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-    
-    /* Critical hero section styles */
-    .hero-gradient { 
-      background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #f9fafb 100%);
-    }
-    
-    /* Prevent FOUC for hero section */
-    #root > div:first-child {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 50%, #f9fafb 100%);
-    }
-    
-    /* Loading placeholder for critical images */
-    .hero-img-placeholder {
-      width: 100%;
-      height: 400px;
-      background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
-      border-radius: 0.75rem;
-    }
-    
-    @media (min-width: 1024px) {
-      .lg\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .lg\:text-6xl { font-size: 3.75rem; line-height: 1; }
-      .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
-    }
-  </style>
 
   <!-- Preload key LCP image of the hero for faster rendering on homepage only -->
   <!-- Note: to avoid warnings on non-home routes, keep preload only on root path build or remove. Using eager+fetchpriority in HeroSection already covers LCP. -->

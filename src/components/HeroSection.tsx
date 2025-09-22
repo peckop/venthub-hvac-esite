@@ -5,16 +5,16 @@ const InViewCounter = React.lazy(() => import('./InViewCounter'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=40&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=60&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=55&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=75&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=65&srcset'
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=85&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=65'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=85'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px'
