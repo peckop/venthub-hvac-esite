@@ -12,7 +12,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
   const isCoarse = (() => {
     try { return window.matchMedia('(pointer: coarse)').matches } catch { return false }
   })()
-  const dur = isCoarse ? Math.max(20, Math.min(32, durationSec - 12)) : durationSec
+  const dur = isCoarse ? 14 : durationSec
 
   return (
     <div className="relative overflow-hidden group">

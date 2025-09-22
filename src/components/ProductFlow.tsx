@@ -130,9 +130,9 @@ const ProductFlow: React.FC = () => {
           <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
           <div className="space-y-4">
-            <TickerCardLane items={FA} speed={isCoarse ? 0.7 : 1.0} gap={14} width={300} height={140} pauseOnHover />
-            <TickerCardLane items={FB} speed={isCoarse ? -0.8 : -1.2} gap={14} width={300} height={140} pauseOnHover />
-            <TickerCardLane items={FC} speed={isCoarse ? 0.6 : 0.9} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FA} speed={isCoarse ? 0.35 : 1.0} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FB} speed={isCoarse ? -0.45 : -1.2} gap={14} width={300} height={140} pauseOnHover />
+            <TickerCardLane items={FC} speed={isCoarse ? 0.3 : 0.9} gap={14} width={300} height={140} pauseOnHover />
           </div>
         </div>
       </section>
@@ -149,11 +149,11 @@ const ProductFlow: React.FC = () => {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent" />
         <div className="space-y-3">
           {/* Üst (daha yavaş, okunabilir geçiş) */}
-          <TickerLane items={toTickerItems(AProds)} speed={isCoarse ? 0.6 : 1.0} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(AProds)} speed={isCoarse ? 0.35 : 1.0} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
           {/* Orta (ters yön, biraz daha hızlı) */}
-          <TickerLane items={toTickerItems(BProds)} speed={isCoarse ? -0.7 : -1.2} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(BProds)} speed={isCoarse ? -0.45 : -1.2} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
           {/* Alt (en yavaş, görsel ritim farklılığı) */}
-          <TickerLane items={toTickerItems(CProds)} speed={isCoarse ? 0.5 : 0.9} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
+          <TickerLane items={toTickerItems(CProds)} speed={isCoarse ? 0.3 : 0.9} gap={14} itemWidth={220} itemHeight={128} pauseOnHover />
         </div>
       </div>
     </section>

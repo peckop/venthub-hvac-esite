@@ -76,7 +76,7 @@ export const HeroSection: React.FC = () => {
     >
       {/* Background (decorative) moved to CSS to keep it out of LCP */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-20 hidden md:block"
+        className="absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
         aria-hidden="true"
         role="presentation"
       >
@@ -101,7 +101,7 @@ export const HeroSection: React.FC = () => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <div className="space-y-8 order-2 lg:order-1">
+          <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-industrial-gray leading-tight">
                 {t('home.heroTitle')}
@@ -153,7 +153,7 @@ export const HeroSection: React.FC = () => {
           {/* Right Content - Featured Product/Stats */}
           <div className="space-y-6 order-1 lg:order-2">
             {/* Stats Counters (in-view) */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
                 <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
               </React.Suspense>
@@ -168,8 +168,8 @@ export const HeroSection: React.FC = () => {
               </React.Suspense>
             </div>
 
-            {/* Featured Image */}
-            <div className="relative">
+            {/* Featured Image (hide on mobile to reduce clutter; visible from lg) */}
+            <div className="relative hidden lg:block">
               {/* Responsive picture with AVIF/WebP/JPEG via vite-imagetools */}
               <HeroPicture />
               <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
