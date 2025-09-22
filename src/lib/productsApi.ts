@@ -20,9 +20,15 @@ function getEnv(key: string): string {
 const BASE = getEnv('VITE_SUPABASE_URL')
 const KEY = getEnv('VITE_SUPABASE_ANON_KEY')
 
-async function srf(path: string, params: Record<string, string | number | boolean>): Promise<Response> {
+async function srf(path: string, params: Record<string, string | number | boolean | string[]>): Promise<Response> {
   const usp = new URLSearchParams()
-  for (const [k, v] of Object.entries(params)) usp.append(k, String(v))
+  for (const [k, v] of Object.entries(params)) {
+    if (Array.isArray(v)) {
+      for (const vv of v) usp.append(k, String(vv))
+    } else {
+      usp.append(k, String(v))
+    }
+  }
   const url = `${BASE}/rest/v1/${path}?${usp.toString()}`
   return fetch(url, {
     headers: {
@@ -36,11 +42,10 @@ async function srf(path: string, params: Record<string, string | number | boolea
 export async function fetchHomeProducts(limit: number = 36) {
   // 1) featured
   const featuredRes = await srf('products', {
-select: 'id,name,image_url,brand,sku,is_featured,status',
+    select: 'id,name,image_url,brand,sku,is_featured,status',
     'is_featured': 'eq.true',
     'status': 'eq.active',
-    'order': 'is_featured.desc',
-    'order2': 'name.asc', // PostgREST supports multiple order keys via order,order2 in URLSearchParams
+    'order': ['is_featured.desc', 'name.asc'],
     'limit': 6,
   })
   if (!featuredRes.ok) throw new Error('Featured fetch failed')
@@ -48,10 +53,9 @@ select: 'id,name,image_url,brand,sku,is_featured,status',
 
   // 2) general list
   const listRes = await srf('products', {
-select: 'id,name,image_url,brand,sku,is_featured,status',
+    select: 'id,name,image_url,brand,sku,is_featured,status',
     'status': 'eq.active',
-    'order': 'is_featured.desc',
-    'order2': 'name.asc',
+    'order': ['is_featured.desc', 'name.asc'],
     'limit': limit,
   })
   if (!listRes.ok) throw new Error('Products fetch failed')
