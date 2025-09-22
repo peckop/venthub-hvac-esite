@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
+const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
 import { CartProvider } from './hooks/useCart'
 import { AuthProvider } from './contexts/AuthContext'
 import { useScrollThrottle } from './hooks/useScrollThrottle'
@@ -103,6 +103,14 @@ function AppShell() {
     const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
     const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 600))
     idle(() => prefetchProductsPage())
+  }, [])
+
+  // Mount Toaster on idle to avoid blocking initial render
+  const [enableToaster, setEnableToaster] = React.useState(false)
+  React.useEffect(() => {
+    const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+    const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 1200))
+    idle(() => setEnableToaster(true))
   }, [])
 
   return (
@@ -212,32 +220,36 @@ function AppShell() {
         <AddToCartToast />
       </Suspense>
       
-      {/* Toast Container */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#FFFFFF',
-            color: '#374151',
-            border: '1px solid #E5E7EB',
-            borderRadius: '0.75rem',
-            fontSize: '14px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#FFFFFF',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#FFFFFF',
-            },
-          },
-        }}
-      />
+      {/* Toast Container (deferred to idle) */}
+      {enableToaster && (
+        <Suspense fallback={null}>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#FFFFFF',
+                color: '#374151',
+                border: '1px solid #E5E7EB',
+                borderRadius: '0.75rem',
+                fontSize: '14px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#FFFFFF',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#FFFFFF',
+                },
+              },
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

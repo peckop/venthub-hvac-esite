@@ -2,7 +2,6 @@ import React, { useState, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
-import { Star, TrendingUp, Clock } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 const TiltCard = React.lazy(() => import('../components/TiltCard'))
@@ -194,7 +193,7 @@ export const HomePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <Star size={32} className="text-gold-accent" fill="currentColor" />
+                  <StarIcon className="text-gold-accent" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{t('home.why.premiumTitle')}</h3>
                 <p className="text-blue-100">
@@ -204,7 +203,7 @@ export const HomePage: React.FC = () => {
               
               <div className="text-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp size={32} className="text-success-green" />
+                  <TrendingUpIcon className="text-success-green" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{t('home.why.expertTitle')}</h3>
                 <p className="text-blue-100">
@@ -214,7 +213,7 @@ export const HomePage: React.FC = () => {
               
               <div className="text-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <Clock size={32} className="text-warning-orange" />
+                  <ClockIcon className="text-warning-orange" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{t('home.why.fastTitle')}</h3>
                 <p className="text-blue-100">
@@ -253,6 +252,31 @@ export const HomePage: React.FC = () => {
         <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
       </Suspense>
     </div>
+  )
+}
+
+// Minimal inline icons to avoid lucide-react cost on initial load
+function StarIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/>
+    </svg>
+  )
+}
+function TrendingUpIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+      <polyline points="17 6 23 6 23 12"/>
+    </svg>
+  )
+}
+function ClockIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
   )
 }
 

@@ -10,7 +10,7 @@ import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
-import SearchOverlay from './SearchOverlay'
+const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
 const MegaMenu = React.lazy(() => import('./MegaMenu'))
 
 interface StickyHeaderProps {
@@ -440,7 +440,11 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
       </header>
 
       {/* Full-screen search overlay */}
-      <SearchOverlay open={isSearchOverlayOpen} onClose={() => setIsSearchOverlayOpen(false)} />
+      {isSearchOverlayOpen && (
+        <React.Suspense fallback={null}>
+          <SearchOverlay open={isSearchOverlayOpen} onClose={() => setIsSearchOverlayOpen(false)} />
+        </React.Suspense>
+      )}
 
       {/* Enhanced Full-Featured Sticky Header (always mounted to avoid flicker) */}
       <>
@@ -677,10 +681,12 @@ className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy
           </div>
       </>
 
-      {/* Mega Menu */}
-      <React.Suspense fallback={null}>
-        <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      </React.Suspense>
+      {/* Mega Menu (render only when open to avoid loading chunk on first paint) */}
+      {isMenuOpen && (
+        <React.Suspense fallback={null}>
+          <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        </React.Suspense>
+      )}
     </>
   )
 }
