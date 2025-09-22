@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import SpotlightHeroOverlay from './SpotlightHeroOverlay'
+const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
 const InViewCounter = React.lazy(() => import('./InViewCounter'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -48,6 +48,19 @@ export const HeroSection: React.FC = () => {
       return !rm && !coarse
     } catch { return false }
   })()
+  // Lazy mount spotlight overlay only on fine pointer devices after idle
+  const [showOverlay, setShowOverlay] = React.useState(false)
+  React.useEffect(() => {
+    try {
+      const coarse = window.matchMedia('(pointer: coarse)').matches
+      const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (coarse || rm) return
+      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+      const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 800))
+      idle(() => setShowOverlay(true))
+    } catch {}
+  }, [])
+
   return (
     <div
       ref={heroRef}
@@ -78,7 +91,11 @@ export const HeroSection: React.FC = () => {
       </div>
 
       {/* Spotlight Overlay */}
-      <SpotlightHeroOverlay />
+      {showOverlay && (
+        <React.Suspense fallback={null}>
+          <SpotlightHeroOverlay />
+        </React.Suspense>
+      )}
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
