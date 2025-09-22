@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
+import LazyInView from './LazyInView'
 const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
-const InViewCounter = React.lazy(() => import('./InViewCounter'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,16 +14,16 @@ import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_wareh
 import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1600 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1600&format=jpg&quality=88'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 
 const HeroPicture: React.FC = () => {
-  const sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 95vw, 1600px'
+  const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
   return (
     <picture>
       <source type="image/avif" srcSet={avifSet as unknown as string} sizes={sizes} />
       <source type="image/webp" srcSet={webpSet as unknown as string} sizes={sizes} />
       <img
-        src={hero1600 as unknown as string}
+        src={hero1200 as unknown as string}
         srcSet={jpgSet as unknown as string}
         sizes={sizes}
         alt="HVAC Equipment"
@@ -154,18 +154,19 @@ export const HeroSection: React.FC = () => {
           <div className="space-y-6 order-1 lg:order-2">
             {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
-                <InViewCounter label={t('home.stats.premiumBrands') as string} to={6} />
-              </React.Suspense>
-              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
-                <InViewCounter label={t('home.stats.productTypes') as string} to={50} suffix="+" />
-              </React.Suspense>
-              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
-                <InViewCounter label={t('home.stats.yearsExperience') as string} to={15} suffix="+" />
-              </React.Suspense>
-              <React.Suspense fallback={<div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />}>
-                <InViewCounter label={t('home.stats.happyCustomers') as string} to={1000} suffix="+" />
-              </React.Suspense>
+              {(() => {
+                type CounterProps = { label: string; to: number; suffix?: string }
+                const loader = () => import('./InViewCounter').then(m => ({ default: m.default as React.ComponentType<CounterProps> }))
+                const ph = <div className="rounded-2xl border border-light-gray bg-white p-6 text-center h-20" />
+                return (
+                  <>
+                    <LazyInView<CounterProps> loader={loader} placeholder={ph} componentProps={{ label: t('home.stats.premiumBrands') as string, to: 6 }} />
+                    <LazyInView<CounterProps> loader={loader} placeholder={ph} componentProps={{ label: t('home.stats.productTypes') as string, to: 50, suffix: '+' }} />
+                    <LazyInView<CounterProps> loader={loader} placeholder={ph} componentProps={{ label: t('home.stats.yearsExperience') as string, to: 15, suffix: '+' }} />
+                    <LazyInView<CounterProps> loader={loader} placeholder={ph} componentProps={{ label: t('home.stats.happyCustomers') as string, to: 1000, suffix: '+' }} />
+                  </>
+                )
+              })()}
             </div>
 
             {/* Featured Image (hide on mobile to reduce clutter; visible from lg) */}
