@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
 import type { Product } from '../lib/supabase'
-import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 
 // Feature flag: server-side cart sync
@@ -321,7 +320,7 @@ useEffect(() => {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
     } catch {
       try {
-        toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })
+        import('react-hot-toast').then(({ default: toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })).catch(() => {})
       } catch {}
     }
   }
@@ -330,7 +329,7 @@ useEffect(() => {
     setItems(currentItems => {
       const item = currentItems.find(item => item.product.id === productId)
       if (item) {
-        toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })
+        import('react-hot-toast').then(({ default: toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })).catch(() => {})
       }
       return currentItems.filter(item => item.product.id !== productId)
     })
@@ -395,7 +394,7 @@ useEffect(() => {
     }
     
     if (!opts?.silent) {
-      toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })).catch(() => {})
     }
     
     if (CART_SERVER_SYNC && user && serverCartId) {

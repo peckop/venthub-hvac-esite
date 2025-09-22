@@ -1,6 +1,5 @@
 import React, { createContext, useEffect, useState, ReactNode } from 'react'
-import { User, Session } from '@supabase/supabase-js'
-import toast from 'react-hot-toast'
+import type { User, Session } from '@supabase/supabase-js'
 
 interface AuthError { message: string }
 
@@ -52,15 +51,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(newSession?.user || null)
           switch (event) {
             case 'SIGNED_IN':
-              if (newSession?.user?.email) {
-                toast.success(`Hoş geldiniz, ${newSession.user.user_metadata?.full_name || newSession.user.email}!`)
+if (newSession?.user?.email) {
+                import('react-hot-toast').then(({ default: toast }) => {
+                  toast.success(`Hoş geldiniz, ${newSession.user.user_metadata?.full_name || newSession.user.email}!`)
+                }).catch(() => {})
               }
               break
-            case 'SIGNED_OUT':
-              toast.success('Çıkış yaptınız')
+case 'SIGNED_OUT':
+              import('react-hot-toast').then(({ default: toast }) => toast.success('Çıkış yaptınız')).catch(() => {})
               break
-            case 'USER_UPDATED':
-              toast.success('Bilgileriniz güncellendi')
+case 'USER_UPDATED':
+              import('react-hot-toast').then(({ default: toast }) => toast.success('Bilgileriniz güncellendi')).catch(() => {})
               break
             default:
           }
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             errorMessage = error.message || 'Bilinmeyen hata';
         }
         
-        toast.error(errorMessage);
+import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
         return { error: { message: errorMessage } };
       }
 
@@ -151,8 +152,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return { data }
     } catch (error: unknown) {
       console.error('Sign in catch error:', error)
-      const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu'
-      toast.error(errorMessage)
+const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu'
+      import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
       return { error: { message: errorMessage } }
     } finally {
       setLoading(false)
@@ -193,19 +194,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
             errorMessage = error.message || 'Bilinmeyen hata';
         }
         
-        toast.error(errorMessage);
+import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
         return { error: { message: errorMessage } };
       }
 
-      if (data.user && !data.session) {
-        toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın');
+if (data.user && !data.session) {
+        import('react-hot-toast').then(({ default: toast }) => toast.success('Kayıt başarılı! Lütfen e-posta adresinizi doğrulayın')).catch(() => {})
       }
 
       return { data }
     } catch (error: unknown) {
       console.error('Sign up catch error:', error)
-      const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu'
-      toast.error(errorMessage)
+const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu'
+      import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
       return { error: { message: errorMessage } }
     } finally {
       setLoading(false)
@@ -216,13 +217,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const { supabase } = await import('../lib/supabase')
       const { error } = await supabase.auth.signOut()
-      if (error) {
+if (error) {
         console.error('Sign out error:', error)
-        toast.error('Çıkış sırasında hata oluştu')
+        import('react-hot-toast').then(({ default: toast }) => toast.error('Çıkış sırasında hata oluştu')).catch(() => {})
       }
     } catch (error: unknown) {
-      console.error('Sign out catch error:', error)
-      toast.error('Çıkış sırasında beklenmeyen hata oluştu')
+console.error('Sign out catch error:', error)
+      import('react-hot-toast').then(({ default: toast }) => toast.error('Çıkış sırasında beklenmeyen hata oluştu')).catch(() => {})
     }
   }
 
@@ -243,16 +244,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           errorMessage = 'Geçersiz e-posta adresi';
         }
         
-        toast.error(errorMessage);
+import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
         return { error: { message: errorMessage } };
       }
 
-      toast.success('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi');
+import('react-hot-toast').then(({ default: toast }) => toast.success('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi')).catch(() => {})
       return { data };
     } catch (error: unknown) {
       console.error('Reset password catch error:', error);
-      const errorMessage = 'Şifre sıfırlama sırasında beklenmeyen hata oluştu';
-      toast.error(errorMessage);
+const errorMessage = 'Şifre sıfırlama sırasında beklenmeyen hata oluştu';
+      import('react-hot-toast').then(({ default: toast }) => toast.error(errorMessage)).catch(() => {})
       return { error: { message: errorMessage } };
     }
   }
