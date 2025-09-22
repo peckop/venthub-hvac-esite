@@ -1,6 +1,5 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { ChevronUp } from 'lucide-react'
 import { useI18n } from '../i18n/I18nProvider'
 
 const GAP = 12
@@ -55,7 +54,9 @@ const BackToTopButton: React.FC = () => {
       className="fixed bg-primary-navy hover:bg-secondary-blue text-white p-3 rounded-full shadow-lg transition-all z-40 border border-white/20"
       style={{ bottom: pos.bottom, right: pos.right }}
     >
-      <ChevronUp size={20} />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <polyline points="18 15 12 9 6 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </button>
   )
 }
