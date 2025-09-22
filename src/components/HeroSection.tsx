@@ -15,6 +15,19 @@ import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_wareho
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+// Background image responsive variants (decorative)
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgAvifSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=avif&quality=50&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgWebpSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=webp&quality=70&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgJpgSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=jpg&quality=80&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgDefault from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=jpg&quality=80'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
@@ -80,14 +93,20 @@ export const HeroSection: React.FC = () => {
         aria-hidden="true"
         role="presentation"
       >
-        <img
-          src="/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg"
-          alt=""
-          loading="lazy"
-          decoding="async"
-          {...({ fetchpriority: 'low' } as Record<string, string>)}
-          className="hidden md:block w-full h-full object-cover object-center"
-        />
+        <picture>
+          <source type="image/avif" srcSet={bgAvifSet as unknown as string} sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px" />
+          <source type="image/webp" srcSet={bgWebpSet as unknown as string} sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px" />
+          <img
+            src={bgDefault as unknown as string}
+            srcSet={bgJpgSet as unknown as string}
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            {...({ fetchpriority: 'low' } as Record<string, string>)}
+            className="w-full h-full object-cover object-center"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
 

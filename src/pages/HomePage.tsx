@@ -1,4 +1,5 @@
 import React, { useState, Suspense, useEffect } from 'react'
+import LazyInView from '../components/LazyInView'
 import { Link } from 'react-router-dom'
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
@@ -16,11 +17,7 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 // Kritik olmayan blokları tembel yükleme
 const BentoGrid = React.lazy(() => import('../components/BentoGrid'))
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
-const ResourcesSection = React.lazy(() => import('../components/ResourcesSection'))
 import LazyProductFlow from '../components/LazyProductFlow'
-const BeforeAfterSlider = React.lazy(() => import('../components/BeforeAfterSlider'))
-const ScrollLinkedProcess = React.lazy(() => import('../components/ScrollLinkedProcess'))
-const MagneticCTA = React.lazy(() => import('../components/MagneticCTA'))
 
 export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
@@ -143,13 +140,22 @@ export const HomePage: React.FC = () => {
 
       {/* Before/After Slider (Uygulamaya göre çözümler altı) */}
       <div className="cv-400">
-        <Suspense fallback={<div className="min-h-[160px]" aria-hidden="true" />}> 
-          <BeforeAfterSlider
-            beforeSrc="/images/before_parking_jet_fan.jpg"
-            afterSrc="/images/after_parking_jet_fan.jpg"
-            alt={t('home.beforeAfterAlt')}
-          />
-        </Suspense>
+        {(() => {
+          type BASProps = { beforeSrc: string; afterSrc: string; alt?: string }
+          return (
+            <LazyInView<BASProps>
+              loader={() => import('../components/BeforeAfterSlider')}
+              placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
+              rootMargin="0px 0px"
+              once
+              componentProps={{
+                beforeSrc: '/images/before_parking_jet_fan.jpg',
+                afterSrc: '/images/after_parking_jet_fan.jpg',
+                alt: t('home.beforeAfterAlt') as string,
+              }}
+            />
+          )
+        })()}
       </div>
 
 
@@ -170,23 +176,32 @@ export const HomePage: React.FC = () => {
 
       {/* Resources (Ürün görsel akışının altında) */}
       <div className="cv-320">
-        <Suspense fallback={null}> 
-          <ResourcesSection />
-        </Suspense>
+        <LazyInView
+          loader={() => import('../components/ResourcesSection')}
+          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
+          rootMargin="0px 0px"
+          once
+        />
       </div>
 
       {/* Scroll-Linked Process */}
       <div className="cv-400">
-        <Suspense fallback={null}> 
-          <ScrollLinkedProcess />
-        </Suspense>
+        <LazyInView
+          loader={() => import('../components/ScrollLinkedProcess')}
+          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
+          rootMargin="0px 0px"
+          once
+        />
       </div>
 
       {/* Magnetic CTA */}
       <div className="cv-320">
-        <Suspense fallback={null}> 
-          <MagneticCTA />
-        </Suspense>
+        <LazyInView
+          loader={() => import('../components/MagneticCTA')}
+          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
+          rootMargin="0px 0px"
+          once
+        />
       </div>
 
 

@@ -7,13 +7,13 @@ import { useScrollThrottle } from './hooks/useScrollThrottle'
 import StickyHeader from './components/StickyHeader'
 import ScrollToTop from './components/ScrollToTop'
 import LanguageSwitcher from './components/LanguageSwitcher'
-const Footer = lazy(() => import('./components/Footer'))
 import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
 const AddToCartToast = lazy(() => import('./components/AddToCartToast'))
 import LoadingSpinner from './components/LoadingSpinner'
 const WhatsAppFloat = lazy(() => import('./components/WhatsAppFloat'))
 import { prefetchProductsPage } from './utils/prefetch'
+import LazyInView from './components/LazyInView'
 
 // Keep HomePage as direct import for fastest initial load
 import HomePage from './pages/HomePage'
@@ -255,9 +255,12 @@ function AppShell() {
         </Suspense>
       </main>
 
-      <Suspense fallback={<div className="min-h-[400px]" aria-hidden="true" />}>
-        <Footer />
-      </Suspense>
+      <LazyInView
+        loader={() => import('./components/Footer')}
+        placeholder={<div className="min-h-[240px]" aria-hidden="true" />}
+        rootMargin="0px 0px"
+        once
+      />
 
       {/* Global WhatsApp floater (idle + coarse pointer) */}
       {enableWhatsApp && (
