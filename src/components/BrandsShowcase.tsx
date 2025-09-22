@@ -9,11 +9,16 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
   const REPEAT = 3
   const repeated = useMemo(() => Array.from({ length: REPEAT }).flatMap(() => items), [items])
 
+  const isCoarse = (() => {
+    try { return window.matchMedia('(pointer: coarse)').matches } catch { return false }
+  })()
+  const dur = isCoarse ? Math.max(20, Math.min(32, durationSec - 12)) : durationSec
+
   return (
     <div className="relative overflow-hidden group">
       <style>{`
         @keyframes brands-scroll-left { from { transform: translateX(0); } to { transform: translateX(-33.333%); } }
-        .brands-track { animation: brands-scroll-left ${durationSec}s linear infinite; will-change: transform; }
+        .brands-track { animation: brands-scroll-left ${dur}s linear infinite; will-change: transform; }
         .brands-lane:hover .brands-track { animation-play-state: paused; }
       `}</style>
       <div className="brands-lane">
