@@ -61,6 +61,32 @@ export const HeroSection: React.FC = () => {
       return !rm && !coarse
     } catch { return false }
   })()
+  // Render desktop-only large hero image to avoid high-priority fetch on mobile
+  const [isDesktop, setIsDesktop] = React.useState(false)
+  React.useEffect(() => {
+    try {
+      const mq = window.matchMedia('(min-width: 1024px)')
+      type MQLModern = { addEventListener(type: 'change', listener: (e: MediaQueryListEvent) => void): void; removeEventListener(type: 'change', listener: (e: MediaQueryListEvent) => void): void }
+      type MQLLegacy = { addListener(listener: (e: MediaQueryListEvent) => void): void; removeListener(listener: (e: MediaQueryListEvent) => void): void }
+      const mql = mq as MediaQueryList & Partial<MQLModern> & Partial<MQLLegacy>
+
+      const onChange = () => setIsDesktop(mql.matches)
+      onChange()
+
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', onChange)
+      } else if (typeof mql.addListener === 'function') {
+        mql.addListener(onChange)
+      }
+      return () => {
+        if (typeof mql.removeEventListener === 'function') {
+          mql.removeEventListener('change', onChange)
+        } else if (typeof mql.removeListener === 'function') {
+          mql.removeListener(onChange)
+        }
+      }
+    } catch { setIsDesktop(false) }
+  }, [])
   // Lazy mount spotlight overlay only on fine pointer devices after idle
   const [showOverlay, setShowOverlay] = React.useState(false)
   React.useEffect(() => {
@@ -189,12 +215,14 @@ export const HeroSection: React.FC = () => {
               })()}
             </div>
 
-            {/* Featured Image (hide on mobile to reduce clutter; visible from lg) */}
-            <div className="relative hidden lg:block">
-              {/* Responsive picture with AVIF/WebP/JPEG via vite-imagetools */}
-              <HeroPicture />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
-            </div>
+            {/* Featured Image (render only on desktop to prevent mobile fetching) */}
+            {isDesktop && (
+              <div className="relative hidden lg:block">
+                {/* Responsive picture with AVIF/WebP/JPEG via vite-imagetools */}
+                <HeroPicture />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
+              </div>
+            )}
           </div>
         </div>
       </div>
