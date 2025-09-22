@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from 'react'
+import React, { useState, Suspense, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
@@ -8,6 +8,10 @@ const TiltCard = React.lazy(() => import('../components/TiltCard'))
 import { trackEvent } from '../utils/analytics'
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 
 // Kritik olmayan blokları tembel yükleme
 const BentoGrid = React.lazy(() => import('../components/BentoGrid'))
@@ -22,6 +26,21 @@ export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
 
   const { t } = useI18n()
+
+  // Preload LCP hero image only on homepage and only on desktop (lg+) where it's visible
+  useEffect(() => {
+    try {
+      const desktop = window.matchMedia && window.matchMedia('(min-width: 1024px)').matches
+      if (!desktop) return
+      const link = document.createElement('link')
+      link.setAttribute('rel', 'preload')
+      link.setAttribute('as', 'image')
+      link.setAttribute('href', hero1200 as unknown as string)
+      link.setAttribute('fetchpriority', 'high')
+      document.head.appendChild(link)
+      return () => { document.head.removeChild(link) }
+    } catch {}
+  }, [])
 
 
 

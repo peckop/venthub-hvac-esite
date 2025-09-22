@@ -1,6 +1,5 @@
 import React from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Download } from 'lucide-react'
 
 export type ExportMenuItem = {
   key: string
@@ -13,7 +12,11 @@ export const ExportMenu: React.FC<{ items: ExportMenuItem[]; buttonLabel?: strin
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">
-          <Download size={16} />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="M12 3v12"/>
+            <polyline points="8 11 12 15 16 11"/>
+            <rect x="4" y="19" width="16" height="2" rx="1"/>
+          </svg>
           {buttonLabel || 'Dışa Aktar'}
         </button>
       </DropdownMenu.Trigger>

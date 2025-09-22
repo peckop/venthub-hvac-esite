@@ -85,7 +85,8 @@ export const HeroSection: React.FC = () => {
           alt=""
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover object-center"
+          {...({ fetchpriority: 'low' } as Record<string, string>)}
+          className="hidden md:block w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
