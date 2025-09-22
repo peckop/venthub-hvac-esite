@@ -83,7 +83,7 @@ case 'USER_UPDATED':
       idleHandle = (window as unknown as { requestIdleCallback: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback(() => { initializeAuth() }, { timeout: 1500 })
     } else {
       // Küçük bir gecikme ile başlat (ilk boyama sonrasına bırakmak için)
-      setTimeout(() => { initializeAuth() }, needImmediate ? 0 : 800)
+      setTimeout(() => { initializeAuth() }, needImmediate ? 0 : 2000)
     }
 
     return () => {

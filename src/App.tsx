@@ -12,7 +12,7 @@ import PaymentWatcher from './components/PaymentWatcher'
 import BackToTopButton from './components/BackToTopButton'
 const AddToCartToast = lazy(() => import('./components/AddToCartToast'))
 import LoadingSpinner from './components/LoadingSpinner'
-import WhatsAppFloat from './components/WhatsAppFloat'
+const WhatsAppFloat = lazy(() => import('./components/WhatsAppFloat'))
 import { prefetchProductsPage } from './utils/prefetch'
 
 // Keep HomePage as direct import for fastest initial load
@@ -111,6 +111,18 @@ function AppShell() {
     const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
     const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 1200))
     idle(() => setEnableToaster(true))
+  }, [])
+
+  // WhatsApp: sadece pointer:coarse ve idle sonrasında yükle
+  const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
+  React.useEffect(() => {
+    try {
+      const coarse = window.matchMedia('(pointer: coarse)').matches
+      if (!coarse) return
+      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+      const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 1500))
+      idle(() => setEnableWhatsApp(true))
+    } catch {}
   }, [])
 
   return (
@@ -212,8 +224,12 @@ function AppShell() {
         <Footer />
       </Suspense>
 
-      {/* Global WhatsApp floater */}
-      <WhatsAppFloat />
+      {/* Global WhatsApp floater (idle + coarse pointer) */}
+      {enableWhatsApp && (
+        <Suspense fallback={null}>
+          <WhatsAppFloat />
+        </Suspense>
+      )}
       
       {/* Global cart toast */}
       <Suspense fallback={null}>
