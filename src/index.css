@@ -2,11 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Self-hosted fonts */
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
+/* Self-hosted fonts imported via main.tsx to avoid PostCSS @import ordering warnings */
 
 /* Smooth scroll behavior */
 html {
