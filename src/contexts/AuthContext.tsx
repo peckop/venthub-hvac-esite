@@ -99,10 +99,10 @@ case 'USER_UPDATED':
     } else {
       const ricb = (window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number }).requestIdleCallback
       if (typeof ricb === 'function') {
-        ricb(() => start(), { timeout: 5000 })
+        // İlk ölçüm penceresini etkilememek için daha uzun idle bekle
+        ricb(() => start(), { timeout: 10000 })
       } else {
-        // Başlatmayı yükleme sonrasına veya ilk kullanıcı etkileşimine bırak
-        window.addEventListener('load', start, { once: true })
+        // Yalnızca ilk kullanıcı etkileşimiyle başlat (load'da başlatma!)
         window.addEventListener('pointerdown', start, { once: true })
         window.addEventListener('keydown', start, { once: true })
         window.addEventListener('touchstart', start, { once: true })
