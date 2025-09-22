@@ -21,7 +21,6 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
       <style>{`
         @keyframes brands-scroll-left { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
         .brands-track { animation: brands-scroll-left ${dur}s linear infinite; will-change: transform; backface-visibility: hidden; }
-        .brands-lane:hover .brands-track { animation-play-state: paused; }
       `}</style>
       <div className="brands-lane">
         <div className="brands-track flex items-stretch gap-0 w-max">
