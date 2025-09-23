@@ -302,6 +302,7 @@ img {
   background-size: cover;
   background-position: center;
   filter: var(--hero-bg-filter, blur(12px));
+  opacity: var(--hero-bg-opacity, 0);
   transition: filter 400ms ease, opacity 400ms ease;
   pointer-events: none;
   will-change: filter, background-image;
