@@ -107,6 +107,7 @@ export const HeroSection: React.FC = () => {
       const setPlaceholder = () => {
         el.style.setProperty('--hero-bg-url', `url(${(bgTiny as unknown as string)})`)
         el.style.setProperty('--hero-bg-filter', 'blur(12px)')
+        el.style.setProperty('--hero-bg-opacity', '0')
       }
 
       const setHighResNow = () => {
@@ -114,6 +115,7 @@ export const HeroSection: React.FC = () => {
         const url = (isLg ? (bgLarge as unknown as string) : (bgDefault as unknown as string))
         el.style.setProperty('--hero-bg-url', `url(${url})`)
         el.style.setProperty('--hero-bg-filter', 'blur(0)')
+        el.style.setProperty('--hero-bg-opacity', '1')
       }
 
       // Show tiny LQIP ASAP to avoid long blank paint
