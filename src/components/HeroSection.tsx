@@ -98,33 +98,35 @@ export const HeroSection: React.FC = () => {
     } catch {}
   }, [])
 
-  // Defer high-res background; show tiny blurred LQIP early
+  // Defer high-res background; show tiny blurred LQIP early (via CSS var + ::before)
   React.useEffect(() => {
     try {
       if (!bgRef.current) return
       const el = bgRef.current
-      // Base styles
-      el.style.backgroundSize = 'cover'
-      el.style.backgroundPosition = 'center'
-      el.style.transition = 'filter 400ms ease, opacity 400ms ease'
 
       const setPlaceholder = () => {
-        el.style.backgroundImage = `url(${(bgTiny as unknown as string)})`
-        el.style.filter = 'blur(12px)'
+        el.style.setProperty('--hero-bg-url', `url(${(bgTiny as unknown as string)})`)
+        el.style.setProperty('--hero-bg-filter', 'blur(12px)')
       }
 
-      const setHighRes = () => {
+      const setHighResNow = () => {
         const isLg = window.matchMedia('(min-width: 1024px)').matches
         const url = (isLg ? (bgLarge as unknown as string) : (bgDefault as unknown as string))
-        el.style.backgroundImage = `url(${url})`
-        el.style.filter = 'blur(0)'
+        el.style.setProperty('--hero-bg-url', `url(${url})`)
+        el.style.setProperty('--hero-bg-filter', 'blur(0)')
       }
 
       // Show tiny LQIP ASAP to avoid long blank paint
       const raf = requestAnimationFrame(setPlaceholder)
 
-      // Swap to high-res after full load + delay to avoid affecting LCP
-      const onLoad = () => setTimeout(setHighRes, 1200)
+      // Swap to high-res after full load + delay (longer on mobile) to avoid affecting LCP
+      const onLoad = () => {
+        try {
+          const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
+          const delay = isMobile ? 5200 : 1200
+          setTimeout(setHighResNow, delay)
+        } catch { setTimeout(setHighResNow, 1500) }
+      }
       window.addEventListener('load', onLoad)
 
       return () => {
@@ -147,13 +149,12 @@ export const HeroSection: React.FC = () => {
       }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
-      {/* Background (decorative) applied via CSS background to avoid LCP */}
+      {/* Background (decorative) via pseudo-element to avoid being LCP */}
       <div
         ref={bgRef}
-        className="absolute inset-0 pointer-events-none opacity-15 md:opacity-20 bg-cover bg-center"
+        className="hero-bg absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
         aria-hidden="true"
         role="presentation"
-        style={{ backgroundImage: 'none' }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
