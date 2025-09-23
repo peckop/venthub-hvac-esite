@@ -22,6 +22,9 @@ import bgDefault from '../../public/images/modern-industrial-HVAC-rooftop-blue-s
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import bgLarge from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=jpg&quality=80'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=jpg&quality=20'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
@@ -95,18 +98,39 @@ export const HeroSection: React.FC = () => {
     } catch {}
   }, [])
 
-  // Defer decorative background load to avoid becoming LCP
+  // Defer high-res background; show tiny blurred LQIP early
   React.useEffect(() => {
     try {
-      const applyBg = () => {
-        if (!bgRef.current) return
+      if (!bgRef.current) return
+      const el = bgRef.current
+      // Base styles
+      el.style.backgroundSize = 'cover'
+      el.style.backgroundPosition = 'center'
+      el.style.transition = 'filter 400ms ease, opacity 400ms ease'
+
+      const setPlaceholder = () => {
+        el.style.backgroundImage = `url(${(bgTiny as unknown as string)})`
+        el.style.filter = 'blur(12px)'
+      }
+
+      const setHighRes = () => {
         const isLg = window.matchMedia('(min-width: 1024px)').matches
         const url = (isLg ? (bgLarge as unknown as string) : (bgDefault as unknown as string))
-        bgRef.current.style.backgroundImage = `url(${url})`
+        el.style.backgroundImage = `url(${url})`
+        el.style.filter = 'blur(0)'
       }
-      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
-      if (typeof win.requestIdleCallback === 'function') win.requestIdleCallback(applyBg)
-      else setTimeout(applyBg, 500)
+
+      // Show tiny LQIP ASAP to avoid long blank paint
+      const raf = requestAnimationFrame(setPlaceholder)
+
+      // Swap to high-res after full load + delay to avoid affecting LCP
+      const onLoad = () => setTimeout(setHighRes, 1200)
+      window.addEventListener('load', onLoad)
+
+      return () => {
+        window.removeEventListener('load', onLoad)
+        cancelAnimationFrame(raf)
+      }
     } catch {}
   }, [])
 
