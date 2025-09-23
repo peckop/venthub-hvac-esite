@@ -28,6 +28,9 @@ import bgJpgSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sk
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import bgDefault from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=jpg&quality=80'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import bgLarge from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=jpg&quality=80'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
@@ -54,6 +57,7 @@ const HeroPicture: React.FC = () => {
 export const HeroSection: React.FC = () => {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement | null>(null)
+  const bgRef = useRef<HTMLDivElement | null>(null)
   const enableParallax = (() => {
     try {
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -100,6 +104,21 @@ export const HeroSection: React.FC = () => {
     } catch {}
   }, [])
 
+  // Defer decorative background load to avoid becoming LCP
+  React.useEffect(() => {
+    try {
+      const applyBg = () => {
+        if (!bgRef.current) return
+        const isLg = window.matchMedia('(min-width: 1024px)').matches
+        const url = (isLg ? (bgLarge as unknown as string) : (bgDefault as unknown as string))
+        bgRef.current.style.backgroundImage = `url(${url})`
+      }
+      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+      if (typeof win.requestIdleCallback === 'function') win.requestIdleCallback(applyBg)
+      else setTimeout(applyBg, 500)
+    } catch {}
+  }, [])
+
   return (
     <div
       ref={heroRef}
@@ -113,26 +132,14 @@ export const HeroSection: React.FC = () => {
       }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
-      {/* Background (decorative) moved to CSS to keep it out of LCP */}
+      {/* Background (decorative) applied via CSS background to avoid LCP */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
+        ref={bgRef}
+        className="absolute inset-0 pointer-events-none opacity-15 md:opacity-20 bg-cover bg-center"
         aria-hidden="true"
         role="presentation"
+        style={{ backgroundImage: 'none' }}
       >
-        <picture>
-          <source type="image/avif" srcSet={bgAvifSet as unknown as string} sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px" />
-          <source type="image/webp" srcSet={bgWebpSet as unknown as string} sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px" />
-          <img
-            src={bgDefault as unknown as string}
-            srcSet={bgJpgSet as unknown as string}
-            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1280px"
-            alt=""
-            loading="lazy"
-            decoding="async"
-            {...({ fetchpriority: 'low' } as Record<string, string>)}
-            className="w-full h-full object-cover object-center"
-          />
-        </picture>
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
 
