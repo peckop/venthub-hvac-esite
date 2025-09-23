@@ -288,3 +288,21 @@ img {
 .fixed {
   position: fixed;
 }
+
+/* Hero background via pseudo-element to keep it out of LCP */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+}
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-bg-url);
+  background-size: cover;
+  background-position: center;
+  filter: var(--hero-bg-filter, blur(12px));
+  transition: filter 400ms ease, opacity 400ms ease;
+  pointer-events: none;
+  will-change: filter, background-image;
+}
