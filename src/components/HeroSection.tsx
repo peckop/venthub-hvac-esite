@@ -18,15 +18,6 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 // Background image responsive variants (decorative)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgAvifSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=avif&quality=50&srcset'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgWebpSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=webp&quality=70&srcset'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgJpgSet from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=480;768;1024;1280&format=jpg&quality=80&srcset'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import bgDefault from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=jpg&quality=80'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
