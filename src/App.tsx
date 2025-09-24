@@ -165,7 +165,9 @@ function AppShell() {
       
       <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
         <BackToTopButton />
-        <PaymentWatcher />
+        {(() => {
+          try { return localStorage.getItem('vh_pending_order') ? <PaymentWatcher /> : null } catch { return null }
+        })()}
         <LanguageSwitcher />
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>

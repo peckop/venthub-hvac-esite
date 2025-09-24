@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { HelpCircle } from 'lucide-react'
 import { trackEvent } from '../utils/analytics'
 import { useI18n } from '../i18n/I18nProvider'
 
@@ -24,7 +23,7 @@ const FAQShortSection: React.FC = () => {
           {items.map((it) => (
             <div key={it.q} className="rounded-2xl border border-light-gray bg-gradient-to-br from-gray-50 to-white p-5">
               <div className="flex items-start gap-3">
-                <HelpCircle size={20} className="text-primary-navy mt-1" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary-navy mt-1" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
                 <div>
                   <div className="font-semibold text-industrial-gray">{it.q}</div>
                   <div className="text-sm text-steel-gray mt-1">{it.a}</div>
