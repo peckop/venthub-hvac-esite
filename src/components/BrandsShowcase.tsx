@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { HVAC_BRANDS } from '../lib/supabase'
+import { HVAC_BRANDS } from '../lib/brands'
 import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'

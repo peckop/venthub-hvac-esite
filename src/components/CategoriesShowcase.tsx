@@ -2,7 +2,7 @@ import React from 'react'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ArrowRight, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Category } from '../lib/supabase'
+import type { Category } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
 
 interface CategoriesShowcaseProps {
