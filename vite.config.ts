@@ -1,14 +1,54 @@
 import path from "path"
+import { readFileSync, writeFileSync } from 'fs'
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { imagetools } from 'vite-imagetools'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Critters from 'critters'
 
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production'
+
+  // Minimal Critters integration to inline critical CSS after build
+  const criticalCssPlugin = (() => {
+    let outDir = 'dist'
+    const plugin: any = {
+      name: 'inline-critical-css',
+      apply: 'build' as const,
+      enforce: 'post' as const,
+      configResolved(resolved: any) {
+        outDir = resolved.build?.outDir || 'dist'
+      },
+      async closeBundle() {
+        try {
+          const distDir = path.resolve(__dirname, outDir)
+          const htmlPath = path.join(distDir, 'index.html')
+          const html = readFileSync(htmlPath, 'utf-8')
+          const critters = new Critters({
+            path: distDir,
+            preload: 'swap',
+            pruneSource: true,
+            reduceInlineStyles: true,
+            compress: true,
+            logLevel: 'silent',
+          })
+          const out = await critters.process(html)
+          writeFileSync(htmlPath, out)
+          console.log('[critters] Inlined critical CSS into index.html')
+        } catch (e: any) {
+          console.warn('[critters] skipped:', e?.message || e)
+        }
+      },
+    }
+    return plugin
+  })()
+
   return {
     plugins: [
       imagetools(),
       react(),
+      criticalCssPlugin,
     ],
     resolve: {
       alias: {

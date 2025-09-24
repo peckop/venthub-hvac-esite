@@ -240,6 +240,8 @@ textarea:focus-visible {
   :root {
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
+    /* Avoid synthetic bold/italic to reduce layout shifts */
+    font-synthesis: none;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
