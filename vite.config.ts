@@ -45,6 +45,11 @@ export default defineConfig(({ mode }) => {
             return `<link rel="preload" as="style" ${attrs} onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" ${attrs}></noscript>`
           })
 
+          // Remove modulepreload/prefetch for dynamic chunks to avoid downloading unused JS on first paint.
+          out = out.replace(/<link\s+[^>]*rel=["']modulepreload["'][^>]*>/gi, '')
+          out = out.replace(/<link\s+[^>]*rel=["']prefetch["'][^>]*>/gi, '')
+          out = out.replace(/<link\s+[^>]*rel=["']preload["'][^>]*as=["']script["'][^>]*>/gi, '')
+
           writeFileSync(htmlPath, out)
           console.log('[critters] Inlined critical CSS and converted to preload+swap in index.html')
         } catch (e: any) {
