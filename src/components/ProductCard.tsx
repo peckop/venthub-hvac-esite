@@ -1,5 +1,5 @@
 import React from 'react'
-import { Product } from '../lib/supabase'
+import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'

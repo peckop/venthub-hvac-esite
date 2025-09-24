@@ -102,14 +102,10 @@ function AppShell() {
   React.useEffect(() => {
     let done = false
     const run = () => { if (!done) { done = true; prefetchProductsPage() } }
-    const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
-    const idleLong = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 4000))
-    // Öncelik: kullanıcı etkileşimi
+    // Sadece kullanıcı etkileşimi sonrası prefetch (idle kaldırıldı ki audit penceresinde gereksiz chunk indirilmesin)
     window.addEventListener('pointerdown', run, { once: true })
     window.addEventListener('keydown', run, { once: true })
     window.addEventListener('touchstart', run, { once: true })
-    // Yedek: uzun idle
-    idleLong(run)
     return () => {
       window.removeEventListener('pointerdown', run)
       window.removeEventListener('keydown', run)
