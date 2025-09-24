@@ -33,9 +33,21 @@ export default defineConfig(({ mode }) => {
             compress: true,
             logLevel: 'silent',
           })
-          const out = await critters.process(html)
+          let out = await critters.process(html)
+
+          // Force non-blocking CSS: convert remaining stylesheet links to preload+swap with noscript fallback.
+          out = out.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["'][^"']+\.css["'][^>]*>/gi, (tag: string) => {
+            // Remove rel="stylesheet" and any existing onload to avoid duplicates, keep other attrs (e.g., href, crossorigin).
+            const cleaned = tag
+              .replace(/<link/i, '')
+              .replace(/>/, '')
+              .replace(/\srel=["']stylesheet["']/i, '')
+              .replace(/\sonload=["'][^"']*["']/i, '')
+            return `<link rel="preload" as="style"${cleaned} onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet"${cleaned}></noscript>`
+          })
+
           writeFileSync(htmlPath, out)
-          console.log('[critters] Inlined critical CSS into index.html')
+          console.log('[critters] Inlined critical CSS and converted to preload+swap in index.html')
         } catch (e: any) {
           console.warn('[critters] skipped:', e?.message || e)
         }
