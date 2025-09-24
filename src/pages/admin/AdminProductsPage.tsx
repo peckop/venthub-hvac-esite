@@ -1,8 +1,7 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
-import ExportMenu from '../../components/admin/ExportMenu'
+import type { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import * as Tabs from '@radix-ui/react-tabs'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -516,6 +515,9 @@ const before = rows.find(r=>r.id===id) || null
   const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string,string>[]; total: number } | null>(null)
   const [importRows, setImportRows] = React.useState<Record<string,string>[] | null>(null)
 
+  const ColumnsMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ColumnsMenu')), [])
+  const ExportMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ExportMenu')), [])
+
   return (
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
@@ -552,7 +554,8 @@ const before = rows.find(r=>r.id===id) || null
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
             <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
-            <ColumnsMenu
+            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>Görünüm…</button>}>
+              <ColumnsMenu
               columns={[
 { key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
                 { key: 'name', label: t('admin.products.table.name'), checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
@@ -566,7 +569,9 @@ const before = rows.find(r=>r.id===id) || null
               density={density}
               onDensityChange={setDensity}
             />
-<ExportMenu
+            </React.Suspense>
+            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>İndir…</button>}>
+              <ExportMenu
               items={[
                 { key: 'csv', label: t('admin.products.export.csvLabel'), onSelect: ()=>{
                   const cols = ['id','name','sku','category_id','status','price','stock_qty']
@@ -585,6 +590,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                 }}
               ]}
             />
+            </React.Suspense>
           </div>
         )}
       />
