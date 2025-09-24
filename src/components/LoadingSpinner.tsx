@@ -1,5 +1,4 @@
 import React from 'react'
-import { Loader2 } from 'lucide-react'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
@@ -18,7 +17,10 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   const spinnerElement = (
     <div className="flex items-center justify-center">
-      <Loader2 className={`${sizeClasses[size]} animate-spin text-primary-navy`} />
+      <span
+        className={`${sizeClasses[size]} inline-block rounded-full border-2 border-primary-navy border-t-transparent animate-spin`}
+        aria-label="Yükleniyor"
+      />
     </div>
   )
 

@@ -50,6 +50,16 @@ export default defineConfig(({ mode }) => {
           out = out.replace(/<link\s+[^>]*rel=["']prefetch["'][^>]*>/gi, '')
           out = out.replace(/<link\s+[^>]*rel=["']preload["'][^>]*as=["']script["'][^>]*>/gi, '')
 
+          // Dedupe: if a preload as=style exists for an href, remove any plain rel=stylesheet with same href (outside noscript)
+          try {
+            const matches = Array.from(out.matchAll(/<link\s+[^>]*rel=["']preload["'][^>]*as=["']style["'][^>]*href=["']([^"']+\.css)["'][^>]*>/gi)) as RegExpMatchArray[]
+            const preloadHrefs = matches.map(m => m[1])
+            for (const href of preloadHrefs) {
+              const re = new RegExp(`<link\\s+((?!<).)*rel=["']stylesheet["']((?!<).)*href=["']${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']((?!<).)*>`, 'gi')
+              out = out.replace(re, '')
+            }
+          } catch {}
+
           writeFileSync(htmlPath, out)
           console.log('[critters] Inlined critical CSS and converted to preload+swap in index.html')
         } catch (e: any) {
