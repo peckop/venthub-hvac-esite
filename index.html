@@ -22,9 +22,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
 
-  <!-- Preconnects for faster first byte on external origins -->
-  <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin>
-  <link rel="dns-prefetch" href="%VITE_SUPABASE_URL%">
+  <!-- Removed global preconnect/dns-prefetch to avoid unused-preconnect warnings; we will add preconnect at first real Supabase usage if needed. -->
   
   <!-- Fonts: self-hosted via @fontsource/inter; removed external Google Fonts links -->
   <!-- Preload critical fonts -->
