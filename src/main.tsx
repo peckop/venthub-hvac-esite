@@ -37,8 +37,9 @@ try {
       : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
     const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
     const isProd = viteEnv.MODE === 'production'
-    const sample = isProd ? 0.1 : 1.0
-    const ttlMs = isProd ? 60_000 : 0
+    // Production'da başlangıç ölçüm penceresinde hata raporlamayı tamamen kapat (supabase-js import'unu tetiklememek için)
+    const sample = isProd ? 0 : 1.0
+    const ttlMs = isProd ? 120_000 : 0
     installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
   }
 } catch {}
