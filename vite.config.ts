@@ -36,14 +36,13 @@ export default defineConfig(({ mode }) => {
           let out = await critters.process(html)
 
           // Force non-blocking CSS: convert remaining stylesheet links to preload+swap with noscript fallback.
-          out = out.replace(/<link\s+[^>]*rel=["']stylesheet["'][^>]*href=["'][^"']+\.css["'][^>]*>/gi, (tag: string) => {
-            // Remove rel="stylesheet" and any existing onload to avoid duplicates, keep other attrs (e.g., href, crossorigin).
-            const cleaned = tag
-              .replace(/<link/i, '')
-              .replace(/>/, '')
-              .replace(/\srel=["']stylesheet["']/i, '')
-              .replace(/\sonload=["'][^"']*["']/i, '')
-            return `<link rel="preload" as="style"${cleaned} onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet"${cleaned}></noscript>`
+          // Keep all attributes (href, crossorigin, integrity, etc.) but strip rel=stylesheet and any onload.
+          out = out.replace(/<link\s+([^>]*?)\brel=["']stylesheet["']([^>]*?)>/gi, (_full: string, a1: string, a2: string) => {
+            let attrs = `${a1} ${a2}`
+            attrs = attrs.replace(/\s*rel=["']stylesheet["']/i, '')
+            attrs = attrs.replace(/\s*onload=["'][^"']*["']/i, '')
+            attrs = attrs.replace(/\s+/g, ' ').trim()
+            return `<link rel="preload" as="style" ${attrs} onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" ${attrs}></noscript>`
           })
 
           writeFileSync(htmlPath, out)
