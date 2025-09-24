@@ -40,13 +40,22 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
       if (!force && Math.random() > sample) return
       const key = JSON.stringify([payload.msg, payload.url, payload.stack]).slice(0, 256)
       if (!shouldSend(key)) return
-      // Lazy import Supabase to avoid pulling it into initial render
-      const { supabase } = await import('./supabase')
-      const { error } = await supabase.functions.invoke('log-client-error', { body: payload })
-      if (error) {
-        // Best-effort: surface in console for quick diagnosis during tests
+
+      const body = JSON.stringify(payload)
+      // First try: sendBeacon (non-blocking, avoids JS imports)
+      try {
+        if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+          const ok = (navigator as unknown as { sendBeacon: (url: string, data?: BodyInit) => boolean }).sendBeacon(_endpoint, new Blob([body], { type: 'application/json' }))
+          if (ok) return
+        }
+      } catch {}
+
+      // Fallback: fetch (no supabase-js import)
+      try {
+        await fetch(_endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body, keepalive: true })
+      } catch (err) {
         // eslint-disable-next-line no-console
-        console.debug('[errorReporter] invoke error:', error)
+        console.debug('[errorReporter] fetch failed:', err)
       }
     } catch (e) {
       // eslint-disable-next-line no-console
