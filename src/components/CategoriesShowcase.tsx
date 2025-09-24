@@ -1,6 +1,5 @@
 import React from 'react'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { ArrowRight, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Category } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
@@ -42,7 +41,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
         {/* Popular Categories */}
         <div className="mb-16">
           <div className="flex items-center justify-center mb-8">
-            <TrendingUp className="text-gold-accent mr-2" size={24} />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold-accent mr-2" aria-hidden="true"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 5h7v7"/></svg>
             <h3 className="text-2xl font-semibold text-industrial-gray">
               {t('products.popularCategories')}
             </h3>
@@ -71,7 +70,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                     <span className="text-sm font-medium mr-1">
                       {t('categories.subCount', { count: getSubCategoryCount(category.id) })}
                     </span>
-                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
                   </div>
                 </div>
               </Link>
@@ -103,10 +102,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                     {t('categories.variantCount', { count: getSubCategoryCount(category.id) })}
                   </p>
                 </div>
-                <ArrowRight 
-                  size={16} 
-                  className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" 
-                />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
               </Link>
             ))}
           </div>
@@ -119,7 +115,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
             className="inline-flex items-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
           >
             <span>{t('common.seeAllProducts')}</span>
-            <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
           </Link>
         </div>
       </div>
