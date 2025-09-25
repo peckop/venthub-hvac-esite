@@ -15,7 +15,6 @@ import Seo from '../components/Seo'
 import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 
 // Kritik olmayan blokları tembel yükleme
-const BentoGrid = React.lazy(() => import('../components/BentoGrid'))
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
 import LazyProductFlow from '../components/LazyProductFlow'
 
@@ -87,9 +86,12 @@ export const HomePage: React.FC = () => {
 
       {/* Bento Grid (hover video önizleme) */}
       <div className="cv-600">
-        <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}> 
-          <BentoGrid />
-        </Suspense>
+        <LazyInView
+          loader={() => import('../components/BentoGrid')}
+          placeholder={<div className="min-h-[200px]" aria-hidden="true" />}
+          rootMargin="0px 0px"
+          once
+        />
       </div>
 
       {/* Premium HVAC Markaları (BentoGrid sonrası) */}
@@ -278,9 +280,11 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      <Suspense fallback={null}>
-        <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
-      </Suspense>
+      {leadOpen && (
+        <Suspense fallback={null}>
+          <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }
