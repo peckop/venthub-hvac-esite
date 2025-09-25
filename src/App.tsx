@@ -267,10 +267,12 @@ function AppShell() {
         </Suspense>
       )}
       
-      {/* Global cart toast */}
-      <Suspense fallback={null}>
-        <AddToCartToast />
-      </Suspense>
+      {/* Global cart toast (ilk etkileşim sonrası) */}
+      {enableToaster && (
+        <Suspense fallback={null}>
+          <AddToCartToast />
+        </Suspense>
+      )}
       
       {/* Toast Container (deferred to idle) */}
       {enableToaster && (
