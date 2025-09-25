@@ -5,10 +5,10 @@ const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=60&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=55&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=80&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=72&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
@@ -18,10 +18,10 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 // Background image responsive variants (decorative)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=60'
+import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=60'
+import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'

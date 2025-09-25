@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
 import { useI18n } from '../i18n/I18nProvider'
 
 // Hafif bir görsel akış/slider (kütüphane kullanmadan)
@@ -173,12 +172,12 @@ const VisualShowcase: React.FC = () => {
 
           {/* Controls */}
           <div className="absolute inset-0 flex items-center justify-between p-2 pointer-events-none z-20">
-            <button
+              <button
               onClick={prev}
               className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
               aria-label={t('homeShowcase.prevAria')}
             >
-              <ChevronLeft size={18} />
+              <ChevronLeftIcon size={18} />
             </button>
             <div className="pointer-events-auto flex items-center gap-2">
               <button
@@ -186,14 +185,14 @@ const VisualShowcase: React.FC = () => {
                 className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={playing ? t('homeShowcase.pauseAria') : t('homeShowcase.playAria')}
               >
-                {playing ? <Pause size={18} /> : <Play size={18} />}
+                {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
               </button>
               <button
                 onClick={next}
                 className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={t('homeShowcase.nextAria')}
               >
-                <ChevronRight size={18} />
+                <ChevronRightIcon size={18} />
               </button>
             </div>
           </div>
@@ -216,4 +215,34 @@ const VisualShowcase: React.FC = () => {
 }
 
 export default VisualShowcase
+
+function ChevronLeftIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  )
+}
+function ChevronRightIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  )
+}
+function PauseIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
+      <rect x="6" y="4" width="4" height="16" />
+      <rect x="14" y="4" width="4" height="16" />
+    </svg>
+  )
+}
+function PlayIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className} aria-hidden="true">
+      <polygon points="5,3 19,12 5,21" />
+    </svg>
+  )
+}
 
