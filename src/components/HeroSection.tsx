@@ -18,13 +18,13 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 // Background image responsive variants (decorative)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgDefault from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=jpg&quality=80'
+import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=60'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgLarge from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=jpg&quality=80'
+import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=60'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=jpg&quality=20'
+import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
@@ -110,9 +110,9 @@ export const HeroSection: React.FC = () => {
         el.style.setProperty('--hero-bg-opacity', '0')
       }
 
-      const setHighResNow = () => {
+const setHighResNow = () => {
         const isLg = window.matchMedia('(min-width: 1024px)').matches
-        const url = (isLg ? (bgLarge as unknown as string) : (bgDefault as unknown as string))
+        const url = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string))
         el.style.setProperty('--hero-bg-url', `url(${url})`)
         el.style.setProperty('--hero-bg-filter', 'blur(0)')
         el.style.setProperty('--hero-bg-opacity', '1')

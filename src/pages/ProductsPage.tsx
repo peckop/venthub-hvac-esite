@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useRef } from 'react'
-import { getProducts, getAllProducts, getFeaturedProducts, searchProducts, getCategories, Product, Category } from '../lib/supabase'
+import type { Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import TrustSection from '../components/TrustSection'
 import LeadModal from '../components/LeadModal'
-import { Grid, List, Search, Star, Clock, BadgeCheck, ShieldCheck, Layers } from 'lucide-react'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
 import { trackEvent } from '../utils/analytics'
@@ -72,6 +71,7 @@ const ProductsPage: React.FC = () => {
       try {
         setLoading(true)
         // Fetch only what we need for Discover: featured, categories, and a small slice of products
+        const { getFeaturedProducts, getCategories, getProducts } = await import('../lib/supabase')
         const [featuredData, categoriesData, limitedProducts] = await Promise.all([
           getFeaturedProducts(),
           getCategories(),
@@ -98,6 +98,7 @@ const ProductsPage: React.FC = () => {
         if (hasLoadedAll) return
         // For All Products mode, fetch the complete list only when needed
         setLoading(true)
+        const { getAllProducts } = await import('../lib/supabase')
         const productsData = await getAllProducts()
         const productsWithCovers = await attachCovers(productsData)
         setAllProducts(productsWithCovers)
@@ -174,6 +175,7 @@ const ProductsPage: React.FC = () => {
       }
       try {
         setSearchLoading(true)
+        const { searchProducts } = await import('../lib/supabase')
         const results = await searchProducts(searchQuery)
         const withCovers = await attachCovers(results)
         if (active) setSearchResults(withCovers)
@@ -278,7 +280,7 @@ const ProductsPage: React.FC = () => {
                     : 'text-steel-gray hover:text-primary-navy'
                 }`}
               >
-                <Grid size={16} />
+                <GridIcon size={16} />
               </button>
               <button
                 onClick={() => setViewMode('list')}
@@ -288,11 +290,11 @@ const ProductsPage: React.FC = () => {
                     : 'text-steel-gray hover:text-primary-navy'
                 }`}
               >
-                <List size={16} />
+                <ListIcon size={16} />
               </button>
             </div>
             <div className="relative w-full sm:w-auto sm:min-w-[18rem]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
               <input
                 type="text"
 placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
@@ -322,7 +324,7 @@ placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
                 </a>
               </div>
               <div className="relative mt-6 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
                   <input
                   type="text"
 placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
@@ -342,15 +344,15 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
           <div className="bg-white/10 border-t border-white/20">
             <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="flex items-center gap-3">
-                <BadgeCheck size={18} />
+                <BadgeCheckIcon size={18} />
                 <span className="text-sm">{t('products.heroValue1')}</span>
               </div>
               <div className="flex items-center gap-3">
-                <ShieldCheck size={18} />
+                <ShieldCheckIcon size={18} />
                 <span className="text-sm">{t('products.heroValue2')}</span>
               </div>
               <div className="flex items-center gap-3">
-                <Clock size={18} />
+                <ClockIcon size={18} />
                 <span className="text-sm">{t('products.heroValue3')}</span>
               </div>
             </div>
@@ -464,7 +466,7 @@ onClick={() => {
                   <Link key={cat.id} to={`/category/${cat.slug}`} className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition" onClick={() => { trackEvent('category_click', { level: 0, slug: cat.slug, source: 'products' }) }}>
                     <div className="p-4">
                       <div className="flex items-center gap-2 text-primary-navy">
-                        <Layers size={16} />
+                        <LayersIcon size={16} />
                         <div className="font-medium text-industrial-gray group-hover:text-primary-navy">{cat.name}</div>
                       </div>
                       <div className="text-xs text-steel-gray mt-1">{t('common.gotoCategory')} →</div>
@@ -479,7 +481,7 @@ onClick={() => {
           {featured.length > 0 && (
             <section className="mb-12">
               <div className="flex items-center mb-4">
-                <Star className="text-gold-accent mr-2" size={20} fill="currentColor" />
+                <StarIconSmall className="text-gold-accent mr-2" size={20} />
                 <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.featured')}</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -494,7 +496,7 @@ onClick={() => {
           {newProducts.length > 0 && (
             <section className="mb-12">
               <div className="flex items-center mb-4">
-                <Clock className="text-secondary-blue mr-2" size={20} />
+                <ClockIcon className="text-secondary-blue mr-2" size={20} />
                 <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.newProducts')}</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -527,6 +529,78 @@ onClick={() => {
       )}
       <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
     </div>
+  )
+}
+
+// Minimal inline SVG icons to avoid lucide-react in this route chunk
+function GridIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <rect x="3" y="3" width="7" height="7"/>
+      <rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/>
+    </svg>
+  )
+}
+function ListIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <line x1="8" y1="6" x2="21" y2="6"/>
+      <line x1="8" y1="12" x2="21" y2="12"/>
+      <line x1="8" y1="18" x2="21" y2="18"/>
+      <circle cx="4" cy="6" r="1"/>
+      <circle cx="4" cy="12" r="1"/>
+      <circle cx="4" cy="18" r="1"/>
+    </svg>
+  )
+}
+function SearchIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  )
+}
+function BadgeCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <path d="M7.5 2.5l2 1 2.5-1 2.5 1 2-1 2 2-.5 2.5 1 2.5-1 2.5.5 2.5-2 2-2-1-2.5 1-2.5-1-2 1-2-2 .5-2.5-1-2.5 1-2.5-.5-2.5 2-2z"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  )
+}
+function ShieldCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  )
+}
+function ClockIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+  )
+}
+function LayersIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+      <polyline points="2 12 12 17 22 12"/>
+      <polyline points="2 17 12 22 22 17"/>
+    </svg>
+  )
+}
+function StarIconSmall({ size = 20, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+    </svg>
   )
 }
 
