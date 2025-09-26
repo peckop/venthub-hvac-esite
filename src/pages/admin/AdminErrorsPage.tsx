@@ -1,4 +1,5 @@
 import React from 'react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -96,7 +97,7 @@ const AdminErrorsPage: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    let ch: ReturnType<any> | null = null
+let ch: RealtimeChannel | null = null
     ;(async () => {
       const supabase = await getSupabase()
       ch = supabase

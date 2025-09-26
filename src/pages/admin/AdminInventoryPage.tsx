@@ -1,4 +1,5 @@
 import React from 'react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -183,7 +184,7 @@ const AdminInventoryPage: React.FC = () => {
 
   // Realtime: inventory_settings değiştiğinde efektif eşik değerini güncelle
   React.useEffect(() => {
-    let ch: ReturnType<any> | null = null
+let ch: RealtimeChannel | null = null
     ;(async () => {
       const supabase = await getSupabase()
       ch = supabase

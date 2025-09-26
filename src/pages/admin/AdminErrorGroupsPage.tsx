@@ -1,4 +1,5 @@
 import React from 'react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -165,7 +166,7 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   // Realtime: refresh list on any change in error_groups
   React.useEffect(() => {
-    let ch: ReturnType<any> | null = null
+let ch: RealtimeChannel | null = null
     ;(async () => {
       const supabase = await getSupabase()
       ch = supabase
