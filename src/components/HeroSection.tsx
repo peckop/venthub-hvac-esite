@@ -100,18 +100,16 @@ export const HeroSection: React.FC = () => {
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
       {/* Background (decorative) via pseudo-element to avoid being LCP */}
-      {/* Background (decorative). Do NOT render on first paint to avoid LCP picking it. */}
-      {showOverlay && (
-        <div
-          ref={bgRef}
-          className="hero-bg absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
-          aria-hidden="true"
-          role="presentation"
-          style={{ contain: 'paint', contentVisibility: 'auto' } as React.CSSProperties}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
-        </div>
-      )}
+      {/* Background (decorative). Mobil dahil her zaman render et (Spotlight ayrı kontrol edilir) */}
+      <div
+        ref={bgRef}
+        className="hero-bg absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
+        aria-hidden="true"
+        role="presentation"
+        style={{ contain: 'paint', contentVisibility: 'auto' } as React.CSSProperties}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
+      </div>
 
       {/* Spotlight Overlay */}
       {showOverlay && (
