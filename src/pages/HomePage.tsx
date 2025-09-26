@@ -13,6 +13,9 @@ import Seo from '../components/Seo'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import hero640 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640&format=jpg&quality=80'
 
 // Kritik olmayan blokları tembel yükleme
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
@@ -23,20 +26,40 @@ export const HomePage: React.FC = () => {
 
   const { t } = useI18n()
 
-  // Preload LCP hero image only on homepage and only on desktop (lg+) where it's visible
-  useEffect(() => {
-    try {
-      const desktop = window.matchMedia && window.matchMedia('(min-width: 1024px)').matches
-      if (!desktop) return
-      const link = document.createElement('link')
-      link.setAttribute('rel', 'preload')
-      link.setAttribute('as', 'image')
-      link.setAttribute('href', hero1200 as unknown as string)
-      link.setAttribute('fetchpriority', 'high')
-      document.head.appendChild(link)
-      return () => { document.head.removeChild(link) }
-    } catch {}
-  }, [])
+// Preload LCP hero images for both mobile and desktop, and preconnect to Supabase
+useEffect(() => {
+  try {
+    const head = document.head
+    const makePreload = (href: string) => {
+      const l = document.createElement('link')
+      l.setAttribute('rel', 'preload')
+      l.setAttribute('as', 'image')
+      l.setAttribute('href', href)
+      l.setAttribute('fetchpriority', 'high')
+      head.appendChild(l)
+      return l
+    }
+    const l1 = makePreload(hero640 as unknown as string)
+    const l2 = makePreload(hero1200 as unknown as string)
+
+    // Preconnect to Supabase (for product images and API)
+    const supa = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL
+    let p: HTMLLinkElement | null = null
+    if (supa) {
+      p = document.createElement('link')
+      p.rel = 'preconnect'
+      p.href = supa
+      p.crossOrigin = 'anonymous'
+      head.appendChild(p)
+    }
+
+    return () => {
+      l1 && head.removeChild(l1)
+      l2 && head.removeChild(l2)
+      if (p) head.removeChild(p)
+    }
+  } catch {}
+}, [])
 
 
 

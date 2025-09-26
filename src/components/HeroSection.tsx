@@ -245,10 +245,15 @@ export const HeroSection: React.FC = () => {
               })()}
             </div>
 
-            {/* Featured Image (render only on desktop to prevent mobile fetching) */}
+            {/* Featured Image */}
+            {/* Mobile/Tablet version (ensures an <img> LCP element exists on small screens) */}
+            <div className="relative lg:hidden">
+              <HeroPicture />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
+            </div>
+            {/* Desktop version */}
             {isDesktop && (
               <div className="relative hidden lg:block">
-                {/* Responsive picture with AVIF/WebP/JPEG via vite-imagetools */}
                 <HeroPicture />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
               </div>

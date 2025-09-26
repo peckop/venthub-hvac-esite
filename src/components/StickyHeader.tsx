@@ -94,28 +94,38 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     }
   }, [t])
 
-  // Scroll progress tracker - throttled
+  // Scroll progress tracker - minimized reflow (cache doc height; update on resize)
   useEffect(() => {
     if (!isScrolled) return
-    
+
     let ticking = false
+    const heightRef = { current: 0 }
+    const computeDocHeight = () => {
+      try {
+        const de = document.documentElement
+        heightRef.current = Math.max(0, de.scrollHeight - de.clientHeight)
+      } catch { heightRef.current = 0 }
+    }
+    computeDocHeight()
+    const onResize = () => computeDocHeight()
+
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const winScroll = document.documentElement.scrollTop
-          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
-          const scrolled = height > 0 ? (winScroll / height) * 100 : 0
-          setScrollProgress(scrolled)
-          ticking = false
-        })
-        ticking = true
-      }
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const winScroll = window.scrollY || document.documentElement.scrollTop || 0
+        const h = heightRef.current
+        const scrolled = h > 0 ? (winScroll / h) * 100 : 0
+        setScrollProgress(scrolled)
+        ticking = false
+      })
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // Initial call
+    window.addEventListener('resize', onResize)
+    handleScroll()
 
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => { window.removeEventListener('scroll', handleScroll); window.removeEventListener('resize', onResize) }
   }, [isScrolled])
 
   // Defer categories fetch until dropdown first open (reduce initial header churn)
