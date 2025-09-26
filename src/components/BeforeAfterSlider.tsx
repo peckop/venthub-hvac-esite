@@ -4,9 +4,15 @@ interface BeforeAfterSliderProps {
   beforeSrc: string
   afterSrc: string
   alt?: string
+  // Optional responsive sources
+  beforeSrcSetAvif?: string
+  beforeSrcSetWebp?: string
+  afterSrcSetAvif?: string
+  afterSrcSetWebp?: string
+  sizes?: string
 }
 
-const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterSrc, alt = 'before-after' }) => {
+const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterSrc, alt = 'before-after', beforeSrcSetAvif, beforeSrcSetWebp, afterSrcSetAvif, afterSrcSetWebp, sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 456px' }) => {
   const [pos, setPos] = useState(50) // yüzde
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,9 +41,26 @@ const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({ beforeSrc, afterS
           className="relative w-full h-56 sm:h-72 lg:h-80 rounded-2xl overflow-hidden border border-light-gray shadow"
           aria-label="Öncesi / sonrası karşılaştırma"
         >
-          <img src={afterSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="absolute inset-0 w-full h-full object-cover object-center" />
+          {/* After image */}
+          {afterSrcSetAvif || afterSrcSetWebp ? (
+            <picture>
+              {afterSrcSetAvif ? <source type="image/avif" srcSet={afterSrcSetAvif} sizes={sizes} /> : null}
+              {afterSrcSetWebp ? <source type="image/webp" srcSet={afterSrcSetWebp} sizes={sizes} /> : null}
+              <img src={afterSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="absolute inset-0 w-full h-full object-cover object-center" />
+            </picture>
+          ) : (
+            <img src={afterSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="absolute inset-0 w-full h-full object-cover object-center" />
+          )}
           <div className="absolute inset-0" style={{ width: `${pos}%`, overflow: 'hidden' }}>
-            <img src={beforeSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="w-full h-full object-cover object-center" />
+            {beforeSrcSetAvif || beforeSrcSetWebp ? (
+              <picture>
+                {beforeSrcSetAvif ? <source type="image/avif" srcSet={beforeSrcSetAvif} sizes={sizes} /> : null}
+                {beforeSrcSetWebp ? <source type="image/webp" srcSet={beforeSrcSetWebp} sizes={sizes} /> : null}
+                <img src={beforeSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="w-full h-full object-cover object-center" />
+              </picture>
+            ) : (
+              <img src={beforeSrc} alt={alt} loading="lazy" decoding="async" {...({ fetchpriority: 'low' } as Record<string, string>)} className="w-full h-full object-cover object-center" />
+            )}
           </div>
           {/* Divider */}
           <div className="absolute top-0" style={{ left: `${pos}%` }}>

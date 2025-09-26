@@ -16,6 +16,19 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import hero640 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640&format=jpg&quality=80'
+// Responsive sources for Before/After slider
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import beforeSetAvif from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=avif&quality=52&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import beforeSetWebp from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=webp&quality=68&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import afterSetAvif from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=avif&quality=52&srcset'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import afterSetWebp from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=webp&quality=68&srcset'
 
 // Kritik olmayan blokları tembel yükleme
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
@@ -168,14 +181,21 @@ useEffect(() => {
         {(() => {
           type BASProps = { beforeSrc: string; afterSrc: string; alt?: string }
           return (
-            <LazyInView<BASProps>
+            <LazyInView<BASProps & { beforeSrcSetAvif?: string; beforeSrcSetWebp?: string; afterSrcSetAvif?: string; afterSrcSetWebp?: string; sizes?: string }>
               loader={() => import('../components/BeforeAfterSlider')}
               placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
               rootMargin="0px 0px"
               once
               componentProps={{
-                beforeSrc: '/images/before_parking_jet_fan.jpg',
-                afterSrc: '/images/after_parking_jet_fan.jpg',
+                // Responsive sources (build-time generated)
+                beforeSrcSetAvif: beforeSetAvif as unknown as string,
+                beforeSrcSetWebp: beforeSetWebp as unknown as string,
+                afterSrcSetAvif: afterSetAvif as unknown as string,
+                afterSrcSetWebp: afterSetWebp as unknown as string,
+                // Base fallbacks
+                beforeSrc: '/images/hvac_clean_air_8.jpg',
+                afterSrc: '/images/hvac_technician_equipment_maintenance_professional.jpg',
+                sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 456px',
                 alt: t('home.beforeAfterAlt') as string,
               }}
             />
