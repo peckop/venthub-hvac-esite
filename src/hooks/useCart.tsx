@@ -253,7 +253,7 @@ useEffect(() => {
 
     // Defer sync on non-critical routes to avoid impacting LCP/TBT
     const path = (typeof window !== 'undefined' ? window.location.pathname : '/') || '/'
-    const needImmediate = /^(\/account|\/admin|\/checkout|\/cart)/.test(path)
+    const needImmediate = /^(\/account|\/admin|\/checkout|\/cart|\/auth|\/payment)/.test(path)
 
     let started = false
     const start = () => { if (!started) { started = true; void syncWithServer(); cleanup() } }
@@ -267,7 +267,7 @@ useEffect(() => {
     } else {
       const win = window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number, cancelIdleCallback?: (id: number) => void }
       if (typeof win.requestIdleCallback === 'function') {
-        const id = win.requestIdleCallback(() => start(), { timeout: 10000 })
+        const id = win.requestIdleCallback(() => start(), { timeout: 20000 })
         cleanups.push(() => { try { win.cancelIdleCallback?.(id) } catch {} })
       } else {
         const onFirstInteract = () => start()
@@ -279,8 +279,8 @@ useEffect(() => {
           window.removeEventListener('keydown', onFirstInteract)
           window.removeEventListener('touchstart', onFirstInteract)
         })
-        // Fallback guard: start after a short delay if no interaction
-        const to = window.setTimeout(start, 3000)
+        // Fallback guard: start after longer delay for non-critical paths (reduce main thread work)
+        const to = window.setTimeout(start, 8000)
         cleanups.push(() => window.clearTimeout(to))
       }
     }

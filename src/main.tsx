@@ -25,24 +25,24 @@ criticalPreloads.forEach(({ href, as, type, crossOrigin }) => {
   document.head.appendChild(link)
 })
 
-// Sentry init (yalnızca DSN varsa); Supabase preconnect'i globalden kaldırdık (gerektiğinde kullanılacak)
-try {
-  const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
-  const supaUrl = viteEnv.VITE_SUPABASE_URL
-  if (supaUrl) {
-    // Lightweight error reporter to Supabase Edge Function
-    const isLocal = /localhost|127\.0\.0\.1/.test(supaUrl)
-    const endpoint = isLocal
-      ? `${supaUrl}/functions/v1/log-client-error`
-      : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
-    const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
-    const isProd = viteEnv.MODE === 'production'
-    // Production'da başlangıç ölçüm penceresinde hata raporlamayı tamamen kapat (supabase-js import'unu tetiklememek için)
-    const sample = isProd ? 0 : 1.0
-    const ttlMs = isProd ? 120_000 : 0
-    installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
-  }
-} catch {}
+// Error reporting deferred to avoid impacting LCP/TBT
+setTimeout(() => {
+  try {
+    const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
+    const supaUrl = viteEnv.VITE_SUPABASE_URL
+    if (supaUrl) {
+      const isLocal = /localhost|127\.0\.0\.1/.test(supaUrl)
+      const endpoint = isLocal
+        ? `${supaUrl}/functions/v1/log-client-error`
+        : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
+      const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
+      const isProd = viteEnv.MODE === 'production'
+      const sample = isProd ? 0 : 1.0
+      const ttlMs = isProd ? 120_000 : 0
+      installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
+    }
+  } catch {}
+}, 2000)
 
 // Optional: automatic test error trigger behind a flag (disabled in production; only active on localhost)
 try {

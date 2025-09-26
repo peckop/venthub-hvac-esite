@@ -62,6 +62,7 @@ export async function getUserRole(userId: string): Promise<string> {
       .from('user_profiles')
       .select('role')
       .eq('id', userId)
+      .limit(1)
       .maybeSingle()
       
     if (error) {

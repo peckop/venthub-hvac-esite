@@ -18,7 +18,10 @@ const InViewCounter: React.FC<CounterProps> = ({ label, to, suffix = '', duratio
     try {
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)')
       const coarse = window.matchMedia('(pointer: coarse)')
-      const update = () => setShouldAnimate(!(rm.matches || coarse.matches))
+      const update = () => {
+        const disable = rm.matches || coarse.matches
+        setShouldAnimate(prev => prev === disable ? prev : !disable)
+      }
       update()
       rm.addEventListener?.('change', update)
       coarse.addEventListener?.('change', update)

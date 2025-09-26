@@ -5,26 +5,26 @@ const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=55&srcset'
+import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=55&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=72&srcset'
+import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=72&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
+import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=88&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88&imagetools'
 // Background image responsive variants (decorative)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50'
+import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45'
+import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'
+import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40&imagetools'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'

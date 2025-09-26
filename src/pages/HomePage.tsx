@@ -12,23 +12,23 @@ import Seo from '../components/Seo'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero640 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640&format=jpg&quality=80'
+import hero640 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640&format=jpg&quality=80&imagetools'
 // Responsive sources for Before/After slider
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import beforeSetAvif from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=avif&quality=52&srcset'
+import beforeSetAvif from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=avif&quality=52&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import beforeSetWebp from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=webp&quality=68&srcset'
+import beforeSetWebp from '../../public/images/hvac_clean_air_8.jpg?w=456;684&format=webp&quality=68&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import afterSetAvif from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=avif&quality=52&srcset'
+import afterSetAvif from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=avif&quality=52&srcset&imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import afterSetWebp from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=webp&quality=68&srcset'
+import afterSetWebp from '../../public/images/hvac_technician_equipment_maintenance_professional.jpg?w=456;684&format=webp&quality=68&srcset&imagetools'
 
 // Kritik olmayan blokları tembel yükleme
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'

@@ -77,7 +77,7 @@ case 'USER_UPDATED':
 
     // /account, /admin, /checkout gibi sayfalarda gecikme yapma
     const path = (typeof window !== 'undefined' ? window.location.pathname : '/') || '/'
-    const needImmediate = /^(\/account|\/admin|\/checkout)/.test(path)
+    const needImmediate = /^(\/account|\/admin|\/checkout|\/auth)/.test(path)
 
     let started = false
     const start = () => {
