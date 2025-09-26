@@ -291,8 +291,11 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                     aria-label={t('header.cart')}
                     className="relative p-3 hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 rounded-xl transition-all duration-300 group"
                   >
-                <svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h11.5l3.5-8H5.4" />
+<svg width={22} height={22} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:scale-110 transition-all duration-300">
+                  <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
+                  <path strokeWidth={2} d="M5 6L4 2H2" />
+                  <circle cx="16" cy="19" r="2" />
+                  <circle cx="8" cy="19" r="2" />
                 </svg>
                 {showSyncPulse && syncing && (
                   <span title={t('header.syncing')} className="absolute -top-1 -left-1 h-3 w-3 rounded-full bg-amber-400 animate-pulse ring-2 ring-white" aria-label="syncing" />
@@ -642,8 +645,11 @@ className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-mediu
                       className="relative flex items-center space-x-2 p-2 hover:bg-success-green/10 rounded-lg transition-all duration-200 group"
                     >
                       <div className="relative">
-                        <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-success-green transition-all duration-300">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h11.5l3.5-8H5.4" />
+<svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-success-green transition-all duration-300">
+                          <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
+                          <path strokeWidth={2} d="M5 6L4 2H2" />
+                          <circle cx="16" cy="19" r="2" />
+                          <circle cx="8" cy="19" r="2" />
                         </svg>
                         {getCartCount() > 0 && (
                           <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-navy to-secondary-blue text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-md">

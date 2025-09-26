@@ -7,15 +7,19 @@ const LazyProductFlow: React.FC = () => {
     const enable = () => setEnabled(true)
     window.addEventListener('pointerdown', enable, { once: true })
     window.addEventListener('touchstart', enable, { once: true })
-    const t = setTimeout(() => setEnabled(true), 6000) // LCP penceresi sonrasında yükle
-    return () => { window.removeEventListener('pointerdown', enable); window.removeEventListener('touchstart', enable); clearTimeout(t) }
+    // Daha erken etkinleştir: idle sonrası veya en geç 1500ms
+    const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+    const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 800))
+    const idleId = idle(() => setEnabled(true))
+    const t = setTimeout(() => setEnabled(true), 1500)
+    return () => { window.removeEventListener('pointerdown', enable); window.removeEventListener('touchstart', enable); clearTimeout(t); if (typeof idleId === 'number') clearTimeout(idleId as unknown as number) }
   }, [])
-  if (!enabled) return <div className="min-h-[200px]" aria-hidden="true" />
+  if (!enabled) return <div className="min-h-[80px]" aria-hidden="true" />
   return (
     <LazyInView
       loader={() => import('./ProductFlow')}
-      placeholder={<div className="min-h-[200px]" aria-hidden="true" />}
-      rootMargin="0px 0px"
+      placeholder={<div className="min-h-[80px]" aria-hidden="true" />}
+      rootMargin="600px 0px"
       once
       className=""
     />

@@ -110,7 +110,7 @@ export const HeroSection: React.FC = () => {
         el.style.setProperty('--hero-bg-opacity', '0')
       }
 
-const setHighResNow = () => {
+      const setHighResNow = () => {
         const isLg = window.matchMedia('(min-width: 1024px)').matches
         const url = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string))
         el.style.setProperty('--hero-bg-url', `url(${url})`)
@@ -121,18 +121,23 @@ const setHighResNow = () => {
       // Show tiny LQIP ASAP to avoid long blank paint
       const raf = requestAnimationFrame(setPlaceholder)
 
-      // Swap to high-res after full load + delay (longer on mobile) to avoid affecting LCP
-      const onLoad = () => {
-        try {
-          const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
-          const delay = isMobile ? 5200 : 1200
-          setTimeout(setHighResNow, delay)
-        } catch { setTimeout(setHighResNow, 1500) }
+      // Preload high-res explicitly; do not rely on window 'load' (SPA navigasyonunda tetiklenmez)
+      const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
+      const delay = isMobile ? 1200 : 400
+      const isLg = window.matchMedia('(min-width: 1024px)').matches
+      const targetUrl = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string)) as string
+      const img = new Image()
+      img.onload = () => {
+        // küçük bir gecikme ile yüksek çözünürlüğe geç (LCP’yi sarsmadan)
+        setTimeout(setHighResNow, delay)
       }
-      window.addEventListener('load', onLoad)
+      img.src = targetUrl
+      if (img.complete) {
+        // cache’ten geldiyse hemen uygula
+        setTimeout(setHighResNow, delay)
+      }
 
       return () => {
-        window.removeEventListener('load', onLoad)
         cancelAnimationFrame(raf)
       }
     } catch {}
