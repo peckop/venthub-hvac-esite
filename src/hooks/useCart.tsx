@@ -141,6 +141,7 @@ useEffect(() => {
   // When user logs in, sync/merge guest cart with server cart and keep them in sync
   useEffect(() => {
     let cancelled = false
+
     async function syncWithServer() {
       if (!CART_SERVER_SYNC || !user || mergingRef.current) return
       mergingRef.current = true
@@ -244,8 +245,47 @@ useEffect(() => {
         setSyncing(false)
       }
     }
-    syncWithServer()
-    return () => { cancelled = true }
+
+    // If no user or server sync disabled, nothing to do
+    if (!user || !CART_SERVER_SYNC) {
+      return
+    }
+
+    // Defer sync on non-critical routes to avoid impacting LCP/TBT
+    const path = (typeof window !== 'undefined' ? window.location.pathname : '/') || '/'
+    const needImmediate = /^(\/account|\/admin|\/checkout|\/cart)/.test(path)
+
+    let started = false
+    const start = () => { if (!started) { started = true; void syncWithServer(); cleanup() } }
+
+    // Keep track of listeners/timeouts to clean up on unmount or user change
+    const cleanups: Array<() => void> = []
+    const cleanup = () => { cleanups.splice(0).forEach(fn => { try { fn() } catch {} }) }
+
+    if (needImmediate) {
+      start()
+    } else {
+      const win = window as unknown as { requestIdleCallback?: (cb: IdleRequestCallback, opts?: { timeout?: number }) => number, cancelIdleCallback?: (id: number) => void }
+      if (typeof win.requestIdleCallback === 'function') {
+        const id = win.requestIdleCallback(() => start(), { timeout: 10000 })
+        cleanups.push(() => { try { win.cancelIdleCallback?.(id) } catch {} })
+      } else {
+        const onFirstInteract = () => start()
+        window.addEventListener('pointerdown', onFirstInteract, { once: true })
+        window.addEventListener('keydown', onFirstInteract, { once: true })
+        window.addEventListener('touchstart', onFirstInteract, { once: true })
+        cleanups.push(() => {
+          window.removeEventListener('pointerdown', onFirstInteract)
+          window.removeEventListener('keydown', onFirstInteract)
+          window.removeEventListener('touchstart', onFirstInteract)
+        })
+        // Fallback guard: start after a short delay if no interaction
+        const to = window.setTimeout(start, 3000)
+        cleanups.push(() => window.clearTimeout(to))
+      }
+    }
+
+    return () => { cancelled = true; cleanup() }
     // only run when user changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])

@@ -89,32 +89,31 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
+          manualChunks(id) {
+            // Create chunks only when modules are actually present in the graph to avoid empty chunk warnings
+            if (!id.includes('node_modules')) return undefined
+
             // Core vendor libraries - highest priority
-            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            
+            if (id.includes('react-router') || /\\react(-dom)?\\/.test(id) || /\/(react|react-dom)[@/]/.test(id)) return 'vendor-react'
+
             // Split UI libraries for better caching
-            'vendor-radix': [
-              '@radix-ui/react-dialog',
-              '@radix-ui/react-dropdown-menu', 
-              '@radix-ui/react-tabs',
-              '@radix-ui/react-select',
-              '@radix-ui/react-accordion'
-            ],
-            
-            // Utility libraries - medium priority 
-            'utils': ['clsx', 'date-fns'],
-            'toast': ['react-hot-toast'],
-            
+            if (id.includes('@radix-ui')) return 'vendor-radix'
+
+            // Utility libraries - medium priority
+            if (id.includes('clsx') || id.includes('date-fns')) return 'utils'
+            if (id.includes('react-hot-toast')) return 'toast'
+
             // Feature-specific - lazy loaded
-            'supabase': ['@supabase/supabase-js'],
-            'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
-            'motion': ['framer-motion'],
-            'charts': ['recharts'],
-            'pdf': ['jspdf', 'jspdf-autotable'],
-            
-            // Icons - now split to optimize initial load (since we inlined most critical ones)
-            'icons': ['lucide-react'],
+            if (id.includes('@supabase/supabase-js')) return 'supabase'
+            if (id.includes('react-hook-form') || id.includes('@hookform/resolvers') || id.includes('zod')) return 'forms'
+            if (id.includes('framer-motion')) return 'motion'
+            if (id.includes('recharts')) return 'charts'
+            if (id.includes('jspdf')) return 'pdf'
+
+            // Icons - split off
+            if (id.includes('lucide-react')) return 'icons'
+
+            return undefined
           },
         },
         // Enable aggressive tree shaking

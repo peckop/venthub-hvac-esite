@@ -52,8 +52,9 @@ useEffect(() => {
       head.appendChild(l)
       return l
     }
-    const l1 = makePreload(hero640 as unknown as string)
-    const l2 = makePreload(hero1200 as unknown as string)
+    // Preload only the likely-used variant to avoid "preloaded but not used" warnings
+    const desktop = window.matchMedia && window.matchMedia('(min-width: 1024px)').matches
+    const l = makePreload((desktop ? hero1200 : hero640) as unknown as string)
 
     // Preconnect to Supabase (for product images and API)
     const supa = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL
@@ -67,8 +68,7 @@ useEffect(() => {
     }
 
     return () => {
-      if (l1) head.removeChild(l1)
-      if (l2) head.removeChild(l2)
+      if (l) head.removeChild(l)
       if (p) head.removeChild(p)
     }
   } catch {}
