@@ -54,8 +54,8 @@ useEffect(() => {
     }
 
     return () => {
-      l1 && head.removeChild(l1)
-      l2 && head.removeChild(l2)
+      if (l1) head.removeChild(l1)
+      if (l2) head.removeChild(l2)
       if (p) head.removeChild(p)
     }
   } catch {}
