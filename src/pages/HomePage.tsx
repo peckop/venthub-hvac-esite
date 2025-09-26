@@ -10,12 +10,8 @@ import { trackEvent } from '../utils/analytics'
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import hero640 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640&format=jpg&quality=80&imagetools'
+// Hero görseli (public yolu)
+const HERO_IMG = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 // Responsive sources for Before/After slider
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -39,38 +35,17 @@ export const HomePage: React.FC = () => {
 
   const { t } = useI18n()
 
-// Preload LCP hero images for both mobile and desktop, and preconnect to Supabase
+// Hero görselini preload et (tek kaynak)
 useEffect(() => {
   try {
     const head = document.head
-    const makePreload = (href: string) => {
-      const l = document.createElement('link')
-      l.setAttribute('rel', 'preload')
-      l.setAttribute('as', 'image')
-      l.setAttribute('href', href)
-      l.setAttribute('fetchpriority', 'high')
-      head.appendChild(l)
-      return l
-    }
-    // Preload only the likely-used variant to avoid "preloaded but not used" warnings
-    const desktop = window.matchMedia && window.matchMedia('(min-width: 1024px)').matches
-    const l = makePreload((desktop ? hero1200 : hero640) as unknown as string)
-
-    // Preconnect to Supabase (for product images and API)
-    const supa = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL
-    let p: HTMLLinkElement | null = null
-    if (supa) {
-      p = document.createElement('link')
-      p.rel = 'preconnect'
-      p.href = supa
-      p.crossOrigin = 'anonymous'
-      head.appendChild(p)
-    }
-
-    return () => {
-      if (l) head.removeChild(l)
-      if (p) head.removeChild(p)
-    }
+    const l = document.createElement('link')
+    l.rel = 'preload'
+    l.as = 'image'
+    l.href = HERO_IMG
+    ;(l as unknown as HTMLLinkElement & { fetchpriority?: string }).fetchpriority = 'high'
+    head.appendChild(l)
+    return () => { head.removeChild(l) }
   } catch {}
 }, [])
 

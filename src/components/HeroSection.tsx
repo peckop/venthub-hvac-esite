@@ -2,49 +2,22 @@ import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import LazyInView from './LazyInView'
 const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
-// Responsive hero variants generated at build-time via vite-imagetools
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=avif&quality=55&srcset&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=webp&quality=72&srcset&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200&format=jpg&quality=88&srcset&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88&imagetools'
-// Background image responsive variants (decorative)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45&imagetools'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40&imagetools'
+// ÖNEMLİ: Üretimde güvenilir yükleme için public/images altındaki statik yolları kullanıyoruz
+const HERO_IMG = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
+const BG_IMG = '/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg'
 
 const HeroPicture: React.FC = () => {
-  const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
   return (
-    <picture>
-      <source type="image/avif" srcSet={avifSet as unknown as string} sizes={sizes} />
-      <source type="image/webp" srcSet={webpSet as unknown as string} sizes={sizes} />
-      <img
-        src={hero1200 as unknown as string}
-        srcSet={jpgSet as unknown as string}
-        sizes={sizes}
-        alt="HVAC Equipment"
-        width={1200}
-        height={800}
-        loading="eager"
-        {...({ fetchpriority: 'high' } as Record<string, string>)}
-        decoding="async"
-        className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
-      />
-    </picture>
+    <img
+      src={HERO_IMG}
+      alt="HVAC Equipment"
+      width={1200}
+      height={800}
+      loading="eager"
+      {...({ fetchpriority: 'high' } as Record<string, string>)}
+      decoding="async"
+      className="w-full rounded-xl shadow-hvac-lg object-cover object-center"
+    />
   )
 }
 
@@ -81,35 +54,29 @@ export const HeroSection: React.FC = () => {
       const el = bgRef.current
 
       const setPlaceholder = () => {
-        el.style.setProperty('--hero-bg-url', `url(${(bgTiny as unknown as string)})`)
+        el.style.setProperty('--hero-bg-url', `url(${BG_IMG})`)
         el.style.setProperty('--hero-bg-filter', 'blur(12px)')
         el.style.setProperty('--hero-bg-opacity', '0')
       }
 
       const setHighResNow = () => {
-        const isLg = window.matchMedia('(min-width: 1024px)').matches
-        const url = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string))
-        el.style.setProperty('--hero-bg-url', `url(${url})`)
+        el.style.setProperty('--hero-bg-url', `url(${BG_IMG})`)
         el.style.setProperty('--hero-bg-filter', 'blur(0)')
         el.style.setProperty('--hero-bg-opacity', '1')
       }
 
-      // Show tiny LQIP ASAP to avoid long blank paint
+      // Show placeholder ASAP
       const raf = requestAnimationFrame(setPlaceholder)
 
-      // Preload high-res explicitly; do not rely on window 'load' (SPA navigasyonunda tetiklenmez)
+      // Preload background explicitly; no transformation
       const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
       const delay = isMobile ? 1200 : 400
-      const isLg = window.matchMedia('(min-width: 1024px)').matches
-      const targetUrl = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string)) as string
       const img = new Image()
       img.onload = () => {
-        // küçük bir gecikme ile yüksek çözünürlüğe geç (LCP’yi sarsmadan)
         setTimeout(setHighResNow, delay)
       }
-      img.src = targetUrl
+      img.src = BG_IMG
       if (img.complete) {
-        // cache’ten geldiyse hemen uygula
         setTimeout(setHighResNow, delay)
       }
 
