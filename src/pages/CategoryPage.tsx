@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
+import { getCategories, getProductsByCategory, Category, Product, getSupabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { ChevronRight, Filter, Grid, List } from 'lucide-react'
@@ -37,6 +37,7 @@ export const CategoryPage: React.FC = () => {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
         const ids = list.map(p => p.id)
+        const supabase = await getSupabase()
         const { data: imgs } = await supabase
           .from('product_images')
           .select('product_id,path,sort_order,alt')

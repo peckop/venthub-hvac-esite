@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -19,6 +19,7 @@ export default function AccountSecurityPage() {
 
   async function refreshIdentities() {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase.auth.getUser()
       if (!error && data?.user) {
         const ids = (data.user as unknown as { identities?: Array<{ id?: string; provider?: string }> }).identities || []
@@ -47,6 +48,7 @@ export default function AccountSecurityPage() {
       setSaving(true)
       // Re-auth with current password
       const email = user?.email || ''
+      const supabase = await getSupabase()
       const reauth = await supabase.auth.signInWithPassword({ email, password: current })
       if (reauth.error) {
         toast.error(t('account.security.wrongCurrent'))
@@ -97,6 +99,7 @@ export default function AccountSecurityPage() {
               type="button"
               onClick={async () => {
                 try {
+                  const supabase = await getSupabase()
                   const { data, error } = await supabase.auth.linkIdentity({
                     provider: 'google',
                     options: { redirectTo: `${window.location.origin}/auth/callback` }
@@ -136,6 +139,7 @@ export default function AccountSecurityPage() {
                   }
                   // Typings may vary across versions; narrow to a minimal interface at runtime
                   type AuthWithUnlink = { unlinkIdentity?: (args: { identity_id: string }) => Promise<{ error?: unknown }> }
+                  const supabase = await getSupabase()
                   const authMaybe = supabase.auth as unknown as AuthWithUnlink
                   if (typeof authMaybe.unlinkIdentity !== 'function') {
                     toast.error('unlinkIdentity API desteklenmiyor')

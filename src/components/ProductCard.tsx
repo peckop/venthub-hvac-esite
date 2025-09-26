@@ -46,9 +46,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
   // Build responsive image URLs (Supabase Image Transform if available)
   const buildImage = (url: string, w?: number, q: number = 70, format: 'webp' | 'jpeg' = 'webp') => {
     const base = url.split('?')[0]
-    const renderUrl = base.includes('/object/')
+    const enableTransform = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_IMAGE_TRANSFORM === '1')
+    const renderUrl = (enableTransform && base.includes('/object/'))
       ? base.replace('/object/', '/render/image/')
       : base
+    if (!enableTransform) {
+      // Image Transform kapalıysa doğrudan public object URL'ini kullan
+      return renderUrl
+    }
     const params = new URLSearchParams()
     if (w) params.set('width', String(w))
     params.set('quality', String(q))
@@ -194,7 +199,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13h10m6 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6h14z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h11.5l3.5-8H5.4" />
               </svg>
               <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
             </button>

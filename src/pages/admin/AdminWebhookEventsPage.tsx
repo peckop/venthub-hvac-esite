@@ -1,6 +1,6 @@
 import React from 'react'
 import { adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -63,6 +63,7 @@ const AdminWebhookEventsPage: React.FC = () => {
     setLoading(true)
     try {
       if (tab === 'returns') {
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('returns_webhook_events')
           .select('id,event_id,return_id,order_id,carrier,tracking_number,status_raw,status_mapped,received_at,processed_at')
@@ -72,6 +73,7 @@ const AdminWebhookEventsPage: React.FC = () => {
         const list = (data || []) as unknown as ReturnEventRow[]
         setReturnsRows(list)
       } else {
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('shipping_email_events')
           .select('order_id,email_to,subject,provider,provider_message_id,carrier,tracking_number,created_at')

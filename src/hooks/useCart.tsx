@@ -146,7 +146,8 @@ useEffect(() => {
       mergingRef.current = true
       setSyncing(true)
       try {
-        const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, getEffectivePriceInfo, upsertCartItem, supabase } = await import('../lib/supabase')
+        const { getOrCreateShoppingCart, listCartItemsWithProducts, clearCartItems: clearDbCartItems, getEffectivePriceInfo, upsertCartItem, getSupabase } = await import('../lib/supabase')
+        const supabase = await getSupabase()
         const cart = await getOrCreateShoppingCart(user.id)
         if (cancelled) return
         setServerCartId(cart.id)

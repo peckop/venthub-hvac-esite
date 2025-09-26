@@ -56,7 +56,8 @@ function isProdEnv(): boolean {
  */
 export async function getUserRole(userId: string): Promise<string> {
   try {
-    const { supabase } = await import('../lib/supabase')
+    const { getSupabase } = await import('../lib/supabase')
+    const supabase = await getSupabase()
     const { data, error } = await supabase
       .from('user_profiles')
       .select('role')
@@ -162,7 +163,8 @@ export async function checkAdminAccessAsync(user: { id?: string; email?: string 
  */
 export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 'moderator' | 'superadmin'): Promise<boolean> {
   try {
-    const { supabase } = await import('../lib/supabase')
+    const { getSupabase } = await import('../lib/supabase')
+    const supabase = await getSupabase()
     // Database RPC (SECURITY DEFINER) – sunucu tarafında gerçek rol ataması
     const { data, error } = await supabase.rpc('set_user_admin_role', {
       user_id: userId,
@@ -186,7 +188,8 @@ export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 
  */
 export async function listAdminUsers(): Promise<AdminUser[]> {
   try {
-    const { supabase } = await import('../lib/supabase')
+    const { getSupabase } = await import('../lib/supabase')
+    const supabase = await getSupabase()
     // Güvenli RPC (SECURITY DEFINER + role kontrolü) – tek kaynak
     const rpcRes = await supabase.rpc('admin_list_users')
     const rpcErr = (rpcRes as { error?: unknown }).error

@@ -47,7 +47,8 @@ const ProductsPage: React.FC = () => {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
         const ids = list.map(p => p.id)
-        const { supabase } = await import('../lib/supabase')
+        const { getSupabase } = await import('../lib/supabase')
+        const supabase = await getSupabase()
         const { data: imgs, error: imgErr } = await supabase
           .from('product_images')
           .select('product_id,path,sort_order,alt')
@@ -149,7 +150,8 @@ const ProductsPage: React.FC = () => {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
         const ids = list.map(p => p.id)
-        const { supabase } = await import('../lib/supabase')
+        const { getSupabase } = await import('../lib/supabase')
+        const supabase = await getSupabase()
         const { data: imgs } = await supabase
           .from('product_images')
           .select('product_id,path,sort_order,alt')

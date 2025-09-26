@@ -2,7 +2,7 @@ import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { format as _format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -113,6 +113,7 @@ const AdminOrdersPage: React.FC = () => {
       params.set('page', String(page))
       const url = `${supabaseUrl}/functions/v1/admin-orders-latest?${params.toString()}`
       // Include user session token so Edge Function (verify_jwt=true) authorizes the request
+      const supabase = await getSupabase()
       const { data: sess } = await supabase.auth.getSession()
       const headers: Record<string, string> = {}
       if (sess?.session?.access_token) headers['Authorization'] = `Bearer ${sess.session.access_token}`
@@ -140,6 +141,7 @@ const AdminOrdersPage: React.FC = () => {
     setSendEmail(true)
     // Prefill existing shipping info if exists
     try {
+      const supabase = await getSupabase()
       const { data } = await supabase
         .from('venthub_orders')
         .select('carrier, tracking_number')
@@ -168,6 +170,7 @@ const AdminOrdersPage: React.FC = () => {
     setLogsOpen(true)
     setLogsLoading(true)
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('shipping_email_events')
         .select('subject,email_to,provider_message_id,created_at,carrier,tracking_number')
@@ -191,6 +194,7 @@ const AdminOrdersPage: React.FC = () => {
     setNotesOpen(true)
     setNotesLoading(true)
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('order_notes')
         .select('id,note,created_at,user_id')
@@ -213,6 +217,7 @@ const AdminOrdersPage: React.FC = () => {
     if (!notesOrderId || !noteInput.trim()) return
     try {
       setNotesLoading(true)
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('order_notes')
         .insert({ order_id: notesOrderId, note: noteInput.trim() })
@@ -233,6 +238,7 @@ const AdminOrdersPage: React.FC = () => {
     if (!noteId) return
     try {
       setNotesLoading(true)
+      const supabase = await getSupabase()
       const { error } = await supabase
         .from('order_notes')
         .delete()
@@ -254,6 +260,7 @@ const AdminOrdersPage: React.FC = () => {
     if (!ok) return
     try {
       setSaving(true)
+      const supabase = await getSupabase()
       const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
         body: { order_id: id, cancel: true, send_email: false }
       })
@@ -269,6 +276,7 @@ const AdminOrdersPage: React.FC = () => {
   }
 
   const submitShip = async () => {
+    const supabase = await getSupabase()
     // Single or bulk mode submission
     if (!bulkMode) {
       if (!shipId) return
@@ -322,6 +330,7 @@ const AdminOrdersPage: React.FC = () => {
         // Simple mode: same carrier/tracking for all
         const tracking_url = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
         const results = await Promise.all(targets.map(async (id) => {
+          const supabase = await getSupabase()
           const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
             body: {
               order_id: id,
@@ -362,6 +371,7 @@ const AdminOrdersPage: React.FC = () => {
         const results = await Promise.all(targets.map(async (id) => {
           const row = mapById.get(id)!
           const turl = generateTrackingUrl(row.carrier, row.tracking)
+          const supabase = await getSupabase()
           const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
             body: {
               order_id: id,
@@ -467,6 +477,7 @@ const AdminOrdersPage: React.FC = () => {
     setSaving(true)
     try {
       const results = await Promise.all(targets.map(async (id) => {
+        const supabase = await getSupabase()
         const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
           body: { order_id: id, cancel: true, send_email: false }
         })

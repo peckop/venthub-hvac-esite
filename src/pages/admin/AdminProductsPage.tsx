@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
@@ -115,6 +115,7 @@ const [metaDesc, setMetaDesc] = React.useState('')
     setError(null)
     try {
       // Build products query with server-side filters and pagination
+      const supabase = await getSupabase()
       let query = supabase
         .from('products')
         .select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
@@ -212,6 +213,7 @@ const [metaDesc, setMetaDesc] = React.useState('')
     setSelectedId(id)
     setTab('info')
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -240,6 +242,7 @@ const [metaDesc, setMetaDesc] = React.useState('')
   }
 
   const loadImages = async (productId: string) => {
+    const supabase = await getSupabase()
     const { data, error } = await supabase
       .from('product_images')
       .select('id, product_id, path, alt, sort_order')
@@ -265,7 +268,8 @@ const [metaDesc, setMetaDesc] = React.useState('')
         category_id: categoryId || null, is_featured: isFeatured,
       }
       if (!payload.name || !payload.sku) return
-if (selectedId) {
+      const supabase = await getSupabase()
+      if (selectedId) {
         const before = rows.find(r=>r.id===selectedId) || null
         const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
         if (error) throw error
@@ -292,7 +296,8 @@ if (selectedId) {
         price: price === '' ? null : Number(price),
         purchase_price: purchasePrice === '' ? null : Number(purchasePrice),
       }
-const before = rows.find(r=>r.id===selectedId) || null
+      const before = rows.find(r=>r.id===selectedId) || null
+      const supabase = await getSupabase()
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
@@ -312,7 +317,8 @@ const before = rows.find(r=>r.id===selectedId) || null
         low_stock_threshold: isDefault ? null : Number(lowStock),
         low_stock_override: !isDefault,
       }
-const before = rows.find(r=>r.id===selectedId) || null
+      const before = rows.find(r=>r.id===selectedId) || null
+      const supabase = await getSupabase()
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
@@ -331,6 +337,7 @@ const before = rows.find(r=>r.id===selectedId) || null
         const ext = file.name.split('.').pop() || 'jpg'
         const filename = `${Date.now()}-${slugify(name || 'urun')}.${ext}`
         const path = `product/${selectedId}/${filename}`
+const supabase = await getSupabase()
 const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
         if (upErr) {
           console.warn('storage upload error', upErr)
@@ -365,6 +372,7 @@ const { error: upErr } = await supabase.storage.from('product-images').upload(pa
   const deleteImage = async (img: ImageRow) => {
     if (!confirm(t('admin.products.confirm.deleteImage'))) return
     try {
+const supabase = await getSupabase()
 await supabase.from('product_images').delete().eq('id', img.id)
       const { logAdminAction } = await import('../../lib/audit')
       await logAdminAction(supabase, { table_name: 'product_images', row_pk: img.id, action: 'DELETE', before: img, after: null, comment: 'deleteImage' })
@@ -380,6 +388,7 @@ await supabase.from('product_images').delete().eq('id', img.id)
     try {
       if (images.length === 0 || images[0].id === img.id) return
       const first = images[0]
+      const supabase = await getSupabase()
       await Promise.all([
         supabase.from('product_images').update({ sort_order: first.sort_order }).eq('id', img.id),
         supabase.from('product_images').update({ sort_order: img.sort_order }).eq('id', first.id),
@@ -403,6 +412,7 @@ await supabase.from('product_images').delete().eq('id', img.id)
     const a = list[idx]
     const b = list[swapIdx]
     try {
+const supabase = await getSupabase()
 await Promise.all([
         supabase.from('product_images').update({ sort_order: b.sort_order }).eq('id', a.id),
         supabase.from('product_images').update({ sort_order: a.sort_order }).eq('id', b.id)
@@ -428,6 +438,7 @@ await Promise.all([
         meta_description: metaDesc || null,
       }
 const before = rows.find(r=>r.id===selectedId) || null
+      const supabase = await getSupabase()
       const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
@@ -442,6 +453,7 @@ const before = rows.find(r=>r.id===selectedId) || null
     if (!confirm(t('admin.products.confirm.deleteProduct'))) return
     try {
 const before = rows.find(r=>r.id===id) || null
+      const supabase = await getSupabase()
       const { error } = await supabase.from('products').delete().eq('id', id)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
@@ -485,6 +497,7 @@ const before = rows.find(r=>r.id===id) || null
     if (!selectedId) return
     try {
       setSavingImages(true)
+      const supabase = await getSupabase()
       await Promise.all(images.map(row => supabase.from('product_images').update({ alt: row.alt || '' }).eq('id', row.id)))
       await loadImages(selectedId)
       alert(t('admin.products.toasts.imagesSaved'))
@@ -654,6 +667,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
               try {
                 // chunked upsert by sku
                 let ok=0, fail=0
+                const supabase = await getSupabase()
                 for (let i=0;i<payloads.length;i+=100) {
                   const chunk = payloads.slice(i,i+100)
                   const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
@@ -756,7 +770,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   {images.map((img, idx) => (
                     <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
                       <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert(t('admin.products.toasts.altSaveFailed', { msg: ((err as Error).message || String(err)) })); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.images.altPlaceholder') ?? 'Alternatif metin'} />
+<input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const supabase = await getSupabase(); const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert(t('admin.products.toasts.altSaveFailed', { msg: ((err as Error).message || String(err)) })); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.images.altPlaceholder') ?? 'Alternatif metin'} />
                       <div className="flex flex-wrap gap-2">
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>{t('admin.products.edit.images.up')}</button>
                         <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>{t('admin.products.edit.images.down')}</button>
@@ -775,7 +789,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
           <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
               <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.slug')}</label>
-<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError(t('admin.products.edit.seo.slugRequired')); return } const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists ? t('admin.products.edit.seo.slugInUse') : '') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.seo.slugPlaceholder') ?? 'ornek-urun'} />
+<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError(t('admin.products.edit.seo.slugRequired')); return } const supabase = await getSupabase(); const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists ? t('admin.products.edit.seo.slugInUse') : '') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.seo.slugPlaceholder') ?? 'ornek-urun'} />
               {slugError && <div className="text-xs text-red-600">{slugError}</div>}
               <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.metaTitle')}</label>
               <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />

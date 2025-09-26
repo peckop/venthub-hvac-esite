@@ -68,7 +68,8 @@ try {
       // 2) Also call the Edge Function directly to guarantee a row (lazy import Supabase)
       setTimeout(async () => {
         try {
-          const { supabase } = await import('./lib/supabase')
+          const { getSupabase } = await import('./lib/supabase')
+          const supabase = await getSupabase()
           await supabase.functions.invoke('log-client-error', {
             body: {
               msg: 'VH SELF-TEST ' + new Date().toISOString(),

@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, fetchDefaultInvoiceProfile, type InvoiceProfile } from '../lib/supabase'
+import { getSupabase, listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, fetchDefaultInvoiceProfile, type InvoiceProfile } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
 import SecurityRibbon from '../components/SecurityRibbon'
 import toast from 'react-hot-toast'
@@ -368,6 +367,7 @@ export const CheckoutPage: React.FC = () => {
       const headers: Record<string,string> = {}
       try { const e2 = (import.meta as unknown as { env?: Record<string,string> }).env; if (e2?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch {}
 
+      const supabase = await getSupabase()
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
         body: requestData,
         headers,
@@ -581,8 +581,9 @@ export const CheckoutPage: React.FC = () => {
     let timer: number | undefined
     if (step === 4 && orderId) {
       timer = window.setInterval(async () => {
-        try {
-          const { data, error } = await supabase
+          try {
+            const supabase = await getSupabase()
+            const { data, error } = await supabase
             .from('venthub_orders')
             .select('status')
             .eq('id', orderId)

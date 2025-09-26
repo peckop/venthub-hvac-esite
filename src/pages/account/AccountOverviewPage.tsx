@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { listAddresses, UserAddress, supabase } from '../../lib/supabase'
+import { listAddresses, UserAddress, getSupabase } from '../../lib/supabase'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
@@ -36,6 +36,7 @@ export default function AccountOverviewPage() {
         // noop (liste boş olabilir)
       }
       try {
+        const supabase = await getSupabase()
         let { data: orders, error } = await supabase
           .from('venthub_orders')
           .select('id, created_at, total_amount, status, order_number')

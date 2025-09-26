@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import toast from 'react-hot-toast'
@@ -68,6 +68,7 @@ const AdminCouponsPage: React.FC = () => {
   const fetchCoupons = React.useCallback(async () => {
     setLoading(true)
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('coupons')
         .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
@@ -112,6 +113,7 @@ const AdminCouponsPage: React.FC = () => {
         used_count: 0,
       }
       // RLS sorunlarında edge function üzerinden oluştur
+      const supabase = await getSupabase()
       const { data, error } = await supabase.functions.invoke('admin-create-coupon', {
         body: {
           code: payload.code,
@@ -139,6 +141,7 @@ const AdminCouponsPage: React.FC = () => {
 
   async function toggleActive(id: string, active: boolean) {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('coupons')
         .update({ is_active: !active })

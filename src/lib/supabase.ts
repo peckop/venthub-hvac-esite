@@ -1,17 +1,20 @@
-import { createClient } from '@supabase/supabase-js'
-
+import type { SupabaseClient } from '@supabase/supabase-js'
 // Define import.meta.env interface for Vite
 /// <reference types="vite/client" />
 
-const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY
+let __supabase: SupabaseClient | null = null
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  // Ortam değişkenleri zorunlu; yanlış projeye bağlanmayı önlemek için fallback kaldırıldı
-  throw new Error('Supabase yapılandırması eksik: VITE_SUPABASE_URL ve VITE_SUPABASE_ANON_KEY ayarlanmalı.')
+export async function getSupabase(): Promise<SupabaseClient> {
+  if (__supabase) return __supabase
+  const { createClient } = await import('@supabase/supabase-js')
+  const supabaseUrl = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL
+  const supabaseAnonKey = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_ANON_KEY
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase yapılandırması eksik: VITE_SUPABASE_URL ve VITE_SUPABASE_ANON_KEY ayarlanmalı.')
+  }
+  __supabase = createClient(supabaseUrl, supabaseAnonKey)
+  return __supabase
 }
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Database types
 export interface Category {
@@ -104,6 +107,7 @@ export const HVAC_BRANDS: HVACBrand[] = [
 
 // API functions
 export async function getCategories() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -115,6 +119,7 @@ export async function getCategories() {
 }
 
 export async function getProducts(limit?: number) {
+  const supabase = await getSupabase()
   let query = supabase
     .from('products')
     .select('*')
@@ -133,6 +138,7 @@ export async function getProducts(limit?: number) {
 
 // Get all products without limit
 export async function getAllProducts() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -145,6 +151,7 @@ export async function getAllProducts() {
 }
 
 export async function getProductsByCategory(categoryId: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -158,6 +165,7 @@ export async function getProductsByCategory(categoryId: string) {
 }
 
 export async function getProductsBySubcategory(subcategoryId: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -171,6 +179,7 @@ export async function getProductsBySubcategory(subcategoryId: string) {
 }
 
 export async function getProductById(id: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -182,6 +191,7 @@ export async function getProductById(id: string) {
 }
 
 export async function getFeaturedProducts() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -194,6 +204,7 @@ export async function getFeaturedProducts() {
 }
 
 export async function searchProducts(query: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -208,6 +219,7 @@ export async function searchProducts(query: string) {
 // Full‑text search (Turkish) via RPC; returns lightweight fields + rank
 export interface FtsProductResult { id: string; name: string; sku: string; brand: string | null; price: number | string | null; rank: number | null }
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
+  const supabase = await getSupabase()
   const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as unknown }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
@@ -248,6 +260,7 @@ export interface CreateAddressInput {
 export type UpdateAddressInput = Partial<CreateAddressInput>
 
 export async function listAddresses() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('user_addresses')
     .select('*')
@@ -259,6 +272,7 @@ export async function listAddresses() {
 }
 
 export async function createAddress(payload: CreateAddressInput) {
+  const supabase = await getSupabase()
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -279,6 +293,7 @@ export async function createAddress(payload: CreateAddressInput) {
 }
 
 export async function updateAddress(id: string, payload: UpdateAddressInput) {
+  const supabase = await getSupabase()
   const updatePatch = { ...payload } as Record<string, unknown>
   if (payload.full_address) {
     (updatePatch as Record<string, unknown>).street_address = payload.full_address
@@ -300,6 +315,7 @@ export async function updateAddress(id: string, payload: UpdateAddressInput) {
 }
 
 export async function deleteAddress(id: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase
     .from('user_addresses')
     .delete()
@@ -310,6 +326,7 @@ export async function deleteAddress(id: string) {
 }
 
 export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string) {
+  const supabase = await getSupabase()
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -370,6 +387,7 @@ export interface CreateInvoiceProfileInput {
 export type UpdateInvoiceProfileInput = Partial<CreateInvoiceProfileInput>
 
 export async function listInvoiceProfiles() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
@@ -387,6 +405,7 @@ export async function listInvoiceProfiles() {
 }
 
 export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
+  const supabase = await getSupabase()
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -402,6 +421,7 @@ export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
 }
 
 export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .update(payload)
@@ -413,6 +433,7 @@ export async function updateInvoiceProfile(id: string, payload: UpdateInvoicePro
 }
 
 export async function deleteInvoiceProfile(id: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase
     .from('user_invoice_profiles')
     .delete()
@@ -422,6 +443,7 @@ export async function deleteInvoiceProfile(id: string) {
 }
 
 export async function setDefaultInvoiceProfile(id: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .update({ is_default: true })
@@ -433,6 +455,7 @@ export async function setDefaultInvoiceProfile(id: string) {
 }
 
 export async function fetchDefaultInvoiceProfile() {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
@@ -470,6 +493,7 @@ export interface CartDbItem {
 }
 
 async function ensureUserProfile(userId: string): Promise<boolean> {
+  const supabase = await getSupabase()
   try {
     const { data: prof, error: selErr } = await supabase
       .from('user_profiles')
@@ -491,6 +515,7 @@ async function ensureUserProfile(userId: string): Promise<boolean> {
 }
 
 export async function getOrCreateShoppingCart(userId: string) {
+  const supabase = await getSupabase()
   // Try existing
   const { data: existing, error: selErr } = await supabase
     .from('shopping_carts')
@@ -532,6 +557,7 @@ export async function getOrCreateShoppingCart(userId: string) {
 }
 
 export async function listCartItems(cartId: string) {
+  const supabase = await getSupabase()
   const { data, error } = await supabase
     .from('cart_items')
     .select('*')
@@ -544,6 +570,7 @@ export async function listCartItemsWithProducts(cartId: string) {
   const items = await listCartItems(cartId)
   if (items.length === 0) return [] as { item: CartDbItem; product: Product }[]
   const productIds = Array.from(new Set(items.map(i => i.product_id)))
+  const supabase = await getSupabase()
   const { data: products, error: pErr } = await supabase
     .from('products')
     .select('*')
@@ -557,6 +584,7 @@ export async function listCartItemsWithProducts(cartId: string) {
 }
 
 export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
+  const supabase = await getSupabase()
   const { cartId, productId, quantity, unitPrice, priceListId } = params
   // Manual UPSERT to avoid relying on on_conflict and optional columns
   const sel = await supabase
@@ -588,6 +616,7 @@ export async function upsertCartItem(params: { cartId: string; productId: string
 }
 
 export async function removeCartItem(cartId: string, productId: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase
     .from('cart_items')
     .delete()
@@ -598,6 +627,7 @@ export async function removeCartItem(cartId: string, productId: string) {
 }
 
 export async function clearCartItems(cartId: string) {
+  const supabase = await getSupabase()
   const { error } = await supabase
     .from('cart_items')
     .delete()
@@ -632,6 +662,7 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
 }
 
 export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
+  const supabase = await getSupabase()
   // Fallback: product.price numeric
   const fallback = (() => {
     const v = parseFloat(product.price || '0')

@@ -18,7 +18,8 @@ export const PaymentWatcher: React.FC = () => {
       const data = JSON.parse(raw || '{}') as { orderId?: string, conversationId?: string }
       const orderId = data.orderId
       if (!orderId) return
-      const { supabase } = await import('../lib/supabase')
+      const { getSupabase } = await import('../lib/supabase')
+      const supabase = await getSupabase()
       const { data: row, error } = await supabase
         .from('venthub_orders')
         .select('status')

@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -47,6 +47,7 @@ const AdminAuditLogPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      const supabase = await getSupabase()
       let query = supabase
         .from('admin_audit_log')
         .select('id, at, actor, table_name, row_pk, action, comment, before, after', { count: 'exact' })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
 import { useAuth } from '../../hooks/useAuth'
 import { checkAdminAccessAsync } from '../../config/admin'
@@ -20,6 +20,7 @@ const AdminInventorySettingsPage: React.FC = () => {
   const load = React.useCallback(async()=>{
     try {
       setLoading(LoadState.Loading)
+      const supabase = await getSupabase()
       const { data, error } = await supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle()
       if (error) throw error
       const val = (data?.default_low_stock_threshold as number | null)
@@ -41,6 +42,7 @@ const AdminInventorySettingsPage: React.FC = () => {
       setError('')
       const value = (defaultThreshold === '' ? null : Number(defaultThreshold))
       // Global eşik ve toplu uygulama için yeni RPC
+      const supabase = await getSupabase()
       const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value, p_reset_overrides: resetAll })
       if (error) throw error
       setSuccess(resetAll ? 'Kaydedildi ve tüm ürünlere uygulandı' : 'Kaydedildi')

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
@@ -40,6 +40,7 @@ export default function AccountShipmentsPage() {
       try {
         setLoading(true)
         const baseSelect = 'id, created_at, total_amount, status, order_number, carrier, tracking_number, tracking_url, shipped_at, delivered_at'
+        const supabase = await getSupabase()
         let { data, error } = await supabase
           .from('venthub_orders')
           .select(baseSelect)

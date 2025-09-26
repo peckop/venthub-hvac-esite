@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
 import { useCart } from '../hooks/useCart'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
@@ -31,6 +31,7 @@ export const PaymentSuccessPage: React.FC = () => {
     async function fetchOrderDetails(oid?: string) {
       try {
         if (!oid) return
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('venthub_orders')
           .select('total_amount, created_at, venthub_order_items(quantity)')
@@ -65,6 +66,7 @@ export const PaymentSuccessPage: React.FC = () => {
 
         // 2) Token varsa, Functions üzerinden doğrula
         if (token) {
+          const supabase = await getSupabase()
           const { data, error } = await supabase.functions.invoke('iyzico-callback', {
             body: { token, conversationId, orderId }
           })
@@ -104,9 +106,11 @@ export const PaymentSuccessPage: React.FC = () => {
         // 3) Token yoksa ama orderId varsa: callback'i orderId ile tetikle (token fallback), ardından veritabanından durumu kontrol et
         if (orderId) {
           try {
+            const supabase = await getSupabase()
             await supabase.functions.invoke('iyzico-callback', { body: { orderId, conversationId } })
           } catch {}
 
+          const supabase = await getSupabase()
           const { data, error } = await supabase
             .from('venthub_orders')
             .select('status')

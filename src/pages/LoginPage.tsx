@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -61,6 +61,7 @@ export const LoginPage: React.FC = () => {
       const prodOrigin = 'https://venthub-hvac-esite.pages.dev'
       const origin = isProd ? prodOrigin : window.location.origin
       const redirectTo = `${origin}/auth/callback`
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
       if (error) {
         console.error('Google sign-in error:', error)

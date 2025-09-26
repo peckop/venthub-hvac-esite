@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -54,6 +54,7 @@ const AdminErrorsPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      const supabase = await getSupabase()
       let query = supabase
         .from('client_errors')
         .select('id, at, url, message, stack, user_agent, release, env, level', { count: 'exact' })
@@ -95,14 +96,18 @@ const AdminErrorsPage: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    const ch = supabase
-      .channel('client-errors')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'client_errors' }, () => {
-        scheduleRefetch()
-      })
-      .subscribe()
+    let ch: ReturnType<any> | null = null
+    ;(async () => {
+      const supabase = await getSupabase()
+      ch = supabase
+        .channel('client-errors')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'client_errors' }, () => {
+          scheduleRefetch()
+        })
+        .subscribe()
+    })()
     return () => {
-      supabase.removeChannel(ch)
+      ;(async () => { const supabase = await getSupabase(); if (ch) supabase.removeChannel(ch) })()
       if (refetchTimer.current) clearTimeout(refetchTimer.current)
     }
   }, [scheduleRefetch])

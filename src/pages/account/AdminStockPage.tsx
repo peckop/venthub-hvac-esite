@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { supabase, Product } from '../../lib/supabase'
+import { getSupabase, Product } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { Search, Plus, Minus, Save } from 'lucide-react'
@@ -32,6 +32,7 @@ export default function AdminStockPage() {
     let mounted = true
     async function load() {
       try {
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('products')
           .select('id, name, sku, brand, price, status, is_featured, stock_qty, low_stock_threshold')
@@ -59,6 +60,7 @@ export default function AdminStockPage() {
       const currentProduct = all.find(p => p.id === productId)
       const newQty = Math.max(0, (currentProduct?.stock_qty ?? 0) + delta)
       
+      const supabase = await getSupabase()
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
@@ -79,6 +81,7 @@ export default function AdminStockPage() {
       // Direkt UPDATE query - RPC yerine
       const newQty = Math.max(0, qty)
       
+      const supabase = await getSupabase()
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
@@ -100,6 +103,7 @@ export default function AdminStockPage() {
       // null değeri "varsayılan kullan" anlamına gelir
       const newThreshold = threshold !== null && threshold >= 0 ? threshold : null
       
+      const supabase = await getSupabase()
       const { error } = await supabase
         .from('products')
         .update({ low_stock_threshold: newThreshold })

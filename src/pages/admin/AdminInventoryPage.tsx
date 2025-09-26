@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -81,6 +81,7 @@ const AdminInventoryPage: React.FC = () => {
 
   const loadMovements = React.useCallback(async (productId: string) => {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('inventory_movements')
         .select('id, delta, reason, created_at')
@@ -113,6 +114,7 @@ const AdminInventoryPage: React.FC = () => {
       if (inverse === 0) return
       const shortId = String(last.id).slice(0, 8)
       const reason = `undo:${shortId}`
+      const supabase = await getSupabase()
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: selected.product_id, p_delta: inverse, p_reason: reason })
       if (error) throw error
       toast.success('Hareket geri alındı')
@@ -134,6 +136,7 @@ const AdminInventoryPage: React.FC = () => {
   const load = React.useCallback(async () => {
     try {
       setLoading(LoadState.Loading)
+      const supabase = await getSupabase()
       const [invRes, settingsRes, catRes] = await Promise.all([
         supabase.from('inventory_summary').select('*'),
         supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
@@ -180,14 +183,18 @@ const AdminInventoryPage: React.FC = () => {
 
   // Realtime: inventory_settings değiştiğinde efektif eşik değerini güncelle
   React.useEffect(() => {
-    const ch = supabase
-      .channel('inventory-settings')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory_settings' }, (payload) => {
-        const newVal = (payload.new as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null
-        setDefaultThreshold(newVal)
-      })
-      .subscribe()
-    return () => { supabase.removeChannel(ch) }
+    let ch: ReturnType<any> | null = null
+    ;(async () => {
+      const supabase = await getSupabase()
+      ch = supabase
+        .channel('inventory-settings')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory_settings' }, (payload) => {
+          const newVal = (payload.new as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null
+          setDefaultThreshold(newVal)
+        })
+        .subscribe()
+    })()
+    return () => { ;(async () => { const supabase = await getSupabase(); if (ch) supabase.removeChannel(ch) })() }
   }, [])
 
   // Görünür kategoriler: sadece listedeki satırlarda geçen kategori id’leri
@@ -324,6 +331,7 @@ const AdminInventoryPage: React.FC = () => {
 
   const loadReserved = React.useCallback(async (productId: string) => {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('reserved_orders')
         .select('order_id, created_at, status, payment_status, quantity')
@@ -338,6 +346,7 @@ const AdminInventoryPage: React.FC = () => {
 
   const loadProductDetails = React.useCallback(async (productId: string) => {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('products')
         .select('stock_qty, low_stock_threshold, low_stock_override')
@@ -369,6 +378,7 @@ const AdminInventoryPage: React.FC = () => {
   async function saveThreshold(productId: string) {
     try {
       setSaving(true)
+      const supabase = await getSupabase()
       const isDefault = selectedThreshold === ''
       const payload: Record<string, unknown> = {
         low_stock_threshold: (isDefault ? null : Number(selectedThreshold)),
@@ -406,6 +416,7 @@ const AdminInventoryPage: React.FC = () => {
     setCsvPreview([])
     setCsvErrors([])
     try {
+      const supabase = await getSupabase()
       const textRaw = await file.text()
       const text = textRaw.replace(/^\ufeff/, '')
       const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0)
@@ -518,6 +529,7 @@ const AdminInventoryPage: React.FC = () => {
     try {
       // SKU -> product_id eşlemesi için tekrar sorgu
       const skus = csvPreview.map(item => item.sku)
+      const supabase = await getSupabase()
       const { data: products } = await supabase
         .from('products')
         .select('id, sku')
@@ -650,6 +662,7 @@ const AdminInventoryPage: React.FC = () => {
     const ids = Array.from(new Set(sortedRows.map(r => r.product_id)))
     let idToSku = new Map<string, string>()
     try {
+      const supabase = await getSupabase()
       if (ids.length > 0) {
         const { data, error } = await supabase
           .from('products')
@@ -711,6 +724,7 @@ const AdminInventoryPage: React.FC = () => {
   async function adjustStock(productId: string, delta: number, reason: string) {
     try {
       setMoving(true)
+      const supabase = await getSupabase()
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: reason })
       if (error) throw error
       // Audit log

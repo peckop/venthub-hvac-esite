@@ -33,7 +33,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function initializeAuth() {
       try {
-        const { supabase } = await import('../lib/supabase')
+        const { getSupabase } = await import('../lib/supabase')
+        const supabase = await getSupabase()
         // İlk oturumu al
         const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession()
         if (sessionError) {
@@ -137,7 +138,8 @@ case 'USER_UPDATED':
   async function signIn(email: string, password: string, rememberMe = true) {
     try {
       setLoading(true)
-      const { supabase } = await import('../lib/supabase')
+      const { getSupabase } = await import('../lib/supabase')
+      const supabase = await getSupabase()
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password
@@ -184,7 +186,8 @@ const errorMessage = 'Giriş sırasında beklenmeyen hata oluştu'
   async function signUp(email: string, password: string, name: string) {
     try {
       setLoading(true)
-      const { supabase } = await import('../lib/supabase')
+      const { getSupabase } = await import('../lib/supabase')
+      const supabase = await getSupabase()
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -236,7 +239,8 @@ const errorMessage = 'Kayıt sırasında beklenmeyen hata oluştu'
 
   async function signOut() {
     try {
-      const { supabase } = await import('../lib/supabase')
+      const { getSupabase } = await import('../lib/supabase')
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.signOut()
 if (error) {
         console.error('Sign out error:', error)
@@ -250,7 +254,8 @@ console.error('Sign out catch error:', error)
 
   async function resetPassword(email: string) {
     try {
-      const { supabase } = await import('../lib/supabase')
+      const { getSupabase } = await import('../lib/supabase')
+      const supabase = await getSupabase()
       const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/auth/reset-password`
       })

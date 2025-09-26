@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -97,6 +97,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     // load admin/moderator users for assignment via secure RPC
     ;(async () => {
       try {
+        const supabase = await getSupabase()
         const { data, error } = await supabase.rpc('admin_list_users')
         if (!error && Array.isArray(data)) {
           const list = (data as Array<{ id: string; email: string; full_name?: string | null }>).map(u => ({
@@ -114,6 +115,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      const supabase = await getSupabase()
       let query = supabase
         .from('error_groups')
         .select('id, signature, level, last_message, url_sample, env, release, first_seen, last_seen, count, status, assigned_to, notes', { count: 'exact' })
@@ -163,14 +165,18 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   // Realtime: refresh list on any change in error_groups
   React.useEffect(() => {
-    const ch = supabase
-      .channel('error-groups')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'error_groups' }, () => {
-        scheduleRefetch()
-      })
-      .subscribe()
+    let ch: ReturnType<any> | null = null
+    ;(async () => {
+      const supabase = await getSupabase()
+      ch = supabase
+        .channel('error-groups')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'error_groups' }, () => {
+          scheduleRefetch()
+        })
+        .subscribe()
+    })()
     return () => {
-      supabase.removeChannel(ch)
+      ;(async () => { const supabase = await getSupabase(); if (ch) supabase.removeChannel(ch) })()
       if (refetchTimer.current) clearTimeout(refetchTimer.current)
     }
   }, [scheduleRefetch])
@@ -178,6 +184,7 @@ const AdminErrorGroupsPage: React.FC = () => {
   const updateStatus = async (id: string, newStatus: 'open' | 'resolved' | 'ignored') => {
     const prev = rows
     setRows(rs => rs.map(r => r.id === id ? { ...r, status: newStatus } : r))
+    const supabase = await getSupabase()
     const { error } = await supabase.from('error_groups').update({ status: newStatus }).eq('id', id)
     if (error) {
       setRows(prev)
@@ -188,6 +195,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     const val = userId || null
     const prev = rows
     setRows(rs => rs.map(r => r.id === id ? { ...r, assigned_to: val } : r))
+    const supabase = await getSupabase()
     const { error } = await supabase.from('error_groups').update({ assigned_to: val }).eq('id', id)
     if (error) setRows(prev)
   }
@@ -195,12 +203,14 @@ const AdminErrorGroupsPage: React.FC = () => {
   const updateNotes = async (id: string, notes: string) => {
     const prev = rows
     setRows(rs => rs.map(r => r.id === id ? { ...r, notes } : r))
+    const supabase = await getSupabase()
     const { error } = await supabase.from('error_groups').update({ notes }).eq('id', id)
     if (error) setRows(prev)
   }
 
   const loadLatestClientErrors = async (groupId: string) => {
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('client_errors')
         .select('id, at, url, message, stack, user_agent, release, env, level')
@@ -218,6 +228,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     const CHUNK = 1000
     let offset = 0
     let all: ErrorGroup[] = []
+    const supabase = await getSupabase()
     // Aynı filtreleri uygulayan sorgu kurucu
     const makeQuery = () => {
       let q = supabase
@@ -331,6 +342,7 @@ const AdminErrorGroupsPage: React.FC = () => {
     if (selectedIds.length === 0) return
     setSavingBulk(true)
     try {
+      const supabase = await getSupabase()
       const { error } = await supabase.from('error_groups').update({ status: bulkStatus }).in('id', selectedIds)
       if (error) throw error
       setRows(prev => prev.map(r => selectedIds.includes(r.id) ? { ...r, status: bulkStatus } : r))

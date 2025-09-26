@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 
 interface UserMetadata {
@@ -25,6 +25,7 @@ export default function AccountProfilePage() {
     e.preventDefault()
     try {
       setSaving(true)
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.updateUser({
         data: { full_name: fullName || undefined, phone: phone || undefined }
       })

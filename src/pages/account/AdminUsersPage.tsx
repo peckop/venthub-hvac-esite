@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -99,6 +99,7 @@ export default function AdminUsersPage() {
         setIsLoading(true)
         
         // auth.users tablosundan tüm kullanıcıları getir
+        const supabase = await getSupabase()
         const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers()
         
         if (authError) {
@@ -171,6 +172,7 @@ export default function AdminUsersPage() {
         // Audit log
         try {
           const { logAdminAction } = await import('../../lib/audit')
+          const supabase = await getSupabase()
           await logAdminAction(supabase, {
             table_name: 'user_profiles',
             row_pk: userId,

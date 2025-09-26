@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -74,6 +74,7 @@ const AdminMovementsPage: React.FC = () => {
       const to = from + PAGE_SIZE - 1
 
       // Sorgu
+      const supabase = await getSupabase()
       let query = supabase
         .from('inventory_movements')
         .select('id, product_id, delta, reason, order_id, created_at, batch_id', { count: 'exact' })

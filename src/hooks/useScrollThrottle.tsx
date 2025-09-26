@@ -55,6 +55,15 @@ export const useScrollThrottle = (
     requestAnimationFrame(() => {
       const scrollTop = window.scrollY
 
+      // Tepeye dönüldüyse yapışkan başlığı anında gizle (histerezisi aşmak için)
+      if (scrollTop <= 1) {
+        if (isScrolled) setIsScrolled(false)
+        lastAboveRef.current = false
+        lastBelowRef.current = true
+        tickingRef.current = false
+        return
+      }
+
       // iki ardışık örneklemede doğrula
       const nowAbove = scrollTop > showAt
       const nowBelow = scrollTop < hideBelow

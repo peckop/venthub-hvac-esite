@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { useCart } from '../hooks/useCart'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
@@ -66,6 +66,7 @@ export const ProductDetailPage: React.FC = () => {
 
         // Fetch product images (cover + gallery)
         try {
+          const supabase = await getSupabase()
           const { data: imgs } = await supabase
             .from('product_images')
             .select('path, alt, sort_order')

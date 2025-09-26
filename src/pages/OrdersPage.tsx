@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
@@ -94,6 +94,7 @@ export const OrdersPage: React.FC = () => {
       setLoading(true)
 
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
+      const supabase = await getSupabase()
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
         .select('id, user_id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')

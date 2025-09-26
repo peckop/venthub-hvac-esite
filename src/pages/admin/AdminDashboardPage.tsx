@@ -1,6 +1,6 @@
 import React from 'react'
 import { adminSectionTitleClass, adminCardPaddedClass } from '../../utils/adminUi'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
@@ -42,6 +42,7 @@ const AdminDashboardPage: React.FC = () => {
       setError(null)
 
       // Orders count and sales total within range
+      const supabase = await getSupabase()
       const ordersQuery = supabase
         .from('venthub_orders')
         .select('id, total_amount, created_at, status, order_number', { count: 'exact' })

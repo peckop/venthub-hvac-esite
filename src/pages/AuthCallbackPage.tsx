@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -12,6 +12,7 @@ export const AuthCallbackPage: React.FC = () => {
   useEffect(() => {
     async function handleAuthCallback() {
       try {
+        const supabase = await getSupabase()
         // Get the hash fragment from the URL
         const hashFragment = window.location.hash
 

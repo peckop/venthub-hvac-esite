@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -40,6 +40,7 @@ const AdminCategoriesPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('categories')
         .select('id,name,slug,parent_id')
@@ -85,11 +86,13 @@ const AdminCategoriesPage: React.FC = () => {
       if (!payload.name || !payload.slug) return
 if (editingId) {
         const before = rows.find(r=>r.id===editingId) || null
+        const supabase = await getSupabase()
         const { error } = await supabase.from('categories').update(payload).eq('id', editingId)
         if (error) throw error
         const { logAdminAction } = await import('../../lib/audit')
         await logAdminAction(supabase, { table_name: 'categories', row_pk: editingId, action: 'UPDATE', before, after: payload, comment: 'save category' })
       } else {
+        const supabase = await getSupabase()
         const { data, error } = await supabase.from('categories').insert(payload).select('id').maybeSingle()
         if (error) throw error
         const inserted = (data as {id:string}|null)?.id || null
@@ -107,6 +110,7 @@ if (editingId) {
     if (!confirm('Bu kategoriyi silmek istiyor musunuz?')) return
     try {
 const before = rows.find(r=>r.id===id) || null
+      const supabase = await getSupabase()
       const { error } = await supabase.from('categories').delete().eq('id', id)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')

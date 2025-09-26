@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase, Product } from '../../lib/supabase'
+import { getSupabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
@@ -118,6 +118,7 @@ export default function OrderDetailPage() {
       try {
         setLoading(true)
 const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+        const supabase = await getSupabase()
         const baseRes = await supabase
           .from('venthub_orders')
           .select(baseSelect)
@@ -265,6 +266,7 @@ const mapped: Order = {
       const ids = Array.from(new Set((o.order_items||[]).map(it=>it.product_id).filter(Boolean))) as string[]
       const names = Array.from(new Set((o.order_items||[]).filter(it=>!it.product_id && it.product_name).map(it=>it.product_name)))
       const productMap: Record<string, Product> = {}
+      const supabase = await getSupabase()
       if (ids.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('id', ids)
         if (error) throw error

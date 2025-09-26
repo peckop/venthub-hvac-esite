@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
@@ -76,6 +76,7 @@ export default function AdminReturnsPage() {
         }
         
         // Production admin check
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('user_profiles')
           .select('role')
@@ -129,6 +130,7 @@ export default function AdminReturnsPage() {
         setIsLoading(true)
         
         // İade taleplerini ve sipariş bilgilerini birlikte getir
+        const supabase = await getSupabase()
         const { data, error } = await supabase
           .from('venthub_returns')
           .select(`
@@ -245,6 +247,7 @@ export default function AdminReturnsPage() {
       
       const oldStatus = returnItem.status
       
+      const supabase = await getSupabase()
       const { error } = await supabase
         .from('venthub_returns')
         .update({ status: newStatus })

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase'
+import { getSupabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
@@ -41,6 +41,7 @@ export default function AccountReturnsPage() {
     async function load() {
       try {
         setLoading(true)
+        const supabase = await getSupabase()
         const { data: list, error } = await supabase
           .from('venthub_returns')
           .select('id, order_id, reason, description, status, created_at')
@@ -70,6 +71,7 @@ export default function AccountReturnsPage() {
     let mounted = true
     async function loadOrders() {
       try {
+        const supabase = await getSupabase()
         let { data, error } = await supabase
           .from('venthub_orders')
           .select('id, order_number, created_at')
@@ -128,6 +130,7 @@ export default function AccountReturnsPage() {
         reason: form.reason,
         description: form.description || null
       }
+      const supabase = await getSupabase()
       const { error } = await supabase.from('venthub_returns').insert(payload)
       if (error) throw error
       toast.success(t('returns.createdToast'))
