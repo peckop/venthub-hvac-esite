@@ -15,14 +15,18 @@ vi.mock('react-hot-toast', () => {
 })
 
 // Mock supabase auth API used by AccountSecurityPage
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
+vi.mock('../../../lib/supabase', () => {
+  const supabase = {
     auth: {
       signInWithPassword: vi.fn(),
       updateUser: vi.fn(),
     },
-  },
-}))
+  }
+  return {
+    supabase,
+    getSupabase: vi.fn().mockResolvedValue(supabase),
+  }
+})
 
 // Mock HIBP checker to avoid external network and allow updates in tests
 vi.mock('../../../utils/passwordSecurity', () => ({
