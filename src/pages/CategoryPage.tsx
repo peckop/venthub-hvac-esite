@@ -340,7 +340,7 @@ export const CategoryPage: React.FC = () => {
                     {subCategories.map((sub) => (
                       <Link
                         key={sub.id}
-                        to={`/category/${category.slug}/${sub.slug}`}
+                        to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                       >
                         {sub.name}
@@ -611,7 +611,7 @@ export const CategoryPage: React.FC = () => {
                     {subCategories.map((sub) => (
                       <Link
                         key={sub.id}
-                        to={`/category/${category.slug}/${sub.slug}`}
+                        to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                         onClick={()=>setIsFilterOpen(false)}
                       >
