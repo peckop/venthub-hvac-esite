@@ -81,13 +81,42 @@ export const CategoryPage: React.FC = () => {
         setParentCategory(targetParentCategory)
 
         // Get subcategories if this is a main category
+        let subs: Category[] = []
         if (targetCategory.level === 0) {
-          const subs = categories.filter(c => c.parent_id === targetCategory.id)
+          subs = categories.filter(c => c.parent_id === targetCategory.id)
           setSubCategories(subs)
         }
 
         // Fetch products + attach cover images
-        const productsData = await getProductsByCategory(targetCategory.id)
+        let productsData: Product[]
+        if (targetCategory.level === 0 && subs.length > 0) {
+          // Ana kategori ve alt kategorileri varsa: category_id ile eşleşen tüm ürünleri çek
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('category_id', targetCategory.id)
+            .eq('status', 'active')
+            .order('is_featured', { ascending: false })
+            .order('name', { ascending: true })
+          
+          if (error) throw error
+          productsData = data as Product[]
+        } else if (targetCategory.level === 1) {
+          // Alt kategori: subcategory_id ile eşleşen ürünleri çek
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('subcategory_id', targetCategory.id)
+            .eq('status', 'active')
+            .order('is_featured', { ascending: false })
+            .order('name', { ascending: true })
+          
+          if (error) throw error
+          productsData = data as Product[]
+        } else {
+          // Diğer durumlar: normal query
+          productsData = await getProductsByCategory(targetCategory.id)
+        }
         const withCovers = await attachCovers(productsData)
         setProducts(withCovers)
 
