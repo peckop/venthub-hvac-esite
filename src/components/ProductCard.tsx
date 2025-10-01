@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 import { useI18n } from '../i18n/I18nProvider'
 import { getStockInquiryLink } from '../utils/whatsapp'
@@ -25,6 +25,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false }) => {
   const { t, lang } = useI18n()
+  const navigate = useNavigate()
   const isList = layout === 'list'
   const { addToCart } = useCart()
   const price = parseFloat(product.price)
@@ -176,13 +177,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           {relatedTopicSlug ? (
             <div className="mb-2 text-xs">
               <span className="text-steel-gray">{t('pdp.relatedGuide')}:</span>
-              <Link
-                to={`/destek/konular/${relatedTopicSlug}`}
-                onClick={(e) => { e.stopPropagation() }}
-                className="ml-1 text-primary-navy hover:text-secondary-blue underline"
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  navigate(`/destek/konular/${relatedTopicSlug}`)
+                }}
+                className="ml-1 text-primary-navy hover:text-secondary-blue underline bg-transparent border-none cursor-pointer"
               >
                 {t(`knowledge.topics.${relatedTopicSlug}.title`)}
-              </Link>
+              </button>
             </div>
           ) : null}
 
@@ -218,14 +223,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                 )
               }
               return (
-                <Link
-                  to="/contact"
-                  onClick={(e) => { e.stopPropagation() }}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate('/contact')
+                  }}
                   className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
                   title={t('pdp.askStock') as string}
                 >
                   {t('pdp.askStock')}
-                </Link>
+                </button>
               )
             })()}
             {onQuickView ? (

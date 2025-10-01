@@ -1,0 +1,32 @@
+{
+  "name": "avens-integration",
+  "version": "1.0.0",
+  "description": "Avens sitesinden ürün entegrasyonu için scraping ve veri işleme scriptleri",
+  "type": "module",
+  "main": "scrape_all_avens.js",
+  "scripts": {
+    "scrape": "node scrape_all_avens.js",
+    "import": "node import_products.js",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "avens",
+    "scraping",
+    "hvac",
+    "products",
+    "integration"
+  ],
+  "author": "VentHub",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "dotenv": "^17.2.3",
+    "puppeteer": "^24.10.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
