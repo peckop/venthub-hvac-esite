@@ -17,7 +17,8 @@ export const CategoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000])
+  // Varsayılan fiyat aralığını geniş tut (ürünler yüksek fiyatlı olabilir)
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000000])
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   // Teknik filtreler
   const [airflowMin, setAirflowMin] = useState<string>('')
@@ -53,6 +54,20 @@ export const CategoryPage: React.FC = () => {
       } catch {
         return list
       }
+    }
+
+    // Yardımcı: fiyatı güvenle sayıya çevir ("12.345,67" -> 12345.67, "12345" -> 12345)
+    const parsePriceToNumber = (val: unknown): number | null => {
+      if (typeof val === 'number') return Number.isFinite(val) ? val : null
+      if (typeof val === 'string') {
+        const trimmed = val.trim()
+        if (!trimmed) return null
+        // TR format desteği: nokta binlik, virgül ondalık
+        const normalized = trimmed.replace(/\./g, '').replace(/,/g, '.')
+        const n = Number(normalized)
+        return Number.isFinite(n) ? n : null
+      }
+      return null
     }
 
     async function fetchData() {
@@ -120,6 +135,16 @@ export const CategoryPage: React.FC = () => {
         const withCovers = await attachCovers(productsData)
         setProducts(withCovers)
 
+        // Ürünlerden dinamik maksimum fiyatı hesapla ve üst sınırı buna ayarla
+        const prices = withCovers
+          .map(p => parsePriceToNumber((p as unknown as { price?: unknown }).price))
+          .filter((v): v is number => v != null && Number.isFinite(v))
+        if (prices.length > 0) {
+          const maxPrice = Math.max(...prices)
+          // Eğer mevcut üst sınır daha düşükse, güncelle (kullanıcıyı rahatsız etmemek için sadece genişlet)
+          setPriceRange(([lo, hi]) => [lo, Math.max(hi, Math.ceil(maxPrice))])
+        }
+
       } catch (error) {
         console.error('Error fetching category data:', error)
       } finally {
@@ -139,8 +164,12 @@ export const CategoryPage: React.FC = () => {
         const hay = [product.name, product.brand, modelCode, product.sku].map(v => String(v||'').toLowerCase())
         if (!hay.some(h => h.includes(term))) return false
       }
-      const price = parseFloat(product.price)
-      const matchesPrice = price >= priceRange[0] && price <= priceRange[1]
+      const rawPrice = (product as unknown as { price?: unknown }).price
+      const priceNum = typeof rawPrice === 'number' ? rawPrice : Number(rawPrice)
+      // Fiyat sayıya çevrilemiyorsa (NaN), fiyat filtresini devre dışı bırak (ürünü eleme)
+      const matchesPrice = Number.isFinite(priceNum)
+        ? priceNum >= priceRange[0] && priceNum <= priceRange[1]
+        : true
       const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand)
 
       // Teknik filtreler
