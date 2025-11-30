@@ -197,7 +197,7 @@ export async function searchProducts(query: string) {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%`)
+    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%,description.ilike.%${query}%,technical_specs.ilike.%${query}%`)
     .eq('status', 'active')
     .limit(20)
 
@@ -513,10 +513,10 @@ export async function getOrCreateShoppingCart(userId: string) {
     code?: string
     message?: string
   }
-  
+
   if (error && (String((error as SupabaseError).code) === '23503' || /user_profiles/i.test(String((error as SupabaseError).message || '')))) {
     await ensureUserProfile(userId)
-    ;({ data, error } = await attemptInsert())
+      ; ({ data, error } = await attemptInsert())
   }
   // If unique conflict (cart already exists), select and return it
   if (error && (String((error as SupabaseError).code) === '23505' || String((error as SupabaseError).code) === '409' || /conflict|duplicate key/i.test(String((error as SupabaseError).message || '')))) {
