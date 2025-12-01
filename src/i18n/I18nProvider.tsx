@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from 'react'
+import React, { useContext, useMemo, useState, useEffect } from 'react'
 import { en } from './dictionaries/en'
 import { tr } from './dictionaries/tr'
 
-export type Lang = 'tr' | 'en'
+import { I18nContext, type Lang } from './I18nContext'
+
+export type { Lang }
+
 
 type Dict = Record<string, unknown>
 const DICTS: Record<Lang, Dict> = { en, tr }
@@ -41,21 +44,20 @@ function detectDefaultLang(): Lang {
     if (fromUrl === 'tr' || fromUrl === 'en') {
       return fromUrl
     }
-  } catch {}
+  } catch { }
   const saved = window.localStorage.getItem('lang')
   if (saved === 'tr' || saved === 'en') return saved
   const nav = navigator.language?.toLowerCase() || 'tr'
   return nav.startsWith('tr') ? 'tr' : 'en'
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const I18nContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: (key: string, params?: Record<string, unknown>) => string } | null>(null)
+
 
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lang, setLangState] = useState<Lang>(detectDefaultLang())
 
   useEffect(() => {
-    try { window.localStorage.setItem('lang', lang) } catch {}
+    try { window.localStorage.setItem('lang', lang) } catch { }
   }, [lang])
 
   // Keep <html lang> and dir in sync with current language for a11y & SEO
@@ -65,7 +67,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
         document.documentElement.setAttribute('lang', lang)
         document.documentElement.setAttribute('dir', 'ltr')
       }
-    } catch {}
+    } catch { }
   }, [lang])
 
   const setLang = React.useCallback((l: Lang) => setLangState(l), [])
@@ -81,6 +83,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useI18n() {
+
   const ctx = useContext(I18nContext)
   if (!ctx) throw new Error('useI18n must be used within I18nProvider')
   return ctx

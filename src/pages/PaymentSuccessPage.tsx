@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { supabase } from '../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
@@ -17,7 +17,7 @@ export const PaymentSuccessPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
-  
+
   // Başarı teyit edilmeden sepeti temizleme! Yalnızca doğrulanmış başarıda temizlenecek.
 
   useEffect(() => {
@@ -37,10 +37,10 @@ export const PaymentSuccessPage: React.FC = () => {
           .eq('id', oid)
           .maybeSingle()
         if (!error && data) {
-          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: { quantity?: number }) => s + (Number(it?.quantity)||0), 0) : undefined
-          setOrderSummary({ amount: Number(data.total_amount)||undefined, createdAt: data.created_at, items: count })
+          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: { quantity?: number }) => s + (Number(it?.quantity) || 0), 0) : undefined
+          setOrderSummary({ amount: Number(data.total_amount) || undefined, createdAt: data.created_at, items: count })
         }
-      } catch {}
+      } catch { }
     }
 
     async function verify() {
@@ -57,7 +57,7 @@ export const PaymentSuccessPage: React.FC = () => {
             localStorage.removeItem('vh_pending_order');
             localStorage.setItem('vh_last_order_status', 'success');
             localStorage.setItem('vh_clear_server_cart_once', '1');
-          } catch {}
+          } catch { }
           if (orderId) await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
           return
@@ -88,7 +88,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('vh_pending_order');
               localStorage.setItem('vh_last_order_status', 'success');
               localStorage.setItem('vh_clear_server_cart_once', '1');
-            } catch {}
+            } catch { }
             await fetchOrderDetails(orderId)
             toast.success(t('checkout.paymentSuccess'))
             return
@@ -105,7 +105,7 @@ export const PaymentSuccessPage: React.FC = () => {
         if (orderId) {
           try {
             await supabase.functions.invoke('iyzico-callback', { body: { orderId, conversationId } })
-          } catch {}
+          } catch { }
 
           const { data, error } = await supabase
             .from('venthub_orders')
@@ -132,7 +132,7 @@ export const PaymentSuccessPage: React.FC = () => {
               localStorage.removeItem('vh_pending_order');
               localStorage.setItem('vh_last_order_status', 'success');
               localStorage.setItem('vh_clear_server_cart_once', '1');
-            } catch {}
+            } catch { }
             await fetchOrderDetails(orderId)
             toast.success('🎉 Ödeme başarıyla tamamlandı!')
             return
@@ -143,12 +143,12 @@ export const PaymentSuccessPage: React.FC = () => {
         if (errorMessage) {
           setStatus('error')
           setPaymentInfo({ errorMessage })
-          try { localStorage.setItem('vh_last_order_status', 'failure') } catch {}
+          try { localStorage.setItem('vh_last_order_status', 'failure') } catch { }
           toast.error(t('payment.errorDuring', { msg: errorMessage }))
         } else {
           setStatus('error')
           setPaymentInfo({ errorMessage: t('payment.unverified') })
-          try { localStorage.setItem('vh_last_order_status', 'failure') } catch {}
+          try { localStorage.setItem('vh_last_order_status', 'failure') } catch { }
           toast.error(t('payment.unverified'))
         }
       } catch (e: unknown) {

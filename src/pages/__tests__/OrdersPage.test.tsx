@@ -40,7 +40,7 @@ vi.mock('../../i18n/I18nProvider', () => ({
       'orders.reorderedToast': 'Sepete eklendi',
       'orders.reorderNotFound': 'Ürün bulunamadı',
       'orders.reorderError': 'Tekrar sipariş hatası',
-    } as Record<string,string>)[k] || k
+    } as Record<string, string>)[k] || k
   })
 }))
 
@@ -100,7 +100,7 @@ function LocationProbe() {
 describe.skip('OrdersPage', () => {
   it('Detaylar butonuna tıklayınca order detail sayfasına yönlendirir', async () => {
     render(
-<MemoryRouter initialEntries={[ '/account/orders' ]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter initialEntries={['/account/orders']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/account/orders" element={<><LocationProbe /><OrdersPage /></>} />
           <Route path="/account/orders/:id" element={<><LocationProbe /><div data-testid="detail">Detay sayfası</div></>} />

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BrandIcon } from '../components/HVACIcons'
@@ -20,7 +20,7 @@ export const CartPage: React.FC = () => {
             <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-sm">
               <ShoppingBag size={48} className="text-steel-gray" />
             </div>
-              <h2 className="text-2xl font-bold text-industrial-gray mb-4">
+            <h2 className="text-2xl font-bold text-industrial-gray mb-4">
               {t('cart.emptyTitle')}
             </h2>
             <p className="text-steel-gray mb-8">
@@ -41,11 +41,11 @@ export const CartPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-light-gray">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="mb-4">
-              <SecurityRibbon />
-            </div>
-          {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-4">
+          <SecurityRibbon />
+        </div>
+        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-industrial-gray mb-2">
             {t('cart.title')}

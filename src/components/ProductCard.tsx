@@ -2,7 +2,7 @@ import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
 import { getStockInquiryLink } from '../utils/whatsapp'
 import { formatCurrency } from '../i18n/format'
@@ -68,9 +68,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
   return (
     <Link to={`/product/${product.id}`}>
-      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${
-        highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
-      } ${isList ? 'md:flex items-stretch' : ''}`}>
+      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
+        } ${isList ? 'md:flex items-stretch' : ''}`}>
         {/* Featured Badge */}
         {product.is_featured && (
           <div className="absolute top-3 left-3 z-10">
@@ -93,7 +92,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
         {/* Product Image */}
         <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg overflow-hidden' : 'aspect-square rounded-t-xl overflow-hidden'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
-{product.image_url ? (
+          {product.image_url ? (
             <img
               src={src}
               srcSet={srcSet}

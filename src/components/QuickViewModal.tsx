@@ -1,7 +1,7 @@
 import React from 'react'
 import { Product } from '../lib/supabase'
 import { X, ShoppingCart, Eye } from 'lucide-react'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'

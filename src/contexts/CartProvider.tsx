@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react'
+import React, { useEffect, useState, ReactNode, useRef } from 'react'
 import type { Product } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
@@ -16,30 +16,10 @@ const CART_OWNER_KEY = 'venthub-cart-owner'
 const CART_SCHEMA_KEY = 'venthub-cart-schema'
 const CURRENT_CART_SCHEMA = '2'
 
-interface CartItem {
-  id: string
-  product: Product
-  quantity: number
-  // Snapshot unit price (role/tier-based) if available
-  unitPrice?: number
-}
-
-interface CartContextType {
-  items: CartItem[]
-  syncing: boolean
-  addToCart: (product: Product, quantity?: number) => void
-  removeFromCart: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
-  clearCart: (opts?: { silent?: boolean }) => void
-  getCartTotal: () => number
-  getCartCount: () => number
-  // Yeni: Sunucunun hesapladığı birim fiyatları uygula (mismatch sonrası loop'u kırmak için)
-  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
-}
-
-const CartContext = createContext<CartContextType | undefined>(undefined)
+import { CartContext, CartItem } from '../contexts/CartContext'
 
 export { CartContext }
+
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
@@ -49,51 +29,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const mergingRef = useRef(false)
   const localVersionRef = useRef<number>(0)
 
-// Load cart from localStorage on mount
-useEffect(() => {
-  try {
-    // One-time migration: if schema mismatch, silently clear any stale cart from previous deployments
-    const schema = localStorage.getItem(CART_SCHEMA_KEY)
-    if (schema !== CURRENT_CART_SCHEMA) {
-      try {
-        localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
-        localStorage.removeItem(CART_VERSION_KEY)
-        localStorage.removeItem(CART_OWNER_KEY)
-        localStorage.removeItem('vh_pending_order')
-        localStorage.setItem(CART_SCHEMA_KEY, CURRENT_CART_SCHEMA)
-      } catch {}
-    }
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    try {
+      // One-time migration: if schema mismatch, silently clear any stale cart from previous deployments
+      const schema = localStorage.getItem(CART_SCHEMA_KEY)
+      if (schema !== CURRENT_CART_SCHEMA) {
+        try {
+          localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+          localStorage.removeItem(CART_VERSION_KEY)
+          localStorage.removeItem(CART_OWNER_KEY)
+          localStorage.removeItem('vh_pending_order')
+          localStorage.setItem(CART_SCHEMA_KEY, CURRENT_CART_SCHEMA)
+        } catch { }
+      }
 
-    // Safety: if the last order status was success, enforce an empty cart on fresh load
-    const lastStatus = localStorage.getItem('vh_last_order_status')
-    if (lastStatus === 'success') {
-      try {
-        setItems([])
-        localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
-        localStorage.removeItem(CART_VERSION_KEY)
-        localStorage.removeItem(CART_OWNER_KEY)
-        localStorage.removeItem('vh_pending_order')
-        localStorage.removeItem('vh_last_order_id')
-        // keep a breadcrumb but don't keep success forever to avoid repeated forced clears
-        localStorage.removeItem('vh_last_order_status')
-        // Cross-tab sync
-        window.dispatchEvent(new StorageEvent('storage', { key: CART_LOCAL_STORAGE_KEY, newValue: JSON.stringify([]), oldValue: null, storageArea: localStorage }))
-      } catch {}
-    }
+      // Safety: if the last order status was success, enforce an empty cart on fresh load
+      const lastStatus = localStorage.getItem('vh_last_order_status')
+      if (lastStatus === 'success') {
+        try {
+          setItems([])
+          localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
+          localStorage.removeItem(CART_VERSION_KEY)
+          localStorage.removeItem(CART_OWNER_KEY)
+          localStorage.removeItem('vh_pending_order')
+          localStorage.removeItem('vh_last_order_id')
+          // keep a breadcrumb but don't keep success forever to avoid repeated forced clears
+          localStorage.removeItem('vh_last_order_status')
+          // Cross-tab sync
+          window.dispatchEvent(new StorageEvent('storage', { key: CART_LOCAL_STORAGE_KEY, newValue: JSON.stringify([]), oldValue: null, storageArea: localStorage }))
+        } catch { }
+      }
 
-    const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
-    const savedVer = localStorage.getItem(CART_VERSION_KEY)
-    if (savedVer) {
-      const v = parseInt(savedVer, 10)
-      if (Number.isFinite(v)) localVersionRef.current = v
+      const savedCart = localStorage.getItem(CART_LOCAL_STORAGE_KEY)
+      const savedVer = localStorage.getItem(CART_VERSION_KEY)
+      if (savedVer) {
+        const v = parseInt(savedVer, 10)
+        if (Number.isFinite(v)) localVersionRef.current = v
+      }
+      if (savedCart) {
+        setItems(JSON.parse(savedCart))
+      }
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error)
     }
-    if (savedCart) {
-      setItems(JSON.parse(savedCart))
-    }
-  } catch (error) {
-    console.error('Error loading cart from localStorage:', error)
-  }
-}, [])
+  }, [])
 
   // Save cart to localStorage whenever items change (and bump version)
   useEffect(() => {
@@ -110,7 +90,7 @@ useEffect(() => {
   // Helper: merge two cart item arrays by product.id
   function mergeItems(local: CartItem[], server: CartItem[], isGuestCart: boolean) {
     const map = new Map<string, CartItem>()
-    
+
     // If we have a guest cart with items, prioritize it (user just added items before login)
     if (isGuestCart && local.length > 0) {
       // Start with local guest cart items
@@ -154,7 +134,7 @@ useEffect(() => {
         // Check if this is a guest cart (no owner in localStorage)
         const currentOwner = localStorage.getItem(CART_OWNER_KEY)
         const isGuestCart = !currentOwner || currentOwner === '' || currentOwner !== user.id
-        
+
         // Determine if we must discard local guest cart due to a recently paid order
         let discardLocalGuestCart = false
         let clearOnce = localStorage.getItem('vh_clear_server_cart_once') === '1'
@@ -165,7 +145,7 @@ useEffect(() => {
             localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
             localStorage.removeItem(CART_VERSION_KEY)
             localStorage.removeItem(CART_OWNER_KEY)
-          } catch {}
+          } catch { }
         }
         try {
           const raw = localStorage.getItem('vh_pending_order')
@@ -184,12 +164,12 @@ useEffect(() => {
                 try {
                   localStorage.setItem('vh_last_order_status', 'success')
                   localStorage.removeItem('vh_pending_order')
-                } catch {}
+                } catch { }
               }
             }
           }
-        } catch {}
-        
+        } catch { }
+
         // If we have a guest cart with items, or we have a post-order clear flag, clear server cart first
         if ((isGuestCart && items.length > 0) || clearOnce) {
           if (((import.meta as ImportMeta).env?.VITE_DEBUG ?? 'false') === 'true') {
@@ -197,7 +177,7 @@ useEffect(() => {
           }
           await clearDbCartItems(cart.id)
         }
-        
+
         // Fetch server items (will be empty if we just cleared)
         const serverRows = await listCartItemsWithProducts(cart.id)
         const serverItems: CartItem[] = serverRows.map(({ item, product }) => ({ id: item.product_id, product, quantity: item.quantity }))
@@ -208,7 +188,7 @@ useEffect(() => {
           : (isGuestCart && items.length > 0 ? items : mergeItems(items, serverItems, isGuestCart))
 
         // If we cleared server due to post-order flag, also remove the flag now
-        try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch {}
+        try { if (clearOnce) localStorage.removeItem('vh_clear_server_cart_once') } catch { }
         // Compute unit prices for merged items and upsert server
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
@@ -234,7 +214,7 @@ useEffect(() => {
           const v = Date.now()
           localVersionRef.current = v
           localStorage.setItem(CART_VERSION_KEY, String(v))
-        } catch {}
+        } catch { }
 
       } catch (e) {
         console.error('cart sync error', e)
@@ -248,7 +228,7 @@ useEffect(() => {
     // only run when user changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
-  
+
   // Clear owner when user logs out
   useEffect(() => {
     if (!user) {
@@ -279,7 +259,7 @@ useEffect(() => {
             localVersionRef.current = v
           }
         }
-      } catch {}
+      } catch { }
     }
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
@@ -288,7 +268,7 @@ useEffect(() => {
   const addToCart = (product: Product, quantity = 1) => {
     setItems(currentItems => {
       const existingItem = currentItems.find(item => item.product.id === product.id)
-      
+
       if (existingItem) {
         return currentItems.map(item =>
           item.product.id === product.id
@@ -312,7 +292,7 @@ useEffect(() => {
             setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
           })
           .catch(err => console.error('server addToCart error', err))
-      }).catch(() => {})
+      }).catch(() => { })
     }
 
     // Dispatch a global event so UI can present a rich toast/modal
@@ -320,8 +300,8 @@ useEffect(() => {
       window.dispatchEvent(new CustomEvent('vh_cart_item_added', { detail: { product } }))
     } catch {
       try {
-        import('react-hot-toast').then(({ default: toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })).catch(() => {})
-      } catch {}
+        import('react-hot-toast').then(({ default: toast }) => toast.success(`${product.name} sepete eklendi!`, { duration: 2500, position: 'top-right' })).catch(() => { })
+      } catch { }
     }
   }
 
@@ -329,7 +309,7 @@ useEffect(() => {
     setItems(currentItems => {
       const item = currentItems.find(item => item.product.id === productId)
       if (item) {
-        import('react-hot-toast').then(({ default: toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })).catch(() => {})
+        import('react-hot-toast').then(({ default: toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })).catch(() => { })
       }
       return currentItems.filter(item => item.product.id !== productId)
     })
@@ -367,21 +347,21 @@ useEffect(() => {
               setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
             })
             .catch(err => console.error('server updateQuantity error', err))
-        }).catch(()=>{})
+        }).catch(() => { })
       }
     }
   }
 
   const clearCart = (opts?: { silent?: boolean }) => {
     setItems([])
-    
+
     // Clear all localStorage cart data
     try {
       localStorage.removeItem(CART_LOCAL_STORAGE_KEY)
       localStorage.removeItem(CART_VERSION_KEY)
       localStorage.removeItem(CART_OWNER_KEY)
       localStorage.removeItem('vh_pending_order')
-      
+
       // Dispatch cross-tab sync event
       window.dispatchEvent(new StorageEvent('storage', {
         key: CART_LOCAL_STORAGE_KEY,
@@ -392,11 +372,11 @@ useEffect(() => {
     } catch (e) {
       console.error('Error clearing localStorage:', e)
     }
-    
+
     if (!opts?.silent) {
-      import('react-hot-toast').then(({ default: toast }) => toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })).catch(() => {})
+      import('react-hot-toast').then(({ default: toast }) => toast.success('Sepet temizlendi', { duration: 2000, position: 'top-right' })).catch(() => { })
     }
-    
+
     if (CART_SERVER_SYNC && user && serverCartId) {
       import('../lib/supabase').then(({ clearCartItems }) => {
         return clearCartItems(serverCartId)
@@ -459,8 +439,8 @@ useEffect(() => {
             return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
               .catch(e => console.warn('applyServerPricing upsert error', e))
           })
-          Promise.allSettled(tasks).catch(()=>{})
-        }).catch(()=>{})
+          Promise.allSettled(tasks).catch(() => { })
+        }).catch(() => { })
       } catch { /* no-op */ }
     }
   }
@@ -484,14 +464,5 @@ useEffect(() => {
   )
 }
 
-// Hook to use cart context  
-function useCartHook() {
-  const context = useContext(CartContext)
-  if (!context) {
-    throw new Error('useCart must be used within a CartProvider')
-  }
-  return context
-}
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useCart = useCartHook
+

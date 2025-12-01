@@ -52,7 +52,7 @@ vi.mock('../../../i18n/I18nProvider', () => ({
       'orders.copy': 'Kopyala',
       'orders.copied': 'Kopyalandı',
       'orders.copyFailed': 'Kopyalanamadı'
-    } as Record<string,string>)[k] || k
+    } as Record<string, string>)[k] || k
   })
 }))
 
@@ -123,7 +123,7 @@ import OrderDetailPage from '../OrderDetailPage'
 describe.skip('OrderDetailPage', () => {
   it('Sekme geçişi çalışır ve tracking link görünür', async () => {
     render(
-<MemoryRouter initialEntries={[ '/account/orders/ord1' ]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter initialEntries={['/account/orders/ord1']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/account/orders/:id" element={<OrderDetailPage />} />
         </Routes>

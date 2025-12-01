@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { useCart } from '../hooks/useCart'
+import React, { useState, useEffect } from 'react' // refresh
+import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -34,22 +34,21 @@ export const CheckoutPage: React.FC = () => {
 
   // Dev-only debug logger to avoid leaking PII in production
   const debug = (...args: unknown[]) => {
-    const env = (import.meta as unknown as { env?: Record<string, string> }).env
+    const env = import.meta.env
     let on = env?.VITE_DEBUG === 'true'
-    try { if (!on && typeof localStorage !== 'undefined') on = localStorage.getItem('vh_debug') === '1' } catch {}
+    try { if (!on && typeof localStorage !== 'undefined') on = localStorage.getItem('vh_debug') === '1' } catch { }
     if (on) {
-      try { console.warn(...args) } catch {}
+      try { console.warn(...args) } catch { }
     }
   }
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
   const { t, lang } = useI18n()
-  // i18n fallback helper (if missing key, t(key) returns key string)
+  // i18n fallback helper
   const tf = (key: string, fallback: string) => {
     try {
-      const translate = t as unknown as (k: string) => string
-      const v = translate(key)
+      const v = t(key)
       return v === key ? fallback : v
     } catch {
       return fallback
@@ -59,13 +58,13 @@ export const CheckoutPage: React.FC = () => {
   const to2 = (n: number) => Number(Number(n).toFixed(2))
   const priceHashLocal = () => {
     const norm = items.map(i => ({ id: i.id, qty: i.quantity, unit: to2(Number((typeof i.unitPrice === 'number' ? i.unitPrice : parseFloat(i.product.price)))) }))
-      .sort((a,b)=>a.id.localeCompare(b.id))
+      .sort((a, b) => a.id.localeCompare(b.id))
     return JSON.stringify(norm)
   }
-  const priceHashServer = (serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }>|undefined|null) => {
+  const priceHashServer = (serverItems: Array<{ product_id: string; quantity?: number; unit_price: number }> | undefined | null) => {
     const arr = Array.isArray(serverItems) ? serverItems : []
-    const norm = arr.map(i => ({ id: String(i.product_id), qty: Number(i.quantity ?? items.find(it=>it.id===String(i.product_id))?.quantity ?? 0), unit: to2(Number(i.unit_price)) }))
-      .sort((a,b)=>a.id.localeCompare(b.id))
+    const norm = arr.map(i => ({ id: String(i.product_id), qty: Number(i.quantity ?? items.find(it => it.id === String(i.product_id))?.quantity ?? 0), unit: to2(Number(i.unit_price)) }))
+      .sort((a, b) => a.id.localeCompare(b.id))
     return JSON.stringify(norm)
   }
 
@@ -285,7 +284,7 @@ export const CheckoutPage: React.FC = () => {
     debug('Cart total:', getCartTotal());
     debug('Customer info present:', Boolean(customerInfo?.email));
     debug('Shipping city:', shippingAddress?.city);
-    
+
     // Test ortamında yan etkileri tamamen kapat ve direkt 4. adıma geç
     if (isTest) {
       setStep(4)
@@ -306,9 +305,9 @@ export const CheckoutPage: React.FC = () => {
             const pid = s.product_id
             const avail = Number(s.available)
             if (!Number.isFinite(avail) || avail <= 0) {
-              try { removeFromCart(pid) } catch {}
+              try { removeFromCart(pid) } catch { }
             } else {
-              try { updateQuantity(pid, avail) } catch {}
+              try { updateQuantity(pid, avail) } catch { }
             }
           }
           toast('Bazı ürünlerin stokları güncellendi. Lütfen kontrol edin ve onaylayın.')
@@ -322,14 +321,14 @@ export const CheckoutPage: React.FC = () => {
         const s2 = Number(Number(serverTotal).toFixed(2))
         const l2 = Number(Number(localTotal).toFixed(2))
         const localHash = priceHashLocal()
-        const serverHash = priceHashServer((validation as unknown as { items?: Array<{ product_id: string; quantity?: number; unit_price: number }> })?.items)
+        const serverHash = priceHashServer(validation?.items)
         const hashesDiffer = serverHash !== localHash
-        debug('validation diff check', { s2, l2, diff: Number(Math.abs(s2-l2).toFixed(4)), hashesDiffer, localHash, serverHash })
+        debug('validation diff check', { s2, l2, diff: Number(Math.abs(s2 - l2).toFixed(4)), hashesDiffer, localHash, serverHash })
 
         if (hashesDiffer || Math.abs(s2 - l2) > 0.01) {
           // Sunucunun fiyatlarını uygula ve ÖDEMEYE DEVAM ET (kullanıcıyı geri döndürme)
-          try { applyServerPricing((validation as unknown as { items?: Array<{ product_id: string; unit_price: number }> }).items || []) } catch {}
-          try { localStorage.setItem('vh_last_price_hash', serverHash) } catch {}
+          try { applyServerPricing(validation?.items || []) } catch { }
+          try { localStorage.setItem('vh_last_price_hash', serverHash) } catch { }
           authoritativeTotal = s2
           toast('Fiyatlar güncellendi, ödeme devam ediyor.')
           // Not: Artık geri dönmüyoruz; ödeme isteği düzeltilmiş tutarla devam edecek
@@ -365,8 +364,8 @@ export const CheckoutPage: React.FC = () => {
         billCity: requestData?.billingAddress?.city,
       })
 
-      const headers: Record<string,string> = {}
-      try { const e2 = (import.meta as unknown as { env?: Record<string,string> }).env; if (e2?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch {}
+      const headers: Record<string, string> = {}
+      try { const e2 = (import.meta as unknown as { env?: Record<string, string> }).env; if (e2?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch { }
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
         body: requestData,
@@ -380,16 +379,16 @@ export const CheckoutPage: React.FC = () => {
         throw error;
       }
 
-        if (data && data.data) {
-          debug('İyzico payment response:', { status: data.data?.status, hasToken: !!data.data?.token, hasUrl: !!data.data?.paymentPageUrl });
-          
-          // Öncelik: hosted ödeme sayfasına yönlendirme (3D sonrası otomatik dönüş daha sorunsuz)
-          if (data.data.paymentPageUrl) {
-            debug('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
+      if (data && data.data) {
+        debug('İyzico payment response:', { status: data.data?.status, hasToken: !!data.data?.token, hasUrl: !!data.data?.paymentPageUrl });
+
+        // Öncelik: hosted ödeme sayfasına yönlendirme (3D sonrası otomatik dönüş daha sorunsuz)
+        if (data.data.paymentPageUrl) {
+          debug('Redirecting to İyzico payment page:', data.data.paymentPageUrl);
           try {
             localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
             localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
-          } catch {}
+          } catch { }
           window.location.href = data.data.paymentPageUrl;
           return;
         }
@@ -403,7 +402,7 @@ export const CheckoutPage: React.FC = () => {
           try {
             localStorage.setItem('vh_pending_order', JSON.stringify({ orderId: data.data.orderId, conversationId: data.data.conversationId }))
             localStorage.setItem('vh_last_order_id', String(data.data.orderId || ''))
-          } catch {}
+          } catch { }
           setStep(4)
           return
         }
@@ -416,7 +415,7 @@ export const CheckoutPage: React.FC = () => {
           setStep(3)
           return
         }
-        
+
         // Hemen tamamlanan ödeme (demo)
         if (data.data.status === 'success') {
           debug('Payment completed immediately');
@@ -466,7 +465,7 @@ export const CheckoutPage: React.FC = () => {
       } catch (e) {
         console.warn('debug direct fetch failed:', e)
       }
-      
+
       // More detailed error message
       let errorMessage = t('checkout.errors.paymentInit')
       if (err?.message && err.message.includes('VALIDATION_ERROR')) {
@@ -476,7 +475,7 @@ export const CheckoutPage: React.FC = () => {
       } else if (err?.message) {
         errorMessage = err.message
       }
-      
+
       toast.error(errorMessage)
       setStep(3) // Go back to review step
     } finally {
@@ -516,7 +515,7 @@ export const CheckoutPage: React.FC = () => {
       if (oldScript && oldScript.parentElement) oldScript.parentElement.removeChild(oldScript)
       const mount = document.getElementById('iyzipay-checkout-form')
       if (mount) mount.innerHTML = ''
-    } catch {}
+    } catch { }
 
     // Yeni scripti token ile ekle (İyzico beklentisi: token script tag'inde data olarak verilir)
     const script = document.createElement('script')
@@ -534,7 +533,7 @@ export const CheckoutPage: React.FC = () => {
         try {
           localStorage.setItem('vh_pending_order', JSON.stringify({ orderId, conversationId: convId }))
           localStorage.setItem('vh_last_order_id', String(orderId || ''))
-        } catch {}
+        } catch { }
         // Fallback: hosted ödeme sayfasına yönlendir (aynı sekme)
         window.location.href = paymentUrl
       }
@@ -549,14 +548,14 @@ export const CheckoutPage: React.FC = () => {
       if (iframe) {
         try {
           iframe.addEventListener('load', () => setFormReady(true), { once: true } as AddEventListenerOptions)
-        } catch {}
+        } catch { }
         return
       }
       // Yoksa değişiklikleri izle
       const obs = new MutationObserver((_mut) => {
         const ifr = mount.querySelector('iframe') as HTMLIFrameElement | null
         if (ifr) {
-          try { ifr.addEventListener('load', () => setFormReady(true), { once: true } as AddEventListenerOptions) } catch {}
+          try { ifr.addEventListener('load', () => setFormReady(true), { once: true } as AddEventListenerOptions) } catch { }
           obs.disconnect()
         }
       })
@@ -597,7 +596,7 @@ export const CheckoutPage: React.FC = () => {
               navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=failure`)
             }
           }
-        } catch {}
+        } catch { }
       }, 3000)
     }
     return () => { if (timer) clearInterval(timer) }
@@ -624,7 +623,7 @@ export const CheckoutPage: React.FC = () => {
             setInvoiceInfo({ type: 'corporate', companyName: def.company_name || '', vkn: def.vkn || '', taxOffice: def.tax_office || '', eInvoice: !!def.e_invoice })
           }
         }
-      } catch {}
+      } catch { }
       setDefaultInvoiceApplied(true)
     }
     tryApplyDefault()
@@ -713,79 +712,79 @@ export const CheckoutPage: React.FC = () => {
   // Address selection modal
   const AddressSelectModal: React.FC<{ title: string; addresses: UserAddress[]; onClose: () => void; onPick: (a: UserAddress) => void }>
     = ({ title, addresses, onClose, onPick }) => (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
-      <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
-        <div className="px-5 py-4 border-b flex items-center justify-between">
-          <div className="text-industrial-gray font-semibold">{title}</div>
-          <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
-        </div>
-        <div className="p-5 overflow-y-auto">
-          {addresses.length === 0 ? (
-            <div className="text-sm text-steel-gray">—</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {addresses.map((a) => (
-                <div key={a.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
-                  <div className="text-sm text-industrial-gray font-medium">
-                    {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+      <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
+        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
+          <div className="px-5 py-4 border-b flex items-center justify-between">
+            <div className="text-industrial-gray font-semibold">{title}</div>
+            <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
+          </div>
+          <div className="p-5 overflow-y-auto">
+            {addresses.length === 0 ? (
+              <div className="text-sm text-steel-gray">—</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {addresses.map((a) => (
+                  <div key={a.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
+                    <div className="text-sm text-industrial-gray font-medium">
+                      {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+                    </div>
+                    <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
+                    <div className="mt-2 flex justify-end">
+                      <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(a)}>
+                        {t('checkout.saved.use')}
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
-                  <div className="mt-2 flex justify-end">
-                    <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(a)}>
-                      {t('checkout.saved.use')}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
 
   const InvoiceProfileModal: React.FC<{ title: string; profiles: InvoiceProfile[]; onClose: () => void; onPick: (p: InvoiceProfile) => void }>
     = ({ title, profiles, onClose, onPick }) => (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
-      <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
-        <div className="px-5 py-4 border-b flex items-center justify-between">
-          <div className="text-industrial-gray font-semibold">{title}</div>
-          <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
-        </div>
-        <div className="p-5 overflow-y-auto">
-          {profiles.length === 0 ? (
-            <div className="text-sm text-steel-gray">—</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {profiles.map((p) => (
-                <div key={p.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
-                  <div className="text-sm text-industrial-gray font-medium">
-                    {(p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate')))} {p.is_default && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+      <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
+        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
+          <div className="px-5 py-4 border-b flex items-center justify-between">
+            <div className="text-industrial-gray font-semibold">{title}</div>
+            <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
+          </div>
+          <div className="p-5 overflow-y-auto">
+            {profiles.length === 0 ? (
+              <div className="text-sm text-steel-gray">—</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {profiles.map((p) => (
+                  <div key={p.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
+                    <div className="text-sm text-industrial-gray font-medium">
+                      {(p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate')))} {p.is_default && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+                    </div>
+                    <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
+                      {p.type === 'individual' ? (
+                        <div>TCKN: {p.tckn || '-'}</div>
+                      ) : (
+                        <div>
+                          <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
+                          <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
+                          <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-2 flex justify-end">
+                      <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(p)}>
+                        {t('checkout.saved.use')}
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
-                    {p.type === 'individual' ? (
-                      <div>TCKN: {p.tckn || '-'}</div>
-                    ) : (
-                      <div>
-                        <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
-                        <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
-                        <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-2 flex justify-end">
-                    <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(p)}>
-                      {t('checkout.saved.use')}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
 
   return (
     <div className="min-h-screen bg-light-gray">
@@ -874,12 +873,12 @@ export const CheckoutPage: React.FC = () => {
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-2">
-            {[1,2,3,4].map((n, idx) => (
+            {[1, 2, 3, 4].map((n, idx) => (
               <React.Fragment key={n}>
                 <div className="flex flex-col items-center min-w-[110px]">
                   <div className={`w-8 h-8 rounded-full font-semibold text-sm flex items-center justify-center ${step >= n ? 'bg-primary-navy text-white' : 'bg-light-gray text-steel-gray border-2 border-light-gray'}`}>{n}</div>
                   <span className={`mt-1 text-sm ${step >= n ? 'text-primary-navy font-medium' : 'text-steel-gray'}`}>
-                    {n===1 ? t('checkout.steps.step1') : n===2 ? t('checkout.steps.step2') : n===3 ? t('checkout.steps.step3') : t('checkout.steps.step4')}
+                    {n === 1 ? t('checkout.steps.step1') : n === 2 ? t('checkout.steps.step2') : n === 3 ? t('checkout.steps.step3') : t('checkout.steps.step4')}
                   </span>
                 </div>
                 {idx < 2 && (
@@ -972,7 +971,7 @@ export const CheckoutPage: React.FC = () => {
                       <input
                         type="text"
                         value={customerInfo.name}
-                        onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                        onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                         placeholder={t('checkout.personal.namePlaceholder')}
                       />
@@ -984,7 +983,7 @@ export const CheckoutPage: React.FC = () => {
                       <input
                         type="email"
                         value={customerInfo.email}
-                        onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                        onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                         placeholder={t('checkout.personal.emailPlaceholder')}
                       />
@@ -996,7 +995,7 @@ export const CheckoutPage: React.FC = () => {
                       <input
                         type="tel"
                         value={customerInfo.phone}
-                        onChange={(e) => setCustomerInfo({...customerInfo, phone: e.target.value})}
+                        onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                         placeholder={t('checkout.personal.phonePlaceholder')}
                       />
@@ -1008,7 +1007,7 @@ export const CheckoutPage: React.FC = () => {
                       <input
                         type="text"
                         value={customerInfo.identityNumber}
-                        onChange={(e) => setCustomerInfo({...customerInfo, identityNumber: e.target.value})}
+                        onChange={(e) => setCustomerInfo({ ...customerInfo, identityNumber: e.target.value })}
                         className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                         placeholder={t('checkout.personal.idPlaceholder')}
                         maxLength={11}
@@ -1023,21 +1022,21 @@ export const CheckoutPage: React.FC = () => {
                 <div className="space-y-8">
                   {/* Shipping Method (Service Level) */}
                   <div>
-<h3 className="text-lg font-semibold text-industrial-gray mb-3">{tf('checkout.shipping.methodTitle','Teslimat Yöntemi')}</h3>
+                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{tf('checkout.shipping.methodTitle', 'Teslimat Yöntemi')}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod==='standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
+                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
                           <div className="text-sm font-medium text-industrial-gray">Standart</div>
                           <div className="text-xs text-steel-gray">3–5 iş günü</div>
                         </div>
-                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod==='standard'} onChange={() => setShippingMethod('standard')} />
+                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'standard'} onChange={() => setShippingMethod('standard')} />
                       </label>
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod==='express' ? 'border-primary-navy' : 'border-light-gray'}`}>
+                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'express' ? 'border-primary-navy' : 'border-light-gray'}`}>
                         <div>
                           <div className="text-sm font-medium text-industrial-gray">Ekspres</div>
                           <div className="text-xs text-steel-gray">1–2 iş günü</div>
                         </div>
-                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod==='express'} onChange={() => setShippingMethod('express')} />
+                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'express'} onChange={() => setShippingMethod('express')} />
                       </label>
                     </div>
                   </div>
@@ -1053,136 +1052,136 @@ export const CheckoutPage: React.FC = () => {
                       </h2>
                     </div>
 
-                  {/* Saved addresses quick pick */}
-                  {savedAddresses.length > 0 && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm text-industrial-gray font-medium">{t('checkout.saved.title')}</div>
-                        <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => { setAddressPickTarget('shipping'); setShowAddressModal(true) }}>
-                          {t('checkout.saved.seeAll')}
-                        </button>
-                      </div>
-                      <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                        {savedAddresses.map((a) => (
-                          <div key={a.id} className="min-w-[260px] border rounded-lg p-3 bg-white/90">
-                            <div className="flex items-center justify-between">
-                              <div className="text-sm text-industrial-gray font-medium">
-                              {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
-                              </div>
-                              <div className="flex items-center gap-2 ml-2">
-                                <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50" onClick={() => {
-                                  setEditingAddressId(a.id)
-                                  setEditForm({
-                                    label: a.label || '',
-                                    full_name: a.full_name || '',
-                                    phone: a.phone || '',
-                                    full_address: a.full_address || '',
-                                    city: a.city || '',
-                                    district: a.district || '',
-                                    postal_code: a.postal_code || '',
-                                    is_default_shipping: a.is_default_shipping,
-                                    is_default_billing: a.is_default_billing,
-                                  })
-                                }}>
-                                  {t('checkout.saved.edit')}
-                                </button>
-                                <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50 text-red-600" onClick={async () => {
-                                  if (!confirm(t('checkout.saved.confirmDelete'))) return
-                                  try {
-                                    await deleteAddress(a.id)
-                                    toast.success(t('checkout.saved.deleted'))
-                                    const rows = await listAddresses(); setSavedAddresses(rows)
-                                  } catch (e) {
-                                    console.error(e)
-                                    toast.error(t('checkout.saved.deleteError'))
-                                  }
-                                }}>
-                                  {t('checkout.saved.delete')}
-                                </button>
-                              </div>
-                            </div>
-                            <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
-                              {a.full_address}
-                            </div>
-                            {editingAddressId === a.id ? (
-                              <div className="mt-2 border-t pt-2 space-y-2">
-                                <input type="text" value={editForm.label || ''} onChange={(e) => setEditForm(f => ({ ...f, label: e.target.value }))} placeholder={t('checkout.saved.address')} className="w-full px-3 py-2 border rounded text-xs" />
-                                <textarea value={editForm.full_address} onChange={(e) => setEditForm(f => ({ ...f, full_address: e.target.value }))} placeholder={t('checkout.shipping.addressPlaceholder')} className="w-full px-3 py-2 border rounded text-xs min-h-20" />
-                                <div className="grid grid-cols-3 gap-2">
-                                  <input type="text" value={editForm.city} onChange={(e) => setEditForm(f => ({ ...f, city: e.target.value }))} placeholder={t('checkout.shipping.cityPlaceholder')} className="px-3 py-2 border rounded text-xs" />
-                                  <input type="text" value={editForm.district} onChange={(e) => setEditForm(f => ({ ...f, district: e.target.value }))} placeholder={t('checkout.shipping.districtPlaceholder')} className="px-3 py-2 border rounded text-xs" />
-                                  <input type="text" value={editForm.postal_code || ''} onChange={(e) => setEditForm(f => ({ ...f, postal_code: e.target.value.replace(/\D/g, '') }))} placeholder={t('checkout.shipping.postalPlaceholder')} className="px-3 py-2 border rounded text-xs" />
+                    {/* Saved addresses quick pick */}
+                    {savedAddresses.length > 0 && (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-sm text-industrial-gray font-medium">{t('checkout.saved.title')}</div>
+                          <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => { setAddressPickTarget('shipping'); setShowAddressModal(true) }}>
+                            {t('checkout.saved.seeAll')}
+                          </button>
+                        </div>
+                        <div className="flex gap-3 overflow-x-auto no-scrollbar">
+                          {savedAddresses.map((a) => (
+                            <div key={a.id} className="min-w-[260px] border rounded-lg p-3 bg-white/90">
+                              <div className="flex items-center justify-between">
+                                <div className="text-sm text-industrial-gray font-medium">
+                                  {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
                                 </div>
-                                <div className="flex items-center gap-4">
-                                  <label className="flex items-center gap-2 text-[11px]">
-                                    <input type="checkbox" checked={!!editForm.is_default_shipping} onChange={(e) => setEditForm(f => ({ ...f, is_default_shipping: e.target.checked }))} />
-                                    {t('checkout.saved.defaultShipping')}
-                                  </label>
-                                  <label className="flex items-center gap-2 text-[11px]">
-                                    <input type="checkbox" checked={!!editForm.is_default_billing} onChange={(e) => setEditForm(f => ({ ...f, is_default_billing: e.target.checked }))} />
-                                    {t('checkout.saved.defaultBilling')}
-                                  </label>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <button type="button" disabled={savingEdit} className="text-[12px] px-3 py-1.5 rounded bg-primary-navy text-white disabled:opacity-60" onClick={async () => {
+                                <div className="flex items-center gap-2 ml-2">
+                                  <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50" onClick={() => {
+                                    setEditingAddressId(a.id)
+                                    setEditForm({
+                                      label: a.label || '',
+                                      full_name: a.full_name || '',
+                                      phone: a.phone || '',
+                                      full_address: a.full_address || '',
+                                      city: a.city || '',
+                                      district: a.district || '',
+                                      postal_code: a.postal_code || '',
+                                      is_default_shipping: a.is_default_shipping,
+                                      is_default_billing: a.is_default_billing,
+                                    })
+                                  }}>
+                                    {t('checkout.saved.edit')}
+                                  </button>
+                                  <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50 text-red-600" onClick={async () => {
+                                    if (!confirm(t('checkout.saved.confirmDelete'))) return
                                     try {
-                                      setSavingEdit(true)
-                                      await updateAddress(a.id, {
-                                        label: editForm.label,
-                                        full_name: editForm.full_name,
-                                        phone: editForm.phone,
-                                        full_address: editForm.full_address,
-                                        city: editForm.city,
-                                        district: editForm.district,
-                                        postal_code: editForm.postal_code,
-                                        is_default_shipping: editForm.is_default_shipping,
-                                        is_default_billing: editForm.is_default_billing,
-                                      })
-                                      toast.success(t('checkout.saved.updated'))
+                                      await deleteAddress(a.id)
+                                      toast.success(t('checkout.saved.deleted'))
                                       const rows = await listAddresses(); setSavedAddresses(rows)
-                                      setEditingAddressId(null)
                                     } catch (e) {
                                       console.error(e)
-                                      toast.error(t('checkout.saved.updateError'))
-                                    } finally { setSavingEdit(false) }
+                                      toast.error(t('checkout.saved.deleteError'))
+                                    }
                                   }}>
-                                    {t('checkout.saved.save')}
-                                  </button>
-                                  <button type="button" className="text-[12px] px-3 py-1.5 rounded border" onClick={() => setEditingAddressId(null)}>
-                                    {t('checkout.saved.cancel')}
+                                    {t('checkout.saved.delete')}
                                   </button>
                                 </div>
                               </div>
-                            ) : (
-                              <div className="mt-2">
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50"
-                                  onClick={() => setShippingAddress({ fullAddress: a.full_address || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' })}
-                                >
-                                  {t('checkout.saved.use')}
-                                </button>
-                                <Link to="/account/addresses" className="text-xs text-primary-navy hover:underline">
-                                  {t('checkout.saved.manage')}
-                                </Link>
+                              <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
+                                {a.full_address}
                               </div>
+                              {editingAddressId === a.id ? (
+                                <div className="mt-2 border-t pt-2 space-y-2">
+                                  <input type="text" value={editForm.label || ''} onChange={(e) => setEditForm(f => ({ ...f, label: e.target.value }))} placeholder={t('checkout.saved.address')} className="w-full px-3 py-2 border rounded text-xs" />
+                                  <textarea value={editForm.full_address} onChange={(e) => setEditForm(f => ({ ...f, full_address: e.target.value }))} placeholder={t('checkout.shipping.addressPlaceholder')} className="w-full px-3 py-2 border rounded text-xs min-h-20" />
+                                  <div className="grid grid-cols-3 gap-2">
+                                    <input type="text" value={editForm.city} onChange={(e) => setEditForm(f => ({ ...f, city: e.target.value }))} placeholder={t('checkout.shipping.cityPlaceholder')} className="px-3 py-2 border rounded text-xs" />
+                                    <input type="text" value={editForm.district} onChange={(e) => setEditForm(f => ({ ...f, district: e.target.value }))} placeholder={t('checkout.shipping.districtPlaceholder')} className="px-3 py-2 border rounded text-xs" />
+                                    <input type="text" value={editForm.postal_code || ''} onChange={(e) => setEditForm(f => ({ ...f, postal_code: e.target.value.replace(/\D/g, '') }))} placeholder={t('checkout.shipping.postalPlaceholder')} className="px-3 py-2 border rounded text-xs" />
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                      <input type="checkbox" checked={!!editForm.is_default_shipping} onChange={(e) => setEditForm(f => ({ ...f, is_default_shipping: e.target.checked }))} />
+                                      {t('checkout.saved.defaultShipping')}
+                                    </label>
+                                    <label className="flex items-center gap-2 text-[11px]">
+                                      <input type="checkbox" checked={!!editForm.is_default_billing} onChange={(e) => setEditForm(f => ({ ...f, is_default_billing: e.target.checked }))} />
+                                      {t('checkout.saved.defaultBilling')}
+                                    </label>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <button type="button" disabled={savingEdit} className="text-[12px] px-3 py-1.5 rounded bg-primary-navy text-white disabled:opacity-60" onClick={async () => {
+                                      try {
+                                        setSavingEdit(true)
+                                        await updateAddress(a.id, {
+                                          label: editForm.label,
+                                          full_name: editForm.full_name,
+                                          phone: editForm.phone,
+                                          full_address: editForm.full_address,
+                                          city: editForm.city,
+                                          district: editForm.district,
+                                          postal_code: editForm.postal_code,
+                                          is_default_shipping: editForm.is_default_shipping,
+                                          is_default_billing: editForm.is_default_billing,
+                                        })
+                                        toast.success(t('checkout.saved.updated'))
+                                        const rows = await listAddresses(); setSavedAddresses(rows)
+                                        setEditingAddressId(null)
+                                      } catch (e) {
+                                        console.error(e)
+                                        toast.error(t('checkout.saved.updateError'))
+                                      } finally { setSavingEdit(false) }
+                                    }}>
+                                      {t('checkout.saved.save')}
+                                    </button>
+                                    <button type="button" className="text-[12px] px-3 py-1.5 rounded border" onClick={() => setEditingAddressId(null)}>
+                                      {t('checkout.saved.cancel')}
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50"
+                                      onClick={() => setShippingAddress({ fullAddress: a.full_address || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' })}
+                                    >
+                                      {t('checkout.saved.use')}
+                                    </button>
+                                    <Link to="/account/addresses" className="text-xs text-primary-navy hover:underline">
+                                      {t('checkout.saved.manage')}
+                                    </Link>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            )}
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-industrial-gray mb-2">
                           {t('checkout.shipping.addressLabel')}
                         </label>
                         <textarea
                           value={shippingAddress.fullAddress}
-                          onChange={(e) => setShippingAddress({...shippingAddress, fullAddress: e.target.value})}
+                          onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           rows={3}
                           placeholder={t('checkout.shipping.addressPlaceholder')}
@@ -1195,7 +1194,7 @@ export const CheckoutPage: React.FC = () => {
                         <input
                           type="text"
                           value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                          onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           placeholder={t('checkout.shipping.cityPlaceholder')}
                         />
@@ -1207,7 +1206,7 @@ export const CheckoutPage: React.FC = () => {
                         <input
                           type="text"
                           value={shippingAddress.district}
-                          onChange={(e) => setShippingAddress({...shippingAddress, district: e.target.value})}
+                          onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           placeholder={t('checkout.shipping.districtPlaceholder')}
                         />
@@ -1222,7 +1221,7 @@ export const CheckoutPage: React.FC = () => {
                           value={shippingAddress.postalCode}
                           onChange={(e) => {
                             const v = e.target.value.replace(/\D/g, '').slice(0, 10)
-                            setShippingAddress({...shippingAddress, postalCode: v})
+                            setShippingAddress({ ...shippingAddress, postalCode: v })
                           }}
                           className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                           placeholder={t('checkout.shipping.postalPlaceholder')}
@@ -1263,7 +1262,7 @@ export const CheckoutPage: React.FC = () => {
                           </label>
                           <textarea
                             value={billingAddress.fullAddress}
-                            onChange={(e) => setBillingAddress({...billingAddress, fullAddress: e.target.value})}
+                            onChange={(e) => setBillingAddress({ ...billingAddress, fullAddress: e.target.value })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             rows={3}
                             placeholder={t('checkout.billing.addressPlaceholder')}
@@ -1276,7 +1275,7 @@ export const CheckoutPage: React.FC = () => {
                           <input
                             type="text"
                             value={billingAddress.city}
-                            onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
+                            onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             placeholder={t('checkout.billing.cityPlaceholder')}
                           />
@@ -1288,7 +1287,7 @@ export const CheckoutPage: React.FC = () => {
                           <input
                             type="text"
                             value={billingAddress.district}
-                            onChange={(e) => setBillingAddress({...billingAddress, district: e.target.value})}
+                            onChange={(e) => setBillingAddress({ ...billingAddress, district: e.target.value })}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             placeholder={t('checkout.billing.districtPlaceholder')}
                           />
@@ -1303,7 +1302,7 @@ export const CheckoutPage: React.FC = () => {
                             value={billingAddress.postalCode}
                             onChange={(e) => {
                               const v = e.target.value.replace(/\D/g, '').slice(0, 10)
-                              setBillingAddress({...billingAddress, postalCode: v})
+                              setBillingAddress({ ...billingAddress, postalCode: v })
                             }}
                             className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
                             placeholder={t('checkout.billing.postalPlaceholder')}
@@ -1317,7 +1316,7 @@ export const CheckoutPage: React.FC = () => {
                   <div className="mt-10">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-industrial-gray">{t('checkout.invoice.title')}</h3>
-                      <button type="button" className="text-xs text-primary-navy hover:underline" onClick={async () => { try { const rows = await listInvoiceProfiles(); setSavedInvoiceProfiles(rows) } catch {} finally { setShowInvoiceModal(true) } }}>
+                      <button type="button" className="text-xs text-primary-navy hover:underline" onClick={async () => { try { const rows = await listInvoiceProfiles(); setSavedInvoiceProfiles(rows) } catch { } finally { setShowInvoiceModal(true) } }}>
                         {t('checkout.saved.seeAll')}
                       </button>
                     </div>
@@ -1594,24 +1593,24 @@ export const CheckoutPage: React.FC = () => {
                   <input
                     type="text"
                     value={couponCode}
-                    onChange={(e)=>setCouponCode(e.target.value)}
+                    onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="Kupon kodu"
                     className="flex-1 border border-light-gray rounded px-3 py-2 text-sm"
                   />
                   <button
                     type="button"
                     className="px-3 py-2 rounded bg-primary-navy text-white text-sm"
-                    onClick={async ()=>{
+                    onClick={async () => {
                       const code = couponCode.trim();
                       if (code.length < 3) { toast.error('Kupon kodu geçersiz'); return }
                       try {
-                        const base = ((import.meta as unknown as { env?: Record<string,string> }).env?.VITE_SUPABASE_URL) || ''
+                        const base = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL) || ''
                         const resp = await fetch(`${base}/functions/v1/apply-coupon`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ code, subtotal: totalAmount })
                         });
-                        const json = await resp.json().catch(()=>({}));
+                        const json = await resp.json().catch(() => ({}));
                         if (!resp.ok || !json?.valid) {
                           toast.error('Kupon uygulanamadı');
                           setCouponApplied(null)
@@ -1625,7 +1624,7 @@ export const CheckoutPage: React.FC = () => {
                     }}
                   >Uygula</button>
                   {couponApplied ? (
-                    <button type="button" className="px-3 py-2 rounded border text-sm" onClick={()=>{ setCouponApplied(null); setCouponCode(''); }}>Kaldır</button>
+                    <button type="button" className="px-3 py-2 rounded border text-sm" onClick={() => { setCouponApplied(null); setCouponCode(''); }}>Kaldır</button>
                   ) : null}
                 </div>
                 <hr className="border-light-gray" />

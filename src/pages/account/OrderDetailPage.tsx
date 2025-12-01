@@ -9,7 +9,7 @@ import { Package, Calendar, CreditCard, ArrowLeft, Link as LinkIcon, Copy, Refre
 import toast from 'react-hot-toast'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { useCart } from '../../hooks/useCart'
+import { useCart } from '../../hooks/useCartHook'
 
 interface ShippingAddress {
   fullAddress?: string
@@ -103,7 +103,7 @@ export default function OrderDetailPage() {
 
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'overview'|'items'|'shipping'|'invoice'>('overview')
+  const [tab, setTab] = useState<'overview' | 'items' | 'shipping' | 'invoice'>('overview')
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -117,7 +117,7 @@ export default function OrderDetailPage() {
     async function load() {
       try {
         setLoading(true)
-const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+        const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
         const baseRes = await supabase
           .from('venthub_orders')
           .select(baseSelect)
@@ -132,7 +132,7 @@ const baseSelect = 'id, total_amount, status, payment_status, created_at, custom
           data = baseRes.data as unknown as SupabaseOrderData
         } else if (((baseRes.error as SupabaseError).code === '42703') || ((baseRes.error as SupabaseError).status === 400)) {
           // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
-const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
+          const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
           const fb = await supabase
             .from('venthub_orders')
             .select(fallbackSelect)
@@ -174,45 +174,45 @@ const fallbackSelect = 'id, total_amount, status, created_at, customer_name, cus
                 product_image_url: r.product_image_url,
               })) as unknown as SupabaseOrderItem[]
             }
-          } catch {}
+          } catch { }
         }
-        
-const mapped: Order = {
-  id: orderDataWithDefaults.id,
-  total_amount: Number(orderDataWithDefaults.total_amount) || 0,
-  status: orderDataWithDefaults.status || 'pending',
-  payment_status: orderDataWithDefaults.payment_status || undefined,
-  created_at: orderDataWithDefaults.created_at,
-  customer_name: orderDataWithDefaults.customer_name,
-  customer_email: orderDataWithDefaults.customer_email,
-  shipping_address: orderDataWithDefaults.shipping_address,
-  order_items: (itemsData || []).map((it: SupabaseOrderItem) => {
-    const unit = Number(it.price_at_time) || 0
-    const total = unit * Number(it.quantity || 0)
-    return {
-      id: it.id,
-      product_id: it.product_id ?? undefined,
-      product_name: it.product_name,
-      quantity: it.quantity,
-      unit_price: unit,
-      total_price: total,
-      product_image_url: it.product_image_url,
-    }
-  }),
-  order_number: orderDataWithDefaults.order_number || undefined,
-  is_demo: false,
-  payment_data: undefined,
-  conversation_id: orderDataWithDefaults.conversation_id || undefined,
-  carrier: orderDataWithDefaults.carrier || undefined,
-  tracking_number: orderDataWithDefaults.tracking_number || undefined,
-  tracking_url: orderDataWithDefaults.tracking_url || undefined,
-  shipped_at: orderDataWithDefaults.shipped_at || undefined,
-  delivered_at: orderDataWithDefaults.delivered_at || undefined,
-  shipping_method: (orderDataWithDefaults.shipping_method || undefined) as string | undefined,
-  invoice_type: orderDataWithDefaults.invoice_type || undefined,
-  invoice_info: orderDataWithDefaults.invoice_info || undefined,
-  legal_consents: orderDataWithDefaults.legal_consents || undefined,
-}
+
+        const mapped: Order = {
+          id: orderDataWithDefaults.id,
+          total_amount: Number(orderDataWithDefaults.total_amount) || 0,
+          status: orderDataWithDefaults.status || 'pending',
+          payment_status: orderDataWithDefaults.payment_status || undefined,
+          created_at: orderDataWithDefaults.created_at,
+          customer_name: orderDataWithDefaults.customer_name,
+          customer_email: orderDataWithDefaults.customer_email,
+          shipping_address: orderDataWithDefaults.shipping_address,
+          order_items: (itemsData || []).map((it: SupabaseOrderItem) => {
+            const unit = Number(it.price_at_time) || 0
+            const total = unit * Number(it.quantity || 0)
+            return {
+              id: it.id,
+              product_id: it.product_id ?? undefined,
+              product_name: it.product_name,
+              quantity: it.quantity,
+              unit_price: unit,
+              total_price: total,
+              product_image_url: it.product_image_url,
+            }
+          }),
+          order_number: orderDataWithDefaults.order_number || undefined,
+          is_demo: false,
+          payment_data: undefined,
+          conversation_id: orderDataWithDefaults.conversation_id || undefined,
+          carrier: orderDataWithDefaults.carrier || undefined,
+          tracking_number: orderDataWithDefaults.tracking_number || undefined,
+          tracking_url: orderDataWithDefaults.tracking_url || undefined,
+          shipped_at: orderDataWithDefaults.shipped_at || undefined,
+          delivered_at: orderDataWithDefaults.delivered_at || undefined,
+          shipping_method: (orderDataWithDefaults.shipping_method || undefined) as string | undefined,
+          invoice_type: orderDataWithDefaults.invoice_type || undefined,
+          invoice_info: orderDataWithDefaults.invoice_info || undefined,
+          legal_consents: orderDataWithDefaults.legal_consents || undefined,
+        }
         setOrder(mapped)
       } catch (e) {
         console.error('Order load error', e)
@@ -234,24 +234,24 @@ const mapped: Order = {
   const handleInvoicePdf = (o: Order) => {
     try {
       const doc = new jsPDF({ unit: 'pt', format: 'a4' })
-      const nf = new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US',{style:'currency',currency:'TRY'})
+      const nf = new Intl.NumberFormat(lang === 'tr' ? 'tr-TR' : 'en-US', { style: 'currency', currency: 'TRY' })
       const orderNo = o.order_number ? o.order_number.split('-')[1] : o.id.slice(-8).toUpperCase()
-      doc.setFont('helvetica','bold'); doc.setFontSize(16)
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16)
       doc.text('PROFORMA', 40, 40)
-      doc.setFont('helvetica','normal'); doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10)
       doc.text(`Proforma No: ${orderNo}`, 40, 58)
       doc.text(`Tarih: ${formatDateTime(o.created_at, lang)}`, 40, 72)
-      doc.setFont('helvetica','bold'); doc.text('Müşteri', 350, 40)
-      doc.setFont('helvetica','normal')
+      doc.setFont('helvetica', 'bold'); doc.text('Müşteri', 350, 40)
+      doc.setFont('helvetica', 'normal')
       doc.text(`${o.customer_name}`, 350, 58)
       if (o.customer_email) doc.text(`${o.customer_email}`, 350, 72)
       const head = [[t('orders.productCol'), t('orders.qtyCol'), t('orders.unitPriceCol'), t('orders.totalCol')]]
       const body = (o.order_items || []).map(it => [it.product_name || '-', String(it.quantity ?? 0), nf.format(Number(it.unit_price) || 0), nf.format(Number(it.total_price) || 0)])
-      autoTable(doc, { startY: 100, head, body, styles: { font: 'helvetica', fontSize: 10 }, headStyles: { fillColor: [245,247,250], textColor: 20 }, columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } } })
+      autoTable(doc, { startY: 100, head, body, styles: { font: 'helvetica', fontSize: 10 }, headStyles: { fillColor: [245, 247, 250], textColor: 20 }, columnStyles: { 1: { halign: 'center' }, 2: { halign: 'right' }, 3: { halign: 'right' } } })
       const after = (doc as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY || 100
-      doc.setFont('helvetica','bold'); doc.setFontSize(12)
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12)
       doc.text(`${t('orders.grandTotal')}: ${nf.format(o.total_amount)}`, 40, after + 24)
-      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(100)
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100)
       doc.text('Bu belge resmî fatura değildir; bilgilendirme amaçlıdır.', 40, after + 42)
       doc.save(`Proforma-${orderNo}.pdf`)
     } catch (e) {
@@ -262,27 +262,27 @@ const mapped: Order = {
 
   const handleReorder = async (o: Order) => {
     try {
-      const ids = Array.from(new Set((o.order_items||[]).map(it=>it.product_id).filter(Boolean))) as string[]
-      const names = Array.from(new Set((o.order_items||[]).filter(it=>!it.product_id && it.product_name).map(it=>it.product_name)))
+      const ids = Array.from(new Set((o.order_items || []).map(it => it.product_id).filter(Boolean))) as string[]
+      const names = Array.from(new Set((o.order_items || []).filter(it => !it.product_id && it.product_name).map(it => it.product_name)))
       const productMap: Record<string, Product> = {}
       if (ids.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('id', ids)
         if (error) throw error
-        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.id] = p })
+          ; ((data || []) as Product[]).forEach((p) => { productMap[p.id] = p })
       }
       if (names.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('name', names)
         if (error) throw error
-        ;((data || []) as Product[]).forEach((p)=>{ productMap[p.name] = p })
+          ; ((data || []) as Product[]).forEach((p) => { productMap[p.name] = p })
       }
       let added = 0
-      for (const it of o.order_items||[]) {
+      for (const it of o.order_items || []) {
         let prod: Product | undefined
         if (it.product_id) prod = productMap[it.product_id]
         if (!prod) prod = productMap[it.product_name]
         if (prod) { addToCart({ ...prod, price: String(prod.price) }, it.quantity); added += it.quantity }
       }
-      if (added>0) { toast.success(t('orders.reorderedToast', { count: added })); navigate('/cart') } else { toast.error(t('orders.reorderNotFound')) }
+      if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); navigate('/cart') } else { toast.error(t('orders.reorderNotFound')) }
     } catch (e) { console.error(e); toast.error(t('orders.reorderError')) }
   }
 
@@ -323,7 +323,7 @@ const mapped: Order = {
       default: return status
     }
   }
-  const steps = ['pending','paid','shipped','delivered'] as const
+  const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
   // Normalize 'confirmed' status to 'paid' for progress bar
   const normalizedStatus = (order.status || 'pending').toLowerCase() === 'confirmed' ? 'paid' : (order.status || 'pending').toLowerCase()
   const activeIdx = Math.max(steps.indexOf(normalizedStatus as typeof steps[number]), 0)
@@ -331,7 +331,7 @@ const mapped: Order = {
   return (
     <div className="min-h-screen bg-clean-white py-8">
       <div className="max-w-5xl mx-auto px-4">
-        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={()=>navigate('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
+        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => navigate('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
 
         <div className="bg-white rounded-lg shadow-hvac-md p-6 mb-6">
           <div className="flex items-center justify-between">
@@ -350,8 +350,8 @@ const mapped: Order = {
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={()=>navigate(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
-              <button onClick={()=>handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14}/>{t('orders.reorder')}</button>
+              <button onClick={() => navigate(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
+              <button onClick={() => handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14} />{t('orders.reorder')}</button>
             </div>
           </div>
           {/* Compact stepper */}
@@ -360,11 +360,11 @@ const mapped: Order = {
               {steps.map((s, idx) => (
                 <React.Fragment key={s}>
                   <div className="flex flex-col items-center min-w-[60px]">
-                    <div className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center ${idx <= activeIdx ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx+1}</div>
+                    <div className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center ${idx <= activeIdx ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx + 1}</div>
                     <span className="mt-1 text-[10px] text-steel-gray">{getStatusText(s)}</span>
                   </div>
-                  {idx < steps.length-1 && (
-                    <div className={`flex-1 h-0.5 ${activeIdx >= idx+1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
+                  {idx < steps.length - 1 && (
+                    <div className={`flex-1 h-0.5 ${activeIdx >= idx + 1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
                   )}
                 </React.Fragment>
               ))}
@@ -375,18 +375,18 @@ const mapped: Order = {
         <div className="bg-white rounded-lg shadow-hvac-md p-6">
           <div className="border-b border-light-gray mb-4">
             <nav className="flex flex-wrap gap-2">
-              {(['overview','items','shipping','invoice'] as const).map(tt => (
-                <button key={tt} onClick={()=>setTab(tt)} className={`px-3 py-2 text-sm rounded-t ${tab===tt ? 'bg-white border border-light-gray border-b-transparent text-primary-navy' : 'text-steel-gray hover:text-primary-navy'}`}>
-                  {tt==='overview' && (t('orders.tabs.overview') || 'Özet')}
-                  {tt==='items' && (t('orders.tabs.items') || 'Ürünler')}
-                  {tt==='shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
-                  {tt==='invoice' && (t('orders.tabs.invoice') || 'Fatura')}
+              {(['overview', 'items', 'shipping', 'invoice'] as const).map(tt => (
+                <button key={tt} onClick={() => setTab(tt)} className={`px-3 py-2 text-sm rounded-t ${tab === tt ? 'bg-white border border-light-gray border-b-transparent text-primary-navy' : 'text-steel-gray hover:text-primary-navy'}`}>
+                  {tt === 'overview' && (t('orders.tabs.overview') || 'Özet')}
+                  {tt === 'items' && (t('orders.tabs.items') || 'Ürünler')}
+                  {tt === 'shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
+                  {tt === 'invoice' && (t('orders.tabs.invoice') || 'Fatura')}
                 </button>
               ))}
             </nav>
           </div>
 
-          {tab==='overview' && (
+          {tab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <div>
                 <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
@@ -439,7 +439,7 @@ const mapped: Order = {
             </div>
           )}
 
-          {tab==='items' && (
+          {tab === 'items' && (
             <div>
               <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
               <div className="bg-white rounded-lg overflow-hidden">
@@ -458,7 +458,7 @@ const mapped: Order = {
                       <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-air-blue/5'}>
                         <td className="p-4 text-sm text-industrial-gray">{item.product_name}</td>
                         <td className="p-4 text-sm">
-                          { item.product_image_url ? (
+                          {item.product_image_url ? (
                             <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded" />
                           ) : (
                             <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">{t('orders.noImage')}</div>
@@ -481,7 +481,7 @@ const mapped: Order = {
             </div>
           )}
 
-          {tab==='shipping' && (
+          {tab === 'shipping' && (
             <div className="space-y-6">
 
               {/* Mevcut Kargo Bilgileri */}
@@ -499,14 +499,14 @@ const mapped: Order = {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
                     {order.tracking_number && (
-                      <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline"><Copy size={12}/>{t('orders.copy')}</button>
+                      <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline"><Copy size={12} />{t('orders.copy')}</button>
                     )}
                   </div>
                 </div>
                 <div>
                   <div className="text-steel-gray">{t('orders.trackingLink')}</div>
                   {order.tracking_url ? (
-                    <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14}/>{t('orders.openLink')}</a>
+                    <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14} />{t('orders.openLink')}</a>
                   ) : (
                     <div className="text-industrial-gray">-</div>
                   )}
@@ -523,7 +523,7 @@ const mapped: Order = {
             </div>
           )}
 
-          {tab==='invoice' && (
+          {tab === 'invoice' && (
             <div className="space-y-4">
               <h4 className="font-semibold text-industrial-gray">{t('orders.tabs.invoice')}</h4>
 

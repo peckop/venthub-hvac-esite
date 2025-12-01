@@ -1,7 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
-import { CartProvider } from './hooks/useCart'
+import { CartProvider } from './contexts/CartProvider'
 import { AuthProvider } from './contexts/AuthContext'
 import { useScrollThrottle } from './hooks/useScrollThrottle'
 import StickyHeader from './components/StickyHeader'
@@ -153,16 +153,16 @@ function AppShell() {
         window.removeEventListener('pointerdown', enable)
         window.removeEventListener('touchstart', enable)
       }
-    } catch {}
+    } catch { }
   }, [enableWhatsApp])
 
   return (
     <div className="min-h-screen bg-white">
       {/* Scroll to top component - her sayfa geçişinde otomatik scroll */}
       <ScrollToTop />
-      
+
       <StickyHeader isScrolled={isScrolled} />
-      
+
       <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
         <BackToTopButton />
         {(() => {
@@ -171,84 +171,84 @@ function AppShell() {
         <LanguageSwitcher />
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
-                <Route path="/category/:slug" element={<CategoryPage />} />
-                <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
-                <Route path="/brands" element={<BrandsPage />} />
-                <Route path="/brands/:slug" element={<BrandDetailPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/category/:slug" element={<CategoryPage />} />
+            <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
+            <Route path="/brands" element={<BrandsPage />} />
+            <Route path="/brands/:slug" element={<BrandDetailPage />} />
 
-                {/* Corporate */}
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboardPage />} />
-                  <Route path="inventory" element={<AdminInventoryPage />} />
-                  <Route path="inventory/settings" element={<AdminInventorySettingsPage />} />
-                  <Route path="movements" element={<AdminMovementsPage />} />
-                  <Route path="orders" element={<AdminOrdersPage />} />
-                  <Route path="logs" element={<AdminAuditLogPage />} />
-                  <Route path="errors" element={<AdminErrorsPage />} />
-                  <Route path="error-groups" element={<AdminErrorGroupsPage />} />
-                  <Route path="products" element={<AdminProductsPage />} />
-                  <Route path="categories" element={<AdminCategoriesPage />} />
-                  {/* Geçici: mevcut admin sayfalarına geçiş */}
-                  <Route path="returns" element={<AdminReturnsPage />} />
-                  <Route path="webhook-events" element={<AdminWebhookEventsPage />} />
-                  <Route path="coupons" element={<AdminCouponsPage />} />
-                  <Route path="users" element={<AdminUsersPage />} />
-                </Route>
+            {/* Corporate */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
 
-                {/* Account Routes */}
-                <Route path="/account" element={<AccountLayout />}>
-                  <Route index element={<AccountOverviewPage />} />
-                  <Route path="orders" element={<OrdersPage />} />
-                  <Route path="orders/:id" element={<OrderDetailPage />} />
-                  <Route path="shipments" element={<AccountShipmentsPage />} />
-                  <Route path="addresses" element={<AccountAddressesPage />} />
-                  <Route path="invoices" element={<AccountInvoicesPage />} />
-                  <Route path="returns" element={<AccountReturnsPage />} />
-                  <Route path="profile" element={<AccountProfilePage />} />
-                  <Route path="security" element={<AccountSecurityPage />} />
-                  {/* Admin operations routes kaldırıldı */}
-                </Route>
-                
-                {/* Auth Routes */}
-                <Route path="/auth/login" element={<LoginPage />} />
-                <Route path="/auth/register" element={<RegisterPage />} />
-                <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/auth/callback" element={<AuthCallbackPage />} />
-                <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="inventory" element={<AdminInventoryPage />} />
+              <Route path="inventory/settings" element={<AdminInventorySettingsPage />} />
+              <Route path="movements" element={<AdminMovementsPage />} />
+              <Route path="orders" element={<AdminOrdersPage />} />
+              <Route path="logs" element={<AdminAuditLogPage />} />
+              <Route path="errors" element={<AdminErrorsPage />} />
+              <Route path="error-groups" element={<AdminErrorGroupsPage />} />
+              <Route path="products" element={<AdminProductsPage />} />
+              <Route path="categories" element={<AdminCategoriesPage />} />
+              {/* Geçici: mevcut admin sayfalarına geçiş */}
+              <Route path="returns" element={<AdminReturnsPage />} />
+              <Route path="webhook-events" element={<AdminWebhookEventsPage />} />
+              <Route path="coupons" element={<AdminCouponsPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+            </Route>
 
-                {/* Knowledge Routes */}
-                <Route path="/destek/merkez" element={<KnowledgeHubPage />} />
-                <Route path="/destek/konular/:slug" element={<KnowledgeTopicPage />} />
+            {/* Account Routes */}
+            <Route path="/account" element={<AccountLayout />}>
+              <Route index element={<AccountOverviewPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="orders/:id" element={<OrderDetailPage />} />
+              <Route path="shipments" element={<AccountShipmentsPage />} />
+              <Route path="addresses" element={<AccountAddressesPage />} />
+              <Route path="invoices" element={<AccountInvoicesPage />} />
+              <Route path="returns" element={<AccountReturnsPage />} />
+              <Route path="profile" element={<AccountProfilePage />} />
+              <Route path="security" element={<AccountSecurityPage />} />
+              {/* Admin operations routes kaldırıldı */}
+            </Route>
 
-                {/* Calculators (v1) */}
-                <Route path="/destek/hesaplayicilar/hrv" element={<HRVCalcPage />} />
-                <Route path="/destek/hesaplayicilar/hava-perdesi" element={<AirCurtainCalcPage />} />
-                <Route path="/destek/hesaplayicilar/jet-fan" element={<JetFanCalcPage />} />
-                <Route path="/destek/hesaplayicilar/kanal" element={<DuctCalcPage />} />
+            {/* Auth Routes */}
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/register" element={<RegisterPage />} />
+            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
 
-                {/* Support Routes */}
-                <Route path="/support" element={<SupportHomePage />} />
-                <Route path="/support/sss" element={<FAQPage />} />
-                <Route path="/support/iade-degisim" element={<ReturnsPage />} />
-                <Route path="/support/teslimat-kargo" element={<ShippingPage />} />
-                <Route path="/support/garanti-servis" element={<WarrantyPage />} />
-                
-                {/* Legal Routes */}
-                <Route path="/legal/kvkk" element={<KVKKPage />} />
-                <Route path="/legal/mesafeli-satis-sozlesmesi" element={<DistanceSalesAgreementPage />} />
-                <Route path="/legal/on-bilgilendirme-formu" element={<PreInformationPage />} />
-                <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
-                <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
-                <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
+            {/* Knowledge Routes */}
+            <Route path="/destek/merkez" element={<KnowledgeHubPage />} />
+            <Route path="/destek/konular/:slug" element={<KnowledgeTopicPage />} />
+
+            {/* Calculators (v1) */}
+            <Route path="/destek/hesaplayicilar/hrv" element={<HRVCalcPage />} />
+            <Route path="/destek/hesaplayicilar/hava-perdesi" element={<AirCurtainCalcPage />} />
+            <Route path="/destek/hesaplayicilar/jet-fan" element={<JetFanCalcPage />} />
+            <Route path="/destek/hesaplayicilar/kanal" element={<DuctCalcPage />} />
+
+            {/* Support Routes */}
+            <Route path="/support" element={<SupportHomePage />} />
+            <Route path="/support/sss" element={<FAQPage />} />
+            <Route path="/support/iade-degisim" element={<ReturnsPage />} />
+            <Route path="/support/teslimat-kargo" element={<ShippingPage />} />
+            <Route path="/support/garanti-servis" element={<WarrantyPage />} />
+
+            {/* Legal Routes */}
+            <Route path="/legal/kvkk" element={<KVKKPage />} />
+            <Route path="/legal/mesafeli-satis-sozlesmesi" element={<DistanceSalesAgreementPage />} />
+            <Route path="/legal/on-bilgilendirme-formu" element={<PreInformationPage />} />
+            <Route path="/legal/cerez-politikasi" element={<CookiePolicyPage />} />
+            <Route path="/legal/gizlilik-politikasi" element={<PrivacyPolicyPage />} />
+            <Route path="/legal/kullanim-kosullari" element={<TermsOfUsePage />} />
           </Routes>
         </Suspense>
       </main>
@@ -266,14 +266,14 @@ function AppShell() {
           <WhatsAppFloat />
         </Suspense>
       )}
-      
+
       {/* Global cart toast (ilk etkileşim sonrası) */}
       {enableToaster && (
         <Suspense fallback={null}>
           <AddToCartToast />
         </Suspense>
       )}
-      
+
       {/* Toast Container (deferred to idle) */}
       {enableToaster && (
         <Suspense fallback={null}>

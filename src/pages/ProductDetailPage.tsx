@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
-import { useCart } from '../hooks/useCart'
+import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
 import Seo from '../components/Seo'
@@ -11,12 +11,12 @@ import { formatCurrency } from '../i18n/format'
 import LeadModal from '../components/LeadModal'
 import legalConfig from '../config/legal'
 import { getStockInquiryLink } from '../utils/whatsapp'
-import { 
-  ArrowLeft, 
-  ShoppingCart, 
-  Heart, 
-  Share2, 
-  Check, 
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Check,
   Truck,
   Shield,
   Phone,
@@ -52,11 +52,11 @@ export const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     async function fetchProduct() {
       if (!id) return
-      
+
       try {
         setLoading(true)
         const productData = await getProductById(id)
-        
+
         if (!productData) {
           setProduct(null)
           return
@@ -74,7 +74,7 @@ export const ProductDetailPage: React.FC = () => {
           const list = (imgs || []) as { path: string; alt?: string | null }[]
           setImages(list)
           setActiveIdx(0)
-        } catch {}
+        } catch { }
 
         // Fetch categories for breadcrumb
         const cats = await getCategories()
@@ -109,7 +109,7 @@ export const ProductDetailPage: React.FC = () => {
       if (navTriggerRef.current) {
         const triggerTop = navTriggerRef.current.offsetTop
         const scrollY = window.scrollY
-        
+
         // Nav becomes sticky when we scroll past the trigger point
         setIsNavSticky(scrollY > triggerTop)
       }
@@ -290,23 +290,23 @@ export const ProductDetailPage: React.FC = () => {
             <div
               className="relative aspect-square bg-white rounded-xl flex items-center justify-center mb-4 overflow-hidden"
               role="group"
-              aria-label={`Görsel ${Math.min(activeIdx+1, images.length)} / ${images.length}`}
+              aria-label={`Görsel ${Math.min(activeIdx + 1, images.length)} / ${images.length}`}
               tabIndex={0}
-              onKeyDown={(e)=>{
-                if (e.key === 'ArrowLeft') setActiveIdx(i=> (i-1+images.length)%images.length)
-                if (e.key === 'ArrowRight') setActiveIdx(i=> (i+1)%images.length)
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') setActiveIdx(i => (i - 1 + images.length) % images.length)
+                if (e.key === 'ArrowRight') setActiveIdx(i => (i + 1) % images.length)
               }}
-              onTouchStart={(e: React.TouchEvent<HTMLDivElement>)=>{
+              onTouchStart={(e: React.TouchEvent<HTMLDivElement>) => {
                 (e.currentTarget as unknown as { _ts?: number })._ts = e.changedTouches[0].clientX
               }}
-              onTouchEnd={(e: React.TouchEvent<HTMLDivElement>)=>{
+              onTouchEnd={(e: React.TouchEvent<HTMLDivElement>) => {
                 const tsHolder = e.currentTarget as unknown as { _ts?: number }
                 const startX = tsHolder._ts
                 if (typeof startX !== 'number') return
                 const dx = e.changedTouches[0].clientX - startX
                 const TH = 30
-                if (dx > TH) setActiveIdx(i=> (i-1+images.length)%images.length)
-                if (dx < -TH) setActiveIdx(i=> (i+1)%images.length)
+                if (dx > TH) setActiveIdx(i => (i - 1 + images.length) % images.length)
+                if (dx < -TH) setActiveIdx(i => (i + 1) % images.length)
                 tsHolder._ts = undefined
               }}
             >
@@ -316,11 +316,11 @@ export const ProductDetailPage: React.FC = () => {
                     type="button"
                     aria-label="Önceki görsel"
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
-                    onClick={()=> setActiveIdx(i=> (i-1+images.length)%images.length)}
+                    onClick={() => setActiveIdx(i => (i - 1 + images.length) % images.length)}
                   >
                     ◀
                   </button>
-<picture>
+                  <picture>
                     <source
                       srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}?format=avif&quality=85`}
                       type="image/avif"
@@ -344,7 +344,7 @@ export const ProductDetailPage: React.FC = () => {
                     type="button"
                     aria-label="Sonraki görsel"
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
-                    onClick={()=> setActiveIdx(i=> (i+1)%images.length)}
+                    onClick={() => setActiveIdx(i => (i + 1) % images.length)}
                   >
                     ▶
                   </button>
@@ -353,7 +353,7 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="text-8xl text-secondary-blue/30">🌪️</div>
               )}
             </div>
-            
+
             {/* Thumbnail Gallery */}
             <div className="grid grid-cols-4 gap-2">
               {images.length > 0 ? (
@@ -497,20 +497,19 @@ export const ProductDetailPage: React.FC = () => {
                   <ShoppingCart size={18} />
                   <span>{t('pdp.addToCart')}</span>
                 </button>
-                
+
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
                   aria-label={isWishlisted ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
                   aria-pressed={isWishlisted}
-                  className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${
-                    isWishlisted 
-                      ? 'border-red-500 text-red-500 bg-red-50' 
+                  className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${isWishlisted
+                      ? 'border-red-500 text-red-500 bg-red-50'
                       : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
-                  }`}
+                    }`}
                 >
                   <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
                 </button>
-                
+
                 <button
                   onClick={handleShare}
                   aria-label="Paylaş"
@@ -531,7 +530,7 @@ export const ProductDetailPage: React.FC = () => {
                 {(() => {
                   const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
                   if (inStock) return null
-                  
+
                   const whatsappLink = getStockInquiryLink(product.name, product.sku)
                   if (whatsappLink) {
                     return (
@@ -545,7 +544,7 @@ export const ProductDetailPage: React.FC = () => {
                       </a>
                     )
                   }
-                  
+
                   const mail = legalConfig?.sellerEmail || 'info@example.com'
                   const subject = encodeURIComponent('Stok Bilgisi Talebi')
                   const body = encodeURIComponent(`Merhaba, ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''} ürünü için stok durumu hakkında bilgi alabilir miyim?`)
@@ -585,11 +584,10 @@ export const ProductDetailPage: React.FC = () => {
       <div ref={navTriggerRef} className="h-0" />
 
       {/* Section Navigation */}
-      <div 
-        id="pdp-sticky-nav" 
-        className={`transition-all duration-300 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm ${
-          isNavSticky ? 'fixed top-14 md:top-16 left-0 right-0' : 'relative'
-        }`}
+      <div
+        id="pdp-sticky-nav"
+        className={`transition-all duration-300 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm ${isNavSticky ? 'fixed top-14 md:top-16 left-0 right-0' : 'relative'
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex space-x-1 overflow-x-auto py-3">
@@ -597,11 +595,10 @@ export const ProductDetailPage: React.FC = () => {
               <button
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
-                  activeSection === section.id
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${activeSection === section.id
                     ? 'bg-primary-navy text-white shadow-sm'
                     : 'text-steel-gray hover:text-primary-navy hover:bg-light-gray'
-                }`}
+                  }`}
               >
                 <section.icon size={16} />
                 <span>{section.title}</span>
@@ -675,7 +672,7 @@ export const ProductDetailPage: React.FC = () => {
         {sections.map((section, _index) => {
           const IconComponent = section.icon
           return (
-            <section 
+            <section
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
               data-section={section.id}
@@ -710,28 +707,28 @@ export const ProductDetailPage: React.FC = () => {
                           </h4>
                           <ul className="space-y-3 text-steel-gray">
                             <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
+                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
                               {t('pdp.features.materialQuality')}
                             </li>
                             <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
+                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
                               {t('pdp.features.energyEfficient')}
                             </li>
                             <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
+                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
                               {t('pdp.features.quietOperation')}
                             </li>
                             <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
+                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
                               {t('pdp.features.easyMaintenance')}
                             </li>
                             <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" /> 
+                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
                               {t('pdp.features.durable')}
                             </li>
                           </ul>
                         </div>
-                        
+
                         <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                           <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.productDescription')}</h4>
                           <p className="text-steel-gray leading-relaxed">
@@ -750,13 +747,12 @@ export const ProductDetailPage: React.FC = () => {
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
                             <span className="text-steel-gray">{t('pdp.model')}</span>
-<span className="font-medium text-industrial-gray">{product.model_code ?? product.sku}</span>
+                            <span className="font-medium text-industrial-gray">{product.model_code ?? product.sku}</span>
                           </div>
                           <div className="flex justify-between py-2 border-b border-light-gray/50">
                             <span className="text-steel-gray">{t('pdp.statusLabel')}</span>
-                            <span className={`font-medium ${
-                              product.status === 'active' ? 'text-success-green' : 'text-warning-orange'
-                            }`}>
+                            <span className={`font-medium ${product.status === 'active' ? 'text-success-green' : 'text-warning-orange'
+                              }`}>
                               {product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}
                             </span>
                           </div>
@@ -824,7 +820,7 @@ export const ProductDetailPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                         <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.performanceMetrics')}</h4>
                         <div className="space-y-3">
@@ -873,7 +869,7 @@ export const ProductDetailPage: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.diagramsExtra.threeDViews')}</h4>
                             <div className="space-y-4">
@@ -914,7 +910,7 @@ export const ProductDetailPage: React.FC = () => {
                               <span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-secondary-blue mx-auto mb-3" />
@@ -923,10 +919,10 @@ export const ProductDetailPage: React.FC = () => {
                             </div>
                             <button className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
                               <Download size={16} />
-<span>{t('pdp.actions.download')}</span>
+                              <span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-success-green mx-auto mb-3" />
@@ -938,7 +934,7 @@ export const ProductDetailPage: React.FC = () => {
                               <span>{t('pdp.actions.download')}</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-warning-orange mx-auto mb-3" />
@@ -950,7 +946,7 @@ export const ProductDetailPage: React.FC = () => {
                               <span>İndir</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-steel-gray mx-auto mb-3" />
@@ -962,7 +958,7 @@ export const ProductDetailPage: React.FC = () => {
                               <span>İndir</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <div className="text-center mb-4">
                               <FileText size={48} className="text-air-blue mx-auto mb-3" />
@@ -998,7 +994,7 @@ export const ProductDetailPage: React.FC = () => {
                               <span>{t('pdp.actions.downloadCatalog')}</span>
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                             <h4 className="font-semibold text-industrial-gray mb-6">{t('pdp.docs.technicalBrochure')}</h4>
                             <div className="aspect-[3/4] bg-gradient-to-br from-secondary-blue/10 to-air-blue/20 rounded-lg mb-4 flex items-center justify-center">
@@ -1014,7 +1010,7 @@ export const ProductDetailPage: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        
+
                         {/* Additional Resources */}
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
@@ -1025,7 +1021,7 @@ export const ProductDetailPage: React.FC = () => {
                               {t('pdp.actions.download')}
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
                             <FileText size={32} className="text-warning-orange mx-auto mb-2" />
                             <h5 className="font-medium text-industrial-gray mb-1">{t('pdp.docs.troubleshootingGuide')}</h5>
@@ -1034,7 +1030,7 @@ export const ProductDetailPage: React.FC = () => {
                               {t('pdp.actions.download')}
                             </button>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center">
                             <FileText size={32} className="text-air-blue mx-auto mb-2" />
                             <h5 className="font-medium text-industrial-gray mb-1">{t('pdp.docs.sparePartsList')}</h5>
@@ -1065,7 +1061,7 @@ export const ProductDetailPage: React.FC = () => {
                               <p><strong>{t('pdp.certLabels.standard')}:</strong> EN 12101-3:2013</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-primary-navy/10 to-primary-navy/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-primary-navy mx-auto mb-3" />
@@ -1078,7 +1074,7 @@ export const ProductDetailPage: React.FC = () => {
                               <p><strong>{t('pdp.certLabels.standard')}:</strong> ISO 9001:2015</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-secondary-blue/10 to-secondary-blue/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-secondary-blue mx-auto mb-3" />
@@ -1086,12 +1082,12 @@ export const ProductDetailPage: React.FC = () => {
                               <p className="text-sm text-steel-gray">Turkish Standards Institute</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> TSE-2024-{product.sku.substring(0, 3)}</p>
-<p><strong>{t('pdp.certLabels.validity')}:</strong> 2025</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> TSE-2024-{product.sku.substring(0, 3)}</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> 2025</p>
                               <p><strong>{t('pdp.certLabels.standard')}:</strong> TS EN 12101-3</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-air-blue/20 to-air-blue/10 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-air-blue mx-auto mb-3" />
@@ -1099,12 +1095,12 @@ export const ProductDetailPage: React.FC = () => {
                               <p className="text-sm text-steel-gray">{t('pdp.certLabels.efficiency')}</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> ES-2024-{product.id.substring(0, 8)}</p>
-<p><strong>{t('pdp.certLabels.validity')}:</strong> 2027</p>
-<p><strong>{t('pdp.certLabels.efficiency')}:</strong> A++</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> ES-2024-{product.id.substring(0, 8)}</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> 2027</p>
+                              <p><strong>{t('pdp.certLabels.efficiency')}:</strong> A++</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-warning-orange/10 to-warning-orange/5 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-warning-orange mx-auto mb-3" />
@@ -1112,12 +1108,12 @@ export const ProductDetailPage: React.FC = () => {
                               <p className="text-sm text-steel-gray">Underwriters Laboratories</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> UL-{product.sku}-2024</p>
-<p><strong>{t('pdp.certLabels.validity')}:</strong> 2026</p>
-<p><strong>{t('pdp.certLabels.standard')}:</strong> UL 555S</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> UL-{product.sku}-2024</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> 2026</p>
+                              <p><strong>{t('pdp.certLabels.standard')}:</strong> UL 555S</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20 text-center">
                             <div className="bg-gradient-to-br from-success-green/20 to-success-green/10 rounded-lg p-4 mb-4">
                               <Award size={48} className="text-success-green mx-auto mb-3" />
@@ -1125,13 +1121,13 @@ export const ProductDetailPage: React.FC = () => {
                               <p className="text-sm text-steel-gray">{t('pdp.cert.rohsCompliant')}</p>
                             </div>
                             <div className="text-xs text-steel-gray space-y-1">
-<p><strong>{t('pdp.certLabels.certificateNo')}:</strong> RoHS-{product.brand}-2024</p>
-<p><strong>{t('pdp.certLabels.validity')}:</strong> Continuous</p>
-<p><strong>{t('pdp.certLabels.standard')}:</strong> EU 2011/65</p>
+                              <p><strong>{t('pdp.certLabels.certificateNo')}:</strong> RoHS-{product.brand}-2024</p>
+                              <p><strong>{t('pdp.certLabels.validity')}:</strong> Continuous</p>
+                              <p><strong>{t('pdp.certLabels.standard')}:</strong> EU 2011/65</p>
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="mt-8 bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                           <h4 className="font-semibold text-industrial-gray mb-4 text-center">{t('pdp.cert.downloadCenter')}</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
