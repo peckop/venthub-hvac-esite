@@ -79,9 +79,9 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
     // Technical Specs State (Key-Value pairs for UI)
     const [specs, setSpecs] = useState<{ key: string; value: string }[]>([])
-    const [initialData, setInitialData] = useState<any>(null)
+    const [initialData, setInitialData] = useState<ProductFormValues | null>(null)
 
-    const { register, control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<ProductFormValues>({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
         defaultValues: {
             status: 'active',
