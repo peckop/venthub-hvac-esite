@@ -16,7 +16,7 @@ Bu içeriği `C:\Users\alize\AppData\Roaming\Claude\claude_desktop_config.json` 
         "@modelcontextprotocol/server-github"
       ],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN_HERE"
       }
     },
     "supabase": {
@@ -29,7 +29,7 @@ Bu içeriği `C:\Users\alize\AppData\Roaming\Claude\claude_desktop_config.json` 
         "--project-ref=tnofewwkwlyjsqgwjjga"
       ],
       "env": {
-        "SUPABASE_ACCESS_TOKEN": "sbp_05659fab34c4fb892b622a6d99c7be856df0a94f"
+        "SUPABASE_ACCESS_TOKEN": "YOUR_SUPABASE_TOKEN_HERE"
       }
     },
     "Context7 Live": {
