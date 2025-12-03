@@ -140,7 +140,7 @@ const AdminProductsPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page, t])
+  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page, _defaultThreshold, t])
 
   React.useEffect(() => { load() }, [load])
 
