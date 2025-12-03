@@ -3,9 +3,9 @@ import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
-import * as Tabs from '@radix-ui/react-tabs'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
+import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
 
 interface ProductRow {
   id: string
@@ -22,7 +22,6 @@ interface ProductRow {
 }
 
 interface CategoryOpt { id: string; name: string }
-interface ImageRow { id: string; product_id: string; path: string; alt?: string | null; sort_order: number }
 
 const AdminProductsPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -33,12 +32,16 @@ const AdminProductsPage: React.FC = () => {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [editingId, setEditingId] = React.useState<string | null>(null)
+
   // Pagination
   const PAGE_SIZE = 50
   const [page, setPage] = React.useState(1)
   const [total, setTotal] = React.useState(0)
 
-  // Toolbar filtreleri (stok özetine uyum)
+  // Toolbar filtreleri
   const [selectedCategoryFilter, setSelectedCategoryFilter] = React.useState<string>('')
   const [statusFilter, setStatusFilter] = React.useState<{ active: boolean; inactive: boolean; out_of_stock: boolean }>({ active: false, inactive: false, out_of_stock: false })
   const [featuredOnly, setFeaturedOnly] = React.useState<boolean>(false)
@@ -49,68 +52,29 @@ const AdminProductsPage: React.FC = () => {
   const [density, setDensity] = React.useState<Density>('comfortable')
   const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
   const [covers, setCovers] = React.useState<Record<string, string>>({})
-  React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+
+  React.useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
   // Persist sort settings
-  type SortKey = 'name'|'sku'|'category'|'status'|'price'|'stock'
+  type SortKey = 'name' | 'sku' | 'category' | 'status' | 'price' | 'stock'
   const SORT_KEY_STORAGE = `${STORAGE_KEY}:sortKey`
   const SORT_DIR_STORAGE = `${STORAGE_KEY}:sortDir`
-  const [sortKey, setSortKey] = React.useState<SortKey>(()=>{
-    try { const v = localStorage.getItem(SORT_KEY_STORAGE) as SortKey | null; if (v==='name'||v==='sku'||v==='category'||v==='status'||v==='price'||v==='stock') return v; } catch {}
+  const [sortKey, setSortKey] = React.useState<SortKey>(() => {
+    try { const v = localStorage.getItem(SORT_KEY_STORAGE) as SortKey | null; if (v === 'name' || v === 'sku' || v === 'category' || v === 'status' || v === 'price' || v === 'stock') return v; } catch { }
     return 'name'
   })
-  const [sortDir, setSortDir] = React.useState<'asc'|'desc'>(()=>{
-    try { const v = localStorage.getItem(SORT_DIR_STORAGE) as 'asc'|'desc' | null; if (v==='asc'||v==='desc') return v } catch {}
+  const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>(() => {
+    try { const v = localStorage.getItem(SORT_DIR_STORAGE) as 'asc' | 'desc' | null; if (v === 'asc' || v === 'desc') return v } catch { }
     return 'asc'
   })
-  React.useEffect(()=>{ try { localStorage.setItem(SORT_KEY_STORAGE, sortKey) } catch{} }, [sortKey, SORT_KEY_STORAGE])
-  React.useEffect(()=>{ try { localStorage.setItem(SORT_DIR_STORAGE, sortDir) } catch{} }, [sortDir, SORT_DIR_STORAGE])
+  React.useEffect(() => { try { localStorage.setItem(SORT_KEY_STORAGE, sortKey) } catch { } }, [sortKey, SORT_KEY_STORAGE])
+  React.useEffect(() => { try { localStorage.setItem(SORT_DIR_STORAGE, sortDir) } catch { } }, [sortDir, SORT_DIR_STORAGE])
 
-  // selection & form state
-  const [selectedId, setSelectedId] = React.useState<string | null>(null)
-  const [tab, setTab] = React.useState<'info'|'pricing'|'stock'|'images'|'seo'>('info')
-  const TAB_KEY = 'products:editTab'
-  React.useEffect(()=>{ try { const v=localStorage.getItem(TAB_KEY); if(v==='info'||v==='pricing'||v==='stock'||v==='images'||v==='seo') setTab(v as 'info'|'pricing'|'stock'|'images'|'seo') } catch{} },[])
-  React.useEffect(()=>{ try { localStorage.setItem(TAB_KEY, tab) } catch{} }, [tab])
-
-  // info
-  const [name, setName] = React.useState('')
-  const [sku, setSku] = React.useState('')
-  const [brand, setBrand] = React.useState('')
-  const [modelCode, setModelCode] = React.useState('')
-  const [status, setStatus] = React.useState('active')
-  const [categoryId, setCategoryId] = React.useState('')
-  const [isFeatured, setIsFeatured] = React.useState(false)
-
-  // pricing
-  const [price, setPrice] = React.useState<string>('')
-  const [purchasePrice, setPurchasePrice] = React.useState<string>('')
-
-  // stock
-  const [stockQty, setStockQty] = React.useState<string>('')
-  const [lowStock, setLowStock] = React.useState<string>('')
-
-  // images
-  const [images, setImages] = React.useState<ImageRow[]>([])
-  const [uploading, setUploading] = React.useState(false)
-  const [savingImages, setSavingImages] = React.useState(false)
-
-  // seo
-  const [slug, setSlug] = React.useState('')
-  const [metaTitle, setMetaTitle] = React.useState('')
-const [metaDesc, setMetaDesc] = React.useState('')
-  const [slugError, setSlugError] = React.useState('')
-
-  const slugify = (s: string) => s
-    .toLowerCase()
-    .normalize('NFD').replace(/\p{Diacritic}/gu, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$|--+/g, '-')
-
-  const load = React.useCallback(async ()=>{
+  const load = React.useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -159,14 +123,14 @@ const [metaDesc, setMetaDesc] = React.useState('')
       ])
       if (c.error) throw c.error
       setCats((c.data || []) as CategoryOpt[])
-      if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number|null } | null)?.default_low_stock_threshold ?? null) as number | null)
+      if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null) as number | null)
 
       // Cover images for current page
-      const ids = list.map(x=>x.id)
-      if (ids.length>0) {
+      const ids = list.map(x => x.id)
+      if (ids.length > 0) {
         const { data: imgs } = await supabase.from('product_images').select('product_id,path,sort_order').in('product_id', ids).order('sort_order', { ascending: true })
         const map: Record<string, string> = {}
-        ;(imgs as {product_id:string;path:string;sort_order:number}[]|null|undefined)?.forEach(r=>{ if(map[r.product_id]==null) map[r.product_id]=r.path })
+          ; (imgs as { product_id: string; path: string; sort_order: number }[] | null | undefined)?.forEach(r => { if (map[r.product_id] == null) map[r.product_id] = r.path })
         setCovers(map)
       }
     } catch (e) {
@@ -178,7 +142,7 @@ const [metaDesc, setMetaDesc] = React.useState('')
     }
   }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page, t])
 
-  React.useEffect(()=>{ load() }, [load])
+  React.useEffect(() => { load() }, [load])
 
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
@@ -186,410 +150,161 @@ const [metaDesc, setMetaDesc] = React.useState('')
   }, [q])
 
   // Server-side filtered rows already; keep as identity
-  const filtered = React.useMemo(()=> rows, [rows])
+  const filtered = React.useMemo(() => rows, [rows])
 
-  const startCreate = () => {
-    setSelectedId(null)
-    setTab('info')
-    setName('')
-    setSku('')
-    setBrand('')
-    setStatus('active')
-    setCategoryId('')
-    setIsFeatured(false)
-    setPrice('')
-    setPurchasePrice('')
-    setStockQty('')
-    setLowStock('')
-    setSlug('')
-    setMetaTitle('')
-    setMetaDesc('')
-    setImages([])
+  const handleCreate = () => {
+    setEditingId(null)
+    setIsModalOpen(true)
   }
 
-  type DBProduct = { id: string; name?: string|null; sku?: string|null; model_code?: string|null; brand?: string|null; status?: string|null; category_id?: string|null; is_featured?: boolean|null; price?: number|null; purchase_price?: number|null; stock_qty?: number|null; low_stock_threshold?: number|null; slug?: string|null; meta_title?: string|null; meta_description?: string|null }
-  const startEdit = async (id: string) => {
-    setSelectedId(id)
-    setTab('info')
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle()
-      if (error) throw error
-      const p = (data as DBProduct) || ({} as DBProduct)
-      setName(p?.name || '')
-      setSku(p?.sku || '')
-      setBrand(p?.brand || '')
-      setModelCode(p?.model_code || '')
-      setStatus(p?.status || 'active')
-      setCategoryId(p?.category_id || '')
-      setIsFeatured(!!p?.is_featured)
-      setPrice(p?.price != null ? String(p.price) : '')
-      setPurchasePrice(p?.purchase_price != null ? String(p.purchase_price) : '')
-      setStockQty(p?.stock_qty != null ? String(p.stock_qty) : '')
-      setLowStock(p?.low_stock_threshold != null ? String(p.low_stock_threshold) : '')
-      setSlug(p?.slug || '')
-      setMetaTitle(p?.meta_title || '')
-      setMetaDesc(p?.meta_description || '')
-      await loadImages(id)
-    } catch (e) {
-      alert(t('admin.products.toasts.productLoadFailed', { msg: ((e as Error).message || String(e)) }))
-    }
+  const handleEdit = (id: string) => {
+    setEditingId(id)
+    setIsModalOpen(true)
   }
 
-  const loadImages = async (productId: string) => {
-    const { data, error } = await supabase
-      .from('product_images')
-      .select('id, product_id, path, alt, sort_order')
-      .eq('product_id', productId)
-      .order('sort_order', { ascending: true })
-    if (!error) {
-      const list = (data || []) as ImageRow[]
-      setImages(list)
-      // Ayrıca sol listedeki kapak görselini güncelle
-      const first = list[0]
-      setCovers(prev => {
-        if (first && first.path) return { ...prev, [productId]: first.path }
-        const { [productId]: _removed, ...rest } = prev
-        return rest
-      })
-    }
-  }
-
-  const saveInfo = async () => {
-    try {
-      const payload: { name: string; sku: string; model_code?: string|null; brand?: string; status?: string; category_id: string | null; is_featured: boolean } = {
-        name: name.trim(), sku: sku.trim(), model_code: modelCode.trim() ? modelCode.trim() : null, brand: brand.trim(), status,
-        category_id: categoryId || null, is_featured: isFeatured,
-      }
-      if (!payload.name || !payload.sku) return
-if (selectedId) {
-        const before = rows.find(r=>r.id===selectedId) || null
-        const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
-        if (error) throw error
-        const { logAdminAction } = await import('../../lib/audit')
-        await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveInfo' })
-      } else {
-        const { data, error } = await supabase.from('products').insert(payload).select('id').maybeSingle()
-        if (error) throw error
-        const inserted = (data as { id: string } | null)
-        setSelectedId(inserted?.id || null)
-        const { logAdminAction } = await import('../../lib/audit')
-        await logAdminAction(supabase, { table_name: 'products', row_pk: inserted?.id || null, action: 'INSERT', before: null, after: payload, comment: 'saveInfo' })
-      }
-      await load()
-    } catch (e) {
-      alert(t('admin.products.toasts.saveFailed', { msg: ((e as Error).message || String(e)) }))
-    }
-  }
-
-  const savePricing = async () => {
-    if (!selectedId) return
-    try {
-      const payload = {
-        price: price === '' ? null : Number(price),
-        purchase_price: purchasePrice === '' ? null : Number(purchasePrice),
-      }
-const before = rows.find(r=>r.id===selectedId) || null
-      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
-      if (error) throw error
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'savePricing' })
-      await load()
-    } catch (e) {
-      alert(t('admin.products.toasts.priceSaveFailed', { msg: ((e as Error).message || String(e)) }))
-    }
-  }
-
-  const saveStock = async () => {
-    if (!selectedId) return
-    try {
-      const isDefault = lowStock === ''
-      const payload = {
-        stock_qty: stockQty === '' ? null : Number(stockQty),
-        low_stock_threshold: isDefault ? null : Number(lowStock),
-        low_stock_override: !isDefault,
-      }
-const before = rows.find(r=>r.id===selectedId) || null
-      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
-      if (error) throw error
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveStock' })
-      await load()
-    } catch (e) {
-      alert(t('admin.products.toasts.stockSaveFailed', { msg: ((e as Error).message || String(e)) }))
-    }
-  }
-
-  const uploadImages = async (files: FileList | null) => {
-    if (!selectedId || !files || files.length === 0) return
-    setUploading(true)
-    try {
-      for (const file of Array.from(files)) {
-        const ext = file.name.split('.').pop() || 'jpg'
-        const filename = `${Date.now()}-${slugify(name || 'urun')}.${ext}`
-        const path = `product/${selectedId}/${filename}`
-const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: false })
-        if (upErr) {
-          console.warn('storage upload error', upErr)
-          throw new Error('Storage upload RLS/policy hatası: ' + (upErr.message || upErr.name))
-        }
-        const { error: dbErr } = await supabase.from('product_images').insert({ product_id: selectedId, path, alt: '', sort_order: images.length + 1 })
-        if (dbErr) {
-          console.warn('db insert error', dbErr)
-          try {
-            const ctx = await supabase.rpc('debug_context')
-            console.warn('debug_context', ctx.data)
-            type DebugContext = { current_user?: string; auth_uid?: string | null }
-            const ctxData = (ctx.data ?? null) as DebugContext | null
-            const cu = ctxData?.current_user
-            const au = ctxData?.auth_uid
-            throw new Error('DB insert RLS/policy hatası: ' + (dbErr.message || 'unknown') + `\nContext -> current_user: ${cu}, auth_uid: ${au}`)
-          } catch (ctxErr) {
-            console.warn('debug_context rpc failed', ctxErr)
-            throw new Error('DB insert RLS/policy hatası: ' + (dbErr.message || 'unknown'))
-          }
-        }
-      }
-      await loadImages(selectedId)
-      await load()
-    } catch (e) {
-      alert(String(e))
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const deleteImage = async (img: ImageRow) => {
-    if (!confirm(t('admin.products.confirm.deleteImage'))) return
-    try {
-await supabase.from('product_images').delete().eq('id', img.id)
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'product_images', row_pk: img.id, action: 'DELETE', before: img, after: null, comment: 'deleteImage' })
-      // storage’dan da sil (best-effort)
-      await supabase.storage.from('product-images').remove([img.path])
-      if (selectedId) await loadImages(selectedId)
-    } catch (e) {
-      alert(t('admin.products.toasts.deleteFailed', { msg: ((e as Error).message || String(e)) }))
-    }
-  }
-
-  const makeCover = async (img: ImageRow) => {
-    try {
-      if (images.length === 0 || images[0].id === img.id) return
-      const first = images[0]
-      await Promise.all([
-        supabase.from('product_images').update({ sort_order: first.sort_order }).eq('id', img.id),
-        supabase.from('product_images').update({ sort_order: img.sort_order }).eq('id', first.id),
-      ])
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, [
-        { table_name: 'product_images', row_pk: img.id, action: 'UPDATE', before: img, after: { sort_order: first.sort_order }, comment: 'makeCover' },
-        { table_name: 'product_images', row_pk: first.id, action: 'UPDATE', before: first, after: { sort_order: img.sort_order }, comment: 'makeCover' },
-      ])
-      if (selectedId) await loadImages(selectedId)
-    } catch (e) {
-      alert(t('admin.ui.failed') + ': ' + ((e as Error).message || String(e)))
-    }
-  }
-
-  const bumpImage = async (img: ImageRow, dir: -1 | 1) => {
-    const list = [...images]
-    const idx = list.findIndex(x => x.id === img.id)
-    const swapIdx = idx + dir
-    if (idx < 0 || swapIdx < 0 || swapIdx >= list.length) return
-    const a = list[idx]
-    const b = list[swapIdx]
-    try {
-await Promise.all([
-        supabase.from('product_images').update({ sort_order: b.sort_order }).eq('id', a.id),
-        supabase.from('product_images').update({ sort_order: a.sort_order }).eq('id', b.id)
-      ])
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, [
-        { table_name: 'product_images', row_pk: a.id, action: 'UPDATE', before: a, after: { sort_order: b.sort_order }, comment: 'bumpImage' },
-        { table_name: 'product_images', row_pk: b.id, action: 'UPDATE', before: b, after: { sort_order: a.sort_order }, comment: 'bumpImage' },
-      ])
-      if (selectedId) await loadImages(selectedId)
-    } catch {
-      alert(t('admin.products.toasts.orderNotChanged'))
-    }
-  }
-
-  const saveSeo = async () => {
-    if (!selectedId) return
-    if (slugError) { alert(slugError); return }
-    try {
-      const payload = {
-        slug: (slug || slugify(name)).trim() || null,
-        meta_title: metaTitle || null,
-        meta_description: metaDesc || null,
-      }
-const before = rows.find(r=>r.id===selectedId) || null
-      const { error } = await supabase.from('products').update(payload).eq('id', selectedId)
-      if (error) throw error
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'products', row_pk: selectedId, action: 'UPDATE', before, after: payload, comment: 'saveSeo' })
-      await load()
-    } catch (e) {
-      alert(t('admin.products.toasts.seoSaveFailed', { msg: ((e as Error).message || String(e)) }))
-    }
+  const handleModalSuccess = () => {
+    load()
+    // Modal will be closed by the modal itself or we can close it here if needed, 
+    // but the modal calls onSuccess then onOpenChange(false) usually.
+    // Actually our modal implementation calls onSuccess then onOpenChange(false).
+    // So we just need to reload data.
   }
 
   const remove = async (id: string) => {
     if (!confirm(t('admin.products.confirm.deleteProduct'))) return
     try {
-const before = rows.find(r=>r.id===id) || null
+      const before = rows.find(r => r.id === id) || null
       const { error } = await supabase.from('products').delete().eq('id', id)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
       await logAdminAction(supabase, { table_name: 'products', row_pk: id, action: 'DELETE', before, after: null, comment: 'remove product' })
       await load()
-      if (selectedId === id) startCreate()
     } catch (e) {
       alert(t('admin.products.toasts.deleteFailed', { msg: ((e as Error).message || String(e)) }))
     }
   }
 
   const toggleSort = (key: SortKey) => {
-    if (sortKey === key) setSortDir(d => d==='asc'?'desc':'asc')
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     else { setSortKey(key); setSortDir('asc') }
     setPage(1)
   }
-  const sortIndicator = (key: SortKey) => sortKey!==key ? '' : (sortDir==='asc'?'▲':'▼')
+  const sortIndicator = (key: SortKey) => sortKey !== key ? '' : (sortDir === 'asc' ? '▲' : '▼')
 
-  const sorted = React.useMemo(()=>{
+  const sorted = React.useMemo(() => {
     const arr = [...filtered]
-    arr.sort((a,b)=>{
-      const dir = sortDir==='asc'?1:-1
+    arr.sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1
       switch (sortKey) {
         case 'name': return dir * a.name.localeCompare(b.name, 'tr')
         case 'sku': return dir * a.sku.localeCompare(b.sku, 'tr')
         case 'category': {
-          const an = cats.find(c=>c.id===a.category_id)?.name || ''
-          const bn = cats.find(c=>c.id===b.category_id)?.name || ''
+          const an = cats.find(c => c.id === a.category_id)?.name || ''
+          const bn = cats.find(c => c.id === b.category_id)?.name || ''
           return dir * an.localeCompare(bn, 'tr')
         }
-        case 'status': return dir * (String(a.status||'').localeCompare(String(b.status||''), 'tr'))
-        case 'price': return dir * (((a.price??-Infinity) as number) - ((b.price??-Infinity) as number))
-        case 'stock': return dir * (((a.stock_qty??-Infinity) as number) - ((b.stock_qty??-Infinity) as number))
+        case 'status': return dir * (String(a.status || '').localeCompare(String(b.status || ''), 'tr'))
+        case 'price': return dir * (((a.price ?? -Infinity) as number) - ((b.price ?? -Infinity) as number))
+        case 'stock': return dir * (((a.stock_qty ?? -Infinity) as number) - ((b.stock_qty ?? -Infinity) as number))
         default: return 0
       }
     })
     return arr
   }, [filtered, sortKey, sortDir, cats])
 
-  const saveImages = async () => {
-    if (!selectedId) return
-    try {
-      setSavingImages(true)
-      await Promise.all(images.map(row => supabase.from('product_images').update({ alt: row.alt || '' }).eq('id', row.id)))
-      await loadImages(selectedId)
-      alert(t('admin.products.toasts.imagesSaved'))
-    } catch (e) {
-      alert(t('admin.products.toasts.imagesSaveFailed', { msg: ((e as Error).message || String(e)) }))
-    } finally {
-      setSavingImages(false)
-    }
-  }
-
-  const saveCurrent = async () => {
-    if (tab === 'info') return saveInfo()
-    if (tab === 'pricing') return savePricing()
-    if (tab === 'stock') return saveStock()
-    if (tab === 'images') return saveImages()
-    if (tab === 'seo') return saveSeo()
-    return
-  }
-
   const statusBadge = (s?: string | null) => {
-    const v = (s||'').toLowerCase()
-    if (v==='active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">{t('admin.products.statusLabels.active')}</span>
-    if (v==='inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{t('admin.products.statusLabels.inactive')}</span>
-    if (v==='out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">{t('admin.products.statusLabels.out_of_stock')}</span>
+    const v = (s || '').toLowerCase()
+    if (v === 'active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">{t('admin.products.statusLabels.active')}</span>
+    if (v === 'inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{t('admin.products.statusLabels.inactive')}</span>
+    if (v === 'out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">{t('admin.products.statusLabels.out_of_stock')}</span>
     return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
   }
 
-  const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string,string>[]; total: number } | null>(null)
-  const [importRows, setImportRows] = React.useState<Record<string,string>[] | null>(null)
+  const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string, string>[]; total: number } | null>(null)
+  const [importRows, setImportRows] = React.useState<Record<string, string>[] | null>(null)
 
   const ColumnsMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ColumnsMenu')), [])
   const ExportMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ExportMenu')), [])
 
   return (
     <div className="space-y-6">
-      <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
+      <div className="flex justify-between items-center">
+        <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
+        <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
+          <span>+</span> {t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}
+        </button>
+      </div>
 
       <AdminToolbar
         storageKey="toolbar:products"
         sticky
-        search={{ value: q, onChange: (v)=>{ setQ(v); setPage(1) }, placeholder: t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
+        search={{ value: q, onChange: (v) => { setQ(v); setPage(1) }, placeholder: t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
         select={{
           value: selectedCategoryFilter,
           onChange: setSelectedCategoryFilter,
           title: t('admin.products.toolbar.categoryTitle') ?? 'Kategori',
-          options: [ { value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name })) ],
+          options: [{ value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name }))],
         }}
         chips={[
-          { key: 'active', label: t('admin.products.statusLabels.active'), active: statusFilter.active, onToggle: ()=>setStatusFilter(s=>({ ...s, active: !s.active })) },
-          { key: 'inactive', label: t('admin.products.statusLabels.inactive'), active: statusFilter.inactive, onToggle: ()=>setStatusFilter(s=>({ ...s, inactive: !s.inactive })) },
-          { key: 'out_of_stock', label: t('admin.products.statusLabels.out_of_stock'), active: statusFilter.out_of_stock, onToggle: ()=>setStatusFilter(s=>({ ...s, out_of_stock: !s.out_of_stock })) },
+          { key: 'active', label: t('admin.products.statusLabels.active'), active: statusFilter.active, onToggle: () => setStatusFilter(s => ({ ...s, active: !s.active })) },
+          { key: 'inactive', label: t('admin.products.statusLabels.inactive'), active: statusFilter.inactive, onToggle: () => setStatusFilter(s => ({ ...s, inactive: !s.inactive })) },
+          { key: 'out_of_stock', label: t('admin.products.statusLabels.out_of_stock'), active: statusFilter.out_of_stock, onToggle: () => setStatusFilter(s => ({ ...s, out_of_stock: !s.out_of_stock })) },
         ]}
         toggles={[{ key: 'featured', label: t('admin.products.toggles.featuredOnly'), checked: featuredOnly, onChange: setFeaturedOnly }]}
-        onClear={()=>{ setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active:false, inactive:false, out_of_stock:false }); setFeaturedOnly(false); setPage(1) }}
+        onClear={() => { setQ(''); setSelectedCategoryFilter(''); setStatusFilter({ active: false, inactive: false, out_of_stock: false }); setFeaturedOnly(false); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e)=>{
+            <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e) => {
               const f = e.target.files?.[0]
               if (!f) return
               const text = await f.text()
-              const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l=>l.trim().length>0)
-              const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"'))
-              const header = split(lines[0]).map(h=>h.trim().toLowerCase())
-              const rows = lines.slice(1).map(l=>{ const cells = split(l); const obj: Record<string,string> = {}; header.forEach((h,i)=>obj[h]=cells[i]||''); return obj })
+              const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim().length > 0)
+              const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
+              const header = split(lines[0]).map(h => h.trim().toLowerCase())
+              const rows = lines.slice(1).map(l => { const cells = split(l); const obj: Record<string, string> = {}; header.forEach((h, i) => obj[h] = cells[i] || ''); return obj })
               setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
-            <button onClick={()=>document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
+            <button onClick={() => document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
             <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>Görünüm…</button>}>
               <ColumnsMenu
-              columns={[
-{ key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v)=>setVisibleCols(s=>({ ...s, image: v })) },
-                { key: 'name', label: t('admin.products.table.name'), checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
-                { key: 'sku', label: t('admin.products.table.sku'), checked: visibleCols.sku, onChange: (v)=>setVisibleCols(s=>({ ...s, sku: v })) },
-                { key: 'category', label: t('admin.products.table.category'), checked: visibleCols.category, onChange: (v)=>setVisibleCols(s=>({ ...s, category: v })) },
-                { key: 'status', label: t('admin.products.table.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'price', label: t('admin.products.table.price'), checked: visibleCols.price, onChange: (v)=>setVisibleCols(s=>({ ...s, price: v })) },
-                { key: 'stock', label: t('admin.products.table.stock'), checked: visibleCols.stock, onChange: (v)=>setVisibleCols(s=>({ ...s, stock: v })) },
-                { key: 'actions', label: t('admin.products.table.actions'), checked: visibleCols.actions, onChange: (v)=>setVisibleCols(s=>({ ...s, actions: v })) },
-              ]}
-              density={density}
-              onDensityChange={setDensity}
-            />
+                columns={[
+                  { key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v) => setVisibleCols(s => ({ ...s, image: v })) },
+                  { key: 'name', label: t('admin.products.table.name'), checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
+                  { key: 'sku', label: t('admin.products.table.sku'), checked: visibleCols.sku, onChange: (v) => setVisibleCols(s => ({ ...s, sku: v })) },
+                  { key: 'category', label: t('admin.products.table.category'), checked: visibleCols.category, onChange: (v) => setVisibleCols(s => ({ ...s, category: v })) },
+                  { key: 'status', label: t('admin.products.table.status'), checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
+                  { key: 'price', label: t('admin.products.table.price'), checked: visibleCols.price, onChange: (v) => setVisibleCols(s => ({ ...s, price: v })) },
+                  { key: 'stock', label: t('admin.products.table.stock'), checked: visibleCols.stock, onChange: (v) => setVisibleCols(s => ({ ...s, stock: v })) },
+                  { key: 'actions', label: t('admin.products.table.actions'), checked: visibleCols.actions, onChange: (v) => setVisibleCols(s => ({ ...s, actions: v })) },
+                ]}
+                density={density}
+                onDensityChange={setDensity}
+              />
             </React.Suspense>
             <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>İndir…</button>}>
               <ExportMenu
-              items={[
-                { key: 'csv', label: t('admin.products.export.csvLabel'), onSelect: ()=>{
-                  const cols = ['id','name','sku','category_id','status','price','stock_qty']
-                  const header = cols.join(',')
-                  const lines = sorted.map(r=>[
-r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status||'', r.price!=null?String(r.price):'', r.stock_qty!=null?String(r.stock_qty):''
-                  ].join(','))
-                  const csv = '\ufeff' + [header, ...lines].join('\n')
-                  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-                  const url = URL.createObjectURL(blob)
-                  const a = document.createElement('a')
-                  a.href = url
-                  a.download = 'products.csv'
-                  a.click()
-                  URL.revokeObjectURL(url)
-                }}
-              ]}
-            />
+                items={[
+                  {
+                    key: 'csv', label: t('admin.products.export.csvLabel'), onSelect: () => {
+                      const cols = ['id', 'name', 'sku', 'category_id', 'status', 'price', 'stock_qty']
+                      const header = cols.join(',')
+                      const lines = sorted.map(r => [
+                        r.id, `"${(r.name || '').replace(/"/g, '""')}"`, r.sku, r.category_id || '', r.status || '', r.price != null ? String(r.price) : '', r.stock_qty != null ? String(r.stock_qty) : ''
+                      ].join(','))
+                      const csv = '\ufeff' + [header, ...lines].join('\n')
+                      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'products.csv'
+                      a.click()
+                      URL.revokeObjectURL(url)
+                    }
+                  }
+                ]}
+              />
             </React.Suspense>
           </div>
         )}
@@ -602,40 +317,40 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
                 <tr>
-                  {importPreview.header.map(h=> (<th key={h} className="p-2 border-b text-left">{h}</th>))}
+                  {importPreview.header.map(h => (<th key={h} className="p-2 border-b text-left">{h}</th>))}
                 </tr>
               </thead>
               <tbody>
-                {importPreview.rows.map((r,idx)=> (
+                {importPreview.rows.map((r, idx) => (
                   <tr key={idx} className="border-b">
-                    {importPreview.header.map(h=> (<td key={h} className="p-2">{r[h]}</td>))}
+                    {importPreview.header.map(h => (<td key={h} className="p-2">{r[h]}</td>))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={()=>{ setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={()=>{
-              const h = (importPreview?.header||[])
-              const required = ['name','sku']
-              const hasRequired = required.every(k=>h.includes(k))
-              const okCount = (importPreview?.rows||[]).filter(r=>r['name']&&r['sku']).length
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
+            <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={() => {
+              const h = (importPreview?.header || [])
+              const required = ['name', 'sku']
+              const hasRequired = required.every(k => h.includes(k))
+              const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
               alert(t('admin.products.import.dryRunResult', { status: t(`admin.products.import.${hasRequired ? 'statusComplete' : 'statusMissing'}`), ok: okCount, total: importPreview?.total || 0 }))
             }}>{t('admin.products.import.dryRun')}</button>
-            <button className="px-3 h-10 rounded-md bg-primary-navy text-white text-xs" onClick={async ()=>{
+            <button className="px-3 h-10 rounded-md bg-primary-navy text-white text-xs" onClick={async () => {
               if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
               const h = importPreview.header
               if (!h.includes('sku') || !h.includes('name')) { alert(t('admin.products.import.minColumns')); return }
-              const mapCategorySlugToId = (slug: string)=>{
-                const s = (slug||'').toLowerCase().trim()
-                const found = cats.find(c=>c.name.toLowerCase()===s)
+              const mapCategorySlugToId = (slug: string) => {
+                const s = (slug || '').toLowerCase().trim()
+                const found = cats.find(c => c.name.toLowerCase() === s)
                 return found?.id || null
               }
-              const payloads: { sku: string; name: string; model_code?: string|null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
+              const payloads: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
               for (const r of importRows) {
                 if (!r['sku'] || !r['name']) continue
-                const p: { sku: string; name: string; model_code?: string|null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
+                const p: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
                   sku: r['sku'].trim(),
                   name: r['name'].trim(),
                 }
@@ -647,146 +362,27 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                 if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
                 if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
                 if (r['category_id']) p.category_id = r['category_id'] || null
-                else if (r['category_slug']||r['category']) p.category_id = mapCategorySlugToId(r['category_slug']||r['category'])
+                else if (r['category_slug'] || r['category']) p.category_id = mapCategorySlugToId(r['category_slug'] || r['category'])
                 payloads.push(p)
               }
-              if (payloads.length===0) { alert(t('admin.products.import.noneFound')); return }
+              if (payloads.length === 0) { alert(t('admin.products.import.noneFound')); return }
               try {
                 // chunked upsert by sku
-                let ok=0, fail=0
-                for (let i=0;i<payloads.length;i+=100) {
-                  const chunk = payloads.slice(i,i+100)
+                let ok = 0, fail = 0
+                for (let i = 0; i < payloads.length; i += 100) {
+                  const chunk = payloads.slice(i, i + 100)
                   const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
-                  if (error) { console.warn('import upsert error', error); fail+=chunk.length } else ok+=chunk.length
+                  if (error) { console.warn('import upsert error', error); fail += chunk.length } else ok += chunk.length
                 }
                 alert(t('admin.products.import.done', { ok, fail }))
                 await load()
               } catch (e) {
                 alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }))
               }
-}}>{t('admin.products.import.writeButton')}</button>
+            }}>{t('admin.products.import.writeButton')}</button>
           </div>
         </div>
       )}
-
-      {/* Düzenleme Paneli */}
-      <div className={`${adminCardClass} p-4`}>
-        <div className="rounded-md bg-gray-50 border border-light-gray p-2 md:p-3 mb-3 flex items-center gap-3">
-          <span className="text-sm text-steel-gray">{selectedId ? t('admin.products.edit.editing') : t('admin.products.edit.new')}</span>
-          <Tabs.Root value={tab} onValueChange={(v)=>setTab(v as typeof tab)}>
-            <Tabs.List className="inline-flex items-center gap-1">
-              <Tabs.Trigger value="info" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.info')}</Tabs.Trigger>
-              <Tabs.Trigger value="pricing" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.pricing')}</Tabs.Trigger>
-              <Tabs.Trigger value="stock" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.stock')}</Tabs.Trigger>
-              <Tabs.Trigger value="images" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.images')}</Tabs.Trigger>
-              <Tabs.Trigger value="seo" className="px-3 py-2 text-sm rounded data-[state=active]:bg-white data-[state=active]:border-primary-navy border border-transparent text-steel-gray">{t('admin.products.edit.tabs.seo')}</Tabs.Trigger>
-            </Tabs.List>
-          </Tabs.Root>
-          <div className="ml-auto flex items-center gap-2">
-            <button onClick={startCreate} className="px-3 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm">{t('admin.products.edit.actions.new')}</button>
-            <button onClick={saveCurrent} disabled={savingImages} className={`${adminButtonPrimaryClass} h-11 disabled:opacity-50 disabled:cursor-not-allowed`}>{t('admin.products.edit.actions.save')}</button>
-            {selectedId && (
-              <button onClick={()=>remove(selectedId)} className="px-3 h-11 rounded-md border border-light-gray bg-white text-red-600 hover:border-red-400 text-sm">{t('admin.products.edit.actions.delete')}</button>
-            )}
-          </div>
-        </div>
-
-        {tab === 'info' && (
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.name')}</label>
-              <input value={name} onChange={(e)=>setName(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.sku')}</label>
-              <input value={sku} onChange={(e)=>setSku(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.modelCode')}</label>
-              <input value={modelCode} onChange={(e)=>setModelCode(e.target.value)} placeholder={t('admin.products.edit.info.modelPlaceholder') ?? 'örn. AD-H-900-T'} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.brand')}</label>
-              <input value={brand} onChange={(e)=>setBrand(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.status')}</label>
-              <select value={status} onChange={(e)=>setStatus(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
-                <option value="active">{t('admin.products.statusLabels.active')}</option>
-                <option value="inactive">{t('admin.products.statusLabels.inactive')}</option>
-                <option value="out_of_stock">{t('admin.products.statusLabels.out_of_stock')}</option>
-              </select>
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.info.category')}</label>
-              <select value={categoryId} onChange={(e)=>setCategoryId(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white">
-                <option value="">{t('admin.products.edit.info.categoryUnset')}</option>
-                {cats.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
-              </select>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isFeatured} onChange={(e)=>setIsFeatured(e.target.checked)} /> {t('admin.products.edit.info.featured')}</label>
-            </div>
-          </div>
-        )}
-
-        {tab === 'pricing' && (
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.pricing.salePrice')}</label>
-              <input value={price} onChange={(e)=>setPrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.pricing.salePlaceholder') ?? 'örn. 1999.90'} />
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.pricing.purchasePrice')}</label>
-              <input value={purchasePrice} onChange={(e)=>setPurchasePrice(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.pricing.purchasePlaceholder') ?? 'örn. 1499.50'} />
-            </div>
-          </div>
-        )}
-
-        {tab === 'stock' && (
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.stock.stock')}</label>
-              <input value={stockQty} onChange={(e)=>setStockQty(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.stock.stockPlaceholder') ?? 'örn. 50'} />
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.stock.lowThreshold')}</label>
-              <input value={lowStock} onChange={(e)=>setLowStock(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.stock.lowPlaceholder') ?? 'örn. 5'} />
-              <div className="text-xs text-industrial-gray">{t('admin.products.edit.stock.hintBase')}{defaultThreshold!=null ? t('admin.products.edit.stock.defaultSuffix', { default: defaultThreshold }) : ''}.</div>
-            </div>
-          </div>
-        )}
-
-        {tab === 'images' && (
-          <div className="space-y-3">
-            {!selectedId && <div className="text-sm text-steel-gray">{t('admin.products.edit.images.saveFirst')}</div>}
-            {selectedId && (
-              <>
-                <input type="file" multiple onChange={(e)=>uploadImages(e.target.files)} disabled={uploading} />
-                {images.length === 0 && (
-                  <div className="text-sm text-industrial-gray">{t('admin.products.edit.images.none')}</div>
-                )}
-                <div className="grid md:grid-cols-4 gap-3">
-                  {images.map((img, idx) => (
-                    <div key={img.id} className="border rounded p-2 flex flex-col gap-2">
-                      <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`} alt={img.alt||''} className="w-full h-32 object-cover" />
-                      <input value={img.alt||''} onChange={(e)=>{ const v=e.target.value; setImages(list=>list.map(it=>it.id===img.id?{...it, alt:v}:it)) }} onBlur={async (e)=>{ try { const v=e.target.value; const { error } = await supabase.from('product_images').update({ alt: v }).eq('id', img.id); if (error) throw error; } catch (err) { alert(t('admin.products.toasts.altSaveFailed', { msg: ((err as Error).message || String(err)) })); if (selectedId) await loadImages(selectedId); } }} className="px-2 py-1 border border-light-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.images.altPlaceholder') ?? 'Alternatif metin'} />
-                      <div className="flex flex-wrap gap-2">
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, -1)} disabled={idx===0}>{t('admin.products.edit.images.up')}</button>
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>bumpImage(img, +1)} disabled={idx===images.length-1}>{t('admin.products.edit.images.down')}</button>
-                        <button className="px-2 py-1 border rounded text-xs" onClick={()=>makeCover(img)} disabled={idx===0}>{t('admin.products.edit.images.makeCover')}</button>
-                        <button className="px-2 py-1 border rounded text-xs text-red-600" onClick={()=>deleteImage(img)}>{t('admin.products.edit.images.delete')}</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {tab === 'seo' && (
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.slug')}</label>
-<input value={slug} onChange={(e)=>{ setSlug(e.target.value); setSlugError('') }} onBlur={async ()=>{ const clean=slugify(slug||name); setSlug(clean); if(!clean){ setSlugError(t('admin.products.edit.seo.slugRequired')); return } const { data }=await supabase.from('products').select('id').eq('slug', clean); const exists=((data||[]) as {id:string}[]).some(row=>row.id!==(selectedId||'')); setSlugError(exists ? t('admin.products.edit.seo.slugInUse') : '') }} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" placeholder={t('admin.products.edit.seo.slugPlaceholder') ?? 'ornek-urun'} />
-              {slugError && <div className="text-xs text-red-600">{slugError}</div>}
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.metaTitle')}</label>
-              <input value={metaTitle} onChange={(e)=>setMetaTitle(e.target.value)} className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" />
-              <div className="text-xs text-industrial-gray">{t('admin.products.edit.seo.chars', { count: metaTitle.length })}</div>
-              <label className="text-sm text-steel-gray">{t('admin.products.edit.seo.metaDesc')}</label>
-              <textarea value={metaDesc} onChange={(e)=>setMetaDesc(e.target.value)} className="w-full border border-light-gray rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white" rows={3} />
-              <div className="text-xs text-industrial-gray">{t('admin.products.edit.seo.chars', { count: metaDesc.length })}</div>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Table */}
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -794,9 +390,9 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
         <div className="p-2 flex items-center justify-between text-sm text-steel-gray">
           <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
           <div className="flex items-center gap-2">
-            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
             <span>{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-            <button onClick={()=>setPage(p=>p+1)} disabled={page>=Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
           </div>
         </div>
         <table className="w-full">
@@ -807,32 +403,32 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
               )}
               {visibleCols.name && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
                 </th>
               )}
               {visibleCols.sku && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
                 </th>
               )}
               {visibleCols.category && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
                 </th>
               )}
               {visibleCols.status && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
                 </th>
               )}
               {visibleCols.price && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
                 </th>
               )}
               {visibleCols.stock && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
                 </th>
               )}
               {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.actions')}</th>}
@@ -845,7 +441,7 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
               <tr><td className="p-4" colSpan={7}>{t('admin.ui.noRecords')}</td></tr>
             ) : (
               sorted.map(r => (
-<tr key={r.id} className="border-b border-light-gray/60">
+                <tr key={r.id} className="border-b border-light-gray/60">
                   {visibleCols.image && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       {covers[r.id] ? (
@@ -857,15 +453,15 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
                   )}
                   {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
                   {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
-                  {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c=>c.id===r.category_id)?.name || '-'}</td>}
-{visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
-{visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price!=null?formatCurrency(Number(r.price), lang):'-'}</td>}
-                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{(r.stock_qty!=null?Number(r.stock_qty):null) ?? '-'}</td>}
+                  {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
+                  {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</td>}
+                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}</td>}
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2 whitespace-nowrap">
-                        <button className="px-2 py-1 rounded border text-xs" onClick={()=>startEdit(r.id)}>{t('admin.ui.edit')}</button>
-                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={()=>remove(r.id)}>{t('admin.ui.delete')}</button>
+                        <button className="px-2 py-1 rounded border text-xs" onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
                       </div>
                     </td>
                   )}
@@ -875,9 +471,16 @@ r.id, `"${(r.name||'').replace(/"/g,'""')}"`, r.sku, r.category_id||'', r.status
           </tbody>
         </table>
       </div>
+
+      <ProductFormModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        productId={editingId}
+        onSuccess={handleModalSuccess}
+        categories={cats.map(c => ({ id: c.id, name: c.name }))}
+      />
     </div>
   )
 }
 
 export default AdminProductsPage
-

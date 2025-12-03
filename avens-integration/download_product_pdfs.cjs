@@ -148,7 +148,7 @@ async function processCategory(page, category) {
                 });
 
                 if (clicked) {
-                    await page.waitForTimeout(5000);
+                    await new Promise(r => setTimeout(r, 5000));
                 }
 
                 const pdfLinks = await page.evaluate(() => {

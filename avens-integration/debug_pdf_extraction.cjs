@@ -27,7 +27,7 @@ async function main() {
         console.log(`Tab clicked: ${clicked}`);
 
         console.log('Waiting 10 seconds...');
-        await page.waitForTimeout(10000);
+        await new Promise(r => setTimeout(r, 10000));
 
         // Dump HTML of tab content
         const debugInfo = await page.evaluate(() => {
