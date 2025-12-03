@@ -50,7 +50,7 @@ const AdminProductsPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:products'
   const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  const [defaultThreshold, setDefaultThreshold] = React.useState<number | null>(null)
+  const _defaultThreshold = React.useState<number | null>(null)
   const [covers, setCovers] = React.useState<Record<string, string>>({})
 
   React.useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
@@ -123,7 +123,7 @@ const AdminProductsPage: React.FC = () => {
       ])
       if (c.error) throw c.error
       setCats((c.data || []) as CategoryOpt[])
-      if (!s.error) setDefaultThreshold(((s.data as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null) as number | null)
+      if (!s.error) _defaultThreshold[1](((s.data as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null) as number | null)
 
       // Cover images for current page
       const ids = list.map(x => x.id)

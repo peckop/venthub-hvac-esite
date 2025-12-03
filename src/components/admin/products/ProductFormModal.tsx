@@ -4,7 +4,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Upload, Trash2, Plus, Save, Loader2, Image as ImageIcon, GripVertical } from 'lucide-react'
+import { X, Upload, Trash2, Plus, Save, Loader2 } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
@@ -69,7 +69,7 @@ const compressImage = async (file: File): Promise<Blob> => {
 }
 
 export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpenChange, productId, onSuccess, categories }) => {
-    const { t } = useI18n()
+    const { t: _t } = useI18n()
     const [activeTab, setActiveTab] = useState('info')
     const [loading, setLoading] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -90,20 +90,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
         }
     })
 
-    // Load Data
-    useEffect(() => {
-        if (open && productId) {
-            loadProduct(productId)
-        } else if (open && !productId) {
-            reset({ status: 'active', is_featured: false, technical_specs: {} })
-            setImages([])
-            setSpecs([])
-            setInitialData(null)
-            setActiveTab('info')
-        }
-    }, [open, productId])
-
-    const loadProduct = async (id: string) => {
+    const loadProduct = React.useCallback(async (id: string) => {
         setLoading(true)
         try {
             // Fetch product
@@ -162,7 +149,20 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
         } finally {
             setLoading(false)
         }
-    }
+    }, [reset])
+
+    // Load Data
+    useEffect(() => {
+        if (open && productId) {
+            loadProduct(productId)
+        } else if (open && !productId) {
+            reset({ status: 'active', is_featured: false, technical_specs: {} })
+            setImages([])
+            setSpecs([])
+            setInitialData(null)
+            setActiveTab('info')
+        }
+    }, [open, productId, loadProduct, reset])
 
     // --- Handlers ---
 
