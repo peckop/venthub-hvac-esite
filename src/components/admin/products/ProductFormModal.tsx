@@ -198,7 +198,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             const specsJson = specs.reduce((acc, curr) => {
                 if (curr.key.trim()) acc[curr.key.trim()] = curr.value
                 return acc
-            }, {} as Record<string, any>)
+            }, {} as Record<string, string>)
 
             data.technical_specs = specsJson
 
@@ -245,9 +245,9 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             onSuccess()
             onOpenChange(false)
 
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Save error:', e)
-            alert(`Kaydetme hatası: ${e.message}`)
+            alert(`Kaydetme hatası: ${e instanceof Error ? e.message : 'Bilinmeyen hata'}`)
         } finally {
             setLoading(false)
         }
