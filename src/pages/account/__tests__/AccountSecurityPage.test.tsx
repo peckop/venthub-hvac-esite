@@ -30,7 +30,7 @@ vi.mock('../../../utils/passwordSecurity', () => ({
 }))
 
 // Provide minimal Auth and I18n contexts
-import { AuthContext } from '../../../contexts/AuthContext'
+import { AuthContext } from '../../../contexts/AuthContextDefinition'
 import { I18nProvider } from '../../../i18n/I18nProvider'
 import AccountSecurityPage from '../AccountSecurityPage'
 import { supabase } from '../../../lib/supabase'
