@@ -35,7 +35,7 @@ export interface Product {
   status: 'active' | 'inactive' | 'out_of_stock'
   is_featured: boolean
   description?: string
-  technical_specs?: unknown
+  technical_specs?: Record<string, string | number | boolean | null>
   image_url?: string
   image_alt?: string | null
   // Stok alanları (opsiyonel; migration sonrası gelir)

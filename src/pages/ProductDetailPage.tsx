@@ -503,8 +503,8 @@ export const ProductDetailPage: React.FC = () => {
                   aria-label={isWishlisted ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
                   aria-pressed={isWishlisted}
                   className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${isWishlisted
-                      ? 'border-red-500 text-red-500 bg-red-50'
-                      : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
+                    ? 'border-red-500 text-red-500 bg-red-50'
+                    : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
                     }`}
                 >
                   <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
@@ -596,8 +596,8 @@ export const ProductDetailPage: React.FC = () => {
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${activeSection === section.id
-                    ? 'bg-primary-navy text-white shadow-sm'
-                    : 'text-steel-gray hover:text-primary-navy hover:bg-light-gray'
+                  ? 'bg-primary-navy text-white shadow-sm'
+                  : 'text-steel-gray hover:text-primary-navy hover:bg-light-gray'
                   }`}
               >
                 <section.icon size={16} />
@@ -800,46 +800,21 @@ export const ProductDetailPage: React.FC = () => {
                   {section.id === 'olcuiler' && (
                     <>
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.physicalDimensions')}</h4>
+                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.technicalSpecifications')}</h4>
                         <div className="space-y-3">
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.width')}</span>
-                            <span className="font-medium text-industrial-gray">450 mm</span>
-                          </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.height')}</span>
-                            <span className="font-medium text-industrial-gray">350 mm</span>
-                          </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.depth')}</span>
-                            <span className="font-medium text-industrial-gray">200 mm</span>
-                          </div>
-                          <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">{t('pdp.labels.weight')}</span>
-                            <span className="font-medium text-industrial-gray">15.5 kg</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.performanceMetrics')}</h4>
-                        <div className="space-y-3">
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.airflow')}</span>
-                            <span className="font-medium text-industrial-gray">2.850 m³/h</span>
-                          </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.pressure')}</span>
-                            <span className="font-medium text-industrial-gray">245 Pa</span>
-                          </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.power')}</span>
-                            <span className="font-medium text-industrial-gray">180 W</span>
-                          </div>
-                          <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">{t('pdp.labels.noise')}</span>
-                            <span className="font-medium text-industrial-gray">45 dB(A)</span>
-                          </div>
+                          {product.technical_specs && Object.entries(product.technical_specs).map(([key, value]) => (
+                            <div key={key} className="flex justify-between py-2 border-b border-light-gray/50 last:border-0">
+                              <span className="text-steel-gray capitalize">{key.replace(/_/g, ' ')}</span>
+                              <span className="font-medium text-industrial-gray">
+                                {value !== null && value !== undefined ? String(value) : '-'}
+                              </span>
+                            </div>
+                          ))}
+                          {!product.technical_specs && (
+                            <div className="text-steel-gray italic">
+                              {t('pdp.labels.noSpecsAvailable')}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
