@@ -19,107 +19,16 @@ if not SUPABASE_URL or not SERVICE_KEY:
     exit(1)
 
 def apply_migration():
-    migration_file = os.path.join(os.path.dirname(__file__), '..', 'supabase', 'migrations', '20251128_fts_technical_specs.sql')
+    migration_file = os.path.join(os.path.dirname(__file__), '..', 'supabase', 'migrations', '20251203_fix_performance_lints.sql')
     
     with open(migration_file, 'r', encoding='utf-8') as f:
         sql_content = f.read()
     
-    # Split into statements (rough split by ;)
-    # Note: This is a simple splitter, might break on complex PL/PGSQL. 
-    # But the migration file mainly has CREATE INDEX and CREATE FUNCTION.
-    # The CREATE FUNCTION uses $$ so ; inside it shouldn't be split.
-    # A better way is to send the whole thing if the RPC supports it, or use the `exec_sql` format if known.
-    # Based on run-sql-curl.sh, it expects "statements" array.
-    
-    # Let's try sending the whole content as one statement first, or split intelligently.
-    # The run-sql-curl.sh example sends a list of statements.
-    
-    # For this specific migration, we have:
-    # 1. DROP INDEX
-    # 2. CREATE INDEX
-    # 3. CREATE FUNCTION
-    
-    # We can manually define the statements to be safe.
-    
-    statements = [
-        "DROP INDEX IF EXISTS public.idx_products_fts_tr;",
-        
-        """CREATE INDEX idx_products_fts_tr_enhanced ON public.products USING gin (
-          to_tsvector('turkish', 
-            coalesce(name,'') || ' ' || 
-            coalesce(model_code,'') || ' ' || 
-            coalesce(sku,'') || ' ' || 
-            coalesce(brand,'') || ' ' ||
-            coalesce(description,'') || ' ' ||
-            coalesce(technical_specs::text,'')
-          )
-        );""",
-        
-        """CREATE OR REPLACE FUNCTION public.fts_search_products(
-          p_q text,
-          p_limit integer DEFAULT 20,
-          p_filters jsonb DEFAULT '{}'::jsonb
-        )
-        RETURNS TABLE(
-          id uuid,
-          name text,
-          sku text,
-          brand text,
-          price numeric,
-          rank real
-        )
-        LANGUAGE sql
-        STABLE
-        SECURITY INVOKER
-        SET search_path TO pg_catalog, public
-        AS $$
-          WITH params AS (
-            SELECT
-              coalesce(p_q,'')::text AS raw,
-              plainto_tsquery('turkish', coalesce(p_q,'')) AS tsq,
-              LEAST(GREATEST(p_limit,1), 100) AS lim,
-              p_filters AS f
-          )
-          SELECT p.id, p.name, p.sku, p.brand, p.price,
-                 ts_rank(
-                   to_tsvector('turkish', 
-                     coalesce(p.name,'') || ' ' || 
-                     coalesce(p.model_code,'') || ' ' || 
-                     coalesce(p.sku,'') || ' ' || 
-                     coalesce(p.brand,'') || ' ' ||
-                     coalesce(p.description,'') || ' ' ||
-                     coalesce(p.technical_specs::text,'')
-                   ),
-                   (SELECT tsq FROM params)
-                 ) AS rank
-          FROM public.products p, params x
-          WHERE (
-            p.name ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-            OR p.model_code ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-            OR p.sku ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-            OR p.brand ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-            OR p.description ILIKE '%' || replace(x.raw, ' ', '%') || '%'
-            OR p.technical_specs::text ILIKE '%' || x.raw || '%'
-            OR to_tsvector('turkish', 
-                 coalesce(p.name,'') || ' ' || 
-                 coalesce(p.model_code,'') || ' ' || 
-                 coalesce(p.sku,'') || ' ' || 
-                 coalesce(p.brand,'') || ' ' ||
-                 coalesce(p.description,'') || ' ' ||
-                 coalesce(p.technical_specs::text,'')
-               ) @@ x.tsq
-          )
-          AND (
-            (NOT (x.f ? 'category_id')) OR (p.category_id = (x.f->>'category_id')::uuid)
-          )
-          AND p.status = 'active'
-          ORDER BY rank DESC NULLS LAST, p.name ASC
-          LIMIT x.lim;
-        $$;"""
-    ]
+    # Use the file content directly
+    full_sql = sql_content
     
     # Join statements into one block for exec function
-    full_sql = "\n".join(statements)
+    # full_sql is already set above
     
     url = f"{SUPABASE_URL}/rest/v1/rpc/exec"
     headers = {
