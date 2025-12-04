@@ -69,7 +69,7 @@ export const CartPage: React.FC = () => {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      to={`/product/${item.product.id}`}
+                      to={`/products/${item.product.id}`}
                       className="block hover:text-primary-navy transition-colors"
                     >
                       <h3 className="font-semibold text-industrial-gray mb-1">

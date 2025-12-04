@@ -74,7 +74,7 @@ export const CategoryPage: React.FC = () => {
       try {
         setLoading(true)
         const categories = await getCategories()
-        
+
         let targetCategory: Category | null = null
         let targetParentCategory: Category | null = null
 
@@ -113,7 +113,7 @@ export const CategoryPage: React.FC = () => {
             .eq('status', 'active')
             .order('is_featured', { ascending: false })
             .order('name', { ascending: true })
-          
+
           if (error) throw error
           productsData = data as Product[]
         } else if (targetCategory.level === 1) {
@@ -125,7 +125,7 @@ export const CategoryPage: React.FC = () => {
             .eq('status', 'active')
             .order('is_featured', { ascending: false })
             .order('name', { ascending: true })
-          
+
           if (error) throw error
           productsData = data as Product[]
         } else {
@@ -161,7 +161,7 @@ export const CategoryPage: React.FC = () => {
       const term = catSearch.trim().toLowerCase()
       if (term) {
         const modelCode = (product as unknown as { model_code?: string | null }).model_code || ''
-        const hay = [product.name, product.brand, modelCode, product.sku].map(v => String(v||'').toLowerCase())
+        const hay = [product.name, product.brand, modelCode, product.sku].map(v => String(v || '').toLowerCase())
         if (!hay.some(h => h.includes(term))) return false
       }
       const rawPrice = (product as unknown as { price?: unknown }).price
@@ -199,8 +199,8 @@ export const CategoryPage: React.FC = () => {
   const availableBrands = Array.from(new Set(products.map(p => p.brand)))
 
   const toggleBrand = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) 
+    setSelectedBrands(prev =>
+      prev.includes(brand)
         ? prev.filter(b => b !== brand)
         : [...prev, brand]
     )
@@ -254,7 +254,7 @@ export const CategoryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-light-gray">
-      <Seo 
+      <Seo
         title={`${category.name} | VentHub`}
         description={category.description}
         canonical={canonicalUrl}
@@ -285,7 +285,7 @@ export const CategoryPage: React.FC = () => {
             itemListElement: filteredProducts.map((p, idx) => ({
               '@type': 'ListItem',
               position: idx + 1,
-              url: `${window.location.origin}/product/${p.id}`,
+              url: `${window.location.origin}/products/${p.id}`,
               name: p.name,
             })),
           }),
@@ -301,8 +301,8 @@ export const CategoryPage: React.FC = () => {
             <ChevronRight size={16} className="text-steel-gray" />
             {parentCategory && (
               <>
-                <Link 
-                  to={`/category/${parentCategory.slug}`} 
+                <Link
+                  to={`/category/${parentCategory.slug}`}
                   className="text-steel-gray hover:text-primary-navy"
                 >
                   {parentCategory.name}
@@ -346,7 +346,7 @@ export const CategoryPage: React.FC = () => {
             <input
               type="text"
               value={catSearch}
-              onChange={(e)=>setCatSearch(e.target.value)}
+              onChange={(e) => setCatSearch(e.target.value)}
               placeholder={t('category.localSearchPlaceholder') as string}
               className="w-full pl-3 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
             />
@@ -426,20 +426,20 @@ export const CategoryPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.airflow')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e=>setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e=>setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e => setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e => setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.pressure')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e=>setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e=>setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e => setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e => setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.noise')}</label>
-                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e=>setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e => setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                   </div>
                 </div>
               </div>
@@ -466,7 +466,7 @@ export const CategoryPage: React.FC = () => {
                 {/* Mobile filter button */}
                 <button
                   type="button"
-                  onClick={()=>setIsFilterOpen(true)}
+                  onClick={() => setIsFilterOpen(true)}
                   className="lg:hidden inline-flex items-center gap-2 px-3 py-2 border border-light-gray rounded-lg text-sm text-industrial-gray hover:bg-light-gray"
                 >
                   <Filter size={16} /> {t('category.filters')}
@@ -488,11 +488,10 @@ export const CategoryPage: React.FC = () => {
                     onClick={() => setViewMode('grid')}
                     aria-label={t('category.gridViewAria') as string}
                     aria-pressed={viewMode === 'grid'}
-                    className={`p-2 rounded transition-colors ${
-                      viewMode === 'grid' 
-                        ? 'bg-primary-navy text-white' 
+                    className={`p-2 rounded transition-colors ${viewMode === 'grid'
+                        ? 'bg-primary-navy text-white'
                         : 'text-steel-gray hover:bg-light-gray'
-                    }`}
+                      }`}
                   >
                     <Grid size={20} />
                   </button>
@@ -500,11 +499,10 @@ export const CategoryPage: React.FC = () => {
                     onClick={() => setViewMode('list')}
                     aria-label={t('category.listViewAria') as string}
                     aria-pressed={viewMode === 'list'}
-                    className={`p-2 rounded transition-colors ${
-                      viewMode === 'list' 
-                        ? 'bg-primary-navy text-white' 
+                    className={`p-2 rounded transition-colors ${viewMode === 'list'
+                        ? 'bg-primary-navy text-white'
                         : 'text-steel-gray hover:bg-light-gray'
-                    }`}
+                      }`}
                   >
                     <List size={20} />
                   </button>
@@ -515,14 +513,14 @@ export const CategoryPage: React.FC = () => {
             {/* Products */}
             <div className="bg-white rounded-xl p-2 sm:p-3">
               {filteredProducts.length > 0 ? (
-                <div className={viewMode === 'grid' 
+                <div className={viewMode === 'grid'
                   ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
                   : 'space-y-4'
                 }>
-{filteredProducts.map((product, i) => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
+                  {filteredProducts.map((product, i) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
                       highlightFeatured={false}
                       showCompare
                       compareSelected={compareIds.includes(product.id)}
@@ -563,43 +561,43 @@ export const CategoryPage: React.FC = () => {
       {compareIds.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-white border border-light-gray shadow-lg rounded-full px-4 py-2 flex items-center gap-3">
           <span className="text-sm text-industrial-gray">{t('category.compareBar')}: {compareIds.length}</span>
-          <button onClick={()=>setCompareOpen(true)} className="text-sm bg-primary-navy hover:bg-secondary-blue text-white px-3 py-1 rounded-full">{t('category.open')}</button>
-          <button onClick={()=>setCompareIds([])} className="text-sm text-steel-gray hover:text-red-600">{t('category.clean')}</button>
+          <button onClick={() => setCompareOpen(true)} className="text-sm bg-primary-navy hover:bg-secondary-blue text-white px-3 py-1 rounded-full">{t('category.open')}</button>
+          <button onClick={() => setCompareIds([])} className="text-sm text-steel-gray hover:text-red-600">{t('category.clean')}</button>
         </div>
       )}
 
       {/* Compare modal */}
       {compareOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={()=>setCompareOpen(false)}>
-          <div className="bg-white rounded-xl w-full max-w-5xl shadow-2xl p-4" onClick={(e)=>e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setCompareOpen(false)}>
+          <div className="bg-white rounded-xl w-full max-w-5xl shadow-2xl p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b pb-2 mb-4">
               <h3 className="text-xl font-bold text-industrial-gray">{t('category.compareTitle')}</h3>
-              <button onClick={()=>setCompareOpen(false)} className="text-steel-gray hover:text-primary-navy">{t('category.close')}</button>
+              <button onClick={() => setCompareOpen(false)} className="text-steel-gray hover:text-primary-navy">{t('category.close')}</button>
             </div>
             <div className="overflow-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-industrial-gray">
                     <th className="py-2 pr-4">{t('category.feature')}</th>
-                    {filteredProducts.filter(p=>compareIds.includes(p.id)).map(p=> (
+                    {filteredProducts.filter(p => compareIds.includes(p.id)).map(p => (
                       <th key={p.id} className="py-2 pr-4 whitespace-nowrap">{p.name}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="text-steel-gray">
                   {[
-                    {label: t('category.labelBrand'), key:'brand'},
-                    {label: t('category.labelModel'), key:'sku'},
-                    {label: t('category.labelPrice'), key:'price', render:(v: unknown)=> formatCurrency(parseFloat(String(v ?? '0')), lang, { maximumFractionDigits: 0 })},
-                    {label: t('category.airflow'), key:'airflow_capacity'},
-                    {label: t('category.pressure'), key:'pressure_rating'},
-                    {label: t('category.noise'), key:'noise_level'},
+                    { label: t('category.labelBrand'), key: 'brand' },
+                    { label: t('category.labelModel'), key: 'sku' },
+                    { label: t('category.labelPrice'), key: 'price', render: (v: unknown) => formatCurrency(parseFloat(String(v ?? '0')), lang, { maximumFractionDigits: 0 }) },
+                    { label: t('category.airflow'), key: 'airflow_capacity' },
+                    { label: t('category.pressure'), key: 'pressure_rating' },
+                    { label: t('category.noise'), key: 'noise_level' },
                   ].map(row => (
                     <tr key={row.label} className="border-t">
                       <td className="py-2 pr-4 font-medium text-industrial-gray">{row.label}</td>
-                      {filteredProducts.filter(p=>compareIds.includes(p.id)).map(p=> (
-                        <td key={p.id+String(row.key)} className="py-2 pr-4">
-{row.render ? row.render((p as unknown as Record<string, unknown>)[row.key]) : String((p as unknown as Record<string, unknown>)[row.key] ?? '-')}
+                      {filteredProducts.filter(p => compareIds.includes(p.id)).map(p => (
+                        <td key={p.id + String(row.key)} className="py-2 pr-4">
+                          {row.render ? row.render((p as unknown as Record<string, unknown>)[row.key]) : String((p as unknown as Record<string, unknown>)[row.key] ?? '-')}
                         </td>
                       ))}
                     </tr>
@@ -613,11 +611,11 @@ export const CategoryPage: React.FC = () => {
       {/* Mobile Filter Drawer */}
       {isFilterOpen && (
         <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-black/40" onClick={()=>setIsFilterOpen(false)} />
-          <div className="absolute inset-y-0 right-0 w-full sm:w-[420px] bg-white shadow-2xl p-5 animate-slideDown overflow-y-auto" onClick={(e)=>e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/40" onClick={() => setIsFilterOpen(false)} />
+          <div className="absolute inset-y-0 right-0 w-full sm:w-[420px] bg-white shadow-2xl p-5 animate-slideDown overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-industrial-gray">{t('category.filters')}</h3>
-              <button onClick={()=>setIsFilterOpen(false)} className="text-steel-gray hover:text-primary-navy">{t('category.close')}</button>
+              <button onClick={() => setIsFilterOpen(false)} className="text-steel-gray hover:text-primary-navy">{t('category.close')}</button>
             </div>
             {/* Local search (mobile) */}
             <div className="mb-4">
@@ -625,7 +623,7 @@ export const CategoryPage: React.FC = () => {
                 <input
                   type="text"
                   value={catSearch}
-                  onChange={(e)=>setCatSearch(e.target.value)}
+                  onChange={(e) => setCatSearch(e.target.value)}
                   placeholder={t('category.localSearchPlaceholder') as string}
                   className="w-full pl-3 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
                 />
@@ -642,7 +640,7 @@ export const CategoryPage: React.FC = () => {
                         key={sub.id}
                         to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
-                        onClick={()=>setIsFilterOpen(false)}
+                        onClick={() => setIsFilterOpen(false)}
                       >
                         {sub.name}
                       </Link>
@@ -698,27 +696,27 @@ export const CategoryPage: React.FC = () => {
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.airflow')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e=>setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e=>setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={airflowMin} onChange={e => setAirflowMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={airflowMax} onChange={e => setAirflowMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.pressure')}</label>
                     <div className="grid grid-cols-2 gap-2">
-                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e=>setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
-                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e=>setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                      <input type="number" placeholder={t('category.minPlaceholder') as string} value={pressureMin} onChange={e => setPressureMin(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+                      <input type="number" placeholder={t('category.maxPlaceholder') as string} value={pressureMax} onChange={e => setPressureMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm text-industrial-gray mb-1">{t('category.noise')}</label>
-                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e=>setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"/>
+                    <input type="number" placeholder={t('category.ltePlaceholder') as string} value={noiseMax} onChange={e => setNoiseMax(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
                   </div>
                 </div>
               </div>
 
               <div className="pt-2">
                 <button
-                  onClick={()=>setIsFilterOpen(false)}
+                  onClick={() => setIsFilterOpen(false)}
                   className="w-full bg-primary-navy hover:bg-secondary-blue text-white rounded-lg px-4 py-2 text-sm"
                 >
                   {t('category.applyFilters')}

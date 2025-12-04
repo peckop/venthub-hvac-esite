@@ -559,7 +559,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                         <button
                           key={product.id}
                           onClick={() => {
-                            navigate(`/product/${product.id}`)
+                            navigate(`/products/${product.id}`)
                             setStickySearchQuery('')
                             setIsStickySearchOpen(false)
                           }}
@@ -601,7 +601,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     <button
                       onClick={() => {
                         const recent = JSON.parse(window.localStorage.getItem('recentProducts') || '[]')
-                        if (recent.length > 0) navigate(`/product/${recent[0]}`)
+                        if (recent.length > 0) navigate(`/products/${recent[0]}`)
                       }}
                       className="hidden xl:block p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
                       title={t('header.recentlyViewed')}

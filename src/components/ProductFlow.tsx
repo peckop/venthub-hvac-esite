@@ -28,7 +28,7 @@ const useProductsWithImages = () => {
         setLoading(true)
         const { featured, list } = await fetchHomeProducts(36)
         const merged = [...featured, ...list]
-const map = new Map<string, LiteProduct>()
+        const map = new Map<string, LiteProduct>()
         merged.forEach(p => {
           if (!p.image_url) return
           map.set(p.id, p as LiteProduct)
@@ -140,7 +140,7 @@ const ProductFlow: React.FC = () => {
   }
 
   const toTickerItems = (prods: LiteProduct[]) =>
-    prods.map(p => ({ src: p.image_url!, href: `/product/${p.id}` as const, alt: p.name }))
+    prods.map(p => ({ src: p.image_url!, href: `/products/${p.id}` as const, alt: p.name }))
 
   return (
     <section className="py-8">

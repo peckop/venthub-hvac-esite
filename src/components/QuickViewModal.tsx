@@ -49,7 +49,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
               <button onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}
               </button>
-              <Link to={`/product/${product.id}`} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
+              <Link to={`/products/${product.id}`} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
                 <Eye size={18} className="mr-2" /> {t('quickView.viewProduct')}
               </Link>
             </div>

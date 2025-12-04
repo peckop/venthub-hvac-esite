@@ -21,8 +21,8 @@ const ProductsPage: React.FC = () => {
   const { t } = useI18n()
   const appSectionRef = useRef<HTMLDivElement | null>(null)
 
-  // Teklif/lead modalını global tetikleyiciye bağla (sayfa içinde kullanılacak)
-  ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
+    // Teklif/lead modalını global tetikleyiciye bağla (sayfa içinde kullanılacak)
+    ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
   const [featured, setFeatured] = useState<Product[]>([])
   const [newProducts, setNewProducts] = useState<Product[]>([])
@@ -115,7 +115,7 @@ const ProductsPage: React.FC = () => {
     if (targetApp && appSectionRef.current) {
       try {
         appSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      } catch {}
+      } catch { }
     }
 
     // Decide what to fetch based on URL and query
@@ -222,7 +222,7 @@ const ProductsPage: React.FC = () => {
               itemListElement: (searchQuery ? searchResults : isAll ? allProducts : []).map((p, idx) => ({
                 '@type': 'ListItem',
                 position: idx + 1,
-                url: `${window.location.origin}/product/${p.id}`,
+                url: `${window.location.origin}/products/${p.id}`,
                 name: p.name,
               })),
             }),
@@ -274,21 +274,19 @@ const ProductsPage: React.FC = () => {
             <div className="flex bg-light-gray rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid'
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'grid'
                     ? 'bg-white text-primary-navy shadow-sm'
                     : 'text-steel-gray hover:text-primary-navy'
-                }`}
+                  }`}
               >
                 <GridIcon size={16} />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list'
+                className={`p-2 rounded-lg transition-colors ${viewMode === 'list'
                     ? 'bg-white text-primary-navy shadow-sm'
                     : 'text-steel-gray hover:text-primary-navy'
-                }`}
+                  }`}
               >
                 <ListIcon size={16} />
               </button>
@@ -297,7 +295,7 @@ const ProductsPage: React.FC = () => {
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
               <input
                 type="text"
-placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
+                placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full sm:w-72 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
@@ -310,56 +308,56 @@ placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
       {/* Keşfet hero (yalnızca Keşfet modunda) */}
       {!isAll && !searchQuery && (
         <>
-        <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
-          <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold leading-tight">{t('products.heroTitle')}</h1>
-              <p className="mt-3 text-white/90">{t('products.heroSubtitle')}</p>
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <Link to="/products?all=1" className="inline-flex items-center justify-center rounded-lg bg-white text-primary-navy px-5 py-2.5 font-semibold shadow-sm hover:bg-gray-100 transition">
-                  {t('common.seeAllProducts')}
-                </Link>
-                <a href="#by-application" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
-                  {t('common.selectByNeed')}
-                </a>
-              </div>
-              <div className="relative mt-6 max-w-md">
-                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
+          <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
+            <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold leading-tight">{t('products.heroTitle')}</h1>
+                <p className="mt-3 text-white/90">{t('products.heroSubtitle')}</p>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <Link to="/products?all=1" className="inline-flex items-center justify-center rounded-lg bg-white text-primary-navy px-5 py-2.5 font-semibold shadow-sm hover:bg-gray-100 transition">
+                    {t('common.seeAllProducts')}
+                  </Link>
+                  <a href="#by-application" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
+                    {t('common.selectByNeed')}
+                  </a>
+                </div>
+                <div className="relative mt-6 max-w-md">
+                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
                   <input
-                  type="text"
-placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
-                />
+                    type="text"
+                    placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
+                  />
+                </div>
+              </div>
+              <div className="hidden lg:block">
+                <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
+                  <span className="text-white/80">{t('products.discoverVisual')}</span>
+                </div>
               </div>
             </div>
-            <div className="hidden lg:block">
-              <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
-                <span className="text-white/80">{t('products.discoverVisual')}</span>
+            {/* Value props strip */}
+            <div className="bg-white/10 border-t border-white/20">
+              <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex items-center gap-3">
+                  <BadgeCheckIcon size={18} />
+                  <span className="text-sm">{t('products.heroValue1')}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ShieldCheckIcon size={18} />
+                  <span className="text-sm">{t('products.heroValue2')}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <ClockIcon size={18} />
+                  <span className="text-sm">{t('products.heroValue3')}</span>
+                </div>
               </div>
             </div>
-          </div>
-          {/* Value props strip */}
-          <div className="bg-white/10 border-t border-white/20">
-            <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="flex items-center gap-3">
-                <BadgeCheckIcon size={18} />
-                <span className="text-sm">{t('products.heroValue1')}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <ShieldCheckIcon size={18} />
-                <span className="text-sm">{t('products.heroValue2')}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <ClockIcon size={18} />
-                <span className="text-sm">{t('products.heroValue3')}</span>
-              </div>
-            </div>
-          </div>
-        </section>
-        {/* Keşfet kahramanının hemen altında Güven/Uygunluk */}
-        <TrustSection />
+          </section>
+          {/* Keşfet kahramanının hemen altında Güven/Uygunluk */}
+          <TrustSection />
         </>
       )}
 
@@ -368,7 +366,7 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
           {searchLoading ? (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {[1,2,3,4,5,6,7,8,9].map((i) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
                 <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
               ))}
             </div>
@@ -394,7 +392,7 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
         <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
           {!hasLoadedAll ? (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {[1,2,3,4,5,6,7,8,9].map((i) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
                 <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
               ))}
             </div>
@@ -408,10 +406,10 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
             </div>
           ) : (
             <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-{([...allProducts].sort((a,b)=>{
+              {([...allProducts].sort((a, b) => {
                 switch (sortBy) {
-                  case 'price-low': return parseFloat(a.price)-parseFloat(b.price)
-                  case 'price-high': return parseFloat(b.price)-parseFloat(a.price)
+                  case 'price-low': return parseFloat(a.price) - parseFloat(b.price)
+                  case 'price-high': return parseFloat(b.price) - parseFloat(a.price)
                   case 'name':
                   default: return a.name.localeCompare(b.name, 'tr')
                 }
@@ -432,26 +430,27 @@ placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
               {applicationCards.map((card) => {
                 const selected = card.key === appParam
                 return (
-                <Link
-                  key={card.key}
-                  to={card.href}
-                  className={`group relative overflow-hidden rounded-xl border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition ${selected ? 'border-primary-navy ring-2 ring-primary-navy' : 'border-light-gray'}`}
-                  aria-current={selected ? 'true' : undefined}
-onClick={() => {
-                    trackEvent('application_click', { key: card.key, source: 'products' })
-                  }}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
-                  <div className="p-5 relative z-10">
-                    <div className="flex items-center gap-2 text-primary-navy">
-                      {iconFor(card.icon, 18)}
-                      <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                  <Link
+                    key={card.key}
+                    to={card.href}
+                    className={`group relative overflow-hidden rounded-xl border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition ${selected ? 'border-primary-navy ring-2 ring-primary-navy' : 'border-light-gray'}`}
+                    aria-current={selected ? 'true' : undefined}
+                    onClick={() => {
+                      trackEvent('application_click', { key: card.key, source: 'products' })
+                    }}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
+                    <div className="p-5 relative z-10">
+                      <div className="flex items-center gap-2 text-primary-navy">
+                        {iconFor(card.icon, 18)}
+                        <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
+                      </div>
+                      <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
+                      <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
                     </div>
-                    <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
-                    <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
-                  </div>
-                </Link>
-              )})}
+                  </Link>
+                )
+              })}
             </div>
           </section>
 
@@ -459,7 +458,7 @@ onClick={() => {
           {mainCategories.length > 0 && (
             <section className="mb-12">
               <div className="flex items-center mb-4">
-              <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.popularCategories')}</h2>
+                <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.popularCategories')}</h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 {mainCategories.slice(0, 6).map((cat) => (
@@ -536,63 +535,63 @@ onClick={() => {
 function GridIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <rect x="3" y="3" width="7" height="7"/>
-      <rect x="14" y="3" width="7" height="7"/>
-      <rect x="14" y="14" width="7" height="7"/>
-      <rect x="3" y="14" width="7" height="7"/>
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
     </svg>
   )
 }
 function ListIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <line x1="8" y1="6" x2="21" y2="6"/>
-      <line x1="8" y1="12" x2="21" y2="12"/>
-      <line x1="8" y1="18" x2="21" y2="18"/>
-      <circle cx="4" cy="6" r="1"/>
-      <circle cx="4" cy="12" r="1"/>
-      <circle cx="4" cy="18" r="1"/>
+      <line x1="8" y1="6" x2="21" y2="6" />
+      <line x1="8" y1="12" x2="21" y2="12" />
+      <line x1="8" y1="18" x2="21" y2="18" />
+      <circle cx="4" cy="6" r="1" />
+      <circle cx="4" cy="12" r="1" />
+      <circle cx="4" cy="18" r="1" />
     </svg>
   )
 }
 function SearchIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="11" cy="11" r="8"/>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
   )
 }
 function BadgeCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <path d="M7.5 2.5l2 1 2.5-1 2.5 1 2-1 2 2-.5 2.5 1 2.5-1 2.5.5 2.5-2 2-2-1-2.5 1-2.5-1-2 1-2-2 .5-2.5-1-2.5 1-2.5-.5-2.5 2-2z"/>
-      <path d="M9 12l2 2 4-4"/>
+      <path d="M7.5 2.5l2 1 2.5-1 2.5 1 2-1 2 2-.5 2.5 1 2.5-1 2.5.5 2.5-2 2-2-1-2.5 1-2.5-1-2 1-2-2 .5-2.5-1-2.5 1-2.5-.5-2.5 2-2z" />
+      <path d="M9 12l2 2 4-4" />
     </svg>
   )
 }
 function ShieldCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z"/>
-      <path d="M9 12l2 2 4-4"/>
+      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z" />
+      <path d="M9 12l2 2 4-4" />
     </svg>
   )
 }
 function ClockIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
     </svg>
   )
 }
 function LayersIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-      <polyline points="2 12 12 17 22 12"/>
-      <polyline points="2 17 12 22 22 17"/>
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 12 12 17 22 12" />
+      <polyline points="2 17 12 22 22 17" />
     </svg>
   )
 }

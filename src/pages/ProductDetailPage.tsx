@@ -237,7 +237,7 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   // SEO values for PDP
-  const canonicalUrl = `${window.location.origin}/product/${product.id}`
+  const canonicalUrl = `${window.location.origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
   return (

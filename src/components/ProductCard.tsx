@@ -67,7 +67,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
     : '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px'
 
   return (
-    <Link to={`/product/${product.id}`}>
+    <Link to={`/products/${product.id}`}>
       <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
         } ${isList ? 'md:flex items-stretch' : ''}`}>
         {/* Featured Badge */}

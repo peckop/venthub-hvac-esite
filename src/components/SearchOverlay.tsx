@@ -59,19 +59,19 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center gap-2 mb-4">
           <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input
             autoFocus
             value={q}
-            onChange={(e)=>setQ(e.target.value)}
+            onChange={(e) => setQ(e.target.value)}
             placeholder="Ürün, model veya SKU ara"
             className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy"
             type="text"
           />
           <button aria-label="Kapat" onClick={onClose} className="p-2 rounded hover:bg-gray-100">
             <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
@@ -88,7 +88,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                 <li key={r.id}>
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center justify-between"
-                    onClick={() => { navigate(`/product/${r.id}`); onClose() }}
+                    onClick={() => { navigate(`/products/${r.id}`); onClose() }}
                   >
                     <div>
                       <div className="font-medium text-industrial-gray">{r.name}</div>
