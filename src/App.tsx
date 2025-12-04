@@ -175,7 +175,7 @@ function AppShell() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/category/:parentSlug/:slug" element={<CategoryPage />} />
             <Route path="/brands" element={<BrandsPage />} />
