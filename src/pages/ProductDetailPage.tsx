@@ -1181,46 +1181,7 @@ export const ProductDetailPage: React.FC = () => {
 }
 
 
-// Helper component for rich text rendering
-const RichTextRendererDup = ({ content }: { content: string }) => {
-  if (!content) return null;
 
-  // Split content by double newlines or specifically marked sections
-  const sections = content.split(/\n\n+/);
-
-  return (
-    <div className="space-y-6 text-steel-gray leading-relaxed">
-      {sections.map((section, idx) => {
-        // Headers (bold stars) - **Header**
-        if (section.trim().startsWith('**') && section.trim().endsWith(':**')) {
-          return <h4 key={idx} className="text-lg font-bold text-industrial-gray mt-4 mb-2">{section.replace(/\*\*/g, '')}</h4>
-        }
-
-        // Headers inside text blocks
-        const parts = section.split(/(\*\*.*?\*\*)/g);
-        if (parts.length > 1) {
-          return (
-            <p key={idx}>
-              {parts.map((part, pIdx) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                  return <strong key={pIdx} className="font-semibold text-industrial-gray">{part.replace(/\*\*/g, '')}</strong>
-                }
-                return part;
-              })}
-            </p>
-          )
-        }
-
-        // Lists (* item or - item)
-        if (section.includes('\n* ') || section.startsWith('* ')) {
-          const items = section.split(/\n\* |\n- /).filter(i => i.trim().length > 0 && i !== '* ' && i !== '- ');
-          // Check if first line is a header for the list
-          const firstLine = items[0].startsWith('* ') ? '' : items[0];
-          const listItems = firstLine ? items.slice(1) : items;
-
-          return (
-            <div key={idx}>
-              {firstLine && <p className="mb-2">{firstLine}</p>}
               <ul className="space-y-3 mt-2">
                 {listItems.map((item, i) => (
                   <li key={i} className="flex items-start">
