@@ -79,11 +79,12 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
-        ...(isProd ? {
-          'react': 'preact/compat',
-          'react-dom': 'preact/compat',
-          'react/jsx-runtime': 'preact/jsx-runtime',
-        } : {}),
+        // Temporarily disable Preact alias to debug production issues
+        // ...(isProd ? {
+        //   'react': 'preact/compat',
+        //   'react-dom': 'preact/compat',
+        //   'react/jsx-runtime': 'preact/jsx-runtime',
+        // } : {}),
       },
     },
     build: {
