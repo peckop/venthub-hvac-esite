@@ -1,9 +1,9 @@
 {
   "lighthouseVersion": "12.8.2",
-  "requestedUrl": "http://127.0.0.1:4173/products",
-  "mainDocumentUrl": "http://127.0.0.1:4173/products",
-  "finalDisplayedUrl": "http://127.0.0.1:4173/products",
-  "finalUrl": "http://127.0.0.1:4173/products",
+  "requestedUrl": "https://127.0.0.1:4173/products",
+  "mainDocumentUrl": "https://127.0.0.1:4173/products",
+  "finalDisplayedUrl": "https://127.0.0.1:4173/products",
+  "finalUrl": "https://127.0.0.1:4173/products",
   "fetchTime": "2025-09-20T09:23:15.883Z",
   "gatherMode": "navigation",
   "runWarnings": [],
@@ -277,7 +277,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/products",
+            "url": "https://127.0.0.1:4173/products",
             "responseTime": 8.58
           }
         ],
@@ -343,7 +343,7 @@
         "chains": {
           "EFF3D00EA72D87CAFFF728646867761D": {
             "request": {
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "startTime": 66710.893794,
               "endTime": 66710.906282,
               "responseReceivedTime": 66710.90579,
@@ -352,7 +352,7 @@
             "children": {
               "24908.2": {
                 "request": {
-                  "url": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+                  "url": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
                   "startTime": 66710.918812,
                   "endTime": 66711.008049,
                   "responseReceivedTime": 66710.987229,
@@ -361,7 +361,7 @@
               },
               "24908.6": {
                 "request": {
-                  "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+                  "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
                   "startTime": 66710.919746,
                   "endTime": 66710.998322,
                   "responseReceivedTime": 66710.985483,
@@ -634,19 +634,19 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "total": 2179.1040000000025,
             "scripting": 1587.972000000002,
             "scriptParseCompile": 1.316
           },
           {
-            "url": "http://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
+            "url": "https://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
             "total": 1218.7519999999995,
             "scripting": 209.74399999999994,
             "scriptParseCompile": 0.08
           },
           {
-            "url": "http://127.0.0.1:4173/products",
+            "url": "https://127.0.0.1:4173/products",
             "total": 1103.12,
             "scripting": 20.759999999999984,
             "scriptParseCompile": 0.904
@@ -658,13 +658,13 @@
             "scriptParseCompile": 0
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "total": 80.57199999999997,
             "scripting": 76.34399999999998,
             "scriptParseCompile": 0.452
           },
           {
-            "url": "http://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
+            "url": "https://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
             "total": 61.12799999999996,
             "scripting": 46.543999999999954,
             "scriptParseCompile": 1.016
@@ -841,7 +841,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/products",
+            "url": "https://127.0.0.1:4173/products",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 0,
@@ -858,7 +858,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+            "url": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 25.36099999397993,
@@ -875,7 +875,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 25.921999998390675,
@@ -893,7 +893,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 26.07599999755621,
@@ -911,7 +911,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
+            "url": "https://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 26.209000006318092,
@@ -929,7 +929,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+            "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 26.35299999266863,
@@ -946,7 +946,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
+            "url": "https://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 189.3509999960661,
@@ -963,7 +963,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/ProductCard-B-Rp0KTp.js",
+            "url": "https://127.0.0.1:4173/assets/ProductCard-B-Rp0KTp.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 189.84999999403954,
@@ -980,7 +980,7 @@
             "entity": "127.0.0.1"
           },
           {
-            "url": "http://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
+            "url": "https://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 190.2719999924302,
@@ -1014,7 +1014,7 @@
             "entity": "wikimedia.org"
           },
           {
-            "url": "http://127.0.0.1:4173/favicon.svg",
+            "url": "https://127.0.0.1:4173/favicon.svg",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 281.49399999529123,
@@ -1336,31 +1336,31 @@
           "initiators": [
             {
               "type": "parser",
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "lineNumber": 33,
               "columnNumber": 68
             },
             {
               "type": "parser",
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "lineNumber": 34,
               "columnNumber": 80
             },
             {
               "type": "parser",
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "lineNumber": 35,
               "columnNumber": 77
             },
             {
               "type": "parser",
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "lineNumber": 36,
               "columnNumber": 76
             },
             {
               "type": "parser",
-              "url": "http://127.0.0.1:4173/products",
+              "url": "https://127.0.0.1:4173/products",
               "lineNumber": 37,
               "columnNumber": 71
             },
@@ -1430,7 +1430,7 @@
             "rtt": 2.02083
           },
           {
-            "origin": "http://127.0.0.1:4173",
+            "origin": "https://127.0.0.1:4173",
             "rtt": 0.13755
           }
         ],
@@ -1469,7 +1469,7 @@
             "serverResponseTime": 106.63767
           },
           {
-            "origin": "http://127.0.0.1:4173",
+            "origin": "https://127.0.0.1:4173",
             "serverResponseTime": 12.900449999999998
           },
           {
@@ -2064,22 +2064,22 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "duration": 299,
             "startTime": 4979.8009
           },
           {
-            "url": "http://127.0.0.1:4173/products",
+            "url": "https://127.0.0.1:4173/products",
             "duration": 131,
             "startTime": 689.90045
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "duration": 128,
             "startTime": 4825.8009
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "duration": 79,
             "startTime": 2125.8009
           },
@@ -2098,9 +2098,9 @@
         "debugData": {
           "type": "debugdata",
           "urls": [
-            "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
-            "http://127.0.0.1:4173/products",
-            "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "https://127.0.0.1:4173/products",
+            "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "Unattributable"
           ],
           "tasks": [
@@ -2438,43 +2438,43 @@
         "type": "treemap-data",
         "nodes": [
           {
-            "name": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+            "name": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
             "resourceBytes": 203546,
             "encodedBytes": 206070,
             "unusedBytes": 53096
           },
           {
-            "name": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "name": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "resourceBytes": 39996,
             "encodedBytes": 40009,
             "unusedBytes": 5393
           },
           {
-            "name": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "name": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "resourceBytes": 166308,
             "encodedBytes": 166353,
             "unusedBytes": 45775
           },
           {
-            "name": "http://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
+            "name": "https://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
             "resourceBytes": 124620,
             "encodedBytes": 124661,
             "unusedBytes": 92375
           },
           {
-            "name": "http://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
+            "name": "https://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
             "resourceBytes": 16165,
             "encodedBytes": 16190,
             "unusedBytes": 1612
           },
           {
-            "name": "http://127.0.0.1:4173/assets/ProductCard-B-Rp0KTp.js",
+            "name": "https://127.0.0.1:4173/assets/ProductCard-B-Rp0KTp.js",
             "resourceBytes": 5106,
             "encodedBytes": 5123,
             "unusedBytes": 821
           },
           {
-            "name": "http://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
+            "name": "https://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
             "resourceBytes": 2870,
             "encodedBytes": 2882,
             "unusedBytes": 18
@@ -5207,23 +5207,23 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+            "url": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
             "totalBytes": 206440
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "totalBytes": 166723
           },
           {
-            "url": "http://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
+            "url": "https://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
             "totalBytes": 125031
           },
           {
-            "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+            "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
             "totalBytes": 81923
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "totalBytes": 40378
           },
           {
@@ -5235,7 +5235,7 @@
             "totalBytes": 17095
           },
           {
-            "url": "http://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
+            "url": "https://127.0.0.1:4173/assets/ProductsPage-D9E6n2Uh.js",
             "totalBytes": 16559
           },
           {
@@ -5320,7 +5320,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+            "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
             "totalBytes": 81923,
             "wastedMs": 2113
           }
@@ -5396,7 +5396,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-ui-CMLWBIpe.js",
             "totalBytes": 40009,
             "wastedBytes": 12648,
             "wastedPercent": 31.61316131613161
@@ -5451,7 +5451,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+            "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
             "wastedBytes": 63717,
             "wastedPercent": 78.12181931892039,
             "totalBytes": 81561
@@ -5516,19 +5516,19 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
+            "url": "https://127.0.0.1:4173/assets/supabase-DEj1gqCa.js",
             "totalBytes": 124657,
             "wastedBytes": 92402,
             "wastedPercent": 74.12534103675172
           },
           {
-            "url": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+            "url": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
             "totalBytes": 203598,
             "wastedBytes": 53110,
             "wastedPercent": 26.085504013834708
           },
           {
-            "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+            "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
             "totalBytes": 166353,
             "wastedBytes": 45787,
             "wastedPercent": 27.524232147581596
@@ -6084,7 +6084,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6097,7 +6097,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6110,7 +6110,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6123,7 +6123,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6136,7 +6136,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6149,7 +6149,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6162,7 +6162,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6175,7 +6175,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6188,7 +6188,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6201,7 +6201,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6214,7 +6214,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6227,7 +6227,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6240,7 +6240,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6253,7 +6253,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6266,7 +6266,7 @@
           {
             "source": {
               "type": "url",
-              "value": "http://127.0.0.1:4173/products"
+              "value": "https://127.0.0.1:4173/products"
             },
             "selector": {
               "type": "node",
@@ -6408,7 +6408,7 @@
     "structured-data": {
       "id": "structured-data",
       "title": "Structured data is valid",
-      "description": "Run the [Structured Data Testing Tool](https://search.google.com/structured-data/testing-tool/) and the [Structured Data Linter](http://linter.structured-data.org/) to validate structured data. [Learn more about Structured Data](https://developer.chrome.com/docs/lighthouse/seo/structured-data/).",
+      "description": "Run the [Structured Data Testing Tool](https://search.google.com/structured-data/testing-tool/) and the [Structured Data Linter](https://linter.structured-data.org/) to validate structured data. [Learn more about Structured Data](https://developer.chrome.com/docs/lighthouse/seo/structured-data/).",
       "score": null,
       "scoreDisplayMode": "manual"
     },
@@ -6781,7 +6781,7 @@
               {
                 "source": {
                   "type": "source-location",
-                  "url": "http://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
+                  "url": "https://127.0.0.1:4173/assets/vendor-react-BKmzHhxs.js",
                   "urlProvider": "network",
                   "line": 17,
                   "column": 1910
@@ -6809,7 +6809,7 @@
               {
                 "source": {
                   "type": "source-location",
-                  "url": "http://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
+                  "url": "https://127.0.0.1:4173/assets/BrandsShowcase-CLZjqKhb.js",
                   "urlProvider": "network",
                   "line": 0,
                   "column": 442
@@ -7048,20 +7048,20 @@
               "type": "network-tree",
               "chains": {
                 "EFF3D00EA72D87CAFFF728646867761D": {
-                  "url": "http://127.0.0.1:4173/products",
+                  "url": "https://127.0.0.1:4173/products",
                   "navStartToEndTime": 28,
                   "transferSize": 2546,
                   "isLongest": true,
                   "children": {
                     "24908.2": {
-                      "url": "http://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
+                      "url": "https://127.0.0.1:4173/assets/index-DiJJ_H2M.js",
                       "navStartToEndTime": 121,
                       "transferSize": 206440,
                       "isLongest": true,
                       "children": {}
                     },
                     "24908.6": {
-                      "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+                      "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
                       "navStartToEndTime": 110,
                       "transferSize": 81923,
                       "children": {}
@@ -7188,7 +7188,7 @@
         ],
         "items": [
           {
-            "url": "http://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
+            "url": "https://127.0.0.1:4173/assets/index-Be-sA4Q0.css",
             "totalBytes": 81923,
             "wastedMs": 2113
           }
@@ -8413,7 +8413,7 @@
     {
       "name": "127.0.0.1",
       "origins": [
-        "http://127.0.0.1:4173"
+        "https://127.0.0.1:4173"
       ],
       "isFirstParty": true,
       "isUnrecognized": true

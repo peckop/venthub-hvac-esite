@@ -12,7 +12,7 @@ export const FanIcon: React.FC<IconProps> = ({ className = '', size = 48 }) => (
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -52,7 +52,7 @@ export const HeatRecoveryIcon: React.FC<IconProps> = ({ className = '', size = 4
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <rect x="8" y="16" width="32" height="16" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -79,7 +79,7 @@ export const AirCurtainIcon: React.FC<IconProps> = ({ className = '', size = 48 
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <rect x="8" y="8" width="32" height="6" rx="2" stroke="currentColor" strokeWidth="2" fill="currentColor" opacity="0.2" />
@@ -110,7 +110,7 @@ export const DehumidifierIcon: React.FC<IconProps> = ({ className = '', size = 4
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <rect x="12" y="16" width="24" height="24" rx="4" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -131,7 +131,7 @@ export const AirPurifierIcon: React.FC<IconProps> = ({ className = '', size = 48
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <rect x="14" y="12" width="20" height="28" rx="4" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -155,7 +155,7 @@ export const FlexibleDuctIcon: React.FC<IconProps> = ({ className = '', size = 4
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <path
@@ -191,7 +191,7 @@ export const SpeedControlIcon: React.FC<IconProps> = ({ className = '', size = 4
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <rect x="8" y="12" width="32" height="24" rx="4" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -216,7 +216,7 @@ export const AccessoriesIcon: React.FC<IconProps> = ({ className = '', size = 48
     height={size}
     viewBox="0 0 48 48"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns="https://www.w3.org/2000/svg"
     className={className}
   >
     <path

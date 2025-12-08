@@ -26,8 +26,67 @@ import {
   Download,
   Award,
   Ruler,
-  Settings
+  Settings,
+  Info
 } from 'lucide-react'
+
+// Helper component for rich text rendering
+const RichTextRenderer = ({ content }: { content: string }) => {
+  if (!content) return null;
+
+  // Split content by double newlines or specifically marked sections
+  const sections = content.split(/\n\n+/);
+
+  return (
+    <div className="space-y-6 text-steel-gray leading-relaxed">
+      {sections.map((section, idx) => {
+        // Headers (bold stars) - **Header**
+        if (section.trim().startsWith('**') && section.trim().endsWith(':**')) {
+          return <h4 key={idx} className="text-lg font-bold text-industrial-gray mt-4 mb-2">{section.replace(/\*\*/g, '')}</h4>
+        }
+
+        // Headers inside text blocks
+        const parts = section.split(/(\*\*.*?\*\*)/g);
+        if (parts.length > 1) {
+          return (
+            <p key={idx}>
+              {parts.map((part, pIdx) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return <strong key={pIdx} className="font-semibold text-industrial-gray">{part.replace(/\*\*/g, '')}</strong>
+                }
+                return part;
+              })}
+            </p>
+          )
+        }
+
+        // Lists (* item or - item)
+        if (section.includes('\n* ') || section.startsWith('* ')) {
+          const items = section.split(/\n\* |\n- /).filter(i => i.trim().length > 0 && i !== '* ' && i !== '- ');
+          // Check if first line is a header for the list
+          const firstLine = items[0].startsWith('* ') ? '' : items[0];
+          const listItems = firstLine ? items.slice(1) : items;
+
+          return (
+            <div key={idx}>
+              {firstLine && <p className="mb-2">{firstLine}</p>}
+              <ul className="space-y-3 mt-2">
+                {listItems.map((item, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check size={18} className="text-success-green mr-3 mt-1 flex-shrink-0" />
+                    <span>{item.replace(/^\* |^- /, '')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        return <p key={idx}>{section}</p>
+      })}
+    </div>
+  )
+}
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -446,9 +505,7 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Description */}
-            <p className="text-steel-gray leading-relaxed">
-              {product.description || t('pdp.descFallback')}
-            </p>
+
 
             {/* Related Guide */}
             {topicSlug && (
@@ -699,41 +756,14 @@ export const ProductDetailPage: React.FC = () => {
                   {section.id === 'genel' && (
                     <>
                       {/* Product Features */}
+                      {/* Product Dictionary / Rich Description */}
                       <div className="space-y-6">
                         <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                           <h4 className="font-semibold text-industrial-gray mb-4 flex items-center">
-                            <Check className="text-success-green mr-2" size={20} />
-                            {t('pdp.labels.productFeatures')}
+                            <Info className="text-primary-navy mr-2" size={20} />
+                            {t('pdp.labels.productDescription')}
                           </h4>
-                          <ul className="space-y-3 text-steel-gray">
-                            <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
-                              {t('pdp.features.materialQuality')}
-                            </li>
-                            <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
-                              {t('pdp.features.energyEfficient')}
-                            </li>
-                            <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
-                              {t('pdp.features.quietOperation')}
-                            </li>
-                            <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
-                              {t('pdp.features.easyMaintenance')}
-                            </li>
-                            <li className="flex items-center">
-                              <Check size={16} className="text-success-green mr-3 flex-shrink-0" />
-                              {t('pdp.features.durable')}
-                            </li>
-                          </ul>
-                        </div>
-
-                        <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                          <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.productDescription')}</h4>
-                          <p className="text-steel-gray leading-relaxed">
-                            {product.description || t('pdp.descFallback')}
-                          </p>
+                          <RichTextRenderer content={product.description || t('pdp.descFallback')} />
                         </div>
                       </div>
 
@@ -1150,4 +1180,64 @@ export const ProductDetailPage: React.FC = () => {
   )
 }
 
+
+// Helper component for rich text rendering
+const RichTextRendererDup = ({ content }: { content: string }) => {
+  if (!content) return null;
+
+  // Split content by double newlines or specifically marked sections
+  const sections = content.split(/\n\n+/);
+
+  return (
+    <div className="space-y-6 text-steel-gray leading-relaxed">
+      {sections.map((section, idx) => {
+        // Headers (bold stars) - **Header**
+        if (section.trim().startsWith('**') && section.trim().endsWith(':**')) {
+          return <h4 key={idx} className="text-lg font-bold text-industrial-gray mt-4 mb-2">{section.replace(/\*\*/g, '')}</h4>
+        }
+
+        // Headers inside text blocks
+        const parts = section.split(/(\*\*.*?\*\*)/g);
+        if (parts.length > 1) {
+          return (
+            <p key={idx}>
+              {parts.map((part, pIdx) => {
+                if (part.startsWith('**') && part.endsWith('**')) {
+                  return <strong key={pIdx} className="font-semibold text-industrial-gray">{part.replace(/\*\*/g, '')}</strong>
+                }
+                return part;
+              })}
+            </p>
+          )
+        }
+
+        // Lists (* item or - item)
+        if (section.includes('\n* ') || section.startsWith('* ')) {
+          const items = section.split(/\n\* |\n- /).filter(i => i.trim().length > 0 && i !== '* ' && i !== '- ');
+          // Check if first line is a header for the list
+          const firstLine = items[0].startsWith('* ') ? '' : items[0];
+          const listItems = firstLine ? items.slice(1) : items;
+
+          return (
+            <div key={idx}>
+              {firstLine && <p className="mb-2">{firstLine}</p>}
+              <ul className="space-y-3 mt-2">
+                {listItems.map((item, i) => (
+                  <li key={i} className="flex items-start">
+                    <Check size={18} className="text-success-green mr-3 mt-1 flex-shrink-0" />
+                    <span>{item.replace(/^\* |^- /, '')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+
+        return <p key={idx}>{section}</p>
+      })}
+    </div>
+  )
+}
+
 export default ProductDetailPage
+
