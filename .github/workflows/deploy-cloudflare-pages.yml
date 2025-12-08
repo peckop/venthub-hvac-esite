@@ -44,12 +44,11 @@ jobs:
       - name: Build
         env:
           NODE_ENV: "production"
-          VITE_CART_SERVER_SYNC: "true"
           VITE_COMMIT_SHA: "${{ github.sha }}"
           VITE_BRANCH: "${{ github.ref_name }}"
         run: |
           rm -rf dist
-          pnpm run build:ci
+          pnpm run build
 
       - name: Ensure Cloudflare Pages project exists (idempotent)
         env:
