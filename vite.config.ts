@@ -71,11 +71,19 @@ export default defineConfig(({ mode }) => {
 
   return {
     define: {
-      'process.env.NODE_ENV': '"production"',
+      'process.env.NODE_ENV': JSON.stringify(mode),
     },
     plugins: [
       imagetools(),
-      ...(isProduction ? [react({ jsxRuntime: 'automatic' })] : [react({ jsxRuntime: 'classic' })]),
+      react({
+        jsxRuntime: 'automatic',
+        ...(isProduction && {
+          jsxImportSource: undefined,
+          babel: {
+            plugins: []
+          }
+        })
+      }),
       criticalCssPlugin,
     ],
     resolve: {
