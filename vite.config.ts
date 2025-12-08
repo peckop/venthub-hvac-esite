@@ -8,7 +8,7 @@ import { imagetools } from 'vite-imagetools'
 import Critters from 'critters'
 
 export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production'
+  // const isProd = mode === 'production'
 
   // Minimal Critters integration to inline critical CSS after build
   const criticalCssPlugin = (() => {
