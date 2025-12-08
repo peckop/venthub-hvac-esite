@@ -69,6 +69,9 @@ export default defineConfig(() => {
   })()
 
   return {
+    define: {
+      'process.env.NODE_ENV': '"production"',
+    },
     plugins: [
       imagetools(),
       react(),
@@ -85,27 +88,27 @@ export default defineConfig(() => {
           manualChunks: {
             // Core vendor libraries - highest priority
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            
+
             // Split UI libraries for better caching
             'vendor-radix': [
               '@radix-ui/react-dialog',
-              '@radix-ui/react-dropdown-menu', 
+              '@radix-ui/react-dropdown-menu',
               '@radix-ui/react-tabs',
               '@radix-ui/react-select',
               '@radix-ui/react-accordion'
             ],
-            
-            // Utility libraries - medium priority 
+
+            // Utility libraries - medium priority
             'utils': ['clsx', 'date-fns'],
             'toast': ['react-hot-toast'],
-            
+
             // Feature-specific - lazy loaded
             'supabase': ['@supabase/supabase-js'],
             'forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
             'motion': ['framer-motion'],
             'charts': ['recharts'],
             'pdf': ['jspdf', 'jspdf-autotable'],
-            
+
             // Icons - now split to optimize initial load (since we inlined most critical ones)
             'icons': ['lucide-react'],
           },
@@ -119,14 +122,14 @@ export default defineConfig(() => {
       },
       // Increase chunk size warning limit since we're optimizing
       chunkSizeWarningLimit: 1000,
-      
+
       // Enable minification and compression
       minify: true,
       sourcemap: false, // Disable sourcemaps in production for smaller bundles
-      
+
       // CSS code splitting for better caching
       cssCodeSplit: true,
-      
+
       // Optimize asset handling
       assetsInlineLimit: 4096, // Inline assets smaller than 4KB
     },
