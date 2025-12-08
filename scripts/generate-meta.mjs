@@ -10,15 +10,15 @@ if (!fs.existsSync(publicDir)) {
   process.exit(0)
 }
 
-const rawSiteUrl = process.env.VITE_SITE_URL || 'http://localhost:4173'
+const rawSiteUrl = process.env.VITE_SITE_URL || 'https://venthub-hvac-esite.pages.dev'
 let siteUrl
 try {
   const u = new URL(rawSiteUrl)
   // strip trailing slash
   siteUrl = `${u.origin}`
 } catch {
-  console.warn(`[generate-meta] VITE_SITE_URL invalid (${rawSiteUrl}), falling back to http://localhost:4173`)
-  siteUrl = 'http://localhost:4173'
+  console.warn(`[generate-meta] VITE_SITE_URL invalid (${rawSiteUrl}), falling back to https://venthub-hvac-esite.pages.dev`)
+  siteUrl = 'https://venthub-hvac-esite.pages.dev'
 }
 
 const isPreview = (() => {
