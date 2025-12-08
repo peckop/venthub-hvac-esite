@@ -121,7 +121,7 @@ export default defineConfig(() => {
       chunkSizeWarningLimit: 1000,
       
       // Enable minification and compression
-      minify: 'esbuild',
+      minify: true,
       sourcemap: false, // Disable sourcemaps in production for smaller bundles
       
       // CSS code splitting for better caching
