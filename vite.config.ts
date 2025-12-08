@@ -7,9 +7,7 @@ import { imagetools } from 'vite-imagetools'
 // @ts-ignore
 import Critters from 'critters'
 
-export default defineConfig(({ mode }) => {
-  // const isProd = mode === 'production'
-
+export default defineConfig(() => {
   // Minimal Critters integration to inline critical CSS after build
   const criticalCssPlugin = (() => {
     let outDir = 'dist'
@@ -79,12 +77,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
-        // Temporarily disable Preact alias to debug production issues
-        // ...(isProd ? {
-        //   'react': 'preact/compat',
-        //   'react-dom': 'preact/compat',
-        //   'react/jsx-runtime': 'preact/jsx-runtime',
-        // } : {}),
       },
     },
     build: {
