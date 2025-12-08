@@ -1182,23 +1182,7 @@ export const ProductDetailPage: React.FC = () => {
 
 
 
-              <ul className="space-y-3 mt-2">
-                {listItems.map((item, i) => (
-                  <li key={i} className="flex items-start">
-                    <Check size={18} className="text-success-green mr-3 mt-1 flex-shrink-0" />
-                    <span>{item.replace(/^\* |^- /, '')}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        }
 
-        return <p key={idx}>{section}</p>
-      })}
-    </div>
-  )
-}
 
 export default ProductDetailPage
 
