@@ -152,7 +152,7 @@ const translateSpecKey = (key: string): string => {
 };
 
 // Helper function to extract and format units
-const formatSpecValue = (key: string, value: string | number | boolean | null | undefined): string => {
+const formatSpecValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);
   const lowerKey = key.toLowerCase();
