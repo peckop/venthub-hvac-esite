@@ -27,8 +27,11 @@ import {
   Award,
   Ruler,
   Settings,
-  Info
+  Info,
+  AlertCircle,
+  ChevronDown
 } from 'lucide-react'
+import ImageGallery from '../components/ImageGallery'
 
 // Helper component for rich text rendering
 const RichTextRenderer = ({ content }: { content: string }) => {
@@ -45,19 +48,22 @@ const RichTextRenderer = ({ content }: { content: string }) => {
           return <h4 key={idx} className="text-lg font-bold text-industrial-gray mt-4 mb-2">{section.replace(/\*\*/g, '')}</h4>
         }
 
-        // Headers inside text blocks
-        const parts = section.split(/(\*\*.*?\*\*)/g);
-        if (parts.length > 1) {
-          return (
-            <p key={idx}>
-              {parts.map((part, pIdx) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                  return <strong key={pIdx} className="font-semibold text-industrial-gray">{part.replace(/\*\*/g, '')}</strong>
-                }
-                return part;
-              })}
-            </p>
-          )
+        // Headers inside text blocks (but NOT list items!)
+        // Skip if section starts with a list marker
+        if (!section.trim().match(/^[\*-]\s+/)) {
+          const parts = section.split(/(\*\*.*?\*\*)/g);
+          if (parts.length > 1) {
+            return (
+              <p key={idx}>
+                {parts.map((part, pIdx) => {
+                  if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={pIdx} className="font-semibold text-industrial-gray">{part.replace(/\*\*/g, '')}</strong>
+                  }
+                  return part;
+                })}
+              </p>
+            )
+          }
         }
 
         // Lists (* item or - item)
@@ -71,12 +77,25 @@ const RichTextRenderer = ({ content }: { content: string }) => {
             <div key={idx}>
               {firstLine && <p className="mb-2">{firstLine}</p>}
               <ul className="space-y-3 mt-2">
-                {listItems.map((item, i) => (
-                  <li key={i} className="flex items-start">
-                    <Check size={18} className="text-success-green mr-3 mt-1 flex-shrink-0" />
-                    <span>{item.replace(/^\* |^- /, '')}</span>
-                  </li>
-                ))}
+                {listItems.map((item, i) => {
+                  // Parse bold text within list item
+                  const cleanItem = item.replace(/^\* |^- /, '');
+                  const itemParts = cleanItem.split(/(\*\*.*?\*\*)/g);
+
+                  return (
+                    <li key={i} className="flex items-start">
+                      <Check size={18} className="text-success-green mr-3 mt-1 flex-shrink-0" />
+                      <span>
+                        {itemParts.map((part, partIdx) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={partIdx}>{part.replace(/\*\*/g, '')}</strong>
+                          }
+                          return part;
+                        })}
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           )
@@ -88,6 +107,170 @@ const RichTextRenderer = ({ content }: { content: string }) => {
   )
 }
 
+// Helper function to translate spec keys from English to Turkish
+const translateSpecKey = (key: string): string => {
+  const translations: Record<string, string> = {
+    // Exact DB Keys to Turkish
+    'rpm_max': '2. Kademe Devir Hızı',
+    'rpm_min': '1. Kademe Devir Hızı',
+    'size_a_mm': 'Genişlik (A)',
+    'size_b_mm': 'Derinlik (B)', // Typically B is depth/height context dependent, assuming depth based on 220mm
+    'size_c_mm': 'Yükseklik (C)', // Assuming C is height based on 190mm
+    'voltage_v': 'Voltaj',
+    'weight_kg': 'Ağırlık',
+    'frequency_hz': 'Frekans',
+    'number_of_speeds': 'Hız Kademesi Sayısı',
+    'max_ambient_temp_c': 'Maksimum Ortam Sıcaklığı',
+    'airflow_speed_max_ms': '2. Kademe Hava Hızı',
+    'airflow_speed_min_ms': '1. Kademe Hava Hızı',
+    'delivery_1st_speed_ls': '1. Kademe Hava Debisi (l/s)',
+    'absorbed_current_max_a': 'Maksimum Çekilen Akım',
+    'delivery_1st_speed_m3h': '1. Kademe Hava Debisi',
+    'max_delivery_max_speed_ls': '2. Kademe Hava Debisi (l/s)',
+    'absorbed_power_1st_speed_w': '1. Kademe Güç Tüketimi',
+    'max_delivery_max_speed_m3h': '2. Kademe Hava Debisi',
+    'max_absorbed_power_max_speed_w': '2. Kademe Güç Tüketimi',
+    'sound_pressure_level_lp_db_a_2m_max': 'Ses Basınç Seviyesi (2. Kademe)',
+    'sound_pressure_level_lp_db_a_2m_min': 'Ses Basınç Seviyesi (1. Kademe)',
+
+    // Fallbacks
+    'airflow': 'Hava Debisi',
+    'power': 'Güç',
+    'sound': 'Ses Seviyesi',
+    'width': 'Genişlik',
+    'height': 'Yükseklik',
+    'depth': 'Derinlik',
+    'weight': 'Ağırlık'
+  };
+
+  const lowerKey = key.toLowerCase();
+  if (translations[lowerKey]) return translations[lowerKey];
+
+  return key.split('_').map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+};
+
+// Helper function to extract and format units
+const formatSpecValue = (key: string, value: any): string => {
+  if (value === null || value === undefined) return '-';
+  const stringValue = String(value);
+  const lowerKey = key.toLowerCase();
+
+  // Check if value already has a unit (contains letters)
+  if (/[a-zA-Z]/.test(stringValue)) return stringValue;
+
+  // Suffix-based mapping (Highest priority)
+  if (lowerKey.endsWith('_mm')) return `${stringValue} mm`;
+  if (lowerKey.endsWith('_kg')) return `${stringValue} kg`;
+  if (lowerKey.endsWith('_v')) return `${stringValue} V`;
+  if (lowerKey.endsWith('_hz')) return `${stringValue} Hz`;
+  if (lowerKey.endsWith('_c')) return `${stringValue} °C`;
+  if (lowerKey.endsWith('_ms')) return `${stringValue} m/s`;
+  // if (lowerKey.endsWith('_ls')) return `${stringValue} l/s`; // Filtered out
+  if (lowerKey.endsWith('_a')) return `${stringValue} A`;
+  if (lowerKey.endsWith('_m3h')) return `${stringValue} m³/h`;
+  if (lowerKey.endsWith('_w')) return `${stringValue} W`;
+  if (lowerKey.includes('db_a')) return `${stringValue} dB(A)`;
+  if (lowerKey.includes('rpm')) return `${stringValue} RPM`;
+
+  return stringValue;
+};
+
+// Helper function to group technical specs into logical categories
+const groupTechnicalSpecs = (specs: Record<string, any> | null | undefined) => {
+  if (!specs) return null;
+
+  const groups: Record<string, { label: string; icon: any; specs: Record<string, any> }> = {
+    performance: {
+      label: 'Performans Ölçüleri',
+      icon: Settings,
+      specs: {}
+    },
+    physical: {
+      label: 'Fiziksel Ölçüler',
+      icon: Ruler,
+      specs: {}
+    },
+    electrical: { // Moved "Power" here based on user feedback
+      label: 'Elektrik Özellikleri',
+      icon: Award,
+      specs: {}
+    },
+    other: {
+      label: 'Diğer Özellikler',
+      icon: Info,
+      specs: {}
+    }
+  };
+
+  // Group definitions based on exact keys or strict partials
+  const electricalKeys = ['voltage', 'current', 'absorbed_power', 'power_consumption', 'frequency', 'motor_power', 'phase'];
+  const physicalKeys = ['size_', 'weight', 'dimension', 'width', 'height', 'depth'];
+  const performanceKeys = ['rpm', 'airflow', 'delivery', 'sound', 'pressure', 'speed', 'temp', 'capacity'];
+
+  Object.entries(specs).forEach(([key, value]) => {
+    const lowerKey = key.toLowerCase();
+
+    // Filter out unwanted keys (e.g. l/s units)
+    if (lowerKey.endsWith('_ls')) return;
+
+    // Strict order: Physical -> Electrical -> Performance -> Other
+    if (physicalKeys.some(pk => lowerKey.includes(pk))) {
+      groups.physical.specs[key] = value;
+    } else if (electricalKeys.some(ek => lowerKey.includes(ek))) {
+      groups.electrical.specs[key] = value;
+    } else if (performanceKeys.some(pk => lowerKey.includes(pk))) {
+      groups.performance.specs[key] = value;
+    } else {
+      groups.other.specs[key] = value;
+    }
+  });
+
+  // Filter out empty groups
+  return Object.fromEntries(
+    Object.entries(groups).filter(([_, group]) => Object.keys(group.specs).length > 0)
+  );
+};
+
+// Standard sort order for technical specifications
+const SPEC_SORT_ORDER: Record<string, number> = {
+  // Performance Group Priority
+  'number_of_speeds': 1,
+  'max_ambient_temp_c': 2,
+  'sound_pressure_level_lp_db_a_2m_min': 3,
+  'sound_pressure_level_lp_db_a_2m_max': 4,
+  'delivery_1st_speed_m3h': 5,
+  'max_delivery_max_speed_m3h': 6,
+  'airflow_speed_min_ms': 7,
+  'airflow_speed_max_ms': 8,
+  'rpm_min': 9,
+  'rpm_max': 10,
+
+  // Electrical Group Priority
+  'absorbed_power_1st_speed_w': 11,
+  'max_absorbed_power_max_speed_w': 12,
+  'absorbed_current_max_a': 13,
+  'frequency_hz': 14,
+  'voltage_v': 15,
+
+  // Physical Group Priority
+  'size_a_mm': 21,
+  'size_b_mm': 22,
+  'size_c_mm': 23,
+  'weight_kg': 24,
+
+  // Fallbacks based on common keys
+  'power': 11,
+  'current': 13,
+  'frequency': 14,
+  'voltage': 15,
+  'width': 21,
+  'depth': 22,
+  'height': 23,
+  'weight': 24
+};
+
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -98,15 +281,25 @@ export const ProductDetailPage: React.FC = () => {
   const [mainCategory, setMainCategory] = useState<Category | null>(null)
   const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
-  const [activeIdx, setActiveIdx] = useState(0)
+  // activeIdx state moved to ImageGallery component
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
+  const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance']) // First section open by default
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const observerRef = useRef<IntersectionObserver | null>(null)
   const navTriggerRef = useRef<HTMLDivElement>(null)
+
+  // Toggle accordion section
+  const toggleSpecSection = (sectionKey: string) => {
+    setOpenSpecSections(prev =>
+      prev.includes(sectionKey)
+        ? prev.filter(k => k !== sectionKey)
+        : [...prev, sectionKey]
+    );
+  };
 
   useEffect(() => {
     async function fetchProduct() {
@@ -132,7 +325,6 @@ export const ProductDetailPage: React.FC = () => {
             .order('sort_order', { ascending: true })
           const list = (imgs || []) as { path: string; alt?: string | null }[]
           setImages(list)
-          setActiveIdx(0)
         } catch { }
 
         // Fetch categories for breadcrumb
@@ -251,12 +443,12 @@ export const ProductDetailPage: React.FC = () => {
 
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-light-gray' },
-    { id: 'olcuiler', title: t('pdp.sections.dimensions'), icon: Ruler, bgClass: 'bg-white' },
+    { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' }, // Was "Ölçüler" - now covers Performance/Physical/Electrical
     { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-air-blue' },
     { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
     { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-light-gray' },
-    { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' }
+    { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
+    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-light-gray' } // Moved to end per user request
   ]
 
   // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
@@ -344,114 +536,9 @@ export const ProductDetailPage: React.FC = () => {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Image */}
-          <div>
-            <div
-              className="relative aspect-square bg-white rounded-xl flex items-center justify-center mb-4 overflow-hidden"
-              role="group"
-              aria-label={`Görsel ${Math.min(activeIdx + 1, images.length)} / ${images.length}`}
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowLeft') setActiveIdx(i => (i - 1 + images.length) % images.length)
-                if (e.key === 'ArrowRight') setActiveIdx(i => (i + 1) % images.length)
-              }}
-              onTouchStart={(e: React.TouchEvent<HTMLDivElement>) => {
-                (e.currentTarget as unknown as { _ts?: number })._ts = e.changedTouches[0].clientX
-              }}
-              onTouchEnd={(e: React.TouchEvent<HTMLDivElement>) => {
-                const tsHolder = e.currentTarget as unknown as { _ts?: number }
-                const startX = tsHolder._ts
-                if (typeof startX !== 'number') return
-                const dx = e.changedTouches[0].clientX - startX
-                const TH = 30
-                if (dx > TH) setActiveIdx(i => (i - 1 + images.length) % images.length)
-                if (dx < -TH) setActiveIdx(i => (i + 1) % images.length)
-                tsHolder._ts = undefined
-              }}
-            >
-              {images.length > 0 ? (
-                <>
-                  <button
-                    type="button"
-                    aria-label="Önceki görsel"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
-                    onClick={() => setActiveIdx(i => (i - 1 + images.length) % images.length)}
-                  >
-                    ◀
-                  </button>
-                  <picture>
-                    <source
-                      srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}?format=avif&quality=85`}
-                      type="image/avif"
-                    />
-                    <source
-                      srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}?format=webp&quality=85`}
-                      type="image/webp"
-                    />
-                    <img
-                      src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${images[activeIdx].path}`}
-                      alt={images[activeIdx].alt || product.name}
-                      className="w-full h-full object-contain"
-                      {...{ fetchpriority: 'high' }}
-                      loading="eager"
-                      decoding="async"
-                      width={1200}
-                      height={1200}
-                    />
-                  </picture>
-                  <button
-                    type="button"
-                    aria-label="Sonraki görsel"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-primary-navy rounded-full w-9 h-9 flex items-center justify-center shadow"
-                    onClick={() => setActiveIdx(i => (i + 1) % images.length)}
-                  >
-                    ▶
-                  </button>
-                </>
-              ) : (
-                <div className="text-8xl text-secondary-blue/30">🌪️</div>
-              )}
-            </div>
-
-            {/* Thumbnail Gallery */}
-            <div className="grid grid-cols-4 gap-2">
-              {images.length > 0 ? (
-                images.slice(0, 8).map((img, i) => (
-                  <button
-                    type="button"
-                    key={`${img.path}-${i}`}
-                    onClick={() => setActiveIdx(i)}
-                    aria-pressed={activeIdx === i}
-                    className={`aspect-square rounded-lg transition-all overflow-hidden bg-white border ${activeIdx === i ? 'ring-2 ring-primary-navy border-primary-navy' : 'border-light-gray hover:ring-2 hover:ring-primary-navy'}`}
-                    title={(img.alt || product.name) ?? ''}
-                  >
-                    <picture>
-                      <source
-                        srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?format=avif&quality=80&width=180&height=180`}
-                        type="image/avif"
-                      />
-                      <source
-                        srcSet={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?format=webp&quality=80&width=180&height=180`}
-                        type="image/webp"
-                      />
-                      <img
-                        src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}?width=180&height=180`}
-                        alt={img.alt || product.name}
-                        className="w-full h-full object-contain"
-                        loading="lazy"
-                        decoding="async"
-                        width={180}
-                        height={180}
-                      />
-                    </picture>
-                  </button>
-                ))
-              ) : (
-                [1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square bg-light-gray rounded-lg" />
-                ))
-              )}
-            </div>
+          {/* Product Image Gallery (Premium) */}
+          <div className="sticky top-24 self-start z-10">
+            <ImageGallery key={product.id} images={images} productName={product.name} />
           </div>
 
           {/* Product Info */}
@@ -521,6 +608,52 @@ export const ProductDetailPage: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Trust Signals (Standardized - Matches Cart/Checkout) */}
+            <div className="bg-gradient-to-r from-light-gray to-white rounded-xl p-4 space-y-3 border border-light-gray/50">
+              {/* Stock Urgency - ONLY if stock is low (≤3) */}
+              {typeof product.stock_qty === 'number' && product.stock_qty > 0 && product.stock_qty <= 3 && (
+                <div className="flex items-center space-x-2 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <AlertCircle className="text-orange-600 flex-shrink-0" size={20} />
+                  <span className="text-sm font-semibold text-orange-700">
+                    Son {product.stock_qty} ürün! Hızlı karar verin.
+                  </span>
+                </div>
+              )}
+
+              {/* Shipping Guarantee - Consistent with Cart */}
+              <div className="flex items-center space-x-3">
+                <div className="bg-success-green/10 p-2 rounded-lg">
+                  <Truck className="text-success-green" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-industrial-gray">Ücretsiz Kargo</p>
+                  <p className="text-xs text-steel-gray">500 TL ve üzeri siparişlerde</p>
+                </div>
+              </div>
+
+              {/* Secure Payment - iyzico Branding */}
+              <div className="flex items-center space-x-3">
+                <div className="bg-primary-navy/10 p-2 rounded-lg">
+                  <Shield className="text-primary-navy" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-industrial-gray">Güvenli Ödeme</p>
+                  <p className="text-xs text-steel-gray">iyzico altyapısı ile 256-bit SSL</p>
+                </div>
+              </div>
+
+              {/* Warranty Badge */}
+              <div className="flex items-center space-x-3">
+                <div className="bg-secondary-blue/10 p-2 rounded-lg">
+                  <Award className="text-secondary-blue" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-industrial-gray">2 Yıl Garanti</p>
+                  <p className="text-xs text-steel-gray">Resmi distribütör garantisi</p>
+                </div>
+              </div>
+            </div>
 
             {/* Quantity & Add to Cart */}
             <div className="space-y-4">
@@ -617,19 +750,19 @@ export const ProductDetailPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Features */}
+            {/* Value Props - DIFFERENT from Trust Signals above */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-light-gray">
               <div className="text-center">
-                <Truck className="text-success-green mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">{t('pdp.freeShipping')}</p>
-              </div>
-              <div className="text-center">
-                <Shield className="text-success-green mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">{t('pdp.warranty2y')}</p>
-              </div>
-              <div className="text-center">
-                <Phone className="text-success-green mx-auto mb-2" size={24} />
+                <Phone className="text-primary-navy mx-auto mb-2" size={24} />
                 <p className="text-sm text-steel-gray">{t('pdp.support247')}</p>
+              </div>
+              <div className="text-center">
+                <Settings className="text-primary-navy mx-auto mb-2" size={24} />
+                <p className="text-sm text-steel-gray">Teknik Destek</p>
+              </div>
+              <div className="text-center">
+                <Award className="text-primary-navy mx-auto mb-2" size={24} />
+                <p className="text-sm text-steel-gray">Hızlı Teslimat</p>
               </div>
             </div>
           </div>
@@ -646,8 +779,8 @@ export const ProductDetailPage: React.FC = () => {
         className={`transition-all duration-300 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm ${isNavSticky ? 'fixed top-14 md:top-16 left-0 right-0' : 'relative'
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-1 overflow-x-auto py-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <nav className="flex space-x-1 overflow-x-auto py-3 no-scrollbar">
             {sections.map((section) => (
               <button
                 key={section.id}
@@ -662,6 +795,24 @@ export const ProductDetailPage: React.FC = () => {
               </button>
             ))}
           </nav>
+
+          {/* Quick Actions (only when sticky) */}
+          {isNavSticky && (
+            <div className="hidden lg:flex items-center space-x-4 pl-4 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex flex-col items-end">
+                <span className="text-sm font-semibold text-industrial-gray line-clamp-1 max-w-[200px]">{product.name}</span>
+                <span className="text-xs text-primary-navy font-bold">{formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}</span>
+              </div>
+              <button
+                onClick={handleAddToCart}
+                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                className="bg-primary-navy hover:bg-secondary-blue text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2"
+              >
+                <ShoppingCart size={16} />
+                <span>{t('pdp.addToCart')}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -827,28 +978,111 @@ export const ProductDetailPage: React.FC = () => {
                     </>
                   )}
 
+
                   {section.id === 'olcuiler' && (
                     <>
                       <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.technicalSpecifications')}</h4>
-                        <div className="space-y-3">
-                          {product.technical_specs && Object.entries(product.technical_specs).map(([key, value]) => (
-                            <div key={key} className="flex justify-between py-2 border-b border-light-gray/50 last:border-0">
-                              <span className="text-steel-gray capitalize">{key.replace(/_/g, ' ')}</span>
-                              <span className="font-medium text-industrial-gray">
-                                {value !== null && value !== undefined ? String(value) : '-'}
-                              </span>
-                            </div>
-                          ))}
-                          {!product.technical_specs && (
-                            <div className="text-steel-gray italic">
-                              {t('pdp.labels.noSpecsAvailable')}
-                            </div>
-                          )}
-                        </div>
+                        {/* Title already shown in navigation tab, no need for redundant header */}
+
+                        {product.technical_specs ? (
+                          <>
+                            {(() => {
+                              const groupedSpecs = groupTechnicalSpecs(product.technical_specs);
+
+                              if (!groupedSpecs || Object.keys(groupedSpecs).length === 0) {
+                                return (
+                                  <div className="text-steel-gray italic">
+                                    {t('pdp.labels.noSpecsAvailable')}
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <div className="space-y-4">
+                                  {Object.entries(groupedSpecs).map(([groupKey, group]) => {
+                                    const isOpen = openSpecSections.includes(groupKey);
+                                    const Icon = group.icon;
+
+                                    return (
+                                      <div key={groupKey} className="border border-light-gray/40 rounded-lg overflow-hidden shadow-sm">
+                                        {/* Accordion Header */}
+                                        <button
+                                          onClick={() => toggleSpecSection(groupKey)}
+                                          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-air-blue/20 to-light-gray/30 hover:from-air-blue/30 hover:to-light-gray/40 transition-all"
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <Icon size={22} className="text-primary-navy" />
+                                            <span className="font-semibold text-industrial-gray">{group.label}</span>
+                                            <span className="text-xs text-steel-gray">
+                                              ({Object.keys(group.specs).length} özellik)
+                                            </span>
+                                          </div>
+                                          <ChevronDown
+                                            size={22}
+                                            className={`text-primary-navy transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
+                                              }`}
+                                          />
+                                        </button>
+
+                                        {/* Accordion Content */}
+                                        <div
+                                          className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                                            } overflow-hidden`}
+                                        >
+                                          <div className="p-4 bg-white space-y-2">
+                                            {Object.entries(group.specs)
+                                              .sort(([keyA], [keyB]) => {
+                                                // Use standard sort order
+                                                const weightA = SPEC_SORT_ORDER[keyA] || 99;
+                                                const weightB = SPEC_SORT_ORDER[keyB] || 99;
+
+                                                if (weightA !== weightB) {
+                                                  return weightA - weightB;
+                                                }
+
+                                                // Fallback for non-listed items: Min -> Max -> Alpha
+                                                const a = keyA.toLowerCase();
+                                                const b = keyB.toLowerCase();
+
+                                                const isMinA = a.includes('min') || a.includes('1st');
+                                                const isMaxA = a.includes('max');
+
+                                                const isMinB = b.includes('min') || b.includes('1st');
+                                                const isMaxB = b.includes('max');
+
+                                                if (isMinA && !isMinB) return -1;
+                                                if (!isMinA && isMinB) return 1;
+                                                if (isMaxA && !isMaxB) return 1;
+                                                if (!isMaxA && isMaxB) return -1;
+
+                                                return keyA.localeCompare(keyB);
+                                              })
+                                              .map(([key, value]) => (
+                                                <div key={key} className="flex justify-between items-center py-3 border-b border-light-gray/50 last:border-0 group hover:bg-air-blue/10 transition-colors px-2 rounded">
+                                                  <span className="text-steel-gray font-medium">{translateSpecKey(key)}</span>
+                                                  <span className="font-bold text-industrial-gray text-right">
+                                                    {formatSpecValue(key, value)}
+                                                  </span>
+                                                </div>
+                                              ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <div className="text-steel-gray italic">
+                            {t('pdp.labels.noSpecsAvailable')}
+                          </div>
+                        )}
                       </div>
                     </>
                   )}
+
 
                   {section.id === 'diyagramlar' && (
                     <>

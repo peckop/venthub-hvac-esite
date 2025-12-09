@@ -917,12 +917,12 @@ export const tr = {
     summary: 'Sipariş Özeti',
     subtotal: 'Ara Toplam',
     shipping: 'Kargo',
-    free: 'Bedava',
+    free: '500 TL ve üzeri ücretsiz',
     vatIncluded: 'KDV (%20, dahil)',
     total: 'Toplam',
     checkout: 'Siparişi Tamamla',
     continueShopping: 'Alışverişe Devam Et',
-    securePayment: '🔒 Güvenli ödeme sistemi ile korunmaktadır',
+    securePayment: '🔒 iyzico ile güvenli ödeme',
     itemTotal: 'Toplam'
   },
   orders: {
