@@ -50,7 +50,7 @@ const RichTextRenderer = ({ content }: { content: string }) => {
 
         // Headers inside text blocks (but NOT list items!)
         // Skip if section starts with a list marker
-        if (!section.trim().match(/^[\*-]\s+/)) {
+        if (!section.trim().match(/^[*-]\s+/)) {
           const parts = section.split(/(\*\*.*?\*\*)/g);
           if (parts.length > 1) {
             return (
@@ -152,7 +152,7 @@ const translateSpecKey = (key: string): string => {
 };
 
 // Helper function to extract and format units
-const formatSpecValue = (key: string, value: any): string => {
+const formatSpecValue = (key: string, value: string | number | boolean | null | undefined): string => {
   if (value === null || value === undefined) return '-';
   const stringValue = String(value);
   const lowerKey = key.toLowerCase();
@@ -178,10 +178,10 @@ const formatSpecValue = (key: string, value: any): string => {
 };
 
 // Helper function to group technical specs into logical categories
-const groupTechnicalSpecs = (specs: Record<string, any> | null | undefined) => {
+const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
-  const groups: Record<string, { label: string; icon: any; specs: Record<string, any> }> = {
+  const groups: Record<string, { label: string; icon: React.ElementType; specs: Record<string, unknown> }> = {
     performance: {
       label: 'Performans Ölçüleri',
       icon: Settings,

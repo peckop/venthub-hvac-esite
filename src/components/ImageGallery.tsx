@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react'
 
@@ -37,15 +37,16 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
     }
 
     // Navigation
-    const nextImage = (e?: React.MouseEvent) => {
+    // Navigation
+    const nextImage = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation()
         setActiveIdx((prev) => (prev + 1) % images.length)
-    }
+    }, [images.length])
 
-    const prevImage = (e?: React.MouseEvent) => {
+    const prevImage = useCallback((e?: React.MouseEvent) => {
         e?.stopPropagation()
         setActiveIdx((prev) => (prev - 1 + images.length) % images.length)
-    }
+    }, [images.length])
 
     // Keyboard navigation for Lightbox
     useEffect(() => {
@@ -57,7 +58,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
         }
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [isLightboxOpen, images.length])
+    }, [isLightboxOpen, nextImage, prevImage])
 
     // Lock body scroll when lightbox is open (Premium UX) - DEFINITIVE FIX
     useEffect(() => {
