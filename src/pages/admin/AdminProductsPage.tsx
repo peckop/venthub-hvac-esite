@@ -11,6 +11,7 @@ interface ProductRow {
   id: string
   name: string
   sku: string
+  model_code?: string | null
   brand?: string | null
   status?: string | null
   category_id?: string | null
@@ -50,7 +51,7 @@ const AdminProductsPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:products'
   const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  const _defaultThreshold = React.useState<number | null>(null)
+
   const [covers, setCovers] = React.useState<Record<string, string>>({})
 
   React.useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
@@ -81,7 +82,7 @@ const AdminProductsPage: React.FC = () => {
       // Build products query with server-side filters and pagination
       let query = supabase
         .from('products')
-        .select('id,name,sku,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
+        .select('id,name,sku,model_code,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
 
       // Filters
       if (selectedCategoryFilter) query = query.eq('category_id', selectedCategoryFilter)
@@ -97,8 +98,10 @@ const AdminProductsPage: React.FC = () => {
       }
       const term = debouncedQ.trim()
       if (term) {
-        const like = `%${term}%`
-        query = query.or(`name.ilike.${like},sku.ilike.${like},brand.ilike.${like},slug.ilike.${like}`)
+        // Sanitize term to prevent PostgREST delimiter issues in .or()
+        const safeTerm = term.replace(/[(),]/g, ' ')
+        const like = `%${safeTerm}%`
+        query = query.or(`name.ilike.${like},sku.ilike.${like},model_code.ilike.${like},brand.ilike.${like},slug.ilike.${like}`)
       }
 
       // Sorting (only supported keys)
@@ -123,29 +126,53 @@ const AdminProductsPage: React.FC = () => {
       ])
       if (c.error) throw c.error
       setCats((c.data || []) as CategoryOpt[])
-      if (!s.error) _defaultThreshold[1](((s.data as { default_low_stock_threshold?: number | null } | null)?.default_low_stock_threshold ?? null) as number | null)
+      if (!s.error) {
+        // default threshold logic removed as unused state caused infinite loop
+      }
 
       // Cover images for current page
       const ids = list.map(x => x.id)
       if (ids.length > 0) {
-        const { data: imgs } = await supabase.from('product_images').select('product_id,path,sort_order').in('product_id', ids).order('sort_order', { ascending: true })
-        const map: Record<string, string> = {}
-          ; (imgs as { product_id: string; path: string; sort_order: number }[] | null | undefined)?.forEach(r => { if (map[r.product_id] == null) map[r.product_id] = r.path })
-        setCovers(map)
+        try {
+          // Chunk IDs to avoid URL length constraints (CORS/502 errors)
+          const chunkSize = 20
+          const chunks = []
+          for (let i = 0; i < ids.length; i += chunkSize) chunks.push(ids.slice(i, i + chunkSize))
+
+          const results = await Promise.all(chunks.map(c =>
+            supabase.from('product_images').select('product_id,path,sort_order').in('product_id', c).order('sort_order', { ascending: true })
+          ))
+
+          const map: Record<string, string> = {}
+          results.forEach(({ data }) => {
+            if (data) {
+              (data as { product_id: string; path: string; sort_order: number }[]).forEach(r => {
+                if (map[r.product_id] == null) map[r.product_id] = r.path
+              })
+            }
+          })
+          setCovers(map)
+        } catch (err) {
+          console.warn('Cover image fetch failed (non-fatal):', err)
+        }
       }
     } catch (e) {
-      setError((e as Error).message || t('admin.products.toasts.loadFailed'))
+      console.error('Load Error:', e)
+      setError((e as Error).message || 'Ürünler yüklenemedi')
       setRows([])
       setTotal(0)
     } finally {
       setLoading(false)
     }
-  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page, _defaultThreshold, t])
+  }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page])
 
   React.useEffect(() => { load() }, [load])
 
   React.useEffect(() => {
-    const t = setTimeout(() => setDebouncedQ(q.trim()), 300)
+    const t = setTimeout(() => {
+      setDebouncedQ(q.trim())
+      setPage(1)
+    }, 300)
     return () => clearTimeout(t)
   }, [q])
 
@@ -226,6 +253,18 @@ const AdminProductsPage: React.FC = () => {
   const ColumnsMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ColumnsMenu')), [])
   const ExportMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ExportMenu')), [])
 
+  // Memoize select config with stable onChange reference
+  const handleCategoryChange = React.useCallback((value: string) => {
+    setSelectedCategoryFilter(value)
+  }, [])
+
+  const selectConfig = React.useMemo(() => ({
+    value: selectedCategoryFilter,
+    onChange: handleCategoryChange,
+    title: t('admin.products.toolbar.categoryTitle') ?? 'Kategori',
+    options: [{ value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name }))]
+  }), [selectedCategoryFilter, t, cats, handleCategoryChange])
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -235,16 +274,33 @@ const AdminProductsPage: React.FC = () => {
         </button>
       </div>
 
+      {/* SIMPLE DIRECT SEARCH INPUT - NO ADMIN TOOLBAR COMPLEXITY */}
+      <div className={adminCardClass + " p-4"}>
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <input
+              type="text"
+              className="w-full border border-light-gray rounded-md px-3 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+              placeholder={t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara'}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </div>
+          {q && (
+            <button
+              onClick={() => setQ('')}
+              className="text-sm text-steel-gray hover:text-primary-navy"
+            >
+              Temizle
+            </button>
+          )}
+        </div>
+      </div>
+
       <AdminToolbar
         storageKey="toolbar:products"
         sticky
-        search={{ value: q, onChange: (v) => { setQ(v); setPage(1) }, placeholder: t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara', focusShortcut: '/' }}
-        select={{
-          value: selectedCategoryFilter,
-          onChange: setSelectedCategoryFilter,
-          title: t('admin.products.toolbar.categoryTitle') ?? 'Kategori',
-          options: [{ value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name }))],
-        }}
+        select={selectConfig}
         chips={[
           { key: 'active', label: t('admin.products.statusLabels.active'), active: statusFilter.active, onToggle: () => setStatusFilter(s => ({ ...s, active: !s.active })) },
           { key: 'inactive', label: t('admin.products.statusLabels.inactive'), active: statusFilter.inactive, onToggle: () => setStatusFilter(s => ({ ...s, inactive: !s.inactive })) },
@@ -452,7 +508,12 @@ const AdminProductsPage: React.FC = () => {
                     </td>
                   )}
                   {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
-                  {visibleCols.sku && <td className={`${adminTableCellClass} ${cellPad}`}>{r.sku}</td>}
+                  {visibleCols.sku && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>
+                      {r.sku}
+                      {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
+                    </td>
+                  )}
                   {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
                   {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
                   {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</td>}

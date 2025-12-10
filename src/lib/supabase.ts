@@ -197,7 +197,7 @@ export async function searchProducts(query: string) {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%,description.ilike.%${query}%,technical_specs.ilike.%${query}%`)
+    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%,description.ilike.%${query}%`)
     .eq('status', 'active')
     .limit(20)
 

@@ -63,30 +63,9 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   persist,
 }) => {
   const { t } = useI18n()
-  const inputRef = React.useRef<HTMLInputElement | null>(null)
   const hydratedRef = React.useRef(false)
 
-  React.useEffect(() => {
-    const shortcut = (search?.focusShortcut || '/').trim()
-    if (!shortcut) return
-    const handler = (e: KeyboardEvent) => {
-      // Sadece düz kısayol (modifier olmadan) ve içerikte yazmıyorken çalıştır
-      if (e.key !== shortcut || e.ctrlKey || e.metaKey || e.altKey) return
-      const target = e.target as HTMLElement | null
-      const isEditable = !!target && (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        (target as HTMLElement).isContentEditable
-      )
-      if (isEditable) return
-      if (inputRef.current) {
-        e.preventDefault()
-        inputRef.current.focus()
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [search?.focusShortcut])
+  // NOTE: Removed inputRef and focus shortcut handler - they were causing cursor position issues
 
   // Kalıcılık: yükleme
   React.useEffect(() => {
@@ -106,10 +85,10 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
         chips?: Record<string, boolean>
         toggles?: Record<string, boolean>
       }
-      // search/select controlled değerlerini parent'a yaz
-      if (enable.search && search && typeof saved.search === 'string' && saved.search !== search.value) {
-        search.onChange(saved.search)
-      }
+      // DISABLED: search persistence causes cursor position issues
+      // if (enable.search && search && typeof saved.search === 'string' && saved.search !== search.value) {
+      //   search.onChange(saved.search)
+      // }
       if (enable.select && select && typeof saved.select === 'string' && saved.select !== select.value) {
         select.onChange(saved.select)
       }
@@ -135,8 +114,8 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     } finally {
       hydratedRef.current = true
     }
-  // chips/toggles dizileri her render'da yeni referans olabilir; mount'ta bir kez çalıştırmak yeterli.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // chips/toggles dizileri her render'da yeni referans olabilir; mount'ta bir kez çalıştırmak yeterli.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storageKey])
 
   // Kalıcılık: kaydetme
@@ -150,7 +129,8 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
         toggles: persist?.toggles !== false,
       }
       const payload: Record<string, unknown> = {}
-      if (enable.search && search) payload.search = search.value
+      // DISABLED: search persistence removed to prevent cursor issues
+      // if (enable.search && search) payload.search = search.value
       if (enable.select && select) payload.select = select.value
       if (enable.chips && chips) payload.chips = Object.fromEntries(chips.map(c => [c.key, !!c.active]))
       if (enable.toggles && toggles) payload.toggles = Object.fromEntries(toggles.map(t => [t.key, !!t.checked]))
@@ -158,101 +138,97 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     } catch {
       // no-op
     }
-  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, search, search?.value, select, select?.value, chips, toggles])
+  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, select?.value, chips, toggles])
 
-  const Container: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-    <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
-      <div className="rounded-md bg-gray-50 border border-light-gray p-3 md:p-3">
-        {children}
-      </div>
-    </div>
-  )
+  // NOTE: Container was previously defined here as an inline component.
+  // This caused React to see a NEW component on every render, destroying and recreating all children
+  // (including the input), which reset cursor position. Fixed by using direct JSX instead.
 
   return (
-    <Container>
-      <div className="flex flex-col gap-3">
-        {/* Üst sıra: arama + select + sağ aksiyonlar */}
-        <div className="flex flex-wrap items-center gap-3">
-          {search && (
-            <div className="flex-1 min-w-[240px]">
-              <input
-                ref={inputRef}
-                className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
-                placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
-                title={search.title || `Kısayol: ${search.focusShortcut || '/'}`}
-                value={search.value}
-                onChange={(e) => search.onChange(e.target.value)}
-              />
-            </div>
-          )}
-
-          {select && (
-            <div className="flex items-center gap-2">
-              <select
-                className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm min-w-[180px] bg-white focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1"
-                value={select.value}
-                onChange={(e)=>select.onChange(e.target.value)}
-                title={select.title || 'Seçim'}
-              >
-                {select.options.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="ml-auto flex items-center gap-3 flex-wrap w-full sm:w-auto justify-end">
-            {toggles && toggles.length > 0 && (
-              <div className="flex items-center gap-4">
-                {toggles.map(t => (
-                  <div key={t.key} className="flex items-center gap-2 text-xs">
-                    <span className="text-industrial-gray whitespace-nowrap">{t.label}</span>
-                    <Switch.Root
-                      checked={t.checked}
-                      onCheckedChange={t.onChange}
-                      className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
-                      aria-label={t.title || t.label}
-                    >
-                      <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
-                    </Switch.Root>
-                  </div>
-                ))}
+    <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
+      <div className="rounded-md bg-gray-50 border border-light-gray p-3 md:p-3">
+        <div className="flex flex-col gap-3">
+          {/* Üst sıra: arama + select + sağ aksiyonlar */}
+          <div className="flex flex-wrap items-center gap-3">
+            {search && (
+              <div className="flex-1 min-w-[240px]">
+                <input
+                  className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+                  placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
+                  value={search.value}
+                  onChange={(e) => search.onChange(e.target.value)}
+                />
               </div>
             )}
 
-            {onClear && (
-              <button
-                type="button"
-                onClick={onClear}
-                className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy whitespace-nowrap"
-              >{t('admin.toolbar.clear')}</button>
+            {select && (
+              <div className="flex items-center gap-2">
+                <select
+                  className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm min-w-[180px] bg-white focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1"
+                  value={select.value}
+                  onChange={(e) => select.onChange(e.target.value)}
+                  title={select.title || 'Seçim'}
+                >
+                  {select.options.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
             )}
 
-            {typeof recordCount === 'number' && (
-              <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
-            )}
+            <div className="ml-auto flex items-center gap-3 flex-wrap w-full sm:w-auto justify-end">
+              {toggles && toggles.length > 0 && (
+                <div className="flex items-center gap-4">
+                  {toggles.map(tog => (
+                    <div key={tog.key} className="flex items-center gap-2 text-xs">
+                      <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
+                      <Switch.Root
+                        checked={tog.checked}
+                        onCheckedChange={tog.onChange}
+                        className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
+                        aria-label={tog.title || tog.label}
+                      >
+                        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
+                      </Switch.Root>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {rightExtra}
+              {onClear && (
+                <button
+                  type="button"
+                  onClick={onClear}
+                  className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy whitespace-nowrap"
+                >{t('admin.toolbar.clear')}</button>
+              )}
+
+              {typeof recordCount === 'number' && (
+                <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
+              )}
+
+              {rightExtra}
+            </div>
           </div>
+
+          {/* Alt sıra: chip'ler */}
+          {chips && chips.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {chips.map(ch => (
+                <button
+                  key={ch.key}
+                  type="button"
+                  onClick={ch.onToggle}
+                  className={`px-3 md:h-8 h-9 inline-flex items-center rounded-full border transition ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1`}
+                  title={ch.title || ch.label}
+                  aria-pressed={ch.active}
+                >{ch.label}</button>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* Alt sıra: chip'ler */}
-        {chips && chips.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            {chips.map(ch => (
-              <button
-                key={ch.key}
-                type="button"
-                onClick={ch.onToggle}
-                className={`px-3 md:h-8 h-9 inline-flex items-center rounded-full border transition ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1`}
-                title={ch.title || ch.label}
-                aria-pressed={ch.active}
-              >{ch.label}</button>
-            ))}
-          </div>
-        )}
       </div>
-    </Container>
+    </div>
   )
 }
 

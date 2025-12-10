@@ -16,14 +16,37 @@ const ProductsPage: React.FC = () => {
   const location = useLocation()
   const [leadOpen, setLeadOpen] = useState(false)
   const params = new URLSearchParams(location.search)
-  const q = params.get('q')?.trim() || ''
+  const qParam = params.get('q')?.trim() || ''
+
+  // Local input state (what user types)
+  const [inputValue, setInputValue] = useState(qParam)
+  // Active search state (what triggers fetch/UI change)
+  const [searchQuery, setSearchQuery] = useState(qParam)
+
+  // Sync active search with URL param (navigated from outside)
+  useEffect(() => {
+    const nextQ = new URLSearchParams(location.search).get('q')?.trim() || ''
+    setInputValue(nextQ)
+    setSearchQuery(nextQ)
+  }, [location.search])
+
+  // Debounce input value to update active search query
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearchQuery(inputValue)
+    }, 600) // 600ms debounce
+    return () => clearTimeout(t)
+  }, [inputValue])
+
   const appParam = params.get('app') || ''
   const { t } = useI18n()
   const appSectionRef = useRef<HTMLDivElement | null>(null)
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
 
-    // Teklif/lead modalını global tetikleyiciye bağla (sayfa içinde kullanılacak)
+    // Teklif/lead modalını global tetikleyiciye bağla
     ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
+  // State declarations
   const [featured, setFeatured] = useState<Product[]>([])
   const [newProducts, setNewProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -33,8 +56,27 @@ const ProductsPage: React.FC = () => {
   const [_loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy] = useState('name')
-  const [searchQuery, setSearchQuery] = useState(q)
   const [hasLoadedAll, setHasLoadedAll] = useState(false)
+
+  // Auto-focus search input when UI mode changes
+  useEffect(() => {
+    if (inputValue) {
+      // Use requestAnimationFrame to ensure the new input element is mounted
+      requestAnimationFrame(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus()
+          // Move cursor to end
+          const len = searchInputRef.current.value.length
+          searchInputRef.current.setSelectionRange(len, len)
+        }
+      })
+    }
+  }, [inputValue])
+
+  const clearSearch = () => {
+    setInputValue('')
+    setSearchQuery('')
+  }
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -190,9 +232,6 @@ const ProductsPage: React.FC = () => {
     return () => { active = false }
   }, [searchQuery])
 
-  const clearSearch = () => {
-    setSearchQuery('')
-  }
 
   const mainCategories = categories.filter(cat => cat.level === 0)
   const applicationCards = getActiveApplicationCards()
@@ -253,13 +292,13 @@ const ProductsPage: React.FC = () => {
       {/* Keşfet / Tüm Ürünler toggle */}
       <div className="mb-6">
         <div className="inline-flex rounded-lg bg-light-gray p-1">
-          <Link to="/products" className={`px-4 py-2 rounded-md text-sm font-medium transition ${!isAll && !searchQuery ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.discover')}</Link>
+          <Link to="/products" className={`px-4 py-2 rounded-md text-sm font-medium transition ${!isAll && !inputValue ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.discover')}</Link>
           <Link to="/products?all=1" className={`px-4 py-2 rounded-md text-sm font-medium transition ${isAll ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.allProducts')}</Link>
         </div>
       </div>
 
       {/* Header + Search (yalnızca All veya Search modunda) */}
-      {(isAll || searchQuery) && (
+      {(isAll || inputValue) && (
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-industrial-gray mb-2">
@@ -275,8 +314,8 @@ const ProductsPage: React.FC = () => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors ${viewMode === 'grid'
-                    ? 'bg-white text-primary-navy shadow-sm'
-                    : 'text-steel-gray hover:text-primary-navy'
+                  ? 'bg-white text-primary-navy shadow-sm'
+                  : 'text-steel-gray hover:text-primary-navy'
                   }`}
               >
                 <GridIcon size={16} />
@@ -284,33 +323,24 @@ const ProductsPage: React.FC = () => {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors ${viewMode === 'list'
-                    ? 'bg-white text-primary-navy shadow-sm'
-                    : 'text-steel-gray hover:text-primary-navy'
+                  ? 'bg-white text-primary-navy shadow-sm'
+                  : 'text-steel-gray hover:text-primary-navy'
                   }`}
               >
                 <ListIcon size={16} />
               </button>
             </div>
-            <div className="relative w-full sm:w-auto sm:min-w-[18rem]">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray" size={16} />
-              <input
-                type="text"
-                placeholder={t('common.searchPlaceholder') || 'Ürün, model veya SKU ara'}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-72 pl-10 pr-3 py-2 border border-light-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy"
-              />
-            </div>
           </div>
         </div>
       )}
 
-      {/* Keşfet hero (yalnızca Keşfet modunda) */}
-      {!isAll && !searchQuery && (
-        <>
-          <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
-            <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div>
+      {/* Hero section with persistent search input */}
+      <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
+        <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div>
+            {/* Hero content - hidden when searching or viewing all */}
+            {!isAll && !inputValue && (
+              <>
                 <h1 className="text-3xl sm:text-4xl font-bold leading-tight">{t('products.heroTitle')}</h1>
                 <p className="mt-3 text-white/90">{t('products.heroSubtitle')}</p>
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -321,44 +351,51 @@ const ProductsPage: React.FC = () => {
                     {t('common.selectByNeed')}
                   </a>
                 </div>
-                <div className="relative mt-6 max-w-md">
-                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
-                  <input
-                    type="text"
-                    placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
-                  />
-                </div>
-              </div>
-              <div className="hidden lg:block">
-                <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
-                  <span className="text-white/80">{t('products.discoverVisual')}</span>
-                </div>
+              </>
+            )}
+            {/* Search input - always visible */}
+            <div className={`relative max-w-md ${!isAll && !inputValue ? 'mt-6' : ''}`}>
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
+              />
+            </div>
+          </div>
+          {/* Visual placeholder - hidden when searching or viewing all */}
+          {!isAll && !inputValue && (
+            <div className="hidden lg:block">
+              <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
+                <span className="text-white/80">{t('products.discoverVisual')}</span>
               </div>
             </div>
-            {/* Value props strip */}
-            <div className="bg-white/10 border-t border-white/20">
-              <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="flex items-center gap-3">
-                  <BadgeCheckIcon size={18} />
-                  <span className="text-sm">{t('products.heroValue1')}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ShieldCheckIcon size={18} />
-                  <span className="text-sm">{t('products.heroValue2')}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <ClockIcon size={18} />
-                  <span className="text-sm">{t('products.heroValue3')}</span>
-                </div>
-              </div>
+          )}
+        </div>
+        {/* Value props strip */}
+        <div className="bg-white/10 border-t border-white/20">
+          <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-3">
+              <BadgeCheckIcon size={18} />
+              <span className="text-sm">{t('products.heroValue1')}</span>
             </div>
-          </section>
-          {/* Keşfet kahramanının hemen altında Güven/Uygunluk */}
-          <TrustSection />
-        </>
+            <div className="flex items-center gap-3">
+              <ShieldCheckIcon size={18} />
+              <span className="text-sm">{t('products.heroValue2')}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <ClockIcon size={18} />
+              <span className="text-sm">{t('products.heroValue3')}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Güven section - only show in discover mode */}
+      {!isAll && !inputValue && (
+        <TrustSection />
       )}
 
       {/* Liste alanı: Arama / Tüm Ürünler / Keşfet bölümleri */}
