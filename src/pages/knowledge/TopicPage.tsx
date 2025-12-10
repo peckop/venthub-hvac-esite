@@ -3,9 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const PRODUCTS_QUERY: Record<string, string> = {
-  'hava-perdesi': '/products?application=air-curtain',
-  'jet-fan': '/products?application=jet-fan',
-  'hrv': '/products?application=hrv'
+  'hava-perdesi': '/products?application=air-curtain#applications',
+  'jet-fan': '/products?application=jet-fan#applications',
+  'hrv': '/products?application=hrv#applications'
 }
 
 const TopicPage: React.FC = () => {

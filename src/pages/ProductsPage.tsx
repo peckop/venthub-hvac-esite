@@ -11,6 +11,7 @@ import { iconFor, accentOverlayClass, gridColsClass } from '../utils/application
 import { trackEvent } from '../utils/analytics'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import { useScrollToHash } from '../hooks/useScrollToHash'
 
 const ProductsPage: React.FC = () => {
   const location = useLocation()
@@ -38,7 +39,7 @@ const ProductsPage: React.FC = () => {
     return () => clearTimeout(t)
   }, [inputValue])
 
-  const appParam = params.get('app') || ''
+  const appParam = params.get('application') || params.get('app') || '' // Support both 'application' and legacy 'app'
   const { t } = useI18n()
   const appSectionRef = useRef<HTMLDivElement | null>(null)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
@@ -57,6 +58,9 @@ const ProductsPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy] = useState('name')
   const [hasLoadedAll, setHasLoadedAll] = useState(false)
+
+  // Auto-scroll to hash anchor (e.g., #applications from knowledge center)
+  useScrollToHash([appParam, searchResults])
 
   // Auto-focus search input when UI mode changes
   useEffect(() => {
@@ -459,7 +463,7 @@ const ProductsPage: React.FC = () => {
       ) : (
         <>
           {/* Uygulama alanına göre keşfet - öne alındı */}
-          <section id="by-application" ref={appSectionRef} className="mb-12">
+          <section id="applications" ref={appSectionRef} className="mb-12">
             <div className="flex items-center mb-4">
               <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.applicationTitle')}</h2>
             </div>
