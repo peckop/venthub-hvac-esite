@@ -35,14 +35,14 @@ export const HomePage: React.FC = () => {
       link.setAttribute('fetchpriority', 'high')
       document.head.appendChild(link)
       return () => { document.head.removeChild(link) }
-    } catch {}
+    } catch { }
   }, [])
 
 
 
 
-  // Global lead modal trigger for HeroSection button
-  ;((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
+    // Global lead modal trigger for HeroSection button
+    ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
 
   return (
@@ -101,11 +101,11 @@ export const HomePage: React.FC = () => {
 
 
       {/* Uygulamaya Göre Çözümler */}
-      <section id="by-application" className="py-16 bg-gradient-to-br from-gray-50 to-white" aria-labelledby="by-application-heading">
+      <section id="applications" className="py-16 bg-gradient-to-br from-gray-50 to-white" aria-labelledby="applications-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 id="by-application-heading" className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('common.byApplication')}</h2>
-            <a href="/products#by-application" className="text-primary-navy hover:underline text-sm font-medium">{t('common.viewAll')} →</a>
+            <h2 id="applications-heading" className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('common.byApplication')}</h2>
+            <a href="/products#applications" className="text-primary-navy hover:underline text-sm font-medium">{t('common.viewAll')} →</a>
           </div>
           {(() => {
             const appCards = getActiveApplicationCards()
@@ -232,7 +232,7 @@ export const HomePage: React.FC = () => {
                   {t('home.why.premiumText')}
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <TrendingUpIcon className="text-success-green" />
@@ -242,7 +242,7 @@ export const HomePage: React.FC = () => {
                   {t('home.why.expertText')}
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <ClockIcon className="text-warning-orange" />
@@ -293,23 +293,23 @@ export const HomePage: React.FC = () => {
 function StarIcon({ className = '' }: { className?: string }) {
   return (
     <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/>
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
     </svg>
   )
 }
 function TrendingUpIcon({ className = '' }: { className?: string }) {
   return (
     <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-      <polyline points="17 6 23 6 23 12"/>
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+      <polyline points="17 6 23 6 23 12" />
     </svg>
   )
 }
 function ClockIcon({ className = '' }: { className?: string }) {
   return (
     <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
     </svg>
   )
 }

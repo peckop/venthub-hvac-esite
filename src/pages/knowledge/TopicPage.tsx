@@ -1,12 +1,7 @@
 import React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
-
-const PRODUCTS_QUERY: Record<string, string> = {
-  'hava-perdesi': '/products?application=air-curtain#applications',
-  'jet-fan': '/products?application=jet-fan#applications',
-  'hrv': '/products?application=hrv#applications'
-}
+import { getProductsUrlFromTopic } from '../../utils/applicationLinks'
 
 const TopicPage: React.FC = () => {
   const { t } = useI18n()
@@ -59,7 +54,7 @@ const TopicPage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            to={slug ? PRODUCTS_QUERY[slug] : '/products'}
+            to={slug ? getProductsUrlFromTopic(slug) : '/products#applications'}
             className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
           >
             {t('knowledge.topic.toProducts')}

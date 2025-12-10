@@ -351,7 +351,7 @@ const ProductsPage: React.FC = () => {
                   <Link to="/products?all=1" className="inline-flex items-center justify-center rounded-lg bg-white text-primary-navy px-5 py-2.5 font-semibold shadow-sm hover:bg-gray-100 transition">
                     {t('common.seeAllProducts')}
                   </Link>
-                  <a href="#by-application" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
+                  <a href="#applications" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
                     {t('common.selectByNeed')}
                   </a>
                 </div>

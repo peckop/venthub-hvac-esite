@@ -29,7 +29,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
           playsInline
           preload="none"
           className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          onMouseEnter={() => videoRef.current?.play().catch(()=>{})}
+          onMouseEnter={() => videoRef.current?.play().catch(() => { })}
           onMouseLeave={() => { videoRef.current?.pause(); if (videoRef.current) videoRef.current.currentTime = 0 }}
           aria-hidden
         />
@@ -42,7 +42,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
         </div>
         <div className="flex items-center gap-2">
           <Link
-            to={item.hrefProducts || '/products#by-application'}
+            to={item.hrefProducts || '/products#applications'}
             className="inline-flex items-center rounded-lg bg-white/90 hover:bg-white text-industrial-gray px-3 py-1.5 text-xs font-semibold shadow"
             onClick={() => trackEvent('home_gallery_cta', { cta: 'products', title: item.title })}
           >
@@ -66,12 +66,12 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
 const BentoGrid: React.FC = () => {
   const { t } = useI18n()
   const items: BentoItem[] = [
-    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: '/products?app=parking#by-application' },
-    { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: '/products?app=air-curtain#by-application' },
-    { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4', topic: 'hrv', hrefProducts: '/products?app=heat-recovery#by-application' },
-    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: '/products#by-application' },
-    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: '/products#by-application' },
-    { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: '/products#by-application' },
+    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: '/products?application=parking#applications' },
+    { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: '/products?application=air-curtain#applications' },
+    { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4', topic: 'hrv', hrefProducts: '/products?application=heat-recovery#applications' },
+    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: '/products#applications' },
+    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: '/products#applications' },
+    { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: '/products#applications' },
   ]
   // 2x3 grid, bir büyük karo
   return (
