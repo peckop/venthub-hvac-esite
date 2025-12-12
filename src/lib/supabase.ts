@@ -21,6 +21,19 @@ export interface Category {
   parent_id: string | null
   level: number
   description: string
+  image_url?: string | null
+  seo_title?: string | null
+  seo_desc?: string | null
+  sort_order?: number
+  is_featured?: boolean
+  metadata?: {
+    display_mode?: 'showcase' | 'series' | 'list'
+    showcase_images?: { desktop: string; mobile: string }[]
+    features?: { icon: string; title: string; description: string }[]
+    technical_summary?: string
+    hero_title?: string
+    hero_description?: string
+  } | null
 }
 
 export interface Product {

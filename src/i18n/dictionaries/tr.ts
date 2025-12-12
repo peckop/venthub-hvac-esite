@@ -110,6 +110,8 @@ export const tr = {
     }
   },
   home: {
+    seoTitle: "VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma",
+    seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
     features: {
       euQuality: "Avrupa kalite standartları",
       fastDelivery: "Hızlı teslimat",

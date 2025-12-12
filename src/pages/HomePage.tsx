@@ -1,6 +1,9 @@
 import React, { useState, Suspense, useEffect } from 'react'
 import LazyInView from '../components/LazyInView'
 import { Link } from 'react-router-dom'
+import { getCategories, Category } from '../lib/supabase'
+const HeroCarousel = React.lazy(() => import('../components/HeroCarousel').then(module => ({ default: module.HeroCarousel })))
+
 import HeroSection from '../components/HeroSection'
 import { useI18n } from '../i18n/I18nProvider'
 import { getActiveApplicationCards } from '../config/applications'
@@ -20,8 +23,13 @@ import LazyProductFlow from '../components/LazyProductFlow'
 
 export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
-
+  const [categories, setCategories] = useState<Category[]>([])
   const { t } = useI18n()
+
+  useEffect(() => {
+    // Fetch categories for Hero Carousel
+    getCategories().then(setCategories).catch(console.error)
+  }, [])
 
   // Preload LCP hero image only on homepage and only on desktop (lg+) where it's visible
   useEffect(() => {
@@ -52,8 +60,14 @@ export const HomePage: React.FC = () => {
         description={t('home.seoDesc')}
         canonical={`${window.location.origin}/`}
       />
-      {/* Hero Section */}
-      <HeroSection />
+      {/* Hero Section - Carousel or Static Fallback */}
+      <Suspense fallback={<HeroSection />}>
+        {categories.length > 0 ? (
+          <HeroCarousel categories={categories} />
+        ) : (
+          <HeroSection />
+        )}
+      </Suspense>
 
       {/* JSON-LD: Organization & WebSite */}
       <script
