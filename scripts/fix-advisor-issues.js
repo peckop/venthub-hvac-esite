@@ -30,21 +30,21 @@ async function applyFixes() {
         }
 
         // 2. Consolidate RLS Policies on product_images
-        // Identified 'product_images_update_adm', 'merged_product_images_update', 'authenticated_update'
-        const policiesToDrop = [
-            "product_images_update_adm",
-            "merged_product_images_update",
-            "authenticated_update",
-            "product_images_select_adm"
-        ];
-
-        for (const policy of policiesToDrop) {
-            try {
-                await client.query(`DROP POLICY IF EXISTS "${policy}" ON product_images;`);
-                console.log(`✅ Dropped redundant policy: ${policy}`);
-            } catch (e) {
-                console.log(`Note: Policy ${policy} not found or error.`);
-            }
+        // Nuke all PERMISSIVE policies on product_images to be safe and clean.
+        try {
+            await client.query(`
+                DO $$
+                DECLARE r RECORD;
+                BEGIN
+                    FOR r IN SELECT policyname FROM pg_policies WHERE tablename = 'product_images' AND permissive = 'PERMISSIVE' LOOP
+                        EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON product_images';
+                        RAISE NOTICE 'Dropped policy: %', r.policyname;
+                    END LOOP;
+                END $$;
+            `);
+            console.log('✅ Dropped all permissive policies on product_images via dynamic SQL.');
+        } catch (e) {
+            console.log('Error dropping policies: ' + e.message);
         }
 
         // 3. Recreate a single consolidated update policy (optional, but good practice if we removed all updates)
