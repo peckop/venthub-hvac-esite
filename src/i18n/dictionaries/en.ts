@@ -110,6 +110,8 @@ export const en = {
     }
   },
   home: {
+    seoTitle: "VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling",
+    seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
     features: {
       euQuality: "European quality standards",
       fastDelivery: "Fast delivery",

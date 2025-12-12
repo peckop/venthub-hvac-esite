@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
               const re = new RegExp(`<link\\s+((?!<).)*rel=["']stylesheet["']((?!<).)*href=["']${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']((?!<).)*>`, 'gi')
               out = out.replace(re, '')
             }
-          } catch {}
+          } catch { }
 
           writeFileSync(htmlPath, out)
           console.log('[critters] Inlined critical CSS and converted to preload+swap in index.html')
@@ -89,6 +89,19 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+      },
+    },
+    // Ignore non-React HTML files from dependency scanning
+    optimizeDeps: {
+      entries: ['index.html', 'src/**/*.{ts,tsx,js,jsx}'],
+    },
+    server: {
+      watch: {
+        ignored: [
+          '**/hood-visualization*.html',
+          '**/avens-integration/**',
+          '**/supabase/functions/**',
+        ],
       },
     },
     build: {
@@ -144,4 +157,3 @@ export default defineConfig(({ mode }) => {
     },
   }
 })
-

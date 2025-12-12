@@ -7,6 +7,9 @@ import { ChevronRight, Filter, Grid, List } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
+import CategoryShowcase from '../components/category/CategoryShowcase'
+import CategoryLanding from '../components/category/CategoryLanding'
+import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
@@ -98,7 +101,19 @@ export const CategoryPage: React.FC = () => {
         // Get subcategories if this is a main category
         let subs: Category[] = []
         if (targetCategory.level === 0) {
-          subs = categories.filter(c => c.parent_id === targetCategory.id)
+          subs = categories
+            .filter(c => c.parent_id === targetCategory.id)
+            .sort((a, b) => {
+              // Primary sort: sort_order (descending - higher number first if that's the convention, or ascending. 
+              // Usually sort_order is ascending (0, 1, 2...). Let's assume ascending.
+              // If sort_order is missing/null, treat as 0 or put at end? defaulting to 0.
+              const orderA = a.sort_order ?? 0
+              const orderB = b.sort_order ?? 0
+              if (orderA !== orderB) return orderA - orderB
+
+              // Secondary sort: alphabetical
+              return a.name.localeCompare(b.name)
+            })
           setSubCategories(subs)
         }
 
@@ -252,13 +267,60 @@ export const CategoryPage: React.FC = () => {
   }
   const relatedTopicSlug = mapSlugToTopic(parentCategory?.slug || category.slug)
 
+  // Construct image URL if available
+  const categoryImageUrl = category.image_url
+    ? `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
+    : null
+
+  // --- Display Mode Handling ---
+  // Merge DB metadata with Static fallback (Static takes precedence if DB is empty for that field)
+
+  const mergedMetadata = {
+    ...(STATIC_CATEGORY_METADATA[slug || ''] || {}),
+    ...(category.metadata || {})
+  }
+
+  const displayMode = mergedMetadata.display_mode
+
+  if (displayMode === 'showcase') {
+    // Inject metadata into category object for the component
+    const enrichedCategory = { ...category, metadata: mergedMetadata }
+    return (
+      <>
+        <Seo
+          title={category.seo_title || `${category.name} | VentHub`}
+          description={category.seo_desc || category.description}
+          canonical={canonicalUrl}
+          image={categoryImageUrl || undefined}
+        />
+        <CategoryShowcase category={enrichedCategory} subCategories={subCategories} />
+      </>
+    )
+  }
+
+  if (displayMode === 'series') {
+    const enrichedCategory = { ...category, metadata: mergedMetadata }
+    return (
+      <>
+        <Seo
+          title={category.seo_title || `${category.name} | VentHub`}
+          description={category.seo_desc || category.description}
+          canonical={canonicalUrl}
+          image={categoryImageUrl || undefined}
+        />
+        <CategoryLanding category={enrichedCategory} products={products} />
+      </>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-light-gray">
       <Seo
-        title={`${category.name} | VentHub`}
-        description={category.description}
+        title={category.seo_title || `${category.name} | VentHub`}
+        description={category.seo_desc || category.description}
         canonical={canonicalUrl}
         noindex={false}
+        image={categoryImageUrl || undefined} // Use category image for OG image if allowed by Seo component types
       />
       {/* JSON-LD: BreadcrumbList */}
       <script
@@ -321,8 +383,16 @@ export const CategoryPage: React.FC = () => {
       <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center space-x-6">
-            <div className="text-primary-navy">
-              {getCategoryIcon(parentCategory?.slug || category.slug, { size: 64 })}
+            <div className="text-primary-navy shrink-0">
+              {categoryImageUrl ? (
+                <img
+                  src={categoryImageUrl}
+                  alt={category.name}
+                  className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm border border-light-gray"
+                />
+              ) : (
+                getCategoryIcon(parentCategory?.slug || category.slug, { size: 64 })
+              )}
             </div>
             <div>
               <h1 className="text-4xl font-bold text-industrial-gray mb-2">
@@ -489,8 +559,8 @@ export const CategoryPage: React.FC = () => {
                     aria-label={t('category.gridViewAria') as string}
                     aria-pressed={viewMode === 'grid'}
                     className={`p-2 rounded transition-colors ${viewMode === 'grid'
-                        ? 'bg-primary-navy text-white'
-                        : 'text-steel-gray hover:bg-light-gray'
+                      ? 'bg-primary-navy text-white'
+                      : 'text-steel-gray hover:bg-light-gray'
                       }`}
                   >
                     <Grid size={20} />
@@ -500,8 +570,8 @@ export const CategoryPage: React.FC = () => {
                     aria-label={t('category.listViewAria') as string}
                     aria-pressed={viewMode === 'list'}
                     className={`p-2 rounded transition-colors ${viewMode === 'list'
-                        ? 'bg-primary-navy text-white'
-                        : 'text-steel-gray hover:bg-light-gray'
+                      ? 'bg-primary-navy text-white'
+                      : 'text-steel-gray hover:bg-light-gray'
                       }`}
                   >
                     <List size={20} />
