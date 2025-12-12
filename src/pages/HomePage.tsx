@@ -14,6 +14,7 @@ const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 // @ts-ignore
 import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 
