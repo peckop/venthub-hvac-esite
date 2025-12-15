@@ -67,67 +67,20 @@ Workflow içinde VITE_* değişkenleri Secrets üzerinden geçiriyoruz. Secrets 
 
 ---
 
-## Değişiklik Özeti (Son Çalışmalar)
-Bkz. ayrıntılı günlük: `docs/CHANGELOG.md`.
+## Son Gelişmeler (2025-12-15)
 
-Tarih: 2025-09-19
+Proje modernizasyonu ve stabilite çalışmaları tamamlandı:
 
-- Admin Dashboard ve Orders
-  - KPI kartları tıklanabilir hale getirildi (Bekleyen İade, Bekleyen Kargo)
-  - `admin-orders-latest` fonksiyonu `preset=pendingShipments` desteği ile sunucu tarafı filtre uyguluyor (status ∈ confirmed/processing ve shipped_at IS NULL)
-  - Dashboard kırılımları: Bekleyen Kargo — kargo dağılımı; Bekleyen İade — durum kırılımı
-- Envanter: Geri Al (Undo) ve Toplu Geri Al (Batch Undo)
-  - Ürün sağ panelinde mini hareket geçmişi (son 5) ve tek hareket için 10 dk içinde geri al
-  - `inventory_movements.batch_id` ile CSV import’larına toplu geri al desteği; `reverse_inventory_batch(uuid, int)` RPC eklendi
-  - CSV export: SKU sütunu artık gerçek SKU yazar (önceden product_id idi)
-  - UI: Movements ve Audit Log sayfalarında `?batch=<uuid>` filtresi ve hızlı bağlantılar
-- Güvenlik ve Veritabanı
-  - Fonksiyonlarda `search_path=pg_catalog, public` sabitlendi (mutable search_path uyarıları giderildi)
-  - `reserved_orders`, `inventory_summary`, `admin_users` gibi view’lar `security_invoker=on`; `admin_users` erişimleri (anon/auth) kaldırıldı
-  - RLS konsolidasyonu: cart_items, shopping_carts, products, user_profiles, venthub_returns tablolarında aynı rol/aksiyon için tekleştirilmiş politikalar
-  - Performans: kritik FK indeksleri eklendi; mükerrer indeksler temizlendi; danışman uyarıları doğrulandı
-  - İndeks kullanım ölçümü: pg_stat_user_indexes ile mini yük testinde tüm kritik indeksler için `idx_scan>0` doğrulandı
+- **CI/CD Pipeline**: Tüm workflow'lar (Lint, Build, Test) yeşil (%100 başarı). `--max-warnings=0` politikası aktif.
+- **Supabase Optimizasyonu**:
+  - RLS policy'leri `initplan` sorunlarına karşı optimize edildi (`(select auth.uid())` pattern).
+  - Performans indeklemesi yapıldı, gereksiz indeksler temizlendi.
+- **UI/UX**:
+  - Yeni **Category Landing** sayfaları (metadata-driven).
+  - Ana sayfa **Hero Carousel** (otomatik kategori geçişi).
+  - Hava Perdesi **Seçim Sihirbazı**.
 
-- i18n & SEO: TR/EN iki dilli yapı son hâline getirildi. Para/tarih saat formatları helper’lar ile (src/i18n/format.ts, src/i18n/datetime.ts), Seo.tsx hreflang (tr-TR, en-US, x-default) ve OG locale dinamik. Dokümantasyon güncellendi (docs/SEO_I18N.md).
-
-Detaylar için `docs/CHANGELOG.md` ve `docs/SECURITY_AND_PERF_CHECKLIST.md` dosyalarına bakın.
-
-Tarih: 2025-09-07
-
-- **Ana Sayfa Konsolidasyonu**
-  - VisualShowcase ve SpotlightList kaldırıldı; ProductFlow tek vitrin (full‑bleed) olarak kaldı.
-  - BrandFlow eklendi (iki şeritli marka akışı); Featured/New Products kaldırıldı.
-  - TrustSection, ResourcesSection, FAQShortSection konumları kurumsal plana göre netleşti; spacing normalize edildi.
-- **Knowledge Hub & Hesaplayıcılar v1**
-  - /destek/merkez hub: arama + etiket filtresi; TopicPage i18n.
-  - Hesaplayıcı iskeletleri: HRV, Hava Perdesi, Jet Fan, Kanal (rotalar aktif).
-- **Deploy**
-  - GitHub → Cloudflare Pages otomatik yayın (PR preview’lar açık). Env: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY.
-- **Bilinen konu**
-  - Ana sayfada bazı menü linklerinde ilk tık gecikmesi/bloklanması (overlay/pointer‑events şüphesi). İlgisiz header/mega‑menu değişiklikleri geri alındı.
-
-Önceki çalışmalar (2025-09-02):
-
-- **WhatsApp & SMS Bildirim Sistemi**
-  - Twilio entegrasyonu ile WhatsApp Business API ve SMS desteği
-  - Otomatik stok uyarı sistemi: eşik değerinin altına düştüğünde bildirim
-  - Edge Functions: `notification-service` ve `stock-alert` tamamen hazır
-  - Template sistemi ve idempotency koruması mevcut
-  - Kurulum rehberi: `docs/WHATSAPP_SETUP_GUIDE.md`
-- **Stok Yönetimi**
-  - Otomatik stok düşümü: ödeme sonrası idempotent stok güncelleme
-  - Ürün bazında düşük stok eşikleri (`low_stock_threshold`)
-  - Müşteri UI: "Stokta/Stokta yok" rozeti ve "Stok sor" butonu
-  - Admin operasyon sayfası: stok düzenleme ve raporlama
-- **Güvenlik / Log Hijyeni**
-  - App: `console.log` kaldırıldı/koşullandı; dev-only `debug(...)` (VITE_DEBUG)
-  - Edge Function: loglar `IYZICO_DEBUG` ile koşullu; PII maskeleme
-  - Kullanılmayan modüller temizlendi
-- **CI/CD & Build**
-  - Lint politikası: `no-console` etkin, `--max-warnings=0` ile geçiyor
-  - Bundle optimizasyonu: %87 küçültme (1,118kB → 145kB)
-
-Önceki çalışmalar için `docs/CHANGELOG.md` dosyasına bakın (2025-08-29 ve öncesi).
+Detaylı değişiklik günlüğü için: [docs/CHANGELOG.md](docs/CHANGELOG.md)
 
 ## Geliştirme
 - pnpm install

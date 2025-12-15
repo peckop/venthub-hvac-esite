@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import { getCategories, Category } from '../lib/supabase'
 const HeroCarousel = React.lazy(() => import('../components/HeroCarousel').then(module => ({ default: module.HeroCarousel })))
 
-import HeroSection from '../components/HeroSection'
+
+import HeroSkeleton from '../components/HeroSkeleton'
 import { useI18n } from '../i18n/I18nProvider'
 import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
@@ -60,11 +61,11 @@ export const HomePage: React.FC = () => {
         canonical={`${window.location.origin}/`}
       />
       {/* Hero Section - Carousel or Static Fallback */}
-      <Suspense fallback={<HeroSection />}>
+      <Suspense fallback={<HeroSkeleton />}>
         {categories.length > 0 ? (
           <HeroCarousel categories={categories} />
         ) : (
-          <HeroSection />
+          <HeroSkeleton />
         )}
       </Suspense>
 

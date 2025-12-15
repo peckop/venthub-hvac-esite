@@ -14,6 +14,18 @@ Bu doküman, VentHub ana sayfası için uygulanmış geliştirmeleri ve sıradak
 - HomePage spacing/padding normalize edildi; bileşen sıralaması kurumsal plana göre sadeleştirildi.
 - i18n: başlıklar/kopyalar için eksik anahtarlar eklendi.
 
+## 2) Uygulanan Geliştirmeler (2025-12-15: Hero & Category Renewal)
+
+- **Hero Carousel (VisualShowcase alternatifi)**:
+  - "VisualShowcase" yerine, kullanıcıya doğrudan ana kategorileri (Fanlar, Isı Geri Kazanım, Hava Perdeleri vb.) sunan, sekmeli ve otomatik geçişli bir Hero modülü geliştirildi.
+  - Her kategori için özel görsel ve CTA ("Keşfet") butonu.
+  - Teknik: `HeroCarousel.tsx` (framer-motion, useInterval, preloading).
+
+- **Category Landing Entegrasyonu**:
+  - Ana sayfadan kategorilere tıklanıldığında açılan sayfalar (`CategoryLanding.tsx`) tamamen yenilendi.
+  - Alt kategoriler, öne çıkan özellikler (ikonlu grid) ve doğrudan ürün listeleme bağlantıları eklendi.
+  - Hava Perdeleri için özel "Seçim Sihirbazı" (Wizard) entegre edildi.
+
 ## (Önceki) 1) Uygulanan Geliştirmeler (2025-09-05)
 
 Uygulama odaklı kurgu, ürün satışına zorlamadan bilgilendirici bir akış sağlar. Uygulanan başlıca değişiklikler:

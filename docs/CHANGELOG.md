@@ -1,5 +1,28 @@
 # Changelog
 
+## 2025-12-15
+
+### CI Pipeline & Linting Fixes
+- **CI Green**: GitHub Actions workflow'u artık tüm adımları başarıyla geçiyor (Lint, Typecheck, Build, Test).
+- **ESLint Fixes**: `--max-warnings=0` politikasına uyum sağlandı.
+  - `HeroCarousel.tsx`: Kullanılmayan importlar ve `exhaustive-deps` uyarıları giderildi.
+  - `EnhancedNeedsWizard.tsx`: React Hook bağımlılıkları düzeltildi.
+  - Genel: Kullanılmayan değişkenler temizlendi.
+
+### Supabase Performance & RLS Optimization
+- **RLS Policy Konsolidasyonu**:
+  - `product_images`: 4 farklı permissive policy tek bir `update` policy altında birleştirildi.
+  - `venthub_order_items`, `venthub_returns`: Çoklu policy'ler tekleştirildi.
+  - `auth.uid()` performansı: Tüm RLS policy'lerde `(select auth.uid())` sub-query pattern'i uygulanarak initplan stabillitesi sağlandı.
+- **İndeks Optimizasyonu**:
+  - Kullanılmayan indeksler (`idx_products_model_code`, `idx_products_category_id` vb.) drop edildi.
+  - Eksik FK indeksleri kontrol edildi.
+
+### UI/UX: Dynamic Category Landing
+- **New Category Landing**: Tüm ana kategoriler için (Fanlar, Isı Geri Kazanım vb.) metadata-driven dinamik landing sayfası (`CategoryLanding.tsx`) devreye alındı.
+- **Hero Carousel**: Ana sayfada kategori bazlı, otomatik geçişli hero slider geliştirildi.
+- **Wizard Integration**: Hava perdeleri kategorisi için "Bana Uygun Olanı Bul" wizard entegrasyonu tamamlandı.
+
 ## 2025-09-19
 
 ### Admin Dashboard Navigasyon & Filtreler

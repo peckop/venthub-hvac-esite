@@ -95,97 +95,93 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
     if (mainCategories.length === 0) return null
 
-    const currentCat = mainCategories[currentIndex]
-    // Merge DB data with Fallback
-    const meta = currentCat.metadata || FALLBACK_METADATA[currentCat.slug] || FALLBACK_METADATA['default']
-
-    // Construct image URL (mock or real)
-    // For now using the local reference images or placeholders as user hasn't uploaded all to Supabase yet
-    // If image_url exists in DB, use it. Else use local placeholders based on slug.
-    const getImageUrl = (cat: Category) => {
-        if (cat.image_url) {
-            return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${cat.image_url}`
-        }
-        // Fallback to local images path (assuming they will be placed there)
-        // Or use the ones we generated contextually - for now using a generic placeholder if missing
-        // Actually we have: hero-vortice.png logic from previous steps. 
-        // Let's use a smart local path mapping if we know the filenames
-        return `/images/category/hero-${cat.slug}.png` // Expectation for local files
-    }
-
-    const bgImage = getImageUrl(currentCat)
-
     return (
         <div className="relative h-[600px] lg:h-[700px] w-full overflow-hidden bg-zinc-900 text-white group">
+            {mainCategories.map((cat, idx) => {
+                const isActive = idx === currentIndex
+                const meta = cat.metadata || FALLBACK_METADATA[cat.slug] || FALLBACK_METADATA['default']
 
-            {/* Background Image Layer */}
-            <div key={currentCat.id} className="absolute inset-0 transition-opacity duration-700 ease-in-out">
-                <div className="absolute inset-0 bg-black/40 z-10" /> {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
-                <img
-                    src={bgImage}
-                    alt={currentCat.name}
-                    className="w-full h-full object-cover object-center transform scale-105 animate-slow-zoom"
-                    onError={(e) => {
-                        // Fallback if local image missing
-                        (e.target as HTMLImageElement).src = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
-                    }}
-                />
-            </div>
+                // Construct image URL
+                let bgImage = `/images/category/hero-${cat.slug}.png`
+                if (cat.image_url) {
+                    bgImage = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${cat.image_url}`
+                }
 
-            {/* Content Layer */}
-            <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
-                <div className="max-w-2xl animate-fade-in-up">
-                    {/* Category Badge */}
-                    <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/10">
-                        <Activity className="text-secondary-blue w-4 h-4" />
-                        <span className="text-sm font-medium tracking-wide uppercase">{currentCat.name}</span>
-                    </div>
-
-                    <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-                        {meta.hero_title || currentCat.name}
-                    </h1>
-
-                    <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">
-                        {meta.hero_description || currentCat.description}
-                    </p>
-
-                    {/* Features Grid */}
-                    {meta.features && (
-                        <div className="flex gap-8 mb-10">
-                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                            {meta.features.map((f: any, idx: number) => {
-                                const Icon = IconMap[f.icon] || Activity
-                                return (
-                                    <div key={idx} className="flex items-center gap-3">
-                                        <div className="p-2 bg-white/10 rounded-lg">
-                                            <Icon className="w-6 h-6 text-secondary-blue" />
-                                        </div>
-                                        <div>
-                                            <div className="font-bold">{f.title}</div>
-                                            <div className="text-xs text-gray-400">{f.description}</div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                return (
+                    <div
+                        key={cat.id}
+                        className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-20' : 'opacity-0 z-10 pointer-events-none'}`}
+                    >
+                        {/* Background Image Layer */}
+                        <div className="absolute inset-0">
+                            <div className="absolute inset-0 bg-black/40 z-10" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
+                            <img
+                                src={bgImage}
+                                alt={cat.name}
+                                className={`w-full h-full object-cover object-center transform transition-transform duration-[2000ms] ${isActive ? 'scale-105' : 'scale-100'}`}
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
+                                }}
+                            />
                         </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-4">
-                        <Link
-                            to={`/category/${currentCat.slug}`}
-                            className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
-                        >
-                            Ürünleri İncele
-                            <ArrowRight className="ml-2 w-5 h-5" />
-                        </Link>
-                        <button className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm">
-                            Hızlı Teklif Al
-                        </button>
+                        {/* Content Layer */}
+                        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
+                            <div className={`max-w-2xl transition-all duration-1000 transform ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                                {/* Category Badge */}
+                                <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/10">
+                                    <Activity className="text-secondary-blue w-4 h-4" />
+                                    <span className="text-sm font-medium tracking-wide uppercase">{cat.name}</span>
+                                </div>
+
+                                <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+                                    {meta.hero_title || cat.name}
+                                </h1>
+
+                                <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">
+                                    {meta.hero_description || cat.description}
+                                </p>
+
+                                {/* Features Grid */}
+                                {meta.features && (
+                                    <div className="flex gap-8 mb-10">
+                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                        {meta.features.map((f: any, i: number) => {
+                                            const Icon = IconMap[f.icon] || Activity
+                                            return (
+                                                <div key={i} className="flex items-center gap-3">
+                                                    <div className="p-2 bg-white/10 rounded-lg">
+                                                        <Icon className="w-6 h-6 text-secondary-blue" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold">{f.title}</div>
+                                                        <div className="text-xs text-gray-400">{f.description}</div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* Actions */}
+                                <div className="flex flex-wrap gap-4">
+                                    <Link
+                                        to={`/category/${cat.slug}`}
+                                        className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
+                                    >
+                                        Ürünleri İncele
+                                        <ArrowRight className="ml-2 w-5 h-5" />
+                                    </Link>
+                                    <button className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm">
+                                        Hızlı Teklif Al
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                )
+            })}
 
             {/* Navigation Controls */}
             <div className="absolute bottom-10 right-10 z-30 flex gap-2">
