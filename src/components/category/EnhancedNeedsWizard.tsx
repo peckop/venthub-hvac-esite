@@ -233,6 +233,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         if (state.step === 5 && isOpen) {
             fetchMatchingProducts()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.step, isOpen])
 
     const fetchMatchingProducts = async () => {

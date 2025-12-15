@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize } from 'lucide-react'
 import { Category } from '../lib/supabase'
-import { CATEGORY_REGISTRY, getCategoryUrl } from '../config/categoryRegistry'
+import { CATEGORY_REGISTRY } from '../config/categoryRegistry'
 import { useI18n } from '../i18n/I18nProvider'
 
 interface HeroCarouselProps {
@@ -55,7 +55,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-    const { t } = useI18n()
+    const { t: _t } = useI18n()
 
     // Filter only main categories defined in registry
     const mainCategories = categories.filter(c =>
@@ -68,6 +68,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     // Safe reset if categories change
     useEffect(() => {
         if (currentIndex >= mainCategories.length) setCurrentIndex(0)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mainCategories.length])
 
     // Auto-play logic
