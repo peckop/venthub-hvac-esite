@@ -1,22 +1,15 @@
 # ROADMAP — VentHub HVAC (Single Source of Truth)
 
-Last updated: 2025-09-19
+Last updated: 2025-12-15
 
 Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyonel notlar için tek ve güncel kaynaktır.
 
 ## 1) Durum Özeti (TL;DR)
-- Sepet Senkronizasyonu: Misafir ve kullanıcı sepeti senkronizasyonu tamamen düzeltildi. Misafir sepeti korunuyor, ödeme sonrası sepet tamamen temizleniyor, eski ürünler karışmıyor.
-- Router & Navigasyon: Sipariş Detay sayfası eklendi, Orders listesi detay sayfasına yönlendiriyor, inline panel kaldırıldı.
-- Kargo: Detay sayfasında kargo alanları ve timeline var; link olduğunda dış bağlantı ikonu gösteriliyor (UI hazır).
-- İadeler: Returns listesinde sipariş kodu yeni detay rotasına gidiyor.
-- Fatura: Proforma PDF indirme mevcut (OrderDetailPage). Kurumsal bilgiler ve numaralandırma/şablon iyileştirmeleri TODO.
-- Testler: Suite yeşil; 3 UI testi skip (test ortamı stabilizasyonu gerektiriyor, fonksiyonelliği etkilemiyor).
-- Lint: CI'da blocking (maks. uyarı=0); kalan uyarılar kademeli temizlenecek.
-- Güvenlik/Log Hijyeni: Uygulama tarafında konsol logları kaldırıldı/koşullandı (VITE_DEBUG); Edge Function logları IYZICO_DEBUG ile koşullu ve PII maskeli; ESLint 'no-console' politikası etkin.
-- Ürün Görünürlüğü & RLS: Products/Categories tablolarına herkese SELECT politikası eklendi; user_profiles üzerindeki RLS sonsuz döngü hatası kalıcı olarak giderildi (SECURITY DEFINER fonksiyonları ile). Ürün istekleri 500 → 200.
-- Sipariş Onayı E-postası: Ödeme başarı sonrası metin netleştirildi; order-confirmation Edge Function canlıda güncellendi.
-- DB Performansı & RLS: Eksik FK indeksleri eklendi; cart_items üzerindeki mükerrer indeks kaldırıldı; cart_items ve shopping_carts RLS politikaları sadeleştirildi; user_profiles ve venthub_returns için auth.* çağrıları (SELECT ile sarım) initplan açısından optimize edildi.
-- Products RLS: SELECT ayrıştırması tamamlandı; admin DML politikaları ayrı (INSERT/UPDATE/DELETE).
+- **CI/CD Pipeline**: GitHub Actions (Lint, Typecheck, Build, Test) %100 başarılı ve yeşil. `--max-warnings=0` standardı sağlandı.
+- **Supabase & RLS**: Tüm RLS policy'leri `initplan` verimliliği için `(select auth.uid())` pattern'ine geçirildi. `product_images` ve diğer tablolarda permissive policy'ler tekleştirildi. Gereksiz indeksler temizlendi.
+- **UI/UX**: Ana sayfada **Hero Carousel** ve tamamen dinamik **Category Landing** sayfaları devreye alındı. Hava perdeleri için **Seçim Sihirbazı** (Product Selector) canlıda.
+- **Sepet Senkronizasyonu**: Misafir ve kullanıcı sepeti senkronizasyonu düzeltildi.
+- **Router & Navigasyon**: Detay sayfaları ve breadcrumb yapısı optimize edildi.
 
 ## 2) Sprint Planı
 
@@ -104,6 +97,15 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] “Kargolandı” durumuna geçiş; müşteri e‑postası (opsiyonel)
   - [x] İade webhooks: returns-webhook (HMAC/Token) ile delivered→received otomasyonu; received’de e‑posta tetikleme; returns_webhook_events audit/dedup
 
+### Sprint 4 — Tamamlandı (Aralık 2025: Hero & Category Landing)
+- Ana Sayfa Geliştirmeleri
+  - [x] **Hero Carousel**: Kategori (Fan, Isı Geri Kazanım vb.) bazlı otomatik geçişli hero, dinamik içerik yükleme.
+  - [x] **Category Landing**: Tüm ana kategoriler için metadata-driven dinamik landing sayfaları (`CategoryLanding.tsx`).
+  - [x] **Product Selector**: "Hava Perdeleri" için wizard entegrasyonu (kapı ölçülerine göre ürün önerme).
+- Kalite ve Stabilite
+  - [x] **CI Pipeline**: Lint/Build süreçleri tamamen yeşil (%100 pass).
+  - [x] **Supabase**: Performans indeksleri eklendi, RLS policy'leri `initplan` için optimize edildi.
+
 ### Sprint 3 — Planlı
 - Admin panel (gelişmiş): sipariş yönetimi, kargo bilgisi girme, toplu işlem, fatura yönetimi
 - Kargo 3PL/API entegrasyonları ve otomatik status güncellemeleri
@@ -119,7 +121,7 @@ Bu belge; proje yol haritası, sprint planları, kurumsal/PLP planı ve operasyo
   - [x] v1 hesaplayıcılar: HRV, Hava Perdesi, Jet Fan, Kanal hız/Δp (ön-boyutlandırma) — iskelet sayfalar
   - [ ] Ürün filtre eşlemesi ve “filtreli URL” ile ürün listesine geçiş
 - Sprint 2
-  - [ ] Ürün Seçici (wizard) → konu sayfalarından bağlama
+  - [x] Ürün Seçici (wizard) → Hava Perdeleri için tamamlandı (EnhancedNeedsWizard)
   - [ ] Hesap girdilerinin URL ile paylaşımı (link/share)
 - Sprint 3
   - [ ] Fan Eğrisi Motoru (v2): üretici eğrileri + sistem eğrisi kesişimi + FEI

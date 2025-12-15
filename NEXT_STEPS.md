@@ -47,40 +47,31 @@
    - [ ] JSON‑LD SearchAction; noindex/canonical kuralları
    - [ ] A11y: focus trap, ARIA rolleri, canlı bölge (n sonuç)
 
-### ✅ TAMAMLANAN GÖREVLER (2025-09-02'ye kadar)
-- [x] **CI: Lint'i "blocking" yap** — CI'da lint adımı bloklayıcı (--max-warnings=0)
-- [x] **Performans: Bundle optimizasyonu** — %87 küçültme sağlandı (1,118kB → 145kB)
-- [x] **Güvenlik/Log Hijyeni** — PII maskeleme, VITE_DEBUG/IYZICO_DEBUG gates
-- [x] **no-console politikası** — ESLint kuralı aktif (warn/error serbest)
-- [x] **WhatsApp & SMS sistemi** — Notification service ve stock alerts hazır
-- [x] **Stok yönetimi** — Otomatik stok düşümü, idempotent guards, admin UI
+### ✅ TAMAMLANAN GÖREVLER
+- [x] **CI: Lint Cleanup** — Tüm uyarılar giderildi, CI bloklayıcı (`--max-warnings=0`) olarak geçiyor.
+- [x] **Supabase: RLS Optimization** — Policy performansı ve güvenlik iyileştirildi, `initplan` sorunları çözüldü.
+- [x] **UI: Category Landing & Hero** — Dinamik kategori sayfaları ve Hero Carousel canlıda.
+- [x] **Performans: Bundle optimizasyonu** — %87 küçültme sağlandı.
+- [x] **Güvenlik/Log Hijyeni** — PII maskeleme ve VITE_DEBUG gates aktif.
+- [x] **WhatsApp & SMS sistemi** — Notification service hazır.
+- [x] **Stok yönetimi** — Otomatik stok düşümü ve admin UI hazır.
 
 ### 📋 KALAN ÖNCELIKLI GÖREVLER
-1) **Lint cleanup (Phase 1 – detay temizliği)**
-   - CheckoutPage.tsx
-     - Missing deps (clearCart, orderId, convId), "any" tiplerini unknown'a çevir
-   - PaymentWatcher.tsx
-     - useEffect: checkOnce bağımlılığı (useCallback ile çöz)
-   - HomePage.tsx
-     - handleCartToast kullanılmıyor — kaldır ya da kullan
-   - AuthContext.tsx, hooks/useCart.tsx, components/HVACIcons.tsx
-     - react-refresh/only-export-components uyarıları
-   - Genel: Kalan "any" tiplerini daralt
 
-2) **iyzico production hygiene** 🔄 Kısmen yapıldı
+1) **iyzico production hygiene** 🔄 Kısmen yapıldı
    - [x] PII maskeleme ve debug gating
    - [ ] Env toggle: sandbox ↔ live (script URLs, API endpoints)
    - [ ] Live callback domain whitelist (iyzico panel)
 
-3) **Sipariş/İdari işlevler**
+2) **Sipariş/İdari işlevler**
    - [ ] Orders detayında fatura bilgileri + yasal onayları görünür kıl
    - [ ] (Opsiyonel) Admin için basit görüntüleme sayfası
 
-4) **İçerik/Legal**
+3) **İçerik/Legal**
    - [ ] Çerez Politikası metni (src/config/legal.ts) şirket bilgileri ile güncelle
 
-5) **Stok sistemi son adımlar** (ROADMAP'de detay)
-  - [ ] RLS policies (güvenlik)
+4) **Stok sistemi son adımlar** (ROADMAP'de detay)
+  - [x] RLS policies (güvenlik)
   - [x] Checkout stock revalidation (oversell engelleme)
   - [ ] WhatsApp wa.me config (frontend entegrasyonu)
 
