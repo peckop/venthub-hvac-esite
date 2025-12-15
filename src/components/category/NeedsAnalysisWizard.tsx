@@ -7,7 +7,7 @@ interface NeedsAnalysisWizardProps {
 }
 
 const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChange }) => {
-    const { t } = useI18n()
+    const { t: _t } = useI18n()
     const [step, setStep] = useState(1)
     const [selections, setSelections] = useState({
         maxHeight: 0,
