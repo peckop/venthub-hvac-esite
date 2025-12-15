@@ -10,6 +10,7 @@ interface HeroCarouselProps {
 }
 
 // Fallback data for when DB metadata is missing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FALLBACK_METADATA: Record<string, any> = {
     'fanlar': {
         hero_title: 'Endüstriyel Havalandırma Çözümleri',
@@ -33,6 +34,7 @@ const FALLBACK_METADATA: Record<string, any> = {
 }
 
 // Icon mapper
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const IconMap: Record<string, any> = {
     wind: Wind,
     shield: Shield,
@@ -150,6 +152,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                     {/* Features Grid */}
                     {meta.features && (
                         <div className="flex gap-8 mb-10">
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             {meta.features.map((f: any, idx: number) => {
                                 const Icon = IconMap[f.icon] || Activity
                                 return (
