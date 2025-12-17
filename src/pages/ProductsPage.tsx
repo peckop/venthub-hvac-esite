@@ -26,11 +26,15 @@ const getAllDescendantIds = (categories: Category[], parentId: string): string[]
 }
 
 // Recursive Category Item
-const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { categories: Category[], selectedCategory: string | null, onSelectCategory: (id: string | null) => void, t: any }) => {
+interface CategoryNode extends Category {
+  children: CategoryNode[]
+}
+
+const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { categories: Category[], selectedCategory: string | null, onSelectCategory: (id: string | null) => void, t: (key: string) => string }) => {
   // Build hierarchy
-  const buildTree = (cats: Category[]) => {
-    const map = new Map<string, Category & { children: any[] }>()
-    const roots: any[] = []
+  const buildTree = (cats: Category[]): CategoryNode[] => {
+    const map = new Map<string, CategoryNode>()
+    const roots: CategoryNode[] = []
     cats.forEach(c => map.set(c.id, { ...c, children: [] }))
     cats.forEach(c => {
       if (c.parent_id && map.has(c.parent_id)) {
@@ -44,10 +48,10 @@ const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { c
 
   const tree = React.useMemo(() => buildTree(categories), [categories])
 
-  const renderNode = (node: any, depth: number = 0) => {
+  const renderNode = (node: CategoryNode, depth: number = 0) => {
     const isSelected = selectedCategory === node.id
     const hasChildren = node.children && node.children.length > 0
-    const isExpanded = isSelected || (selectedCategory && node.children.some((c: any) => c.id === selectedCategory)) // Simple expansion logic
+    const isExpanded = isSelected || (selectedCategory && node.children.some((c: CategoryNode) => c.id === selectedCategory)) // Simple expansion logic
 
     return (
       <li key={node.id} className="relative">
@@ -67,7 +71,7 @@ const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { c
         </button>
         {hasChildren && (
           <ul className={`mt-1 space-y-1 ${isExpanded ? 'block' : 'hidden'}`}>
-            {node.children.map((child: any) => renderNode(child, depth + 1))}
+            {node.children.map((child: CategoryNode) => renderNode(child, depth + 1))}
           </ul>
         )}
       </li>
@@ -109,9 +113,10 @@ const FilterSidebar = ({
   onToggleBrand: (brand: string) => void,
   priceRange: { min: string, max: string },
   onPriceChange: (type: 'min' | 'max', val: string) => void,
-  t: any
+  t: (key: string) => string
 }) => {
-  const rootCats = categories.filter(c => c.level === 0)
+  // Prefix unused var with underscore
+  const _rootCats = categories.filter(c => c.level === 0)
 
   return (
     <aside className="w-full lg:w-64 flex-shrink-0 space-y-8">
@@ -237,7 +242,8 @@ const ProductsPage: React.FC = () => {
       }
     }, 600)
     return () => clearTimeout(timer)
-  }, [inputValue])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, qParam])
 
   // 4. Main Data Fetcher
   useEffect(() => {
@@ -253,7 +259,7 @@ const ProductsPage: React.FC = () => {
 
         if (activeQuery || hasFilters) {
           // Construct Filters
-          const filters: Record<string, any> = {}
+          const filters: Record<string, string | string[] | undefined> = {}
           // For category: Get all descendant IDs for hierarchical filtering
           const categoryIdsToFilter = catParam ? getAllDescendantIds(categories, catParam) : []
           if (categoryIdsToFilter.length > 0) filters.category_ids = categoryIdsToFilter
@@ -329,11 +335,11 @@ const ProductsPage: React.FC = () => {
               ...p,
               status: 'active' as const, // Patch status
               is_featured: false, // Default
-              category_id: filters.category_id || '', // Partial
+              category_id: (filters.category_id as string) || '', // Partial
               subcategory_id: '' // Missing
             }))
-            // We cast to any for state simplicity as we know ProductCard handles partials if status is present
-            setProducts(compatible as any)
+            // We cast to Product[] for state simplicity as we know ProductCard handles partials if status is present
+            setProducts(compatible as unknown as Product[])
           }
         }
         // Mode B: All Products
@@ -354,7 +360,8 @@ const ProductsPage: React.FC = () => {
 
     fetchData()
     return () => { active = false }
-  }, [activeQuery, catParam, params.get('brands'), minPriceParam, maxPriceParam, isAll])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuery, catParam, brandsParam.join(','), minPriceParam, maxPriceParam, isAll, categories])
 
 
   // Helper: Update URL params
@@ -496,7 +503,7 @@ const ProductsPage: React.FC = () => {
 }
 
 // Sub-component to keep main file clean
-const DiscoveryContent = ({ t, appSectionRef }: { t: any, appSectionRef: any }) => {
+const DiscoveryContent = ({ t, appSectionRef }: { t: (key: string) => string, appSectionRef: React.RefObject<HTMLDivElement | null> }) => {
   const appCards = getActiveApplicationCards()
   return (
     <div className="space-y-12">

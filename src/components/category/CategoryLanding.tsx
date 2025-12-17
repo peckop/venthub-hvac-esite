@@ -25,7 +25,7 @@ import {
 import ProductCard from '../ProductCard'
 // import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
-import { Link, useNavigate } from 'react-router-dom'
+// import { Link, useNavigate } from 'react-router-dom'
 // Premium section components for air curtains
 import {
     ProblemSection,
