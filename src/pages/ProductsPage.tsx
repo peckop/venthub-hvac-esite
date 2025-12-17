@@ -1,647 +1,544 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useRef } from 'react'
-import type { Product, Category } from '../lib/supabase'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import TrustSection from '../components/TrustSection'
 import LeadModal from '../components/LeadModal'
 import { getActiveApplicationCards } from '../config/applications'
-import { iconFor, accentOverlayClass, gridColsClass } from '../utils/applicationUi'
-import { trackEvent } from '../utils/analytics'
+import { iconFor, gridColsClass } from '../utils/applicationUi'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
-import { useScrollToHash } from '../hooks/useScrollToHash'
+
+// Helper: Get all descendant category IDs (including self)
+const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
+  const result = [parentId]
+  const queue = [parentId]
+  while (queue.length > 0) {
+    const currentId = queue.shift()!
+    const children = categories.filter(c => c.parent_id === currentId)
+    for (const child of children) {
+      result.push(child.id)
+      queue.push(child.id)
+    }
+  }
+  return result
+}
+
+// Recursive Category Item
+const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { categories: Category[], selectedCategory: string | null, onSelectCategory: (id: string | null) => void, t: any }) => {
+  // Build hierarchy
+  const buildTree = (cats: Category[]) => {
+    const map = new Map<string, Category & { children: any[] }>()
+    const roots: any[] = []
+    cats.forEach(c => map.set(c.id, { ...c, children: [] }))
+    cats.forEach(c => {
+      if (c.parent_id && map.has(c.parent_id)) {
+        map.get(c.parent_id)!.children.push(map.get(c.id))
+      } else {
+        roots.push(map.get(c.id))
+      }
+    })
+    return roots
+  }
+
+  const tree = React.useMemo(() => buildTree(categories), [categories])
+
+  const renderNode = (node: any, depth: number = 0) => {
+    const isSelected = selectedCategory === node.id
+    const hasChildren = node.children && node.children.length > 0
+    const isExpanded = isSelected || (selectedCategory && node.children.some((c: any) => c.id === selectedCategory)) // Simple expansion logic
+
+    return (
+      <li key={node.id} className="relative">
+        <button
+          onClick={() => onSelectCategory(node.id)}
+          className={`w-full text-left py-1.5 rounded transition-colors flex items-center justify-between group
+            ${isSelected ? 'text-primary-navy font-bold bg-primary-navy/5' : 'text-steel-gray hover:text-industrial-gray hover:bg-gray-50'}
+          `}
+          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+        >
+          <span className="truncate">{node.name}</span>
+          {hasChildren && (
+            <span className="text-gray-400 group-hover:text-gray-600 text-xs mr-2">
+              ▼
+            </span>
+          )}
+        </button>
+        {hasChildren && (
+          <ul className={`mt-1 space-y-1 ${isExpanded ? 'block' : 'hidden'}`}>
+            {node.children.map((child: any) => renderNode(child, depth + 1))}
+          </ul>
+        )}
+      </li>
+    )
+  }
+
+  return (
+    <ul className="space-y-1 text-sm">
+      <li>
+        <button
+          onClick={() => onSelectCategory(null)}
+          className={`w-full text-left px-2 py-1.5 rounded hover:bg-gray-100 ${!selectedCategory ? 'font-bold text-primary-navy bg-primary-navy/5' : 'text-steel-gray'}`}
+        >
+          {t('common.allCategories')}
+        </button>
+      </li>
+      {tree.map(root => renderNode(root))}
+    </ul>
+  )
+}
+
+// Filter Sidebar Component
+const FilterSidebar = ({
+  categories,
+  selectedCategory,
+  onSelectCategory,
+  availableBrands,
+  selectedBrands,
+  onToggleBrand,
+  priceRange,
+  onPriceChange,
+  t
+}: {
+  categories: Category[],
+  selectedCategory: string | null,
+  onSelectCategory: (id: string | null) => void,
+  availableBrands: string[],
+  selectedBrands: string[],
+  onToggleBrand: (brand: string) => void,
+  priceRange: { min: string, max: string },
+  onPriceChange: (type: 'min' | 'max', val: string) => void,
+  t: any
+}) => {
+  const rootCats = categories.filter(c => c.level === 0)
+
+  return (
+    <aside className="w-full lg:w-64 flex-shrink-0 space-y-8">
+      {/* Categories */}
+      <div>
+        <h3 className="font-semibold text-industrial-gray mb-3">{t('common.categories')}</h3>
+        <CategoryTree
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={onSelectCategory}
+          t={t}
+        />
+      </div>
+
+      {/* Brands */}
+      <div>
+        <h3 className="font-semibold text-industrial-gray mb-3">{t('common.brands')}</h3>
+        <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+          {availableBrands.map(brand => (
+            <label key={brand} className="flex items-center gap-2 text-sm text-steel-gray hover:text-industrial-gray cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedBrands.includes(brand)}
+                onChange={() => onToggleBrand(brand)}
+                className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy"
+              />
+              {brand}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="font-semibold text-industrial-gray mb-3">{t('common.priceRange')}</h3>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            placeholder="Min"
+            value={priceRange.min}
+            onChange={(e) => onPriceChange('min', e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm focus:ring-primary-navy focus:border-primary-navy"
+          />
+          <span className="text-gray-400">-</span>
+          <input
+            type="number"
+            placeholder="Max"
+            value={priceRange.max}
+            onChange={(e) => onPriceChange('max', e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm focus:ring-primary-navy focus:border-primary-navy"
+          />
+        </div>
+      </div>
+    </aside>
+  )
+}
 
 const ProductsPage: React.FC = () => {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { t } = useI18n()
   const [leadOpen, setLeadOpen] = useState(false)
+
+  // URL Params State
   const params = new URLSearchParams(location.search)
   const qParam = params.get('q')?.trim() || ''
+  const catParam = params.get('category')
+  const brandsParam = params.get('brands')?.split(',').filter(Boolean) || []
+  const minPriceParam = params.get('min_price') || ''
+  const maxPriceParam = params.get('max_price') || ''
+  const isAll = params.get('all') === '1'
 
-  // Local input state (what user types)
+  // Internal State
   const [inputValue, setInputValue] = useState(qParam)
-  // Active search state (what triggers fetch/UI change)
-  const [searchQuery, setSearchQuery] = useState(qParam)
+  const [activeQuery, setActiveQuery] = useState(qParam)
 
-  // Sync active search with URL param (navigated from outside)
-  useEffect(() => {
-    const nextQ = new URLSearchParams(location.search).get('q')?.trim() || ''
-    setInputValue(nextQ)
-    setSearchQuery(nextQ)
-  }, [location.search])
+  // Data State
+  const [products, setProducts] = useState<Product[] | FtsProductResult[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // Debounce input value to update active search query
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setSearchQuery(inputValue)
-    }, 600) // 600ms debounce
-    return () => clearTimeout(t)
-  }, [inputValue])
+  // Filter State
+  const [availableBrands, setAvailableBrands] = useState<string[]>([])
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  const appParam = params.get('application') || params.get('app') || '' // Support both 'application' and legacy 'app'
-  const { t } = useI18n()
-  const appSectionRef = useRef<HTMLDivElement | null>(null)
-  const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const appSectionRef = useRef<HTMLDivElement>(null)
 
-    // Teklif/lead modalını global tetikleyiciye bağla
+    // Global Lead Modal Trigger
     ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
 
-  // State declarations
-  const [featured, setFeatured] = useState<Product[]>([])
-  const [newProducts, setNewProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [searchResults, setSearchResults] = useState<Product[]>([])
-  const [searchLoading, setSearchLoading] = useState(false)
-  const [_loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [sortBy] = useState('name')
-  const [hasLoadedAll, setHasLoadedAll] = useState(false)
-
-  // Auto-scroll to hash anchor (e.g., #applications from knowledge center)
-  useScrollToHash([appParam, searchResults])
-
-  // Auto-focus search input when UI mode changes
+  // 1. Initialize & Fetch Metadata (Cats, Brands)
   useEffect(() => {
-    if (inputValue) {
-      // Use requestAnimationFrame to ensure the new input element is mounted
-      requestAnimationFrame(() => {
-        if (searchInputRef.current) {
-          searchInputRef.current.focus()
-          // Move cursor to end
-          const len = searchInputRef.current.value.length
-          searchInputRef.current.setSelectionRange(len, len)
-        }
-      })
+    async function init() {
+      try {
+        const { getCategories, getAllProducts } = await import('../lib/supabase')
+        const cats = await getCategories()
+        setCategories(cats)
+
+        // Extract unique brands for filter
+        // Note: Ideally this comes from a 'brands' table or RPC, but distinct on products works for now
+        const allProds = await getAllProducts()
+        const brands = Array.from(new Set(allProds.map(p => p.brand).filter(Boolean))) as string[]
+        setAvailableBrands(brands.sort())
+      } catch (e) {
+        console.error('Init error', e)
+      }
     }
+    init()
+  }, [])
+
+  // 2. Sync Input with URL
+  useEffect(() => {
+    setInputValue(qParam)
+    setActiveQuery(qParam)
+  }, [qParam])
+
+  // 3. Debounce Input -> URL Update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (inputValue !== qParam) {
+        updateUrl({ q: inputValue })
+      }
+    }, 600)
+    return () => clearTimeout(timer)
   }, [inputValue])
 
-  const clearSearch = () => {
-    setInputValue('')
-    setSearchQuery('')
-  }
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const isAllNow = searchParams.get('all') === '1'
-    const hasQuery = (searchQuery ?? '').length > 0
-
-    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-
-    async function attachCovers(list: Product[]): Promise<Product[]> {
-      if (!Array.isArray(list) || list.length === 0) return list
-      try {
-        const ids = list.map(p => p.id)
-        const { supabase } = await import('../lib/supabase')
-        const { data: imgs, error: imgErr } = await supabase
-          .from('product_images')
-          .select('product_id,path,sort_order,alt')
-          .in('product_id', ids)
-          .order('sort_order', { ascending: true })
-        if (imgErr) return list
-        const firstMap = new Map<string, { path: string, alt?: string | null }>()
-        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
-        }
-        return list.map(p => {
-          const cover = firstMap.get(p.id)
-          return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-        })
-      } catch {
-        return list
-      }
-    }
-
-    async function fetchDiscoverLight() {
-      try {
-        setLoading(true)
-        // Fetch only what we need for Discover: featured, categories, and a small slice of products
-        const { getFeaturedProducts, getCategories, getProducts } = await import('../lib/supabase')
-        const [featuredData, categoriesData, limitedProducts] = await Promise.all([
-          getFeaturedProducts(),
-          getCategories(),
-          getProducts(24),
-        ])
-        const [featuredWithCovers, limitedWithCovers] = await Promise.all([
-          attachCovers(featuredData),
-          attachCovers(limitedProducts),
-        ])
-        setFeatured(featuredWithCovers)
-        // Derive "new" products from non-featured items in the limited list
-        const newItems = limitedWithCovers.filter((p) => !p.is_featured).slice(0, 12)
-        setNewProducts(newItems)
-        setCategories(categoriesData)
-      } catch (error) {
-        console.error('Error fetching discover data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    async function fetchAllIfNeeded() {
-      try {
-        if (hasLoadedAll) return
-        // For All Products mode, fetch the complete list only when needed
-        setLoading(true)
-        const { getAllProducts } = await import('../lib/supabase')
-        const productsData = await getAllProducts()
-        const productsWithCovers = await attachCovers(productsData)
-        setAllProducts(productsWithCovers)
-        setHasLoadedAll(true)
-      } catch (error) {
-        console.error('Error fetching all products:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    // Scroll to application section if deep-linked via app param
-    const targetApp = searchParams.get('app')
-    if (targetApp && appSectionRef.current) {
-      try {
-        appSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      } catch { }
-    }
-
-    // Decide what to fetch based on URL and query
-    if (isAllNow) {
-      // When entering All Products view directly, fetch the full list.
-      // We intentionally avoid fetching featured/categories here to reduce payload.
-      // Keep existing discover data if any for quick toggle back.
-      if (!hasLoadedAll) {
-        fetchAllIfNeeded()
-      }
-    } else if (!hasQuery) {
-      // Discover view without a search query: fetch the light set
-      if (featured.length === 0 || categories.length === 0 || newProducts.length === 0) {
-        fetchDiscoverLight()
-      }
-    }
-  }, [location.search, hasLoadedAll, featured.length, categories.length, newProducts.length, searchQuery])
-
-  // Sync searchQuery with URL param q (when navigated from header or sticky search)
-  useEffect(() => {
-    const paramsNow = new URLSearchParams(location.search)
-    const nextQ = paramsNow.get('q')?.trim() || ''
-    setSearchQuery(nextQ)
-  }, [location.search])
-
-  // Arama sonuçlarını (varsa) yükle
+  // 4. Main Data Fetcher
   useEffect(() => {
     let active = true
-    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-    async function attachCovers(list: Product[]): Promise<Product[]> {
-      if (!Array.isArray(list) || list.length === 0) return list
+
+    async function fetchData() {
+      setLoading(true)
       try {
-        const ids = list.map(p => p.id)
-        const { supabase } = await import('../lib/supabase')
-        const { data: imgs } = await supabase
-          .from('product_images')
-          .select('product_id,path,sort_order,alt')
-          .in('product_id', ids)
-          .order('sort_order', { ascending: true })
-        const firstMap = new Map<string, { path: string, alt?: string | null }>()
-        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
+        const { ftsSearchProducts, getAllProducts } = await import('../lib/supabase')
+
+        // Mode A: Search (Query or Filters active)
+        const hasFilters = catParam || brandsParam.length > 0 || minPriceParam || maxPriceParam
+
+        if (activeQuery || hasFilters) {
+          // Construct Filters
+          const filters: Record<string, any> = {}
+          // For category: Get all descendant IDs for hierarchical filtering
+          const categoryIdsToFilter = catParam ? getAllDescendantIds(categories, catParam) : []
+          if (categoryIdsToFilter.length > 0) filters.category_ids = categoryIdsToFilter
+          if (brandsParam.length > 0) filters.brand = brandsParam[0] // Single brand support
+          if (minPriceParam) filters.price_min = minPriceParam
+          if (maxPriceParam) filters.price_max = maxPriceParam
+
+          // Fetch products - if no query but category filter, get all products in those categories
+          let results: FtsProductResult[]
+          if (activeQuery) {
+            results = await ftsSearchProducts(activeQuery, 50, Object.keys(filters).length ? filters : undefined)
+          } else {
+            // No search query, just filtering by category - fetch all products and filter client-side
+            const allProds = await getAllProducts()
+            results = allProds
+              .filter(p => {
+                // Category filter
+                if (categoryIdsToFilter.length > 0 && !categoryIdsToFilter.includes(p.category_id)) return false
+                // Brand filter
+                if (filters.brand && p.brand !== filters.brand) return false
+                // Price filters
+                const price = parseFloat(p.price || '0')
+                if (filters.price_min && price < parseFloat(filters.price_min)) return false
+                if (filters.price_max && price > parseFloat(filters.price_max)) return false
+                return true
+              })
+              .map(p => ({
+                id: p.id,
+                name: p.name,
+                sku: p.sku,
+                brand: p.brand,
+                price: p.price,
+                rank: null,
+                is_fuzzy_match: false,
+                status: p.status,
+                image_url: p.image_url,
+                image_alt: p.image_alt,
+                is_featured: p.is_featured,
+                stock_qty: p.stock_qty,
+                model_code: p.model_code
+              }))
+          }
+
+          // Enhanced results with generic attachCovers + active status patch
+          const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+
+          async function attachCovers<T extends { id: string }>(list: T[]): Promise<(T & { image_url?: string, image_alt?: string | null })[]> {
+            if (!Array.isArray(list) || list.length === 0) return list
+            try {
+              const ids = list.map(p => p.id)
+              const { supabase } = await import('../lib/supabase')
+              const { data: imgs } = await supabase
+                .from('product_images')
+                .select('product_id,path,sort_order,alt')
+                .in('product_id', ids)
+                .order('sort_order', { ascending: true })
+              const firstMap = new Map<string, { path: string, alt?: string | null }>()
+              for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
+                if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
+              }
+              return list.map(p => {
+                const cover = firstMap.get(p.id)
+                return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
+              })
+            } catch { return list }
+          }
+
+          const withCovers = await attachCovers(results)
+
+          if (active) {
+            // Cast to compatible type
+            const compatible = withCovers.map(p => ({
+              ...p,
+              status: 'active' as const, // Patch status
+              is_featured: false, // Default
+              category_id: filters.category_id || '', // Partial
+              subcategory_id: '' // Missing
+            }))
+            // We cast to any for state simplicity as we know ProductCard handles partials if status is present
+            setProducts(compatible as any)
+          }
         }
-        return list.map(p => {
-          const cover = firstMap.get(p.id)
-          return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-        })
-      } catch {
-        return list
-      }
-    }
-    async function run() {
-      if (!searchQuery) {
-        setSearchResults([])
-        setSearchLoading(false)
-        return
-      }
-      try {
-        setSearchLoading(true)
-        const { searchProducts } = await import('../lib/supabase')
-        const results = await searchProducts(searchQuery)
-        const withCovers = await attachCovers(results)
-        if (active) setSearchResults(withCovers)
+        // Mode B: All Products
+        else if (isAll) {
+          const all = await getAllProducts()
+          if (active) setProducts(all)
+        }
+        // Mode C: Discovery (Empty)
+        else {
+          setProducts([])
+        }
       } catch (e) {
-        console.error('Search error:', e)
-        if (active) setSearchResults([])
+        console.error('Fetch error', e)
       } finally {
-        if (active) setSearchLoading(false)
+        if (active) setLoading(false)
       }
     }
-    run()
+
+    fetchData()
     return () => { active = false }
-  }, [searchQuery])
+  }, [activeQuery, catParam, params.get('brands'), minPriceParam, maxPriceParam, isAll])
 
 
-  const mainCategories = categories.filter(cat => cat.level === 0)
-  const applicationCards = getActiveApplicationCards()
+  // Helper: Update URL params
+  const updateUrl = (patch: Record<string, string | null>) => {
+    const next = new URLSearchParams(location.search)
+    Object.entries(patch).forEach(([k, v]) => {
+      if (v === null || v === '') next.delete(k)
+      else next.set(k, v)
+    })
+    navigate({ search: next.toString() }, { replace: true })
+  }
 
 
-  const isAll = params.get('all') === '1'
-  const canonicalUrl = `${window.location.origin}/products`
-  const noindex = Boolean(searchQuery) || isAll
-  const breadcrumbLabel = searchQuery ? t('products.searchResultsTitle') : (isAll ? t('common.allProducts') : t('common.discoverPage'))
+  // Handlers
+  const handleCategorySelect = (id: string | null) => updateUrl({ category: id })
+  const handleBrandToggle = (brand: string) => {
+    // Single brand mode for current SQL
+    const current = brandsParam[0]
+    updateUrl({ brands: current === brand ? null : brand })
+  }
+  const handlePriceChange = (type: 'min' | 'max', val: string) => updateUrl({ [`${type}_price`]: val })
+
+  const showSidebar = isAll || activeQuery || catParam || brandsParam.length > 0
+  const isDiscovery = !showSidebar
+
+  // Breadcrumb
+  const breadcrumbLabel = activeQuery ? `"${activeQuery}"` : (isAll ? t('common.allProducts') : t('common.discover'))
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Seo
-        title={noindex ? `${t('products.searchSeoTitle', { q: searchQuery })} | VentHub` : `${t('common.discover')} | VentHub`}
-        description={noindex ? t('products.searchSeoDesc', { q: searchQuery }) : t('products.discoverSeoDesc')}
-        canonical={canonicalUrl}
-        noindex={noindex}
+        title={`${breadcrumbLabel} | VentHub`}
+        description={t('products.discoverSeoDesc')}
+        noindex={Boolean(activeQuery)}
       />
-      {/* JSON-LD: ItemList for /products (All or Search modes) */}
-      {(isAll || !!searchQuery) && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'ItemList',
-              itemListElement: (searchQuery ? searchResults : isAll ? allProducts : []).map((p, idx) => ({
-                '@type': 'ListItem',
-                position: idx + 1,
-                url: `${window.location.origin}/products/${p.id}`,
-                name: p.name,
-              })),
-            }),
-          }}
-        />
-      )}
-      {/* JSON-LD: BreadcrumbList for /products */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: t('common.home'), item: `${window.location.origin}/` },
-              { '@type': 'ListItem', position: 2, name: breadcrumbLabel, item: canonicalUrl },
-            ],
-          }),
-        }}
-      />
+
       {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-steel-gray mb-4">
+      <div className="flex items-center text-sm text-steel-gray mb-6">
         <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
         <span className="mx-2">/</span>
         <span className="text-industrial-gray font-medium">{breadcrumbLabel}</span>
       </div>
 
-      {/* Keşfet / Tüm Ürünler toggle */}
-      <div className="mb-6">
-        <div className="inline-flex rounded-lg bg-light-gray p-1">
-          <Link to="/products" className={`px-4 py-2 rounded-md text-sm font-medium transition ${!isAll && !inputValue ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.discover')}</Link>
-          <Link to="/products?all=1" className={`px-4 py-2 rounded-md text-sm font-medium transition ${isAll ? 'bg-white text-primary-navy shadow-sm' : 'text-industrial-gray hover:text-primary-navy'}`}>{t('common.allProducts')}</Link>
+      {/* Search Header (Always Visible in Search Mode) */}
+      <div className="flex flex-col lg:flex-row gap-6 mb-8">
+        <div className="flex-1 relative">
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
+            className="w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all"
+          />
+        </div>
+        {!isDiscovery && (
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-3 rounded-lg border ${viewMode === 'grid' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+            >
+              <GridIcon size={20} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-3 rounded-lg border ${viewMode === 'list' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+            >
+              <ListIcon size={20} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar */}
+        {showSidebar && (
+          <FilterSidebar
+            categories={categories}
+            availableBrands={availableBrands}
+            selectedCategory={catParam}
+            onSelectCategory={handleCategorySelect}
+            selectedBrands={brandsParam}
+            onToggleBrand={handleBrandToggle}
+            priceRange={{ min: minPriceParam, max: maxPriceParam }}
+            onPriceChange={handlePriceChange}
+            t={t}
+          />
+        )}
+
+        {/* Listenin Ana Gövdesi */}
+        <div className="flex-1">
+          {/* Discovery Content (Hero, Featured, etc.) */}
+          {isDiscovery && (
+            <DiscoveryContent
+              t={t}
+              appSectionRef={appSectionRef}
+            />
+          )}
+
+          {/* Product Grid */}
+          {!isDiscovery && (
+            <div>
+              {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map(n => <div key={n} className="bg-gray-100 rounded-xl h-80 animate-pulse" />)}
+                </div>
+              ) : products.length === 0 ? (
+                <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <div className="text-4xl mb-4">🔍</div>
+                  <h3 className="text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
+                  <p className="text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
+                  <button
+                    onClick={() => navigate('/products')}
+                    className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                  >
+                    Filtreleri Temizle
+                  </button>
+                </div>
+              ) : (
+                <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                  {products.map(p => (
+                    <ProductCard
+                      key={p.id}
+                      product={p as Product} // Safe cast now due to compatibility patch
+                      layout={viewMode}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Header + Search (yalnızca All veya Search modunda) */}
-      {(isAll || inputValue) && (
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-              {searchQuery ? t('products.searchResultsTitle') : isAll ? t('common.allProducts') : t('products.searchResultsTitle')}
-            </h1>
-            <p className="text-steel-gray">
-              {searchQuery ? `${searchResults.length} ${t('products.resultsFound')}` : isAll ? `${allProducts.length} ${t('products.itemsListed')}` : `${searchResults.length} ${t('products.resultsFound')}`}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 mt-4 lg:mt-0">
-            <div className="flex bg-light-gray rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-colors ${viewMode === 'grid'
-                  ? 'bg-white text-primary-navy shadow-sm'
-                  : 'text-steel-gray hover:text-primary-navy'
-                  }`}
-              >
-                <GridIcon size={16} />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-colors ${viewMode === 'list'
-                  ? 'bg-white text-primary-navy shadow-sm'
-                  : 'text-steel-gray hover:text-primary-navy'
-                  }`}
-              >
-                <ListIcon size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hero section with persistent search input */}
-      <section className="mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-secondary-blue to-sky-400 text-white">
-        <div className="px-6 py-10 sm:px-10 sm:py-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div>
-            {/* Hero content - hidden when searching or viewing all */}
-            {!isAll && !inputValue && (
-              <>
-                <h1 className="text-3xl sm:text-4xl font-bold leading-tight">{t('products.heroTitle')}</h1>
-                <p className="mt-3 text-white/90">{t('products.heroSubtitle')}</p>
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <Link to="/products?all=1" className="inline-flex items-center justify-center rounded-lg bg-white text-primary-navy px-5 py-2.5 font-semibold shadow-sm hover:bg-gray-100 transition">
-                    {t('common.seeAllProducts')}
-                  </Link>
-                  <a href="#applications" className="inline-flex items-center justify-center rounded-lg bg-primary-navy/20 backdrop-blur px-5 py-2.5 font-semibold border border-white/30 hover:bg-primary-navy/30 transition">
-                    {t('common.selectByNeed')}
-                  </a>
-                </div>
-              </>
-            )}
-            {/* Search input - always visible */}
-            <div className={`relative max-w-md ${!isAll && !inputValue ? 'mt-6' : ''}`}>
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-white/80" size={16} />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={t('common.searchPlaceholderLong') || 'Ürün, model veya SKU ara'}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 rounded-lg text-industrial-gray focus:outline-none focus:ring-4 focus:ring-white/30"
-              />
-            </div>
-          </div>
-          {/* Visual placeholder - hidden when searching or viewing all */}
-          {!isAll && !inputValue && (
-            <div className="hidden lg:block">
-              <div className="h-56 rounded-xl bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center">
-                <span className="text-white/80">{t('products.discoverVisual')}</span>
-              </div>
-            </div>
-          )}
-        </div>
-        {/* Value props strip */}
-        <div className="bg-white/10 border-t border-white/20">
-          <div className="px-6 sm:px-10 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="flex items-center gap-3">
-              <BadgeCheckIcon size={18} />
-              <span className="text-sm">{t('products.heroValue1')}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <ShieldCheckIcon size={18} />
-              <span className="text-sm">{t('products.heroValue2')}</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <ClockIcon size={18} />
-              <span className="text-sm">{t('products.heroValue3')}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Güven section - only show in discover mode */}
-      {!isAll && !inputValue && (
-        <TrustSection />
-      )}
-
-      {/* Liste alanı: Arama / Tüm Ürünler / Keşfet bölümleri */}
-      {searchQuery ? (
-        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          {searchLoading ? (
-            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
-              ))}
-            </div>
-          ) : searchResults.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl text-light-gray mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-                {t('common.notFound')}
-              </h3>
-              <button onClick={clearSearch} className="bg-primary-navy hover:bg-secondary-blue text-white px-6 py-2 rounded-lg transition-colors">
-                {t('common.clearSearch')}
-              </button>
-            </div>
-          ) : (
-            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {searchResults.map((product, i) => (
-                <ProductCard key={product.id} product={product} layout={viewMode} priority={i === 0} />
-              ))}
-            </div>
-          )}
-        </div>
-      ) : isAll ? (
-        <div className="bg-gray-50 rounded-xl p-2 sm:p-3">
-          {!hasLoadedAll ? (
-            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                <div key={i} className="bg-light-gray rounded-lg h-80 animate-pulse"></div>
-              ))}
-            </div>
-          ) : allProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl text-light-gray mb-4">📦</div>
-              <h3 className="text-xl font-semibold text-industrial-gray mb-2">
-                {t('products.noProducts')}
-              </h3>
-              <p className="text-steel-gray">{t('products.noProductsDesc')}</p>
-            </div>
-          ) : (
-            <div className={`grid gap-3 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
-              {([...allProducts].sort((a, b) => {
-                switch (sortBy) {
-                  case 'price-low': return parseFloat(a.price) - parseFloat(b.price)
-                  case 'price-high': return parseFloat(b.price) - parseFloat(a.price)
-                  case 'name':
-                  default: return a.name.localeCompare(b.name, 'tr')
-                }
-              })).map((product, i) => (
-                <ProductCard key={product.id} product={product} layout={viewMode} priority={i === 0} />
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Uygulama alanına göre keşfet - öne alındı */}
-          <section id="applications" ref={appSectionRef} className="mb-12">
-            <div className="flex items-center mb-4">
-              <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.applicationTitle')}</h2>
-            </div>
-            <div className={`${gridColsClass(applicationCards.length)}`}>
-              {applicationCards.map((card) => {
-                const selected = card.key === appParam
-                return (
-                  <Link
-                    key={card.key}
-                    to={card.href}
-                    className={`group relative overflow-hidden rounded-xl border bg-gradient-to-br from-white to-gray-50 hover:shadow-md transition ${selected ? 'border-primary-navy ring-2 ring-primary-navy' : 'border-light-gray'}`}
-                    aria-current={selected ? 'true' : undefined}
-                    onClick={() => {
-                      trackEvent('application_click', { key: card.key, source: 'products' })
-                    }}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${accentOverlayClass(card.accent)} to-transparent`}></div>
-                    <div className="p-5 relative z-10">
-                      <div className="flex items-center gap-2 text-primary-navy">
-                        {iconFor(card.icon, 18)}
-                        <span className="text-sm font-semibold">{t(`applications.${card.key}.title`)}</span>
-                      </div>
-                      <p className="mt-1 text-sm text-steel-gray">{t(`applications.${card.key}.subtitle`)}</p>
-                      <div className="mt-4 text-sm font-medium text-primary-navy">{t('common.discover')} →</div>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          </section>
-
-          {/* Popüler kategoriler - daha belirgin görsel */}
-          {mainCategories.length > 0 && (
-            <section className="mb-12">
-              <div className="flex items-center mb-4">
-                <h2 className="text-2xl font-semibold text-industrial-gray">{t('products.popularCategories')}</h2>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                {mainCategories.slice(0, 6).map((cat) => (
-                  <Link key={cat.id} to={`/category/${cat.slug}`} className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition" onClick={() => { trackEvent('category_click', { level: 0, slug: cat.slug, source: 'products' }) }}>
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 text-primary-navy">
-                        <LayersIcon size={16} />
-                        <div className="font-medium text-industrial-gray group-hover:text-primary-navy">{cat.name}</div>
-                      </div>
-                      <div className="text-xs text-steel-gray mt-1">{t('common.gotoCategory')} →</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Öne çıkanlar */}
-          {featured.length > 0 && (
-            <section className="mb-12">
-              <div className="flex items-center mb-4">
-                <StarIconSmall className="text-gold-accent mr-2" size={20} />
-                <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.featured')}</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {featured.slice(0, 9).map((product) => (
-                  <ProductCard key={product.id} product={product} highlightFeatured layout={viewMode} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Yeni ürünler */}
-          {newProducts.length > 0 && (
-            <section className="mb-12">
-              <div className="flex items-center mb-4">
-                <ClockIcon className="text-secondary-blue mr-2" size={20} />
-                <h2 className="text-2xl font-semibold text-industrial-gray">{t('common.newProducts')}</h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {newProducts.slice(0, 9).map((product) => (
-                  <ProductCard key={product.id} product={product} layout={viewMode} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Yardım CTA */}
-          <section className="mb-12">
-            <div className="rounded-2xl border border-light-gray bg-gradient-to-r from-gray-50 to-white p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-semibold text-industrial-gray">{t('products.helpCtaTitle')}</h3>
-                <p className="text-steel-gray mt-1">{t('products.helpCtaSubtitle')}</p>
-              </div>
-              <button
-                onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
-                className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
-              >
-                {t('common.getQuote')}
-              </button>
-            </div>
-          </section>
-
-          {/* Markalar vitrin */}
-          <BrandsShowcase />
-        </>
-      )}
       <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
     </div>
   )
 }
 
-// Minimal inline SVG icons to avoid lucide-react in this route chunk
-function GridIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
+// Sub-component to keep main file clean
+const DiscoveryContent = ({ t, appSectionRef }: { t: any, appSectionRef: any }) => {
+  const appCards = getActiveApplicationCards()
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <rect x="3" y="3" width="7" height="7" />
-      <rect x="14" y="3" width="7" height="7" />
-      <rect x="14" y="14" width="7" height="7" />
-      <rect x="3" y="14" width="7" height="7" />
-    </svg>
+    <div className="space-y-12">
+      <section className="bg-gradient-to-r from-primary-navy to-secondary-blue rounded-2xl p-8 text-white">
+        <h1 className="text-3xl font-bold mb-4">{t('products.heroTitle')}</h1>
+        <p className="mb-6 opacity-90">{t('products.heroSubtitle')}</p>
+        <div className="flex gap-4">
+          <Link to="/products?all=1" className="bg-white text-primary-navy px-6 py-2 rounded-lg font-semibold hover:bg-gray-50 transition">
+            {t('common.seeAllProducts')}
+          </Link>
+        </div>
+      </section>
+
+      <section id="applications" ref={appSectionRef}>
+        <h2 className="text-xl font-bold text-industrial-gray mb-6">{t('products.applicationTitle')}</h2>
+        <div className={gridColsClass(appCards.length)}>
+          {appCards.map(card => (
+            <Link key={card.key} to={card.href} className="flex flex-col items-center p-6 bg-white border rounded-xl hover:shadow-lg transition text-center group">
+              <div className="p-3 bg-gray-50 rounded-full mb-4 group-hover:bg-primary-navy/10 text-primary-navy">
+                {iconFor(card.icon, 24)}
+              </div>
+              <h3 className="font-semibold text-industrial-gray">{t(`applications.${card.key}.title`)}</h3>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <BrandsShowcase />
+      <TrustSection />
+    </div>
   )
 }
-function ListIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <circle cx="4" cy="6" r="1" />
-      <circle cx="4" cy="12" r="1" />
-      <circle cx="4" cy="18" r="1" />
-    </svg>
-  )
+
+// Icons
+function GridIcon({ size = 16 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
 }
-function SearchIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  )
+function ListIcon({ size = 16 }: { size?: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" /></svg>
 }
-function BadgeCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <path d="M7.5 2.5l2 1 2.5-1 2.5 1 2-1 2 2-.5 2.5 1 2.5-1 2.5.5 2.5-2 2-2-1-2.5 1-2.5-1-2 1-2-2 .5-2.5-1-2.5 1-2.5-.5-2.5 2-2z" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  )
-}
-function ShieldCheckIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  )
-}
-function ClockIcon({ size = 18, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
-}
-function LayersIcon({ size = 16, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <polygon points="12 2 2 7 12 12 22 7 12 2" />
-      <polyline points="2 12 12 17 22 12" />
-      <polyline points="2 17 12 22 22 17" />
-    </svg>
-  )
-}
-function StarIconSmall({ size = 20, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-    </svg>
-  )
+function SearchIcon({ size = 16, className = "" }: { size?: number, className?: string }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
 }
 
 export default ProductsPage
