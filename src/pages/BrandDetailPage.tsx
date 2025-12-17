@@ -94,31 +94,31 @@ const BrandDetailPage: React.FC = () => {
   const canonicalUrl = `${window.location.origin}/brands/${slug}`
 
   useEffect(() => {
+    const loadProducts = async () => {
+      if (!brand) return
+      setLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('brand', brand.name)
+          .eq('status', 'active')
+          .limit(6)
+
+        if (!error && data) {
+          setProducts(data as Product[])
+        }
+      } catch (e) {
+        console.error('Error loading brand products:', e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
     if (brand) {
       loadProducts()
     }
   }, [brand])
-
-  const loadProducts = async () => {
-    if (!brand) return
-    setLoading(true)
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('brand', brand.name)
-        .eq('status', 'active')
-        .limit(6)
-
-      if (!error && data) {
-        setProducts(data as Product[])
-      }
-    } catch (e) {
-      console.error('Error loading brand products:', e)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (!brand) {
     return (

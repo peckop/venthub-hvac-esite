@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import {
-  Award, Users, Clock, Shield, Target, Heart,
+  Award, Clock, Shield, Target, Heart,
   CheckCircle, Star, Truck, Building2, Globe, Zap
 } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
