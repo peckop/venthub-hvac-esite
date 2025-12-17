@@ -120,11 +120,12 @@ export const CategoryPage: React.FC = () => {
         // Fetch products + attach cover images
         let productsData: Product[]
         if (targetCategory.level === 0 && subs.length > 0) {
-          // Ana kategori ve alt kategorileri varsa: category_id ile eşleşen tüm ürünleri çek
+          // Ana kategori ve alt kategorileri varsa: ana kategori + tüm alt kategorilerdeki ürünleri çek
+          const allCategoryIds = [targetCategory.id, ...subs.map(s => s.id)]
           const { data, error } = await supabase
             .from('products')
             .select('*')
-            .eq('category_id', targetCategory.id)
+            .in('category_id', allCategoryIds)
             .eq('status', 'active')
             .order('is_featured', { ascending: false })
             .order('name', { ascending: true })
@@ -132,11 +133,11 @@ export const CategoryPage: React.FC = () => {
           if (error) throw error
           productsData = data as Product[]
         } else if (targetCategory.level === 1) {
-          // Alt kategori: subcategory_id ile eşleşen ürünleri çek
+          // Alt kategori: category_id ile eşleşen ürünleri çek (ürünler artık category_id ile alt kategorilere atanıyor)
           const { data, error } = await supabase
             .from('products')
             .select('*')
-            .eq('subcategory_id', targetCategory.id)
+            .eq('category_id', targetCategory.id)
             .eq('status', 'active')
             .order('is_featured', { ascending: false })
             .order('name', { ascending: true })
@@ -308,7 +309,7 @@ export const CategoryPage: React.FC = () => {
           canonical={canonicalUrl}
           image={categoryImageUrl || undefined}
         />
-        <CategoryLanding category={enrichedCategory} products={products} />
+        <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} />
       </>
     )
   }

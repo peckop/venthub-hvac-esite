@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { getCategories, Category } from '../lib/supabase'
 const HeroCarousel = React.lazy(() => import('../components/HeroCarousel').then(module => ({ default: module.HeroCarousel })))
 
-
 import HeroSkeleton from '../components/HeroSkeleton'
 import { useI18n } from '../i18n/I18nProvider'
 import { getActiveApplicationCards } from '../config/applications'
@@ -19,7 +18,9 @@ import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_ware
 
 // Kritik olmayan blokları tembel yükleme
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
-import LazyProductFlow from '../components/LazyProductFlow'
+// New optimized components
+const SmartRouting = React.lazy(() => import('../components/SmartRouting'))
+const WhyVentHubEnhanced = React.lazy(() => import('../components/WhyVentHubEnhanced'))
 
 export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
@@ -99,7 +100,7 @@ export const HomePage: React.FC = () => {
       />
 
       {/* Bento Grid (hover video önizleme) */}
-      <div className="cv-600">
+      <div id="categories" className="cv-600 scroll-mt-20">
         <LazyInView
           loader={() => import('../components/BentoGrid')}
           placeholder={<div className="min-h-[200px]" aria-hidden="true" />}
@@ -154,122 +155,15 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Before/After Slider (Uygulamaya göre çözümler altı) */}
-      <div className="cv-400">
-        {(() => {
-          type BASProps = { beforeSrc: string; afterSrc: string; alt?: string }
-          return (
-            <LazyInView<BASProps>
-              loader={() => import('../components/BeforeAfterSlider')}
-              placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
-              rootMargin="0px 0px"
-              once
-              componentProps={{
-                beforeSrc: '/images/before_parking_jet_fan.jpg',
-                afterSrc: '/images/after_parking_jet_fan.jpg',
-                alt: t('home.beforeAfterAlt') as string,
-              }}
-            />
-          )
-        })()}
-      </div>
+      {/* Smart Routing - Niyet Bazlı Yönlendirme */}
+      <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}>
+        <SmartRouting />
+      </Suspense>
 
-
-
-
-
-
-      {/* Ürün Galerisi başlık + akış */}
-      <section className="pt-8 pb-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-industrial-gray">{t('home.galleryTitle')}</h2>
-          <p className="text-steel-gray mt-2">{t('home.gallerySubtitle')}</p>
-        </div>
-      </section>
-      <div className="cv-600">
-        <LazyProductFlow />
-      </div>
-
-      {/* Resources (Ürün görsel akışının altında) */}
-      <div className="cv-320">
-        <LazyInView
-          loader={() => import('../components/ResourcesSection')}
-          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
-          rootMargin="0px 0px"
-          once
-        />
-      </div>
-
-      {/* Scroll-Linked Process */}
-      <div className="cv-400">
-        <LazyInView
-          loader={() => import('../components/ScrollLinkedProcess')}
-          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
-          rootMargin="0px 0px"
-          once
-        />
-      </div>
-
-      {/* Magnetic CTA */}
-      <div className="cv-320">
-        <LazyInView
-          loader={() => import('../components/MagneticCTA')}
-          placeholder={<div className="min-h-[160px]" aria-hidden="true" />}
-          rootMargin="0px 0px"
-          once
-        />
-      </div>
-
-
-
-
-      {/* Neden VentHub (kurumsal blok) */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl bg-gradient-to-br from-primary-navy/90 to-secondary-blue/90 text-white p-8 sm:p-10 shadow-lg ring-1 ring-black/5">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                {t('common.whyUs')}
-              </h2>
-              <p className="text-xl text-blue-100/90 max-w-3xl mx-auto">
-                {t('home.whyParagraph')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <StarIcon className="text-gold-accent" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t('home.why.premiumTitle')}</h3>
-                <p className="text-blue-100">
-                  {t('home.why.premiumText')}
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <TrendingUpIcon className="text-success-green" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t('home.why.expertTitle')}</h3>
-                <p className="text-blue-100">
-                  {t('home.why.expertText')}
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <ClockIcon className="text-warning-orange" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{t('home.why.fastTitle')}</h3>
-                <p className="text-blue-100">
-                  {t('home.why.fastText')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Neden VentHub Enhanced (Trust Signals dahil) */}
+      <Suspense fallback={<div className="min-h-[300px]" aria-hidden="true" />}>
+        <WhyVentHubEnhanced />
+      </Suspense>
 
       {/* Alt CTA */}
       <section className="py-12">
@@ -300,31 +194,6 @@ export const HomePage: React.FC = () => {
         </Suspense>
       )}
     </div>
-  )
-}
-
-// Minimal inline icons to avoid lucide-react cost on initial load
-function StarIcon({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
-    </svg>
-  )
-}
-function TrendingUpIcon({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-      <polyline points="17 6 23 6 23 12" />
-    </svg>
-  )
-}
-function ClockIcon({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
   )
 }
 

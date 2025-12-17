@@ -26,5 +26,6 @@ Bu belge, VentHub projesinin ruhunu, teknik mimarisini ve çalışma prensipleri
     1.  Kullanıcı fiziksel/ticari mantığı verir.
     2.  AI bunu koda ve veritabanı şemasına döker.
     3.  AI, kodu "Apply" edilmeye hazır tam blok halinde sunar.
+    4.  **İletişim Dili:** AI, kullanıcı ile her zaman **TÜRKÇE** konuşur. Kod yorumları ve commit mesajları İngilizce olabilir ancak kullanıcıya verilen yanıtlar, açıklamalar ve durum raporları Türkçe olmalıdır. Kullanıcı İngilizce yazsa bile yanıt Türkçe döner.
 
 > **Not:** Güncel hedefler ve görev listeleri için lütfen `docs/ROADMAP.md` dosyasına bakınız.

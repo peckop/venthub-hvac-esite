@@ -1,97 +1,327 @@
-import React from 'react'
-import { Phone, Mail, MapPin } from 'lucide-react'
+import React, { useState } from 'react'
+import { Phone, Mail, MapPin, Clock, Building2, Wrench, MessageSquare, Send, CheckCircle } from 'lucide-react'
 import { WhatsAppIcon } from '../components/HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../utils/whatsapp'
 import { useI18n } from '../i18n/I18nProvider'
+import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import Seo from '../components/Seo'
 
+/**
+ * ContactPage - Premium "İletişim" sayfası
+ * Department routing, premium form, çalışma saatleri
+ */
 const ContactPage: React.FC = () => {
   const { t } = useI18n()
-  return (
-    <section className="py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-industrial-gray">{t('contactPage.title')}</h1>
-          <p className="text-steel-gray mt-2 max-w-2xl mx-auto">
-            {t('contactPage.subtitle')}
-          </p>
-        </header>
+  const [heroRef, heroVisible] = useScrollAnimation<HTMLElement>()
+  const [formRef, formVisible] = useScrollAnimation<HTMLDivElement>()
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [selectedDept, setSelectedDept] = useState<string>('')
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <div className="flex items-center gap-3 mb-3">
-              <MapPin className="text-primary-navy" size={20} />
-              <h2 className="font-semibold text-industrial-gray">{t('contactPage.addressLabel')}</h2>
-            </div>
-            <p className="text-steel-gray text-sm leading-relaxed">
-              {t('contactPage.addressLine1')}<br />
-              {t('contactPage.addressLine2')}
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: 'Adres',
+      content: 'Organize Sanayi Bölgesi,\nİstanbul, Türkiye',
+      href: null,
+      color: 'text-primary-navy',
+      bgColor: 'bg-air-blue'
+    },
+    {
+      icon: Phone,
+      title: 'Telefon',
+      content: '+90 (216) 123-45-67',
+      href: 'tel:+902161234567',
+      color: 'text-success-green',
+      bgColor: 'bg-green-50'
+    },
+    {
+      icon: Mail,
+      title: 'E-posta',
+      content: 'info@venthub.com.tr',
+      href: 'mailto:info@venthub.com.tr',
+      color: 'text-gold-accent',
+      bgColor: 'bg-orange-50'
+    },
+    {
+      icon: Clock,
+      title: 'Çalışma Saatleri',
+      content: 'Pzt-Cuma: 09:00 - 18:00\nCmt: 09:00 - 14:00',
+      href: null,
+      color: 'text-secondary-blue',
+      bgColor: 'bg-blue-50'
+    }
+  ]
+
+  const departments = [
+    {
+      id: 'sales',
+      icon: Building2,
+      title: 'Satış',
+      description: 'Yeni projeler ve toplu siparişler',
+      color: 'border-primary-navy text-primary-navy'
+    },
+    {
+      id: 'support',
+      icon: Wrench,
+      title: 'Teknik Destek',
+      description: 'Ürün kullanımı ve sorun giderme',
+      color: 'border-success-green text-success-green'
+    },
+    {
+      id: 'consulting',
+      icon: MessageSquare,
+      title: 'Proje Danışmanlığı',
+      description: 'HVAC sistem planlama',
+      color: 'border-gold-accent text-gold-accent'
+    }
+  ]
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormSubmitted(true)
+    // Form submission logic here
+  }
+
+  return (
+    <div className="min-h-screen">
+      <Seo
+        title={`${t('contactPage.title')} | VentHub`}
+        description="VentHub ile iletişime geçin. Satış, teknik destek ve proje danışmanlığı için 7/24 ulaşılabilir."
+        canonical={`${window.location.origin}/contact`}
+      />
+
+      {/* Hero Section */}
+      <section
+        ref={heroRef}
+        className="relative py-12 sm:py-16 bg-gradient-to-br from-primary-navy to-industrial-gray text-white overflow-hidden"
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-secondary-blue rounded-full blur-3xl" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className={`text-center max-w-2xl mx-auto ${scrollAnimationClasses.fadeUp(heroVisible)}`}>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+              {t('contactPage.title')}
+            </h1>
+            <p className="text-lg text-white/70">
+              Sorularınız için yanınızdayız. Size en uygun iletişim kanalını seçin.
             </p>
           </div>
-          <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <div className="flex items-center gap-3 mb-3">
-              <Phone className="text-primary-navy" size={20} />
-              <h2 className="font-semibold text-industrial-gray">{t('contactPage.phoneLabel')}</h2>
-            </div>
-            <a href="tel:+902161234567" className="text-steel-gray text-sm hover:text-primary-navy transition-colors">
-              +90 (216) 123-45-67
-            </a>
-          </div>
-          <div className="rounded-xl border border-light-gray p-6 bg-white">
-            <div className="flex items-center gap-3 mb-3">
-              <Mail className="text-primary-navy" size={20} />
-              <h2 className="font-semibold text-industrial-gray">{t('contactPage.emailLabel')}</h2>
-            </div>
-            <a href="mailto:info@venthub.com.tr" className="text-steel-gray text-sm hover:text-primary-navy transition-colors">
-              info@venthub.com.tr
-            </a>
+        </div>
+      </section>
+
+      {/* Contact Info Cards */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {contactInfo.map((info, index) => {
+              const Icon = info.icon
+              const content = (
+                <div className={`h-full p-5 sm:p-6 rounded-2xl ${info.bgColor} border border-light-gray hover:shadow-hvac transition-all`}>
+                  <div className={`w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4 ${info.color}`}>
+                    <Icon size={20} />
+                  </div>
+                  <h3 className="font-semibold text-industrial-gray mb-2">{info.title}</h3>
+                  <p className="text-sm text-steel-gray whitespace-pre-line">{info.content}</p>
+                </div>
+              )
+
+              if (info.href) {
+                return (
+                  <a key={index} href={info.href} className="block hover:scale-[1.02] transition-transform">
+                    {content}
+                  </a>
+                )
+              }
+              return <div key={index}>{content}</div>
+            })}
           </div>
         </div>
+      </section>
 
-        {/* WhatsApp Quick Contact */}
-        {isWhatsAppAvailable() && (() => {
-          const whatsappLink = getSupportLink('İletişim formu')
-          if (!whatsappLink) return null
-          
-          return (
-            <div className="mb-8 whatsapp-container">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0">
-                  <WhatsAppIcon size={48} />
+      {/* WhatsApp Quick Contact */}
+      {isWhatsAppAvailable() && (() => {
+        const whatsappLink = getSupportLink('İletişim sayfası')
+        if (!whatsappLink) return null
+
+        return (
+          <section className="py-8 bg-gradient-to-r from-green-50 to-green-100 border-y border-green-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-success-green flex items-center justify-center">
+                    <WhatsAppIcon size={28} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-industrial-gray">Hızlı Destek</h3>
+                    <p className="text-steel-gray text-sm">WhatsApp üzerinden anında yanıt alın</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold whatsapp-text mb-2">{t('contactPage.quickTitle')}</h2>
-                  <p className="whatsapp-subtext mb-4">{t('contactPage.quickDesc')}</p>
-                  <a
-                    href={whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="whatsapp-btn"
-                  >
-                  <WhatsAppIcon size={18} />
-                    {t('contactPage.quickButton')}
-                  </a>
-                </div>
+                <a
+                  href={whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-success-green hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 shadow-lg"
+                >
+                  <WhatsAppIcon size={20} />
+                  WhatsApp'tan Yaz
+                </a>
               </div>
             </div>
-          )
-        })()}
+          </section>
+        )
+      })()}
 
-        <div className="rounded-xl border border-light-gray p-6 bg-gradient-to-br from-gray-50 to-white">
-          <h2 className="text-xl font-semibold text-industrial-gray mb-3">{t('contactPage.formTitle')}</h2>
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input className="border border-light-gray rounded-lg p-3" placeholder={t('contactPage.namePh') as string} />
-            <input className="border border-light-gray rounded-lg p-3" placeholder={t('contactPage.emailPh') as string} type="email" />
-            <input className="border border-light-gray rounded-lg p-3 md:col-span-2" placeholder={t('contactPage.subjectPh') as string} />
-            <textarea className="border border-light-gray rounded-lg p-3 md:col-span-2" rows={5} placeholder={t('contactPage.messagePh') as string} />
-            <div className="md:col-span-2">
-              <button type="button" className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition">
-                {t('contactPage.submit')}
-              </button>
+      {/* Department Selection + Form */}
+      <section className="py-12 sm:py-16 bg-light-gray">
+        <div ref={formRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Department Selection */}
+            <div className={`lg:col-span-2 ${scrollAnimationClasses.fadeUp(formVisible)}`}>
+              <h2 className="text-xl font-bold text-industrial-gray mb-4">
+                Konu Seçin
+              </h2>
+              <p className="text-steel-gray text-sm mb-6">
+                İlgili birime yönlendirilmeniz için konu seçin
+              </p>
+              <div className="space-y-3">
+                {departments.map((dept) => {
+                  const Icon = dept.icon
+                  const isSelected = selectedDept === dept.id
+                  return (
+                    <button
+                      key={dept.id}
+                      onClick={() => setSelectedDept(dept.id)}
+                      className={`w-full p-4 rounded-xl border-2 text-left transition-all ${isSelected
+                          ? `${dept.color} bg-white shadow-hvac`
+                          : 'border-light-gray bg-white hover:border-steel-gray'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={20} className={isSelected ? '' : 'text-steel-gray'} />
+                        <div>
+                          <div className={`font-semibold ${isSelected ? '' : 'text-industrial-gray'}`}>
+                            {dept.title}
+                          </div>
+                          <div className="text-sm text-steel-gray">{dept.description}</div>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </form>
+
+            {/* Contact Form */}
+            <div className={`lg:col-span-3 ${scrollAnimationClasses.fadeUp(formVisible)}`} style={{ transitionDelay: '100ms' }}>
+              {formSubmitted ? (
+                <div className="h-full flex items-center justify-center bg-white rounded-2xl p-8 border border-light-gray">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-success-green/10 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle size={32} className="text-success-green" />
+                    </div>
+                    <h3 className="text-xl font-bold text-industrial-gray mb-2">Mesajınız Alındı!</h3>
+                    <p className="text-steel-gray">En kısa sürede size dönüş yapacağız.</p>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 sm:p-8 border border-light-gray">
+                  <h2 className="text-xl font-bold text-industrial-gray mb-6">
+                    Mesaj Gönderin
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-industrial-gray mb-2">
+                        Ad Soyad *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        className="input-modern"
+                        placeholder="Adınız Soyadınız"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-industrial-gray mb-2">
+                        E-posta *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        className="input-modern"
+                        placeholder="ornek@sirket.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-industrial-gray mb-2">
+                        Telefon
+                      </label>
+                      <input
+                        type="tel"
+                        className="input-modern"
+                        placeholder="+90 5XX XXX XX XX"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-industrial-gray mb-2">
+                        Şirket
+                      </label>
+                      <input
+                        type="text"
+                        className="input-modern"
+                        placeholder="Şirket Adı"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-industrial-gray mb-2">
+                      Konu *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="input-modern"
+                      placeholder="Mesajınızın konusu"
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-industrial-gray mb-2">
+                      Mesaj *
+                    </label>
+                    <textarea
+                      required
+                      rows={5}
+                      className="input-modern resize-none"
+                      placeholder="Mesajınızı buraya yazın..."
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all hover:scale-[1.02]"
+                  >
+                    <Send size={18} />
+                    Gönder
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* Map Placeholder */}
+      <section className="h-64 sm:h-80 bg-gradient-to-br from-light-gray to-gray-200 relative">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <MapPin size={48} className="text-steel-gray mx-auto mb-2" />
+            <p className="text-steel-gray">İstanbul, Türkiye</p>
+            <p className="text-sm text-steel-gray/60">Harita için Google Maps API gerekli</p>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
 

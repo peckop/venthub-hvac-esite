@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react'
 import { Category, Product } from '../../lib/supabase'
 import {
@@ -26,11 +25,21 @@ import {
 import ProductCard from '../ProductCard'
 // import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+// Premium section components for air curtains
+import {
+    ProblemSection,
+    HowItWorks,
+    VorticeBrand,
+    TypeComparison,
+    FAQ,
+    TrustSignals
+} from './sections'
 
 interface CategoryLandingProps {
     category: Category
     products: Product[]
+    subCategories?: Category[] // For in-page subcategory selection
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -52,21 +61,43 @@ const ICON_MAP: Record<string, React.ElementType> = {
     'box': Box
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
     // const { t } = useI18n()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)
+    const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
     const productListRef = useRef<HTMLDivElement>(null)
+    const subcategoryProductsRef = useRef<HTMLDivElement>(null)
 
     const isAirCurtain = category.slug === 'hava-perdeleri'
 
     const handleShowProducts = () => {
         setShowProducts(true)
+        setSelectedSubcategory(null) // Clear subcategory selection when showing all
         setTimeout(() => {
             productListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 100)
     }
+
+    // Handle subcategory selection - show products in-page
+    const handleSelectSubcategory = (subcatId: string) => {
+        setSelectedSubcategory(subcatId)
+        setShowProducts(false) // Hide main products
+        // Update URL hash for bookmarking
+        const subcat = subCategories.find(s => s.id === subcatId)
+        if (subcat) {
+            window.history.replaceState(null, '', `#${subcat.slug}`)
+        }
+        setTimeout(() => {
+            subcategoryProductsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+    }
+
+    // Get products for selected subcategory
+    const subcategoryProducts = selectedSubcategory
+        ? products.filter(p => p.category_id === selectedSubcategory)
+        : []
 
     // "Smart" stats calculations (Optional, can be used as fallback or supplementary)
     const maxAirflow = Math.max(...products.map(p => p.airflow_capacity || 0))
@@ -184,115 +215,90 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products })
                 parentSlug={category.slug}
             />
 
-            {/* Educational Section (Air Curtains only) */}
+            {/* ====== PREMIUM AIR CURTAIN EXPERIENCE (8-Section Flow) ====== */}
             {isAirCurtain && (
                 <>
-                    {/* Preserved Vortice Hero Image in Flow */}
-                    <div className="bg-white pt-16">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[21/9] group">
-                                <img
-                                    src="/images/category/hero-vortice.png"
-                                    alt="Vortice Air Curtain Application"
-                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
-                                <div className="absolute bottom-8 left-8 text-white max-w-xl">
-                                    <div className="flex items-center space-x-2 text-yellow-400 mb-2">
-                                        <Sparkles size={20} />
-                                        <span className="font-bold tracking-wider uppercase text-sm">Premium Konfor</span>
+                    {/* Section 2: Problem Recognition */}
+                    <ProblemSection />
+
+                    {/* Section 3: How It Works */}
+                    <HowItWorks />
+
+                    {/* Section 4: Brand Trust - Vortice Story */}
+                    <VorticeBrand />
+
+                    {/* Section 5: Type Comparison (Elektrikli vs Ortam) */}
+                    <TypeComparison
+                        onOpenWizard={() => setWizardOpen(true)}
+                        onSelectType={(type) => {
+                            const targetSlug = type === 'elektrikli' ? 'elektrikli-isitici' : 'ortam-havali'
+                            const subcat = subCategories.find(s => s.slug === targetSlug)
+                            if (subcat) {
+                                handleSelectSubcategory(subcat.id)
+                            }
+                        }}
+                    />
+
+                    {/* Section 6: Subcategory Products (In-Page Expansion) */}
+                    {selectedSubcategory && (
+                        <div
+                            ref={subcategoryProductsRef}
+                            className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200"
+                        >
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                {/* Section Header */}
+                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
+                                            {subCategories.find(s => s.id === selectedSubcategory)?.name || 'Alt Kategori'} Modelleri
+                                            <span className="text-sm font-normal bg-secondary-blue text-white px-3 py-1 rounded-full">
+                                                {subcategoryProducts.length} ürün
+                                            </span>
+                                        </h2>
+                                        <p className="text-sm text-steel-gray mt-1">
+                                            {subCategories.find(s => s.id === selectedSubcategory)?.description || 'Bu kategorideki ürünler'}
+                                        </p>
                                     </div>
-                                    <h3 className="text-3xl font-bold mb-2">Görünmez Konfor Kalkanı</h3>
-                                    <p className="text-gray-200">
-                                        Estetik tasarım, sessiz çalışma ve üstün performansın mükemmel uyumu.
-                                        Mekanınızın havasını korurken şıklığından ödün vermeyin.
-                                    </p>
+
+                                    {/* Clear Selection Button */}
+                                    <button
+                                        onClick={() => {
+                                            setSelectedSubcategory(null)
+                                            window.history.replaceState(null, '', window.location.pathname)
+                                        }}
+                                        className="text-sm text-steel-gray hover:text-industrial-gray underline"
+                                    >
+                                        ← Seçimi Kaldır
+                                    </button>
                                 </div>
+
+                                {/* Products Grid */}
+                                {subcategoryProducts.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {subcategoryProducts.map(product => (
+                                            <ProductCard
+                                                key={product.id}
+                                                product={product}
+                                                layout="grid"
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+                                        <Filter size={48} className="mx-auto mb-4 text-gray-300" />
+                                        <p className="text-steel-gray">Bu alt kategoride henüz ürün bulunmuyor.</p>
+                                        <p className="text-sm text-gray-400 mt-2">Lütfen başka bir kategori seçin veya tüm modelleri görüntüleyin.</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
+                    )}
 
-                    <div className="bg-gray-50 py-16 border-b border-gray-100">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center mb-12">
-                                <h2 className="text-3xl font-bold text-industrial-gray mb-4">Hangi Hava Perdesini Seçmelisiniz?</h2>
-                                <p className="text-steel-gray max-w-2xl mx-auto">
-                                    İhtiyacınıza en uygun çözümü belirlemenize yardımcı olalım.
-                                </p>
-                            </div>
+                    {/* Section 7: Trust Signals */}
+                    <TrustSignals />
 
-                            {/* Comparison Image */}
-                            <div className="flex justify-center mb-12">
-                                <img
-                                    src="/images/category/electric-vs-ambient.png"
-                                    alt="Elektrikli vs Ortam Havalı Karşılaştırma"
-                                    className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
-                                />
-                            </div>
-
-                            {/* Quick Selection Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                                {/* Elektrikli Card */}
-                                <Link
-                                    to={`/category/${category.slug}/elektrikli-isitici`}
-                                    className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-all"
-                                >
-                                    <div className="flex items-center space-x-4 mb-4">
-                                        <div className="p-3 bg-orange-50 rounded-lg text-orange-500 group-hover:bg-orange-100 transition-colors">
-                                            <Zap size={32} />
-                                        </div>
-                                        <h4 className="text-xl font-bold text-industrial-gray">Elektrikli Isıtıcılı</h4>
-                                    </div>
-                                    <p className="text-gray-600 mb-4">
-                                        Kış aylarında kapı önünde sıcak karşılama sağlar.
-                                    </p>
-                                    <div className="flex items-center text-orange-500 font-semibold">
-                                        <span>Modelleri İncele</span>
-                                        <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </div>
-                                </Link>
-
-                                {/* Ortam Havalı Card */}
-                                <Link
-                                    to={`/category/${category.slug}/ortam-havali`}
-                                    className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all"
-                                >
-                                    <div className="flex items-center space-x-4 mb-4">
-                                        <div className="p-3 bg-blue-50 rounded-lg text-blue-500 group-hover:bg-blue-100 transition-colors">
-                                            <Wind size={32} />
-                                        </div>
-                                        <h4 className="text-xl font-bold text-industrial-gray">Ortam Havalı</h4>
-                                    </div>
-                                    <p className="text-gray-600 mb-4">
-                                        Soğuk depolar ve hijyen gereken alanlar için ideal.
-                                    </p>
-                                    <div className="flex items-center text-blue-500 font-semibold">
-                                        <span>Modelleri İncele</span>
-                                        <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </div>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Technical Diagram Section */}
-                    <div className="bg-primary-navy py-16">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center mb-8">
-                                <h2 className="text-3xl font-bold text-white mb-4">Nasıl Çalışır?</h2>
-                                <p className="text-gray-300 max-w-2xl mx-auto">
-                                    Hava perdesi, görünmez bir bariyer oluşturarak iç ve dış ortamı birbirinden ayırır.
-                                </p>
-                            </div>
-                            <div className="flex justify-center">
-                                <img
-                                    src="/images/category/air-curtain-diagram.png"
-                                    alt="Hava Perdesi Çalışma Prensibi"
-                                    className="max-w-full md:max-w-4xl rounded-xl shadow-2xl"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    {/* Section 8: FAQ */}
+                    <FAQ />
                 </>
             )}
 

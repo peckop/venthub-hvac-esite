@@ -17,6 +17,8 @@ export const tr = {
     searchHeaderPlaceholder: "Ürün, marka veya model ara...",
     search: "Ara",
     quickSearch: "Hızlı ara...",
+    allCategories: "Tüm Kategoriler",
+    priceRange: "Fiyat Aralığı",
 
     // Existing
     discover: "Keşfet",

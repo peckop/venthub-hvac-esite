@@ -219,12 +219,41 @@ export async function searchProducts(query: string) {
 }
 
 // Full‑text search (Turkish) via RPC; returns lightweight fields + rank
-export interface FtsProductResult { id: string; name: string; sku: string; brand: string | null; price: number | string | null; rank: number | null }
+export interface FtsProductResult {
+  id: string
+  name: string
+  sku: string
+  brand: string | null
+  price: string
+  rank: number | null
+  is_fuzzy_match?: boolean
+  // Extended fields for compatibility
+  status?: 'active' | 'inactive' | 'out_of_stock'
+  image_url?: string
+  image_alt?: string | null
+  is_featured?: boolean
+  stock_qty?: number | null
+  model_code?: string | null
+}
+
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
   const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as unknown }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
   return (data || []) as FtsProductResult[]
+}
+
+export interface SearchSuggestion {
+  type: 'product' | 'category' | 'brand'
+  label: string
+  url: string
+  metadata: Record<string, unknown>
+}
+
+export async function getSearchSuggestions(q: string, limit = 5) {
+  const { data, error } = await supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit })
+  if (error) throw error
+  return (data || []) as SearchSuggestion[]
 }
 
 // ========== Account: Address Book ==========
