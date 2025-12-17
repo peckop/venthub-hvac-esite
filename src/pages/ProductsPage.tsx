@@ -282,8 +282,8 @@ const ProductsPage: React.FC = () => {
                 if (filters.brand && p.brand !== filters.brand) return false
                 // Price filters
                 const price = parseFloat(p.price || '0')
-                if (filters.price_min && price < parseFloat(filters.price_min)) return false
-                if (filters.price_max && price > parseFloat(filters.price_max)) return false
+                if (filters.price_min && price < parseFloat(String(filters.price_min))) return false
+                if (filters.price_max && price > parseFloat(String(filters.price_max))) return false
                 return true
               })
               .map(p => ({
