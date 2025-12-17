@@ -151,9 +151,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-industrial-gray">{label}</div>
-          {s.type === 'product' && (s.metadata as any).price && (
+          {s.type === 'product' && (s.metadata as { price?: string | number }).price && (
             <div className="text-xs text-primary-ocean font-medium mt-0.5">
-              {formatCurrency(Number((s.metadata as any).price), 'tr')}
+              {formatCurrency(Number((s.metadata as { price?: string | number }).price), 'tr')}
             </div>
           )}
         </div>
