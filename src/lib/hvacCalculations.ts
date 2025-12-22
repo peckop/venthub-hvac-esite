@@ -530,14 +530,6 @@ const TYPICAL_JET_FAN = {
     diameter: 0.4     // m
 }
 
-/**
- * Jet Fan Boyutlandırma Hesaplaması
- * 
- * Formül: 
- * - Hacim = L × W × H
- * - Gerekli Debi = Hacim × ACH / 60 (m³/h)
- * - Toplam İtki = ρ × Q × v
- */
 export function calculateJetFan(input: JetFanInput): JetFanResult {
     const { length, width, height, applicationType, ventilationMode } = input
 
@@ -545,7 +537,7 @@ export function calculateJetFan(input: JetFanInput): JetFanResult {
     const volume = length * width * height
 
     // Gerekli ACH
-    const ach = ventilationMode === 'smoke' ? 10 : 6
+    const ach = getRequiredACH(applicationType, ventilationMode)
 
     // Gerekli hava debisi (m³/h)
     const requiredAirflow = volume * ach

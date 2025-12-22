@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
     X, ChevronRight, ChevronLeft,
@@ -6,12 +6,10 @@ import {
     Store, UtensilsCrossed, HeartPulse, Truck, Building2,
     Ruler, Wind, Zap,
     HelpCircle, MapPin, Clock, Home,
-    CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink,
-    Thermometer
+    CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink
 } from 'lucide-react'
 import { supabase, Product } from '../../lib/supabase'
 import { calculateAirCurtain, type WindCondition, type TrafficIntensity, type AirCurtainApplication } from '../../lib/hvacCalculations'
-import { ResultCard, ResultGrid, Recommendations } from '../calculators'
 
 // Types
 interface WizardState {
@@ -111,30 +109,6 @@ const extractNumber = (value: unknown): number | null => {
     return null
 }
 
-// Helper: Get product width from technical_specs
-const getProductWidth = (product: Product): number | null => {
-    const specs = product.technical_specs
-    if (!specs) return null
-
-    // Try common field names for width
-    const widthKeys = ['genislik', 'genişlik', 'width', 'en', 'boyut', 'uzunluk', 'length', 'size', 'Genişlik', 'Width']
-    for (const key of widthKeys) {
-        if (specs[key]) {
-            const num = extractNumber(specs[key])
-            if (num) return num
-        }
-    }
-
-    // Try to extract from product name (e.g., "Model 120", "HP-150")
-    const nameMatch = product.name.match(/(\d{2,3})/);
-    if (nameMatch) {
-        const num = parseInt(nameMatch[1])
-        // Only accept if it looks like a reasonable width (60-300 cm)
-        if (num >= 60 && num <= 300) return num
-    }
-
-    return null
-}
 
 // Helper: Get max installation height from technical_specs
 const getMaxHeight = (product: Product): number | null => {
@@ -353,18 +327,6 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 return null
             }
 
-            // Helper: Get pressure rating
-            const getProductPressure = (product: Product): number | null => {
-                const specs = product.technical_specs
-                if (!specs) return null
-                const pressureKeys = ['basinc', 'basınç', 'pressure', 'max_pressure_pa', 'statik_basinc']
-                for (const key of pressureKeys) {
-                    if (specs[key]) {
-                        return extractNumber(specs[key])
-                    }
-                }
-                return null
-            }
 
             // Helper: Save selection to DB
             const saveSelectionToDB = async (recommendedProducts: MatchedProduct[]) => {
@@ -407,7 +369,6 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 const maxHeight = getMaxHeight(product)
                 const productAirflow = getProductAirflow(product)
                 const productNoise = getProductNoise(product)
-                const productPressure = getProductPressure(product)
 
                 // 1. Width matching (Weight: 40% - Increased for visibility)
                 if (productWidth) {
