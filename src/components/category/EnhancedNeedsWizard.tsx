@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
     X, ChevronRight, ChevronLeft,
@@ -6,17 +6,22 @@ import {
     Store, UtensilsCrossed, HeartPulse, Truck, Building2,
     Ruler, Wind, Zap,
     HelpCircle, MapPin, Clock, Home,
-    CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink
+    CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink,
+    Thermometer
 } from 'lucide-react'
 import { supabase, Product } from '../../lib/supabase'
+import { calculateAirCurtain, type WindCondition, type TrafficIntensity, type AirCurtainApplication } from '../../lib/hvacCalculations'
+import { ResultCard, ResultGrid, Recommendations } from '../calculators'
 
 // Types
 interface WizardState {
-    step: 1 | 2 | 3 | 4 | 5
+    step: 1 | 2 | 3 | 4 | 5 | 6
     usageLocation: 'entrance' | 'cold-storage' | 'industrial' | 'retail' | null
     sector: string | null
     doorWidth: number
     doorHeight: number
+    windCondition: WindCondition
+    trafficIntensity: TrafficIntensity
     heatingNeeded: 'yes' | 'no' | 'unsure' | null
     climateZone: 'cold' | 'moderate' | 'warm' | null
     doorFrequency: 'low' | 'medium' | 'high' | null
@@ -78,6 +83,21 @@ const CLIMATE_ZONES = [
     { id: 'cold', title: 'Soğuk İklim', description: 'Doğu Anadolu, Karadeniz iç kesimler', icon: '❄️' },
     { id: 'moderate', title: 'Ilıman İklim', description: 'Marmara, Ege, Akdeniz', icon: '🌤️' },
     { id: 'warm', title: 'Sıcak İklim', description: 'Güneydoğu, yaz mevsimi', icon: '☀️' }
+]
+
+// Rüzgar seçenekleri (AirCurtainCalcPage'den)
+const WIND_OPTIONS = [
+    { id: 'none', title: 'Yok', description: 'İç mekan veya korunaklı', icon: '🏠' },
+    { id: 'light', title: 'Hafif', description: '< 5 m/s', icon: '🍃' },
+    { id: 'moderate', title: 'Orta', description: '5-10 m/s', icon: '💨' },
+    { id: 'strong', title: 'Güçlü', description: '> 10 m/s', icon: '🌬️' }
+]
+
+// Trafik yoğunluğu seçenekleri
+const TRAFFIC_OPTIONS = [
+    { id: 'low', title: 'Düşük', description: '< 50 geçiş/saat', icon: '🚶' },
+    { id: 'medium', title: 'Orta', description: '50-200 geçiş/saat', icon: '🚶‍♂️🚶‍♀️' },
+    { id: 'high', title: 'Yüksek', description: '> 200 geçiş/saat', icon: '👥👥' }
 ]
 
 // Helper: Extract numeric value from technical spec
@@ -218,6 +238,8 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         sector: null,
         doorWidth: 120,
         doorHeight: 250,
+        windCondition: 'none',
+        trafficIntensity: 'medium',
         heatingNeeded: null,
         climateZone: null,
         doorFrequency: null,
@@ -230,7 +252,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
     // Fetch matching products when reaching step 5
     useEffect(() => {
-        if (state.step === 5 && isOpen) {
+        if (state.step === 6 && isOpen) {
             fetchMatchingProducts()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -240,6 +262,17 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         setLoadingProducts(true)
         try {
             const recommendation = calculateRecommendation(state)
+
+            // Calculate required airflow based on wizard inputs
+            const calculatedResult = calculateAirCurtain({
+                doorWidth: state.doorWidth / 100, // cm → m
+                doorHeight: state.doorHeight / 100, // cm → m
+                application: state.usageLocation === 'cold-storage' ? 'coldRoom' :
+                    state.usageLocation === 'industrial' ? 'insect' : 'comfort',
+                windCondition: state.windCondition,
+                trafficIntensity: state.trafficIntensity
+            })
+            const requiredAirflow = calculatedResult.requiredAirflow
 
             // Get category ID for the recommended series
             const { data: category } = await supabase
@@ -268,67 +301,201 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 return
             }
 
-            // Score and filter products based on door dimensions
+            // Helper: Get product width (either from specs or name)
+            const getProductWidth = (product: Product): { value: number | null, fromName: boolean } => {
+                // 1. Check technical_specs
+                const specs = product.technical_specs
+                if (specs) {
+                    const widthKeys = ['genislik', 'genişlik', 'width', 'uzunluk', 'length', 'size', 'ebat', 'Size']
+                    for (const key of widthKeys) {
+                        if (specs[key]) {
+                            const num = extractNumber(specs[key])
+                            if (num && num > 50) return { value: num, fromName: false }
+                        }
+                    }
+                }
+
+                // 2. Check product name (e.g. "Vortice Air Door 120 M")
+                const nameMatches = product.name.match(/(?:^|\s)(\d{2,3})(?:\s|cm|m|$)/i)
+                if (nameMatches) {
+                    const num = parseInt(nameMatches[1])
+                    if (num >= 60 && num <= 300) return { value: num, fromName: true }
+                }
+
+                return { value: null, fromName: false }
+            }
+
+            // Helper: Get product airflow from technical_specs
+            const getProductAirflow = (product: Product): number | null => {
+                const specs = product.technical_specs
+                if (!specs) return null
+                const airflowKeys = ['debi', 'hava_debisi', 'max_airflow_m3h', 'airflow', 'capacity', 'kapasite', 'm3h', 'Debi']
+                for (const key of airflowKeys) {
+                    if (specs[key]) {
+                        const val = String(specs[key]).toLowerCase()
+                        const num = extractNumber(val)
+                        if (num && num > 100) return num
+                    }
+                }
+                return null
+            }
+
+            // Helper: Get noise level
+            const getProductNoise = (product: Product): number | null => {
+                const specs = product.technical_specs
+                if (!specs) return null
+                const noiseKeys = ['ses_seviyesi', 'noise_dbA', 'noise', 'ses', 'ses_db', 'Noise']
+                for (const key of noiseKeys) {
+                    if (specs[key]) {
+                        return extractNumber(specs[key])
+                    }
+                }
+                return null
+            }
+
+            // Helper: Get pressure rating
+            const getProductPressure = (product: Product): number | null => {
+                const specs = product.technical_specs
+                if (!specs) return null
+                const pressureKeys = ['basinc', 'basınç', 'pressure', 'max_pressure_pa', 'statik_basinc']
+                for (const key of pressureKeys) {
+                    if (specs[key]) {
+                        return extractNumber(specs[key])
+                    }
+                }
+                return null
+            }
+
+            // Helper: Save selection to DB
+            const saveSelectionToDB = async (recommendedProducts: MatchedProduct[]) => {
+                try {
+                    const { data: { user } } = await supabase.auth.getUser()
+                    const sessionId = localStorage.getItem('wizard_session_id') || `sess_${Math.random().toString(36).substr(2, 9)}`
+                    if (!localStorage.getItem('wizard_session_id')) {
+                        localStorage.setItem('wizard_session_id', sessionId)
+                    }
+
+                    await supabase.from('wizard_selections').insert({
+                        user_id: user?.id || null,
+                        session_id: sessionId,
+                        door_width_cm: state.doorWidth,
+                        door_height_cm: state.doorHeight,
+                        usage_location: state.usageLocation,
+                        sector: state.sector,
+                        wind_condition: state.windCondition,
+                        traffic_intensity: state.trafficIntensity,
+                        heating_needed: state.heatingNeeded,
+                        climate_zone: state.climateZone,
+                        calculated_airflow_m3h: requiredAirflow,
+                        calculated_nozzle_velocity: calculatedResult.nozzleVelocity,
+                        calculated_power_w: calculatedResult.suggestedPower,
+                        recommended_series: recommendation.series,
+                        recommended_product_ids: recommendedProducts.map(p => p.id),
+                        user_agent: navigator.userAgent
+                    })
+                } catch (e) {
+                    console.error('Wizard selection could not be saved:', e)
+                }
+            }
+
+            // Score and filter products based on multi-criteria professional logic
             const scored: MatchedProduct[] = products.map(product => {
-                let score = 50 // Base score
-                let reason = ''
+                let score = 0
+                const reasons: string[] = []
 
-                const productWidth = getProductWidth(product)
+                const { value: productWidth, fromName: widthFromName } = getProductWidth(product)
                 const maxHeight = getMaxHeight(product)
+                const productAirflow = getProductAirflow(product)
+                const productNoise = getProductNoise(product)
+                const productPressure = getProductPressure(product)
 
-                // Width matching (most important)
+                // 1. Width matching (Weight: 40% - Increased for visibility)
                 if (productWidth) {
                     const widthDiff = productWidth - state.doorWidth
                     if (widthDiff >= 0 && widthDiff <= 20) {
                         score += 40
-                        reason = `${productWidth} cm genişlik - kapınız için ideal`
-                    } else if (widthDiff >= -10 && widthDiff <= 50) {
-                        score += 25
-                        reason = `${productWidth} cm genişlik - uygun`
-                    } else if (widthDiff < -10) {
-                        score += 5
-                        reason = `${productWidth} cm genişlik - kapıdan dar`
-                    } else {
-                        score += 15
-                        reason = `${productWidth} cm genişlik`
+                        reasons.push(`${productWidth} cm tam uyumlu genişlik`)
+                    } else if (widthDiff > 20 && widthDiff <= 60) {
+                        score += 30
+                        reasons.push(`${productWidth} cm genişlik (oversize)`)
+                    } else if (widthDiff < 0 && widthDiff >= -10) {
+                        score += 20
+                        reasons.push(`${productWidth} cm (biraz dar)`)
                     }
-                } else {
-                    reason = 'Genişlik bilgisi mevcut değil'
+
+                    // Boost score if width was extracted from name and is a good match
+                    if (widthFromName && widthDiff >= -10 && widthDiff <= 60) {
+                        score += 10 // Additional boost for name-based match
+                        reasons.push('İsimden genişlik tespiti')
+                    }
                 }
 
-                // Height matching
+                // 2. Height/Velocity matching (Weight: 20%)
                 if (maxHeight) {
-                    const heightCm = state.doorHeight
-                    if (maxHeight >= heightCm) {
-                        score += 10
+                    if (maxHeight >= state.doorHeight) {
+                        score += 20
+                        reasons.push(`${maxHeight} cm yüksekliğe kadar etkili bariyer`)
+                    } else {
+                        const diff = state.doorHeight - maxHeight
+                        score += Math.max(0, 10 - diff / 10)
+                        reasons.push('Yükseklik sınırı zorlanıyor')
                     }
                 }
 
-                // Featured products get a boost
-                if (product.is_featured) {
-                    score += 5
+                // 3. AIRFLOW matching (Weight: 30%)
+                if (productAirflow) {
+                    if (productAirflow >= requiredAirflow) {
+                        score += 30
+                        reasons.push('Yeterli hava debisi')
+                    } else {
+                        const deficit = (requiredAirflow - productAirflow) / requiredAirflow
+                        score += Math.max(0, 30 * (1 - deficit * 2))
+                    }
                 }
+
+                // 4. BASE SCORE FOR RECOMMENDED CATEGORY (Graceful Fallback)
+                // If it's in the category but missing specs, give it enough score to be visible (40+)
+                if (!product.technical_specs || (!productWidth && !productAirflow)) {
+                    score = Math.max(score, 45) // Ensure it passes the 40 threshold
+                    if (reasons.length === 0) {
+                        reasons.push('Kategori bazlı genel eşleşme')
+                    }
+                }
+
+                // 5. Sector & Feature matching
+                if (state.sector === 'hospitality' || state.sector === 'health') {
+                    if (productNoise && productNoise < 55) {
+                        score += 10
+                        reasons.push('Sessiz çalışma')
+                    }
+                }
+                if (product.is_featured) score += 5
 
                 return {
                     ...product,
-                    matchScore: score,
-                    matchReason: reason
+                    matchScore: Math.min(100, score),
+                    matchReason: reasons.slice(0, 2).join(' • ')
                 }
             })
 
-            // Sort by score and take top 3
+            // Filter and Sort
             const topMatches = scored
+                .filter(p => p.matchScore >= 40)
                 .sort((a, b) => b.matchScore - a.matchScore)
                 .slice(0, 3)
 
             setMatchedProducts(topMatches)
+
+            // Background persistence
+            if (topMatches.length > 0) {
+                saveSelectionToDB(topMatches)
+            }
         } catch (error) {
             console.error('Error fetching products:', error)
             setMatchedProducts([])
         }
         setLoadingProducts(false)
     }
-
     if (!isOpen) return null
 
     const updateState = (updates: Partial<WizardState>) => {
@@ -336,7 +503,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
     }
 
     const nextStep = () => {
-        if (state.step < 5) {
+        if (state.step < 6) {
             updateState({ step: (state.step + 1) as WizardState['step'] })
         }
     }
@@ -355,6 +522,8 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
             sector: null,
             doorWidth: 120,
             doorHeight: 250,
+            windCondition: 'none',
+            trafficIntensity: 'medium',
             heatingNeeded: null,
             climateZone: null,
             doorFrequency: null,
@@ -371,7 +540,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
         handleClose()
     }
 
-    const recommendation = state.step === 5 ? calculateRecommendation(state) : null
+    const recommendation = state.step === 6 ? calculateRecommendation(state) : null
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -380,7 +549,9 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center z-10">
                     <div>
                         <h2 className="text-xl font-bold text-primary-navy">İhtiyaç Analizi Sihirbazı</h2>
-                        <p className="text-sm text-gray-500">Adım {state.step} / 5</p>
+                        <p className="text-sm text-gray-500">
+                            {state.step > 5 ? 'Hesaplama Sonucu' : `Adım ${state.step} / 5`}
+                        </p>
                     </div>
                     <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                         <X size={20} className="text-gray-500" />
@@ -553,23 +724,136 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 </div>
                             </div>
 
-                            {/* Visual Representation */}
-                            <div className="mt-8 flex justify-center">
-                                <div className="relative bg-gray-100 rounded-lg p-4">
-                                    <div
-                                        className="bg-blue-200 border-4 border-blue-400 rounded flex items-center justify-center"
-                                        style={{
-                                            width: `${Math.min(state.doorWidth / 2, 150)}px`,
-                                            height: `${Math.min(state.doorHeight / 3, 150)}px`
-                                        }}
-                                    >
-                                        <span className="text-blue-600 font-medium text-sm text-center">
-                                            {state.doorWidth} x {state.doorHeight} cm
-                                        </span>
-                                    </div>
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary-blue text-white text-xs px-2 py-1 rounded">
-                                        Hava Perdesi
-                                    </div>
+                            {/* Dynamic SVG Door Diagram */}
+                            <div className="mt-8 p-6 bg-gray-50 rounded-xl">
+                                <div className="flex justify-center">
+                                    <svg viewBox="0 0 200 160" className="w-full max-w-xs">
+                                        {/* Door Frame */}
+                                        <rect x="40" y="20" width="120" height="120" fill="none" stroke="#1C3D5A" strokeWidth="3" />
+
+                                        {/* Air Curtain Unit */}
+                                        <rect x="50" y="20" width="100" height="8" fill="#0EA5E9" rx="2" />
+                                        <text x="100" y="16" textAnchor="middle" className="text-[8px] fill-[#1C3D5A] font-medium">
+                                            Hava Perdesi
+                                        </text>
+
+                                        {/* Air Flow Lines */}
+                                        {[60, 80, 100, 120, 140].map((x, i) => (
+                                            <g key={i}>
+                                                <line x1={x} y1="30" x2={x} y2="130" stroke="#0EA5E9" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
+                                                <polygon points={`${x - 3},125 ${x + 3},125 ${x},135`} fill="#0EA5E9" opacity="0.5" />
+                                            </g>
+                                        ))}
+
+                                        {/* Height Dimension */}
+                                        <line x1="35" y1="20" x2="35" y2="140" stroke="#6B7280" strokeWidth="1" />
+                                        <line x1="30" y1="20" x2="40" y2="20" stroke="#6B7280" strokeWidth="1" />
+                                        <line x1="30" y1="140" x2="40" y2="140" stroke="#6B7280" strokeWidth="1" />
+                                        <text x="20" y="85" textAnchor="middle" className="text-[10px] fill-[#6B7280]" transform="rotate(-90, 20, 85)">
+                                            {state.doorHeight} cm
+                                        </text>
+
+                                        {/* Width Dimension */}
+                                        <line x1="40" y1="150" x2="160" y2="150" stroke="#6B7280" strokeWidth="1" />
+                                        <line x1="40" y1="145" x2="40" y2="155" stroke="#6B7280" strokeWidth="1" />
+                                        <line x1="160" y1="145" x2="160" y2="155" stroke="#6B7280" strokeWidth="1" />
+                                        <text x="100" y="158" textAnchor="middle" className="text-[10px] fill-[#6B7280]">
+                                            {state.doorWidth} cm
+                                        </text>
+                                    </svg>
+                                </div>
+
+                                {/* Quick Calculation Preview */}
+                                {(() => {
+                                    const calc = calculateAirCurtain({
+                                        doorWidth: state.doorWidth / 100,
+                                        doorHeight: state.doorHeight / 100,
+                                        application: state.usageLocation === 'cold-storage' ? 'coldRoom' : 'comfort',
+                                        windCondition: 'none' as WindCondition,
+                                        trafficIntensity: 'medium' as TrafficIntensity
+                                    })
+                                    return (
+                                        <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-lg font-bold text-secondary-blue">{calc.requiredAirflow}</div>
+                                                <div className="text-[10px] text-gray-500">m³/h Debi</div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-lg font-bold text-secondary-blue">{calc.nozzleVelocity}</div>
+                                                <div className="text-[10px] text-gray-500">m/s Hız</div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-2 border border-gray-200">
+                                                <div className="text-lg font-bold text-secondary-blue">{calc.suggestedPower}</div>
+                                                <div className="text-[10px] text-gray-500">W Güç</div>
+                                            </div>
+                                        </div>
+                                    )
+                                })()}
+                            </div>
+
+                            <button
+                                onClick={nextStep}
+                                className="w-full mt-6 bg-secondary-blue text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                            >
+                                Devam Et
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Step 4: Environmental Conditions (NEW) */}
+                    {state.step === 4 && (
+                        <div className="space-y-6">
+                            <div className="text-center mb-8">
+                                <h3 className="text-2xl font-bold text-gray-800 mb-2">Çevresel Koşullar</h3>
+                                <p className="text-gray-500">Kapının maruz kaldığı koşulları belirleyin</p>
+                            </div>
+
+                            {/* Wind Condition */}
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-2 font-medium text-gray-700">
+                                    <Wind size={18} />
+                                    Rüzgar Durumu
+                                </label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {WIND_OPTIONS.map(option => (
+                                        <button
+                                            key={option.id}
+                                            onClick={() => updateState({ windCondition: option.id as WindCondition })}
+                                            className={`p-3 rounded-xl border-2 text-center transition-all ${state.windCondition === option.id
+                                                ? 'border-secondary-blue bg-blue-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
+                                        >
+                                            <span className="text-2xl block mb-1">{option.icon}</span>
+                                            <h5 className="font-semibold text-gray-800 text-sm">{option.title}</h5>
+                                            <p className="text-[10px] text-gray-500">{option.description}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Traffic Intensity */}
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-2 font-medium text-gray-700">
+                                    <Clock size={18} />
+                                    Kapı Trafik Yoğunluğu
+                                </label>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {TRAFFIC_OPTIONS.map(option => (
+                                        <button
+                                            key={option.id}
+                                            onClick={() => updateState({ trafficIntensity: option.id as TrafficIntensity })}
+                                            className={`p-4 rounded-xl border-2 text-center transition-all ${state.trafficIntensity === option.id
+                                                ? 'border-secondary-blue bg-blue-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
+                                        >
+                                            <span className="text-2xl block mb-1">{option.icon}</span>
+                                            <h5 className="font-semibold text-gray-800">{option.title}</h5>
+                                            <p className="text-xs text-gray-500">{option.description}</p>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
 
@@ -583,8 +867,8 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                         </div>
                     )}
 
-                    {/* Step 4: Heating Need */}
-                    {state.step === 4 && (
+                    {/* Step 5: Heating Need (was Step 4) */}
+                    {state.step === 5 && (
                         <div className="space-y-6">
                             <div className="text-center mb-8">
                                 <h3 className="text-2xl font-bold text-gray-800 mb-2">Isıtma ihtiyacınız var mı?</h3>
@@ -596,7 +880,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                     <button
                                         onClick={() => {
                                             updateState({ heatingNeeded: 'yes' })
-                                            setTimeout(() => updateState({ step: 5 }), 300)
+                                            setTimeout(() => updateState({ step: 6 }), 300)
                                         }}
                                         className={`p-5 rounded-xl border-2 text-center transition-all ${state.heatingNeeded === 'yes'
                                             ? 'border-orange-500 bg-orange-50'
@@ -613,7 +897,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                     <button
                                         onClick={() => {
                                             updateState({ heatingNeeded: 'no' })
-                                            setTimeout(() => updateState({ step: 5 }), 300)
+                                            setTimeout(() => updateState({ step: 6 }), 300)
                                         }}
                                         className={`p-5 rounded-xl border-2 text-center transition-all ${state.heatingNeeded === 'no'
                                             ? 'border-blue-500 bg-blue-50'
@@ -729,7 +1013,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                     </div>
 
                                     <button
-                                        onClick={() => updateState({ step: 5 })}
+                                        onClick={() => updateState({ step: 6 })}
                                         disabled={!state.climateZone || !state.doorFrequency || state.hasHeating === null}
                                         className="w-full mt-4 bg-secondary-blue text-white py-3 rounded-xl font-bold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
@@ -742,7 +1026,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                     )}
 
                     {/* Step 5: Result with Product Recommendations */}
-                    {state.step === 5 && recommendation && (
+                    {state.step === 6 && recommendation && (
                         <div className="space-y-6">
                             <div className="text-center mb-6">
                                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -836,7 +1120,10 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                                             <h5 className="font-semibold text-gray-800 truncate">{product.name}</h5>
                                                         </div>
                                                         <p className="text-sm text-gray-500">{product.brand}</p>
-                                                        <p className="text-xs text-secondary-blue mt-1">{product.matchReason}</p>
+                                                        <p className="text-xs text-secondary-blue mt-1">
+                                                            {product.matchReason || 'Boyutlarınıza uygun model'}
+                                                            {!product.technical_specs && ' (Teknik veriler mağazadan teyit edilmelidir)'}
+                                                        </p>
                                                     </div>
 
                                                     <div className="text-right flex-shrink-0">
@@ -855,10 +1142,10 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 )}
                             </div>
 
-                            {/* Technical Summary */}
+                            {/* Technical Summary with Calculations */}
                             <div className="bg-gray-50 p-4 rounded-xl">
                                 <h5 className="font-semibold text-gray-700 mb-3 text-sm">Teknik Özet</h5>
-                                <div className="grid grid-cols-2 gap-3 text-xs">
+                                <div className="grid grid-cols-2 gap-3 text-xs mb-4">
                                     <div>
                                         <span className="text-gray-500">Kapı Boyutu:</span>
                                         <p className="font-medium">{state.doorWidth} x {state.doorHeight} cm</p>
@@ -880,6 +1167,45 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Formula Calculation Results */}
+                                {(() => {
+                                    // Map climate zone to wind condition for more accurate calculation
+                                    const windFromClimate: WindCondition =
+                                        state.climateZone === 'cold' ? 'moderate' :
+                                            state.climateZone === 'warm' ? 'light' : 'none'
+
+                                    const calc = calculateAirCurtain({
+                                        doorWidth: state.doorWidth / 100,
+                                        doorHeight: state.doorHeight / 100,
+                                        application: (state.usageLocation === 'cold-storage' ? 'coldRoom' :
+                                            state.usageLocation === 'industrial' ? 'insect' : 'comfort') as AirCurtainApplication,
+                                        windCondition: windFromClimate,
+                                        trafficIntensity: (state.doorFrequency || 'medium') as TrafficIntensity
+                                    })
+                                    return (
+                                        <div className="border-t border-gray-200 pt-3 mt-3">
+                                            <h6 className="text-xs font-medium text-gray-600 mb-2">Hesaplanan Değerler</h6>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div className="bg-white rounded-lg p-2 text-center border border-secondary-blue/20">
+                                                    <div className="text-lg font-bold text-secondary-blue">{calc.requiredAirflow}</div>
+                                                    <div className="text-[10px] text-gray-500">m³/h Debi</div>
+                                                </div>
+                                                <div className="bg-white rounded-lg p-2 text-center border border-secondary-blue/20">
+                                                    <div className="text-lg font-bold text-secondary-blue">{calc.nozzleVelocity}</div>
+                                                    <div className="text-[10px] text-gray-500">m/s Nozül Hızı</div>
+                                                </div>
+                                                <div className="bg-white rounded-lg p-2 text-center border border-secondary-blue/20">
+                                                    <div className="text-lg font-bold text-secondary-blue">{calc.suggestedPower}</div>
+                                                    <div className="text-[10px] text-gray-500">W Motor Gücü</div>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 mt-2 italic">
+                                                * ISO 27327-1 standartlarına göre hesaplanmıştır
+                                            </p>
+                                        </div>
+                                    )
+                                })()}
                             </div>
 
                             {/* CTA Buttons */}
