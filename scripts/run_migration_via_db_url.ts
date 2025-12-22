@@ -1,14 +1,16 @@
-
 import pg from 'pg'
 import fs from 'fs'
 import path from 'path'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const { Client } = pg
 
-// FAIL-SAFE PROTOCOL: Direct IP to bypass DNS blocking in limited environments
-const DATABASE_URL = 'postgresql://postgres:SgxnZcG8Y79evUfd@52.59.135.244:5432/postgres'
+// Use provided pooler format from .env or fallback to provided working string
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:SgxnZcG8Y79evUfd@aws-1-eu-central-1.pooler.supabase.com:5432/postgres'
 
-console.log('🚀 Using Direct IP Protocol to connect...')
+console.log('🚀 Using Pooler Connection to connect...')
 
 const client = new Client({
     connectionString: DATABASE_URL,
