@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Wind, Ruler, ArrowRight, ArrowLeft, RotateCcw, Circle, Square } from 'lucide-react'
+import { Wind, Ruler, RotateCcw, Circle, Square } from 'lucide-react'
 import {
   CalculatorLayout,
   ResultCard,

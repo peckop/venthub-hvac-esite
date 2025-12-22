@@ -98,9 +98,10 @@ const AirCurtainCalcPage: React.FC = () => {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        const w = parseFloat(doorWidth)
-        const h = parseFloat(doorHeight)
-        return w >= 0.5 && w <= 10 && h >= 1.5 && h <= 6
+        return parseFloat(doorWidth) >= 0.5 &&
+          parseFloat(doorWidth) <= 10 &&
+          parseFloat(doorHeight) >= 1.5 &&
+          parseFloat(doorHeight) <= 6
       case 2:
         return !!application
       case 3:
