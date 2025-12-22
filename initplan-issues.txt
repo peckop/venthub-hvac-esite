@@ -1,0 +1,14 @@
+=== AUTH.UID() INITPLAN SORUNLARI ===
+
+Toplam sorunlu politika: 2
+
+categories.Enable write access for authenticated users [ALL]
+  USING: (auth.role() = 'authenticated'::text)
+  CHECK: null
+
+venthub_order_items.venthub_order_items_insert [INSERT]
+  USING: null
+  CHECK: ((order_id IN ( SELECT venthub_orders.id
+   FROM venthub_orders
+  WHERE (venthub_orders.user_id = auth.uid()))) OR (auth.role() = 'service_role'::text))
+
