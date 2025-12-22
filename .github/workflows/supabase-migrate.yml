@@ -17,26 +17,30 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Secret'lar artik burada (Job-level env) degil, adimlarin icinde tanimlanacak (IDE uyarilarini onlemek icin)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Decide execution path (prefer psql for stability)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      - name: Prepare Master Environment
+        # Bracket notation ve tek adimda toplama stratejisi ile IDE uyarilarini 0'a indirmeyi hedefliyoruz.
         run: |
-          if [ -n "${SUPABASE_DB_URL}" ]; then
-            echo "Will use psql with SUPABASE_DB_URL."
+          # Secret'ları GITHUB_ENV'ye güvenli aktaralım
+          echo "S_DB_URL=${{ secrets['SUPABASE_DB_URL'] }}" >> $GITHUB_ENV
+          echo "S_DB_PASS=${{ secrets['SUPABASE_DB_PASSWORD'] }}" >> $GITHUB_ENV
+          echo "S_PROJ_REF=${{ secrets['SUPABASE_PROJECT_REF'] }}" >> $GITHUB_ENV
+          echo "S_ACC_TOKEN=${{ secrets['SUPABASE_ACCESS_TOKEN'] }}" >> $GITHUB_ENV
+
+      - name: Decide execution path (psql or CLI)
+        run: |
+          if [ -n "$S_DB_URL" ]; then
+            echo "Path: PSQL"
             exit 0
           fi
-          if [ -n "${SUPABASE_ACCESS_TOKEN}" ] && [ -n "${SUPABASE_PROJECT_REF}" ]; then
-            echo "DB_URL missing — fallback to Supabase CLI."
+          if [ -n "$S_ACC_TOKEN" ] && [ -n "$S_PROJ_REF" ]; then
+            echo "Path: CLI"
             exit 0
           fi
-          echo "::error::Missing configuration. Set SUPABASE_DB_URL or fallback variables."
+          echo "::error::Missing DB configuration."
           exit 1
 
       - name: Install PostgreSQL client
@@ -51,54 +55,39 @@ jobs:
           # Host mask (do not print full URL)
           echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
-      - name: Normalize DB URL (Rebuild for Pooler Stability)
-        env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      - name: Rebuild Connection String (Pooler Fix)
         run: |
-          # DİKKAT: Maskelenmis veriler (***) üzerinde sed/grep calismaz.
-          # Bu yüzden URL'yi sıfırdan inşa ediyoruz.
+          # Maskelenmiş (***) veriler üzerinde manipülasyon yapılamaz.
+          # Bu yüzden URL'yi sıfırdan ve doğru formatta (postgres.REF) inşa ediyoruz.
           
-          RAW_URL="${SUPABASE_DB_URL}"
-          P_REF="${SUPABASE_PROJECT_REF:-tnofewwkwlyjsqgwjjga}"
-          P_PASS="${SUPABASE_DB_PASSWORD}"
+          REF="${S_PROJ_REF:-tnofewwkwlyjsqgwjjga}"
+          PASS="${S_DB_PASS}"
           
-          # Eğer tam URL verilmişse ve Pooler formatı DEĞİLSE (nokta yoksa) otomatik düzeltmeye çalışalım
-          # Ama parolanın da elimizde olması lazım (Secrets'ta tanımlanmış olması şart)
-          if [[ -n "$P_PASS" ]] && [[ -n "$P_REF" ]]; then
-            echo "🚀 Rebuilding Pooler URL with component-based protocol..."
-            NEW_URL="postgresql://postgres.${P_REF}:${P_PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
-            echo "DB_URL=$NEW_URL" >> $GITHUB_ENV
+          if [ -n "$PASS" ]; then
+            echo "🚀 Building robust pooler connection..."
+            DB_URL="postgresql://postgres.${REF}:${PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+            echo "DB_URL=$DB_URL" >> $GITHUB_ENV
           else
-            echo "⚠️ Fallback: Using raw SUPABASE_DB_URL (Sed manipulations will fail if masked)."
-            # Minimal normalizasyon
-            if [[ "$RAW_URL" != *"sslmode="* ]]; then
-              if [[ "$RAW_URL" == *"?"* ]]; then RAW_URL="${RAW_URL}&sslmode=require"; else RAW_URL="${RAW_URL}?sslmode=require"; fi
-            fi
-            echo "DB_URL=$RAW_URL" >> $GITHUB_ENV
+            echo "⚠️ Falling back to raw URL (might fail if user/port is wrong)..."
+            echo "DB_URL=$S_DB_URL" >> $GITHUB_ENV
           fi
-          
-          echo "✅ Normalization complete."
 
       - name: Test DB connection
-        if: ${{ env.SUPABASE_DB_URL != '' }}
         run: |
           psql "$DB_URL" -c "select 1;"
 
       - name: Apply migrations via psql
-        if: ${{ env.SUPABASE_DB_URL != '' }}
         run: |
           set -e
           shopt -s nullglob
           files=(supabase/migrations/*.sql)
           if [ ${#files[@]} -eq 0 ]; then
-            echo "No migrations to apply."
-            exit 0
+             echo "No migrations found."
+             exit 0
           fi
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
             echo "Applying $f"
-            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f" || echo "Warning: $f may have already been applied"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
           done
-          echo "Migrations applied successfully via psql."
+          echo "✅ All migrations completed."
 
