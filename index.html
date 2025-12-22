@@ -36,6 +36,22 @@
 
 <body class="overflow-x-hidden">
   <div id="root"></div>
+  <script>
+    window.addEventListener('error', function(event) {
+      if(event.message === 'ResizeObserver loop completed with undelivered notifications.') return;
+      var msg = event.message || event;
+      var div = document.createElement('div');
+      div.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); color:red; z-index:99999; padding:20px; font-family:monospace; white-space:pre-wrap; overflow:auto; pointer-events:none;';
+      div.innerText = '⚠️ CRITICAL RUNTIME ERROR:\n' + msg + '\n\nStack:\n' + (event.error ? event.error.stack : 'N/A');
+      document.body.appendChild(div);
+    });
+    window.addEventListener('unhandledrejection', function(event) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); color:orange; z-index:99999; padding:60px 20px 20px 20px; font-family:monospace; white-space:pre-wrap; overflow:auto; pointer-events:none;';
+      div.innerText = '⚠️ UNHANDLED PROMISE REJECTION:\n' + event.reason;
+      document.body.appendChild(div);
+    });
+  </script>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
