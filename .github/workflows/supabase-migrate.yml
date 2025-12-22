@@ -68,16 +68,18 @@ jobs:
           fi
           
           # 2. Handle Pooler Username Suffix (postgres -> postgres.[PROJECT_REF])
-          # Only if using pooler host and PROJECT_REF is defined
-          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "${SUPABASE_PROJECT_REF}" ]]; then
+          # Use secret if available, otherwise fallback to project-specific ref
+          PROJECT_REF="${SUPABASE_PROJECT_REF:-tnofewwkwlyjsqgwjjga}"
+          
+          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "$PROJECT_REF" ]]; then
             # Check if username already contains a dot
             # URL format: postgresql://[user](:[pass])@host...
             USER_PART=$(echo "$DB_URL" | sed -E 's|postgresql://([^:@]+).*|\1|')
             if [[ "$USER_PART" == "postgres" ]]; then
-              echo "Fixing pooler username: postgres -> postgres.${SUPABASE_PROJECT_REF}"
-              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres:|postgresql://postgres.${SUPABASE_PROJECT_REF}:|")
-              # Also handle case without password (unlikely but safe)
-              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres@|postgresql://postgres.${SUPABASE_PROJECT_REF}@|")
+              echo "Fixing pooler username: postgres -> postgres.${PROJECT_REF}"
+              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres:|postgresql://postgres.${PROJECT_REF}:|")
+              # Also handle case without password
+              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres@|postgresql://postgres.${PROJECT_REF}@|")
             fi
           fi
           
