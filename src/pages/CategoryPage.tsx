@@ -10,6 +10,7 @@ import { formatCurrency } from '../i18n/format'
 import CategoryShowcase from '../components/category/CategoryShowcase'
 import CategoryLanding from '../components/category/CategoryLanding'
 import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
+import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
@@ -34,6 +35,9 @@ export const CategoryPage: React.FC = () => {
   const [compareOpen, setCompareOpen] = useState(false)
   const [catSearch, setCatSearch] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+
+  // Scroll Restoration
+  useManualScrollRestoration(loading)
 
   useEffect(() => {
     const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
@@ -601,6 +605,7 @@ export const CategoryPage: React.FC = () => {
                       layout={viewMode}
                       relatedTopicSlug={relatedTopicSlug || undefined}
                       priority={i === 0}
+                      hidePrice={!!category.metadata?.hide_price}
                     />
                   ))}
                 </div>

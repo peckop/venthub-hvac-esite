@@ -75,9 +75,24 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const handleShowProducts = () => {
         setShowProducts(true)
         setSelectedSubcategory(null) // Clear subcategory selection when showing all
-        setTimeout(() => {
-            productListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 100)
+
+        // Wait for state update and initial layout
+        requestAnimationFrame(() => {
+            // Give a slight buffer for the expansion to register visually
+            setTimeout(() => {
+                const headerOffset = 100 // Adjust based on sticky header height if any
+                const element = productListRef.current
+                if (!element) return
+
+                const elementPosition = element.getBoundingClientRect().top
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                })
+            }, 50)
+        })
     }
 
     // Handle subcategory selection - show products in-page
@@ -280,6 +295,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                                 key={product.id}
                                                 product={product}
                                                 layout="grid"
+                                                hidePrice={!!category.metadata?.hide_price}
                                             />
                                         ))}
                                     </div>
@@ -305,7 +321,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
             {/* Expandable Product List Content */}
             <div
                 ref={productListRef}
-                className={`transition-all duration-1000 ease-in-out ${showProducts ? 'max-h-[10000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                className={`transition-all duration-500 ease-in-out ${showProducts ? 'max-h-[10000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -347,6 +363,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 key={product.id}
                                 product={product}
                                 layout="grid"
+                                hidePrice={!!category.metadata?.hide_price}
                             />
                         ))}
                     </div>

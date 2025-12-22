@@ -21,9 +21,13 @@ interface ProductCardProps {
    * true ise loading="eager" ve fetchpriority="high" kullanılır.
    */
   priority?: boolean
+  /**
+   * Fiyatın gizlenmesi ve "Teklif Al" moduna geçilmesi durumu (B2B kategorileri için).
+   */
+  hidePrice?: boolean
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false, hidePrice = false }) => {
   const { t, lang } = useI18n()
   const navigate = useNavigate()
   const isList = layout === 'list'
@@ -34,6 +38,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
     e.preventDefault()
     e.stopPropagation()
     addToCart(product)
+  }
+
+  const handleAskQuote = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigate('/contact?product=' + encodeURIComponent(product.name))
   }
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -132,9 +142,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           {/* Price + Stock badge */}
           <div className="flex items-center justify-between mb-2">
             <div className="text-xl font-bold text-primary-navy">
-              {formatCurrency(price, lang, { maximumFractionDigits: 0 })}
+              {hidePrice ? (
+                <span className="text-base text-industrial-gray/80">{t('pdp.askPrice') || 'Fiyat Teklifi Alın'}</span>
+              ) : (
+                formatCurrency(price, lang, { maximumFractionDigits: 0 })
+              )}
             </div>
             {(() => {
+              // Hide stock if price is hidden? Or keep it? Usually B2B might not show explicit stock quantity but status.
+              // Letting it stay for now.
               const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
               return (
                 <span className={`text-xs px-2 py-1 rounded ${inStock ? 'text-success-green bg-success-green/10' : 'text-warning-orange bg-warning-orange/10'}`}>
@@ -192,20 +208,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
           {/* Actions */}
           <div className="flex items-center space-x-2">
-            <button
-              onClick={handleAddToCart}
-              disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-              className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
-                <path strokeWidth={2} d="M5 6L4 2H2" />
-                <circle cx="16" cy="19" r="2" />
-                <circle cx="8" cy="19" r="2" />
-              </svg>
-              <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
-            </button>
-            {((typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
+            {hidePrice ? (
+              <button
+                onClick={handleAskQuote}
+                className="flex-1 bg-industrial-gray hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2"
+              >
+                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <span className="text-sm font-medium">{t('pdp.askPriceButton') || 'Teklif İste'}</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
+                  <path strokeWidth={2} d="M5 6L4 2H2" />
+                  <circle cx="16" cy="19" r="2" />
+                  <circle cx="8" cy="19" r="2" />
+                </svg>
+                <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
+              </button>
+            )}
+
+            {/* Out of Stock fallback is handled conditionally below for normal items, but if hidePrice, do we still showing Ask Stock? 
+                Usually if hidePrice, we are already asking for quote, so asking for stock is redundant.
+            */}
+            {(!hidePrice && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
               const whatsappLink = getStockInquiryLink(product.name, product.sku)
               if (whatsappLink) {
                 return (
@@ -236,6 +268,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                 </button>
               )
             })()}
+
             {onQuickView ? (
               <button
                 type="button"
