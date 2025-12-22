@@ -54,13 +54,14 @@ jobs:
       - name: Normalize DB URL (enforce sslmode=require & project-ref suffix)
         if: ${{ env.SUPABASE_DB_URL != '' }}
         run: |
+          # Use a local variable to avoid confusion
           RAW_URL="${SUPABASE_DB_URL}"
           
           # 1. Enforce sslmode=require
-          if echo "$RAW_URL" | grep -q "sslmode="; then
+          if [[ "$RAW_URL" == *"sslmode="* ]]; then
             DB_URL="$RAW_URL"
           else
-            if echo "$RAW_URL" | grep -q "?"; then
+            if [[ "$RAW_URL" == *"?"* ]]; then
               DB_URL="${RAW_URL}&sslmode=require"
             else
               DB_URL="${RAW_URL}?sslmode=require"
@@ -68,21 +69,25 @@ jobs:
           fi
           
           # 2. Handle Pooler Username Suffix (postgres -> postgres.[PROJECT_REF])
-          # Use secret if available, otherwise fallback to project-specific ref
-          PROJECT_REF="${SUPABASE_PROJECT_REF:-tnofewwkwlyjsqgwjjga}"
+          # Project Ref fallback
+          P_REF="${SUPABASE_PROJECT_REF:-tnofewwkwlyjsqgwjjga}"
           
-          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "$PROJECT_REF" ]]; then
-            # Check if username already contains a dot
-            # URL format: postgresql://[user](:[pass])@host...
-            USER_PART=$(echo "$DB_URL" | sed -E 's|postgresql://([^:@]+).*|\1|')
+          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "$P_REF" ]]; then
+            # Extract protocol and user
+            # Matches postgres://USER:PASS@HOST or postgresql://USER:PASS@HOST
+            USER_PART=$(echo "$DB_URL" | sed -E 's|^[^:]+://([^:@]+).*|\1|')
+            
             if [[ "$USER_PART" == "postgres" ]]; then
-              echo "Fixing pooler username: postgres -> postgres.${PROJECT_REF}"
-              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres:|postgresql://postgres.${PROJECT_REF}:|")
-              # Also handle case without password
-              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres@|postgresql://postgres.${PROJECT_REF}@|")
+              echo "Fixing pooler username: postgres -> postgres.${P_REF}"
+              # Replace 'user:' with 'user.ref:' or 'user@' with 'user.ref@'
+              # Supports both postgres:// and postgresql://
+              DB_URL=$(echo "$DB_URL" | sed -E "s|//postgres:|//postgres.${P_REF}:|")
+              DB_URL=$(echo "$DB_URL" | sed -E "s|//postgres@|//postgres.${P_REF}@|")
             fi
           fi
           
+          # Verification (Masked)
+          echo "Normalized URL mask: $(echo "$DB_URL" | sed -E 's|//[^:]+:.*@|//***:***@|')"
           echo "DB_URL=$DB_URL" >> $GITHUB_ENV
 
       - name: Test DB connection
