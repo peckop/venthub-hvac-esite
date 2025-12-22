@@ -17,26 +17,26 @@ jobs:
   migrate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    # Secret'lar artik burada (Job-level env) degil, adimlarin icinde tanimlanacak (IDE uyarilarini onlemek icin)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Decide execution path (prefer psql for stability)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: |
           if [ -n "${SUPABASE_DB_URL}" ]; then
-            echo "Will use psql with SUPABASE_DB_URL (sslmode=require)."
+            echo "Will use psql with SUPABASE_DB_URL."
             exit 0
           fi
           if [ -n "${SUPABASE_ACCESS_TOKEN}" ] && [ -n "${SUPABASE_PROJECT_REF}" ]; then
-            echo "DB_URL missing — fallback to Supabase CLI with ACCESS_TOKEN + PROJECT_REF."
+            echo "DB_URL missing — fallback to Supabase CLI."
             exit 0
           fi
-          echo "::error::Missing configuration. Set SUPABASE_DB_URL (preferred), or SUPABASE_ACCESS_TOKEN + SUPABASE_PROJECT_REF as fallback."
+          echo "::error::Missing configuration. Set SUPABASE_DB_URL or fallback variables."
           exit 1
 
       - name: Install PostgreSQL client
@@ -51,44 +51,35 @@ jobs:
           # Host mask (do not print full URL)
           echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
-      - name: Normalize DB URL (enforce sslmode=require & project-ref suffix)
-        if: ${{ env.SUPABASE_DB_URL != '' }}
+      - name: Normalize DB URL (Rebuild for Pooler Stability)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: |
-          # Use a local variable to avoid confusion
+          # DİKKAT: Maskelenmis veriler (***) üzerinde sed/grep calismaz.
+          # Bu yüzden URL'yi sıfırdan inşa ediyoruz.
+          
           RAW_URL="${SUPABASE_DB_URL}"
-          
-          # 1. Enforce sslmode=require
-          if [[ "$RAW_URL" == *"sslmode="* ]]; then
-            DB_URL="$RAW_URL"
-          else
-            if [[ "$RAW_URL" == *"?"* ]]; then
-              DB_URL="${RAW_URL}&sslmode=require"
-            else
-              DB_URL="${RAW_URL}?sslmode=require"
-            fi
-          fi
-          
-          # 2. Handle Pooler Username Suffix (postgres -> postgres.[PROJECT_REF])
-          # Project Ref fallback
           P_REF="${SUPABASE_PROJECT_REF:-tnofewwkwlyjsqgwjjga}"
+          P_PASS="${SUPABASE_DB_PASSWORD}"
           
-          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "$P_REF" ]]; then
-            # Extract protocol and user
-            # Matches postgres://USER:PASS@HOST or postgresql://USER:PASS@HOST
-            USER_PART=$(echo "$DB_URL" | sed -E 's|^[^:]+://([^:@]+).*|\1|')
-            
-            if [[ "$USER_PART" == "postgres" ]]; then
-              echo "Fixing pooler username: postgres -> postgres.${P_REF}"
-              # Replace 'user:' with 'user.ref:' or 'user@' with 'user.ref@'
-              # Supports both postgres:// and postgresql://
-              DB_URL=$(echo "$DB_URL" | sed -E "s|//postgres:|//postgres.${P_REF}:|")
-              DB_URL=$(echo "$DB_URL" | sed -E "s|//postgres@|//postgres.${P_REF}@|")
+          # Eğer tam URL verilmişse ve Pooler formatı DEĞİLSE (nokta yoksa) otomatik düzeltmeye çalışalım
+          # Ama parolanın da elimizde olması lazım (Secrets'ta tanımlanmış olması şart)
+          if [[ -n "$P_PASS" ]] && [[ -n "$P_REF" ]]; then
+            echo "🚀 Rebuilding Pooler URL with component-based protocol..."
+            NEW_URL="postgresql://postgres.${P_REF}:${P_PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+            echo "DB_URL=$NEW_URL" >> $GITHUB_ENV
+          else
+            echo "⚠️ Fallback: Using raw SUPABASE_DB_URL (Sed manipulations will fail if masked)."
+            # Minimal normalizasyon
+            if [[ "$RAW_URL" != *"sslmode="* ]]; then
+              if [[ "$RAW_URL" == *"?"* ]]; then RAW_URL="${RAW_URL}&sslmode=require"; else RAW_URL="${RAW_URL}?sslmode=require"; fi
             fi
+            echo "DB_URL=$RAW_URL" >> $GITHUB_ENV
           fi
           
-          # Verification (Masked)
-          echo "Normalized URL mask: $(echo "$DB_URL" | sed -E 's|//[^:]+:.*@|//***:***@|')"
-          echo "DB_URL=$DB_URL" >> $GITHUB_ENV
+          echo "✅ Normalization complete."
 
       - name: Test DB connection
         if: ${{ env.SUPABASE_DB_URL != '' }}
