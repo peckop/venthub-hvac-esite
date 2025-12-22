@@ -9,6 +9,7 @@ import { getActiveApplicationCards } from '../config/applications'
 import { iconFor, gridColsClass } from '../utils/applicationUi'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -202,6 +203,19 @@ const ProductsPage: React.FC = () => {
   const [availableBrands, setAvailableBrands] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
+  // Scroll Restoration
+  useManualScrollRestoration(loading)
+
+  // Create map of category ID -> hide_price for efficient lookup
+  const categoryHidePriceMap = React.useMemo(() => {
+    const map = new Map<string, boolean>()
+    categories.forEach(c => {
+      // Check for strict boolean true to avoid accidental hiding
+      if (c.metadata?.hide_price === true) map.set(c.id, true)
+    })
+    return map
+  }, [categories])
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   const appSectionRef = useRef<HTMLDivElement>(null)
 
@@ -335,7 +349,8 @@ const ProductsPage: React.FC = () => {
               ...p,
               status: 'active' as const, // Patch status
               is_featured: false, // Default
-              category_id: (filters.category_id as string) || '', // Partial
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              category_id: (p as any).category_id || (filters.category_id as string) || '', // Try to preserve category_id from result, fallback to filter
               subcategory_id: '' // Missing
             }))
             // We cast to Product[] for state simplicity as we know ProductCard handles partials if status is present
@@ -488,6 +503,7 @@ const ProductsPage: React.FC = () => {
                       key={p.id}
                       product={p as Product} // Safe cast now due to compatibility patch
                       layout={viewMode}
+                      hidePrice={Boolean(p.category_id && categoryHidePriceMap.get(p.category_id))}
                     />
                   ))}
                 </div>

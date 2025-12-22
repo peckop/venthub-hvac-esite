@@ -42,7 +42,7 @@ try {
     const ttlMs = isProd ? 120_000 : 0
     installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
   }
-} catch {}
+} catch { }
 
 // Optional: automatic test error trigger behind a flag (disabled in production; only active on localhost)
 try {
@@ -59,8 +59,8 @@ try {
       try {
         // Force error reporting for a short window (bypass sample/dedup)
         localStorage.setItem('errorlog:force', '1')
-        setTimeout(() => { try { localStorage.removeItem('errorlog:force') } catch {} }, 30000)
-      } catch {}
+        setTimeout(() => { try { localStorage.removeItem('errorlog:force') } catch { } }, 30000)
+      } catch { }
       // 1) Throw a real error so window.onerror path is tested
       setTimeout(() => {
         throw new Error('VH TEST ' + new Date().toISOString())
@@ -80,19 +80,18 @@ try {
               release: (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
             }
           })
-        } catch {}
+        } catch { }
       }, 600)
     }
   }
-} catch {}
+} catch { }
 
-// Sayfa yenilemelerinde tarayıcının otomatik scroll restorasyonunu kapat
-// Böylece yenilemede her zaman sayfa başına çıkılır
-if ('scrollRestoration' in window.history) {
-  try {
-    window.history.scrollRestoration = 'manual'
-  } catch {}
-}
+// Sayfa yenilemelerinde tarayıcının otomatik scroll restorasyonunu kullan (kaldırıldı: manual override)
+// if ('scrollRestoration' in window.history) {
+//   try {
+//     window.history.scrollRestoration = 'manual'
+//   } catch {}
+// }
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

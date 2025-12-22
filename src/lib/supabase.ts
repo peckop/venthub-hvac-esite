@@ -33,6 +33,7 @@ export interface Category {
     technical_summary?: string
     hero_title?: string
     hero_description?: string
+    hide_price?: boolean
   } | null
 }
 

@@ -585,10 +585,16 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Price */}
             <div className="text-4xl font-bold text-primary-navy">
-              {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
-              <span className="text-sm text-steel-gray font-normal ml-2">
-                {t('pdp.vatIncluded')}
-              </span>
+              {mainCategory?.metadata?.hide_price ? (
+                <span className="text-lg text-industrial-gray font-normal">Fiyat Teklifi Alın</span>
+              ) : (
+                <>
+                  {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                  <span className="text-sm text-steel-gray font-normal ml-2">
+                    {t('pdp.vatIncluded')}
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Description */}
@@ -679,14 +685,24 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               <div className="flex space-x-2 sm:space-x-4">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                  className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ShoppingCart size={18} />
-                  <span>{t('pdp.addToCart')}</span>
-                </button>
+                {mainCategory?.metadata?.hide_price ? (
+                  <button
+                    onClick={() => setLeadOpen(true)}
+                    className="flex-1 bg-industrial-gray hover:bg-primary-navy text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Settings size={18} />
+                    <span>{t('pdp.techQuote') || 'Teklif İste'}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                    className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ShoppingCart size={18} />
+                    <span>{t('pdp.addToCart')}</span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => setIsWishlisted(!isWishlisted)}
