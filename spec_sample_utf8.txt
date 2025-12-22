@@ -1,0 +1,5 @@
+﻿{"rpm": "2100/2400", "power_w": "22/28", "noise_dbA": "34/39", "voltage_v": "220-240", "weight_kg": "2.2", "frequency_hz": "50", "max_airflow_m3h": "235/280", "max_pressure_pa": "118/137"}
+{"rpm": "2100/2450", "power_w": "27/36", "noise_dbA": "35/40", "voltage_v": "220-240", "weight_kg": "2.5", "frequency_hz": "50", "max_airflow_m3h": "305/360", "max_pressure_pa": "157/186"}
+{"rpm": "2000/2500", "power_w": "45/60", "noise_dbA": "39/44", "voltage_v": "220-240", "weight_kg": "4.2", "frequency_hz": "50", "max_airflow_m3h": "450/550", "max_pressure_pa": "196/245"}
+{"rpm": "1900/2400", "power_w": "70/95", "noise_dbA": "43/48", "voltage_v": "220-240", "weight_kg": "6.0", "frequency_hz": "50", "max_airflow_m3h": "700/900", "max_pressure_pa": "216/275"}
+{"rpm": "1850/2350", "power_w": "120/170", "noise_dbA": "48/53", "voltage_v": "220-240", "weight_kg": "9.0", "frequency_hz": "50", "max_airflow_m3h": "1100/1400", "max_pressure_pa": "294/392"}
