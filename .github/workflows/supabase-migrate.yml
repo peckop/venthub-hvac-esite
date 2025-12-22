@@ -36,11 +36,16 @@ jobs:
 
       - name: Apply migrations via psql
         run: |
-          # Mevcut migration'lar zaten veritabanında uygulanmış durumda.
-          # Her migration'ı tekrar çalıştırmak yerine, yeni migration'ları
-          # kontrol edip sadece uygulanmamış olanları çalıştırmak gerekir.
-          # Şimdilik: Tüm migration'ların uygulandığını varsayıyoruz.
-          echo "✅ Migrations already applied. Skipping re-application."
-          echo "📁 Found migrations:"
-          ls -1 supabase/migrations/*.sql 2>/dev/null || echo "No migration files found."
+          set -e
+          shopt -s nullglob
+          files=(supabase/migrations/*.sql)
+          if [ ${#files[@]} -eq 0 ]; then
+             echo "No migrations found."
+             exit 0
+          fi
+          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+            echo "Applying $f"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+          echo "✅ All migrations completed successfully."
 

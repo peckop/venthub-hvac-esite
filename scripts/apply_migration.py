@@ -19,7 +19,7 @@ if not SUPABASE_URL or not SERVICE_KEY:
     exit(1)
 
 def apply_migration():
-    migration_file = os.path.join(os.path.dirname(__file__), '..', 'supabase', 'migrations', '20251203_fix_performance_lints.sql')
+    migration_file = os.path.join(os.path.dirname(__file__), '..', 'supabase', 'migrations', '20251218_wizard_selections.sql')
     
     with open(migration_file, 'r', encoding='utf-8') as f:
         sql_content = f.read()
