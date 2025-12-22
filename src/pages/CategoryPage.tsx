@@ -11,6 +11,7 @@ import CategoryShowcase from '../components/category/CategoryShowcase'
 import CategoryLanding from '../components/category/CategoryLanding'
 import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
+import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
@@ -629,6 +630,10 @@ export const CategoryPage: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* Undecided User CTA - Only if products exist (or always? Implementation plan didn't specify, but consistent with ProductsPage) */}
+            {filteredProducts.length > 0 && <UndecidedUserCTA />}
+
           </div>
         </div>
       </div>
