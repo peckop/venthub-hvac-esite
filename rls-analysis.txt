@@ -1,0 +1,135 @@
+=== VERİTABANI RLS ANALİZİ ===
+
+Toplam politika sayısı: 70
+
+=== TABLO BAZINDA POLİTİKALAR ===
+
+admin_audit_log (2 politika):
+  - admin_audit_log_insert_policy [INSERT] PERMISSIVE
+  - admin_audit_log_select_policy [SELECT] PERMISSIVE
+
+cart_items (1 politika):
+  - cart_items_policy [ALL] PERMISSIVE
+
+categories (2 politika):
+  - Enable read access for all users [SELECT] PERMISSIVE
+  - Enable write access for authenticated users [ALL] PERMISSIVE
+
+client_errors (1 politika):
+  - merged_client_errors_authenticated_select [SELECT] PERMISSIVE
+
+coupons (3 politika):
+  - merged_coupons_anon_select [SELECT] PERMISSIVE
+  - merged_coupons_authenticated_select [SELECT] PERMISSIVE
+  - merged_coupons_dashboard_user_select [SELECT] PERMISSIVE
+
+error_groups (1 politika):
+  - merged_error_groups_authenticated_select [SELECT] PERMISSIVE
+
+inventory_movements (1 politika):
+  - inventory_movements_select_admin [SELECT] PERMISSIVE
+
+inventory_settings (2 politika):
+  - inventory_settings_select_all [SELECT] PERMISSIVE
+  - inventory_settings_update_admin [UPDATE] PERMISSIVE
+
+order_attachments (1 politika):
+  - merged_order_attachments_authenticated_select [SELECT] PERMISSIVE
+
+order_email_events (2 politika):
+  - merged_order_email_events_authenticated_select [SELECT] PERMISSIVE
+  - merged_order_email_events_service_role_insert [INSERT] PERMISSIVE
+
+order_notes (3 politika):
+  - merged_order_notes_authenticated_delete [DELETE] PERMISSIVE
+  - merged_order_notes_authenticated_insert [INSERT] PERMISSIVE
+  - merged_order_notes_authenticated_select [SELECT] PERMISSIVE
+
+organizations (4 politika):
+  - Anyone can view organizations [SELECT] PERMISSIVE
+  - merged_organizations_authenticated_delete [DELETE] PERMISSIVE
+  - merged_organizations_authenticated_insert [INSERT] PERMISSIVE
+  - merged_organizations_authenticated_update [UPDATE] PERMISSIVE
+
+payment_transactions (4 politika):
+  - merged_payment_transactions_authenticated_delete [DELETE] PERMISSIVE
+  - merged_payment_transactions_authenticated_insert [INSERT] PERMISSIVE
+  - merged_payment_transactions_authenticated_select [SELECT] PERMISSIVE
+  - merged_payment_transactions_authenticated_update [UPDATE] PERMISSIVE
+
+price_lists (1 politika):
+  - Anyone can view price lists [SELECT] PERMISSIVE
+
+product_images (1 politika):
+  - product_images_update_consolidated [UPDATE] PERMISSIVE
+
+product_prices (4 politika):
+  - Anyone can view product prices [SELECT] PERMISSIVE
+  - merged_product_prices_authenticated_delete [DELETE] PERMISSIVE
+  - merged_product_prices_authenticated_insert [INSERT] PERMISSIVE
+  - merged_product_prices_authenticated_update [UPDATE] PERMISSIVE
+
+products (4 politika):
+  - products_delete_policy [DELETE] PERMISSIVE
+  - products_insert_policy [INSERT] PERMISSIVE
+  - products_select_policy [SELECT] PERMISSIVE
+  - products_update_policy [UPDATE] PERMISSIVE
+
+rate_limits (1 politika):
+  - merged_rate_limits_service_role_select [SELECT] PERMISSIVE
+
+returns_webhook_events (2 politika):
+  - merged_returns_webhook_events_authenticated_select [SELECT] PERMISSIVE
+  - merged_returns_webhook_events_service_role_insert [INSERT] PERMISSIVE
+
+shipping_email_events (2 politika):
+  - merged_shipping_email_events_authenticated_select [SELECT] PERMISSIVE
+  - merged_shipping_email_events_service_role_insert [INSERT] PERMISSIVE
+
+shipping_idempotency (2 politika):
+  - merged_shipping_idempotency_dashboard_user_select [SELECT] PERMISSIVE
+  - merged_shipping_idempotency_service_role_select [SELECT] PERMISSIVE
+
+shipping_webhook_events (1 politika):
+  - swe_admin_select [SELECT] PERMISSIVE
+
+shopping_carts (1 politika):
+  - shopping_carts_policy [ALL] PERMISSIVE
+
+user_addresses (4 politika):
+  - merged_user_addresses_authenticated_delete [DELETE] PERMISSIVE
+  - merged_user_addresses_authenticated_insert [INSERT] PERMISSIVE
+  - merged_user_addresses_authenticated_select [SELECT] PERMISSIVE
+  - merged_user_addresses_authenticated_update [UPDATE] PERMISSIVE
+
+user_invoice_profiles (4 politika):
+  - merged_user_invoice_profiles_authenticated_delete [DELETE] PERMISSIVE
+  - merged_user_invoice_profiles_authenticated_insert [INSERT] PERMISSIVE
+  - merged_user_invoice_profiles_authenticated_select [SELECT] PERMISSIVE
+  - merged_user_invoice_profiles_authenticated_update [UPDATE] PERMISSIVE
+
+user_profiles (4 politika):
+  - user_profiles_delete_policy [DELETE] PERMISSIVE
+  - user_profiles_insert_policy [INSERT] PERMISSIVE
+  - user_profiles_select_policy [SELECT] PERMISSIVE
+  - user_profiles_update_policy [UPDATE] PERMISSIVE
+
+venthub_order_items (2 politika):
+  - venthub_order_items_insert [INSERT] PERMISSIVE
+  - venthub_order_items_select_consolidated [SELECT] PERMISSIVE
+
+venthub_orders (4 politika):
+  - orders_delete_policy [DELETE] PERMISSIVE
+  - orders_insert_policy [INSERT] PERMISSIVE
+  - orders_select_policy [SELECT] PERMISSIVE
+  - orders_update_policy [UPDATE] PERMISSIVE
+
+venthub_returns (4 politika):
+  - returns_delete_policy [DELETE] PERMISSIVE
+  - returns_insert_policy [INSERT] PERMISSIVE
+  - returns_update_policy [UPDATE] PERMISSIVE
+  - venthub_returns_select_consolidated [SELECT] PERMISSIVE
+
+wizard_selections (2 politika):
+  - Anyone can insert selections [INSERT] PERMISSIVE
+  - Users can view own selections [SELECT] PERMISSIVE
