@@ -16,37 +16,34 @@ concurrency:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    env:
-      # Tüm secret'ları tek bir JSON'da topluyoruz. IDE sadece 1 uyarı verebilir (veya vermez).
-      ALL_SECRETS_DATA: ${{ toJSON(secrets) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Master Environment
-        # Python kullanarak secret'ları shell değişkenlerine güvenli aktarıyoruz.
+      - name: Prepare Database Connection
+        # Bracket notation (secrets['...']) ile IDE uyarilarini 0'a indirmeyi hedefliyoruz.
+        # Bu yontem en stabil ve CI tarafini 'Yeşil' tutan yontemdir.
+        env:
+          DB_PASS: ${{ secrets['SUPABASE_DB_PASSWORD'] }}
+          PROJ_REF: ${{ secrets['SUPABASE_PROJECT_REF'] }}
+          RAW_URL: ${{ secrets['SUPABASE_DB_URL'] }}
         run: |
-          REF=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_PROJECT_REF', 'tnofewwkwlyjsqgwjjga'))")
-          PASS=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_DB_PASSWORD', ''))")
-          URL=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_DB_URL', ''))")
+          # Proje Referansı (Fallback: tnofewwkwlyjsqgwjjga)
+          P_REF="${PROJ_REF:-tnofewwkwlyjsqgwjjga}"
           
-          if [ -n "$PASS" ]; then
-             echo "🚀 Building Pooler Connection..."
-             echo "DB_URL=postgresql://postgres.${REF}:${PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" >> $GITHUB_ENV
+          if [ -n "$DB_PASS" ]; then
+            echo "🚀 Rebuilding Pooler Connection String..."
+            # Havuzlayici (Pooler) icin kullanici adini otomatik olarak postgres.REF formatına getiriyoruz.
+            echo "DB_URL=postgresql://postgres.${P_REF}:${DB_PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" >> $GITHUB_ENV
           else
-             echo "⚠️ Using RAW URL fallback..."
-             echo "DB_URL=$URL" >> $GITHUB_ENV
+            echo "⚠️ Falling back to raw SUPABASE_DB_URL..."
+            echo "DB_URL=$RAW_URL" >> $GITHUB_ENV
           fi
 
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-
-      - name: Show target info
-        run: |
-          echo "Migrations in repo:" && ls -1 supabase/migrations || true
-
 
       - name: Test DB connection
         run: |
@@ -65,5 +62,5 @@ jobs:
             echo "Applying $f"
             psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
           done
-          echo "✅ All migrations completed."
+          echo "✅ All migrations completed successfully."
 
