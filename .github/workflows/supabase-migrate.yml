@@ -49,18 +49,36 @@ jobs:
           # Host mask (do not print full URL)
           echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
-      - name: Normalize DB URL (enforce sslmode=require)
+      - name: Normalize DB URL (enforce sslmode=require & project-ref suffix)
         if: ${{ env.SUPABASE_DB_URL != '' }}
         run: |
-          if echo "$SUPABASE_DB_URL" | grep -q "sslmode="; then
-            DB_URL="$SUPABASE_DB_URL"
+          RAW_URL="${SUPABASE_DB_URL}"
+          
+          # 1. Enforce sslmode=require
+          if echo "$RAW_URL" | grep -q "sslmode="; then
+            DB_URL="$RAW_URL"
           else
-            if echo "$SUPABASE_DB_URL" | grep -q "?"; then
-              DB_URL="${SUPABASE_DB_URL}&sslmode=require"
+            if echo "$RAW_URL" | grep -q "?"; then
+              DB_URL="${RAW_URL}&sslmode=require"
             else
-              DB_URL="${SUPABASE_DB_URL}?sslmode=require"
+              DB_URL="${RAW_URL}?sslmode=require"
             fi
           fi
+          
+          # 2. Handle Pooler Username Suffix (postgres -> postgres.[PROJECT_REF])
+          # Only if using pooler host and PROJECT_REF is defined
+          if [[ "$DB_URL" == *"pooler.supabase.com"* ]] && [[ -n "${SUPABASE_PROJECT_REF}" ]]; then
+            # Check if username already contains a dot
+            # URL format: postgresql://[user](:[pass])@host...
+            USER_PART=$(echo "$DB_URL" | sed -E 's|postgresql://([^:@]+).*|\1|')
+            if [[ "$USER_PART" == "postgres" ]]; then
+              echo "Fixing pooler username: postgres -> postgres.${SUPABASE_PROJECT_REF}"
+              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres:|postgresql://postgres.${SUPABASE_PROJECT_REF}:|")
+              # Also handle case without password (unlikely but safe)
+              DB_URL=$(echo "$DB_URL" | sed -E "s|postgresql://postgres@|postgresql://postgres.${SUPABASE_PROJECT_REF}@|")
+            fi
+          fi
+          
           echo "DB_URL=$DB_URL" >> $GITHUB_ENV
 
       - name: Test DB connection
