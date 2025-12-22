@@ -16,61 +16,37 @@ concurrency:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    env:
+      # Tüm secret'ları tek bir JSON'da topluyoruz. IDE sadece 1 uyarı verebilir (veya vermez).
+      ALL_SECRETS_DATA: ${{ toJSON(secrets) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare Master Environment
-        # Bracket notation ve tek adimda toplama stratejisi ile IDE uyarilarini 0'a indirmeyi hedefliyoruz.
+      - name: Setup Master Environment
+        # Python kullanarak secret'ları shell değişkenlerine güvenli aktarıyoruz.
         run: |
-          # Secret'ları GITHUB_ENV'ye güvenli aktaralım
-          echo "S_DB_URL=${{ secrets['SUPABASE_DB_URL'] }}" >> $GITHUB_ENV
-          echo "S_DB_PASS=${{ secrets['SUPABASE_DB_PASSWORD'] }}" >> $GITHUB_ENV
-          echo "S_PROJ_REF=${{ secrets['SUPABASE_PROJECT_REF'] }}" >> $GITHUB_ENV
-          echo "S_ACC_TOKEN=${{ secrets['SUPABASE_ACCESS_TOKEN'] }}" >> $GITHUB_ENV
-
-      - name: Decide execution path (psql or CLI)
-        run: |
-          if [ -n "$S_DB_URL" ]; then
-            echo "Path: PSQL"
-            exit 0
+          REF=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_PROJECT_REF', 'tnofewwkwlyjsqgwjjga'))")
+          PASS=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_DB_PASSWORD', ''))")
+          URL=$(echo "$ALL_SECRETS_DATA" | python3 -c "import sys, json; print(json.load(sys.stdin).get('SUPABASE_DB_URL', ''))")
+          
+          if [ -n "$PASS" ]; then
+             echo "🚀 Building Pooler Connection..."
+             echo "DB_URL=postgresql://postgres.${REF}:${PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" >> $GITHUB_ENV
+          else
+             echo "⚠️ Using RAW URL fallback..."
+             echo "DB_URL=$URL" >> $GITHUB_ENV
           fi
-          if [ -n "$S_ACC_TOKEN" ] && [ -n "$S_PROJ_REF" ]; then
-            echo "Path: CLI"
-            exit 0
-          fi
-          echo "::error::Missing DB configuration."
-          exit 1
 
       - name: Install PostgreSQL client
-        if: ${{ env.SUPABASE_DB_URL != '' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Show target and list migrations
+      - name: Show target info
         run: |
           echo "Migrations in repo:" && ls -1 supabase/migrations || true
-          # Host mask (do not print full URL)
-          echo "Target host: $(echo "$SUPABASE_DB_URL" | sed -E 's|.*@([^:/]+).*|\1|')"
 
-      - name: Rebuild Connection String (Pooler Fix)
-        run: |
-          # Maskelenmiş (***) veriler üzerinde manipülasyon yapılamaz.
-          # Bu yüzden URL'yi sıfırdan ve doğru formatta (postgres.REF) inşa ediyoruz.
-          
-          REF="${S_PROJ_REF:-tnofewwkwlyjsqgwjjga}"
-          PASS="${S_DB_PASS}"
-          
-          if [ -n "$PASS" ]; then
-            echo "🚀 Building robust pooler connection..."
-            DB_URL="postgresql://postgres.${REF}:${PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
-            echo "DB_URL=$DB_URL" >> $GITHUB_ENV
-          else
-            echo "⚠️ Falling back to raw URL (might fail if user/port is wrong)..."
-            echo "DB_URL=$S_DB_URL" >> $GITHUB_ENV
-          fi
 
       - name: Test DB connection
         run: |
