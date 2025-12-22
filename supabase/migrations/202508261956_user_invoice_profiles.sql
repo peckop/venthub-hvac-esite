@@ -21,12 +21,26 @@ create table if not exists public.user_invoice_profiles (
   updated_at timestamptz not null default now()
 );
 
--- Helpful indexes
+-- Helpful indexes (wrapped in DO blocks to handle missing columns gracefully)
 create index if not exists idx_user_invoice_profiles_user on public.user_invoice_profiles(user_id);
-create index if not exists idx_user_invoice_profiles_type on public.user_invoice_profiles(type);
-create unique index if not exists uniq_user_invoice_profiles_default_per_type
-  on public.user_invoice_profiles(user_id, type)
-  where is_default is true;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'type') THEN
+    CREATE INDEX IF NOT EXISTS idx_user_invoice_profiles_type ON public.user_invoice_profiles(type);
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'type')
+     AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user_invoice_profiles' AND column_name = 'is_default') THEN
+    CREATE UNIQUE INDEX IF NOT EXISTS uniq_user_invoice_profiles_default_per_type
+      ON public.user_invoice_profiles(user_id, type)
+      WHERE is_default IS TRUE;
+  END IF;
+END $$;
+
 
 alter table public.user_invoice_profiles enable row level security;
 
