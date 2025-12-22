@@ -21,24 +21,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare Database Connection
-        # Bracket notation (secrets['...']) ile IDE uyarilarini 0'a indirmeyi hedefliyoruz.
-        # Bu yontem en stabil ve CI tarafini 'Yeşil' tutan yontemdir.
-        env:
-          DB_PASS: ${{ secrets['SUPABASE_DB_PASSWORD'] }}
-          PROJ_REF: ${{ secrets['SUPABASE_PROJECT_REF'] }}
-          RAW_URL: ${{ secrets['SUPABASE_DB_URL'] }}
+        # Hardcoded connection string - private repo, security via repo access control
         run: |
-          # Proje Referansı (Fallback: tnofewwkwlyjsqgwjjga)
-          P_REF="${PROJ_REF:-tnofewwkwlyjsqgwjjga}"
-          
-          if [ -n "$DB_PASS" ]; then
-            echo "🚀 Rebuilding Pooler Connection String..."
-            # Havuzlayici (Pooler) icin kullanici adini otomatik olarak postgres.REF formatına getiriyoruz.
-            echo "DB_URL=postgresql://postgres.${P_REF}:${DB_PASS}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" >> $GITHUB_ENV
-          else
-            echo "⚠️ Falling back to raw SUPABASE_DB_URL..."
-            echo "DB_URL=$RAW_URL" >> $GITHUB_ENV
-          fi
+          echo "DB_URL=postgresql://postgres.tnofewwkwlyjsqgwjjga:SgxnZcG8Y79evUfd@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require" >> $GITHUB_ENV
 
       - name: Install PostgreSQL client
         run: |
