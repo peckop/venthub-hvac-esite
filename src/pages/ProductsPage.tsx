@@ -10,6 +10,7 @@ import { iconFor, gridColsClass } from '../utils/applicationUi'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
+import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -477,6 +478,9 @@ const ProductsPage: React.FC = () => {
             />
           )}
 
+
+
+          // Inside ProductsPage component render, after product grid:
           {/* Product Grid */}
           {!isDiscovery && (
             <div>
@@ -497,19 +501,25 @@ const ProductsPage: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-                  {products.map(p => (
-                    <ProductCard
-                      key={p.id}
-                      product={p as Product} // Safe cast now due to compatibility patch
-                      layout={viewMode}
-                      hidePrice={Boolean(p.category_id && categoryHidePriceMap.get(p.category_id))}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                    {products.map(p => (
+                      <ProductCard
+                        key={p.id}
+                        product={p as Product} // Safe cast now due to compatibility patch
+                        layout={viewMode}
+                        hidePrice={Boolean(p.category_id && categoryHidePriceMap.get(p.category_id))}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Undecided User CTA - Only show if we found results, or even if filtered but empty? Better if results exist or generally bottom of list */}
+                  {products.length > 0 && <UndecidedUserCTA />}
+                </>
               )}
             </div>
           )}
+
         </div>
       </div>
 

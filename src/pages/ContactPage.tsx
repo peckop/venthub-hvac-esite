@@ -52,7 +52,7 @@ const ContactPage: React.FC = () => {
     }
   ]
 
-  const departments = [
+  const departments = React.useMemo(() => [
     {
       id: 'sales',
       icon: Building2,
@@ -74,12 +74,51 @@ const ContactPage: React.FC = () => {
       description: 'HVAC sistem planlama',
       color: 'border-gold-accent text-gold-accent'
     }
-  ]
+  ], [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // URL Params for Department Pre-selection
+  const query = new URLSearchParams(window.location.search)
+  const deptParam = query.get('dept')
+
+  // Auto-select department from URL if valid
+  React.useEffect(() => {
+    if (deptParam && departments.some(d => d.id === deptParam)) {
+      setSelectedDept(deptParam)
+    }
+  }, [deptParam, departments])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setFormSubmitted(true)
-    // Form submission logic here
+    const form = e.target as HTMLFormElement
+    const formData = new FormData(form)
+
+    // Simple validation
+    if (!selectedDept) {
+      alert('Lütfen bir konu seçiniz.')
+      return
+    }
+
+    const payload = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      company: formData.get('company') as string,
+      subject: formData.get('subject') as string,
+      message: formData.get('message') as string,
+      department: selectedDept as 'sales' | 'support' | 'consulting',
+      status: 'new'
+    }
+
+    try {
+      const { supabase } = await import('../lib/supabase')
+      const { error } = await supabase.from('contact_messages').insert(payload)
+      if (error) throw error
+      setFormSubmitted(true)
+      window.scrollTo({ top: formRef.current?.offsetTop || 0, behavior: 'smooth' })
+    } catch (err) {
+      console.error('Submission error:', err)
+      alert('Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.')
+    }
   }
 
   return (
@@ -193,8 +232,8 @@ const ContactPage: React.FC = () => {
                       key={dept.id}
                       onClick={() => setSelectedDept(dept.id)}
                       className={`w-full p-4 rounded-xl border-2 text-left transition-all ${isSelected
-                          ? `${dept.color} bg-white shadow-hvac`
-                          : 'border-light-gray bg-white hover:border-steel-gray'
+                        ? `${dept.color} bg-white shadow-hvac`
+                        : 'border-light-gray bg-white hover:border-steel-gray'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -235,6 +274,7 @@ const ContactPage: React.FC = () => {
                         Ad Soyad *
                       </label>
                       <input
+                        name="name"
                         type="text"
                         required
                         className="input-modern"
@@ -246,6 +286,7 @@ const ContactPage: React.FC = () => {
                         E-posta *
                       </label>
                       <input
+                        name="email"
                         type="email"
                         required
                         className="input-modern"
@@ -259,6 +300,7 @@ const ContactPage: React.FC = () => {
                         Telefon
                       </label>
                       <input
+                        name="phone"
                         type="tel"
                         className="input-modern"
                         placeholder="+90 5XX XXX XX XX"
@@ -269,6 +311,7 @@ const ContactPage: React.FC = () => {
                         Şirket
                       </label>
                       <input
+                        name="company"
                         type="text"
                         className="input-modern"
                         placeholder="Şirket Adı"
@@ -280,6 +323,7 @@ const ContactPage: React.FC = () => {
                       Konu *
                     </label>
                     <input
+                      name="subject"
                       type="text"
                       required
                       className="input-modern"
@@ -291,6 +335,7 @@ const ContactPage: React.FC = () => {
                       Mesaj *
                     </label>
                     <textarea
+                      name="message"
                       required
                       rows={5}
                       className="input-modern resize-none"
