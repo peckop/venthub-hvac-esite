@@ -19,13 +19,13 @@ async function run() {
 
         console.log('Executing migration...')
         // Capture notices
-        client.on('notice', (msg) => console.log('NOTICE:', msg.message))
+        client.on('notice', (msg: any) => console.log('NOTICE:', msg.message))
 
         await client.query(sql)
         console.log('Migration executed successfully.')
 
-    } catch (e) {
-        console.error('Migration failed:', e)
+    } catch (e: any) {
+        console.error('Migration failed:', e?.message || e)
     } finally {
         await client.end()
     }
