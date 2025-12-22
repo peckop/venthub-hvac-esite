@@ -1,12 +1,17 @@
-
 import pg from 'pg'
 import fs from 'fs'
 import path from 'path'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const { Client } = pg
-const connectionString = 'postgresql://postgres:***REMOVED***@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres'
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:***REMOVED***@aws-1-eu-central-1.pooler.supabase.com:5432/postgres'
 
-const client = new Client({ connectionString })
+const client = new Client({
+    connectionString,
+    ssl: { rejectUnauthorized: false }
+})
 
 async function run() {
     try {
