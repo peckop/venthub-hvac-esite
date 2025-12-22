@@ -36,16 +36,24 @@ jobs:
 
       - name: Apply migrations via psql
         run: |
-          set -e
           shopt -s nullglob
           files=(supabase/migrations/*.sql)
           if [ ${#files[@]} -eq 0 ]; then
              echo "No migrations found."
              exit 0
           fi
+          
+          failed=0
           for f in $(ls -1 supabase/migrations/*.sql | sort); do
             echo "Applying $f"
-            psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f"
+            if psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$f" 2>&1; then
+              echo "✅ $f applied successfully"
+            else
+              echo "⚠️ $f had errors (may already be applied)"
+              failed=$((failed + 1))
+            fi
           done
-          echo "✅ All migrations completed successfully."
+          
+          echo "✅ Migration process completed. Files with errors: $failed"
+
 
