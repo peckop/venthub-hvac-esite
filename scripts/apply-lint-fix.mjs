@@ -19,7 +19,7 @@ async function runMigration() {
         console.log('✅ Connected to database.');
 
         // Migration SQL dosyasını oku
-        const sql = fs.readFileSync('supabase/migrations/20251222_fix_rls_performance_lints.sql', 'utf8');
+        const sql = fs.readFileSync('supabase/migrations/20251222_restore_rls_policies.sql', 'utf8');
 
         // SQL'i çalıştır
         const result = await client.query(sql);
