@@ -16,7 +16,7 @@ set search_path = public
 as $$
   select *
   from venthub_orders
-  where (p_id is null or id = p_id)
+  where (p_id is null or id = p_id::uuid)
     and (p_conv is null or conversation_id = p_conv)
     and (p_status is null or status = p_status)
   order by created_at desc
@@ -41,7 +41,7 @@ declare
 begin
   update venthub_orders
      set status = p_status
-   where (p_id is not null and id = p_id)
+   where (p_id is not null and id = p_id::uuid)
       or (p_id is null and p_conv is not null and conversation_id = p_conv)
   returning * into v_row;
 
