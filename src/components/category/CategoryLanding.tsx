@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Category, Product } from '../../lib/supabase'
 import {
     ChevronDown,
@@ -72,9 +72,83 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const isAirCurtain = category.slug === 'hava-perdeleri'
 
+    // Track if we're restoring from URL hash (to auto-scroll after)
+    const isRestoringFromHash = useRef(false)
+
+    // Restore state from URL hash on mount or back navigation
+    useEffect(() => {
+        const hash = window.location.hash.slice(1) // Remove the '#' prefix
+
+        if (hash === 'tum-modeller') {
+            // "Modelleri İncele" durumunu geri yükle
+            isRestoringFromHash.current = true
+            setShowProducts(true)
+            setSelectedSubcategory(null)
+        } else if (hash && subCategories.length > 0) {
+            const matchedSubcat = subCategories.find(s => s.slug === hash)
+            if (matchedSubcat) {
+                isRestoringFromHash.current = true
+                setSelectedSubcategory(matchedSubcat.id)
+                setShowProducts(false)
+            }
+        }
+    }, [subCategories])
+
+    // Auto-scroll to products section when restored from hash (after DOM render)
+    useEffect(() => {
+        if ((selectedSubcategory || showProducts) && isRestoringFromHash.current) {
+            isRestoringFromHash.current = false
+
+            // Scroll fonksiyonu - position hesaplayıp scroll yapar
+            const scrollToTarget = () => {
+                const targetRef = showProducts
+                    ? productListRef.current
+                    : subcategoryProductsRef.current
+
+                if (targetRef) {
+                    const headerOffset = 80
+                    const elementPosition = targetRef.getBoundingClientRect().top
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+                    window.scrollTo({
+                        top: Math.max(0, offsetPosition),
+                        behavior: 'auto'
+                    })
+                    return true
+                }
+                return false
+            }
+
+            // Strateji: Birden fazla scroll denemesi yap (layout shifts için)
+            // 1. İlk scroll - immediate
+            // 2. İkinci scroll - 300ms sonra (layout stabilize olduktan sonra)
+            // 3. Üçüncü scroll - 600ms sonra (görseller yüklendikten sonra)
+
+            let attempts = 0
+            const maxAttempts = 20
+
+            const tryInitialScroll = () => {
+                attempts++
+
+                if (scrollToTarget()) {
+                    // Layout stabilize olduktan sonra tekrar scroll
+                    setTimeout(() => scrollToTarget(), 300)
+                    setTimeout(() => scrollToTarget(), 600)
+                } else if (attempts < maxAttempts) {
+                    setTimeout(tryInitialScroll, 100)
+                }
+            }
+
+            // 100ms sonra başla - React render tamamlansın
+            setTimeout(tryInitialScroll, 100)
+        }
+    }, [selectedSubcategory, showProducts])
+
     const handleShowProducts = () => {
         setShowProducts(true)
         setSelectedSubcategory(null) // Clear subcategory selection when showing all
+        // URL hash'i güncelle - geri navigasyonda restore edilebilsin
+        window.history.replaceState(null, '', '#tum-modeller')
 
         // Wait for state update and initial layout
         requestAnimationFrame(() => {
@@ -218,162 +292,180 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                     </div>
                                 </div>
                             )}
+
+                            {/* Animated Scroll Down Indicator */}
+                            <button
+                                onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce"
+                                aria-label="Devamını keşfet"
+                            >
+                                <span className="text-xs uppercase tracking-widest font-medium">Devamını Keşfet</span>
+                                <ChevronDown className="w-6 h-6" />
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
+                {/* Scroll Down Indicator */}
 
-            {/* Enhanced Needs Analysis Wizard */}
-            <EnhancedNeedsWizard
-                isOpen={wizardOpen}
-                onClose={() => setWizardOpen(false)}
-                parentSlug={category.slug}
-            />
 
-            {/* ====== PREMIUM AIR CURTAIN EXPERIENCE (8-Section Flow) ====== */}
-            {isAirCurtain && (
-                <>
-                    {/* Section 2: Problem Recognition */}
-                    <ProblemSection />
 
-                    {/* Section 3: How It Works */}
-                    <HowItWorks />
+                {/* Scroll Anchor */}
+                <div id="content-start" className="scroll-mt-20" />
 
-                    {/* Section 4: Brand Trust - Vortice Story */}
-                    <VorticeBrand />
+                {/* Enhanced Needs Analysis Wizard */}
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
 
-                    {/* Section 5: Type Comparison (Elektrikli vs Ortam) */}
-                    <TypeComparison
-                        onOpenWizard={() => setWizardOpen(true)}
-                        onSelectType={(type) => {
-                            const targetSlug = type === 'elektrikli' ? 'elektrikli-isitici' : 'ortam-havali'
-                            const subcat = subCategories.find(s => s.slug === targetSlug)
-                            if (subcat) {
-                                handleSelectSubcategory(subcat.id)
-                            }
-                        }}
-                    />
+                {/* ====== PREMIUM AIR CURTAIN EXPERIENCE (8-Section Flow) ====== */}
+                {
+                    isAirCurtain && (
+                        <>
+                            {/* Section 2: Problem Recognition */}
+                            <ProblemSection />
 
-                    {/* Section 6: Subcategory Products (In-Page Expansion) */}
-                    {selectedSubcategory && (
-                        <div
-                            ref={subcategoryProductsRef}
-                            className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200"
-                        >
-                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                {/* Section Header */}
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
-                                            {subCategories.find(s => s.id === selectedSubcategory)?.name || 'Alt Kategori'} Modelleri
-                                            <span className="text-sm font-normal bg-secondary-blue text-white px-3 py-1 rounded-full">
-                                                {subcategoryProducts.length} ürün
-                                            </span>
-                                        </h2>
-                                        <p className="text-sm text-steel-gray mt-1">
-                                            {subCategories.find(s => s.id === selectedSubcategory)?.description || 'Bu kategorideki ürünler'}
-                                        </p>
+                            {/* Section 3: How It Works */}
+                            <HowItWorks />
+
+                            {/* Section 4: Brand Trust - Vortice Story */}
+                            <VorticeBrand />
+
+                            {/* Section 5: Type Comparison (Elektrikli vs Ortam) */}
+                            <TypeComparison
+                                onOpenWizard={() => setWizardOpen(true)}
+                                onSelectType={(type) => {
+                                    const targetSlug = type === 'elektrikli' ? 'elektrikli-isitici' : 'ortam-havali'
+                                    const subcat = subCategories.find(s => s.slug === targetSlug)
+                                    if (subcat) {
+                                        handleSelectSubcategory(subcat.id)
+                                    }
+                                }}
+                            />
+
+                            {/* Section 6: Subcategory Products (In-Page Expansion) */}
+                            {selectedSubcategory && (
+                                <div
+                                    ref={subcategoryProductsRef}
+                                    className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200"
+                                >
+                                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                        {/* Section Header */}
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                                            <div>
+                                                <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
+                                                    {subCategories.find(s => s.id === selectedSubcategory)?.name || 'Alt Kategori'} Modelleri
+                                                    <span className="text-sm font-normal bg-secondary-blue text-white px-3 py-1 rounded-full">
+                                                        {subcategoryProducts.length} ürün
+                                                    </span>
+                                                </h2>
+                                                <p className="text-sm text-steel-gray mt-1">
+                                                    {subCategories.find(s => s.id === selectedSubcategory)?.description || 'Bu kategorideki ürünler'}
+                                                </p>
+                                            </div>
+
+                                            {/* Clear Selection Button */}
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedSubcategory(null)
+                                                    window.history.replaceState(null, '', window.location.pathname)
+                                                }}
+                                                className="text-sm text-steel-gray hover:text-industrial-gray underline"
+                                            >
+                                                ← Seçimi Kaldır
+                                            </button>
+                                        </div>
+
+                                        {/* Products Grid */}
+                                        {subcategoryProducts.length > 0 ? (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                                {subcategoryProducts.map(product => (
+                                                    <ProductCard
+                                                        key={product.id}
+                                                        product={product}
+                                                        layout="grid"
+                                                        hidePrice={!!category.metadata?.hide_price}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
+                                                <Filter size={48} className="mx-auto mb-4 text-gray-300" />
+                                                <p className="text-steel-gray">Bu alt kategoride henüz ürün bulunmuyor.</p>
+                                                <p className="text-sm text-gray-400 mt-2">Lütfen başka bir kategori seçin veya tüm modelleri görüntüleyin.</p>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {/* Clear Selection Button */}
-                                    <button
-                                        onClick={() => {
-                                            setSelectedSubcategory(null)
-                                            window.history.replaceState(null, '', window.location.pathname)
-                                        }}
-                                        className="text-sm text-steel-gray hover:text-industrial-gray underline"
-                                    >
-                                        ← Seçimi Kaldır
-                                    </button>
                                 </div>
+                            )}
 
-                                {/* Products Grid */}
-                                {subcategoryProducts.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                        {subcategoryProducts.map(product => (
-                                            <ProductCard
-                                                key={product.id}
-                                                product={product}
-                                                layout="grid"
-                                                hidePrice={!!category.metadata?.hide_price}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-                                        <Filter size={48} className="mx-auto mb-4 text-gray-300" />
-                                        <p className="text-steel-gray">Bu alt kategoride henüz ürün bulunmuyor.</p>
-                                        <p className="text-sm text-gray-400 mt-2">Lütfen başka bir kategori seçin veya tüm modelleri görüntüleyin.</p>
-                                    </div>
-                                )}
+                            {/* Section 7: Trust Signals */}
+                            <TrustSignals />
+
+                            {/* Section 8: FAQ */}
+                            <FAQ />
+                        </>
+                    )
+                }
+
+                {/* Expandable Product List Content */}
+                <div
+                    ref={productListRef}
+                    className={`transition-all duration-500 ease-in-out ${showProducts ? 'max-h-[10000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                >
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                            <div>
+                                <h2 className="text-2xl font-bold text-industrial-gray">
+                                    {category.name} Modelleri
+                                </h2>
+                                <p className="text-sm text-steel-gray mt-1">
+                                    {filteredProducts.length} model listeleniyor
+                                </p>
+                            </div>
+
+                            {/* Quick Filters */}
+                            <div className="flex flex-wrap gap-2">
+                                <span className="text-sm font-medium text-steel-gray self-center mr-2">Hızlı Filtre:</span>
+                                {[
+                                    { key: 'all', label: 'Tüm Modeller' },
+                                    { key: 'quiet', label: 'En Sessiz' },
+                                    { key: 'powerful', label: 'En Güçlü' }
+                                ].map((filter) => (
+                                    <button
+                                        key={filter.key}
+                                        onClick={() => setActiveFilter(filter.key)}
+                                        className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${activeFilter === filter.key
+                                            ? 'bg-primary-navy text-white border-primary-navy'
+                                            : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'
+                                            }`}
+                                    >
+                                        {filter.label}
+                                    </button>
+                                ))}
                             </div>
                         </div>
-                    )}
 
-                    {/* Section 7: Trust Signals */}
-                    <TrustSignals />
-
-                    {/* Section 8: FAQ */}
-                    <FAQ />
-                </>
-            )}
-
-            {/* Expandable Product List Content */}
-            <div
-                ref={productListRef}
-                className={`transition-all duration-500 ease-in-out ${showProducts ? 'max-h-[10000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                        <div>
-                            <h2 className="text-2xl font-bold text-industrial-gray">
-                                {category.name} Modelleri
-                            </h2>
-                            <p className="text-sm text-steel-gray mt-1">
-                                {filteredProducts.length} model listeleniyor
-                            </p>
-                        </div>
-
-                        {/* Quick Filters */}
-                        <div className="flex flex-wrap gap-2">
-                            <span className="text-sm font-medium text-steel-gray self-center mr-2">Hızlı Filtre:</span>
-                            {[
-                                { key: 'all', label: 'Tüm Modeller' },
-                                { key: 'quiet', label: 'En Sessiz' },
-                                { key: 'powerful', label: 'En Güçlü' }
-                            ].map((filter) => (
-                                <button
-                                    key={filter.key}
-                                    onClick={() => setActiveFilter(filter.key)}
-                                    className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${activeFilter === filter.key
-                                        ? 'bg-primary-navy text-white border-primary-navy'
-                                        : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'
-                                        }`}
-                                >
-                                    {filter.label}
-                                </button>
+                        {/* Product Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {filteredProducts.map(product => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    layout="grid"
+                                    hidePrice={!!category.metadata?.hide_price}
+                                />
                             ))}
                         </div>
-                    </div>
 
-                    {/* Product Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredProducts.map(product => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                layout="grid"
-                                hidePrice={!!category.metadata?.hide_price}
-                            />
-                        ))}
+                        {filteredProducts.length === 0 && (
+                            <div className="text-center py-12 text-steel-gray">
+                                <Filter size={48} className="mx-auto mb-4 opacity-30" />
+                                <p>Bu filtreye uygun ürün bulunamadı.</p>
+                            </div>
+                        )}
                     </div>
-
-                    {filteredProducts.length === 0 && (
-                        <div className="text-center py-12 text-steel-gray">
-                            <Filter size={48} className="mx-auto mb-4 opacity-30" />
-                            <p>Bu filtreye uygun ürün bulunamadı.</p>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

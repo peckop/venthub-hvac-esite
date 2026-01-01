@@ -199,6 +199,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                 </button>
             </div>
 
+
             {/* Progress Indicators */}
             <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-2">
                 {mainCategories.map((_, idx) => (
