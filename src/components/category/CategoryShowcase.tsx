@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Category } from '../../lib/supabase'
-import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2, ChevronDown } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 
@@ -65,7 +65,20 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         </div>
                     </div>
                 </div>
+
+                {/* Animated Scroll Down Indicator */}
+                <button
+                    onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
+                    aria-label="Devamını keşfet"
+                >
+                    <span className="text-xs uppercase tracking-widest font-medium">Devamını Keşfet</span>
+                    <ChevronDown className="w-6 h-6" />
+                </button>
             </div>
+
+            {/* Scroll Anchor */}
+            <div id="content-start" className="scroll-mt-20" />
 
             {/* Enhanced Needs Analysis Wizard */}
             <EnhancedNeedsWizard
@@ -138,28 +151,31 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Technical Diagram Section (Air Curtains only) */}
-            {isAirCurtain && (
-                <div className="bg-primary-navy py-16">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-8">
-                            <h2 className="text-3xl font-bold text-white mb-4">Nasıl Çalışır?</h2>
-                            <p className="text-gray-300 max-w-2xl mx-auto">
-                                Hava perdesi, görünmez bir bariyer oluşturarak iç ve dış ortamı birbirinden ayırır.
-                            </p>
-                        </div>
-                        <div className="flex justify-center">
-                            <img
-                                src="/images/category/air-curtain-diagram.png"
-                                alt="Hava Perdesi Çalışma Prensibi"
-                                className="max-w-full md:max-w-4xl rounded-xl shadow-2xl"
-                            />
+            {
+                isAirCurtain && (
+                    <div className="bg-primary-navy py-16">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="text-center mb-8">
+                                <h2 className="text-3xl font-bold text-white mb-4">Nasıl Çalışır?</h2>
+                                <p className="text-gray-300 max-w-2xl mx-auto">
+                                    Hava perdesi, görünmez bir bariyer oluşturarak iç ve dış ortamı birbirinden ayırır.
+                                </p>
+                            </div>
+                            <div className="flex justify-center">
+                                <img
+                                    src="/images/category/air-curtain-diagram.png"
+                                    alt="Hava Perdesi Çalışma Prensibi"
+                                    className="max-w-full md:max-w-4xl rounded-xl shadow-2xl"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Series Grid */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -233,7 +249,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
