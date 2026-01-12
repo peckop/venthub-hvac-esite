@@ -5,13 +5,11 @@ import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
 import TrustSection from '../components/TrustSection'
 import LeadModal from '../components/LeadModal'
-import { getActiveApplicationCards } from '../config/applications'
-import { iconFor, gridColsClass } from '../utils/applicationUi'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
-import { ProductsHero, CategoryShowcaseCards } from '../components/products'
+import { ProductsHero, CategoryShowcaseCards, ApplicationCards } from '../components/products'
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -474,7 +472,6 @@ const ProductsPage: React.FC = () => {
           {/* Discovery Content (Hero, Featured, etc.) */}
           {isDiscovery && (
             <DiscoveryContent
-              t={t}
               appSectionRef={appSectionRef}
               searchValue={inputValue}
               onSearchChange={setInputValue}
@@ -534,21 +531,18 @@ const ProductsPage: React.FC = () => {
 
 // Sub-component to keep main file clean
 const DiscoveryContent = ({
-  t,
   appSectionRef,
   searchValue,
   onSearchChange,
   searchInputRef
 }: {
-  t: (key: string) => string
   appSectionRef: React.RefObject<HTMLDivElement | null>
   searchValue: string
   onSearchChange: (value: string) => void
   searchInputRef?: React.RefObject<HTMLInputElement>
 }) => {
-  const appCards = getActiveApplicationCards()
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Premium Hero with Search */}
       <ProductsHero
         searchValue={searchValue}
@@ -560,19 +554,9 @@ const DiscoveryContent = ({
       <CategoryShowcaseCards />
 
       {/* Application Areas */}
-      <section id="applications" ref={appSectionRef}>
-        <h2 className="text-xl font-bold text-industrial-gray mb-6">{t('products.applicationTitle')}</h2>
-        <div className={gridColsClass(appCards.length)}>
-          {appCards.map(card => (
-            <Link key={card.key} to={card.href} className="flex flex-col items-center p-6 bg-white border rounded-xl hover:shadow-lg transition text-center group">
-              <div className="p-3 bg-gray-50 rounded-full mb-4 group-hover:bg-primary-navy/10 text-primary-navy">
-                {iconFor(card.icon, 24)}
-              </div>
-              <h3 className="font-semibold text-industrial-gray">{t(`applications.${card.key}.title`)}</h3>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <div ref={appSectionRef}>
+        <ApplicationCards />
+      </div>
 
       <BrandsShowcase />
       <TrustSection />
