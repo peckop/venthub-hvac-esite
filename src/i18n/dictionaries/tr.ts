@@ -235,7 +235,12 @@ export const tr = {
     searchResultsTitle: 'Arama Sonuçları',
     searchSeoTitle: 'Arama: {{q}}',
     searchSeoDesc: '"{{q}}" arama sonuçları',
-    discoverSeoDesc: 'VentHub keşfet: ürünleri, öne çıkanları ve popüler kategorileri görüntüleyin.'
+    discoverSeoDesc: 'VentHub keşfet: ürünleri, öne çıkanları ve popüler kategorileri görüntüleyin.',
+    // Hub Section
+    hubBadge: "Türkiye'nin HVAC Uzmanı",
+    hubTitle: "Profesyonel HVAC Çözümleri",
+    hubSubtitle: "Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınıza uygun ürünü birlikte bulalım.",
+    searchPlaceholder: "Ürün veya model ara..."
   },
   applications: {
     parking: {
