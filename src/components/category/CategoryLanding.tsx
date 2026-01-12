@@ -33,7 +33,8 @@ import {
     VorticeBrand,
     TypeComparison,
     FAQ,
-    TrustSignals
+    TrustSignals,
+    BottomCTA
 } from './sections'
 
 interface CategoryLandingProps {
@@ -405,6 +406,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
                             {/* Section 8: FAQ */}
                             <FAQ />
+
+                            {/* Section 9: Bottom CTA */}
+                            <BottomCTA
+                                onOpenWizard={() => setWizardOpen(true)}
+                                onShowProducts={handleShowProducts}
+                                showWizard={true}
+                                categoryName="Hava Perdesi"
+                            />
                         </>
                     )
                 }

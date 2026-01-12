@@ -18,6 +18,22 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
         features: []
     },
 
+    // Main Category: Fanlar -> Showcase Mode
+    'fanlar': {
+        display_mode: 'showcase',
+        hero_title: 'Endüstriyel Fanlar',
+        hero_description: 'Yüksek verimli, düşük gürültülü profesyonel fan çözümleri. Çatı tipi, kanal tipi, basınçlandırma ve daha fazlası.',
+        features: []
+    },
+
+    // Main Category: Isı Geri Kazanım Cihazları -> Showcase Mode
+    'isi-geri-kazanim-cihazlari': {
+        display_mode: 'showcase',
+        hero_title: 'Isı Geri Kazanım Cihazları',
+        hero_description: 'Enerji tasarrufu ve temiz hava sağlayan profesyonel HRV/ERV sistemleri.',
+        features: []
+    },
+
     // Sub Category: Elektrikli Isıtıcılı -> Series Mode
     'elektrikli-isitici': {
         display_mode: 'series',
@@ -50,3 +66,4 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
         ]
     }
 }
+
