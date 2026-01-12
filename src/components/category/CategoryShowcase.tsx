@@ -4,6 +4,7 @@ import { Category } from '../../lib/supabase'
 import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2, ChevronDown } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
+import { BottomCTA } from './sections'
 
 interface CategoryShowcaseProps {
     category: Category
@@ -249,6 +250,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     </div>
                 </div>
             </div>
+
+            {/* Bottom CTA Section */}
+            <BottomCTA
+                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
+                showWizard={isAirCurtain}
+                categoryName={category.name}
+            />
         </div >
     )
 }
