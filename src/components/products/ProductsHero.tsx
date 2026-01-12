@@ -9,8 +9,8 @@ interface ProductsHeroProps {
 }
 
 /**
- * Products Hub Hero Section
- * Premium gradient hero with search functionality
+ * Products Hub Hero Section - Pixel-perfect mockup implementation
+ * Dark navy gradient with centered title and clean search bar
  */
 const ProductsHero: React.FC<ProductsHeroProps> = ({
     searchValue,
@@ -20,44 +20,40 @@ const ProductsHero: React.FC<ProductsHeroProps> = ({
     const { t } = useI18n()
 
     return (
-        <section className="relative bg-gradient-to-br from-primary-navy via-slate-800 to-primary-navy rounded-2xl overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-secondary-blue rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+        <section className="relative bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] rounded-2xl overflow-hidden">
+            {/* Subtle background pattern lines like mockup */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-600/20 to-transparent" />
+                <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-600/10 to-transparent" />
+                <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-600/10 to-transparent" />
+                {/* Diagonal lines */}
+                <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+                    <div className="absolute inset-0 transform rotate-45 translate-x-1/2 -translate-y-1/2">
+                        <div className="w-full h-px bg-white mb-4" />
+                        <div className="w-full h-px bg-white mb-4" />
+                        <div className="w-full h-px bg-white mb-4" />
+                    </div>
+                </div>
             </div>
 
             {/* Content */}
-            <div className="relative z-10 px-8 py-12 md:py-16 text-center">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                    <span className="text-sm text-gray-200 font-medium">
-                        {t('products.hubBadge') || 'Türkiye\'nin HVAC Uzmanı'}
-                    </span>
-                </div>
-
-                {/* Title */}
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+            <div className="relative z-10 px-8 py-14 md:py-16 text-center">
+                {/* Title - Large and bold like mockup */}
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8 tracking-tight">
                     {t('products.hubTitle') || 'Profesyonel HVAC Çözümleri'}
                 </h1>
 
-                {/* Subtitle */}
-                <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-                    {t('products.hubSubtitle') || 'Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınıza uygun ürünü birlikte bulalım.'}
-                </p>
-
-                {/* Search Bar */}
-                <div className="max-w-xl mx-auto">
+                {/* Search Bar - Clean, rounded, centered like mockup */}
+                <div className="max-w-md mx-auto">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
                             ref={searchInputRef}
                             type="text"
                             value={searchValue}
                             onChange={(e) => onSearchChange(e.target.value)}
-                            placeholder={t('products.searchPlaceholder') || 'Ürün veya model ara...'}
-                            className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 focus:bg-white/20 focus:border-white/40 focus:outline-none transition-all"
+                            placeholder={t('products.searchPlaceholder') || 'Ürün veya kategori arayın...'}
+                            className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all text-sm"
                         />
                     </div>
                 </div>
