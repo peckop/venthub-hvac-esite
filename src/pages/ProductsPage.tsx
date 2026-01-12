@@ -11,6 +11,7 @@ import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
+import { ProductsHero, CategoryShowcaseCards } from '../components/products'
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -475,6 +476,9 @@ const ProductsPage: React.FC = () => {
             <DiscoveryContent
               t={t}
               appSectionRef={appSectionRef}
+              searchValue={inputValue}
+              onSearchChange={setInputValue}
+              searchInputRef={searchInputRef}
             />
           )}
 
@@ -529,20 +533,33 @@ const ProductsPage: React.FC = () => {
 }
 
 // Sub-component to keep main file clean
-const DiscoveryContent = ({ t, appSectionRef }: { t: (key: string) => string, appSectionRef: React.RefObject<HTMLDivElement | null> }) => {
+const DiscoveryContent = ({
+  t,
+  appSectionRef,
+  searchValue,
+  onSearchChange,
+  searchInputRef
+}: {
+  t: (key: string) => string
+  appSectionRef: React.RefObject<HTMLDivElement | null>
+  searchValue: string
+  onSearchChange: (value: string) => void
+  searchInputRef?: React.RefObject<HTMLInputElement>
+}) => {
   const appCards = getActiveApplicationCards()
   return (
-    <div className="space-y-12">
-      <section className="bg-gradient-to-r from-primary-navy to-secondary-blue rounded-2xl p-8 text-white">
-        <h1 className="text-3xl font-bold mb-4">{t('products.heroTitle')}</h1>
-        <p className="mb-6 opacity-90">{t('products.heroSubtitle')}</p>
-        <div className="flex gap-4">
-          <Link to="/products?all=1" className="bg-white text-primary-navy px-6 py-2 rounded-lg font-semibold hover:bg-gray-50 transition">
-            {t('common.seeAllProducts')}
-          </Link>
-        </div>
-      </section>
+    <div className="space-y-8">
+      {/* Premium Hero with Search */}
+      <ProductsHero
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        searchInputRef={searchInputRef}
+      />
 
+      {/* Category Showcase Cards */}
+      <CategoryShowcaseCards />
+
+      {/* Application Areas */}
       <section id="applications" ref={appSectionRef}>
         <h2 className="text-xl font-bold text-industrial-gray mb-6">{t('products.applicationTitle')}</h2>
         <div className={gridColsClass(appCards.length)}>
