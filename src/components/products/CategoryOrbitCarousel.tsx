@@ -128,11 +128,6 @@ const CategoryOrbitCarousel = () => {
     }, [])
 
     // Radial Menu Aksiyonları
-    const handleSelectSubcategories = useCallback(() => {
-        // TODO: Faz 4.2'de alt kategoriler radial genişlemesi
-        console.warn('[Radial] Alt kategoriler seçildi:', radialMenuCategoryId)
-    }, [radialMenuCategoryId])
-
     const handleSelectProducts = useCallback(() => {
         // Kategori sayfasına git (ileride VentHub Geçişi ile)
         if (radialMenuCategoryId) {
@@ -140,18 +135,17 @@ const CategoryOrbitCarousel = () => {
         }
     }, [radialMenuCategoryId, navigate])
 
-    const handleSelectWizard = useCallback(() => {
-        // Wizard sayfasına git
+    const handleSelectQuote = useCallback(() => {
+        // Teklif Al - İletişim sayfasına yönlendir
         if (radialMenuCategoryId) {
-            navigate(`/category/${radialMenuCategoryId}#wizard`)
+            navigate(`/contact?category=${radialMenuCategoryId}&action=quote`)
         }
     }, [radialMenuCategoryId, navigate])
 
-    const handleSelectQuote = useCallback(() => {
-        // Teklif Al - İletişim sayfasına yönlendir veya modal aç
-        // Şimdilik kategori parametresiyle iletişim sayfasına
+    const handleSelectSubcategory = useCallback((subSlug: string) => {
+        // Alt kategori sayfasına git
         if (radialMenuCategoryId) {
-            navigate(`/contact?category=${radialMenuCategoryId}&action=quote`)
+            navigate(`/category/${radialMenuCategoryId}/${subSlug}`)
         }
     }, [radialMenuCategoryId, navigate])
 
@@ -187,10 +181,9 @@ const CategoryOrbitCarousel = () => {
                 onClose={handleCloseRadialMenu}
                 position={radialMenuPosition}
                 categoryId={radialMenuCategoryId || ''}
-                onSelectSubcategories={handleSelectSubcategories}
                 onSelectProducts={handleSelectProducts}
-                onSelectWizard={handleSelectWizard}
                 onSelectQuote={handleSelectQuote}
+                onSelectSubcategory={handleSelectSubcategory}
             />
         </section>
     )
