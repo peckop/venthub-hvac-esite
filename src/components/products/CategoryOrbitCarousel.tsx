@@ -1,8 +1,10 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Wind, Zap, Activity, Fan, Settings, Droplets } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 import CategoryPreviewPanel, { CategoryPreviewData } from './CategoryPreviewPanel'
+import RadialActionMenu from './RadialActionMenu'
 import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
 
 // --- Category Data using OFFICIAL SLUGS from categoryRegistry ---
@@ -101,11 +103,54 @@ const categories: CategoryCard[] = [
 ]
 
 const CategoryOrbitCarousel = () => {
+    const navigate = useNavigate()
+    const containerRef = useRef<HTMLElement>(null)
+
+    // Quick View Panel State (korunuyor)
     const [selectedCategory, setSelectedCategory] = useState<CategoryPreviewData | null>(null)
     const [isPanelOpen, setIsPanelOpen] = useState(false)
 
-    const handleCardClick = useCallback((itemId: string) => {
+    // Radial Menu State
+    const [isRadialMenuOpen, setIsRadialMenuOpen] = useState(false)
+    const [radialMenuPosition, setRadialMenuPosition] = useState({ x: 0, y: 0 })
+    const [radialMenuCategoryId, setRadialMenuCategoryId] = useState<string | null>(null)
+    const [radialMenuCategoryTitle, setRadialMenuCategoryTitle] = useState('')
+
+    // Kart tıklandığında Radial Menu aç
+    const handleCardClick = useCallback((itemId: string, event?: MouseEvent) => {
         const category = categories.find(c => c.id === itemId)
+        if (category) {
+            // Tıklama pozisyonunu al (ekran ortasına yakın)
+            const x = event?.clientX ?? window.innerWidth / 2
+            const y = event?.clientY ?? window.innerHeight / 2
+
+            setRadialMenuCategoryId(itemId)
+            setRadialMenuCategoryTitle(category.title)
+            setRadialMenuPosition({ x, y })
+            setIsRadialMenuOpen(true)
+        }
+    }, [])
+
+    const handleCloseRadialMenu = useCallback(() => {
+        setIsRadialMenuOpen(false)
+    }, [])
+
+    // Radial Menu Aksiyonları
+    const handleSelectSubcategories = useCallback(() => {
+        // TODO: Faz 4.2'de alt kategoriler radial genişlemesi
+        console.warn('[Radial] Alt kategoriler seçildi:', radialMenuCategoryId)
+    }, [radialMenuCategoryId])
+
+    const handleSelectProductInfo = useCallback(() => {
+        // Kategori sayfasına git (ileride VentHub Geçişi ile)
+        if (radialMenuCategoryId) {
+            navigate(`/category/${radialMenuCategoryId}`)
+        }
+    }, [radialMenuCategoryId, navigate])
+
+    const handleSelectPriceInfo = useCallback(() => {
+        // Quick View Panel'i aç (fiyat bilgisi için)
+        const category = categories.find(c => c.id === radialMenuCategoryId)
         if (category) {
             setSelectedCategory({
                 id: category.id,
@@ -119,14 +164,21 @@ const CategoryOrbitCarousel = () => {
             })
             setIsPanelOpen(true)
         }
-    }, [])
+    }, [radialMenuCategoryId])
+
+    const handleSelectTechnicalWizard = useCallback(() => {
+        // Wizard sayfasına git
+        if (radialMenuCategoryId) {
+            navigate(`/category/${radialMenuCategoryId}#wizard`)
+        }
+    }, [radialMenuCategoryId, navigate])
 
     const handleClosePanel = useCallback(() => {
         setIsPanelOpen(false)
     }, [])
 
     return (
-        <section className="bg-[#020617] overflow-hidden relative">
+        <section ref={containerRef} className="bg-[#020617] overflow-hidden relative">
             {/* Background Atmosphere */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/50 via-[#020617] to-[#020617] pointer-events-none" />
 
@@ -143,14 +195,27 @@ const CategoryOrbitCarousel = () => {
             </div>
 
             <div className="container mx-auto px-4 relative z-10 w-full">
-                {/* 3D Showcase - Pass category data with correct slugs */}
+                {/* 3D Showcase */}
                 <OrbitalProductsShowcase
                     items={categories.map(c => ({ id: c.id, title: c.title, image: c.image }))}
                     onCardClick={handleCardClick}
                 />
             </div>
 
-            {/* Quick View Panel */}
+            {/* Radial Action Menu */}
+            <RadialActionMenu
+                isOpen={isRadialMenuOpen}
+                onClose={handleCloseRadialMenu}
+                position={radialMenuPosition}
+                categoryId={radialMenuCategoryId || ''}
+                categoryTitle={radialMenuCategoryTitle}
+                onSelectSubcategories={handleSelectSubcategories}
+                onSelectProductInfo={handleSelectProductInfo}
+                onSelectPriceInfo={handleSelectPriceInfo}
+                onSelectTechnicalWizard={handleSelectTechnicalWizard}
+            />
+
+            {/* Quick View Panel (korunuyor, fiyat bilgisi için kullanılıyor) */}
             <CategoryPreviewPanel
                 category={selectedCategory}
                 isOpen={isPanelOpen}
@@ -161,4 +226,5 @@ const CategoryOrbitCarousel = () => {
 }
 
 export default CategoryOrbitCarousel
+
 
