@@ -1,6 +1,6 @@
 import React, { Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { PerspectiveCamera, Image, Float, shaderMaterial, Stars, Sparkles } from '@react-three/drei'
+import { PerspectiveCamera, Image, Float, shaderMaterial, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 import { extend } from '@react-three/fiber'
 
@@ -59,10 +59,16 @@ const HolographicMaterial = shaderMaterial(
 
 extend({ HolographicMaterial })
 
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            holographicMaterial: any
+// ThreeElements is used in the module declaration below
+import type { ThreeElements as _ThreeElements } from '@react-three/fiber'
+
+declare module '@react-three/fiber' {
+    interface ThreeElements {
+        holographicMaterial: _ThreeElements['shaderMaterial'] & {
+            uTime?: number
+            uColor?: THREE.Color
+            uTexture?: THREE.Texture
+            uOpacity?: number
         }
     }
 }
@@ -73,11 +79,11 @@ declare global {
  */
 const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
     const meshRef = useRef<THREE.Mesh>(null)
-    const materialRef = useRef<any>(null)
+    const materialRef = useRef<THREE.ShaderMaterial>(null)
 
     useFrame((state) => {
         if (materialRef.current) {
-            materialRef.current.uTime = state.clock.getElapsedTime()
+            materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
         }
         // Subtle tilt based on mouse position (Parallax)
         if (meshRef.current) {
@@ -146,7 +152,7 @@ const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image, className }) =
  * Local error boundary to prevent the whole page from crashing if WebGL fails
  */
 class ErrorBoundaryFallback extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-    constructor(props: any) {
+    constructor(props: { children: React.ReactNode }) {
         super(props);
         this.state = { hasError: false };
     }

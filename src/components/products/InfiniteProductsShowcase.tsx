@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Text } from '@react-three/drei'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom'
@@ -66,7 +66,7 @@ const ProductCard: React.FC<{
         }
     })
 
-    const handleClick = (e: any) => {
+    const handleClick = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         navigate(`/category/${item.id}`)
     }

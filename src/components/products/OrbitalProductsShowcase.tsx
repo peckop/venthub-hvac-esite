@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom'
@@ -34,11 +34,10 @@ const OrbitalCard: React.FC<{
     sharedState: React.MutableRefObject<SharedState>
     isPaused: boolean
     onHover: (hovering: boolean) => void
-    onInteract: () => void
     onBringToFront: (index: number) => void
     setIsDragging: (dragging: boolean) => void
     isDraggingRef: React.MutableRefObject<boolean>
-}> = ({ item, index, total, sharedState, isPaused, onHover, onInteract, onBringToFront, setIsDragging, isDraggingRef }) => {
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -96,7 +95,7 @@ const OrbitalCard: React.FC<{
     })
 
     const triggerAction = useCallback(() => {
-        console.log(`[CLICK] Card ${index} triggered`)
+        console.warn(`[CLICK] Card ${index} triggered`)
 
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
         setIsDragging(false)
@@ -106,23 +105,23 @@ const OrbitalCard: React.FC<{
     }, [index, onBringToFront, setIsDragging, isDraggingRef])
 
     // Standart onClick
-    const handleClick = useCallback((e: any) => {
+    const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         triggerAction()
     }, [triggerAction])
 
     // Manuel "Robust" Click Detection
-    const handlePointerDown = useCallback((e: any) => {
-        pointerDownPos.current = { x: e.clientX, y: e.clientY }
+    const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
+        pointerDownPos.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }
         pointerDownTime.current = Date.now()
     }, [])
 
-    const handlePointerUp = useCallback((e: any) => {
+    const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
         const now = Date.now()
         const duration = now - pointerDownTime.current
         const dist = Math.sqrt(
-            Math.pow(e.clientX - pointerDownPos.current.x, 2) +
-            Math.pow(e.clientY - pointerDownPos.current.y, 2)
+            Math.pow(e.nativeEvent.clientX - pointerDownPos.current.x, 2) +
+            Math.pow(e.nativeEvent.clientY - pointerDownPos.current.y, 2)
         )
 
         // Sürükleme yoksa tıkla!
@@ -131,19 +130,19 @@ const OrbitalCard: React.FC<{
         }
     }, [triggerAction])
 
-    const handleDoubleClick = useCallback((e: any) => {
+    const handleDoubleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         navigate(`/category/${item.id}`)
     }, [navigate, item.id])
 
-    const handlePointerOver = (e: any) => {
+    const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation() // Sadece BU kart hover alsın, arkadakiler almasın
         setHover(true)
         onHover(true)
         document.body.style.cursor = 'pointer'
     }
 
-    const handlePointerOut = (e: any) => {
+    const handlePointerOut = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation()
         setHover(false)
         onHover(false)
@@ -226,13 +225,12 @@ const SceneContent: React.FC<{
     items: ProductItem[]
     isPaused: boolean
     onHover: (h: boolean) => void
-    isDragging: boolean
     dragDelta: number
     onInteract: () => void
     sharedState: React.MutableRefObject<SharedState>
     isDraggingRef: React.MutableRefObject<boolean>
     setIsDragging: (val: boolean) => void
-}> = ({ items, isPaused, onHover, isDragging, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging }) => {
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging }) => {
     const { camera } = useThree()
 
     // Kartı öne getirme
@@ -248,7 +246,7 @@ const SceneContent: React.FC<{
         const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
 
         if (Math.abs(shortestDiff) < 0.01 && sharedState.current.target === null) {
-            console.log("Already active, skipping")
+            // Zaten öndeyse, kart detayını açma veya pasif durma aksiyonu buraya gelebilir
             return
         }
 
@@ -259,7 +257,7 @@ const SceneContent: React.FC<{
         sharedState.current.velocity = 0
         sharedState.current.pauseUntil = Date.now() + 4000
 
-        console.log("Bringing to front", index, "target:", sharedState.current.target)
+        console.warn("Bringing to front", index, "target:", sharedState.current.target)
     }, [items.length, onInteract, sharedState, isDraggingRef])
 
     useFrame((state, delta) => {
@@ -304,6 +302,26 @@ const SceneContent: React.FC<{
         else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
             sharedState.current.rotation -= delta * CONFIG.autoRotateSpeed
         }
+        // SNAP-TO-CENTER (Mıknatıslanma)
+        // Eğer hiçbir hareket yoksa ve bir yere gitmiyorsak, en yakın kartı ortaya çek
+        else if (!isDraggingRef.current && sharedState.current.target === null && Math.abs(sharedState.current.velocity) < 0.01) {
+            const total = items.length
+            const currentRot = sharedState.current.rotation
+            const step = (Math.PI * 2) / total
+
+            // En yakın kartın hedefini bul
+            const closestTarget = Math.round(-currentRot / step) * step
+            const diff = -closestTarget - currentRot
+            const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
+
+            // Eğer çok küçük bir fark varsa direkt eşitle (titremeyi önle)
+            if (Math.abs(shortestDiff) < 0.001) {
+                sharedState.current.rotation = -closestTarget
+            } else {
+                // Yavaşça merkeze çek (smooth snap)
+                sharedState.current.rotation += shortestDiff * 0.1
+            }
+        }
 
         camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
@@ -327,7 +345,6 @@ const SceneContent: React.FC<{
                     sharedState={sharedState}
                     isPaused={isPaused}
                     onHover={onHover}
-                    onInteract={onInteract}
                     onBringToFront={handleBringToFront}
                     setIsDragging={setIsDragging}
                     isDraggingRef={isDraggingRef}
@@ -435,7 +452,6 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     items={items}
                     isPaused={isPaused || isDragging}
                     onHover={setIsPaused}
-                    isDragging={isDragging}
                     isDraggingRef={isDraggingRef}
                     dragDelta={dragDelta}
                     onInteract={hideHint}

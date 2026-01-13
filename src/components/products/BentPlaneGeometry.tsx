@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, ThreeEvent } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useScroll, useCursor } from '@react-three/drei'
 import { shaderMaterial } from '@react-three/drei'
@@ -72,10 +72,15 @@ const BentPlaneMaterial = shaderMaterial(
 
 extend({ BentPlaneMaterial })
 
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            bentPlaneMaterial: any
+// ThreeElements is used in the module declaration below
+import type { ThreeElements as _ThreeElements } from '@react-three/fiber'
+
+declare module '@react-three/fiber' {
+    interface ThreeElements {
+        bentPlaneMaterial: _ThreeElements['shaderMaterial'] & {
+            uTexture?: THREE.Texture
+            uHover?: number
+            uColor?: THREE.Color
         }
     }
 }
@@ -84,18 +89,15 @@ interface BentPlaneGeometryProps {
     image: string
     id: string
     position?: [number, number, number]
-    gap?: number
-    index: number
-    total: number
 }
 
 /**
  * BentPlaneGeometry - Individual curved product card
  * Note: Position is now controlled by parent ProductCard component
  */
-const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, position = [0, 0, 0], index, total, gap = 4 }) => {
+const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, position = [0, 0, 0] }) => {
     const meshRef = useRef<THREE.Mesh>(null)
-    const materialRef = useRef<any>(null)
+    const materialRef = useRef<THREE.ShaderMaterial>(null)
     const scroll = useScroll()
     const navigate = useNavigate()
     const [hovered, setHover] = useState(false)
@@ -111,8 +113,10 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
         if (!meshRef.current || !materialRef.current) return
 
         // Update shader uniforms
-        materialRef.current.uScrollOffset = scroll.offset
-        materialRef.current.uHover = THREE.MathUtils.lerp(materialRef.current.uHover, hovered ? 1 : 0, 0.1)
+        if (materialRef.current.uniforms.uScrollOffset) {
+            materialRef.current.uniforms.uScrollOffset.value = scroll.offset
+        }
+        materialRef.current.uniforms.uHover.value = THREE.MathUtils.lerp(materialRef.current.uniforms.uHover.value, hovered ? 1 : 0, 0.1)
 
         // Scale on hover for zoom effect
         const targetScale = hovered ? 1.1 : 1.0
@@ -120,7 +124,7 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
         meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, targetScale, 0.1)
     })
 
-    const handleClick = (e: any) => {
+    const handleClick = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         navigate(`/category/${id}`)
     }
