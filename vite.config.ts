@@ -94,6 +94,7 @@ export default defineConfig(({ mode }) => {
     // Ignore non-React HTML files from dependency scanning
     optimizeDeps: {
       entries: ['index.html', 'src/**/*.{ts,tsx,js,jsx}'],
+      include: ['three', '@react-three/fiber', '@react-three/drei'],
     },
     server: {
       watch: {
@@ -154,6 +155,9 @@ export default defineConfig(({ mode }) => {
 
       // Optimize asset handling
       assetsInlineLimit: 4096, // Inline assets smaller than 4KB
+      commonjsOptions: {
+        include: [/three/, /node_modules/],
+      },
     },
   }
 })

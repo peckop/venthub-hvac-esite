@@ -9,7 +9,7 @@ import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
-import { ProductsHero, CategoryShowcaseCards, ApplicationCards } from '../components/products'
+import { CategoryOrbitCarousel, ApplicationCards } from '../components/products'
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -420,20 +420,20 @@ const ProductsPage: React.FC = () => {
         <span className="text-industrial-gray font-medium">{breadcrumbLabel}</span>
       </div>
 
-      {/* Search Header (Always Visible in Search Mode) */}
-      <div className="flex flex-col lg:flex-row gap-6 mb-8">
-        <div className="flex-1 relative">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
-            className="w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all"
-          />
-        </div>
-        {!isDiscovery && (
+      {/* Search Header - Only in Search/Filter Mode */}
+      {!isDiscovery && (
+        <div className="flex flex-col lg:flex-row gap-6 mb-8">
+          <div className="flex-1 relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
+              className="w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all"
+            />
+          </div>
           <div className="flex gap-2">
             <button
               onClick={() => setViewMode('grid')}
@@ -448,8 +448,8 @@ const ProductsPage: React.FC = () => {
               <ListIcon size={20} />
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
@@ -469,14 +469,9 @@ const ProductsPage: React.FC = () => {
 
         {/* Listenin Ana Gövdesi */}
         <div className="flex-1">
-          {/* Discovery Content (Hero, Featured, etc.) */}
+          {/* Discovery Content */}
           {isDiscovery && (
-            <DiscoveryContent
-              appSectionRef={appSectionRef}
-              searchValue={inputValue}
-              onSearchChange={setInputValue}
-              searchInputRef={searchInputRef}
-            />
+            <DiscoveryContent appSectionRef={appSectionRef} />
           )}
 
 
@@ -531,27 +526,14 @@ const ProductsPage: React.FC = () => {
 
 // Sub-component to keep main file clean
 const DiscoveryContent = ({
-  appSectionRef,
-  searchValue,
-  onSearchChange,
-  searchInputRef
+  appSectionRef
 }: {
   appSectionRef: React.RefObject<HTMLDivElement | null>
-  searchValue: string
-  onSearchChange: (value: string) => void
-  searchInputRef?: React.RefObject<HTMLInputElement>
 }) => {
   return (
-    <div className="space-y-6">
-      {/* Premium Hero with Search */}
-      <ProductsHero
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
-        searchInputRef={searchInputRef}
-      />
-
-      {/* Category Showcase Cards */}
-      <CategoryShowcaseCards />
+    <div className="space-y-8">
+      {/* 3D Orbit Category Carousel - Now the hero */}
+      <CategoryOrbitCarousel />
 
       {/* Application Areas */}
       <div ref={appSectionRef}>
