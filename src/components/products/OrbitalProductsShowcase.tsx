@@ -13,6 +13,7 @@ interface ProductItem {
 
 interface OrbitalProductsShowcaseProps {
     items: ProductItem[]
+    onCardClick?: (itemId: string) => void
 }
 
 // Global rotation state management via Refs (High Performance)
@@ -37,7 +38,8 @@ const OrbitalCard: React.FC<{
     onBringToFront: (index: number) => void
     setIsDragging: (dragging: boolean) => void
     isDraggingRef: React.MutableRefObject<boolean>
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef }) => {
+    onCardClick?: (itemId: string) => void
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -101,14 +103,17 @@ const OrbitalCard: React.FC<{
     })
 
     const triggerAction = useCallback(() => {
-        console.warn(`[CLICK] Card ${index} triggered`)
-
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
         setIsDragging(false)
         isDraggingRef.current = false
 
         onBringToFront(index)
-    }, [index, onBringToFront, setIsDragging, isDraggingRef])
+
+        // Quick View Panel'i aç (eğer callback varsa)
+        if (onCardClick) {
+            onCardClick(item.id)
+        }
+    }, [index, onBringToFront, setIsDragging, isDraggingRef, onCardClick, item.id])
 
     // Standart onClick
     const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
@@ -236,7 +241,8 @@ const SceneContent: React.FC<{
     sharedState: React.MutableRefObject<SharedState>
     isDraggingRef: React.MutableRefObject<boolean>
     setIsDragging: (val: boolean) => void
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging }) => {
+    onCardClick?: (itemId: string) => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick }) => {
     const { camera } = useThree()
 
     // Kartı öne getirme
@@ -354,6 +360,7 @@ const SceneContent: React.FC<{
                     onBringToFront={handleBringToFront}
                     setIsDragging={setIsDragging}
                     isDraggingRef={isDraggingRef}
+                    onCardClick={onCardClick}
                 />
             ))}
 
@@ -373,7 +380,7 @@ const SceneContent: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -463,6 +470,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     onInteract={hideHint}
                     sharedState={sharedState}
                     setIsDragging={handleSetIsDragging}
+                    onCardClick={onCardClick}
                 />
             </Canvas>
             {/* Hint overlay */}
