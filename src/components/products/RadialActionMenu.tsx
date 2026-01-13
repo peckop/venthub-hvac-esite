@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Layers, FileText, Tag, Settings2 } from 'lucide-react'
+import { Layers, Eye, Wand2, MessageSquareText } from 'lucide-react'
 
 export interface RadialMenuItem {
     id: string
@@ -17,31 +17,30 @@ interface RadialActionMenuProps {
     position: { x: number; y: number }
     categoryId: string
     onSelectSubcategories: () => void
-    onSelectProductInfo: () => void
-    onSelectPriceInfo: () => void
-    onSelectTechnicalWizard: () => void
+    onSelectProducts: () => void
+    onSelectWizard: () => void
+    onSelectQuote: () => void
 }
 
 /**
- * Radial Action Menu - Geliştirilmiş Versiyon
- * Kart tıklandığında etrafında radial olarak seçenekler belirir
+ * Radial Action Menu - Optimized Version
  * 
- * İyileştirmeler:
- * - Merkez etiketi kaldırıldı (kart altında zaten var)
- * - Daha büyük ve gösterişli ikonlar
- * - Glow efektleri ve pulsing animasyon
- * - Etiketler her zaman görünür
+ * B2B kullanıcı yolculuğuna göre optimize edilmiş seçenekler:
+ * 1. Alt Kategoriler - Kategori içi gezinme
+ * 2. Ürünleri Gör - Ana aksiyon
+ * 3. Doğru Ürünü Bul - Wizard ile ürün seçimi
+ * 4. Teklif Al - B2B için kritik CTA
  */
 const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     isOpen,
     onClose,
     position,
     onSelectSubcategories,
-    onSelectProductInfo,
-    onSelectPriceInfo,
-    onSelectTechnicalWizard
+    onSelectProducts,
+    onSelectWizard,
+    onSelectQuote
 }) => {
-    // Menü öğeleri - daha gösterişli renkler
+    // Optimized menu items - B2B user journey focused
     const menuItems: RadialMenuItem[] = [
         {
             id: 'subcategories',
@@ -52,28 +51,28 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
             onClick: onSelectSubcategories
         },
         {
-            id: 'product-info',
-            label: 'Ürün Sayfası',
-            icon: <FileText className="w-7 h-7" />,
+            id: 'products',
+            label: 'Ürünleri Gör',
+            icon: <Eye className="w-7 h-7" />,
             color: 'from-emerald-400 via-emerald-500 to-teal-600',
             glowColor: 'shadow-emerald-500/50',
-            onClick: onSelectProductInfo
+            onClick: onSelectProducts
         },
         {
-            id: 'price-info',
-            label: 'Fiyat Bilgisi',
-            icon: <Tag className="w-7 h-7" />,
-            color: 'from-amber-400 via-orange-500 to-red-500',
-            glowColor: 'shadow-orange-500/50',
-            onClick: onSelectPriceInfo
-        },
-        {
-            id: 'technical-wizard',
-            label: 'Teknik Seçim',
-            icon: <Settings2 className="w-7 h-7" />,
+            id: 'wizard',
+            label: 'Doğru Ürünü Bul',
+            icon: <Wand2 className="w-7 h-7" />,
             color: 'from-violet-400 via-purple-500 to-pink-500',
             glowColor: 'shadow-purple-500/50',
-            onClick: onSelectTechnicalWizard
+            onClick: onSelectWizard
+        },
+        {
+            id: 'quote',
+            label: 'Teklif Al',
+            icon: <MessageSquareText className="w-7 h-7" />,
+            color: 'from-amber-400 via-orange-500 to-red-500',
+            glowColor: 'shadow-orange-500/50',
+            onClick: onSelectQuote
         }
     ]
 

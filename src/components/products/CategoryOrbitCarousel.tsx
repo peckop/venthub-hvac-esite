@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { Wind, Zap, Activity, Fan, Settings, Droplets } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
-import CategoryPreviewPanel, { CategoryPreviewData } from './CategoryPreviewPanel'
 import RadialActionMenu from './RadialActionMenu'
 import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
 
@@ -105,10 +104,6 @@ const categories: CategoryCard[] = [
 const CategoryOrbitCarousel = () => {
     const navigate = useNavigate()
 
-    // Quick View Panel State (korunuyor)
-    const [selectedCategory, setSelectedCategory] = useState<CategoryPreviewData | null>(null)
-    const [isPanelOpen, setIsPanelOpen] = useState(false)
-
     // Radial Menu State
     const [isRadialMenuOpen, setIsRadialMenuOpen] = useState(false)
     const [radialMenuPosition, setRadialMenuPosition] = useState({ x: 0, y: 0 })
@@ -138,41 +133,27 @@ const CategoryOrbitCarousel = () => {
         console.warn('[Radial] Alt kategoriler seçildi:', radialMenuCategoryId)
     }, [radialMenuCategoryId])
 
-    const handleSelectProductInfo = useCallback(() => {
+    const handleSelectProducts = useCallback(() => {
         // Kategori sayfasına git (ileride VentHub Geçişi ile)
         if (radialMenuCategoryId) {
             navigate(`/category/${radialMenuCategoryId}`)
         }
     }, [radialMenuCategoryId, navigate])
 
-    const handleSelectPriceInfo = useCallback(() => {
-        // Quick View Panel'i aç (fiyat bilgisi için)
-        const category = categories.find(c => c.id === radialMenuCategoryId)
-        if (category) {
-            setSelectedCategory({
-                id: category.id,
-                title: category.title,
-                description: category.description,
-                image: category.image,
-                icon: category.icon,
-                color: category.color,
-                productCount: category.productCount,
-                priceRange: category.priceRange
-            })
-            setIsPanelOpen(true)
-        }
-    }, [radialMenuCategoryId])
-
-    const handleSelectTechnicalWizard = useCallback(() => {
+    const handleSelectWizard = useCallback(() => {
         // Wizard sayfasına git
         if (radialMenuCategoryId) {
             navigate(`/category/${radialMenuCategoryId}#wizard`)
         }
     }, [radialMenuCategoryId, navigate])
 
-    const handleClosePanel = useCallback(() => {
-        setIsPanelOpen(false)
-    }, [])
+    const handleSelectQuote = useCallback(() => {
+        // Teklif Al - İletişim sayfasına yönlendir veya modal aç
+        // Şimdilik kategori parametresiyle iletişim sayfasına
+        if (radialMenuCategoryId) {
+            navigate(`/contact?category=${radialMenuCategoryId}&action=quote`)
+        }
+    }, [radialMenuCategoryId, navigate])
 
     return (
         <section className="bg-[#020617] overflow-hidden relative">
@@ -207,16 +188,9 @@ const CategoryOrbitCarousel = () => {
                 position={radialMenuPosition}
                 categoryId={radialMenuCategoryId || ''}
                 onSelectSubcategories={handleSelectSubcategories}
-                onSelectProductInfo={handleSelectProductInfo}
-                onSelectPriceInfo={handleSelectPriceInfo}
-                onSelectTechnicalWizard={handleSelectTechnicalWizard}
-            />
-
-            {/* Quick View Panel (korunuyor, fiyat bilgisi için kullanılıyor) */}
-            <CategoryPreviewPanel
-                category={selectedCategory}
-                isOpen={isPanelOpen}
-                onClose={handleClosePanel}
+                onSelectProducts={handleSelectProducts}
+                onSelectWizard={handleSelectWizard}
+                onSelectQuote={handleSelectQuote}
             />
         </section>
     )
