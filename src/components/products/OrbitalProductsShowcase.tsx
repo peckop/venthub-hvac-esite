@@ -467,6 +467,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                             <span className="flex items-center gap-2"><span className="text-cyan-400">↔</span> Sürükle Çevir</span>
                             <span className="text-cyan-500/50">•</span>
                             <span className="flex items-center gap-2"><span className="text-cyan-400">👆</span> Tıkla Seç</span>
+                            <span className="text-cyan-500/50">•</span>
+                            <span className="flex items-center gap-2"><span className="text-cyan-400">🖱️</span> Çift Tıkla İncele</span>
                         </div>
                     </div>
                 </div>
