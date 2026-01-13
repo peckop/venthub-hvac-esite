@@ -14,6 +14,7 @@ interface ProductItem {
 interface OrbitalProductsShowcaseProps {
     items: ProductItem[]
     onCardClick?: (itemId: string, event?: MouseEvent) => void
+    externalPause?: boolean
 }
 
 // Global rotation state management via Refs (High Performance)
@@ -381,7 +382,7 @@ const SceneContent: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -464,7 +465,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
                 <SceneContent
                     items={items}
-                    isPaused={isPaused || isDragging}
+                    isPaused={isPaused || isDragging || externalPause}
                     onHover={setIsPaused}
                     isDraggingRef={isDraggingRef}
                     dragDelta={dragDelta}

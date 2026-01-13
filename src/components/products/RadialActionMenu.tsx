@@ -7,6 +7,7 @@ export interface RadialMenuItem {
     label: string
     icon: React.ReactNode
     color: string
+    glowColor: string
     onClick: () => void
 }
 
@@ -15,7 +16,6 @@ interface RadialActionMenuProps {
     onClose: () => void
     position: { x: number; y: number }
     categoryId: string
-    categoryTitle: string
     onSelectSubcategories: () => void
     onSelectProductInfo: () => void
     onSelectPriceInfo: () => void
@@ -23,47 +23,56 @@ interface RadialActionMenuProps {
 }
 
 /**
- * Radial Action Menu
+ * Radial Action Menu - Geliştirilmiş Versiyon
  * Kart tıklandığında etrafında radial olarak seçenekler belirir
+ * 
+ * İyileştirmeler:
+ * - Merkez etiketi kaldırıldı (kart altında zaten var)
+ * - Daha büyük ve gösterişli ikonlar
+ * - Glow efektleri ve pulsing animasyon
+ * - Etiketler her zaman görünür
  */
 const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
     isOpen,
     onClose,
     position,
-    categoryTitle,
     onSelectSubcategories,
     onSelectProductInfo,
     onSelectPriceInfo,
     onSelectTechnicalWizard
 }) => {
-    // Menü öğeleri
+    // Menü öğeleri - daha gösterişli renkler
     const menuItems: RadialMenuItem[] = [
         {
             id: 'subcategories',
             label: 'Alt Kategoriler',
-            icon: <Layers className="w-5 h-5" />,
-            color: 'from-cyan-500 to-blue-600',
+            icon: <Layers className="w-7 h-7" />,
+            color: 'from-cyan-400 via-cyan-500 to-blue-600',
+            glowColor: 'shadow-cyan-500/50',
             onClick: onSelectSubcategories
         },
         {
             id: 'product-info',
-            label: 'Ürün Bilgi',
-            icon: <FileText className="w-5 h-5" />,
-            color: 'from-emerald-500 to-teal-600',
+            label: 'Ürün Sayfası',
+            icon: <FileText className="w-7 h-7" />,
+            color: 'from-emerald-400 via-emerald-500 to-teal-600',
+            glowColor: 'shadow-emerald-500/50',
             onClick: onSelectProductInfo
         },
         {
             id: 'price-info',
             label: 'Fiyat Bilgisi',
-            icon: <Tag className="w-5 h-5" />,
-            color: 'from-amber-500 to-orange-600',
+            icon: <Tag className="w-7 h-7" />,
+            color: 'from-amber-400 via-orange-500 to-red-500',
+            glowColor: 'shadow-orange-500/50',
             onClick: onSelectPriceInfo
         },
         {
             id: 'technical-wizard',
             label: 'Teknik Seçim',
-            icon: <Settings2 className="w-5 h-5" />,
-            color: 'from-violet-500 to-purple-600',
+            icon: <Settings2 className="w-7 h-7" />,
+            color: 'from-violet-400 via-purple-500 to-pink-500',
+            glowColor: 'shadow-purple-500/50',
             onClick: onSelectTechnicalWizard
         }
     ]
@@ -88,7 +97,7 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
 
     // Radial pozisyon hesaplama (4 öğe için 90° aralıklarla)
     const getItemPosition = (index: number, total: number) => {
-        const radius = 100 // px
+        const radius = 120 // px - daha geniş radius
         const startAngle = -90 // Üstten başla (derece)
         const angleStep = 360 / total
         const angle = (startAngle + index * angleStep) * (Math.PI / 180)
@@ -103,13 +112,13 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
+                    {/* Backdrop - blur efekti ile */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                        className="fixed inset-0 z-40"
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
                         onClick={handleBackdropClick}
                     />
 
@@ -122,19 +131,56 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
                             transform: 'translate(-50%, -50%)'
                         }}
                     >
-                        {/* Center Label */}
+                        {/* Merkez Glow Ring */}
                         <motion.div
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0, opacity: 0 }}
                             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
                             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                                       bg-slate-900/90 backdrop-blur-sm px-4 py-2 rounded-full
-                                       border border-white/20 text-white text-sm font-medium
-                                       whitespace-nowrap pointer-events-none"
+                                       w-20 h-20 rounded-full
+                                       bg-gradient-to-br from-cyan-500/20 to-purple-500/20
+                                       border border-white/10 backdrop-blur-sm"
                         >
-                            {categoryTitle}
+                            {/* Pulsing inner ring */}
+                            <motion.div
+                                animate={{
+                                    scale: [1, 1.2, 1],
+                                    opacity: [0.5, 0.2, 0.5]
+                                }}
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut'
+                                }}
+                                className="absolute inset-0 rounded-full bg-cyan-500/30"
+                            />
                         </motion.div>
+
+                        {/* Connection Lines */}
+                        {menuItems.map((item, index) => {
+                            const pos = getItemPosition(index, menuItems.length)
+                            const angle = Math.atan2(pos.y, pos.x) * (180 / Math.PI)
+                            const lineLength = Math.sqrt(pos.x * pos.x + pos.y * pos.y) - 40
+
+                            return (
+                                <motion.div
+                                    key={`line-${item.id}`}
+                                    initial={{ scaleX: 0, opacity: 0 }}
+                                    animate={{ scaleX: 1, opacity: 0.4 }}
+                                    exit={{ scaleX: 0, opacity: 0 }}
+                                    transition={{
+                                        duration: 0.3,
+                                        delay: index * 0.05
+                                    }}
+                                    className="absolute left-1/2 top-1/2 h-0.5 bg-gradient-to-r from-cyan-500/50 to-transparent origin-left"
+                                    style={{
+                                        width: lineLength,
+                                        transform: `rotate(${angle}deg) translateY(-50%)`
+                                    }}
+                                />
+                            )
+                        })}
 
                         {/* Menu Items */}
                         {menuItems.map((item, index) => {
@@ -153,47 +199,52 @@ const RadialActionMenu: React.FC<RadialActionMenuProps> = ({
                                     exit={{ scale: 0, opacity: 0, x: 0, y: 0 }}
                                     transition={{
                                         type: 'spring',
-                                        damping: 15,
-                                        stiffness: 300,
-                                        delay: index * 0.05
+                                        damping: 12,
+                                        stiffness: 200,
+                                        delay: index * 0.08
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         item.onClick()
                                         onClose()
                                     }}
-                                    className={`
-                                        absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                                        pointer-events-auto cursor-pointer
-                                        flex flex-col items-center gap-1
-                                        group
-                                    `}
+                                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                                               pointer-events-auto cursor-pointer
+                                               flex flex-col items-center gap-2
+                                               group"
                                 >
-                                    {/* Icon Circle */}
-                                    <div className={`
-                                        w-14 h-14 rounded-full
-                                        bg-gradient-to-br ${item.color}
-                                        flex items-center justify-center
-                                        text-white shadow-lg
-                                        transition-all duration-200
-                                        group-hover:scale-110 group-hover:shadow-xl
-                                        group-hover:shadow-cyan-500/30
-                                        border-2 border-white/20
-                                    `}>
-                                        {item.icon}
-                                    </div>
+                                    {/* Icon Circle - Daha büyük ve gösterişli */}
+                                    <motion.div
+                                        whileHover={{ scale: 1.15 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`
+                                            w-16 h-16 rounded-full
+                                            bg-gradient-to-br ${item.color}
+                                            flex items-center justify-center
+                                            text-white shadow-xl ${item.glowColor}
+                                            transition-shadow duration-300
+                                            group-hover:shadow-2xl
+                                            border-2 border-white/30
+                                            relative overflow-hidden
+                                        `}
+                                    >
+                                        {/* Inner shine effect */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20" />
+                                        <span className="relative z-10">{item.icon}</span>
+                                    </motion.div>
 
-                                    {/* Label */}
-                                    <span className="
-                                        text-xs font-medium text-white
-                                        bg-slate-900/80 px-2 py-1 rounded-md
-                                        whitespace-nowrap
-                                        opacity-0 group-hover:opacity-100
-                                        transition-opacity duration-200
-                                        absolute -bottom-8
-                                    ">
+                                    {/* Label - Her zaman görünür */}
+                                    <motion.span
+                                        initial={{ opacity: 0, y: -5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.2 + index * 0.05 }}
+                                        className="text-xs font-semibold text-white
+                                                   bg-slate-900/90 backdrop-blur-sm px-3 py-1.5 rounded-lg
+                                                   whitespace-nowrap shadow-lg
+                                                   border border-white/10"
+                                    >
                                         {item.label}
-                                    </span>
+                                    </motion.span>
                                 </motion.button>
                             )
                         })}
