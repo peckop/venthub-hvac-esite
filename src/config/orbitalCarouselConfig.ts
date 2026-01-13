@@ -75,6 +75,9 @@ export const ORBITAL_CAROUSEL_CONFIG = {
     /** Float (süzülme) efekti genliği */
     floatIntensity: 0.08,
 
+    /** Hover'da kameraya doğru öne çıkma mesafesi (3D derinlik) */
+    hoverZOffset: 1.5,
+
     // ═══════════════════════════════════════════════════════════
     // ✨ GÖRSEL EFEKTLER
     // ═══════════════════════════════════════════════════════════

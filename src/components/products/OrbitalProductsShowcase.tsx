@@ -82,10 +82,16 @@ const OrbitalCard: React.FC<{
         setIsNearFront(isNear)
 
         const normalizedZ = currentRadius > 0 ? (z + currentRadius) / (currentRadius * 2) : 0.5
-        let baseScale = CONFIG.backScale + (CONFIG.frontScale - CONFIG.backScale) * normalizedZ
-        if (hovered) baseScale = CONFIG.hoverScale
+        const baseScale = CONFIG.backScale + (CONFIG.frontScale - CONFIG.backScale) * normalizedZ
 
-        const finalScale = baseScale * easeOutCubic
+        // 🎯 HOVER ZOOM: 3D Derinlik Efekti
+        const hoverZOffset = hovered ? CONFIG.hoverZOffset : 0 // Kameraya doğru öne çıkar
+        const hoverScaleBoost = hovered ? CONFIG.hoverScale : baseScale
+        const finalScale = hoverScaleBoost * easeOutCubic
+
+        // Position'a z-offset ekle (hover'da kart öne gelir)
+        const targetZ = z + hoverZOffset
+        groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
         meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, finalScale, 0.15)
         meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, finalScale, 0.15)
