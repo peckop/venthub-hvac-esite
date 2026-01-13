@@ -13,7 +13,7 @@ interface ProductItem {
 
 interface OrbitalProductsShowcaseProps {
     items: ProductItem[]
-    onCardClick?: (itemId: string) => void
+    onCardClick?: (itemId: string, event?: MouseEvent) => void
 }
 
 // Global rotation state management via Refs (High Performance)
@@ -38,7 +38,7 @@ const OrbitalCard: React.FC<{
     onBringToFront: (index: number) => void
     setIsDragging: (dragging: boolean) => void
     isDraggingRef: React.MutableRefObject<boolean>
-    onCardClick?: (itemId: string) => void
+    onCardClick?: (itemId: string, event?: MouseEvent) => void
 }> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
@@ -102,23 +102,23 @@ const OrbitalCard: React.FC<{
         if (mat) mat.opacity = easeOutCubic
     })
 
-    const triggerAction = useCallback(() => {
+    const triggerAction = useCallback((event?: MouseEvent) => {
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
         setIsDragging(false)
         isDraggingRef.current = false
 
         onBringToFront(index)
 
-        // Quick View Panel'i aç (eğer callback varsa)
+        // Radial Menu aç (eğer callback varsa)
         if (onCardClick) {
-            onCardClick(item.id)
+            onCardClick(item.id, event)
         }
     }, [index, onBringToFront, setIsDragging, isDraggingRef, onCardClick, item.id])
 
     // Standart onClick
     const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
-        triggerAction()
+        triggerAction(e.nativeEvent)
     }, [triggerAction])
 
     // Manuel "Robust" Click Detection
@@ -137,7 +137,8 @@ const OrbitalCard: React.FC<{
 
         // Sürükleme yoksa tıkla!
         if (duration < 300 && dist < 15) {
-            triggerAction()
+            // PointerEvent'i MouseEvent olarak cast et (pozisyon bilgisi aynı)
+            triggerAction(e.nativeEvent as unknown as MouseEvent)
         }
     }, [triggerAction])
 
@@ -241,7 +242,7 @@ const SceneContent: React.FC<{
     sharedState: React.MutableRefObject<SharedState>
     isDraggingRef: React.MutableRefObject<boolean>
     setIsDragging: (val: boolean) => void
-    onCardClick?: (itemId: string) => void
+    onCardClick?: (itemId: string, event?: MouseEvent) => void
 }> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick }) => {
     const { camera } = useThree()
 
