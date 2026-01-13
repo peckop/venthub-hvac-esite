@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Wind, Zap, Activity, Fan, Settings, Droplets } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -104,7 +104,6 @@ const categories: CategoryCard[] = [
 
 const CategoryOrbitCarousel = () => {
     const navigate = useNavigate()
-    const containerRef = useRef<HTMLElement>(null)
 
     // Quick View Panel State (korunuyor)
     const [selectedCategory, setSelectedCategory] = useState<CategoryPreviewData | null>(null)
@@ -114,7 +113,6 @@ const CategoryOrbitCarousel = () => {
     const [isRadialMenuOpen, setIsRadialMenuOpen] = useState(false)
     const [radialMenuPosition, setRadialMenuPosition] = useState({ x: 0, y: 0 })
     const [radialMenuCategoryId, setRadialMenuCategoryId] = useState<string | null>(null)
-    const [radialMenuCategoryTitle, setRadialMenuCategoryTitle] = useState('')
 
     // Kart tıklandığında Radial Menu aç
     const handleCardClick = useCallback((itemId: string, event?: MouseEvent) => {
@@ -125,7 +123,6 @@ const CategoryOrbitCarousel = () => {
             const y = event?.clientY ?? window.innerHeight / 2
 
             setRadialMenuCategoryId(itemId)
-            setRadialMenuCategoryTitle(category.title)
             setRadialMenuPosition({ x, y })
             setIsRadialMenuOpen(true)
         }
@@ -178,7 +175,7 @@ const CategoryOrbitCarousel = () => {
     }, [])
 
     return (
-        <section ref={containerRef} className="bg-[#020617] overflow-hidden relative">
+        <section className="bg-[#020617] overflow-hidden relative">
             {/* Background Atmosphere */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-900/50 via-[#020617] to-[#020617] pointer-events-none" />
 
@@ -199,6 +196,7 @@ const CategoryOrbitCarousel = () => {
                 <OrbitalProductsShowcase
                     items={categories.map(c => ({ id: c.id, title: c.title, image: c.image }))}
                     onCardClick={handleCardClick}
+                    externalPause={isRadialMenuOpen}
                 />
             </div>
 
@@ -208,7 +206,6 @@ const CategoryOrbitCarousel = () => {
                 onClose={handleCloseRadialMenu}
                 position={radialMenuPosition}
                 categoryId={radialMenuCategoryId || ''}
-                categoryTitle={radialMenuCategoryTitle}
                 onSelectSubcategories={handleSelectSubcategories}
                 onSelectProductInfo={handleSelectProductInfo}
                 onSelectPriceInfo={handleSelectPriceInfo}
