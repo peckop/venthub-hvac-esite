@@ -119,9 +119,7 @@ const OrbitalCard: React.FC<{
         }
     })
 
-    // Çift tıklama algılama için ref
-    const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-    const clickCountRef = useRef(0)
+
 
     const triggerAction = useCallback((event?: MouseEvent) => {
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
