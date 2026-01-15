@@ -879,7 +879,6 @@ const SparePartsSet: React.FC<{ materials: IconMaterials }> = ({ materials }) =>
 // =============================================================================
 const Category3DIcon: React.FC<Category3DIconProps> = ({
     categorySlug,
-    color = '#06b6d4',
     scale = 1
 }) => {
     const materials = useMaterials()
