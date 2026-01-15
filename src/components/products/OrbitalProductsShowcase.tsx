@@ -4,17 +4,20 @@ import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config/orbitalCarouselConfig'
+import Category3DIcon from './Category3DIcon'
 
 interface ProductItem {
     id: string
     title: string
     image: string
+    categorySlug?: string
 }
 
 interface OrbitalProductsShowcaseProps {
     items: ProductItem[]
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     externalPause?: boolean
+    onFocusedItemChange?: (itemId: string | null) => void // Yeni prop
 }
 
 // Global rotation state management via Refs (High Performance)
@@ -40,7 +43,8 @@ const OrbitalCard: React.FC<{
     setIsDragging: (dragging: boolean) => void
     isDraggingRef: React.MutableRefObject<boolean>
     onCardClick?: (itemId: string, event?: MouseEvent) => void
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick }) => {
+    onFocusedItemChange?: (itemId: string | null) => void
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -52,13 +56,14 @@ const OrbitalCard: React.FC<{
     const pointerDownTime = useRef(0)
 
     const texture = useMemo(() => {
+        if (item.categorySlug) return null
         const tex = new THREE.TextureLoader().load(item.image)
         tex.colorSpace = THREE.SRGBColorSpace
         return tex
-    }, [item.image])
+    }, [item.image, item.categorySlug])
 
     useFrame(() => {
-        if (!groupRef.current || !meshRef.current) return
+        if (!groupRef.current) return
 
         // 1. Entry Animation
         const now = Date.now()
@@ -96,55 +101,78 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
-        meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, finalScale, 0.15)
-        meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, finalScale, 0.15)
+        // Scale uygulama
+        if (meshRef.current && !item.categorySlug) {
+            // 2D Plane Scale
+            meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, finalScale, 0.15)
+            meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, finalScale, 0.15)
 
-        const mat = meshRef.current.material as THREE.MeshStandardMaterial
-        if (mat) mat.opacity = easeOutCubic
+            const mat = meshRef.current.material as THREE.MeshStandardMaterial
+            if (mat) mat.opacity = easeOutCubic
+        } else {
+            // 3D Icon Scale - Wrapper group'a uygula
+            const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
+            if (iconGroup) {
+                const s = finalScale * 1.5
+                iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
+            }
+        }
     })
+
+    // Çift tıklama algılama için ref
+    const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const clickCountRef = useRef(0)
 
     const triggerAction = useCallback((event?: MouseEvent) => {
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)
         setIsDragging(false)
         isDraggingRef.current = false
 
-        onBringToFront(index)
+        // Kartın en önde olup olmadığını kontrol et
+        const baseAngle = (index / total) * Math.PI * 2
+        const currentRot = sharedState.current.rotation
+        const targetPos = -baseAngle
+        const diff = targetPos - currentRot
+        const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
+        const isAlreadyAtFront = Math.abs(shortestDiff) < 0.15 // Yaklaşık önde
 
-        // Radial Menu aç (eğer callback varsa)
-        if (onCardClick) {
-            onCardClick(item.id, event)
+        if (isAlreadyAtFront) {
+            // Zaten öndeyse -> alt kategoriye geç
+
+            if (onCardClick) {
+                onCardClick(item.id, event)
+            }
+        } else {
+            // Önde değilse -> öne getir
+
+            onBringToFront(index)
+
+            // Parent'a bildir: Bu kart odaklandı
+            if (onFocusedItemChange) {
+                onFocusedItemChange(item.id)
+            }
         }
-    }, [index, onBringToFront, setIsDragging, isDraggingRef, onCardClick, item.id])
+    }, [index, total, sharedState, onBringToFront, setIsDragging, isDraggingRef, onCardClick, item.id, onFocusedItemChange])
 
-    // Standart onClick
+    // Sadece onClick kullan - basit ve güvenilir
     const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         triggerAction(e.nativeEvent)
     }, [triggerAction])
 
-    // Manuel "Robust" Click Detection
+    // PointerDown/Up - sadece sürükleme tespiti için (tıklama değil)
     const handlePointerDown = useCallback((e: ThreeEvent<PointerEvent>) => {
         pointerDownPos.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }
         pointerDownTime.current = Date.now()
     }, [])
 
-    const handlePointerUp = useCallback((e: ThreeEvent<PointerEvent>) => {
-        const now = Date.now()
-        const duration = now - pointerDownTime.current
-        const dist = Math.sqrt(
-            Math.pow(e.nativeEvent.clientX - pointerDownPos.current.x, 2) +
-            Math.pow(e.nativeEvent.clientY - pointerDownPos.current.y, 2)
-        )
-
-        // Sürükleme yoksa tıkla!
-        if (duration < 300 && dist < 15) {
-            // PointerEvent'i MouseEvent olarak cast et (pozisyon bilgisi aynı)
-            triggerAction(e.nativeEvent as unknown as MouseEvent)
-        }
-    }, [triggerAction])
+    const handlePointerUp = useCallback((_e: ThreeEvent<PointerEvent>) => {
+        // Artık tıklama burada işlenmiyor - onClick kullanılıyor
+    }, [])
 
     const handleDoubleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
+        // Çift tık: Direkt kategori sayfasına git
         navigate(`/category/${item.id}`)
     }, [navigate, item.id])
 
@@ -187,18 +215,25 @@ const OrbitalCard: React.FC<{
                     <meshBasicMaterial visible={false} />
                 </mesh>
 
-                {/* GÖRÜNÜR KART */}
-                <mesh ref={meshRef}>
-                    <planeGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight]} />
-                    <meshStandardMaterial
-                        map={texture}
-                        transparent
-                        opacity={0}
-                        side={THREE.DoubleSide}
-                        emissive={hovered ? CONFIG.glowColor : '#000000'}
-                        emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
-                    />
-                </mesh>
+                {/* GÖRÜNÜR KART (3D ICON VEYA PLANE) */}
+                {item.categorySlug ? (
+                    <group name="icon-wrapper" scale={0.8} rotation={[0, Math.PI, 0]}>
+                        {/* Rotation PI çünkü kartlar merkeze bakıyor, ikonlar da bize baksın */}
+                        <Category3DIcon categorySlug={item.categorySlug} scale={1} />
+                    </group>
+                ) : (
+                    <mesh ref={meshRef}>
+                        <planeGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight]} />
+                        <meshStandardMaterial
+                            map={texture || undefined}
+                            transparent
+                            opacity={0}
+                            side={THREE.DoubleSide}
+                            emissive={hovered ? CONFIG.glowColor : '#000000'}
+                            emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
+                        />
+                    </mesh>
+                )}
             </Float>
 
             {showLabel && (
@@ -244,7 +279,8 @@ const SceneContent: React.FC<{
     isDraggingRef: React.MutableRefObject<boolean>
     setIsDragging: (val: boolean) => void
     onCardClick?: (itemId: string, event?: MouseEvent) => void
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick }) => {
+    onFocusedItemChange?: (itemId: string | null) => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange }) => {
     const { camera } = useThree()
 
     // Kartı öne getirme
@@ -271,7 +307,7 @@ const SceneContent: React.FC<{
         sharedState.current.velocity = 0
         sharedState.current.pauseUntil = Date.now() + 4000
 
-        console.warn("Bringing to front", index, "target:", sharedState.current.target)
+
     }, [items.length, onInteract, sharedState, isDraggingRef])
 
     useFrame((state, delta) => {
@@ -363,6 +399,7 @@ const SceneContent: React.FC<{
                     setIsDragging={setIsDragging}
                     isDraggingRef={isDraggingRef}
                     onCardClick={onCardClick}
+                    onFocusedItemChange={onFocusedItemChange}
                 />
             ))}
 
@@ -382,7 +419,7 @@ const SceneContent: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -473,6 +510,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     sharedState={sharedState}
                     setIsDragging={handleSetIsDragging}
                     onCardClick={onCardClick}
+                    onFocusedItemChange={onFocusedItemChange}
                 />
             </Canvas>
             {/* Hint overlay */}
