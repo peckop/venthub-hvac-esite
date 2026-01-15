@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
@@ -432,18 +432,22 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         target: null,
         velocity: 0,
         pauseUntil: 0,
-        startTime: 0
+        startTime: Date.now() // FIX: İlk frame'den itibaren doğru değer
     })
 
+    // İlk mount'ta hint timer'ı başlat
     useEffect(() => {
-        sharedState.current.startTime = Date.now()
-        sharedState.current.rotation = 0
-        sharedState.current.target = null
-
         setShowHint(true)
         const timer = setTimeout(() => setShowHint(false), 5000)
         return () => clearTimeout(timer)
     }, [])
+
+    // items değiştiğinde animasyonu yeniden başlat (level geçişleri için)
+    useEffect(() => {
+        sharedState.current.startTime = Date.now()
+        sharedState.current.rotation = 0
+        sharedState.current.target = null
+    }, [items.length])
 
     const hideHint = useCallback(() => setShowHint(false), [])
 
@@ -496,7 +500,10 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             >
                 <ambientLight intensity={0.5} />
                 <spotLight position={[10, 12, 10]} angle={0.3} penumbra={1} intensity={1} castShadow />
-                <Environment preset="city" />
+                {/* Environment HDRI yüklemesi async - Suspense ile sararak carousel unmount'ını engelliyoruz */}
+                <Suspense fallback={null}>
+                    <Environment preset="city" />
+                </Suspense>
 
                 <SceneContent
                     items={items}
