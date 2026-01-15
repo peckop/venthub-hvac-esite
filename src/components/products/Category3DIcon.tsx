@@ -882,7 +882,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
     color = '#06b6d4',
     scale = 1
 }) => {
-    const materials = useMaterials(color)
+    const materials = useMaterials()
 
     const IconComponent = useMemo(() => {
         const slug = categorySlug.toLowerCase()
