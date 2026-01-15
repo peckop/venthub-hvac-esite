@@ -178,7 +178,8 @@ const CategoryOrbitCarousel = () => {
     const [level, setLevel] = useState<CarouselLevel>('main')
     const [activeMainCategory, setActiveMainCategory] = useState<CategoryCard | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
-    const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) // State for focused item text
+    const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) // Tıklanan (focus) kart
+    const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) // Dönerken önde olan kart
 
     // Alt kategorileri hesapla
     const subcategories = useMemo(() => {
@@ -203,9 +204,23 @@ const CategoryOrbitCarousel = () => {
         setFocusedItemTitle(title)
     }, [level, subcategories])
 
+    // Dönerken önde olan kartın adını güncelle
+    const handleFrontCardChange = useCallback((itemId: string) => {
+        let title = ''
+        if (level === 'main') {
+            const cat = categories.find(c => c.id === itemId)
+            title = cat ? cat.title : ''
+        } else {
+            const sub = subcategories.find(s => s.slug === itemId)
+            title = sub ? sub.title : ''
+        }
+        setFrontCardTitle(title)
+    }, [level, subcategories])
+
     // Reset focus when level changes
     useEffect(() => {
         setFocusedItemTitle(null)
+        setFrontCardTitle(null)
     }, [level])
 
 
@@ -350,7 +365,9 @@ const CategoryOrbitCarousel = () => {
                         <h2 className="text-2xl md:text-3xl font-bold text-white/90">
                             {focusedItemTitle
                                 ? focusedItemTitle
-                                : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
+                                : frontCardTitle
+                                    ? frontCardTitle
+                                    : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
                             }
                         </h2>
                         {/* Dinamik açıklama */}
@@ -389,6 +406,7 @@ const CategoryOrbitCarousel = () => {
                             onCardClick={handleCardClick}
                             externalPause={isTransitioning}
                             onFocusedItemChange={handleFocusedItemChange}
+                            onFrontCardChange={handleFrontCardChange}
                         />
                     </motion.div>
                 </AnimatePresence>

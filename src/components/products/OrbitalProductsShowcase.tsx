@@ -17,7 +17,8 @@ interface OrbitalProductsShowcaseProps {
     items: ProductItem[]
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     externalPause?: boolean
-    onFocusedItemChange?: (itemId: string | null) => void // Yeni prop
+    onFocusedItemChange?: (itemId: string | null) => void
+    onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
 }
 
 // Global rotation state management via Refs (High Performance)
@@ -50,10 +51,27 @@ const OrbitalCard: React.FC<{
     const navigate = useNavigate()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
+    const [showTapHint, setShowTapHint] = useState(true) // El ikonu görünürlüğü
 
     // Robust Click Logiği için Ref'ler
     const pointerDownPos = useRef({ x: 0, y: 0 })
     const pointerDownTime = useRef(0)
+
+    // El ikonu aralıklı görünüm timer'ı (5sn görünür, 10sn sonra tekrar)
+    useEffect(() => {
+        if (!isNearFront) {
+            setShowTapHint(true) // Öne geldiğinde baştan başlat
+            return
+        }
+        // 5sn sonra gizle
+        const hideTimer = setTimeout(() => setShowTapHint(false), 5000)
+        // 15sn sonra tekrar göster (5sn + 10sn)
+        const showTimer = setTimeout(() => setShowTapHint(true), 15000)
+        return () => {
+            clearTimeout(hideTimer)
+            clearTimeout(showTimer)
+        }
+    }, [isNearFront])
 
     const texture = useMemo(() => {
         if (item.categorySlug) return null
@@ -234,6 +252,25 @@ const OrbitalCard: React.FC<{
                 )}
             </Float>
 
+            {/* El ikonu overlay - kartın üzerinde (sadece önde ve tıklanmamışken) */}
+            {isNearFront && !hovered && showTapHint && (
+                <Html
+                    position={[0, 0, 0.5]}
+                    center
+                    distanceFactor={5}
+                    occlude={false}
+                    style={{
+                        pointerEvents: 'none',
+                        transition: 'opacity 0.5s',
+                        opacity: 1
+                    }}
+                >
+                    <div className="text-5xl animate-bounce" style={{ animationDuration: '1s' }}>
+                        👆
+                    </div>
+                </Html>
+            )}
+
             {showLabel && (
                 <Html
                     position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
@@ -247,7 +284,7 @@ const OrbitalCard: React.FC<{
                     }}
                 >
                     <div
-                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg flex items-center gap-2"
+                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
                         style={{
                             background: 'rgba(0,0,0,0.85)',
                             backdropFilter: 'blur(8px)',
@@ -256,8 +293,6 @@ const OrbitalCard: React.FC<{
                             textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                         }}
                     >
-                        {/* Önde ama hover değilse tıkla ikonu göster */}
-                        {isNearFront && !hovered && <span className="animate-pulse">👆</span>}
                         {item.title}
                     </div>
                 </Html>
@@ -280,8 +315,10 @@ const SceneContent: React.FC<{
     setIsDragging: (val: boolean) => void
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange }) => {
+    onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange }) => {
     const { camera } = useThree()
+    const lastFrontCardRef = useRef<string | null>(null) // Debounce için
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -375,6 +412,20 @@ const SceneContent: React.FC<{
 
         camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
+
+        // Dönerken önde olan kartı tespit et ve parent'a bildir
+        if (onFrontCardChange && items.length > 0 && sharedState.current.target === null) {
+            const total = items.length
+            const step = (Math.PI * 2) / total
+            // En öndeki kart index'ini hesapla (rotation'a göre)
+            let frontIndex = Math.round(-sharedState.current.rotation / step) % total
+            if (frontIndex < 0) frontIndex += total
+            const frontItem = items[frontIndex]
+            if (frontItem && frontItem.id !== lastFrontCardRef.current) {
+                lastFrontCardRef.current = frontItem.id
+                onFrontCardChange(frontItem.id)
+            }
+        }
     })
 
     const currentRadius = CONFIG.radius * (1 - Math.pow(1 - Math.min(1, Math.max(0, (Date.now() - sharedState.current.startTime) / 2000)), 3))
@@ -419,7 +470,7 @@ const SceneContent: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -528,6 +579,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     setIsDragging={handleSetIsDragging}
                     onCardClick={onCardClick}
                     onFocusedItemChange={handleFocusedItemChangeInternal}
+                    onFrontCardChange={onFrontCardChange}
                 />
             </Canvas>
             {/* Initial Hint overlay */}
