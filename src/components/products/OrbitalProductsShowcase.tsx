@@ -101,11 +101,6 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
-        // 🎯 TILT EFFECT: Öne gelen kart hafifçe kullanıcıya doğru eğilir
-        const tiltAmount = isNear ? 0.15 : 0 // Radyan cinsinden eğim
-        const currentTiltX = groupRef.current.rotation.x
-        groupRef.current.rotation.x = THREE.MathUtils.lerp(currentTiltX, tiltAmount, 0.08)
-
         // Scale uygulama
         if (meshRef.current && !item.categorySlug) {
             // 2D Plane Scale
@@ -252,7 +247,7 @@ const OrbitalCard: React.FC<{
                     }}
                 >
                     <div
-                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
+                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg flex items-center gap-2"
                         style={{
                             background: 'rgba(0,0,0,0.85)',
                             backdropFilter: 'blur(8px)',
@@ -261,6 +256,8 @@ const OrbitalCard: React.FC<{
                             textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                         }}
                     >
+                        {/* Önde ama hover değilse tıkla ikonu göster */}
+                        {isNearFront && !hovered && <span className="animate-pulse">👆</span>}
                         {item.title}
                     </div>
                 </Html>
