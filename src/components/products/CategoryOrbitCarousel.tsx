@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wind, Zap, Activity, Fan, Settings, Droplets, ArrowLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -178,6 +178,7 @@ const CategoryOrbitCarousel = () => {
     const [level, setLevel] = useState<CarouselLevel>('main')
     const [activeMainCategory, setActiveMainCategory] = useState<CategoryCard | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
+    const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) // State for focused item text
 
     // Alt kategorileri hesapla
     const subcategories = useMemo(() => {
@@ -185,14 +186,48 @@ const CategoryOrbitCarousel = () => {
         return getSubcategoriesForCategory(activeMainCategory.id)
     }, [activeMainCategory])
 
+    const handleFocusedItemChange = useCallback((itemId: string | null) => {
+        if (!itemId) {
+            setFocusedItemTitle(null)
+            return
+        }
+
+        let title = ''
+        if (level === 'main') {
+            const cat = categories.find(c => c.id === itemId)
+            title = cat ? cat.title : ''
+        } else {
+            const sub = subcategories.find(s => s.slug === itemId)
+            title = sub ? sub.title : ''
+        }
+        setFocusedItemTitle(title)
+    }, [level, subcategories])
+
+    // Reset focus when level changes
+    useEffect(() => {
+        setFocusedItemTitle(null)
+    }, [level])
+
+
+
     // Gösterilecek öğeler (level'a göre)
     const displayItems = useMemo(() => {
         if (level === 'main') {
-            return categories.map(c => ({ id: c.id, title: c.title, image: c.image }))
+            return categories.map(c => ({
+                id: c.id,
+                title: c.title,
+                image: c.image,
+                categorySlug: c.id
+            }))
         } else {
-            return subcategories.map(s => ({ id: s.slug, title: s.title, image: s.image }))
+            return subcategories.map(s => ({
+                id: s.slug,
+                title: s.title,
+                image: s.image,
+                categorySlug: activeMainCategory?.id
+            }))
         }
-    }, [level, subcategories])
+    }, [level, subcategories, activeMainCategory])
 
     // Kart tıklama - Ana kategori veya alt kategori
     const handleCardClick = useCallback((itemId: string) => {
@@ -298,23 +333,38 @@ const CategoryOrbitCarousel = () => {
                 )}
             </AnimatePresence>
 
-            {/* Title */}
+
+
+            {/* Title & Instructions */}
             <div className="absolute top-6 left-0 right-0 z-30 container mx-auto px-4">
-                <AnimatePresence mode="wait">
-                    <motion.h2
+                <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
                         key={level}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.3 }}
-                        className="text-2xl md:text-3xl font-bold text-white/90 text-center"
+                        className="text-center"
                         style={{ marginTop: level === 'subcategory' ? '3rem' : 0 }}
                     >
-                        {level === 'main'
-                            ? 'Ürün Yelpazemizi Keşfedin'
-                            : `${activeMainCategory?.title} Alt Kategorileri`
-                        }
-                    </motion.h2>
+                        <h2 className="text-2xl md:text-3xl font-bold text-white/90">
+                            {focusedItemTitle
+                                ? focusedItemTitle
+                                : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
+                            }
+                        </h2>
+                        {/* Dinamik açıklama */}
+                        <p className="text-white/50 text-sm mt-2 font-medium tracking-wide">
+                            {focusedItemTitle
+                                ? (level === 'main'
+                                    ? '🖱️ Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git'
+                                    : '🖱️ Tıklayarak Ürün Sayfasına Gidin')
+                                : (level === 'main'
+                                    ? '🖱️ İstediğiniz Ürüne Tıklayın'
+                                    : '🖱️ Detaylar için Ürüne Tıklayın')
+                            }
+                        </p>
+                    </motion.div>
                 </AnimatePresence>
             </div>
 
@@ -338,6 +388,7 @@ const CategoryOrbitCarousel = () => {
                             items={displayItems}
                             onCardClick={handleCardClick}
                             externalPause={isTransitioning}
+                            onFocusedItemChange={handleFocusedItemChange}
                         />
                     </motion.div>
                 </AnimatePresence>
