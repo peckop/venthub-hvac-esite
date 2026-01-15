@@ -422,6 +422,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
     const [showHint, setShowHint] = useState(true)
+    const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const lastX = useRef(0)
 
     // Drag Conflict Çözümü: Ref ile anlık takip
@@ -450,6 +451,15 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     }, [items.length])
 
     const hideHint = useCallback(() => setShowHint(false), [])
+
+    // Internal wrapper: Local state'i güncelle + parent'a bildir
+    const handleFocusedItemChangeInternal = useCallback((itemId: string | null) => {
+        setFocusedItemId(itemId)
+        setShowHint(false) // İlk hint'i kapat
+        if (onFocusedItemChange) {
+            onFocusedItemChange(itemId)
+        }
+    }, [onFocusedItemChange])
 
     const handlePointerDown = (e: React.PointerEvent) => {
         setIsDragging(true)
@@ -515,11 +525,11 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     sharedState={sharedState}
                     setIsDragging={handleSetIsDragging}
                     onCardClick={onCardClick}
-                    onFocusedItemChange={onFocusedItemChange}
+                    onFocusedItemChange={handleFocusedItemChangeInternal}
                 />
             </Canvas>
-            {/* Hint overlay */}
-            {showHint && (
+            {/* Initial Hint overlay */}
+            {showHint && !focusedItemId && (
                 <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 hidden md:block">
                     <div className="bg-black/70 backdrop-blur-md px-5 py-3 rounded-xl border border-cyan-500/30 animate-bounce" style={{ animationDuration: '2s' }}>
                         <div className="flex items-center gap-4 text-white text-sm">
@@ -528,6 +538,29 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                             <span className="flex items-center gap-2"><span className="text-cyan-400">👆</span> Tıkla Seç</span>
                             <span className="text-cyan-500/50">•</span>
                             <span className="flex items-center gap-2"><span className="text-cyan-400">🖱️</span> Çift Tıkla İncele</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Context-aware Hint: Kart öne geldiğinde */}
+            {focusedItemId && (
+                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20">
+                    <div
+                        className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-md px-5 py-3 rounded-xl border border-cyan-400/50 animate-pulse"
+                        style={{ animationDuration: '1.5s' }}
+                    >
+                        <div className="flex items-center gap-4 text-white text-sm font-medium">
+                            <span className="flex items-center gap-2">
+                                <span className="text-cyan-300">👆</span>
+                                <span>Tek Tık:</span>
+                                <span className="text-cyan-300">Kategoriyi Aç</span>
+                            </span>
+                            <span className="text-cyan-400/50">•</span>
+                            <span className="flex items-center gap-2">
+                                <span className="text-cyan-300">🖱️</span>
+                                <span>Çift Tık:</span>
+                                <span className="text-cyan-300">Sayfaya Git</span>
+                            </span>
                         </div>
                     </div>
                 </div>
