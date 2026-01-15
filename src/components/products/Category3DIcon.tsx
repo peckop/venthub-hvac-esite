@@ -8,10 +8,21 @@ interface Category3DIconProps {
     scale?: number
 }
 
+interface IconMaterials {
+    whiteABS: THREE.MeshStandardMaterial
+    industrialSteel: THREE.MeshStandardMaterial
+    brushedAluminum: THREE.MeshStandardMaterial
+    aluminumFlex: THREE.MeshStandardMaterial
+    matteBlack: THREE.MeshStandardMaterial
+    filterMedia: THREE.MeshStandardMaterial
+    rubberBlack: THREE.MeshStandardMaterial
+    chrome: THREE.MeshStandardMaterial
+}
+
 // =============================================================================
 // FİZİKSEL MATERYALLER
 // =============================================================================
-const useMaterials = (accentColor: string) => {
+const useMaterials = () => {
     return useMemo(() => ({
         whiteABS: new THREE.MeshStandardMaterial({
             color: '#f1f5f9',
@@ -53,16 +64,15 @@ const useMaterials = (accentColor: string) => {
             roughness: 0.1,
             metalness: 0.95,
         }),
-    }), [accentColor])
+    }), [])
 }
 
 // =============================================================================
 // 1. ESNEK KANAL (İç katman olmadan, tek katman)
 // =============================================================================
-const FlexDuctModel: React.FC<{ materials: any }> = ({ materials }) => {
+const FlexDuctModel: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     const meshRef = useRef<THREE.Mesh>(null)
     const spiralRef = useRef<THREE.Group>(null)
-    const bendRef = useRef(0)
 
     // MEKSİKA DALGASI - Dalga bir uçtan diğerine ilerler
     const createWaveCurve = (time: number) => {
@@ -135,7 +145,7 @@ const FlexDuctModel: React.FC<{ materials: any }> = ({ materials }) => {
 // =============================================================================
 // 2. FAN
 // =============================================================================
-const FanIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const FanIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     const rotorRef = useRef<THREE.Group>(null)
     const airFlowRef = useRef<THREE.Group>(null)
     const inletFlowRef = useRef<THREE.Group>(null)
@@ -233,14 +243,16 @@ const InletAirStream: React.FC<{ angle: number }> = ({ angle }) => {
         if (!streamRef.current) return
         const time = state.clock.elapsedTime
 
-        streamRef.current.children.forEach((child: any, i) => {
+        streamRef.current.children.forEach((child: THREE.Object3D, i) => {
+            const meshChild = child as THREE.Mesh
+            const material = meshChild.material as THREE.MeshBasicMaterial
             const progress = ((time * 1.5 + i * 0.4) % 1.0)
             const z = -0.5 + progress * 0.6
             const r = 0.5 - progress * 0.15
 
             const rad = (angle * Math.PI) / 180
             child.position.set(r * Math.cos(rad), r * Math.sin(rad), z)
-            child.material.opacity = 0.3 + progress * 0.2
+            material.opacity = 0.3 + progress * 0.2
         })
     })
 
@@ -263,14 +275,16 @@ const OutletAirStream: React.FC<{ angle: number }> = ({ angle }) => {
         if (!streamRef.current) return
         const time = state.clock.elapsedTime
 
-        streamRef.current.children.forEach((child: any, i) => {
+        streamRef.current.children.forEach((child: THREE.Object3D, i) => {
+            const meshChild = child as THREE.Mesh
+            const material = meshChild.material as THREE.MeshBasicMaterial
             const progress = ((time * 2 + i * 0.3) % 1.5)
             const z = progress
             const r = 0.25 + progress * 0.12
 
             const rad = (angle * Math.PI) / 180
             child.position.set(r * Math.cos(rad), r * Math.sin(rad), z)
-            child.material.opacity = Math.max(0, 0.5 - progress * 0.3)
+            material.opacity = Math.max(0, 0.5 - progress * 0.3)
         })
     })
 
@@ -289,7 +303,7 @@ const OutletAirStream: React.FC<{ angle: number }> = ({ angle }) => {
 // =============================================================================
 // 3. HAVA PERDESİ (Belirgin Mavi/Kırmızı Renk Geçişi)
 // =============================================================================
-const AirCurtainIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const AirCurtainIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     return (
         <group>
             <mesh position={[0, 0.35, 0]} material={materials.whiteABS}>
@@ -329,16 +343,18 @@ const AirCurtainFlow: React.FC = () => {
         // Renk geçişi: 0 = tam mavi, 1 = tam kırmızı (~2.5 saniye döngü)
         const colorPhase = (Math.sin(time * 1.0) + 1) / 2
 
-        curtainRef.current.children.forEach((child: any, i) => {
+        curtainRef.current.children.forEach((child: THREE.Object3D, i) => {
+            const meshChild = child as THREE.Mesh
+            const material = meshChild.material as THREE.MeshBasicMaterial
             // PARLAK renkler - Mavi: #0ea5e9, Kırmızı: #ef4444
             const r = 0.055 + colorPhase * 0.88  // 0.055 -> 0.937
             const g = 0.647 - colorPhase * 0.38  // 0.647 -> 0.267
             const b = 0.914 - colorPhase * 0.65  // 0.914 -> 0.267
 
-            child.material.color.setRGB(r, g, b)
+            material.color.setRGB(r, g, b)
 
             // Daha görünür opacity
-            child.material.opacity = 0.25 + Math.sin(time * 2 + i * 0.2) * 0.08
+            material.opacity = 0.25 + Math.sin(time * 2 + i * 0.2) * 0.08
         })
     })
 
@@ -363,7 +379,7 @@ const AirCurtainFlow: React.FC = () => {
 // =============================================================================
 // 4. HAVA TEMİZLEYİCİ (4 Taraf Giriş + Üst Yüzey Çıkış)
 // =============================================================================
-const DepuroIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const DepuroIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     return (
         <group position={[0, -0.4, 0]}>
             {/* Ana Gövde */}
@@ -453,7 +469,7 @@ const DepuroIcon: React.FC<{ materials: any }> = ({ materials }) => {
 
             {/* Tekerlekler */}
             {[[-0.25, -0.9, 0.15], [0.25, -0.9, 0.15]].map((pos, i) => (
-                <mesh key={i} position={pos as any} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
+                <mesh key={i} position={pos as [number, number, number]} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.045, 0.045, 0.04, 12]} />
                 </mesh>
             ))}
@@ -469,7 +485,13 @@ const AirPurifierFlow: React.FC = () => {
 
     // Kirli partiküller: 4 taraftan
     const dirtyParticles = useMemo(() => {
-        const particles: any[] = []
+        const particles: {
+            x: number; y: number; z: number;
+            startX: number; startY: number; startZ: number;
+            targetX: number; targetY: number; targetZ: number;
+            size: number;
+            speed: number;
+        }[] = []
         // Her taraftan 4 partikül
         for (let side = 0; side < 4; side++) {
             for (let j = 0; j < 4; j++) {
@@ -519,7 +541,14 @@ const AirPurifierFlow: React.FC = () => {
 
     // Temiz partiküller: Üst yüzeyden - DAHA GÖRÜNÜR
     const cleanParticles = useMemo(() => {
-        const particles: any[] = []
+        const particles: {
+            x: number;
+            y: number;
+            z: number;
+            speed: number;
+            phase: number;
+            size: number;
+        }[] = []
         // 5x5 grid = 25 partikül (daha fazla)
         for (let row = 0; row < 5; row++) {
             for (let col = 0; col < 5; col++) {
@@ -539,7 +568,9 @@ const AirPurifierFlow: React.FC = () => {
     useFrame((state, delta) => {
         // Kirli hava: 4 taraftan menfeze
         if (dirtyRef.current) {
-            dirtyRef.current.children.forEach((child: any, i) => {
+            dirtyRef.current.children.forEach((child: THREE.Object3D, i) => {
+                const meshChild = child as THREE.Mesh
+                const material = meshChild.material as THREE.MeshBasicMaterial
                 const p = dirtyParticles[i]
                 const dx = p.targetX - p.x
                 const dy = p.targetY - p.y
@@ -550,14 +581,14 @@ const AirPurifierFlow: React.FC = () => {
                     p.x += (dx / dist) * delta * p.speed
                     p.y += (dy / dist) * delta * p.speed
                     p.z += (dz / dist) * delta * p.speed
-                    child.material.opacity = 0.7
+                    material.opacity = 0.7
                 } else {
-                    child.material.opacity -= delta * 3
-                    if (child.material.opacity <= 0) {
+                    material.opacity -= delta * 3
+                    if (material.opacity <= 0) {
                         p.x = p.startX
                         p.y = p.startY
                         p.z = p.startZ
-                        child.material.opacity = 0.7
+                        material.opacity = 0.7
                     }
                 }
                 child.position.set(p.x, p.y, p.z)
@@ -567,7 +598,9 @@ const AirPurifierFlow: React.FC = () => {
         // Temiz hava: Üstten yukarı - DAHA BELİRGİN
         if (cleanRef.current) {
             const time = state.clock.elapsedTime
-            cleanRef.current.children.forEach((child: any, i) => {
+            cleanRef.current.children.forEach((child: THREE.Object3D, i) => {
+                const meshChild = child as THREE.Mesh
+                const material = meshChild.material as THREE.MeshBasicMaterial
                 const p = cleanParticles[i]
                 const progress = ((time * p.speed + p.phase) % 1.2) / 1.2
 
@@ -578,7 +611,7 @@ const AirPurifierFlow: React.FC = () => {
                 const opacityValue = progress < 0.3
                     ? 0.85 // Başlangıç: çok parlak
                     : Math.max(0, 0.85 - (progress - 0.3) * 1.2)
-                child.material.opacity = opacityValue
+                material.opacity = opacityValue
             })
         }
     })
@@ -609,7 +642,7 @@ const AirPurifierFlow: React.FC = () => {
 // =============================================================================
 // 5. NEM ALMA CİHAZI
 // =============================================================================
-const DehumidifierIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const DehumidifierIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     return (
         <group position={[0, -0.35, 0]}>
             <mesh material={materials.whiteABS}>
@@ -629,7 +662,7 @@ const DehumidifierIcon: React.FC<{ materials: any }> = ({ materials }) => {
             </mesh>
 
             {[[-0.3, -0.67, 0], [0.3, -0.67, 0]].map((pos, i) => (
-                <mesh key={i} position={pos as any} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
+                <mesh key={i} position={pos as [number, number, number]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.045, 0.045, 0.035, 12]} />
                 </mesh>
             ))}
@@ -649,7 +682,7 @@ const CondensationDrops: React.FC = () => {
 
     useFrame((_, delta) => {
         if (!groupRef.current) return
-        groupRef.current.children.forEach((child: any, i) => {
+        groupRef.current.children.forEach((child: THREE.Object3D, i) => {
             const d = drops[i]
             d.y -= delta * d.speed
             if (d.y < -0.38) {
@@ -675,7 +708,7 @@ const CondensationDrops: React.FC = () => {
 // =============================================================================
 // 6. HRV
 // =============================================================================
-const HRVIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const HRVIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     return (
         <group position={[0, -0.25, 0]}>
             <mesh material={materials.whiteABS}>
@@ -686,7 +719,7 @@ const HRVIcon: React.FC<{ materials: any }> = ({ materials }) => {
                 [-0.35, 0.7, 0.12], [0.35, 0.7, 0.12],
                 [-0.35, 0.7, -0.12], [0.35, 0.7, -0.12]
             ].map((pos, i) => (
-                <mesh key={i} position={pos as any} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
+                <mesh key={i} position={pos as [number, number, number]} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.09, 0.09, 0.18, 12]} />
                 </mesh>
             ))}
@@ -706,13 +739,13 @@ const CrossFlowAnimation: React.FC = () => {
 
     useFrame((_, delta) => {
         if (freshRef.current) {
-            freshRef.current.children.forEach((child: any) => {
+            freshRef.current.children.forEach((child: THREE.Object3D) => {
                 child.position.x += delta * 0.5
                 if (child.position.x > 0.45) child.position.x = -0.45
             })
         }
         if (staleRef.current) {
-            staleRef.current.children.forEach((child: any) => {
+            staleRef.current.children.forEach((child: THREE.Object3D) => {
                 child.position.x -= delta * 0.5
                 if (child.position.x < -0.45) child.position.x = 0.45
             })
@@ -744,7 +777,7 @@ const CrossFlowAnimation: React.FC = () => {
 // =============================================================================
 // 7. HIZ KONTROL
 // =============================================================================
-const SpeedControlIcon: React.FC<{ materials: any }> = ({ materials }) => {
+const SpeedControlIcon: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     const ledRef = useRef<THREE.Mesh>(null)
 
     useFrame((state) => {
@@ -783,7 +816,7 @@ const SpeedControlIcon: React.FC<{ materials: any }> = ({ materials }) => {
 // =============================================================================
 // 8. YEDEK PARÇA SETİ
 // =============================================================================
-const SparePartsSet: React.FC<{ materials: any }> = ({ materials }) => {
+const SparePartsSet: React.FC<{ materials: IconMaterials }> = ({ materials }) => {
     return (
         <group>
             <group position={[-0.55, 0.35, 0]} scale={0.6}>
