@@ -45,48 +45,37 @@ const OrbitalCard: React.FC<{
     isDraggingRef: React.MutableRefObject<boolean>
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
-    isFrontCard?: boolean // En öndeki kart mı?
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard }) => {
+    isFrontCard?: boolean
+    shouldShowTapHint?: boolean // SceneContent'ten gelen el ikonu gösterme kararı
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
-    const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü - başlangıçta false
-    const isFirstFrontCardRef = useRef(true) // İlk kart mı takibi
+    const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü
 
     // Robust Click Logiği için Ref'ler
     const pointerDownPos = useRef({ x: 0, y: 0 })
     const pointerDownTime = useRef(0)
 
-    // El ikonu aralıklı görünüm timer'ı
-    // İlk kart: hemen göster, sonrakiler: 3sn gecikme, 4sn görünür, 12sn sonra tekrar
+    // El ikonu görünüm timer'ı
+    // SceneContent'ten externalShouldShowHint true gelirse: 4sn göster, sonra gizle
     useEffect(() => {
-        if (!isFrontCard) {
+        if (!isFrontCard || !externalShouldShowHint) {
             setShowTapHint(false)
             return
         }
 
-        // İlk kart mı kontrol
-        const delay = isFirstFrontCardRef.current ? 0 : 3000
-        isFirstFrontCardRef.current = false
-
-        // Gecikme sonrası göster
-        const showDelayTimer = setTimeout(() => setShowTapHint(true), delay)
-        // 4sn sonra gizle (delay + 4000)
-        const hideTimer = setTimeout(() => setShowTapHint(false), delay + 4000)
-        // 12sn sonra tekrar göster (delay + 4000 + 12000 = delay + 16000)
-        const repeatTimer = setTimeout(() => setShowTapHint(true), delay + 16000)
-        // Tekrar 4sn göster sonra gizle
-        const hideAgainTimer = setTimeout(() => setShowTapHint(false), delay + 20000)
+        // Göster
+        setShowTapHint(true)
+        // 4sn sonra gizle
+        const hideTimer = setTimeout(() => setShowTapHint(false), 4000)
 
         return () => {
-            clearTimeout(showDelayTimer)
             clearTimeout(hideTimer)
-            clearTimeout(repeatTimer)
-            clearTimeout(hideAgainTimer)
         }
-    }, [isFrontCard])
+    }, [isFrontCard, externalShouldShowHint])
 
     const texture = useMemo(() => {
         if (item.categorySlug) return null
@@ -345,6 +334,8 @@ const SceneContent: React.FC<{
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
+    const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
+    const [shouldShowTapHint, setShouldShowTapHint] = useState(false) // Bu kartta el ikonu gösterilsin mi
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -450,6 +441,24 @@ const SceneContent: React.FC<{
             if (frontItem && frontItem.id !== lastFrontCardRef.current) {
                 lastFrontCardRef.current = frontItem.id
                 setFrontCardId(frontItem.id) // Local state güncelle
+
+                // Sayacı artır
+                frontCardChangeCountRef.current += 1
+                const count = frontCardChangeCountRef.current
+
+                // El ikonu gösterme mantığı:
+                // 1. kart: HAYIR (ilk kart, bilgi balonu var)
+                // 2. kart: EVET
+                // 3. kart: HAYIR
+                // 4. kart: HAYIR
+                // 5. kart: EVET (2 + 3 = 5)
+                // 6. kart: HAYIR
+                // 7. kart: HAYIR
+                // 8. kart: EVET (5 + 3 = 8)
+                // Pattern: count === 2 || (count > 2 && (count - 2) % 3 === 0)
+                const showHint = count === 2 || (count > 2 && (count - 2) % 3 === 0)
+                setShouldShowTapHint(showHint)
+
                 if (onFrontCardChange && sharedState.current.target === null) {
                     onFrontCardChange(frontItem.id) // Parent'a bildir
                 }
@@ -481,6 +490,7 @@ const SceneContent: React.FC<{
                     onCardClick={onCardClick}
                     onFocusedItemChange={onFocusedItemChange}
                     isFrontCard={item.id === frontCardId}
+                    shouldShowTapHint={item.id === frontCardId && shouldShowTapHint}
                 />
             ))}
 
