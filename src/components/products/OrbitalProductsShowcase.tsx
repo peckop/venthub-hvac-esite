@@ -336,6 +336,18 @@ const SceneContent: React.FC<{
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
     const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
     const [shouldShowTapHint, setShouldShowTapHint] = useState(false) // Bu kartta el ikonu gösterilsin mi
+    const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
+
+    // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
+    // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
+    // Bu bir "side effect" olarak items değiştiğinde de sıfırlanır
+    useEffect(() => {
+        // items değiştiğinde her şeyi sıfırla
+        frontCardChangeCountRef.current = 0
+        setShouldShowTapHint(false)
+        lastFrontCardRef.current = null
+        hasBeenFocusedRef.current = false
+    }, [items.length])
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -429,6 +441,18 @@ const SceneContent: React.FC<{
 
         camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
+
+        // Carousel tekrar dönmeye başladığında (target null oldu) sayıcıyı sıfırla
+        // Böylece sayfa ilk yüklenmiş gibi olur
+        if (sharedState.current.target === null && hasBeenFocusedRef.current) {
+            // Focus'tan çıktık, sıfırla
+            frontCardChangeCountRef.current = 0
+            hasBeenFocusedRef.current = false
+            setShouldShowTapHint(false)
+        } else if (sharedState.current.target !== null) {
+            // Bir kart focus'ta, işaretle
+            hasBeenFocusedRef.current = true
+        }
 
         // Dönerken önde olan kartı tespit et ve parent'a bildir
         if (items.length > 0) {
