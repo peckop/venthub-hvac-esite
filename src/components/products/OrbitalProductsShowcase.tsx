@@ -443,9 +443,9 @@ const SceneContent: React.FC<{
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
 
         // Carousel tekrar dönmeye başladığında sayıcıyı sıfırla
-        // Koşullar: target null (snap bitti) + pauseUntil doldu (gerçekten dönüyor) + daha önce focus olmuştu
+        // Koşullar: target null + pauseUntil doldu + isPaused false (mouse yok) + daha önce focus olmuştu
         const currentTime = Date.now()
-        const isCarouselRotating = sharedState.current.target === null && currentTime > sharedState.current.pauseUntil
+        const isCarouselRotating = sharedState.current.target === null && currentTime > sharedState.current.pauseUntil && !isPaused
 
         if (isCarouselRotating && hasBeenFocusedRef.current) {
             // Carousel gerçekten döndü, tüm sistemi sıfırla
