@@ -52,25 +52,39 @@ const OrbitalCard: React.FC<{
     const navigate = useNavigate()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
-    const [showTapHint, setShowTapHint] = useState(true) // El ikonu görünürlüğü
+    const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü - başlangıçta false
+    const isFirstFrontCardRef = useRef(true) // İlk kart mı takibi
 
     // Robust Click Logiği için Ref'ler
     const pointerDownPos = useRef({ x: 0, y: 0 })
     const pointerDownTime = useRef(0)
 
-    // El ikonu aralıklı görünüm timer'ı (5sn görünür, 10sn sonra tekrar)
+    // El ikonu aralıklı görünüm timer'ı
+    // İlk kart: hemen göster, sonrakiler: 3sn gecikme, 4sn görünür, 12sn sonra tekrar
     useEffect(() => {
         if (!isFrontCard) {
-            setShowTapHint(true) // Öne geldiğinde baştan başlat
+            setShowTapHint(false)
             return
         }
-        // 5sn sonra gizle
-        const hideTimer = setTimeout(() => setShowTapHint(false), 5000)
-        // 15sn sonra tekrar göster (5sn + 10sn)
-        const showTimer = setTimeout(() => setShowTapHint(true), 15000)
+
+        // İlk kart mı kontrol
+        const delay = isFirstFrontCardRef.current ? 0 : 3000
+        isFirstFrontCardRef.current = false
+
+        // Gecikme sonrası göster
+        const showDelayTimer = setTimeout(() => setShowTapHint(true), delay)
+        // 4sn sonra gizle (delay + 4000)
+        const hideTimer = setTimeout(() => setShowTapHint(false), delay + 4000)
+        // 12sn sonra tekrar göster (delay + 4000 + 12000 = delay + 16000)
+        const repeatTimer = setTimeout(() => setShowTapHint(true), delay + 16000)
+        // Tekrar 4sn göster sonra gizle
+        const hideAgainTimer = setTimeout(() => setShowTapHint(false), delay + 20000)
+
         return () => {
+            clearTimeout(showDelayTimer)
             clearTimeout(hideTimer)
-            clearTimeout(showTimer)
+            clearTimeout(repeatTimer)
+            clearTimeout(hideAgainTimer)
         }
     }, [isFrontCard])
 
@@ -120,11 +134,21 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
+        // 🎯 PULSE EFFECT: Focus olan kart hafifçe büyüyüp küçülür ("nefes alır")
+        // sharedState.target null ise ve isFrontCard ise = kart sabitlenmiş demek
+        let pulseMultiplier = 1
+        if (isFrontCard && sharedState.current.target === null) {
+            // Sin dalgası ile yumuşak pulse: 0.97 - 1.03 arası
+            const pulseSpeed = 2 // Hız (saniyede kaç döngü)
+            pulseMultiplier = 1 + Math.sin(now * 0.003 * pulseSpeed) * 0.03
+        }
+        const pulsedScale = finalScale * pulseMultiplier
+
         // Scale uygulama
         if (meshRef.current && !item.categorySlug) {
             // 2D Plane Scale
-            meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, finalScale, 0.15)
-            meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, finalScale, 0.15)
+            meshRef.current.scale.x = THREE.MathUtils.lerp(meshRef.current.scale.x, pulsedScale, 0.15)
+            meshRef.current.scale.y = THREE.MathUtils.lerp(meshRef.current.scale.y, pulsedScale, 0.15)
 
             const mat = meshRef.current.material as THREE.MeshStandardMaterial
             if (mat) mat.opacity = easeOutCubic
@@ -132,7 +156,7 @@ const OrbitalCard: React.FC<{
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
-                const s = finalScale * 1.5
+                const s = pulsedScale * 1.5
                 iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
             }
         }
