@@ -530,8 +530,15 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         startTime: Date.now() // FIX: İlk frame'den itibaren doğru değer
     })
 
-    // İlk mount'ta hint timer'ı başlat - periyodik tekrar: 5sn görünür, 30sn gizli
+    // İlk mount'ta ve carousel dönmeye başladığında hint timer'ı başlat
+    // focusedItemId null olduğunda (carousel tekrar dönüyor) döngüyü yeniden başlat
     useEffect(() => {
+        // Eğer bir kart focus'taysa, ilk hint'i gösterme
+        if (focusedItemId) {
+            setShowHint(false)
+            return
+        }
+
         let showTimer: NodeJS.Timeout
         let hideTimer: NodeJS.Timeout
 
@@ -551,7 +558,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             clearTimeout(showTimer)
             clearTimeout(hideTimer)
         }
-    }, [])
+    }, [focusedItemId])
 
     // items değiştiğinde animasyonu yeniden başlat (level geçişleri için)
     useEffect(() => {
