@@ -199,6 +199,7 @@ const CategoryOrbitCarousel = () => {
     const handleFocusedItemChange = useCallback((itemId: string | null) => {
         if (!itemId) {
             setFocusedItemTitle(null)
+            setHintIndex(0) // Sayfa ilk yüklenmiş gibi - dönen bilgiler baştan başlasın
             return
         }
 
