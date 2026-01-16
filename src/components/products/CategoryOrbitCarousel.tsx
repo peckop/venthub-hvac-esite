@@ -180,6 +180,15 @@ const CategoryOrbitCarousel = () => {
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) // Tıklanan (focus) kart
     const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) // Dönerken önde olan kart
+    const [hintIndex, setHintIndex] = useState(0) // Dönen hint bilgileri için
+
+    // Dönen hint bilgileri
+    const ROTATING_HINTS = [
+        '↔ Sürükle Çevir',
+        '👆 Tıkla Seç',
+        '↔ Sürükle Keşfet',
+        '🎯 Ürünü Seç',
+    ]
 
     // Alt kategorileri hesapla
     const subcategories = useMemo(() => {
@@ -204,7 +213,7 @@ const CategoryOrbitCarousel = () => {
         setFocusedItemTitle(title)
     }, [level, subcategories])
 
-    // Dönerken önde olan kartın adını güncelle
+    // Dönerken önde olan kartın adını güncelle ve hint index'i artır
     const handleFrontCardChange = useCallback((itemId: string) => {
         let title = ''
         if (level === 'main') {
@@ -215,6 +224,7 @@ const CategoryOrbitCarousel = () => {
             title = sub ? sub.title : ''
         }
         setFrontCardTitle(title)
+        setHintIndex(prev => (prev + 1) % 4) // 4 farklı hint arasında dön
     }, [level, subcategories])
 
     // Reset focus when level changes
@@ -370,15 +380,13 @@ const CategoryOrbitCarousel = () => {
                                     : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
                             }
                         </h2>
-                        {/* Dinamik açıklama */}
+                        {/* Dinamik açıklama - dönen hint bilgileri */}
                         <p className="text-white/50 text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
                                 ? (level === 'main'
                                     ? '🖱️ Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git'
                                     : '🖱️ Tıklayarak Ürün Sayfasına Gidin')
-                                : (level === 'main'
-                                    ? '🖱️ İstediğiniz Ürüne Tıklayın'
-                                    : '🖱️ Detaylar için Ürüne Tıklayın')
+                                : ROTATING_HINTS[hintIndex]
                             }
                         </p>
                     </motion.div>

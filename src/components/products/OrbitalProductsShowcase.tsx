@@ -529,11 +529,27 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         startTime: Date.now() // FIX: İlk frame'den itibaren doğru değer
     })
 
-    // İlk mount'ta hint timer'ı başlat
+    // İlk mount'ta hint timer'ı başlat - periyodik tekrar: 5sn görünür, 30sn gizli
     useEffect(() => {
-        setShowHint(true)
-        const timer = setTimeout(() => setShowHint(false), 5000)
-        return () => clearTimeout(timer)
+        let showTimer: NodeJS.Timeout
+        let hideTimer: NodeJS.Timeout
+
+        const cycleHint = () => {
+            setShowHint(true)
+            hideTimer = setTimeout(() => {
+                setShowHint(false)
+                // 30sn sonra tekrar göster
+                showTimer = setTimeout(cycleHint, 30000)
+            }, 5000)
+        }
+
+        // İlk gösterim
+        cycleHint()
+
+        return () => {
+            clearTimeout(showTimer)
+            clearTimeout(hideTimer)
+        }
     }, [])
 
     // items değiştiğinde animasyonu yeniden başlat (level geçişleri için)
@@ -630,8 +646,6 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                             <span className="flex items-center gap-2"><span className="text-cyan-400">↔</span> Sürükle Çevir</span>
                             <span className="text-cyan-500/50">•</span>
                             <span className="flex items-center gap-2"><span className="text-cyan-400">👆</span> Tıkla Seç</span>
-                            <span className="text-cyan-500/50">•</span>
-                            <span className="flex items-center gap-2"><span className="text-cyan-400">🖱️</span> Çift Tıkla İncele</span>
                         </div>
                     </div>
                 </div>
