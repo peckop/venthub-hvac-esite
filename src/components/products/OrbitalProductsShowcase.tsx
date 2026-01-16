@@ -283,54 +283,54 @@ const OrbitalCard: React.FC<{
                     </mesh>
                 )}
 
-                {/* Yörünge Okları (Drag Hint) - v7: Swap & Dinamik Yön */}
+                {/* Yörünge Okları (Drag Hint) - v9: Küçük & Neon Emerald */}
                 {isFrontCard && shouldShowDragHint && (
                     <>
-                        {/* Sol Konumda -> SAĞA BAKAN (👉) - "Sola gitmek için sağa çek" mantığı veya sadece yer değişimi */}
+                        {/* Sol Konumda -> SAĞA BAKAN (👉) */}
                         <Html
-                            position={[-CONFIG.cardWidth / 2 - 0.35, CONFIG.cardHeight / 2 - 0.1, 0.2]}
+                            position={[-CONFIG.cardWidth / 2 - 0.4, CONFIG.cardHeight / 2 - 0.1, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
+                                className="text-2xl md:text-3xl drop-shadow-[0_0_15px_rgba(52,211,153,0.8)] text-emerald-400"
                                 style={{
                                     transform: `rotate(${CONFIG.tilt}deg)`,
                                     animation: 'swingRight 2s ease-in-out infinite'
                                 }}
                             >
-                                �
+                                👉
                             </div>
                         </Html>
 
                         {/* Sağ Konumda -> SOLA BAKAN (👈) */}
                         <Html
-                            position={[CONFIG.cardWidth / 2 + 0.35, CONFIG.cardHeight / 2 - 0.1, 0.2]}
+                            position={[CONFIG.cardWidth / 2 + 0.4, CONFIG.cardHeight / 2 - 0.1, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
+                                className="text-2xl md:text-3xl drop-shadow-[0_0_15px_rgba(52,211,153,0.8)] text-emerald-400"
                                 style={{
                                     transform: `rotate(${CONFIG.tilt}deg)`,
                                     animation: 'swingLeft 2s ease-in-out infinite'
                                 }}
                             >
-                                �
+                                👈
                             </div>
                         </Html>
 
-                        {/* Tut Çevir Etiketi */}
+                        {/* Tut Çevir Etiketi - Daha Küçük & Neon */}
                         <Html
-                            position={[0, CONFIG.cardHeight / 2 + 0.1, 0.2]}
+                            position={[0, CONFIG.cardHeight / 2 + 0.15, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-400/50 text-cyan-200 text-[10px] font-bold uppercase tracking-wider animate-pulse shadow-lg whitespace-nowrap"
+                                className="bg-emerald-500 text-black px-3 py-0.5 rounded-full border-2 border-emerald-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.5)] whitespace-nowrap"
                                 style={{ transform: `rotate(${CONFIG.tilt}deg)` }}
                             >
-                                ↔ Tut Çevir
+                                ↔ TUT ÇEVİR
                             </div>
                         </Html>
                     </>
@@ -535,43 +535,36 @@ const SceneContent: React.FC<{
                 }
                 else {
                     // Animasyon Başladı
-                    currentSpeed = 0 // Dönüşü durdur
+                    currentSpeed = 0
                     const elapsed = state.clock.elapsedTime - dragStartTimeRef.current
 
                     const maxSwing = Math.PI / 2 // 90 derece
+                    const direction = dragInitialDirectionRef.current // 1: Sola, -1: Sağa
 
                     // Easing helper
                     const easeInOutQuad = (x: number) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
 
                     let targetSway = 0
 
-                    // YÖN MANTIĞI:
-                    // dragInitialDirectionRef.current = 1 (Sola/Next Dönüyordu) -> Önce Sola Gitmeli
-                    // Sola gitmek = Rotation AZALMALI (Negatif Sway)
-                    // O yüzden direction 1 ise Negatif ile başla.
-                    const direction = dragInitialDirectionRef.current // 1 veya -1
-
                     if (elapsed < 0.5) {
                         targetSway = 0
                     } else if (elapsed < 2.0) {
-                        // Faz 1: Dönüş yönünde git
+                        // FAZ 1: Dönüş yönünde 90 derece ilerle
                         const p = (elapsed - 0.5) / 1.5
-                        // Dir 1 (Sola) -> Hedef Negatif Swing
+                        // direction 1 ise rotation AZALMALI (Sola git). O yüzden -direction.
                         targetSway = -direction * easeInOutQuad(p) * maxSwing
                     } else if (elapsed < 3.5) {
-                        // Faz 2: Merkeze dön
+                        // FAZ 2: Merkeze geri dön (Ters yönde)
                         const p = (elapsed - 2.0) / 1.5
                         targetSway = -direction * maxSwing * (1 - easeInOutQuad(p))
                     } else if (elapsed < 5.0) {
-                        // Faz 3: Ters yöne git
+                        // FAZ 3: Diğer ters yöne 90 derece git
                         const p = (elapsed - 3.5) / 1.5
                         targetSway = direction * easeInOutQuad(p) * maxSwing
                     } else if (elapsed < 6.5) {
-                        // Faz 4: Merkeze dön
+                        // FAZ 4: Merkeze tekrar gel ve bitir
                         const p = (elapsed - 5.0) / 1.5
                         targetSway = direction * maxSwing * (1 - easeInOutQuad(p))
-                    } else if (elapsed < 7.0) {
-                        targetSway = 0
                     } else {
                         // Süre bitti -> Cooldown'a geç
                         onStageChange('cooldown')
@@ -793,6 +786,16 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         sharedState.current.startTime = Date.now()
         sharedState.current.rotation = 0
         sharedState.current.target = null
+
+        // v9 - HintStage Logic: Carousel başladıktan 4sn sonra 'tap' göster, 8sn sonra 'drag' göster
+        setHintStage('idle')
+        const t1 = setTimeout(() => setHintStage('tap'), 4000)
+        const t2 = setTimeout(() => setHintStage('drag'), 9000)
+
+        return () => {
+            clearTimeout(t1)
+            clearTimeout(t2)
+        }
     }, [items.length])
 
     // Focus hint periyodik timer: focusedItemId set olduğunda 5sn görünür, 30sn gizli, tekrar
