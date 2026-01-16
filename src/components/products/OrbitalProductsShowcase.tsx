@@ -48,7 +48,7 @@ const OrbitalCard: React.FC<{
     isFrontCard: boolean
     shouldShowTapHint: boolean
     shouldShowDragHint: boolean
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint }) => {
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -150,11 +150,11 @@ const OrbitalCard: React.FC<{
 
             const mat = meshRef.current.material as THREE.MeshStandardMaterial
             if (mat) mat.opacity = easeOutCubic
-        } else {
+        } else if (groupRef.current) {
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
-                const s = pulsedScale * 1.5
+                const s = pulsedScale * 0.8
                 iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
             }
         }
@@ -250,8 +250,7 @@ const OrbitalCard: React.FC<{
                 rotationIntensity={0.03}
                 floatIntensity={CONFIG.floatIntensity}
             >
-                {/* GÖRÜNÜR KART VE HİTBOX - Aynı yöne bakıyorlar */}
-                {/* Hitbox: Kalın kutu, kartla aynı pozisyonda */}
+                {/* Hitbox */}
                 <mesh
                     position={[0, 0, 0.1]}
                     onClick={handleClick}
@@ -261,15 +260,13 @@ const OrbitalCard: React.FC<{
                     onPointerOver={handlePointerOver}
                     onPointerOut={handlePointerOut}
                 >
-                    {/* Kalın kutu: Açılı kartlarda bile tıklanabilir */}
                     <boxGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight, 1.5]} />
                     <meshBasicMaterial visible={false} />
                 </mesh>
 
-                {/* GÖRÜNÜR KART (3D ICON VEYA PLANE) */}
+                {/* GÖRÜNÜR KART */}
                 {item.categorySlug ? (
                     <group name="icon-wrapper" scale={0.8} rotation={[0, Math.PI, 0]}>
-                        {/* Rotation PI çünkü kartlar merkeze bakıyor, ikonlar da bize baksın */}
                         <Category3DIcon categorySlug={item.categorySlug} scale={1} />
                     </group>
                 ) : (
@@ -285,38 +282,52 @@ const OrbitalCard: React.FC<{
                         />
                     </mesh>
                 )}
+
+                {/* Yörünge Okları (Drag Hint) */}
+                {isFrontCard && shouldShowDragHint && (
+                    <Html position={[0, 0, 0]} center>
+                        <style>{`
+                            @keyframes bounce-horizontal-left {
+                                0%, 100% { transform: translateX(0); }
+                                50% { transform: translateX(-20px); }
+                            }
+                            @keyframes bounce-horizontal-right {
+                                0%, 100% { transform: translateX(0); }
+                                50% { transform: translateX(20px); }
+                            }
+                            .animate-bounce-horizontal-left { animation: bounce-horizontal-left 0.8s infinite; }
+                            .animate-bounce-horizontal-right { animation: bounce-horizontal-right 0.8s infinite; }
+                        `}</style>
+                        <div className="flex items-center gap-16 md:gap-24 pointer-events-none select-none" style={{ transform: `rotate(${CONFIG.tilt}deg)` }}>
+                            <div className="text-cyan-400 text-6xl animate-bounce-horizontal-left opacity-90 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">←</div>
+                            <div className="w-56 md:w-80" />
+                            <div className="text-cyan-400 text-6xl animate-bounce-horizontal-right opacity-90 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">→</div>
+                        </div>
+                    </Html>
+                )}
             </Float>
 
-            {/* El ikonu overlay - sadece en öndeki kartta */}
+            {/* El ikonu overlay */}
             {isFrontCard && !hovered && showTapHint && (
                 <Html
                     position={[0, 0, 0.5]}
                     center
                     distanceFactor={5}
                     occlude={false}
-                    style={{
-                        pointerEvents: 'none',
-                        transition: 'opacity 0.5s',
-                        opacity: 1
-                    }}
+                    style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
                 >
-                    <div className="text-5xl animate-bounce" style={{ animationDuration: '1s' }}>
-                        👆
-                    </div>
+                    <div className="text-5xl animate-bounce" style={{ animationDuration: '1s' }}>👆</div>
                 </Html>
             )}
 
+            {/* Label */}
             {showLabel && (
                 <Html
                     position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
                     center
                     distanceFactor={6}
                     occlude={false}
-                    style={{
-                        pointerEvents: 'none',
-                        transition: 'opacity 0.5s',
-                        opacity: 1
-                    }}
+                    style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
                 >
                     <div
                         className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
@@ -352,10 +363,10 @@ const SceneContent: React.FC<{
     onFocusedItemChange?: (itemId: string | null) => void
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
     shouldShowTapHint: boolean
-    setShouldShowTapHint: (v: boolean) => void
     shouldShowDragHint: boolean
-    setShouldShowDragHint: (v: boolean) => void
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, setShouldShowTapHint, shouldShowDragHint, setShouldShowDragHint }) => {
+    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown'
+    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown') => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange }) => {
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
@@ -368,11 +379,10 @@ const SceneContent: React.FC<{
     useEffect(() => {
         // items değiştiğinde her şeyi sıfırla
         frontCardChangeCountRef.current = 0
-        setShouldShowTapHint(false)
-        setShouldShowDragHint(false)
+        onStageChange('idle')
         lastFrontCardRef.current = null
         hasBeenFocusedRef.current = false
-    }, [items.length, setShouldShowTapHint, setShouldShowDragHint])
+    }, [items.length, onStageChange])
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -445,14 +455,20 @@ const SceneContent: React.FC<{
             let currentSpeed = delta * CONFIG.autoRotateSpeed
 
             // Eğer sallanma (wiggle) ipucu aktifse
+            // TERS ESNEME (Drag Simulation)
+            // Sağa-sola sallanma yerine: Dönüş yönünün tersine esneme ve bırakma
             if (shouldShowDragHint) {
-                // Carousel'i yavaşlat ki animasyon görülsün
                 currentSpeed *= 0.3
-
-                // Sağa-sola sallanma (wiggle) ofseti
-                // Sinüs dalgası: t=4.0 civarı hız, 0.05 radyan (~3 derece) genlik
-                const wiggle = Math.sin(state.clock.elapsedTime * 6) * 0.04
-                sharedState.current.rotation += wiggle * 0.1 // Rotasyona hafifçe sızdır
+                const t = state.clock.elapsedTime % 3
+                let stretch = 0
+                if (t < 1.0) {
+                    // Yavaşça geriye çek (autoRotateSpeed'in tersine)
+                    stretch = t * 0.08
+                } else if (t < 1.3) {
+                    // Hızlıca bırak (snap back)
+                    stretch = 0.08 * (1 - (t - 1.0) / 0.3)
+                }
+                sharedState.current.rotation += stretch * 0.1
             }
 
             sharedState.current.rotation -= currentSpeed
@@ -490,13 +506,13 @@ const SceneContent: React.FC<{
             // Carousel gerçekten döndü, tüm sistemi sıfırla
             frontCardChangeCountRef.current = 0
             hasBeenFocusedRef.current = false
-            setShouldShowTapHint(false)
-            setShouldShowDragHint(false)
+            onStageChange('idle')
             // Parent'a bildir: focusedItemId artık null (sayfa ilk yüklenmiş gibi)
             if (onFocusedItemChange) {
                 onFocusedItemChange(null)
             }
-        } else if (sharedState.current.target !== null) {
+        }
+        else if (sharedState.current.target !== null) {
             // Bir kart focus'ta, işaretle
             hasBeenFocusedRef.current = true
         }
@@ -517,14 +533,18 @@ const SceneContent: React.FC<{
                 frontCardChangeCountRef.current += 1
                 const count = frontCardChangeCountRef.current
 
-                // Patern Ayırımı:
-                // 2, 5, 8... -> Tıklama (Tap/Heartbeat)
-                const isTapCycle = count === 2 || (count > 2 && (count - 2) % 3 === 0)
-                // 3, 6, 9... -> Sürükleme (Drag/Wiggle)
-                const isDragCycle = count === 3 || (count > 3 && (count - 3) % 3 === 0)
+                // Patern Ayırımı (v2):
+                // Stage Idle -> frontCardChangeCount 2 olunca -> Stage Tap başlar
+                // Stage Tap bitince (ürün geçince) -> Stage Drag başlar
+                // Stage Drag bitince (ürün geçince) -> Stage Cooldown başlar (15sn)
 
-                setShouldShowTapHint(isTapCycle)
-                setShouldShowDragHint(isDragCycle)
+                if (hintStage === 'idle' && count >= 2) {
+                    onStageChange('tap')
+                } else if (hintStage === 'tap') {
+                    onStageChange('drag')
+                } else if (hintStage === 'drag') {
+                    onStageChange('cooldown')
+                }
 
                 if (onFrontCardChange && sharedState.current.target === null) {
                     onFrontCardChange(frontItem.id) // Parent'a bildir
@@ -585,9 +605,22 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
-    const [shouldShowTapHint, setShouldShowTapHint] = useState(false)
-    const [shouldShowDragHint, setShouldShowDragHint] = useState(false)
+    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown'>('idle')
     const lastX = useRef(0)
+
+    // Stage Cooldown kontrolü
+    useEffect(() => {
+        if (hintStage !== 'cooldown') return
+
+        const timer = setTimeout(() => {
+            setHintStage('idle')
+        }, 15000) // 15sn bekleme
+
+        return () => clearTimeout(timer)
+    }, [hintStage])
+
+    const shouldShowTapHint = hintStage === 'tap'
+    const shouldShowDragHint = hintStage === 'drag'
 
     // Drag Conflict Çözümü: Ref ile anlık takip
     const isDraggingRef = useRef(false)
@@ -741,9 +774,9 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     onFocusedItemChange={handleFocusedItemChangeInternal}
                     onFrontCardChange={onFrontCardChange}
                     shouldShowTapHint={shouldShowTapHint}
-                    setShouldShowTapHint={setShouldShowTapHint}
                     shouldShowDragHint={shouldShowDragHint}
-                    setShouldShowDragHint={setShouldShowDragHint}
+                    hintStage={hintStage}
+                    onStageChange={setHintStage}
                 />
             </Canvas>
             {/* Initial Hint overlay */}
@@ -770,21 +803,10 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     </div>
                 </div>
             )}
-            {/* Sol-Sağ Gradient ve Sürükle İşareti */}
+            {/* Sol-Sağ Gradient */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
             <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
 
-            {/* Sürükleme işareti - aralıklı beliren sol-sağ oklar */}
-            {(showHint || shouldShowDragHint) && !focusedItemId && (
-                <>
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block" style={{ animationDuration: shouldShowDragHint ? '0.8s' : '2s' }}>
-                        ←
-                    </div>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block" style={{ animationDuration: shouldShowDragHint ? '0.8s' : '2s' }}>
-                        →
-                    </div>
-                </>
-            )}
         </div>
     )
 }
