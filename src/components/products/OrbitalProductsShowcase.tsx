@@ -445,10 +445,14 @@ const SceneContent: React.FC<{
         // Carousel tekrar dönmeye başladığında (target null oldu) sayıcıyı sıfırla
         // Böylece sayfa ilk yüklenmiş gibi olur
         if (sharedState.current.target === null && hasBeenFocusedRef.current) {
-            // Focus'tan çıktık, sıfırla
+            // Focus'tan çıktık, tüm sistemi sıfırla
             frontCardChangeCountRef.current = 0
             hasBeenFocusedRef.current = false
             setShouldShowTapHint(false)
+            // Parent'a bildir: focusedItemId artık null (sayfa ilk yüklenmiş gibi)
+            if (onFocusedItemChange) {
+                onFocusedItemChange(null)
+            }
         } else if (sharedState.current.target !== null) {
             // Bir kart focus'ta, işaretle
             hasBeenFocusedRef.current = true
