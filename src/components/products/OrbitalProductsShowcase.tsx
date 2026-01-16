@@ -662,8 +662,21 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     </div>
                 </div>
             )}
+            {/* Sol-Sağ Gradient ve Sürükle İşareti */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
             <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
+
+            {/* Sürükleme işareti - aralıklı beliren sol-sağ oklar */}
+            {showHint && !focusedItemId && (
+                <>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
+                        ←
+                    </div>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
+                        →
+                    </div>
+                </>
+            )}
         </div>
     )
 }
