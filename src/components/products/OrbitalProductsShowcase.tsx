@@ -187,6 +187,18 @@ const OrbitalCard: React.FC<{
     // Sadece onClick kullan - basit ve güvenilir
     const handleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
+
+        // Drag/Click Ayrımı: Mouse'un basıldığı yer ile bırakıldığı yer arasındaki mesafeyi ölç
+        const downX = pointerDownPos.current.x
+        const downY = pointerDownPos.current.y
+        const upX = e.nativeEvent.clientX
+        const upY = e.nativeEvent.clientY
+
+        const distance = Math.sqrt(Math.pow(upX - downX, 2) + Math.pow(upY - downY, 2))
+
+        // Eğer 10px'ten fazla hareket edildiyse, bu bir "Tut Çevir" aksiyonudur, tıklama değildir.
+        if (distance > 10) return
+
         triggerAction(e.nativeEvent)
     }, [triggerAction])
 
