@@ -638,6 +638,25 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         }
     }, [focusedItemId, isPaused])
 
+    // Layout Fix: Mount olduktan sonra (özellikle Lazy Load sonrası) Canvas ve Overlay pozisyonlarını
+    // düzeltmek için yapay resize eventleri tetikle. Scrollbar değişimlerini yakalar.
+    useEffect(() => {
+        // Hızlı düzeltme (100ms)
+        const t1 = setTimeout(() => {
+            window.dispatchEvent(new Event('resize'))
+        }, 100)
+
+        // Kesin düzeltme (800ms) - Animasyonlar ve dış yüklemeler bitince
+        const t2 = setTimeout(() => {
+            window.dispatchEvent(new Event('resize'))
+        }, 800)
+
+        return () => {
+            clearTimeout(t1)
+            clearTimeout(t2)
+        }
+    }, [])
+
     const hideHint = useCallback(() => setShowHint(false), [])
 
     // Internal wrapper: Local state'i güncelle + parent'a bildir
@@ -680,7 +699,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
     return (
         <div
-            className="w-full h-[500px] md:h-[550px] relative select-none touch-none"
+            className="w-full h-[500px] md:h-[550px] relative select-none touch-none overflow-hidden"
             style={{ backgroundColor: CONFIG.backgroundColor }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -742,8 +761,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                 </div>
             )}
             {/* Sol-Sağ Gradient ve Sürükle İşareti */}
-            <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none z-10" />
+            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none z-10" />
 
             {/* Sürükleme işareti - aralıklı beliren sol-sağ oklar */}
             {showHint && !focusedItemId && (
