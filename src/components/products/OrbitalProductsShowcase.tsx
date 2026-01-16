@@ -283,29 +283,12 @@ const OrbitalCard: React.FC<{
                     </mesh>
                 )}
 
-                {/* Yörünge Okları (Drag Hint) - v5: Daha Küçük ve Yakın */}
+                {/* Yörünge Okları (Drag Hint) - v7: Swap & Dinamik Yön */}
                 {isFrontCard && shouldShowDragHint && (
                     <>
-                        {/* Sol El İşareti - Sol Kenarın Hemen Üstü */}
+                        {/* Sol Konumda -> SAĞA BAKAN (👉) - "Sola gitmek için sağa çek" mantığı veya sadece yer değişimi */}
                         <Html
-                            position={[-CONFIG.cardWidth / 2, CONFIG.cardHeight / 2 - 0.2, 0.2]}
-                            center
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            <div
-                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
-                                style={{
-                                    transform: `rotate(${CONFIG.tilt}deg)`,
-                                    animation: 'swingLeft 2s ease-in-out infinite'
-                                }}
-                            >
-                                👈
-                            </div>
-                        </Html>
-
-                        {/* Sağ El İşareti - Sağ Kenarın Hemen Üstü */}
-                        <Html
-                            position={[CONFIG.cardWidth / 2, CONFIG.cardHeight / 2 - 0.2, 0.2]}
+                            position={[-CONFIG.cardWidth / 2 - 0.35, CONFIG.cardHeight / 2 - 0.1, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
@@ -316,11 +299,28 @@ const OrbitalCard: React.FC<{
                                     animation: 'swingRight 2s ease-in-out infinite'
                                 }}
                             >
-                                👉
+                                �
                             </div>
                         </Html>
 
-                        {/* Tut Çevir Etiketi - Daha Yakın */}
+                        {/* Sağ Konumda -> SOLA BAKAN (👈) */}
+                        <Html
+                            position={[CONFIG.cardWidth / 2 + 0.35, CONFIG.cardHeight / 2 - 0.1, 0.2]}
+                            center
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div
+                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
+                                style={{
+                                    transform: `rotate(${CONFIG.tilt}deg)`,
+                                    animation: 'swingLeft 2s ease-in-out infinite'
+                                }}
+                            >
+                                �
+                            </div>
+                        </Html>
+
+                        {/* Tut Çevir Etiketi */}
                         <Html
                             position={[0, CONFIG.cardHeight / 2 + 0.1, 0.2]}
                             center
@@ -405,6 +405,7 @@ const SceneContent: React.FC<{
     const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon
     const dragAnimationStartedRef = useRef(false) // Animasyon başladı mı
     const dragStartTimeRef = useRef(0) // Animasyon başlangıç zamanı
+    const dragInitialDirectionRef = useRef(1) // Animasyon başlangıç yönü (+1 veya -1)
 
     // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
     // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
@@ -485,8 +486,10 @@ const SceneContent: React.FC<{
         // OTO DÖNÜŞ + WIGGLE (Sallanma İpucu)
         else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
             // Normal dönüş hızı
+            let currentSpeed = delta * CONFIG.autoRotateSpeed
+
             // Eğer sallanma (wiggle) ipucu aktifse
-            // PROFESYONEL SALINIM (v5) - Center Lock + 90 Derece Salınım
+            // PROFESYONEL SALINIM (v7) - Dinamik Yön
             if (shouldShowDragHint) {
                 // 1. Önce tam merkeze kilitle (Center Lock)
                 const step = (Math.PI * 2) / items.length
@@ -498,15 +501,34 @@ const SceneContent: React.FC<{
                     const dist = targetRot - currentRot
 
                     // Merkeze çok yakın mı?
-                    if (Math.abs(dist) > 0.002) {
+                    if (Math.abs(dist) > 0.005) { // Tolerans artırıldı
                         // Merkeze doğru yumuşakça kaydır
-                        sharedState.current.rotation += dist * 0.1
-                        currentSpeed = 0 // Auto rotate'i iptal et
+                        sharedState.current.rotation += dist * 0.15
+                        currentSpeed = 0 // Auto rotate'i iptal et (Sadece bu blokta!)
                     } else {
                         // Merkeze oturdu -> Animasyonu başlat
                         sharedState.current.rotation = targetRot
                         dragAnimationStartedRef.current = true
                         dragStartTimeRef.current = state.clock.elapsedTime
+
+                        // YÖN TAYİNİ: Eğer carousel sola dönüyorsa (currentSpeed pozitif -> rotasyon negatif olur)
+                        // veya manuel drag sonrası velocity varsa ona bak.
+                        // Basit heuristic: Varsayılan hız + ise Sola (Next) dönüyordur.
+                        // Ama momentum varsa o geçerli.
+                        // Rotation AZALIYORSA = Next item (Sola gidiyor). direction = 1
+                        // Rotation ARTIYORSA = Prev item (Sağa gidiyor). direction = -1
+                        // Varsayılan autoRotate saatin tersi (rotation azalıyor) -> Next -> direction = 1
+                        const velocity = sharedState.current.velocity
+                        // Eğer velocity çok düşükse default yönü al (1)
+                        if (Math.abs(velocity) > 0.0001) {
+                            // Velocity > 0: rotation artar (sağa döner) -> ilk salınım sağa (pozitif sway) -> direction = -1
+                            // Velocity < 0: rotation azalır (sola döner) -> ilk salınım sola (negatif sway) -> direction = 1
+                            dragInitialDirectionRef.current = velocity > 0 ? -1 : 1
+                        } else {
+                            // Default auto-rotate rotation AZALTIR (sola döner) -> ilk salınım sola (negatif sway)
+                            dragInitialDirectionRef.current = 1 // 1 = Sola öncelikli (Negatif sway)
+                        }
+
                         swayOffsetRef.current = 0
                         currentSpeed = 0
                     }
@@ -516,14 +538,6 @@ const SceneContent: React.FC<{
                     currentSpeed = 0 // Dönüşü durdur
                     const elapsed = state.clock.elapsedTime - dragStartTimeRef.current
 
-                    // Zamanlama (Toplam ~7sn)
-                    // 0.0 - 0.5: Bekle (İşaretler beliriyor)
-                    // 0.5 - 2.0: Sola 90 derece (PI/2)
-                    // 2.0 - 3.5: Merkeze dön (0)
-                    // 3.5 - 5.0: Sağa 90 derece (-PI/2)
-                    // 5.0 - 6.5: Merkeze dön
-                    // 6.5 - 7.0: Bekle -> Bitir
-
                     const maxSwing = Math.PI / 2 // 90 derece
 
                     // Easing helper
@@ -531,24 +545,31 @@ const SceneContent: React.FC<{
 
                     let targetSway = 0
 
+                    // YÖN MANTIĞI:
+                    // dragInitialDirectionRef.current = 1 (Sola/Next Dönüyordu) -> Önce Sola Gitmeli
+                    // Sola gitmek = Rotation AZALMALI (Negatif Sway)
+                    // O yüzden direction 1 ise Negatif ile başla.
+                    const direction = dragInitialDirectionRef.current // 1 veya -1
+
                     if (elapsed < 0.5) {
                         targetSway = 0
                     } else if (elapsed < 2.0) {
-                        // Sola git (Pozitif rotasyon = Ürün Sola gider)
+                        // Faz 1: Dönüş yönünde git
                         const p = (elapsed - 0.5) / 1.5
-                        targetSway = easeInOutQuad(p) * maxSwing
+                        // Dir 1 (Sola) -> Hedef Negatif Swing
+                        targetSway = -direction * easeInOutQuad(p) * maxSwing
                     } else if (elapsed < 3.5) {
-                        // Merkeze dön
+                        // Faz 2: Merkeze dön
                         const p = (elapsed - 2.0) / 1.5
-                        targetSway = maxSwing * (1 - easeInOutQuad(p))
+                        targetSway = -direction * maxSwing * (1 - easeInOutQuad(p))
                     } else if (elapsed < 5.0) {
-                        // Sağa git (Negatif rotasyon = Ürün Sağa gider)
+                        // Faz 3: Ters yöne git
                         const p = (elapsed - 3.5) / 1.5
-                        targetSway = -(easeInOutQuad(p) * maxSwing)
+                        targetSway = direction * easeInOutQuad(p) * maxSwing
                     } else if (elapsed < 6.5) {
-                        // Merkeze dön
+                        // Faz 4: Merkeze dön
                         const p = (elapsed - 5.0) / 1.5
-                        targetSway = -maxSwing * (1 - easeInOutQuad(p))
+                        targetSway = direction * maxSwing * (1 - easeInOutQuad(p))
                     } else if (elapsed < 7.0) {
                         targetSway = 0
                     } else {
@@ -566,10 +587,12 @@ const SceneContent: React.FC<{
             } else {
                 // Hint aktif değil - Reset
                 dragAnimationStartedRef.current = false
+                // Sway offset temizliği
                 if (swayOffsetRef.current !== 0) {
                     sharedState.current.rotation -= swayOffsetRef.current
                     swayOffsetRef.current = 0
                 }
+                // DİKKAT: Burada currentSpeed'e dokunmuyoruz, normal değerini (autoRotateSpeed) koruyor!
             }
 
             // Eğer hint aktifse currentSpeed zaten 0 yapıldı veya yönetildi
