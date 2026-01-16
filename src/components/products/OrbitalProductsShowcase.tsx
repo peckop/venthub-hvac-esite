@@ -45,7 +45,8 @@ const OrbitalCard: React.FC<{
     isDraggingRef: React.MutableRefObject<boolean>
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange }) => {
+    isFrontCard?: boolean // En öndeki kart mı?
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -59,7 +60,7 @@ const OrbitalCard: React.FC<{
 
     // El ikonu aralıklı görünüm timer'ı (5sn görünür, 10sn sonra tekrar)
     useEffect(() => {
-        if (!isNearFront) {
+        if (!isFrontCard) {
             setShowTapHint(true) // Öne geldiğinde baştan başlat
             return
         }
@@ -71,7 +72,7 @@ const OrbitalCard: React.FC<{
             clearTimeout(hideTimer)
             clearTimeout(showTimer)
         }
-    }, [isNearFront])
+    }, [isFrontCard])
 
     const texture = useMemo(() => {
         if (item.categorySlug) return null
@@ -252,8 +253,8 @@ const OrbitalCard: React.FC<{
                 )}
             </Float>
 
-            {/* El ikonu overlay - kartın üzerinde (sadece önde ve tıklanmamışken) */}
-            {isNearFront && !hovered && showTapHint && (
+            {/* El ikonu overlay - sadece en öndeki kartta */}
+            {isFrontCard && !hovered && showTapHint && (
                 <Html
                     position={[0, 0, 0.5]}
                     center
@@ -319,6 +320,7 @@ const SceneContent: React.FC<{
 }> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange }) => {
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
+    const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -414,7 +416,7 @@ const SceneContent: React.FC<{
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
 
         // Dönerken önde olan kartı tespit et ve parent'a bildir
-        if (onFrontCardChange && items.length > 0 && sharedState.current.target === null) {
+        if (items.length > 0) {
             const total = items.length
             const step = (Math.PI * 2) / total
             // En öndeki kart index'ini hesapla (rotation'a göre)
@@ -423,7 +425,10 @@ const SceneContent: React.FC<{
             const frontItem = items[frontIndex]
             if (frontItem && frontItem.id !== lastFrontCardRef.current) {
                 lastFrontCardRef.current = frontItem.id
-                onFrontCardChange(frontItem.id)
+                setFrontCardId(frontItem.id) // Local state güncelle
+                if (onFrontCardChange && sharedState.current.target === null) {
+                    onFrontCardChange(frontItem.id) // Parent'a bildir
+                }
             }
         }
     })
@@ -451,6 +456,7 @@ const SceneContent: React.FC<{
                     isDraggingRef={isDraggingRef}
                     onCardClick={onCardClick}
                     onFocusedItemChange={onFocusedItemChange}
+                    isFrontCard={item.id === frontCardId}
                 />
             ))}
 
