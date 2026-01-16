@@ -283,35 +283,69 @@ const OrbitalCard: React.FC<{
                     </mesh>
                 )}
 
-                {/* Yörünge Okları (Drag Hint) - Ürünün Yukarısında (Top) */}
+                {/* Yörünge Okları (Drag Hint) - v4: Ürün Kenarlarına Hizalı */}
                 {isFrontCard && shouldShowDragHint && (
-                    <Html position={[0, CONFIG.cardHeight / 2 + 0.8, 0]} center>
-                        <style>{`
-                            @keyframes bounce-horizontal-left-v3 {
-                                0%, 100% { transform: translateX(0) scale(1); }
-                                50% { transform: translateX(-30px) scale(1.2); }
-                            }
-                            @keyframes bounce-horizontal-right-v3 {
-                                0%, 100% { transform: translateX(0) scale(1); }
-                                50% { transform: translateX(30px) scale(1.2); }
-                            }
-                            .animate-drag-arrow-left { animation: bounce-horizontal-left-v3 0.8s infinite; }
-                            .animate-drag-arrow-right { animation: bounce-horizontal-right-v3 0.8s infinite; }
-                        `}</style>
-                        <div className="flex flex-col items-center gap-2 pointer-events-none select-none">
-                            <div className="flex items-center gap-20 md:gap-32" style={{ transform: `rotate(${CONFIG.tilt}deg)` }}>
-                                <div className="text-cyan-400 text-7xl animate-drag-arrow-left opacity-90 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
-                                    <span className="flex items-center gap-1">👈</span>
-                                </div>
-                                <div className="text-cyan-400 text-7xl animate-drag-arrow-right opacity-90 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
-                                    <span className="flex items-center gap-1">👉</span>
-                                </div>
+                    <>
+                        {/* Sol El İşareti - Sol Kenarın Üstü */}
+                        <Html
+                            position={[-CONFIG.cardWidth / 2 - 0.2, CONFIG.cardHeight / 2 + 0.15, 0.2]}
+                            center
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div
+                                className="text-5xl md:text-6xl animate-pulse drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]"
+                                style={{
+                                    transform: `rotate(${CONFIG.tilt}deg)`,
+                                    animation: 'swingLeft 1.5s ease-in-out infinite'
+                                }}
+                            >
+                                👈
                             </div>
-                            <div className="bg-cyan-500/20 backdrop-blur-sm px-4 py-1 rounded-full border border-cyan-500/30 text-cyan-300 text-[10px] font-bold uppercase tracking-widest animate-pulse">
-                                Tut Çevir
+                            <style>{`
+                                @keyframes swingLeft {
+                                    0%, 100% { transform: translateX(0) rotate(${CONFIG.tilt}deg); }
+                                    50% { transform: translateX(-15px) rotate(${CONFIG.tilt}deg) scale(1.1); }
+                                }
+                            `}</style>
+                        </Html>
+
+                        {/* Sağ El İşareti - Sağ Kenarın Üstü */}
+                        <Html
+                            position={[CONFIG.cardWidth / 2 + 0.2, CONFIG.cardHeight / 2 + 0.15, 0.2]}
+                            center
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div
+                                className="text-5xl md:text-6xl animate-pulse drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]"
+                                style={{
+                                    transform: `rotate(${CONFIG.tilt}deg)`,
+                                    animation: 'swingRight 1.5s ease-in-out infinite'
+                                }}
+                            >
+                                👉
                             </div>
-                        </div>
-                    </Html>
+                            <style>{`
+                                @keyframes swingRight {
+                                    0%, 100% { transform: translateX(0) rotate(${CONFIG.tilt}deg); }
+                                    50% { transform: translateX(15px) rotate(${CONFIG.tilt}deg) scale(1.1); }
+                                }
+                            `}</style>
+                        </Html>
+
+                        {/* Tut Çevir Etiketi - Ürünün Hemen Üstü (Merkez) */}
+                        <Html
+                            position={[0, CONFIG.cardHeight / 2 + 0.4, 0.2]}
+                            center
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div
+                                className="bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-cyan-400/50 text-cyan-200 text-xs font-bold uppercase tracking-wider animate-pulse shadow-lg"
+                                style={{ transform: `rotate(${CONFIG.tilt}deg)` }}
+                            >
+                                ↔ Tut Çevir
+                            </div>
+                        </Html>
+                    </>
                 )}
             </Float>
 
@@ -464,24 +498,40 @@ const SceneContent: React.FC<{
             let currentSpeed = delta * CONFIG.autoRotateSpeed
 
             // Eğer sallanma (wiggle) ipucu aktifse
-            // GÜÇLÜ SALINIM (Exaggerated Drag Simulation) - v3
-            // Önceki ve sonraki ürüne kadar geniş savrulma
+            // PROFESYONEL SALINIM (v4) - 6 Saniyelik Easing Tabanlı Döngü
+            // Patern: Sağa (Next) -> Merkez -> Sola (Prev) -> Merkez -> Dur
             if (shouldShowDragHint) {
-                currentSpeed *= 0.05 // Dönüşü neredeyse durdur
+                currentSpeed *= 0.02 // Dönüşü neredeyse durdur
 
-                const t = state.clock.elapsedTime % 3 // 3 saniyelik döngü
+                const cycleDuration = 6 // 6 saniyelik döngü
+                const t = state.clock.elapsedTime % cycleDuration
                 const step = (Math.PI * 2) / items.length
-                const maxSway = step * 0.8 // Ürün mesafesinin %80'i
+                const maxSway = step * 1.0 // Tam bir ürün mesafesi (%100)
+
+                // Easing fonksiyonları
+                const easeOutQuad = (x: number) => 1 - (1 - x) * (1 - x)
+                const easeInOutQuad = (x: number) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
 
                 let targetSway = 0
-                if (t < 1.0) {
-                    // Sola (Next)
-                    targetSway = Math.sin(t * Math.PI) * maxSway
-                } else if (t < 2.0) {
-                    // Sağa (Prev)
-                    targetSway = -Math.sin((t - 1.0) * Math.PI) * maxSway
+
+                if (t < 1.5) {
+                    // [0.0s - 1.5s] Sağa doğru tam 1 adım (easeOutQuad - hızlı başla, yavaş dur)
+                    const progress = easeOutQuad(t / 1.5)
+                    targetSway = progress * maxSway
+                } else if (t < 2.5) {
+                    // [1.5s - 2.5s] Merkeze dönüş (easeInOutQuad)
+                    const progress = easeInOutQuad((t - 1.5) / 1.0)
+                    targetSway = maxSway * (1 - progress)
+                } else if (t < 4.0) {
+                    // [2.5s - 4.0s] Sola doğru tam 1 adım (easeOutQuad)
+                    const progress = easeOutQuad((t - 2.5) / 1.5)
+                    targetSway = -progress * maxSway
+                } else if (t < 5.0) {
+                    // [4.0s - 5.0s] Merkeze dönüş (easeInOutQuad)
+                    const progress = easeInOutQuad((t - 4.0) / 1.0)
+                    targetSway = -maxSway * (1 - progress)
                 } else {
-                    // Merkeze dön ve bekle
+                    // [5.0s - 6.0s] Durgun bekle (kullanıcı algılasın)
                     targetSway = 0
                 }
 
