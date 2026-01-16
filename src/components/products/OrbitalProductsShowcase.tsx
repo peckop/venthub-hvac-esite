@@ -45,8 +45,9 @@ const OrbitalCard: React.FC<{
     isDraggingRef: React.MutableRefObject<boolean>
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
-    isFrontCard?: boolean
-    shouldShowTapHint?: boolean // SceneContent'ten gelen el ikonu gösterme kararı
+    isFrontCard: boolean
+    shouldShowTapHint: boolean
+    shouldShowDragHint: boolean
 }> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
@@ -123,12 +124,20 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
-        // 🎯 PULSE EFFECT: Focus olan kart hafifçe büyüyüp küçülür ("nefes alır")
-        // sharedState.target null ise ve isFrontCard ise = kart sabitlenmiş demek
+        // 🎯 PULSE EFFECT: Focus/Hint durumunda kart hareketlenir
         let pulseMultiplier = 1
-        if (isFrontCard && sharedState.current.target === null) {
-            // Sin dalgası ile yumuşak pulse: 0.97 - 1.03 arası
-            const pulseSpeed = 2 // Hız (saniyede kaç döngü)
+
+        // Eğer bu kart ipucu (Heartbeat) döngüsündeyse
+        if (isFrontCard && externalShouldShowHint && sharedState.current.target === null) {
+            // KALB ATIŞI (Heartbeat): Çift vuruşlu keskin pulse
+            const t = now * 0.005
+            // Çift vuruş matematiği: ana vuruş + yankı vuruş
+            const pulse = Math.pow(Math.sin(t), 12) * 0.12 + Math.pow(Math.sin(t + 0.45), 16) * 0.08
+            pulseMultiplier = 1 + pulse
+        }
+        // Normal focus durumu (kullanıcı seçtiyse): Yumuşak nefes alma
+        else if (isFrontCard && sharedState.current.target === null) {
+            const pulseSpeed = 2
             pulseMultiplier = 1 + Math.sin(now * 0.003 * pulseSpeed) * 0.03
         }
         const pulsedScale = finalScale * pulseMultiplier
@@ -342,12 +351,15 @@ const SceneContent: React.FC<{
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange }) => {
+    shouldShowTapHint: boolean
+    setShouldShowTapHint: (v: boolean) => void
+    shouldShowDragHint: boolean
+    setShouldShowDragHint: (v: boolean) => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, setShouldShowTapHint, shouldShowDragHint, setShouldShowDragHint }) => {
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
     const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
-    const [shouldShowTapHint, setShouldShowTapHint] = useState(false) // Bu kartta el ikonu gösterilsin mi
     const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
 
     // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
@@ -357,9 +369,10 @@ const SceneContent: React.FC<{
         // items değiştiğinde her şeyi sıfırla
         frontCardChangeCountRef.current = 0
         setShouldShowTapHint(false)
+        setShouldShowDragHint(false)
         lastFrontCardRef.current = null
         hasBeenFocusedRef.current = false
-    }, [items.length])
+    }, [items.length, setShouldShowTapHint, setShouldShowDragHint])
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -426,9 +439,23 @@ const SceneContent: React.FC<{
             sharedState.current.rotation += sharedState.current.velocity * delta
             sharedState.current.velocity *= friction
         }
-        // OTO DÖNÜŞ
+        // OTO DÖNÜŞ + WIGGLE (Sallanma İpucu)
         else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
-            sharedState.current.rotation -= delta * CONFIG.autoRotateSpeed
+            // Normal dönüş hızı
+            let currentSpeed = delta * CONFIG.autoRotateSpeed
+
+            // Eğer sallanma (wiggle) ipucu aktifse
+            if (shouldShowDragHint) {
+                // Carousel'i yavaşlat ki animasyon görülsün
+                currentSpeed *= 0.3
+
+                // Sağa-sola sallanma (wiggle) ofseti
+                // Sinüs dalgası: t=4.0 civarı hız, 0.05 radyan (~3 derece) genlik
+                const wiggle = Math.sin(state.clock.elapsedTime * 6) * 0.04
+                sharedState.current.rotation += wiggle * 0.1 // Rotasyona hafifçe sızdır
+            }
+
+            sharedState.current.rotation -= currentSpeed
         }
         // SNAP-TO-CENTER (Mıknatıslanma)
         // Eğer hiçbir hareket yoksa ve bir yere gitmiyorsak, en yakın kartı ortaya çek
@@ -464,6 +491,7 @@ const SceneContent: React.FC<{
             frontCardChangeCountRef.current = 0
             hasBeenFocusedRef.current = false
             setShouldShowTapHint(false)
+            setShouldShowDragHint(false)
             // Parent'a bildir: focusedItemId artık null (sayfa ilk yüklenmiş gibi)
             if (onFocusedItemChange) {
                 onFocusedItemChange(null)
@@ -489,18 +517,14 @@ const SceneContent: React.FC<{
                 frontCardChangeCountRef.current += 1
                 const count = frontCardChangeCountRef.current
 
-                // El ikonu gösterme mantığı:
-                // 1. kart: HAYIR (ilk kart, bilgi balonu var)
-                // 2. kart: EVET
-                // 3. kart: HAYIR
-                // 4. kart: HAYIR
-                // 5. kart: EVET (2 + 3 = 5)
-                // 6. kart: HAYIR
-                // 7. kart: HAYIR
-                // 8. kart: EVET (5 + 3 = 8)
-                // Pattern: count === 2 || (count > 2 && (count - 2) % 3 === 0)
-                const showHint = count === 2 || (count > 2 && (count - 2) % 3 === 0)
-                setShouldShowTapHint(showHint)
+                // Patern Ayırımı:
+                // 2, 5, 8... -> Tıklama (Tap/Heartbeat)
+                const isTapCycle = count === 2 || (count > 2 && (count - 2) % 3 === 0)
+                // 3, 6, 9... -> Sürükleme (Drag/Wiggle)
+                const isDragCycle = count === 3 || (count > 3 && (count - 3) % 3 === 0)
+
+                setShouldShowTapHint(isTapCycle)
+                setShouldShowDragHint(isDragCycle)
 
                 if (onFrontCardChange && sharedState.current.target === null) {
                     onFrontCardChange(frontItem.id) // Parent'a bildir
@@ -532,8 +556,9 @@ const SceneContent: React.FC<{
                     isDraggingRef={isDraggingRef}
                     onCardClick={onCardClick}
                     onFocusedItemChange={onFocusedItemChange}
-                    isFrontCard={item.id === frontCardId}
-                    shouldShowTapHint={item.id === frontCardId && shouldShowTapHint}
+                    isFrontCard={frontCardId === item.id}
+                    shouldShowTapHint={shouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
                 />
             ))}
 
@@ -560,6 +585,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
+    const [shouldShowTapHint, setShouldShowTapHint] = useState(false)
+    const [shouldShowDragHint, setShouldShowDragHint] = useState(false)
     const lastX = useRef(0)
 
     // Drag Conflict Çözümü: Ref ile anlık takip
@@ -713,6 +740,10 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     onCardClick={onCardClick}
                     onFocusedItemChange={handleFocusedItemChangeInternal}
                     onFrontCardChange={onFrontCardChange}
+                    shouldShowTapHint={shouldShowTapHint}
+                    setShouldShowTapHint={setShouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
+                    setShouldShowDragHint={setShouldShowDragHint}
                 />
             </Canvas>
             {/* Initial Hint overlay */}
@@ -744,12 +775,12 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
 
             {/* Sürükleme işareti - aralıklı beliren sol-sağ oklar */}
-            {showHint && !focusedItemId && (
+            {(showHint || shouldShowDragHint) && !focusedItemId && (
                 <>
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block" style={{ animationDuration: shouldShowDragHint ? '0.8s' : '2s' }}>
                         ←
                     </div>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block" style={{ animationDuration: shouldShowDragHint ? '0.8s' : '2s' }}>
                         →
                     </div>
                 </>
