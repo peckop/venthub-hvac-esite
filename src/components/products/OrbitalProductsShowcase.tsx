@@ -154,7 +154,7 @@ const OrbitalCard: React.FC<{
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
-                const s = pulsedScale * 0.8
+                const s = pulsedScale * 1.5
                 iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
             }
         }
@@ -283,25 +283,33 @@ const OrbitalCard: React.FC<{
                     </mesh>
                 )}
 
-                {/* Yörünge Okları (Drag Hint) */}
+                {/* Yörünge Okları (Drag Hint) - Ürünün Yukarısında (Top) */}
                 {isFrontCard && shouldShowDragHint && (
-                    <Html position={[0, 0, 0]} center>
+                    <Html position={[0, CONFIG.cardHeight / 2 + 0.8, 0]} center>
                         <style>{`
-                            @keyframes bounce-horizontal-left {
-                                0%, 100% { transform: translateX(0); }
-                                50% { transform: translateX(-20px); }
+                            @keyframes bounce-horizontal-left-v3 {
+                                0%, 100% { transform: translateX(0) scale(1); }
+                                50% { transform: translateX(-30px) scale(1.2); }
                             }
-                            @keyframes bounce-horizontal-right {
-                                0%, 100% { transform: translateX(0); }
-                                50% { transform: translateX(20px); }
+                            @keyframes bounce-horizontal-right-v3 {
+                                0%, 100% { transform: translateX(0) scale(1); }
+                                50% { transform: translateX(30px) scale(1.2); }
                             }
-                            .animate-bounce-horizontal-left { animation: bounce-horizontal-left 0.8s infinite; }
-                            .animate-bounce-horizontal-right { animation: bounce-horizontal-right 0.8s infinite; }
+                            .animate-drag-arrow-left { animation: bounce-horizontal-left-v3 0.8s infinite; }
+                            .animate-drag-arrow-right { animation: bounce-horizontal-right-v3 0.8s infinite; }
                         `}</style>
-                        <div className="flex items-center gap-16 md:gap-24 pointer-events-none select-none" style={{ transform: `rotate(${CONFIG.tilt}deg)` }}>
-                            <div className="text-cyan-400 text-6xl animate-bounce-horizontal-left opacity-90 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">←</div>
-                            <div className="w-56 md:w-80" />
-                            <div className="text-cyan-400 text-6xl animate-bounce-horizontal-right opacity-90 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">→</div>
+                        <div className="flex flex-col items-center gap-2 pointer-events-none select-none">
+                            <div className="flex items-center gap-20 md:gap-32" style={{ transform: `rotate(${CONFIG.tilt}deg)` }}>
+                                <div className="text-cyan-400 text-7xl animate-drag-arrow-left opacity-90 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+                                    <span className="flex items-center gap-1">👈</span>
+                                </div>
+                                <div className="text-cyan-400 text-7xl animate-drag-arrow-right opacity-90 drop-shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+                                    <span className="flex items-center gap-1">👉</span>
+                                </div>
+                            </div>
+                            <div className="bg-cyan-500/20 backdrop-blur-sm px-4 py-1 rounded-full border border-cyan-500/30 text-cyan-300 text-[10px] font-bold uppercase tracking-widest animate-pulse">
+                                Tut Çevir
+                            </div>
                         </div>
                     </Html>
                 )}
@@ -372,6 +380,7 @@ const SceneContent: React.FC<{
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
     const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
     const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
+    const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon (delta takibi için)
 
     // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
     // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
@@ -455,20 +464,37 @@ const SceneContent: React.FC<{
             let currentSpeed = delta * CONFIG.autoRotateSpeed
 
             // Eğer sallanma (wiggle) ipucu aktifse
-            // TERS ESNEME (Drag Simulation)
-            // Sağa-sola sallanma yerine: Dönüş yönünün tersine esneme ve bırakma
+            // GÜÇLÜ SALINIM (Exaggerated Drag Simulation) - v3
+            // Önceki ve sonraki ürüne kadar geniş savrulma
             if (shouldShowDragHint) {
-                currentSpeed *= 0.3
-                const t = state.clock.elapsedTime % 3
-                let stretch = 0
+                currentSpeed *= 0.05 // Dönüşü neredeyse durdur
+
+                const t = state.clock.elapsedTime % 3 // 3 saniyelik döngü
+                const step = (Math.PI * 2) / items.length
+                const maxSway = step * 0.8 // Ürün mesafesinin %80'i
+
+                let targetSway = 0
                 if (t < 1.0) {
-                    // Yavaşça geriye çek (autoRotateSpeed'in tersine)
-                    stretch = t * 0.08
-                } else if (t < 1.3) {
-                    // Hızlıca bırak (snap back)
-                    stretch = 0.08 * (1 - (t - 1.0) / 0.3)
+                    // Sola (Next)
+                    targetSway = Math.sin(t * Math.PI) * maxSway
+                } else if (t < 2.0) {
+                    // Sağa (Prev)
+                    targetSway = -Math.sin((t - 1.0) * Math.PI) * maxSway
+                } else {
+                    // Merkeze dön ve bekle
+                    targetSway = 0
                 }
-                sharedState.current.rotation += stretch * 0.1
+
+                // Delta uygula (rotasyonun bozulmaması için)
+                const swayDelta = targetSway - swayOffsetRef.current
+                sharedState.current.rotation += swayDelta
+                swayOffsetRef.current = targetSway
+            } else {
+                // Hint aktif değilse ofseti sıfırla
+                if (swayOffsetRef.current !== 0) {
+                    sharedState.current.rotation -= swayOffsetRef.current
+                    swayOffsetRef.current = 0
+                }
             }
 
             sharedState.current.rotation -= currentSpeed
