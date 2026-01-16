@@ -184,7 +184,7 @@ const CategoryOrbitCarousel = () => {
 
     // Dönen hint bilgileri
     const ROTATING_HINTS = [
-        '👋 Sürükleyerek Döndür',
+        '👋 Tut Çevir',
         '👆 Ürüne Tıkla',
         '↔ Sol-Sağ Kaydır',
         '🎯 Kategoriyi Seç',
