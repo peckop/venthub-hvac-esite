@@ -516,6 +516,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [dragDelta, setDragDelta] = useState(0)
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
+    const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
     const lastX = useRef(0)
 
     // Drag Conflict Çözümü: Ref ile anlık takip
@@ -558,6 +559,32 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         sharedState.current.rotation = 0
         sharedState.current.target = null
     }, [items.length])
+
+    // Focus hint periyodik timer: focusedItemId set olduğunda 5sn görünür, 30sn gizli, tekrar
+    useEffect(() => {
+        if (!focusedItemId) {
+            setShowFocusedHint(false)
+            return
+        }
+
+        let showTimer: NodeJS.Timeout
+        let hideTimer: NodeJS.Timeout
+
+        const cycleFocusedHint = () => {
+            setShowFocusedHint(true)
+            hideTimer = setTimeout(() => {
+                setShowFocusedHint(false)
+                showTimer = setTimeout(cycleFocusedHint, 30000)
+            }, 5000)
+        }
+
+        cycleFocusedHint()
+
+        return () => {
+            clearTimeout(showTimer)
+            clearTimeout(hideTimer)
+        }
+    }, [focusedItemId])
 
     const hideHint = useCallback(() => setShowHint(false), [])
 
@@ -650,8 +677,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     </div>
                 </div>
             )}
-            {/* Context-aware Hint: Kart öne geldiğinde */}
-            {focusedItemId && (
+            {/* Context-aware Hint: Kart öne geldiğinde - periyodik gösterim */}
+            {focusedItemId && showFocusedHint && (
                 <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20">
                     <div className="bg-black/70 backdrop-blur-md px-5 py-3 rounded-xl border border-cyan-500/30 animate-bounce" style={{ animationDuration: '2s' }}>
                         <div className="flex items-center gap-4 text-white text-sm">
