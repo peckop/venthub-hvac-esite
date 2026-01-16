@@ -283,63 +283,51 @@ const OrbitalCard: React.FC<{
                     </mesh>
                 )}
 
-                {/* Yörünge Okları (Drag Hint) - v4: Ürün Kenarlarına Hizalı */}
+                {/* Yörünge Okları (Drag Hint) - v5: Daha Küçük ve Yakın */}
                 {isFrontCard && shouldShowDragHint && (
                     <>
-                        {/* Sol El İşareti - Sol Kenarın Üstü */}
+                        {/* Sol El İşareti - Sol Kenarın Hemen Üstü */}
                         <Html
-                            position={[-CONFIG.cardWidth / 2 - 0.2, CONFIG.cardHeight / 2 + 0.15, 0.2]}
+                            position={[-CONFIG.cardWidth / 2, CONFIG.cardHeight / 2 - 0.2, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="text-5xl md:text-6xl animate-pulse drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]"
+                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
                                 style={{
                                     transform: `rotate(${CONFIG.tilt}deg)`,
-                                    animation: 'swingLeft 1.5s ease-in-out infinite'
+                                    animation: 'swingLeft 2s ease-in-out infinite'
                                 }}
                             >
                                 👈
                             </div>
-                            <style>{`
-                                @keyframes swingLeft {
-                                    0%, 100% { transform: translateX(0) rotate(${CONFIG.tilt}deg); }
-                                    50% { transform: translateX(-15px) rotate(${CONFIG.tilt}deg) scale(1.1); }
-                                }
-                            `}</style>
                         </Html>
 
-                        {/* Sağ El İşareti - Sağ Kenarın Üstü */}
+                        {/* Sağ El İşareti - Sağ Kenarın Hemen Üstü */}
                         <Html
-                            position={[CONFIG.cardWidth / 2 + 0.2, CONFIG.cardHeight / 2 + 0.15, 0.2]}
+                            position={[CONFIG.cardWidth / 2, CONFIG.cardHeight / 2 - 0.2, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="text-5xl md:text-6xl animate-pulse drop-shadow-[0_0_15px_rgba(34,211,238,0.7)]"
+                                className="text-3xl md:text-4xl animate-pulse drop-shadow-[0_0_10px_rgba(34,211,238,0.7)]"
                                 style={{
                                     transform: `rotate(${CONFIG.tilt}deg)`,
-                                    animation: 'swingRight 1.5s ease-in-out infinite'
+                                    animation: 'swingRight 2s ease-in-out infinite'
                                 }}
                             >
                                 👉
                             </div>
-                            <style>{`
-                                @keyframes swingRight {
-                                    0%, 100% { transform: translateX(0) rotate(${CONFIG.tilt}deg); }
-                                    50% { transform: translateX(15px) rotate(${CONFIG.tilt}deg) scale(1.1); }
-                                }
-                            `}</style>
                         </Html>
 
-                        {/* Tut Çevir Etiketi - Ürünün Hemen Üstü (Merkez) */}
+                        {/* Tut Çevir Etiketi - Daha Yakın */}
                         <Html
-                            position={[0, CONFIG.cardHeight / 2 + 0.4, 0.2]}
+                            position={[0, CONFIG.cardHeight / 2 + 0.1, 0.2]}
                             center
                             style={{ pointerEvents: 'none' }}
                         >
                             <div
-                                className="bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md px-4 py-1.5 rounded-full border border-cyan-400/50 text-cyan-200 text-xs font-bold uppercase tracking-wider animate-pulse shadow-lg"
+                                className="bg-gradient-to-r from-cyan-500/30 to-blue-500/30 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-400/50 text-cyan-200 text-[10px] font-bold uppercase tracking-wider animate-pulse shadow-lg whitespace-nowrap"
                                 style={{ transform: `rotate(${CONFIG.tilt}deg)` }}
                             >
                                 ↔ Tut Çevir
@@ -414,7 +402,9 @@ const SceneContent: React.FC<{
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
     const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
     const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
-    const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon (delta takibi için)
+    const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon
+    const dragAnimationStartedRef = useRef(false) // Animasyon başladı mı
+    const dragStartTimeRef = useRef(0) // Animasyon başlangıç zamanı
 
     // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
     // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
@@ -495,58 +485,94 @@ const SceneContent: React.FC<{
         // OTO DÖNÜŞ + WIGGLE (Sallanma İpucu)
         else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
             // Normal dönüş hızı
-            let currentSpeed = delta * CONFIG.autoRotateSpeed
-
             // Eğer sallanma (wiggle) ipucu aktifse
-            // PROFESYONEL SALINIM (v4) - 6 Saniyelik Easing Tabanlı Döngü
-            // Patern: Sağa (Next) -> Merkez -> Sola (Prev) -> Merkez -> Dur
+            // PROFESYONEL SALINIM (v5) - Center Lock + 90 Derece Salınım
             if (shouldShowDragHint) {
-                currentSpeed *= 0.02 // Dönüşü neredeyse durdur
-
-                const cycleDuration = 6 // 6 saniyelik döngü
-                const t = state.clock.elapsedTime % cycleDuration
+                // 1. Önce tam merkeze kilitle (Center Lock)
                 const step = (Math.PI * 2) / items.length
-                const maxSway = step * 1.0 // Tam bir ürün mesafesi (%100)
+                const currentRot = sharedState.current.rotation
+                const targetRot = Math.round(currentRot / step) * step // En yakın slot
 
-                // Easing fonksiyonları
-                const easeOutQuad = (x: number) => 1 - (1 - x) * (1 - x)
-                const easeInOutQuad = (x: number) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+                // Animasyon başlamadıysa (henüz merkeze yerleşme aşaması)
+                if (!dragAnimationStartedRef.current) {
+                    const dist = targetRot - currentRot
 
-                let targetSway = 0
-
-                if (t < 1.5) {
-                    // [0.0s - 1.5s] Sağa doğru tam 1 adım (easeOutQuad - hızlı başla, yavaş dur)
-                    const progress = easeOutQuad(t / 1.5)
-                    targetSway = progress * maxSway
-                } else if (t < 2.5) {
-                    // [1.5s - 2.5s] Merkeze dönüş (easeInOutQuad)
-                    const progress = easeInOutQuad((t - 1.5) / 1.0)
-                    targetSway = maxSway * (1 - progress)
-                } else if (t < 4.0) {
-                    // [2.5s - 4.0s] Sola doğru tam 1 adım (easeOutQuad)
-                    const progress = easeOutQuad((t - 2.5) / 1.5)
-                    targetSway = -progress * maxSway
-                } else if (t < 5.0) {
-                    // [4.0s - 5.0s] Merkeze dönüş (easeInOutQuad)
-                    const progress = easeInOutQuad((t - 4.0) / 1.0)
-                    targetSway = -maxSway * (1 - progress)
-                } else {
-                    // [5.0s - 6.0s] Durgun bekle (kullanıcı algılasın)
-                    targetSway = 0
+                    // Merkeze çok yakın mı?
+                    if (Math.abs(dist) > 0.002) {
+                        // Merkeze doğru yumuşakça kaydır
+                        sharedState.current.rotation += dist * 0.1
+                        currentSpeed = 0 // Auto rotate'i iptal et
+                    } else {
+                        // Merkeze oturdu -> Animasyonu başlat
+                        sharedState.current.rotation = targetRot
+                        dragAnimationStartedRef.current = true
+                        dragStartTimeRef.current = state.clock.elapsedTime
+                        swayOffsetRef.current = 0
+                        currentSpeed = 0
+                    }
                 }
+                else {
+                    // Animasyon Başladı
+                    currentSpeed = 0 // Dönüşü durdur
+                    const elapsed = state.clock.elapsedTime - dragStartTimeRef.current
 
-                // Delta uygula (rotasyonun bozulmaması için)
-                const swayDelta = targetSway - swayOffsetRef.current
-                sharedState.current.rotation += swayDelta
-                swayOffsetRef.current = targetSway
+                    // Zamanlama (Toplam ~7sn)
+                    // 0.0 - 0.5: Bekle (İşaretler beliriyor)
+                    // 0.5 - 2.0: Sola 90 derece (PI/2)
+                    // 2.0 - 3.5: Merkeze dön (0)
+                    // 3.5 - 5.0: Sağa 90 derece (-PI/2)
+                    // 5.0 - 6.5: Merkeze dön
+                    // 6.5 - 7.0: Bekle -> Bitir
+
+                    const maxSwing = Math.PI / 2 // 90 derece
+
+                    // Easing helper
+                    const easeInOutQuad = (x: number) => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+
+                    let targetSway = 0
+
+                    if (elapsed < 0.5) {
+                        targetSway = 0
+                    } else if (elapsed < 2.0) {
+                        // Sola git (Pozitif rotasyon = Ürün Sola gider)
+                        const p = (elapsed - 0.5) / 1.5
+                        targetSway = easeInOutQuad(p) * maxSwing
+                    } else if (elapsed < 3.5) {
+                        // Merkeze dön
+                        const p = (elapsed - 2.0) / 1.5
+                        targetSway = maxSwing * (1 - easeInOutQuad(p))
+                    } else if (elapsed < 5.0) {
+                        // Sağa git (Negatif rotasyon = Ürün Sağa gider)
+                        const p = (elapsed - 3.5) / 1.5
+                        targetSway = -(easeInOutQuad(p) * maxSwing)
+                    } else if (elapsed < 6.5) {
+                        // Merkeze dön
+                        const p = (elapsed - 5.0) / 1.5
+                        targetSway = -maxSwing * (1 - easeInOutQuad(p))
+                    } else if (elapsed < 7.0) {
+                        targetSway = 0
+                    } else {
+                        // Süre bitti -> Cooldown'a geç
+                        onStageChange('cooldown')
+                        dragAnimationStartedRef.current = false
+                        targetSway = 0
+                    }
+
+                    // Delta uygula
+                    const swayDelta = targetSway - swayOffsetRef.current
+                    sharedState.current.rotation += swayDelta
+                    swayOffsetRef.current = targetSway
+                }
             } else {
-                // Hint aktif değilse ofseti sıfırla
+                // Hint aktif değil - Reset
+                dragAnimationStartedRef.current = false
                 if (swayOffsetRef.current !== 0) {
                     sharedState.current.rotation -= swayOffsetRef.current
                     swayOffsetRef.current = 0
                 }
             }
 
+            // Eğer hint aktifse currentSpeed zaten 0 yapıldı veya yönetildi
             sharedState.current.rotation -= currentSpeed
         }
         // SNAP-TO-CENTER (Mıknatıslanma)
