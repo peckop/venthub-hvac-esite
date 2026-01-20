@@ -70,8 +70,9 @@ const HowItWorks: React.FC = () => {
                             return (
                                 <button
                                     key={index}
+                                    type="button"
                                     onClick={() => setActiveStep(isActive ? -1 : index)}
-                                    className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 ${isActive
+                                    className={`relative z-10 w-full text-left p-5 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isActive
                                         ? 'border-blue-500 bg-blue-50 shadow-lg'
                                         : 'border-gray-200 bg-white hover:border-blue-300'
                                         }`}
@@ -89,7 +90,7 @@ const HowItWorks: React.FC = () => {
                                             </div>
                                             <p className="text-sm text-gray-600 mt-1">{step.description}</p>
                                             {isActive && (
-                                                <p className="text-sm text-blue-600 mt-3 animate-fadeIn">
+                                                <p className="text-sm text-blue-600 mt-3 animate-fade-in">
                                                     💡 {step.detail}
                                                 </p>
                                             )}

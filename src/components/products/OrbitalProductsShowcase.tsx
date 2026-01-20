@@ -299,25 +299,25 @@ const OrbitalCard: React.FC<{
                             style={{ pointerEvents: 'none' }}
                         >
                             <div className="flex flex-col items-center gap-3">
-                                <div className="flex items-center gap-20">
+                                <div className="flex items-center gap-24">
                                     {/* Sol ok */}
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                        <div className="relative w-14 h-14 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                            <ChevronLeft className="w-7 h-7 text-cyan-300 animate-pulse" strokeWidth={2.5} />
+                                        <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                            <ChevronLeft className="w-9 h-9 text-cyan-300 animate-pulse" strokeWidth={2.5} />
                                         </div>
                                     </div>
 
                                     {/* Sağ ok */}
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                        <div className="relative w-14 h-14 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                            <ChevronRight className="w-7 h-7 text-cyan-300 animate-pulse" strokeWidth={2.5} />
+                                        <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                            <ChevronRight className="w-9 h-9 text-cyan-300 animate-pulse" strokeWidth={2.5} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
-                                    <span className="text-xs font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
+                                    <span className="text-sm font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
                                 </div>
                             </div>
                         </Html>
@@ -339,8 +339,8 @@ const OrbitalCard: React.FC<{
                         <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 animate-ping" />
 
                         {/* Static outer ring */}
-                        <div className="relative w-12 h-12 rounded-full border border-cyan-500/60 backdrop-blur-sm bg-cyan-950/30 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                            <MousePointerClick className="w-6 h-6 text-cyan-300" strokeWidth={1.5} />
+                        <div className="relative w-16 h-16 rounded-full border border-cyan-500/60 backdrop-blur-sm bg-cyan-950/30 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                            <MousePointerClick className="w-8 h-8 text-cyan-300" strokeWidth={1.5} />
                         </div>
                     </div>
                 </Html>
@@ -674,12 +674,13 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     }, [hintStage])
 
     // Stage Drag → Cooldown Auto-Transition (5sn sonra)
+    // Stage Drag → Cooldown Auto-Transition (3sn sonra)
     useEffect(() => {
         if (hintStage !== 'drag') return
 
         const timer = setTimeout(() => {
             setHintStage('cooldown')
-        }, 5000) // 5sn drag hint göster
+        }, 3000) // 3sn drag hint göster
 
         return () => clearTimeout(timer)
     }, [hintStage])
