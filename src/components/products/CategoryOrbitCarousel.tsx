@@ -182,12 +182,12 @@ const CategoryOrbitCarousel = () => {
     const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) // Dönerken önde olan kart
     const [hintIndex, setHintIndex] = useState(0) // Dönen hint bilgileri için
 
-    // Dönen hint bilgileri
+    // Dönen hint bilgileri (Emoji'siz - Profesyonel)
     const ROTATING_HINTS = [
-        '👋 Tut Çevir',
-        '👆 Ürüne Tıkla',
-        '↔ Sol-Sağ Kaydır',
-        '🎯 Kategoriyi Seç',
+        'Tut Çevir',
+        'Ürüne Tıkla',
+        'Sol-Sağ Çevir',
+        'Kategoriyi Seç',
     ]
 
     // Alt kategorileri hesapla
@@ -385,8 +385,8 @@ const CategoryOrbitCarousel = () => {
                         <p className="text-white/50 text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
                                 ? (level === 'main'
-                                    ? '🖱️ Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git'
-                                    : '🖱️ Tıklayarak Ürün Sayfasına Gidin')
+                                    ? 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git'
+                                    : 'Tıklayarak Ürün Sayfasına Gidin')
                                 : ROTATING_HINTS[hintIndex]
                             }
                         </p>

@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom'
+import { MousePointerClick, Move, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config/orbitalCarouselConfig'
 import Category3DIcon from './Category3DIcon'
 
@@ -45,9 +46,10 @@ const OrbitalCard: React.FC<{
     isDraggingRef: React.MutableRefObject<boolean>
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
-    isFrontCard?: boolean
-    shouldShowTapHint?: boolean // SceneContent'ten gelen el ikonu gösterme kararı
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint }) => {
+    isFrontCard: boolean
+    shouldShowTapHint: boolean
+    shouldShowDragHint: boolean
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -123,12 +125,20 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
-        // 🎯 PULSE EFFECT: Focus olan kart hafifçe büyüyüp küçülür ("nefes alır")
-        // sharedState.target null ise ve isFrontCard ise = kart sabitlenmiş demek
+        // 🎯 PULSE EFFECT: Focus/Hint durumunda kart hareketlenir
         let pulseMultiplier = 1
-        if (isFrontCard && sharedState.current.target === null) {
-            // Sin dalgası ile yumuşak pulse: 0.97 - 1.03 arası
-            const pulseSpeed = 2 // Hız (saniyede kaç döngü)
+
+        // Eğer bu kart ipucu (Heartbeat) döngüsündeyse
+        if (isFrontCard && externalShouldShowHint && sharedState.current.target === null) {
+            // KALB ATIŞI (Heartbeat): Çift vuruşlu keskin pulse
+            const t = now * 0.005
+            // Çift vuruş matematiği: ana vuruş + yankı vuruş
+            const pulse = Math.pow(Math.sin(t), 12) * 0.12 + Math.pow(Math.sin(t + 0.45), 16) * 0.08
+            pulseMultiplier = 1 + pulse
+        }
+        // Normal focus durumu (kullanıcı seçtiyse): Yumuşak nefes alma
+        else if (isFrontCard && sharedState.current.target === null) {
+            const pulseSpeed = 2
             pulseMultiplier = 1 + Math.sin(now * 0.003 * pulseSpeed) * 0.03
         }
         const pulsedScale = finalScale * pulseMultiplier
@@ -141,7 +151,7 @@ const OrbitalCard: React.FC<{
 
             const mat = meshRef.current.material as THREE.MeshStandardMaterial
             if (mat) mat.opacity = easeOutCubic
-        } else {
+        } else if (groupRef.current) {
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
@@ -241,8 +251,7 @@ const OrbitalCard: React.FC<{
                 rotationIntensity={0.03}
                 floatIntensity={CONFIG.floatIntensity}
             >
-                {/* GÖRÜNÜR KART VE HİTBOX - Aynı yöne bakıyorlar */}
-                {/* Hitbox: Kalın kutu, kartla aynı pozisyonda */}
+                {/* Hitbox */}
                 <mesh
                     position={[0, 0, 0.1]}
                     onClick={handleClick}
@@ -252,15 +261,13 @@ const OrbitalCard: React.FC<{
                     onPointerOver={handlePointerOver}
                     onPointerOut={handlePointerOut}
                 >
-                    {/* Kalın kutu: Açılı kartlarda bile tıklanabilir */}
                     <boxGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight, 1.5]} />
                     <meshBasicMaterial visible={false} />
                 </mesh>
 
-                {/* GÖRÜNÜR KART (3D ICON VEYA PLANE) */}
+                {/* GÖRÜNÜR KART */}
                 {item.categorySlug ? (
                     <group name="icon-wrapper" scale={0.8} rotation={[0, Math.PI, 0]}>
-                        {/* Rotation PI çünkü kartlar merkeze bakıyor, ikonlar da bize baksın */}
                         <Category3DIcon categorySlug={item.categorySlug} scale={1} />
                     </group>
                 ) : (
@@ -276,38 +283,77 @@ const OrbitalCard: React.FC<{
                         />
                     </mesh>
                 )}
+
+                {/* Drag Hint - Profesyonel */}
+                {isFrontCard && shouldShowDragHint && (
+                    <Float
+                        speed={0.5}
+                        rotationIntensity={0}
+                        floatIntensity={0.3}
+                    >
+                        <Html
+                            position={[0, 1.5, 0]}
+                            center
+                            distanceFactor={8}
+                            occlude={false}
+                            style={{ pointerEvents: 'none' }}
+                        >
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="flex items-center gap-20">
+                                    {/* Sol ok */}
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
+                                        <div className="relative w-14 h-14 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                            <ChevronLeft className="w-7 h-7 text-cyan-300 animate-pulse" strokeWidth={2.5} />
+                                        </div>
+                                    </div>
+
+                                    {/* Sağ ok */}
+                                    <div className="relative">
+                                        <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
+                                        <div className="relative w-14 h-14 rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                            <ChevronRight className="w-7 h-7 text-cyan-300 animate-pulse" strokeWidth={2.5} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
+                                    <span className="text-xs font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
+                                </div>
+                            </div>
+                        </Html>
+                    </Float>
+                )}
             </Float>
 
-            {/* El ikonu overlay - sadece en öndeki kartta */}
+            {/* Tap Hint - Profesyonel */}
             {isFrontCard && !hovered && showTapHint && (
                 <Html
                     position={[0, 0, 0.5]}
                     center
                     distanceFactor={5}
                     occlude={false}
-                    style={{
-                        pointerEvents: 'none',
-                        transition: 'opacity 0.5s',
-                        opacity: 1
-                    }}
+                    style={{ pointerEvents: 'none', transition: 'opacity 0.3s', opacity: 1 }}
                 >
-                    <div className="text-5xl animate-bounce" style={{ animationDuration: '1s' }}>
-                        👆
+                    <div className="relative">
+                        {/* Pulsating ring */}
+                        <div className="absolute inset-0 rounded-full border-2 border-cyan-400/40 animate-ping" />
+
+                        {/* Static outer ring */}
+                        <div className="relative w-12 h-12 rounded-full border border-cyan-500/60 backdrop-blur-sm bg-cyan-950/30 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                            <MousePointerClick className="w-6 h-6 text-cyan-300" strokeWidth={1.5} />
+                        </div>
                     </div>
                 </Html>
             )}
 
+            {/* Label */}
             {showLabel && (
                 <Html
                     position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
                     center
                     distanceFactor={6}
                     occlude={false}
-                    style={{
-                        pointerEvents: 'none',
-                        transition: 'opacity 0.5s',
-                        opacity: 1
-                    }}
+                    style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
                 >
                     <div
                         className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
@@ -342,13 +388,17 @@ const SceneContent: React.FC<{
     onCardClick?: (itemId: string, event?: MouseEvent) => void
     onFocusedItemChange?: (itemId: string | null) => void
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange }) => {
+    shouldShowTapHint: boolean
+    shouldShowDragHint: boolean
+    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown'
+    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown') => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange }) => {
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
     const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
     const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
-    const [shouldShowTapHint, setShouldShowTapHint] = useState(false) // Bu kartta el ikonu gösterilsin mi
     const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
+    const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon (delta takibi için)
 
     // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
     // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
@@ -356,10 +406,10 @@ const SceneContent: React.FC<{
     useEffect(() => {
         // items değiştiğinde her şeyi sıfırla
         frontCardChangeCountRef.current = 0
-        setShouldShowTapHint(false)
+        onStageChange('idle')
         lastFrontCardRef.current = null
         hasBeenFocusedRef.current = false
-    }, [items.length])
+    }, [items.length, onStageChange])
 
     // Kartı öne getirme
     const handleBringToFront = useCallback((index: number) => {
@@ -426,9 +476,46 @@ const SceneContent: React.FC<{
             sharedState.current.rotation += sharedState.current.velocity * delta
             sharedState.current.velocity *= friction
         }
-        // OTO DÖNÜŞ
+        // OTO DÖNÜŞ + WIGGLE (Sallanma İpucu)
         else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
-            sharedState.current.rotation -= delta * CONFIG.autoRotateSpeed
+            // Normal dönüş hızı
+            let currentSpeed = delta * CONFIG.autoRotateSpeed
+
+            // Eğer sallanma (wiggle) ipucu aktifse
+            // GÜÇLÜ SALINIM (Exaggerated Drag Simulation) - v3
+            // Önceki ve sonraki ürüne kadar geniş savrulma
+            if (shouldShowDragHint) {
+                currentSpeed *= 0.05 // Dönüşü neredeyse durdur
+
+                const t = state.clock.elapsedTime % 3 // 3 saniyelik döngü
+                const step = (Math.PI * 2) / items.length
+                const maxSway = step * 0.8 // Ürün mesafesinin %80'i
+
+                let targetSway = 0
+                if (t < 1.0) {
+                    // Sola (Next)
+                    targetSway = Math.sin(t * Math.PI) * maxSway
+                } else if (t < 2.0) {
+                    // Sağa (Prev)
+                    targetSway = -Math.sin((t - 1.0) * Math.PI) * maxSway
+                } else {
+                    // Merkeze dön ve bekle
+                    targetSway = 0
+                }
+
+                // Delta uygula (rotasyonun bozulmaması için)
+                const swayDelta = targetSway - swayOffsetRef.current
+                sharedState.current.rotation += swayDelta
+                swayOffsetRef.current = targetSway
+            } else {
+                // Hint aktif değilse ofseti sıfırla
+                if (swayOffsetRef.current !== 0) {
+                    sharedState.current.rotation -= swayOffsetRef.current
+                    swayOffsetRef.current = 0
+                }
+            }
+
+            sharedState.current.rotation -= currentSpeed
         }
         // SNAP-TO-CENTER (Mıknatıslanma)
         // Eğer hiçbir hareket yoksa ve bir yere gitmiyorsak, en yakın kartı ortaya çek
@@ -454,22 +541,22 @@ const SceneContent: React.FC<{
         camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
         camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
 
-        // Carousel tekrar dönmeye başladığında (target null oldu) sayıcıyı sıfırla
+        // Carousel tekrar dönmeye başladığında sayıcıyı sıfırla
         // Koşullar: target null + pauseUntil doldu + isPaused false (mouse yok) + daha önce focus olmuştu
-        // Sadece GERÇEKTEN dönmeye başladığında resetle (sabit dururken resetleme)
-        const isAutoRotating = !isPaused && !isPausedByClick && entryProgress >= 0.8
-        const isMoving = isDraggingRef.current || Math.abs(sharedState.current.velocity) > 0.01 || isAutoRotating
+        const currentTime = Date.now()
+        const isCarouselRotating = sharedState.current.target === null && currentTime > sharedState.current.pauseUntil && !isPaused
 
-        if (sharedState.current.target === null && hasBeenFocusedRef.current && isMoving) {
-            // Focus'tan çıktık, tüm sistemi sıfırla
+        if (isCarouselRotating && hasBeenFocusedRef.current) {
+            // Carousel gerçekten döndü, tüm sistemi sıfırla
             frontCardChangeCountRef.current = 0
             hasBeenFocusedRef.current = false
-            setShouldShowTapHint(false)
+            onStageChange('idle')
             // Parent'a bildir: focusedItemId artık null (sayfa ilk yüklenmiş gibi)
             if (onFocusedItemChange) {
                 onFocusedItemChange(null)
             }
-        } else if (sharedState.current.target !== null) {
+        }
+        else if (sharedState.current.target !== null) {
             // Bir kart focus'ta, işaretle
             hasBeenFocusedRef.current = true
         }
@@ -490,18 +577,17 @@ const SceneContent: React.FC<{
                 frontCardChangeCountRef.current += 1
                 const count = frontCardChangeCountRef.current
 
-                // El ikonu gösterme mantığı:
-                // 1. kart: HAYIR (ilk kart, bilgi balonu var)
-                // 2. kart: EVET
-                // 3. kart: HAYIR
-                // 4. kart: HAYIR
-                // 5. kart: EVET (2 + 3 = 5)
-                // 6. kart: HAYIR
-                // 7. kart: HAYIR
-                // 8. kart: EVET (5 + 3 = 8)
-                // Pattern: count === 2 || (count > 2 && (count - 2) % 3 === 0)
-                const showHint = count === 2 || (count > 2 && (count - 2) % 3 === 0)
-                setShouldShowTapHint(showHint)
+                // Patern Ayırımı (v3 - Timer-Based):
+                // Stage Idle → frontCardChangeCount 2 olunca → Stage Tap başlar (4sn)
+                // Stage Tap → 4sn sonra → Stage Drag başlar (5sn)
+                // Stage Drag → 5sn sonra → Stage Cooldown başlar (15sn)
+
+                // ÇÖZÜM: Her stage'in MİNİMUM GÖSTERİM SÜRESİ var
+                // Stage değişimi sadece süre kontrolünden sonra olur
+
+                if (hintStage === 'idle' && count >= 2) {
+                    onStageChange('tap')
+                }
 
                 if (onFrontCardChange && sharedState.current.target === null) {
                     onFrontCardChange(frontItem.id) // Parent'a bildir
@@ -533,8 +619,9 @@ const SceneContent: React.FC<{
                     isDraggingRef={isDraggingRef}
                     onCardClick={onCardClick}
                     onFocusedItemChange={onFocusedItemChange}
-                    isFrontCard={item.id === frontCardId}
-                    shouldShowTapHint={item.id === frontCardId && shouldShowTapHint}
+                    isFrontCard={frontCardId === item.id}
+                    shouldShowTapHint={shouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
                 />
             ))}
 
@@ -561,7 +648,44 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
+    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown'>('idle')
     const lastX = useRef(0)
+
+    // Stage Cooldown kontrolü
+    useEffect(() => {
+        if (hintStage !== 'cooldown') return
+
+        const timer = setTimeout(() => {
+            setHintStage('idle')
+        }, 15000) // 15sn bekleme
+
+        return () => clearTimeout(timer)
+    }, [hintStage])
+
+    // Stage Tap → Drag Auto-Transition (4sn sonra)
+    useEffect(() => {
+        if (hintStage !== 'tap') return
+
+        const timer = setTimeout(() => {
+            setHintStage('drag')
+        }, 4000) // 4sn tap hint göster
+
+        return () => clearTimeout(timer)
+    }, [hintStage])
+
+    // Stage Drag → Cooldown Auto-Transition (5sn sonra)
+    useEffect(() => {
+        if (hintStage !== 'drag') return
+
+        const timer = setTimeout(() => {
+            setHintStage('cooldown')
+        }, 5000) // 5sn drag hint göster
+
+        return () => clearTimeout(timer)
+    }, [hintStage])
+
+    const shouldShowTapHint = hintStage === 'tap'
+    const shouldShowDragHint = hintStage === 'drag'
 
     // Drag Conflict Çözümü: Ref ile anlık takip
     const isDraggingRef = useRef(false)
@@ -612,50 +736,30 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     }, [items.length])
 
     // Focus hint periyodik timer: focusedItemId set olduğunda 5sn görünür, 30sn gizli, tekrar
-    // Focus hint mantığı: Mouse üzerindeyse sürekli göster, çekilince 5sn sonra gizle
     useEffect(() => {
         if (!focusedItemId) {
             setShowFocusedHint(false)
             return
         }
 
+        let showTimer: NodeJS.Timeout
         let hideTimer: NodeJS.Timeout
 
-        if (isPaused) {
-            // Mouse üzerinde: Timer'ı iptal et ve göster
-            setShowFocusedHint(true)
-        } else {
-            // Mouse üzerinde değil: 8sn sonra gizle
-            // (İlk açılışta da burası çalışır, yani odaklanınca 8sn görünür)
+        const cycleFocusedHint = () => {
             setShowFocusedHint(true)
             hideTimer = setTimeout(() => {
                 setShowFocusedHint(false)
-            }, 8000)
+                showTimer = setTimeout(cycleFocusedHint, 30000)
+            }, 5000)
         }
 
+        cycleFocusedHint()
+
         return () => {
+            clearTimeout(showTimer)
             clearTimeout(hideTimer)
         }
-    }, [focusedItemId, isPaused])
-
-    // Layout Fix: Mount olduktan sonra (özellikle Lazy Load sonrası) Canvas ve Overlay pozisyonlarını
-    // düzeltmek için yapay resize eventleri tetikle. Scrollbar değişimlerini yakalar.
-    useEffect(() => {
-        // Hızlı düzeltme (100ms)
-        const t1 = setTimeout(() => {
-            window.dispatchEvent(new Event('resize'))
-        }, 100)
-
-        // Kesin düzeltme (800ms) - Animasyonlar ve dış yüklemeler bitince
-        const t2 = setTimeout(() => {
-            window.dispatchEvent(new Event('resize'))
-        }, 800)
-
-        return () => {
-            clearTimeout(t1)
-            clearTimeout(t2)
-        }
-    }, [])
+    }, [focusedItemId])
 
     const hideHint = useCallback(() => setShowHint(false), [])
 
@@ -699,7 +803,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
     return (
         <div
-            className="w-full h-[500px] md:h-[550px] relative select-none touch-none overflow-hidden"
+            className="w-full h-[500px] md:h-[550px] relative select-none touch-none"
             style={{ backgroundColor: CONFIG.backgroundColor }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -734,47 +838,52 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     onCardClick={onCardClick}
                     onFocusedItemChange={handleFocusedItemChangeInternal}
                     onFrontCardChange={onFrontCardChange}
+                    shouldShowTapHint={shouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
+                    hintStage={hintStage}
+                    onStageChange={setHintStage}
                 />
             </Canvas>
-            {/* Initial Hint overlay */}
+            {/* Initial Hint - Profesyonel */}
             {showHint && !focusedItemId && (
-                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 hidden md:block">
-                    <div className="bg-black/70 backdrop-blur-md px-5 py-3 rounded-xl border border-cyan-500/30 animate-bounce" style={{ animationDuration: '2s' }}>
-                        <div className="flex items-center gap-4 text-white text-sm">
-                            <span className="flex items-center gap-2"><span className="text-cyan-400">↔</span> Sürükle Çevir</span>
-                            <span className="text-cyan-500/50">•</span>
-                            <span className="flex items-center gap-2"><span className="text-cyan-400">👆</span> Tıkla Seç</span>
+                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 hidden md:block animate-fade-in">
+                    <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 px-3 py-1 rounded bg-slate-800/60 border border-slate-700/50">
+                                <Move className="w-4 h-4 text-cyan-400" strokeWidth={1.5} />
+                                <span className="text-xs font-medium text-slate-200">Tut Çevir</span>
+                            </div>
+                            <span className="text-slate-600">•</span>
+                            <div className="flex items-center gap-2 px-3 py-1 rounded bg-slate-800/60 border border-slate-700/50">
+                                <MousePointerClick className="w-4 h-4 text-cyan-400" strokeWidth={1.5} />
+                                <span className="text-xs font-medium text-slate-200">Seç</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-            {/* Context-aware Hint: Kart öne geldiğinde - periyodik gösterim */}
+            {/* Focus Hint - Profesyonel */}
             {focusedItemId && showFocusedHint && (
-                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20">
-                    <div className="bg-black/70 backdrop-blur-md px-5 py-3 rounded-xl border border-cyan-500/30 animate-bounce" style={{ animationDuration: '2s' }}>
-                        <div className="flex items-center gap-4 text-white text-sm">
-                            <span className="flex items-center gap-2"><span className="text-cyan-400">👆</span> Tek Tık: Alt Kategoriler</span>
-                            <span className="text-cyan-500/50">•</span>
-                            <span className="flex items-center gap-2"><span className="text-cyan-400">🖱️</span> Çift Tık: Ürün Sayfası</span>
+                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 animate-fade-in">
+                    <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
+                        <div className="flex items-center gap-3 text-xs">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-cyan-400 font-medium">Tek Tık:</span>
+                                <span className="text-slate-300">Alt Kategoriler</span>
+                            </div>
+                            <span className="text-slate-600">•</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-cyan-400 font-medium">Çift Tık:</span>
+                                <span className="text-slate-300">Ürün Sayfası</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-            {/* Sol-Sağ Gradient ve Sürükle İşareti */}
-            <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none z-10" />
-            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none z-10" />
+            {/* Sol-Sağ Gradient */}
+            <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
 
-            {/* Sürükleme işareti - aralıklı beliren sol-sağ oklar */}
-            {showHint && !focusedItemId && (
-                <>
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
-                        ←
-                    </div>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-20 text-cyan-400/80 text-4xl animate-pulse hidden md:block">
-                        →
-                    </div>
-                </>
-            )}
         </div>
     )
 }
