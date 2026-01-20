@@ -21,7 +21,7 @@ async function run() {
         await client.connect()
         console.log('Connected.')
 
-        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20251222_create_contact_messages.sql')
+        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260120_fix_performance_lints_execution.sql')
         const sql = fs.readFileSync(sqlPath, 'utf8')
 
         console.log('Executing migration...')
