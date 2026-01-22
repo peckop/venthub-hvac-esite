@@ -110,9 +110,9 @@ export const HVAC_BRANDS: HVACBrand[] = [
     country: 'EU'
   },
   {
-    name: 'Danfoss',
-    slug: 'danfoss',
-    description: 'İskandinav kontrol teknolojisi',
+    name: 'Frekans Konvertörleri',
+    slug: 'frekans-konvertorler',
+    description: 'Hız kontrol çözümleri',
     country: 'DK'
   }
 ]
