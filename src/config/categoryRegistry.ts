@@ -12,19 +12,17 @@ export const CATEGORY_REGISTRY = {
         slug: 'fanlar',
         name: 'Fanlar',
         subs: {
-            BASINCLANDIRMA: 'basinclandirma-fanlari',
+            // Aktif alt kategoriler (ürün barındıranlar)
             CATI_TIPI: 'cati-tipi-fanlar',
             DUMAN_EGZOZ: 'duman-egzoz-fanlari',
             DUVAR_TIPI: 'duvar-tipi-kompakt-aksiyal-fanlar',
             KANAL_TIPI: 'kanal-tipi-fanlar',
             OTOPARK_JET: 'otopark-jet-fanlari',
             ENDUSTRIYEL: 'endustriyel-fanlar',
-            KONUT_TIPI: 'konut-tipi-fanlar',
-            PLUG: 'plug-fanlar',
-            SANTRIFUJ: 'santrifuj-fanlar',
             SIGINAK: 'siginak-havalandirma-fanlari',
             SESSIZ_KANAL: 'sessiz-kanal-tipi-fanlar',
-            NICOTRA: 'nicotra-gebhardt-fanlar'
+            EC_MOTOR: 'ec-motor-fanlar' // Eski: nicotra-gebhardt-fanlar
+            // Pasif (ürün yok): basinclandirma, konut-tipi, plug, santrifuj
         }
     },
     HAVA_PERDELERI: {
@@ -46,30 +44,20 @@ export const CATEGORY_REGISTRY = {
     HAVA_TEMIZLEYICILER: {
         slug: 'hava-temizleyiciler-anti-viral-urunler',
         name: 'Hava Temizleyiciler & Anti-Viral Ürünler',
-        subs: {
-            DEPURO_PRO: 'depuro-pro',
-            SG_DISPENSER: 'sg-dispenser',
-            UV_LOGIKA: 'uv-logika',
-            VORT_SUPER_DRY: 'vort-super-dry'
-        }
+        subs: {} // Seri adları kaldırıldı, düz liste yapısı
     },
     HIZ_KONTROL: {
         slug: 'hiz-kontrolu-cihazlari',
         name: 'Hız Kontrolü Cihazları',
         subs: {
-            DANFOSS: 'danfoss',
-            HIZ_ANAHTARI: 'hiz-anahtari'
+            FREKANS_KONVERTOR: 'frekans-konvertorler' // Eski: danfoss
+            // Pasif (ürün yok): hiz-anahtari
         }
     },
     AKSESUARLAR: {
         slug: 'aksesuarlar',
         name: 'Aksesuarlar',
-        subs: {
-            ALUMINYUM_BANT: 'aluminyum-folyo-bantlar',
-            BAGLANTI_KONNEKTORU: 'baglanti-konnektoru',
-            GEMICI_ANEMOSTADI: 'gemici-anemostadi',
-            PLASTIK_KELEPCE: 'plastik-kelepceler'
-        }
+        subs: {} // Ürünler ana kategoride, alt kategoriler kullanılmıyor
     },
     FLEXIBLE: {
         slug: 'flexible-hava-kanallari',
