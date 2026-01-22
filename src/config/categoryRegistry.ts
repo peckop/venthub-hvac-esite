@@ -53,7 +53,7 @@ export const CATEGORY_REGISTRY = {
         slug: 'hiz-kontrolu-cihazlari',
         name: 'Hız Kontrolü Cihazları',
         subs: {
-            DANFOSS: 'danfoss',
+            FREKANS_KONVERTOR: 'frekans-konvertorler', // Ürün tipi bazlı (marka bağımsız)
             HIZ_ANAHTARI: 'hiz-anahtari'
         }
     },
