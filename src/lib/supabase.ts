@@ -110,9 +110,9 @@ export const HVAC_BRANDS: HVACBrand[] = [
     country: 'EU'
   },
   {
-    name: 'Frekans Konvertörleri',
-    slug: 'frekans-konvertorler',
-    description: 'Hız kontrol çözümleri',
+    name: 'Frekans Konvertörü',
+    slug: 'frekans-konvertoru',
+    description: 'Yüksek verimli hız kontrolü',
     country: 'DK'
   }
 ]
