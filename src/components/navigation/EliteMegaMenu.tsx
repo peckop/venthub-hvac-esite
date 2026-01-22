@@ -5,7 +5,6 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { Category } from '../../lib/supabase'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
-import './EliteMegaMenu.css'
 
 interface EliteMegaMenuProps {
     categories: Category[]
@@ -26,21 +25,20 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
     }
 
     return (
-        <NavigationMenu.Root className="elite-nav-root">
-            <NavigationMenu.List className="elite-nav-list">
+        <NavigationMenu.Root className="relative z-50 flex w-full justify-center">
+            <NavigationMenu.List className="center shadow-blackA7 m-0 flex list-none rounded-[6px] bg-white bg-opacity-95 backdrop-blur-sm p-1 shadow-[0_2px_10px] shadow-black/5">
                 {mainCategories.map((category) => {
                     const subs = getSubCategories(category.id)
 
                     if (subs.length === 0) {
-                        // No subcategories - just a link
                         return (
                             <NavigationMenu.Item key={category.id}>
                                 <Link
                                     to={`/category/${category.slug}`}
                                     onClick={() => handleLinkClick(0, category.slug)}
-                                    className="elite-nav-trigger elite-nav-link"
+                                    className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
                                 >
-                                    <span className="elite-nav-icon">
+                                    <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
                                     </span>
                                     <span>{category.name}</span>
@@ -51,55 +49,62 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
 
                     return (
                         <NavigationMenu.Item key={category.id}>
-                            <NavigationMenu.Trigger className="elite-nav-trigger">
-                                <span className="elite-nav-icon">
-                                    {getCategoryIcon(category.slug, { size: 18 })}
-                                </span>
-                                <span>{category.name}</span>
+                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-primary-navy">
+                                        {getCategoryIcon(category.slug, { size: 18 })}
+                                    </span>
+                                    <span>{category.name}</span>
+                                </div>
                                 <ChevronDown
-                                    className="elite-chevron"
-                                    size={14}
+                                    className="relative top-[1px] ml-1 h-3 w-3 transition-transform duration-[250ms] ease-in group-data-[state=open]:-rotate-180"
                                     aria-hidden
                                 />
                             </NavigationMenu.Trigger>
 
-                            <NavigationMenu.Content className="elite-nav-content">
-                                <div className="elite-content-grid">
+                            <NavigationMenu.Content className="absolute top-0 left-0 w-full sm:w-auto data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight">
+                                <div className="m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
                                     {/* Category Header */}
-                                    <div className="elite-content-header">
-                                        <div className="elite-header-icon">
-                                            {getCategoryIcon(category.slug, { size: 32 })}
-                                        </div>
-                                        <div>
-                                            <h3 className="elite-header-title">{category.name}</h3>
-                                            <p className="elite-header-desc">{category.description}</p>
+                                    <div className="row-span-3">
+                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7">
+                                            <div className="text-white mb-4">
+                                                {getCategoryIcon(category.slug, { size: 48 })}
+                                            </div>
+                                            <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
+                                                {category.name}
+                                            </div>
+                                            <p className="text-[14px] leading-[1.3] text-white/90">
+                                                {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
+                                            </p>
+                                            <Link
+                                                to={`/category/${category.slug}`}
+                                                onClick={() => handleLinkClick(0, category.slug)}
+                                                className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
+                                            >
+                                                Tümünü Gör <ExternalLink size={14} />
+                                            </Link>
                                         </div>
                                     </div>
 
                                     {/* Subcategories Grid */}
-                                    <div className="elite-subcats-grid">
-                                        {subs.map((sub) => (
-                                            <Link
-                                                key={sub.id}
-                                                to={`/category/${category.slug}/${sub.slug}`}
-                                                onClick={() => handleLinkClick(1, sub.slug, category.slug)}
-                                                className="elite-subcat-link"
-                                            >
-                                                <span className="elite-subcat-name">{sub.name}</span>
-                                                <span className="elite-subcat-arrow">→</span>
-                                            </Link>
-                                        ))}
+                                    <div className="col-span-1">
+                                        <ul className="grid grid-cols-2 gap-2">
+                                            {subs.map((sub) => (
+                                                <li key={sub.id}>
+                                                    <Link
+                                                        to={`/category/${category.slug}/${sub.slug}`}
+                                                        onClick={() => handleLinkClick(1, sub.slug, category.slug)}
+                                                        className="block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
+                                                    >
+                                                        <div className="mb-1 font-medium text-slate-900">{sub.name}</div>
+                                                        <p className="text-[13px] leading-[1.4] text-slate-500 line-clamp-2">
+                                                            {sub.description || 'Ürünleri incele →'}
+                                                        </p>
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
-
-                                    {/* View All Button */}
-                                    <Link
-                                        to={`/category/${category.slug}`}
-                                        onClick={() => handleLinkClick(0, category.slug)}
-                                        className="elite-view-all"
-                                    >
-                                        <span>Tüm {category.name}</span>
-                                        <ExternalLink size={14} />
-                                    </Link>
                                 </div>
                             </NavigationMenu.Content>
                         </NavigationMenu.Item>
@@ -111,19 +116,19 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                     <Link
                         to="/products"
                         onClick={() => handleLinkClick(0, 'products')}
-                        className="elite-nav-trigger elite-nav-link elite-nav-primary"
+                        className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-bold leading-none text-secondary-blue outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
                     >
                         Tüm Ürünler
                     </Link>
                 </NavigationMenu.Item>
 
-                <NavigationMenu.Indicator className="elite-nav-indicator">
-                    <div className="elite-indicator-arrow" />
+                <NavigationMenu.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
+                    <div className="relative top-[70%] h-[10px] w-[10px] rotate-[45deg] rounded-tl-[2px] bg-white" />
                 </NavigationMenu.Indicator>
             </NavigationMenu.List>
 
-            <div className="elite-viewport-wrapper">
-                <NavigationMenu.Viewport className="elite-nav-viewport" />
+            <div className="absolute left-0 top-full flex w-full justify-center perspective-[2000px]">
+                <NavigationMenu.Viewport className="data-[state=open]:animate-scaleIn data-[state=closed]:animate-scaleOut relative mt-[10px] h-[var(--radix-navigation-menu-viewport-height)] w-[var(--radix-navigation-menu-viewport-width)] origin-[top_center] overflow-hidden rounded-[10px] bg-white transition-[width,_height] duration-300 shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)]" />
             </div>
         </NavigationMenu.Root>
     )
@@ -163,51 +168,51 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
     if (!isOpen) return null
 
     return (
-        <div className="mobile-mega-overlay" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
             <div
-                className="mobile-mega-panel"
+                className="absolute top-0 left-0 w-[85%] max-w-[360px] h-full bg-white shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="mobile-mega-header">
-                    <h2>Kategoriler</h2>
-                    <button onClick={onClose} className="mobile-mega-close">
-                        <span>✕</span>
+                <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
+                    <h2 className="text-lg font-bold text-slate-800">Kategoriler</h2>
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-500 hover:text-slate-800 transition-colors">
+                        ✕
                     </button>
                 </div>
 
                 {/* Categories */}
-                <div className="mobile-mega-content">
+                <div className="flex-1 overflow-y-auto p-4 space-y-2">
                     {mainCategories.map((category) => {
                         const subs = getSubCategories(category.id)
                         const isExpanded = expandedCategory === category.id
 
                         return (
-                            <div key={category.id} className="mobile-category-item">
+                            <div key={category.id} className="border border-slate-100 rounded-lg overflow-hidden">
                                 <button
-                                    className={`mobile-category-trigger ${isExpanded ? 'expanded' : ''}`}
+                                    className={`w-full flex items-center gap-3 p-3 text-left transition-colors ${isExpanded ? 'bg-slate-50' : 'bg-white hover:bg-slate-50'}`}
                                     onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
                                 >
-                                    <span className="mobile-cat-icon">
+                                    <span className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 rounded-md text-primary-navy shadow-sm">
                                         {getCategoryIcon(category.slug, { size: 20 })}
                                     </span>
-                                    <span className="mobile-cat-name">{category.name}</span>
+                                    <span className="flex-1 font-semibold text-slate-700">{category.name}</span>
                                     {subs.length > 0 && (
                                         <ChevronDown
-                                            className={`mobile-cat-chevron ${isExpanded ? 'rotated' : ''}`}
+                                            className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                                             size={18}
                                         />
                                     )}
                                 </button>
 
                                 {subs.length > 0 && isExpanded && (
-                                    <div className="mobile-subcats">
+                                    <div className="bg-slate-50 border-t border-slate-100 p-2 pl-4 space-y-1">
                                         {subs.map((sub) => (
                                             <Link
                                                 key={sub.id}
                                                 to={`/category/${category.slug}/${sub.slug}`}
                                                 onClick={onClose}
-                                                className="mobile-subcat-link"
+                                                className="block p-2 text-sm font-medium text-slate-600 hover:text-primary-navy hover:bg-white rounded-md transition-all"
                                             >
                                                 {sub.name}
                                             </Link>
@@ -215,7 +220,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                                         <Link
                                             to={`/category/${category.slug}`}
                                             onClick={onClose}
-                                            className="mobile-subcat-link mobile-view-all"
+                                            className="block p-2 text-sm font-bold text-secondary-blue hover:text-primary-navy hover:bg-white rounded-md transition-all mt-2"
                                         >
                                             Tümünü Gör →
                                         </Link>
@@ -224,19 +229,13 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                             </div>
                         )
                     })}
+                </div>
 
-                    {/* Quick Links */}
-                    <div className="mobile-quick-links">
-                        <Link to="/products" onClick={onClose} className="mobile-quick-link primary">
-                            Tüm Ürünler
-                        </Link>
-                        <Link to="/brands" onClick={onClose} className="mobile-quick-link">
-                            Markalar
-                        </Link>
-                        <Link to="/contact" onClick={onClose} className="mobile-quick-link">
-                            İletişim
-                        </Link>
-                    </div>
+                {/* Footer Links */}
+                <div className="p-4 border-t border-slate-100 bg-slate-50">
+                    <Link to="/products" onClick={onClose} className="block w-full py-3 px-4 bg-primary-navy text-white text-center font-bold rounded-lg shadow-lg shadow-primary-navy/20 active:scale-95 transition-all">
+                        Tüm Ürünler
+                    </Link>
                 </div>
             </div>
         </div>
