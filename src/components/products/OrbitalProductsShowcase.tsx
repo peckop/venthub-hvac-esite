@@ -390,8 +390,8 @@ const SceneContent: React.FC<{
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
     shouldShowTapHint: boolean
     shouldShowDragHint: boolean
-    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown'
-    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown') => void
+    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'
+    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished') => void
 }> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange }) => {
     const { camera } = useThree()
     const lastFrontCardRef = useRef<string | null>(null) // Debounce için
@@ -648,16 +648,21 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
-    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown'>('idle')
+    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>('idle')
     const lastX = useRef(0)
 
-    // Stage Cooldown kontrolü
+    // Stage Cooldown kontrolü - ARTIK DÖNGÜ YOK (Tek seferlik)
     useEffect(() => {
         if (hintStage !== 'cooldown') return
 
+        // Kullanıcı isteği: Animasyonlar tekrar etmesin.
+        // Bu yüzden cooldown bitince 'idle' yerine 'finished' durumuna geçiyoruz
+        // veya hiçbir şey yapmıyoruz.
+
+        // Eğer ileride tekrar çalışması gerekirse burayı 'idle' yapabiliriz.
         const timer = setTimeout(() => {
-            setHintStage('idle')
-        }, 15000) // 15sn bekleme
+            setHintStage('finished')
+        }, 15000)
 
         return () => clearTimeout(timer)
     }, [hintStage])
