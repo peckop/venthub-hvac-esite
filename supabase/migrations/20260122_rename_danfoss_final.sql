@@ -1,9 +1,9 @@
--- Rename 'Danfoss' category to 'Frekans Konvertörleri'
--- This ensures the category tree uses Product Type naming instead of Brand naming.
+-- Rename 'Danfoss' (and 'Frekans Konvertörleri' if mistakenly applied) to 'Frekans Konvertörü'
+-- Correct casing (Title Case) and singular form as requested.
 
 UPDATE categories
 SET 
-  name = 'Frekans Konvertörleri',
-  slug = 'frekans-konvertorler',
-  description = 'Enerji verimliliği sağlayan hız kontrol ve frekans konvertör çözümleri'
-WHERE slug = 'danfoss';
+  name = 'Frekans Konvertörü',
+  slug = 'frekans-konvertoru',
+  description = 'Yüksek verimli hız kontrolü ve motor sürücü teknolojileri'
+WHERE slug IN ('danfoss', 'frekans-konvertorler', 'frekans-konvertorleri', 'vlt');

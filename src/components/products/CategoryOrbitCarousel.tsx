@@ -137,7 +137,7 @@ const formatSubcategoryLabel = (key: string): string => {
         UV_LOGIKA: 'UV Logika',
         VORT_SUPER_DRY: 'Vort Super Dry',
         // Hız Kontrol
-        DANFOSS: 'Frekans Konvertörleri',
+        DANFOSS: 'Frekans Konvertörü',
         HIZ_ANAHTARI: 'Hız Anahtarı',
         // Aksesuarlar
         ALUMINYUM_BANT: 'Alüminyum Bantlar',
