@@ -21,7 +21,7 @@ async function run() {
         await client.connect()
         console.log('Connected.')
 
-        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260122_fix_category_structure.sql')
+        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260122_rollback_name_changes.sql')
         const sql = fs.readFileSync(sqlPath, 'utf8')
 
         console.log('Executing migration...')
