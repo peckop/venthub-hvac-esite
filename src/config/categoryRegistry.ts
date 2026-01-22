@@ -12,7 +12,6 @@ export const CATEGORY_REGISTRY = {
         slug: 'fanlar',
         name: 'Fanlar',
         subs: {
-            // Aktif alt kategoriler (ürün barındıranlar)
             CATI_TIPI: 'cati-tipi-fanlar',
             DUMAN_EGZOZ: 'duman-egzoz-fanlari',
             DUVAR_TIPI: 'duvar-tipi-kompakt-aksiyal-fanlar',
@@ -21,8 +20,12 @@ export const CATEGORY_REGISTRY = {
             ENDUSTRIYEL: 'endustriyel-fanlar',
             SIGINAK: 'siginak-havalandirma-fanlari',
             SESSIZ_KANAL: 'sessiz-kanal-tipi-fanlar',
-            EC_MOTOR: 'ec-motor-fanlar' // Eski: nicotra-gebhardt-fanlar
-            // Pasif (ürün yok): basinclandirma, konut-tipi, plug, santrifuj
+            NICOTRA: 'nicotra-gebhardt-fanlar', // Marka adı korundu - farklı fan tipleri var
+            // Henüz ürün olmayan kategoriler:
+            BASINCLANDIRMA: 'basinclandirma-fanlari',
+            KONUT_TIPI: 'konut-tipi-fanlar',
+            PLUG: 'plug-fanlar',
+            SANTRIFUJ: 'santrifuj-fanlar'
         }
     },
     HAVA_PERDELERI: {
@@ -50,8 +53,8 @@ export const CATEGORY_REGISTRY = {
         slug: 'hiz-kontrolu-cihazlari',
         name: 'Hız Kontrolü Cihazları',
         subs: {
-            FREKANS_KONVERTOR: 'frekans-konvertorler' // Eski: danfoss
-            // Pasif (ürün yok): hiz-anahtari
+            DANFOSS: 'danfoss',
+            HIZ_ANAHTARI: 'hiz-anahtari'
         }
     },
     AKSESUARLAR: {
