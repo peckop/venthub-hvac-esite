@@ -53,7 +53,7 @@ export const CATEGORY_REGISTRY = {
         slug: 'hiz-kontrolu-cihazlari',
         name: 'Hız Kontrolü Cihazları',
         subs: {
-            FREKANS_KONVERTOR: 'frekans-konvertorler', // Ürün tipi bazlı (marka bağımsız)
+            FREKANS_KONVERTOR: 'frekans-konvertoru', // Doğru slug (Title Case, Single)
             HIZ_ANAHTARI: 'hiz-anahtari'
         }
     },
