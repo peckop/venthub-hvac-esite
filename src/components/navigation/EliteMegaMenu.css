@@ -5,110 +5,29 @@
 /* ========================
    ROOT & LIST
    ======================== */
+/* ========================
+   ROOT & LIST
+   ======================== */
 .elite-nav-root {
     position: relative;
     display: flex;
     justify-content: center;
+    width: 100%;
+    /* Ensure full width relative to container */
     z-index: 50;
 }
 
 .elite-nav-list {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    justify-content: center;
+    /* Center items */
+    gap: 0.5rem;
+    /* Increased gap */
     list-style: none;
     margin: 0;
     padding: 0;
-}
-
-/* ========================
-   TRIGGER & LINK
-   ======================== */
-.elite-nav-trigger {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--industrial-gray, #1a1a2e);
-    background: transparent;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-}
-
-.elite-nav-trigger:hover,
-.elite-nav-trigger:focus-visible {
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.05), rgba(41, 128, 185, 0.08));
-    color: var(--secondary-blue, #2980b9);
-}
-
-.elite-nav-trigger[data-state="open"] {
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.1), rgba(41, 128, 185, 0.12));
-    color: var(--secondary-blue, #2980b9);
-}
-
-.elite-nav-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: inherit;
-}
-
-.elite-chevron {
-    transition: transform 0.25s ease;
-}
-
-.elite-nav-trigger[data-state="open"] .elite-chevron {
-    transform: rotate(180deg);
-}
-
-/* Primary link style */
-.elite-nav-primary {
-    background: linear-gradient(135deg, var(--primary-navy, #1a1a2e), var(--secondary-blue, #2980b9));
-    color: white !important;
-    font-weight: 600;
-}
-
-.elite-nav-primary:hover {
-    background: linear-gradient(135deg, var(--secondary-blue, #2980b9), var(--primary-navy, #1a1a2e));
-    transform: scale(1.02);
-}
-
-/* ========================
-   INDICATOR
-   ======================== */
-.elite-nav-indicator {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    height: 10px;
-    top: 100%;
-    overflow: hidden;
-    z-index: 1;
-    transition: width, transform 0.25s ease;
-}
-
-.elite-nav-indicator[data-state="visible"] {
-    animation: fadeIn 0.2s ease;
-}
-
-.elite-nav-indicator[data-state="hidden"] {
-    animation: fadeOut 0.2s ease;
-}
-
-.elite-indicator-arrow {
-    position: relative;
-    top: 70%;
-    width: 10px;
-    height: 10px;
-    background: white;
-    border-top-left-radius: 2px;
-    transform: rotate(45deg);
-    box-shadow: -2px -2px 5px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 /* ========================
@@ -122,8 +41,13 @@
     top: 100%;
     left: 0;
     perspective: 2000px;
+    z-index: 40;
+    /* Behind the list but above other content */
+    pointer-events: none;
+    /* Pass through clicks when closed */
 }
 
+/* Allow pointer events only on viewport */
 .elite-nav-viewport {
     position: relative;
     margin-top: 10px;
@@ -132,12 +56,15 @@
     background: white;
     border-radius: 1rem;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
         0 20px 40px rgba(0, 0, 0, 0.1),
         0 10px 20px rgba(0, 0, 0, 0.05),
         0 0 0 1px rgba(0, 0, 0, 0.05);
+    /* Added subtle border */
     transition: width 0.3s ease, height 0.3s ease;
     transform-origin: top center;
+    pointer-events: auto;
+    /* Re-enable pointer events */
 }
 
 .elite-nav-viewport[data-state="open"] {
@@ -294,13 +221,23 @@
    ANIMATIONS
    ======================== */
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
 }
 
 @keyframes scaleIn {
@@ -308,6 +245,7 @@
         opacity: 0;
         transform: rotateX(-10deg) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: rotateX(0deg) scale(1);
@@ -319,6 +257,7 @@
         opacity: 1;
         transform: rotateX(0deg) scale(1);
     }
+
     to {
         opacity: 0;
         transform: rotateX(-10deg) scale(0.95);
@@ -330,6 +269,7 @@
         opacity: 0;
         transform: translateX(-100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -341,6 +281,7 @@
         opacity: 0;
         transform: translateX(100px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -352,6 +293,7 @@
         opacity: 1;
         transform: translateX(0);
     }
+
     to {
         opacity: 0;
         transform: translateX(-100px);
@@ -363,6 +305,7 @@
         opacity: 1;
         transform: translateX(0);
     }
+
     to {
         opacity: 0;
         transform: translateX(100px);
@@ -399,6 +342,7 @@
     from {
         transform: translateX(-100%);
     }
+
     to {
         transform: translateX(0);
     }
