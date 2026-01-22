@@ -26,6 +26,7 @@ export interface Category {
   seo_desc?: string | null
   sort_order?: number
   is_featured?: boolean
+  is_active?: boolean // Kategori aktif mi?
   metadata?: {
     display_mode?: 'showcase' | 'series' | 'list'
     showcase_images?: { desktop: string; mobile: string }[]
@@ -121,6 +122,7 @@ export async function getCategories() {
   const { data, error } = await supabase
     .from('categories')
     .select('*')
+    .eq('is_active', true) // Sadece aktif kategorileri getir
     .order('level', { ascending: true })
     .order('name', { ascending: true })
 
