@@ -5,6 +5,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { Category } from '../../lib/supabase'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
+import MegaMenu3DBackground from './MegaMenu3DBackground'
 
 interface EliteMegaMenuProps {
     categories: Category[]
@@ -66,23 +67,26 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                 <div className="m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
                                     {/* Category Header */}
                                     <div className="row-span-3">
-                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7">
-                                            <div className="text-white mb-4">
-                                                {getCategoryIcon(category.slug, { size: 48 })}
+                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7 relative overflow-hidden">
+                                            <MegaMenu3DBackground categorySlug={category.slug} />
+                                            <div className="relative z-10">
+                                                <div className="text-white mb-4">
+                                                    {getCategoryIcon(category.slug, { size: 48 })}
+                                                </div>
+                                                <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
+                                                    {category.name}
+                                                </div>
+                                                <p className="text-[14px] leading-[1.3] text-white/90">
+                                                    {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
+                                                </p>
+                                                <Link
+                                                    to={`/category/${category.slug}`}
+                                                    onClick={() => handleLinkClick(0, category.slug)}
+                                                    className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
+                                                >
+                                                    Tümünü Gör <ExternalLink size={14} />
+                                                </Link>
                                             </div>
-                                            <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
-                                                {category.name}
-                                            </div>
-                                            <p className="text-[14px] leading-[1.3] text-white/90">
-                                                {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
-                                            </p>
-                                            <Link
-                                                to={`/category/${category.slug}`}
-                                                onClick={() => handleLinkClick(0, category.slug)}
-                                                className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
-                                            >
-                                                Tümünü Gör <ExternalLink size={14} />
-                                            </Link>
                                         </div>
                                     </div>
 
