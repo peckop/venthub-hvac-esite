@@ -36,7 +36,8 @@ import {
     TrustSignals,
     BottomCTA
 } from './sections'
-import { Breadcrumb, buildCategoryBreadcrumb } from '../navigation/Breadcrumb'
+import { Breadcrumb } from '../navigation/Breadcrumb'
+import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 
 interface CategoryLandingProps {
     category: Category

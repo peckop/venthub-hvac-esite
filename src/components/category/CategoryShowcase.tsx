@@ -5,7 +5,8 @@ import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2, ChevronDown } from
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
-import { Breadcrumb, buildCategoryBreadcrumb } from '../navigation/Breadcrumb'
+import { Breadcrumb } from '../navigation/Breadcrumb'
+import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 
 interface CategoryShowcaseProps {
     category: Category

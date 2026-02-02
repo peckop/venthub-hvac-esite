@@ -887,7 +887,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
         const slug = categorySlug.toLowerCase()
 
         if (slug.includes('fan')) return FanIcon
-        if (slug.includes('hava-perde')) return AirCurtainIcon
+        if (slug.includes('hava-perde') || slug.includes('elektrikli-isitici') || slug.includes('ortam-havali')) return AirCurtainIcon
         if (slug.includes('flexible') || slug.includes('kanal')) return FlexDuctModel
         if (slug.includes('isi-geri') || slug.includes('hrv')) return HRVIcon
         if (slug.includes('aksesuar') || slug.includes('yedek')) return SparePartsSet
