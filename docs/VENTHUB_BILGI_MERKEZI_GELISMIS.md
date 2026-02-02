@@ -1,4 +1,7 @@
-# VentHub Bilgi ve Kılavuz Merkezi — Gelişmiş Mimari ve Hesaplayıcı Planı (EU/US Referanslı)
+# VentHub Bilgi ve Kılavuz Merkezi — Gelişmiş Mimari ve Hesaplayıcı Planı
+> **Status: 🚧 PARTIALLY ACTIVE (Jan 2026)**
+> Hesaplayıcı arayüzleri (`src/pages/calculators`) mevcuttur. Hesaplama motoru (v2) geliştirmeleri backlog'dadır.
+
 
 Amaç
 - Kullanıcıyı (tüketici + teknik) kafasında soru bırakmadan doğru ürüne yönlendirmek.

@@ -1,4 +1,7 @@
 # SEO ve i18n Standartları (VentHub)
+> **Status: ✅ ACTIVE & VERIFIED (Jan 2026)**
+> Proje genelinde dil ve SEO standartları bu belgeye göre yapılandırılmıştır.
+
 
 Son güncelleme: 2025-09-19
 

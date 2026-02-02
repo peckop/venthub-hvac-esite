@@ -1,4 +1,7 @@
 # OPERATIONS & STOCK PLAN — VentHub HVAC
+> **Status: ✅ ACTIVE & VERIFIED (Jan 2026)**
+> Bu belge güncel stok ve operasyon mimarisini yansıtır. Referans olarak kullanılabilir.
+
 
 Last updated: 2025-09-19
 

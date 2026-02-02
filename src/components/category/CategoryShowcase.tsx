@@ -5,13 +5,15 @@ import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2, ChevronDown } from
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
+import { Breadcrumb, buildCategoryBreadcrumb } from '../navigation/Breadcrumb'
 
 interface CategoryShowcaseProps {
     category: Category
     subCategories: Category[]
+    parentCategory?: Category | null
 }
 
-const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories }) => {
+const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
     const [wizardOpen, setWizardOpen] = useState(false)
 
     // Check if this is hava-perdeleri category for special treatment
@@ -24,8 +26,14 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
 
 
+    // Build breadcrumb items
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, 'Ana Sayfa')
+
     return (
         <div className="min-h-screen bg-white">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb items={breadcrumbItems} variant="white" />
+
             {/* Hero Section */}
             <div className="relative h-[600px] w-full overflow-hidden bg-primary-navy">
                 {heroImage && (

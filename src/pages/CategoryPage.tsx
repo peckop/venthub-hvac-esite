@@ -299,7 +299,7 @@ export const CategoryPage: React.FC = () => {
           canonical={canonicalUrl}
           image={categoryImageUrl || undefined}
         />
-        <CategoryShowcase category={enrichedCategory} subCategories={subCategories} />
+        <CategoryShowcase category={enrichedCategory} subCategories={subCategories} parentCategory={parentCategory} />
       </>
     )
   }
@@ -314,7 +314,7 @@ export const CategoryPage: React.FC = () => {
           canonical={canonicalUrl}
           image={categoryImageUrl || undefined}
         />
-        <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} />
+        <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} parentCategory={parentCategory} />
       </>
     )
   }
