@@ -36,11 +36,13 @@ import {
     TrustSignals,
     BottomCTA
 } from './sections'
+import { Breadcrumb, buildCategoryBreadcrumb } from '../navigation/Breadcrumb'
 
 interface CategoryLandingProps {
     category: Category
     products: Product[]
     subCategories?: Category[] // For in-page subcategory selection
+    parentCategory?: Category | null
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -62,7 +64,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
     'box': Box
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [], parentCategory }) => {
     // const { t } = useI18n()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
@@ -208,8 +210,16 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const features = category.metadata?.features || []
 
+    // Build breadcrumb items
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, 'Ana Sayfa')
+
     return (
         <div className="min-h-screen bg-white">
+            {/* Breadcrumb Navigation - Dark variant for dark hero */}
+            <div className="bg-zinc-900">
+                <Breadcrumb items={breadcrumbItems} variant="dark" className="border-b-0" />
+            </div>
+
             {/* Hero Section */}
             <div className="relative bg-zinc-900 text-white py-20 lg:py-32 overflow-hidden">
                 {/* Abstract Background Element */}
