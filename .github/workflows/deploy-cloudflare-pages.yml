@@ -41,6 +41,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate _headers (no restrictive security headers)
+        run: |
+          HEADERS_FILE="public/_headers"
+          if grep -q "Content-Security-Policy" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains CSP which can block the site. Remove it!"
+            exit 1
+          fi
+          if grep -q "frame-ancestors" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains frame-ancestors which can block the site. Remove it!"
+            exit 1
+          fi
+          if grep -q "X-Frame-Options: DENY" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains X-Frame-Options: DENY which can block the site. Use SAMEORIGIN or remove it!"
+            exit 1
+          fi
+          echo "✅ _headers file is safe for deployment"
+
       - name: Build
         env:
           NODE_ENV: "production"
