@@ -526,9 +526,17 @@ export const ProductDetailPage: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
+        {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (subCategory && mainCategory) {
+              navigate(`/category/${mainCategory.slug}/${subCategory.slug}`)
+            } else if (mainCategory) {
+              navigate(`/category/${mainCategory.slug}`)
+            } else {
+              navigate(-1) // fallback
+            }
+          }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
         >
           <ArrowLeft size={20} />
