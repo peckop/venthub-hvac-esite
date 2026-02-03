@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { X, Grid3X3, ArrowLeft, ChevronRight } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import CategoryCard3D from './CategoryCard3D'
 import type { Category } from '../../lib/supabase'
 
