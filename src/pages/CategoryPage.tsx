@@ -288,6 +288,7 @@ export const CategoryPage: React.FC = () => {
   }
 
   const displayMode = mergedMetadata.display_mode
+    || (parentCategory ? 'series' : (subCategories.length > 0 ? 'showcase' : undefined))
 
   if (displayMode === 'showcase') {
     // Inject metadata into category object for the component

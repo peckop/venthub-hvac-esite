@@ -64,6 +64,30 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
             { icon: 'wind', title: 'Güçlü İzolasyon', description: 'Yüksek hava hızı ile tam koruma' },
             { icon: 'leaf', title: 'Enerji Dostu', description: 'Isıtma gideri olmadan maksimum tasarruf' }
         ]
+    },
+
+    // Main Category: Aksesuarlar -> Showcase Mode
+    'aksesuarlar': {
+        display_mode: 'showcase',
+        hero_title: 'Aksesuarlar',
+        hero_description: 'HVAC sistemleri için bağlantı elemanları, kontrol üniteleri ve yardımcı ekipmanlar.',
+        features: []
+    },
+
+    // Main Category: Endüstriyel Sistemler -> Showcase Mode
+    'endustriyel-sistemler': {
+        display_mode: 'showcase',
+        hero_title: 'Endüstriyel Sistemler',
+        hero_description: 'Fabrika ve büyük tesisler için profesyonel havalandırma çözümleri.',
+        features: []
+    },
+
+    // Main Category: Hava Temizleyiciler -> Showcase Mode
+    'hava-temizleyiciler-anti-viral-urunler': {
+        display_mode: 'showcase',
+        hero_title: 'Hava Temizleyiciler',
+        hero_description: 'İç ortam hava kalitesini artıran anti-viral ve filtrasyon sistemleri.',
+        features: []
     }
 }
 
