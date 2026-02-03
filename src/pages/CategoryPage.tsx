@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { ChevronRight, Filter, Grid, List } from 'lucide-react'
+import { ChevronRight, Filter, Grid, List, ArrowLeft } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
@@ -15,6 +15,7 @@ import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
 export const CategoryPage: React.FC = () => {
   const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
+  const navigate = useNavigate()
   const [category, setCategory] = useState<Category | null>(null)
   const [parentCategory, setParentCategory] = useState<Category | null>(null)
   const [subCategories, setSubCategories] = useState<Category[]>([])
@@ -387,7 +388,16 @@ export const CategoryPage: React.FC = () => {
 
       {/* Category Header */}
       <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Geri Butonu */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span>{t('common.back')}</span>
+          </button>
+
           <div className="flex items-center space-x-6">
             <div className="text-primary-navy shrink-0">
               {categoryImageUrl ? (
