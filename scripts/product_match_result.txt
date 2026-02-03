@@ -1,0 +1,239 @@
+========================================
+BENZERLİK ANALİZİ: Kategori vs Ürün İsimleri
+========================================
+
+
+>>> "Depuro Pro" araması:
+  [KATEGORİ] ID: ca83b3d1-9958-461b-acbb-4196cdeda9b0, Parent: Hava Temizleyiciler Anti-Viral Ürünler
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "S&G Dispenser" araması:
+  [KATEGORİ] ID: 79e6a033-cfc2-4417-b5a6-20224e64b6fe, Parent: Hava Temizleyiciler Anti-Viral Ürünler
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Uv Logika" araması:
+  [KATEGORİ] ID: 515c15b9-e7a4-4a1c-b704-e2c3928c1be5, Parent: Hava Temizleyiciler Anti-Viral Ürünler
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Vort Super Dry" araması:
+  [KATEGORİ] ID: 626113e0-927f-4d25-9678-5f259fc3f49c, Parent: Hava Temizleyiciler Anti-Viral Ürünler
+  [ÜRÜNLER] 2 eşleşme:
+    - VORT QBK SAL KC EVO 315 M4 0,25kW (category: Fanlar, SKU: AVE-VOR-00259)
+    - VORT QBK SAL KC EVO 355 M4 0,25kW (category: Fanlar, SKU: AVE-VOR-00262)
+
+>>> "Alüminyum Folyo Bantlar" araması:
+  [KATEGORİ] ID: 591c0ea4-5e24-4214-b9fb-ed32d741cdd7, Parent: Aksesuarlar
+  [ÜRÜNLER] 13 eşleşme:
+    - Alüminyum Folyo Bant Takviyesiz 4,8 cm*25 m (category: Aksesuarlar, SKU: AVE-ALM-00021)
+    - Alüminyum Folyo Bant Takviyesiz 7,2 cm*25 m (category: Aksesuarlar, SKU: AVE-ALM-00039)
+    - Alüminyum Eşanjörlü Isı Geri Kazanım Cihazları - Avens 3000 (category: Konut Tipi, SKU: AVE-ALM-00073)
+    - Alüminyum Eşanjörlü Isı Geri Kazanım Cihazları - Avens 750 (category: Konut Tipi, SKU: AVE-ALM-00011)
+    - Alüminyum Eşanjörlü Isı Geri Kazanım Cihazları - Avens 1000 (category: Konut Tipi, SKU: AVE-ALM-00028)
+    ... ve 8 tane daha
+
+>>> "Bağlantı Konnektörü" araması:
+  [KATEGORİ] ID: bce93862-5402-4850-96ae-1f4fdd5656e3, Parent: Aksesuarlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Basınçlandırma Fanları" araması:
+  [KATEGORİ] ID: f1023011-4390-42d3-bcc4-53510a43c93f, Parent: Fanlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Ex-Proof Fanlar" araması:
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Gemici Anemostadı" araması:
+  [KATEGORİ] ID: 44f69169-0075-4c29-ac05-d76f55f935a8, Parent: Aksesuarlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Hız Anahtarı" araması:
+  [KATEGORİ] ID: 882982be-e355-4ccb-aea9-b5480b0fadf3, Parent: Hız Kontrolü Cihazları
+  [ÜRÜNLER] 5 eşleşme:
+    - Hız Anahtarı (Vortice - C 1,5) (category: Hız Kontrolü Cihazları, SKU: AVE-HIZ-00016)
+    - Hız Anahtarı (Vortice - C 2,5) (category: Hız Kontrolü Cihazları, SKU: AVE-HIZ-00033)
+    - Hız Anahtarı (Vortice - CR5 N) (category: Hız Kontrolü Cihazları, SKU: AVE-HIZ-00049)
+    - Hız Anahtarı (Vortice - IRT 35) (category: Hız Kontrolü Cihazları, SKU: AVE-HIZ-00063)
+    - Hız Anahtarı (Vortice - IRT 40) (category: Hız Kontrolü Cihazları, SKU: AVE-HIZ-00074)
+
+>>> "Konut Tipi Fanlar" araması:
+  [KATEGORİ] ID: f3a75c19-256a-44bb-a816-9379881f1346, Parent: Fanlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Plastik Kelepçeler" araması:
+  [KATEGORİ] ID: 8195387b-2bf5-4576-935a-0293ea0b0f34, Parent: Aksesuarlar
+  [ÜRÜNLER] 6 eşleşme:
+    - Plastik Kelepçe PK45 133 mm (category: Aksesuarlar, SKU: AVE-PLA-00019)
+    - Plastik Kelepçe PK55 166 mm (category: Aksesuarlar, SKU: AVE-PLA-00037)
+    - Plastik Kelepçe PK61 185 mm (category: Aksesuarlar, SKU: AVE-PLA-00053)
+    - Plastik Kelepçe PK75 229 mm (category: Aksesuarlar, SKU: AVE-PLA-00067)
+    - Plastik Kelepçe PK92 270 mm (category: Aksesuarlar, SKU: AVE-PLA-00078)
+    ... ve 1 tane daha
+
+>>> "Plug Fanlar" araması:
+  [KATEGORİ] ID: ff1bcb1f-9df2-443a-afe6-e8d261098d88, Parent: Fanlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Santrifüj Fanlar" araması:
+  [KATEGORİ] ID: 29af592c-b745-440a-80a1-1badec6ca91b, Parent: Fanlar
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+>>> "Ticari Tip" araması:
+  [KATEGORİ] ID: 0dd451bd-a4b7-4bab-9de6-338d7085e86b, Parent: Isı Geri Kazanım Cihazları
+  [ÜRÜNLER] Eşleşme bulunamadı
+
+========================================
+HAVA TEMİZLEYİCİLER İLE İLGİLİ TÜM ÜRÜNLER
+========================================
+
+Ana kategoride (Hava Temizleyiciler Anti-Viral Ürünler): 0 ürün
+
+Alt kategori "Depuro Pro": 0 ürün
+
+Alt kategori "Uv Logika": 0 ürün
+
+Alt kategori "Vort Super Dry": 0 ürün
+
+Alt kategori "S&G Dispenser": 0 ürün
+
+========================================
+ANAHTAR KELİME ARAMALARI
+========================================
+
+"depuro" içeren ürünler: 0
+"dispenser" içeren ürünler: 0
+"logika" içeren ürünler: 0
+"vort" içeren ürünler: 133
+  - Vortice Lineo 100 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - Vortice Lineo 125 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - Vortice Lineo 150 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - Vortice Lineo 200 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - Vortice Lineo 250 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - Vortice Lineo 315 Quiet → Kategori: Sessiz Kanal Tipi Fanlar
+  - VORT-E 354 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - Vortice VORT QUADRO EVO → Kategori: Fanlar
+  - Vortice VORT QBK SAL-KC T 355 → Kategori: Fanlar
+  - Vortice CRC-A 20/2 T → Kategori: Fanlar
+  - Vortice VORT HRW 40 MONO EVO (Oda Tipi Isı Geri Kazanım Cihazı) → Kategori: Isı Geri Kazanım Cihazları
+  - Vortice ME 100/4" LL GIALLO - YELLOW GOLD → Kategori: Fanlar
+  - Hız Anahtarı (Vortice - C 1,5) → Kategori: Hız Kontrolü Cihazları
+  - Vortice DEUMIDO EVO 10 (Oda Tipi Nem Alma Cihazı) → Kategori: Nem Alma Cihazları
+  - Vortice DEUMIDO NG 14 (Oda Tipi Nem Alma Cihazı) → Kategori: Nem Alma Cihazları
+  - Vortice VORT HRW 30 MONO EVO (Oda Tipi Isı Geri Kazanım Cihazı) → Kategori: Isı Geri Kazanım Cihazları
+  - Hız Anahtarı (Vortice - C 2,5) → Kategori: Hız Kontrolü Cihazları
+  - Vortice ME 100/4" LL T PUNTO EVO ROSA - PINK GOLD - Zaman Saatli → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice AIR DOOR AD 1200 (Ortam Havalı Hava Perdesi) → Kategori: Ortam Havalı
+  - Vortice  LINEO 315 → Kategori: Kanal Tipi Fanlar
+  - Vortice LINEO 100 Q → Kategori: Kanal Tipi Fanlar
+  - Vortice LINEO 100 → Kategori: Kanal Tipi Fanlar
+  - Vortice LINEO 125 → Kategori: Kanal Tipi Fanlar
+  - Vortice LINEO 150 → Kategori: Kanal Tipi Fanlar
+  - Vortice  LINEO 200 → Kategori: Kanal Tipi Fanlar
+  - Vortice LINEO 250 → Kategori: Kanal Tipi Fanlar
+  - Vortice ME 100/4" LL PUNTO EVO ROSA - PINK GOLD → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice ME 100/4" LL T PUNTO EVO NERO - BLACK GOLD - Zaman Saatli → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MFO 100/4" PUNTO FOUR → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 300/12" ARI-LL-S VARIO I (Duvar Tipi Ankastre) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice ME 100/4" PUNTO EVO BIANCO - WHITE GOLD → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MF 100/4" PUNTO FILO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MF 120/5" PUNTO FILO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MF 150/6" PUNTO FILO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MFO 90/3,5" PUNTO FOUR → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MFO 120/5" PUNTO FOUR → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice M 100/4" PUNTO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice M 120/5" PUNTO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice M 150/6" PUNTO → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MG 90/3,5" PUNTO GHOST → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MG 100/4" LL Tımer PUNTO GHOST → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MG 120/5" PUNTO GHOST → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice MG 150/6" PUNTO GHOST → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 150/6" AR-LL-S VARIO (Cam Tipi) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 230/9" AR-LL-S VARIO (Cam Tipi) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 300/12" AR-LL-S VARIO (Cam Tipi) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 150/6" ARI-LL-S VARIO I (Duvar Tipi Ankastre) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice 230/9" ARI-LL-S VARIO I (Duvar Tipi Ankastre) → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - Vortice AIR DOOR H AD 900 T ( Elektrikli Isıtıcılı Hava Perdesi) → Kategori: Elektrikli Isıtıcılı
+  - Vortice AIR DOOR H AD 1200 T  ( Elektrikli Isıtıcılı Hava Perdesi) → Kategori: Elektrikli Isıtıcılı
+  - Vortice AIR DOOR H AD 1500 T  ( Elektrikli Isıtıcılı Hava Perdesi) → Kategori: Elektrikli Isıtıcılı
+  - Vortice AIR DOOR H AD 900 M ( Elektrikli Isıtıcılı Hava Perdesi) → Kategori: Elektrikli Isıtıcılı
+  - Vortice AIR DOOR AD 1500 (Ortam Havalı Hava Perdesi) → Kategori: Ortam Havalı
+  - Vortice AIR DOOR AD 2000 (Ortam Havalı Hava Perdesi) → Kategori: Ortam Havalı
+  - Vortice ME 100/4" LL NERO - BLACK GOLD → Kategori: Fanlar
+  - Vortice DEUMIDO NG 20 (Oda Tipi Nem Alma Cihazı) → Kategori: Nem Alma Cihazları
+  - Hız Anahtarı (Vortice - CR5 N) → Kategori: Hız Kontrolü Cihazları
+  - Hız Anahtarı (Vortice - IRT 35) → Kategori: Hız Kontrolü Cihazları
+  - Vortice ME 100/4" LL T GIALLO - YELLOW GOLD - Zaman Saatli → Kategori: Fanlar
+  - Vortice C37-4 T ATEX → Kategori: Endüstriyel Fanlar
+  - Hız Anahtarı (Vortice - IRT 40) → Kategori: Hız Kontrolü Cihazları
+  - Vortice CRC-A 25/2 T → Kategori: Fanlar
+  - Vortice ME 100/4" LL T  PUNTO EVO BIANCO - WHITE GOLD - Zaman Saatli → Kategori: Duvar Tipi Kompakt Aksiyal Fanlar
+  - VORTICEL MP 252 M → Kategori: Fanlar
+  - Vortice C15-2 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice C20-2 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice C25-2 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice C30-2 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice C30-4 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice C31-4 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice  C35-4 T ATEX → Kategori: Endüstriyel Fanlar
+  - Vortice MEX 100/4" LL 1S FLEXO → Kategori: Fanlar
+  - VORTICEL  MP 254 M → Kategori: Fanlar
+  - VORTICEL MP 302 M → Kategori: Fanlar
+  - Vortice MEX 100/4" LL 1S Timer FLEXO → Kategori: Fanlar
+  - Vortice MEX 120/5" LL 1S FLEXO → Kategori: Fanlar
+  - Vortice MEX 120/5" LL 1S Timer FLEXO → Kategori: Fanlar
+  - Vortice MICRO 100 VORT QUADRO → Kategori: Fanlar
+  - Vortice MEDIO VORT QUADRO → Kategori: Fanlar
+  - Vortice SUPER VORT QUADRO → Kategori: Fanlar
+  - Vortice MICRO 100 I VORT QUADRO I (Ankastre) → Kategori: Fanlar
+  - Vortice MEDIO I VORT QUADRO I (Ankastre) → Kategori: Fanlar
+  - Vortice SUPER I VORT QUADRO I (Ankastre) → Kategori: Fanlar
+  - Vortice TIRACAMINO Şömine ve Baca Fanı → Kategori: Fanlar
+  - Vortice CA 100 MD → Kategori: Fanlar
+  - Vortice CA 125 MD → Kategori: Fanlar
+  - Vortice CA 150 Q MD → Kategori: Fanlar
+  - Vortice CA 150 MD → Kategori: Fanlar
+  - Vortice CA 200 MD → Kategori: Fanlar
+  - Vortice CA 250 MD → Kategori: Fanlar
+  - Vortice CA 315 MD → Kategori: Fanlar
+  - Vortice VORT QBK SAL-KC M 315 → Kategori: Fanlar
+  - Vortice AIR DOOR AD 900 (Ortam Havalı Hava Perdesi) → Kategori: Ortam Havalı
+  - Vortice VORT QBK - SAL KC T 315 → Kategori: Fanlar
+  - VORT QBK SAL KC EVO 315 M4 0,25kW → Kategori: Fanlar
+  - VORT QBK SAL KC EVO 355 M4 0,25kW → Kategori: Fanlar
+  - Vortice VORT QBK SAL-KC T 400 → Kategori: Fanlar
+  - Vortice VORT QBK - SAL KC T 500 → Kategori: Fanlar
+  - Vortice VORT QBK SAL-KC T 560 → Kategori: Fanlar
+  - Vortice CA 100 MD E RF → Kategori: Fanlar
+  - Vortice CA 125 MD E RF → Kategori: Fanlar
+  - Vortice CA 150 MD E RF → Kategori: Fanlar
+  - Vortice CA 200 MD E RF → Kategori: Fanlar
+  - Vortice CA 250 MD E RF → Kategori: Fanlar
+  - Vortice C10-2 T ATEX → Kategori: Endüstriyel Fanlar
+  - VORT-E 254 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORT-E 304 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORT-E 454 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORT-E 504 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORT-E 604 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORT-E 606 T ATEX II 2G/D h T3/125°C X Gb/Db → Kategori: Endüstriyel Fanlar
+  - VORTICEL MP 304 M → Kategori: Fanlar
+  - VORTICEL MP 354 M → Kategori: Fanlar
+  - VORTICEL MP 254 T → Kategori: Fanlar
+  - VORTICEL MP 302 T → Kategori: Fanlar
+  - VORTICEL MP 304 T → Kategori: Fanlar
+  - VORTICEL MP 354 T → Kategori: Fanlar
+  - VORTICEL MP 454 T → Kategori: Fanlar
+  - VORTICEL MP 504 T → Kategori: Fanlar
+  - VORTICEL MP 506 T → Kategori: Fanlar
+  - VORTICEL  MP 604 T → Kategori: Fanlar
+  - VORTICEL E 354 M → Kategori: Fanlar
+  - VORTICEL E 504 M → Kategori: Fanlar
+  - VORTICEL E 604 M → Kategori: Fanlar
+  - VORTICEL  E 504 T → Kategori: Fanlar
+  - VORTICEL E 604 T → Kategori: Fanlar
+  - VORTICEL E 606 T → Kategori: Fanlar
+  - VORTICEL A-E 354 M → Kategori: Fanlar
+  - VORTICEL A-E 454 M → Kategori: Fanlar
+  - VORTICEL A-E 504 M → Kategori: Fanlar
+  - VORTICEL A-E 454 T → Kategori: Fanlar
+  - VORTICEL A-E 504 T → Kategori: Fanlar
+  - VORTICEL A-E 564 T → Kategori: Fanlar
+"super dry" içeren ürünler: 0

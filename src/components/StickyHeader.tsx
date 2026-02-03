@@ -11,6 +11,7 @@ import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
 const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
 const MegaMenu = React.lazy(() => import('./MegaMenu'))
+const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -29,6 +30,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+  const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
+  const [allCategories, setAllCategories] = useState<Category[]>([])
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
   const { getCartCount, syncing, getCartTotal } = useCart()
   const [showSyncPulse, setShowSyncPulse] = useState(false)
@@ -125,11 +128,18 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       const { getCategories } = await import('../lib/supabase')
       const data = await getCategories()
       setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+      setAllCategories(data) // Store all categories for CategoryHub
       setCategoriesLoaded(true)
     } catch (error) {
       console.error('Error fetching categories:', error)
     }
   }, [categoriesLoaded])
+
+  // Open Category Hub with categories loaded
+  const openCategoryHub = useCallback(async () => {
+    await ensureCategories()
+    setIsCategoryHubOpen(true)
+  }, [ensureCategories])
 
   // Delay showing syncing pulse to avoid early flicker
   useEffect(() => {
@@ -225,11 +235,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             {/* Desktop Navigation - Reordered per requirements */}
             <nav className="hidden xl:flex items-center space-x-1">
               <button
-                onClick={() => { trackEvent('nav_click', { target: 'categories' }); setIsMenuOpen(true) }}
+                onClick={() => { trackEvent('nav_click', { target: 'categories' }); openCategoryHub() }}
                 className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center"
               >
                 <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-180 transition-transform duration-300">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <rect x="3" y="3" width="6" height="6" rx="1" /><rect x="15" y="3" width="6" height="6" rx="1" /><rect x="3" y="15" width="6" height="6" rx="1" /><rect x="15" y="15" width="6" height="6" rx="1" />
                 </svg>
                 <span className="font-medium whitespace-nowrap">{t('common.categories')}</span>
               </button>
@@ -692,6 +702,21 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       {isMenuOpen && (
         <React.Suspense fallback={null}>
           <MegaMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        </React.Suspense>
+      )}
+
+      {/* Category Hub Overlay - 3D Grid */}
+      {isCategoryHubOpen && (
+        <React.Suspense fallback={null}>
+          <CategoryHubOverlay
+            isOpen={isCategoryHubOpen}
+            onClose={() => setIsCategoryHubOpen(false)}
+            categories={allCategories}
+            onCategorySelect={(category) => {
+              setIsCategoryHubOpen(false)
+              navigate(`/category/${category.slug}`)
+            }}
+          />
         </React.Suspense>
       )}
     </>

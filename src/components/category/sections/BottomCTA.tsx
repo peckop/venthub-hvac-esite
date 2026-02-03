@@ -35,8 +35,8 @@ const BottomCTA: React.FC<BottomCTAProps> = ({
         <section className="bg-gradient-to-br from-primary-navy via-slate-800 to-primary-navy py-16 relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 left-0 w-96 h-96 bg-secondary-blue rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+                <div className="absolute top-0 left-0 w-96 h-96 bg-secondary-blue rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 will-change-transform" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 will-change-transform" />
             </div>
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
