@@ -38,6 +38,7 @@ export const tr = {
     searchPlaceholderLong: "Ürün adı, marka, model...",
     selectByNeed: "İhtiyacına Göre Seç",
     seeAllProducts: "Tüm Ürünleri Gör",
+    back: "Geri",
     backToTop: "Başa dön",
     gotoCategory: "Kategoriye git",
     cancel: "İptal",
