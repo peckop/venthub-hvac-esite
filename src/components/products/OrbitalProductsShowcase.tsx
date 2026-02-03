@@ -648,6 +648,20 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const [showHint, setShowHint] = useState(true)
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
     const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
+
+    // FIX: Canvas viewport clipping - mount sonrası zorla resize tetikle (agresif)
+    useEffect(() => {
+        // Birden fazla zamanda resize tetikle
+        const timers = [50, 200, 500, 1000].map(delay =>
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'))
+                // Scroll simülasyonu - browser repaint zorla
+                window.scrollBy(0, 1)
+                window.scrollBy(0, -1)
+            }, delay)
+        )
+        return () => timers.forEach(t => clearTimeout(t))
+    }, [])
     const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>('idle')
     const lastX = useRef(0)
 
@@ -818,6 +832,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         >
             <Canvas
                 shadows
+                frameloop="always"
                 gl={{ antialias: true }}
                 dpr={[1, 1.5]}
                 camera={{
