@@ -828,7 +828,7 @@ export const tr = {
     qty: 'Miktar:',
     addToCart: 'Sepete Ekle',
     askStock: 'Stok sorunuz',
-    techQuote: 'Teknik teklif al',
+    askPriceButton: 'Teklif İste',
     freeShipping: 'Bedava Kargo',
     warranty2y: '2 Yıl Garanti',
     support247: '7/24 Destek',
