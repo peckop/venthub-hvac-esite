@@ -280,10 +280,18 @@ export const CategoryPage: React.FC = () => {
     : null
 
   // --- Display Mode Handling ---
-  // Merge DB metadata with Static fallback (Static takes precedence if DB is empty for that field)
+  // Merge DB metadata with Static fallback
+  // Parent metadata is inherited for properties like hide_price
+
+  const parentStaticMeta = parentCategory ? STATIC_CATEGORY_METADATA[parentCategory.slug] || {} : {}
+  const currentStaticMeta = STATIC_CATEGORY_METADATA[slug || ''] || {}
 
   const mergedMetadata = {
-    ...(STATIC_CATEGORY_METADATA[slug || ''] || {}),
+    // Parent metadata first (for inheritance of hide_price etc.)
+    ...(parentStaticMeta.hide_price ? { hide_price: parentStaticMeta.hide_price } : {}),
+    // Then current category static metadata
+    ...currentStaticMeta,
+    // Finally DB metadata (highest priority)
     ...(category.metadata || {})
   }
 
