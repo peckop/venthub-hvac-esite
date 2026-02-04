@@ -7,6 +7,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Hava Perdeleri -> Showcase Mode
     'hava-perdeleri': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Hava Perdeleri',
         hero_description: 'İç mekan konforunu korurken enerji tasarrufu sağlayan profesyonel hava perdesi çözümleri.',
         showcase_images: [
@@ -21,6 +22,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Fanlar -> Showcase Mode
     'fanlar': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Endüstriyel Fanlar',
         hero_description: 'Yüksek verimli, düşük gürültülü profesyonel fan çözümleri. Çatı tipi, kanal tipi, basınçlandırma ve daha fazlası.',
         features: []
@@ -29,6 +31,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Isı Geri Kazanım Cihazları -> Showcase Mode
     'isi-geri-kazanim-cihazlari': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Isı Geri Kazanım Cihazları',
         hero_description: 'Enerji tasarrufu ve temiz hava sağlayan profesyonel HRV/ERV sistemleri.',
         features: []
@@ -69,6 +72,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Aksesuarlar -> Showcase Mode
     'aksesuarlar': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Aksesuarlar',
         hero_description: 'HVAC sistemleri için bağlantı elemanları, kontrol üniteleri ve yardımcı ekipmanlar.',
         features: []
@@ -77,6 +81,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Endüstriyel Sistemler -> Showcase Mode
     'endustriyel-sistemler': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Endüstriyel Sistemler',
         hero_description: 'Fabrika ve büyük tesisler için profesyonel havalandırma çözümleri.',
         features: []
@@ -85,6 +90,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Hava Temizleyiciler -> Showcase Mode
     'hava-temizleyiciler-anti-viral-urunler': {
         display_mode: 'showcase',
+        hide_price: true,
         hero_title: 'Hava Temizleyiciler',
         hero_description: 'İç ortam hava kalitesini artıran anti-viral ve filtrasyon sistemleri.',
         features: []

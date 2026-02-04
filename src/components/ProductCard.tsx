@@ -143,7 +143,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
           <div className="flex items-center justify-between mb-2">
             <div className="text-xl font-bold text-primary-navy">
               {hidePrice ? (
-                <span className="text-base text-industrial-gray/80">{t('pdp.askPrice') || 'Fiyat Teklifi Alın'}</span>
+                <span className="text-base font-medium text-secondary-blue flex items-center gap-1 group-hover:text-primary-navy transition-colors">
+                  Fiyat için Tıklayın
+                  <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:translate-x-1 transition-transform">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
               ) : (
                 formatCurrency(price, lang, { maximumFractionDigits: 0 })
               )}
