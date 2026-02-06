@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wind, Zap, Activity, Fan, Settings, Droplets, ArrowLeft, ChevronRight } from 'lucide-react'
+import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
@@ -250,7 +250,8 @@ const CategoryOrbitCarousel = () => {
                 id: s.slug,
                 title: s.title,
                 image: s.image,
-                categorySlug: activeMainCategory?.id
+                // DÜZELTME: Alt kategorinin kendi slug'ını kullan
+                categorySlug: s.slug
             }))
         }
     }, [level, subcategories, activeMainCategory])
