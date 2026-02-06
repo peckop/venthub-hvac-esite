@@ -6,12 +6,20 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  // Ortam değişkenleri zorunlu; yanlış projeye bağlanmayı önlemek için fallback kaldırıldı
-  throw new Error('Supabase yapılandırması eksik: VITE_SUPABASE_URL ve VITE_SUPABASE_ANON_KEY ayarlanmalı.')
+// Fallback mechanism to prevent white screen on build/env errors
+const missingEnv = !supabaseUrl || !supabaseAnonKey
+if (missingEnv) {
+  console.error('CRITICAL: Supabase config missing. App will strictly fail on data fetch but should render UI.')
+  if (typeof window !== 'undefined') {
+    (window as unknown as { __SUPABASE_CONFIG_ERROR__?: boolean }).__SUPABASE_CONFIG_ERROR__ = true
+  }
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create client with real or dummy values to prevent instant crash
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key'
+)
 
 // Database types
 export interface Category {

@@ -2,7 +2,7 @@ name = "venthub-hvac-esite"
 compatibility_date = "2024-01-01"
 
 [site]
-bucket = "./dist"
+bucket = "./build"
 
 [[headers]]
 for = "/*"
