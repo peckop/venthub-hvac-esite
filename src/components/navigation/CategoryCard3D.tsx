@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Environment } from '@react-three/drei'
 import { ChevronRight } from 'lucide-react'
 import Category3DIcon from '../products/Category3DIcon'
 import type { Category } from '../../lib/supabase'
@@ -31,6 +31,11 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     camera={{ position: [0, 0, 2.2], fov: 45 }}
                     style={{ background: 'transparent' }}
                 >
+                    {/* Lighting Setup for Menu Tiles */}
+                    <ambientLight intensity={1.5} />
+                    <pointLight position={[10, 10, 10]} intensity={2} />
+                    <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
+
                     <Suspense fallback={null}>
                         <Category3DIcon categorySlug={category.slug} scale={0.9} />
                         <OrbitControls
@@ -40,6 +45,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                             autoRotate
                             autoRotateSpeed={2}
                         />
+                        <Environment preset="city" />
                     </Suspense>
                 </Canvas>
 
