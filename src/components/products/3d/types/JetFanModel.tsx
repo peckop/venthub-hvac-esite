@@ -189,7 +189,7 @@ export const JetFanModel: React.FC = () => {
                 {/* Marka/Model Plakası */}
                 <mesh rotation={[0, 0, Math.PI / 2]}>
                     <planeGeometry args={[0.3, 0.15]} />
-                    <meshStandardMaterial color="#1e293b" roughnes={0.8} />
+                    <meshStandardMaterial color="#1e293b" roughness={0.8} />
                 </mesh>
                 {/* Akış Yönü Oku (Flow Direction) */}
                 <group position={[0.4, 0, 0]}>
