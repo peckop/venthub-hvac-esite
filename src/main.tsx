@@ -1,5 +1,31 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+
+// CRITICAL: Fail-safe check for missing environment variables
+// This prevents "White Screen of Death" by showing a clear config error
+if ((window as unknown as { __SUPABASE_CONFIG_ERROR__?: boolean }).__SUPABASE_CONFIG_ERROR__) {
+  document.body.innerHTML = `
+    <div style="background:#fee2e2; color:#991b1b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; text-align:center; padding:2rem;">
+      <h1 style="font-size:2rem; margin-bottom:1rem;">⚠️ Configuration Error</h1>
+      <p style="max-width:600px; font-size:1.1rem; line-height:1.6;">
+        The application failed to initialize because <strong>Environment Variables</strong> are missing in the build.
+      </p>
+      <div style="background:white; padding:1.5rem; border-radius:8px; box-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top:1.5rem; text-align:left;">
+        <h3 style="margin-top:0;">Diagnostics:</h3>
+        <ul style="margin-bottom:0; padding-left:1.2rem;">
+          <li><strong>VITE_SUPABASE_URL:</strong> ${import.meta.env?.VITE_SUPABASE_URL ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
+          <li><strong>VITE_SUPABASE_ANON_KEY:</strong> ${import.meta.env?.VITE_SUPABASE_ANON_KEY ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
+          <li><strong>Mode:</strong> ${import.meta.env?.MODE}</li>
+        </ul>
+      </div>
+      <p style="margin-top:2rem; color:#7f1d1d; font-size:0.9rem;">
+        <strong>Fix for Cloudflare Pages:</strong><br>
+        Dashboard > Settings > Environment Variables > Add variables exactly as VITE_...
+      </p>
+    </div>
+  `
+  throw new Error('Halting app execution due to missing config')
+}
 import './index.css'
 // Self-hosted fonts (reduced weights to 400 & 600; latin + latin-ext)
 import '@fontsource/inter/latin-400.css'
