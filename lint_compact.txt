@@ -1,0 +1,6 @@
+
+> react_repo@0.0.0 lint C:\Users\alize\venthub-hvac
+> eslint src --max-warnings=0 "-f" "compact"
+
+The compact formatter is no longer part of core ESLint. Install it manually with `npm install -D eslint-formatter-compact`
+ ELIFECYCLE  Command failed with exit code 2.
