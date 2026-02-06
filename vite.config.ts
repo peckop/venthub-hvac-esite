@@ -11,13 +11,13 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production'
   // Minimal Critters integration to inline critical CSS after build
   const criticalCssPlugin = (() => {
-    let outDir = 'build' // Changed from 'dist' to 'build' to match Cloudflare CRA defaults
+    let outDir = 'dist'
     const plugin: any = {
       name: 'inline-critical-css',
       apply: 'build' as const,
       enforce: 'post' as const,
       configResolved(resolved: any) {
-        outDir = resolved.build?.outDir || 'build'
+        outDir = resolved.build?.outDir || 'dist'
       },
       async closeBundle() {
         try {
@@ -106,7 +106,6 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      outDir: 'build', // Force output to 'build' folder
       rollupOptions: {
         output: {
           manualChunks: {
