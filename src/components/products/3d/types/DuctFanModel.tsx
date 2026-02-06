@@ -6,7 +6,6 @@ import { useFanMaterials } from '../materials/useFanMaterials'
 
 
 export function DuctFanModel() {
-    const materials = useFanMaterials()
     const fanRef = useRef<THREE.Group>(null)
 
     // ROUND DUCT FAN (Kanal Tipi) - SCALE FIX

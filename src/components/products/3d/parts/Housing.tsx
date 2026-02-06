@@ -9,7 +9,7 @@ interface FlangeProps {
     holes?: number // cıvata deliği sayısı
 }
 
-export const Flange: React.FC<FlangeProps> = ({ radius, width = 0.05, holes = 8 }) => {
+export const Flange: React.FC<FlangeProps> = ({ radius, holes = 8 }) => {
     const materials = useFanMaterials()
 
     // Delikleri simüle etmek için texture veya geometry kullanılabilir
@@ -50,7 +50,7 @@ interface HousingProps { // Renamed from CylinderHousingProps
     color?: string // Added for the change
 }
 
-export const Housing: React.FC<HousingProps> = ({ radius, length, thickness = 0.02, width: _width, color = '#e5e7eb' }) => {
+export const Housing: React.FC<HousingProps> = ({ radius, length, thickness = 0.02, width: _width }) => {
     const materials = useFanMaterials()
 
     return (

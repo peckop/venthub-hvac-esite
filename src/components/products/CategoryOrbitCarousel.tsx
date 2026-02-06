@@ -254,7 +254,7 @@ const CategoryOrbitCarousel = () => {
                 categorySlug: s.slug
             }))
         }
-    }, [level, subcategories, activeMainCategory])
+    }, [level, subcategories])
 
     // Kart tıklama - Ana kategori veya alt kategori
     const handleCardClick = useCallback((itemId: string) => {
