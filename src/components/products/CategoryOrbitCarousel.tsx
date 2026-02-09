@@ -417,6 +417,7 @@ const CategoryOrbitCarousel = () => {
                             externalPause={isTransitioning}
                             onFocusedItemChange={handleFocusedItemChange}
                             onFrontCardChange={handleFrontCardChange}
+                            modelScale={level === 'subcategory' ? 2.3 : 1.5} // Main: 1.5 (Standard), Sub: 2.3 (Large)
                         />
                     </motion.div>
                 </AnimatePresence>
