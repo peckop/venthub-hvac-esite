@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -43,25 +43,23 @@ export function AxialFanModel() {
 
     // REFINED SICKLE BLADE GEOMETRY (BVN Style)
     // Daha agresif kavisli ve uca doğru sivrilen yapı
-    const bladeGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
-        shape.moveTo(0, 0)
-        // Leading Edge (Hücum Kenarı) - Dışa doğru kavis
-        shape.bezierCurveTo(0.1, 0.15, 0.25, 0.22, 0.36, 0.10)
-        // Tip (Uç) - Geriye doğru kıvrım
-        shape.bezierCurveTo(0.38, 0.05, 0.38, -0.05, 0.35, -0.15)
-        // Trailing Edge (Firar Kenarı) - Göbeğe dönüş
-        shape.bezierCurveTo(0.25, -0.12, 0.1, -0.08, 0, -0.05)
+    const shape = new THREE.Shape()
+    shape.moveTo(0, 0)
+    // Leading Edge (Hücum Kenarı) - Dışa doğru kavis
+    shape.bezierCurveTo(0.1, 0.15, 0.25, 0.22, 0.36, 0.10)
+    // Tip (Uç) - Geriye doğru kıvrım
+    shape.bezierCurveTo(0.38, 0.05, 0.38, -0.05, 0.35, -0.15)
+    // Trailing Edge (Firar Kenarı) - Göbeğe dönüş
+    shape.bezierCurveTo(0.25, -0.12, 0.1, -0.08, 0, -0.05)
 
-        const extrudeSettings = {
-            depth: 0.015, // İnce sac/plastik kanat
-            bevelEnabled: true,
-            bevelThickness: 0.005,
-            bevelSize: 0.005,
-            bevelSegments: 2
-        }
-        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    }, [])
+    const extrudeSettings = {
+        depth: 0.015, // İnce sac/plastik kanat
+        bevelEnabled: true,
+        bevelThickness: 0.005,
+        bevelSize: 0.005,
+        bevelSegments: 2
+    }
+    const bladeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
 
     return (
         <group position={[0, 0, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>

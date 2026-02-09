@@ -25,7 +25,6 @@ export const DomesticFanModel: React.FC = () => {
         // SCALE FIX: 0.25 (Endüstriyeller 0.6-0.7 iken bu 0.25 olmalı)
         <group ref={fanRef} position={[0, 0, 0]} scale={[0.25, 0.25, 0.25]}>
             {/* 1. ÖN PANEL ÇERÇEVESİ (Krom/Parlak Metal veya Beyaz Plastik) */}
-            {/* DÜZELTME: chrome -> brushedAluminum */}
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[panelSize, panelSize, panelThickness]} />
             </mesh>
@@ -45,7 +44,6 @@ export const DomesticFanModel: React.FC = () => {
                         const x = (col - 5.5) * (panelSize * 0.07)
                         const y = (row - 5.5) * (panelSize * 0.07)
                         return (
-                            // DÜZELTME: aluminum -> industrialSteel
                             <mesh key={`grid-${row}-${col}`} position={[x, y, 0]} material={materials.industrialSteel}>
                                 <boxGeometry args={[panelSize * 0.05, panelSize * 0.05, 0.005]} />
                             </mesh>
@@ -55,7 +53,6 @@ export const DomesticFanModel: React.FC = () => {
             </group>
 
             {/* 3. ARKA GÖVDE (Duvara giren kısım - Silindir) */}
-            {/* DÜZELTME: plasticWhite -> ral7035 */}
             <mesh position={[0, 0, -0.25]} rotation={[Math.PI / 2, 0, 0]} material={materials.ral7035}>
                 <cylinderGeometry args={[0.35, 0.35, 0.4, 32]} />
             </mesh>

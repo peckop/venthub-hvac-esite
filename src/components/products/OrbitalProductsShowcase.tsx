@@ -21,6 +21,7 @@ interface OrbitalProductsShowcaseProps {
     onFocusedItemChange?: (itemId: string | null) => void
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
     modelScale?: number // New prop for controlling 3D model scale
+    containerHeight?: string | number // New prop for container height
 }
 
 // Global rotation state management
@@ -603,7 +604,7 @@ const OrbitalCard: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5 }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5, containerHeight = 500 }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
@@ -724,12 +725,12 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 
     return (
         <div
-            className="w-full h-[500px] relative touch-none cursor-grab active:cursor-grabbing select-none"
+            className="w-full relative touch-none cursor-grab active:cursor-grabbing select-none"
             onPointerDown={handlePointerDownFull}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
-            style={{ backgroundColor: CONFIG.backgroundColor }}
+            style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
         >
             <Canvas
                 shadows

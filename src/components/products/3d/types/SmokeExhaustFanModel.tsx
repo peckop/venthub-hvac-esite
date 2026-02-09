@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react'
+import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -18,50 +18,48 @@ export function SmokeExhaustFanModel() {
         }
     })
 
-    const smokeCoating = useMemo(() => new THREE.MeshStandardMaterial({
+    const smokeCoating = new THREE.MeshStandardMaterial({
         color: '#334155', roughness: 0.5, metalness: 0.4, side: THREE.DoubleSide
-    }), [])
+    })
 
-    const castBladeMat = useMemo(() => new THREE.MeshStandardMaterial({
+    const castBladeMat = new THREE.MeshStandardMaterial({
         color: '#222',
         roughness: 0.7,
         metalness: 0.3,
         side: THREE.DoubleSide
-    }), [])
+    })
 
-    const boltMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    const boltMaterial = new THREE.MeshStandardMaterial({
         color: '#111', roughness: 0.8, metalness: 0.5
-    }), [])
+    })
 
     // BLADE GEOMETRY: Long Cleaver
-    const bladeGeometry = useMemo(() => {
-        const shape = new THREE.Shape()
+    const shape = new THREE.Shape()
 
-        // Blade Root at (0,0). X is Radial Length. Y is Chord Width.
+    // Blade Root at (0,0). X is Radial Length. Y is Chord Width.
 
-        // Root Chord
-        shape.moveTo(0, -0.05)
-        shape.lineTo(0, 0.05)
+    // Root Chord
+    shape.moveTo(0, -0.05)
+    shape.lineTo(0, 0.05)
 
-        // Leading Edge (Long Sickle Curve)
-        // Adjust control points to stretch to X=0.51 (Max Fill)
-        shape.bezierCurveTo(0.15, 0.12, 0.35, 0.20, 0.51, 0.18) // Tip Leading at X=0.51
+    // Leading Edge (Long Sickle Curve)
+    // Adjust control points to stretch to X=0.51 (Max Fill)
+    shape.bezierCurveTo(0.15, 0.12, 0.35, 0.20, 0.51, 0.18) // Tip Leading at X=0.51
 
-        // Tip Edge
-        shape.lineTo(0.52, 0.08) // Tip Trailing (slightly further out visually)
+    // Tip Edge
+    shape.lineTo(0.52, 0.08) // Tip Trailing (slightly further out visually)
 
-        // Trailing Edge
-        shape.bezierCurveTo(0.35, -0.02, 0.15, -0.04, 0, -0.05) // Back to root
+    // Trailing Edge
+    shape.bezierCurveTo(0.35, -0.02, 0.15, -0.04, 0, -0.05) // Back to root
 
-        const extrudeSettings = {
-            depth: 0.015,
-            bevelEnabled: true,
-            bevelThickness: 0.003,
-            bevelSize: 0.003,
-            bevelSegments: 2
-        }
-        return new THREE.ExtrudeGeometry(shape, extrudeSettings)
-    }, [])
+    const extrudeSettings = {
+        depth: 0.015,
+        bevelEnabled: true,
+        bevelThickness: 0.003,
+        bevelSize: 0.003,
+        bevelSegments: 2
+    }
+    const bladeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
 
     return (
         <group position={[0, -0.1, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>
