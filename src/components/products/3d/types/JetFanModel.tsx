@@ -7,213 +7,187 @@ export const JetFanModel: React.FC = () => {
     const materials = useFanMaterials()
     const fanRef = useRef<THREE.Group>(null)
 
-    // JET FAN (High Fidelity Engineering)
-    // Reference: User Image (Grey body, C-brackets, Deflectors, Terminal Box)
+    // OTOPARK JET FAN (Referans: Kullanıcı Resimleri - DÜZELTME)
+    // - Sol taraf: DAMPER KANATLARI (3-4 adet yatay kanat)
+    // - Sağ taraf: Radyal mazgal ızgara
+    // - Pervane: TAM ORTADA (merkezde)
+    // - Montaj: TAVAN ASMA APARATLARI (yukarı doğru)
 
     useFrame((state, delta) => {
         if (fanRef.current) {
-            fanRef.current.rotation.z -= delta * 25 // High RPM
+            // Pervanenin fan ekseninde (Y) dönmesi sağlanmalı.
+            fanRef.current.rotation.y -= delta * 25
         }
     })
 
-    // --- GEOMETRY HELPERS ---
+    // Turuncu Parlak Materyal
+    const orangeMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+        color: '#FF6600',
+        metalness: 0.6,
+        roughness: 0.2,
+        envMapIntensity: 1.2,
+        side: THREE.DoubleSide
+    }), [])
 
-    // 1. Suspension Bracket Shape (C-Profile)
+    // Gri Elektrik Kutusu Materyali
+    const greyBoxMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+        color: '#9CA3AF',
+        metalness: 0.3,
+        roughness: 0.7,
+    }), [])
 
     return (
-        <group position={[0, -0.2, 0]} scale={[0.9, 0.9, 0.9]} rotation={[0, -Math.PI / 4, 0]}>
+        <group position={[0, -0.2, 0]} scale={[1, 1, 1]} rotation={[0, -Math.PI / 4, 0]}>
 
-            {/* A. ANA SİLİNDİRİK GÖVDE (Main Housing) */}
+            {/* A. ANA SİLİNDİRİK GÖVDE (Turuncu - Üç Bölümlü KAYNAKLI BİRLEŞİM) */}
             <group rotation={[0, 0, Math.PI / 2]}>
 
-                {/* 1. Giriş Susturucu Kovanı */}
-                <mesh position={[0, 0.75, 0]} material={materials.galvanizedSteel}>
-                    <cylinderGeometry args={[0.36, 0.36, 0.8, 64]} />
+                {/* 1. Sol Bölüm (Giriş Tarafı - Büyük Çap - Açık Uçlu) */}
+                <mesh position={[0, 0.65, 0]} material={orangeMaterial}>
+                    <cylinderGeometry args={[0.32, 0.32, 0.8, 64, 1, true]} />
                 </mesh>
 
-                {/* 2. Fan Motor Bölümü (Orta) */}
-                <mesh position={[0, 0, 0]} material={materials.galvanizedSteel}>
-                    <cylinderGeometry args={[0.37, 0.37, 0.6, 64]} />
-                    {/* Hafif daha geniş (Gömlekli yapı hissi için) */}
+                {/* Flanş 1: Sol-Orta Birleşimi */}
+                <mesh position={[0, 0.25, 0]} material={orangeMaterial}>
+                    <cylinderGeometry args={[0.34, 0.34, 0.03, 64]} />
                 </mesh>
 
-                {/* 3. Çıkış Susturucu Kovanı */}
-                <mesh position={[0, -0.75, 0]} material={materials.galvanizedSteel}>
-                    <cylinderGeometry args={[0.36, 0.36, 0.8, 64]} />
+                {/* 2. Orta Bölüm (Motor Bölümü - KÜÇÜK ÇAP - Açık Uçlu) */}
+                <mesh position={[0, 0, 0]} material={orangeMaterial}>
+                    <cylinderGeometry args={[0.28, 0.28, 0.5, 64, 1, true]} />
                 </mesh>
 
-                {/* --- FLANŞ BİLEŞİMLERİ (Joints) --- */}
-                {[0.35, -0.35].map((y, i) => (
-                    <group key={i} position={[0, y, 0]}>
-                        {/* Flanş Halkası */}
-                        <mesh material={materials.galvanizedSteel}>
-                            <cylinderGeometry args={[0.385, 0.385, 0.03, 64]} />
-                        </mesh>
-                        {/* Civata Başları (Detay) */}
-                        {Array(12).fill(0).map((_, j) => (
-                            <mesh key={j} rotation={[0, (j / 12) * Math.PI * 2, 0]} position={[0.38, 0, 0]}>
-                                <boxGeometry args={[0.02, 0.035, 0.02]} />
-                                <meshStandardMaterial color="#64748b" roughness={0.5} />
+                {/* Flanş 2: Orta-Sağ Birleşimi */}
+                <mesh position={[0, -0.25, 0]} material={orangeMaterial}>
+                    <cylinderGeometry args={[0.34, 0.34, 0.03, 64]} />
+                </mesh>
+
+                {/* 3. Sağ Bölüm (Çıkış Tarafı - Büyük Çap - Açık Uçlu) */}
+                <mesh position={[0, -0.65, 0]} material={orangeMaterial}>
+                    <cylinderGeometry args={[0.32, 0.32, 0.8, 64, 1, true]} />
+                </mesh>
+
+                {/* Sac Et Kalınlığı (Uçlardaki Yuvarlatılmış Kenarlar) */}
+                <mesh position={[0, 1.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <torusGeometry args={[0.32, 0.006, 8, 64]} />
+                    <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.2} />
+                </mesh>
+                <mesh position={[0, -1.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                    <torusGeometry args={[0.32, 0.006, 8, 64]} />
+                    <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.2} />
+                </mesh>
+
+                {/* --- SOL TARAF: İÇ KANATLAR (YATAY - Fotoğraftaki Gibi) --- */}
+                <group position={[0, 1.05, 0]}>
+                    {/* 3 Adet Kanat - Orta Hattan Aşağıya, Yuvarlak Kesite Uygun (Chord length) */}
+                    {[0, -0.12, -0.22].map((xVal, k) => {
+                        const r = 0.31;
+                        const w = 2 * Math.sqrt(Math.max(0, r * r - xVal * xVal));
+                        return (
+                            <mesh key={k} position={[xVal, -0.12, 0]}>
+                                <boxGeometry args={[0.015, 0.25, w]} />
+                                <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.3} />
                             </mesh>
-                        ))}
-                    </group>
-                ))}
-
-                {/* --- GİRİŞ (INLET) --- */}
-                {/* Bellmouth (Aerodinamik Giriş Halkası) */}
-                <group position={[0, 1.15, 0]}>
-                    <mesh material={materials.galvanizedSteel}>
-                        <torusGeometry args={[0.36, 0.02, 16, 64]} />
-                    </mesh>
-                    {/* Tel Kafes (Wire Mesh) */}
-                    <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-                        <circleGeometry args={[0.35, 32]} />
-                        <meshStandardMaterial
-                            color="#333"
-                            transparent
-                            opacity={0.3}
-                            side={THREE.DoubleSide}
-                            roughness={0.8}
-                        />
-                        {/* Mesh deseni için texture yerine wireframe trick veya ayrı geometri kullanılabilir. 
-                                 Performans için şeffaf map daha iyi ama burada procedural grid yapalım */}
-                    </mesh>
-                    {/* Izgara Telleri */}
-                    {Array(4).fill(0).map((_, k) => (
-                        <mesh key={k} rotation={[0, k * Math.PI / 4, 0]}>
-                            <boxGeometry args={[0.7, 0.01, 0.005]} />
-                            <meshStandardMaterial color="#333" />
-                        </mesh>
-                    ))}
-                    {Array(3).fill(0).map((_, k) => (
-                        <mesh key={`r-${k}`} rotation={[Math.PI / 2, 0, 0]}>
-                            <ringGeometry args={[(k + 1) * 0.08, (k + 1) * 0.08 + 0.005, 32]} />
-                            <meshStandardMaterial color="#333" side={THREE.DoubleSide} />
-                        </mesh>
-                    ))}
+                        );
+                    })}
                 </group>
 
-                {/* --- DEFLECTOR (Yönlendirici Kanatlar) --- */}
-                <group position={[0, -1.25, 0]}>
-                    {/* Deflector Çerçevesi */}
-                    <mesh position={[0, 0.05, 0]} material={materials.galvanizedSteel}>
-                        <cylinderGeometry args={[0.37, 0.36, 0.2, 64, 1, true]} />
-                        <meshStandardMaterial side={THREE.DoubleSide} {...materials.galvanizedSteel} />
-                    </mesh>
+                {/* --- SAĞ MAZGAL IZGARA (Dairesel Tel Koruma) --- */}
+                <group position={[0, -1.05, 0]}>
 
-                    {/* Kanatlar (Blades) - 3 Adet Eğrisel */}
-                    {[0.1, 0, -0.1].map((offset, idx) => (
-                        <group key={idx} position={[0, 0, offset]} rotation={[0, 0, 0]}>
-                            <mesh rotation={[0, Math.PI / 2, 0]}>
-                                {/* Hafif kavisli plaka */}
-                                <cylinderGeometry args={[0.4, 0.4, 0.65, 3, 1, true, 0, 0.5]} />
-                                {/* Bu sadece bir segment, kavis şeklinde duracak */}
-                                <meshStandardMaterial side={THREE.DoubleSide} {...materials.galvanizedSteel} />
+                    {/* Radyal Koruma Telleri */}
+                    {Array(8).fill(0).map((_, k) => (
+                        <mesh key={k} rotation={[0, (k / 8) * Math.PI, 0]}>
+                            <boxGeometry args={[0.64, 0.01, 0.006]} />
+                            <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.3} />
+                        </mesh>
+                    ))}
+
+                    {/* Dairesel Halka Telleri (3 Adet) */}
+                    {[0.12, 0.2, 0.28].map((radius, k) => (
+                        <mesh key={`ring-${k}`} rotation={[Math.PI / 2, 0, 0]}>
+                            <torusGeometry args={[radius, 0.006, 8, 32]} />
+                            <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.3} />
+                        </mesh>
+                    ))}
+
+                </group>
+
+            </group>
+
+            {/* B. GRİ ELEKTRİK KUTUSU (Saat Yönü Tersine 30 Derece Kaydırılmış +30°) */}
+            <group
+                position={[0, 0.303, 0.175]}
+                rotation={[0.523, 0, 0]} // +30 derece (saat yönü tersi)
+            >
+                {/* Ana Kutu Gövdesi */}
+                <mesh material={greyBoxMaterial}>
+                    <boxGeometry args={[0.16, 0.14, 0.10]} />
+                </mesh>
+
+                {/* Kapak Vidaları */}
+                {[0.065, -0.065].map(bx => [0.05, -0.05].map(by => (
+                    <mesh key={`${bx}-${by}`} position={[bx, by, 0.051]}>
+                        <cylinderGeometry args={[0.006, 0.006, 0.012, 8]} />
+                        <meshStandardMaterial color="#374151" metalness={0.7} roughness={0.4} />
+                    </mesh>
+                )))}
+            </group>
+
+            {/* Kablo Giriş Rakoru ve Esnek Boru (Tam Üstte - Sacın İçine Giren Yer) */}
+            <group position={[0, 0.28, 0]}>
+                {/* Boru Giriş Rakoru (Buhat Girişi) */}
+                <mesh position={[0, 0.03, 0]}>
+                    <cylinderGeometry args={[0.02, 0.025, 0.06, 16]} />
+                    <meshStandardMaterial color="#1F2937" metalness={0.5} roughness={0.6} />
+                </mesh>
+
+                {/* Esnek Kablo Borusu (Tepeden Kutuyu Bağlayan) */}
+                <group position={[0, 0.06, 0]}>
+                    <FlexibleCable />
+                </group>
+            </group>
+
+            {/* C. TAVAN ASMA APARATLARI (Yukarı Doğru) */}
+            {/* C. MONTAJ AYAKLARI (L-Profil - Zemin ve Tavan İçin) */}
+            {/* Ön ve Arka her iki yanda toplam 4 ayak - Orta bölüme yakın */}
+            {[-0.35, 0.35].map((xPos) => (
+                <group key={xPos} position={[xPos, 0, 0]}>
+                    {/* Sağ ve Sol Ayak Takımı */}
+                    {[-0.22, 0.22].map((zPos) => (
+                        <group key={zPos} position={[0, -0.28, zPos]}>
+                            {/* Dikey Bağlantı Parçası (Gövdeye bağlı) */}
+                            <mesh position={[0, 0, 0]}>
+                                <boxGeometry args={[0.08, 0.12, 0.015]} />
+                                <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.3} />
+                            </mesh>
+                            {/* Yatay Sabitleme Parçası (L'nin alt kısmı) */}
+                            <mesh position={[0, -0.06, zPos > 0 ? 0.04 : -0.04]}>
+                                <boxGeometry args={[0.08, 0.015, 0.08]} />
+                                <meshStandardMaterial color="#FF6600" metalness={0.6} roughness={0.3} />
+                            </mesh>
+                            {/* Montaj Delikleri (Siyah Noktalar) */}
+                            <mesh position={[0, -0.061, zPos > 0 ? 0.05 : -0.05]}>
+                                <cylinderGeometry args={[0.008, 0.008, 0.015, 8]} />
+                                <meshStandardMaterial color="#1F2937" />
                             </mesh>
                         </group>
                     ))}
-
-                    {/* Deflector Yan Tutucular */}
-                    <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
-                        <boxGeometry args={[0.74, 0.2, 0.02]} /> {/* Yatay mil */}
-                        <meshStandardMaterial color="#94a3b8" />
-                    </mesh>
-                </group>
-
-            </group>
-
-            {/* B. ASKI APARATLARI (Ceiling Suspension Brackets) */}
-            {/* Gövdenin iki ucuna yakın */}
-            {[0.6, -0.6].map((x, i) => (
-                <group key={i} position={[x, 0.5, 0]}>
-                    {/* Kelepçe Çemberi (Gövdeyi saran) */}
-                    <mesh rotation={[0, 0, Math.PI / 2]} position={[0, -0.12, 0]}>
-                        <torusGeometry args={[0.37, 0.015, 8, 48, Math.PI]} />
-                        <meshStandardMaterial {...materials.industrialSteel} />
-                    </mesh>
-
-                    {/* Dikey Askı Ayakları (L-Profile veya C-Profile) */}
-                    <mesh position={[0, 0.2, 0.25]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.08, 0.6, 0.01]} />
-                    </mesh>
-                    <mesh position={[0, 0.2, -0.25]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.08, 0.6, 0.01]} />
-                    </mesh>
-
-                    {/* Tavan Montaj Plakası (Üst) */}
-                    <mesh position={[0, 0.5, 0]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.1, 0.02, 0.7]} />
-                    </mesh>
-
-                    {/* Takviye Üçgeni (Gusset Plate) */}
-                    <mesh position={[0, 0.05, 0.25]} rotation={[0, 0, 0]} material={materials.industrialSteel}>
-                        <cylinderGeometry args={[0.04, 0.04, 0.02, 6]} /> {/* Somun simülasyonu */}
-                    </mesh>
                 </group>
             ))}
 
-
-            {/* C. KLEMENS KUTUSU & ELEKTRİK (Terminal Box) */}
-            <group position={[0, 0.45, 0.25]}>
-                {/* 1. Kutu */}
-                <mesh material={materials.matteBlack}>
-                    <boxGeometry args={[0.2, 0.15, 0.12]} />
-                </mesh>
-                {/* Kapak Vidaları (4 köşe) */}
-                {[0.08, -0.08].map(bx => [0.05, -0.05].map(by => (
-                    <mesh key={`${bx}-${by}`} position={[bx, by, 0.06]} material={materials.galvanizedSteel}>
-                        <cylinderGeometry args={[0.005, 0.005, 0.01, 8]} />
-                    </mesh>
-                )))}
-
-                {/* 2. Etiket (Sarı Uyarı) */}
-                <mesh position={[0, 0, 0.061]}>
-                    <planeGeometry args={[0.12, 0.08]} />
-                    <meshBasicMaterial color="#fbbf24" /> {/* Amber Warning */}
-                </mesh>
-
-                {/* 3. Spiral Kablo Rakoru ve Borusu */}
-                <group position={[0.1, -0.05, 0]} rotation={[0, 0, -0.5]}>
-                    <mesh position={[0, -0.05, 0]} material={materials.matteBlack}>
-                        <cylinderGeometry args={[0.025, 0.025, 0.08, 16]} /> {/* Rakor */}
-                    </mesh>
-
-                    {/* Spiral Boru (Flexible Conduit) - Motora giriş */}
-                    {/* Eğrisel bir tüp yapalım */}
-                    <CurveTube material={materials.matteBlack} />
-                </group>
-            </group>
-
-            {/* D. ÖZELLİK ETİKETLERİ (Gövde Üzeri Decal) */}
-            <group position={[-0.2, 0, 0.38]} rotation={[Math.PI / 2, 0, 0]}>
-                {/* Marka/Model Plakası */}
-                <mesh rotation={[0, 0, Math.PI / 2]}>
-                    <planeGeometry args={[0.3, 0.15]} />
-                    <meshStandardMaterial color="#1e293b" roughness={0.8} />
-                </mesh>
-                {/* Akış Yönü Oku (Flow Direction) */}
-                <group position={[0.4, 0, 0]}>
-                    <mesh rotation={[0, 0, -Math.PI / 2]}>
-                        <planeGeometry args={[0.2, 0.08]} />
-                        <meshBasicMaterial color="#fff" />
-                    </mesh>
-                    <mesh position={[0, 0, 0.001]} rotation={[0, 0, -Math.PI / 2]}>
-                        {/* Ok Ucu */}
-                        <shapeGeometry args={[new THREE.Shape().moveTo(-0.05, -0.02).lineTo(-0.05, 0.02).lineTo(0.02, 0.02).lineTo(0.02, 0.04).lineTo(0.08, 0).lineTo(0.02, -0.04).lineTo(0.02, -0.02).lineTo(-0.05, -0.02)]} />
-                        <meshBasicMaterial color="#000" />
-                    </mesh>
-                </group>
-            </group>
-
-            {/* E. İÇ PERVANE (Rotor) - Sadece girişten belli belirsiz görünür */}
+            {/* D. İÇ PERVANE (Rotor) - Sadece Tam Ortada */}
             <group ref={fanRef} position={[0, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+                {/* Pervane Göbeği */}
                 <mesh material={materials.brushedAluminum}>
-                    <cylinderGeometry args={[0.14, 0.14, 0.12, 32]} />
+                    <cylinderGeometry args={[0.12, 0.12, 0.1, 32]} />
                 </mesh>
+
+                {/* Pervane Kanatları (8 Adet - Siyah) */}
                 {Array(8).fill(0).map((_, i) => (
-                    <mesh key={i} rotation={[0, (i / 8) * Math.PI * 2, 0]} position={[0.2, 0, 0]}>
-                        <boxGeometry args={[0.25, 0.01, 0.08]} />
-                        <meshStandardMaterial color="#ef4444" /> {/* Red Blades */}
+                    <mesh key={i} rotation={[0, (i / 8) * Math.PI * 2, 0]} position={[0.17, 0, 0]}>
+                        <boxGeometry args={[0.20, 0.012, 0.06]} />
+                        <meshStandardMaterial color="#1F2937" metalness={0.6} roughness={0.3} />
                     </mesh>
                 ))}
             </group>
@@ -222,21 +196,23 @@ export const JetFanModel: React.FC = () => {
     )
 }
 
-// Yardımcı: Spiral Kablo Eğrisi
-const CurveTube = ({ material }: { material: THREE.Material }) => {
+// Yardımcı: Esnek Kablo Borusu
+const FlexibleCable = () => {
     const path = useMemo(() => {
-        // Klemens kutusundan çıkıp gövde motoruna giren 'S' şeklinde eğri
+        // Giriş noktasından (0,0,0) başlayıp +30 derece kaymış kutuya (0, 0.05, 0.175) giden kavis
         const curve = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(0, -0.08, 0),
-            new THREE.Vector3(0.05, -0.15, -0.05),
-            new THREE.Vector3(0.02, -0.25, -0.1), // Motora giriş noktası
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0.04, 0.05),
+            new THREE.Vector3(0, 0.06, 0.12),
+            new THREE.Vector3(0, 0.06, 0.175),
         ])
         return curve
     }, [])
 
     return (
-        <mesh position={[0, 0, 0]} material={material}>
-            <tubeGeometry args={[path, 20, 0.015, 8, false]} />
+        <mesh>
+            <tubeGeometry args={[path, 20, 0.012, 8, false]} />
+            <meshStandardMaterial color="#1F2937" metalness={0.4} roughness={0.7} />
         </mesh>
     )
 }

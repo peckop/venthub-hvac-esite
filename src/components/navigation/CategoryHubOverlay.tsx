@@ -166,46 +166,28 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                 {/* Content: Ana Kategoriler veya Alt Kategoriler */}
                 <div className="p-6">
                     {selectedCategory ? (
-                        /* Alt Kategoriler Grid */
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        /* Alt Kategoriler Grid - ARTIK 3D KARTLAR */
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {subCategories.map((subCat) => (
-                                <button
+                                <CategoryCard3D
                                     key={subCat.id}
+                                    category={subCat}
+                                    subCategoryCount={0} // Alt kategorinin altı yok
                                     onClick={() => handleSubCategoryClick(subCat)}
-                                    className="group flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-secondary-blue/50 rounded-xl transition-all duration-300"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        {/* 3D Icon - küçük */}
-                                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-navy to-secondary-blue flex items-center justify-center overflow-hidden">
-                                            <CategoryCard3D
-                                                category={subCat}
-                                                subCategoryCount={0}
-                                                onClick={() => { }}
-                                            />
-                                        </div>
-                                        <div className="text-left">
-                                            <h3 className="font-semibold text-white group-hover:text-secondary-blue transition-colors">
-                                                {subCat.name}
-                                            </h3>
-                                            {subCat.description && (
-                                                <p className="text-sm text-white/50 line-clamp-1">
-                                                    {subCat.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" />
-                                </button>
+                                />
                             ))}
 
-                            {/* Tüm Ürünleri Gör butonu */}
+                            {/* Tüm Ürünleri Gör butonu - Grid içinde şık durması için kart boyutunda */}
                             <Link
                                 to={`/category/${selectedCategory.slug}`}
                                 onClick={() => onClose()}
-                                className="group flex items-center justify-center p-4 bg-secondary-blue/20 hover:bg-secondary-blue/30 border border-secondary-blue/30 hover:border-secondary-blue rounded-xl transition-all duration-300 col-span-full sm:col-span-1"
+                                className="group relative flex flex-col items-center justify-center p-6 bg-secondary-blue/10 hover:bg-secondary-blue/20 border-2 border-dashed border-secondary-blue/30 hover:border-secondary-blue rounded-2xl transition-all duration-300 h-40"
                             >
-                                <span className="font-semibold text-secondary-blue group-hover:text-white transition-colors">
-                                    Tüm {selectedCategory.name} Ürünlerini Gör →
+                                <div className="p-3 rounded-full bg-secondary-blue/20 group-hover:bg-secondary-blue/30 mb-3 transition-colors">
+                                    <ChevronRight className="w-8 h-8 text-secondary-blue" />
+                                </div>
+                                <span className="font-semibold text-secondary-blue text-center group-hover:text-white transition-colors">
+                                    Tüm {selectedCategory.name} <br /> Ürünlerini Gör
                                 </span>
                             </Link>
                         </div>
