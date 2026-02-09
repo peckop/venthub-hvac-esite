@@ -20,15 +20,240 @@ interface OrbitalProductsShowcaseProps {
     externalPause?: boolean
     onFocusedItemChange?: (itemId: string | null) => void
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
+    modelScale?: number // New prop for controlling 3D model scale
 }
 
-// Global rotation state management via Refs (High Performance)
+// Global rotation state management
 interface SharedState {
     rotation: number
     target: number | null
     velocity: number
     pauseUntil: number
     startTime: number
+    isReady: boolean // Animation trigger
+}
+
+/**
+ * Sahne Zemini ve Efektler (Hemen Yüklenir)
+ */
+const Stage: React.FC<{
+    sharedState: React.MutableRefObject<SharedState>
+}> = ({ sharedState }) => {
+    // Animasyon frame'i
+    useFrame(() => {
+        // Sadece re-render tetiklemek için, asıl hesap component içinde
+    })
+
+    // Yarıçap animasyonu - isReady false ise 0, true ise zamanla artar
+    const getRadius = () => {
+        if (!sharedState.current.isReady) return 0
+        const elapsed = (Date.now() - sharedState.current.startTime) / 2000
+        return CONFIG.radius * (1 - Math.pow(1 - Math.min(1, Math.max(0, elapsed)), 3))
+    }
+
+    const currentRadius = getRadius()
+
+    return (
+        <group>
+            {/* Genişleyen Halka */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
+                <ringGeometry args={[Math.max(0.1, currentRadius - 0.08), currentRadius + 0.08, 64]} />
+                <meshBasicMaterial color="#0891b2" transparent opacity={0.1 * (currentRadius / CONFIG.radius)} />
+            </mesh>
+
+            {/* Zemin */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]}>
+                <circleGeometry args={[12, 64]} />
+                <meshStandardMaterial
+                    color="#050a15"
+                    metalness={CONFIG.floorMetalness}
+                    roughness={0.3}
+                />
+            </mesh>
+            <Sparkles count={CONFIG.particleCount} scale={16} size={2} speed={0.2} opacity={0.3} color={CONFIG.glowColor} />
+        </group>
+    )
+}
+
+/**
+ * Ürün Kartları ve Mantığı (Suspense İçinde)
+ */
+const CarouselItems: React.FC<{
+    items: ProductItem[]
+    isPaused: boolean
+    onHover: (h: boolean) => void
+    dragDelta: number
+    onInteract: () => void
+    sharedState: React.MutableRefObject<SharedState>
+    isDraggingRef: React.MutableRefObject<boolean>
+    setIsDragging: (val: boolean) => void
+    onCardClick?: (itemId: string, event?: MouseEvent) => void
+    onFocusedItemChange?: (itemId: string | null) => void
+    onFrontCardChange?: (itemId: string) => void
+    shouldShowTapHint: boolean
+    shouldShowDragHint: boolean
+    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'
+    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished') => void
+    modelScale: number
+    onReady: () => void
+}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange, modelScale, onReady }) => {
+    const { camera } = useThree()
+    const lastFrontCardRef = useRef<string | null>(null)
+    const [frontCardId, setFrontCardId] = useState<string | null>(null)
+    const frontCardChangeCountRef = useRef(0)
+    const hasBeenFocusedRef = useRef(false)
+    const swayOffsetRef = useRef(0)
+
+    // Notify ready state
+    useEffect(() => {
+        onReady()
+    }, [onReady])
+
+    useFrame((state, delta) => {
+        // ... (Kameranın nefes alma efekti vs buraya taşınmalı veya Stage'de de olabilir ama kamera manipulasyonu burada kalsın)
+        camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
+        camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
+
+        // ... (Mevcut mantık kodları aynen kalacak)
+        const now = Date.now()
+
+        // Animasyon başlamadıysa çık
+        if (!sharedState.current.isReady) return
+
+        const elapsed = (now - sharedState.current.startTime) / 2000
+        const entryProgress = Math.min(1, Math.max(0, elapsed))
+
+        const isPausedByClick = now < sharedState.current.pauseUntil
+        const friction = 0.95
+
+        // ... (Rest of logic: Target Mode, Drag Mode, Momentum, Auto Rotate, Snap)
+        // TARGET MODU AKTİF İSE
+        if (sharedState.current.target !== null) {
+            if (isDraggingRef.current) isDraggingRef.current = false
+            const diff = sharedState.current.target - sharedState.current.rotation
+            if (Math.abs(diff) < 0.002) {
+                sharedState.current.rotation = sharedState.current.target
+                sharedState.current.target = null
+                sharedState.current.velocity = 0
+            } else {
+                sharedState.current.rotation += diff * 0.2
+            }
+        }
+        // DRAG MODU
+        else if (isDraggingRef.current && Math.abs(dragDelta) > 0.5) {
+            const dragSpeed = dragDelta * 0.005
+            sharedState.current.rotation += dragSpeed
+            sharedState.current.velocity = dragSpeed / Math.max(delta, 0.016)
+            sharedState.current.pauseUntil = 0
+        }
+        // MOMENTUM
+        else if (Math.abs(sharedState.current.velocity) > 0.01) {
+            sharedState.current.rotation += sharedState.current.velocity * delta
+            sharedState.current.velocity *= friction
+        }
+        // OTO DÖNÜŞ
+        else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
+            let currentSpeed = delta * CONFIG.autoRotateSpeed
+            if (shouldShowDragHint) {
+                currentSpeed *= 0.05
+                const t = state.clock.elapsedTime % 3
+                const step = (Math.PI * 2) / items.length
+                const maxSway = step * 0.8
+                let targetSway = 0
+                if (t < 1.0) targetSway = Math.sin(t * Math.PI) * maxSway
+                else if (t < 2.0) targetSway = -Math.sin((t - 1.0) * Math.PI) * maxSway
+                else targetSway = 0 // Wait
+                const swayDelta = targetSway - swayOffsetRef.current
+                sharedState.current.rotation += swayDelta
+                swayOffsetRef.current = targetSway
+            } else {
+                if (swayOffsetRef.current !== 0) {
+                    sharedState.current.rotation -= swayOffsetRef.current
+                    swayOffsetRef.current = 0
+                }
+            }
+            sharedState.current.rotation -= currentSpeed
+        }
+        // SNAP
+        else if (!isDraggingRef.current && sharedState.current.target === null && Math.abs(sharedState.current.velocity) < 0.01) {
+            const total = items.length
+            const currentRot = sharedState.current.rotation
+            const step = (Math.PI * 2) / total
+            const closestTarget = Math.round(-currentRot / step) * step
+            const diff = -closestTarget - currentRot
+            const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
+            if (Math.abs(shortestDiff) < 0.001) sharedState.current.rotation = -closestTarget
+            else sharedState.current.rotation += shortestDiff * 0.1
+        }
+
+        // Logic check for reset
+        const currentTime = Date.now()
+        const isCarouselRotating = sharedState.current.target === null && currentTime > sharedState.current.pauseUntil && !isPaused
+        if (isCarouselRotating && hasBeenFocusedRef.current) {
+            frontCardChangeCountRef.current = 0
+            hasBeenFocusedRef.current = false
+            onStageChange('idle')
+            if (onFocusedItemChange) onFocusedItemChange(null)
+        } else if (sharedState.current.target !== null) {
+            hasBeenFocusedRef.current = true
+        }
+
+        // Front Card Check
+        if (items.length > 0) {
+            const total = items.length
+            const step = (Math.PI * 2) / total
+            let frontIndex = Math.round(-sharedState.current.rotation / step) % total
+            if (frontIndex < 0) frontIndex += total
+            const frontItem = items[frontIndex]
+            if (frontItem && frontItem.id !== lastFrontCardRef.current) {
+                lastFrontCardRef.current = frontItem.id
+                setFrontCardId(frontItem.id)
+                frontCardChangeCountRef.current += 1
+                const count = frontCardChangeCountRef.current
+                if (hintStage === 'idle' && count >= 2) onStageChange('tap')
+                if (onFrontCardChange && sharedState.current.target === null) onFrontCardChange(frontItem.id)
+            }
+        }
+    })
+
+    return (
+        <group>
+            {items.map((item, i) => (
+                <OrbitalCard
+                    key={item.id}
+                    item={item}
+                    index={i}
+                    total={items.length}
+                    sharedState={sharedState}
+                    isPaused={isPaused}
+                    onHover={onHover}
+                    onBringToFront={() => {
+                        // Duplicate logic from handleBringToFront since it was inside SceneContent
+                        onInteract()
+                        const total = items.length
+                        const baseAngle = (i / total) * Math.PI * 2
+                        const currentRot = sharedState.current.rotation
+                        const targetPos = -baseAngle
+                        const diff = targetPos - currentRot
+                        const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
+                        if (Math.abs(shortestDiff) < 0.01 && sharedState.current.target === null) return
+                        isDraggingRef.current = false
+                        sharedState.current.target = currentRot + shortestDiff
+                        sharedState.current.velocity = 0
+                        sharedState.current.pauseUntil = Date.now() + 4000
+                    }}
+                    setIsDragging={setIsDragging}
+                    isDraggingRef={isDraggingRef}
+                    onCardClick={onCardClick}
+                    onFocusedItemChange={onFocusedItemChange}
+                    isFrontCard={frontCardId === item.id}
+                    shouldShowTapHint={shouldShowTapHint}
+                    shouldShowDragHint={shouldShowDragHint}
+                    modelScale={modelScale}
+                />
+            ))}
+        </group>
+    )
 }
 
 /**
@@ -49,7 +274,8 @@ const OrbitalCard: React.FC<{
     isFrontCard: boolean
     shouldShowTapHint: boolean
     shouldShowDragHint: boolean
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint }) => {
+    modelScale: number // Receive modelScale
+}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint, modelScale }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -155,7 +381,8 @@ const OrbitalCard: React.FC<{
             // 3D Icon Scale - Wrapper group'a uygula
             const iconGroup = groupRef.current.getObjectByName('icon-wrapper')
             if (iconGroup) {
-                const s = pulsedScale * 1.5
+                // FIX: Use modelScale prop instead of hardcoded 1.5
+                const s = pulsedScale * modelScale
                 iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
             }
         }
@@ -267,7 +494,7 @@ const OrbitalCard: React.FC<{
 
                 {/* GÖRÜNÜR KART */}
                 {item.categorySlug ? (
-                    <group name="icon-wrapper" scale={0.8} rotation={[0, Math.PI, 0]}>
+                    <group name="icon-wrapper" scale={modelScale} rotation={[0, Math.PI, 0]}>
                         <Category3DIcon categorySlug={item.categorySlug} scale={1} />
                     </group>
                 ) : (
@@ -374,466 +601,140 @@ const OrbitalCard: React.FC<{
 }
 
 /**
- * Sahne Mantığı
- */
-const SceneContent: React.FC<{
-    items: ProductItem[]
-    isPaused: boolean
-    onHover: (h: boolean) => void
-    dragDelta: number
-    onInteract: () => void
-    sharedState: React.MutableRefObject<SharedState>
-    isDraggingRef: React.MutableRefObject<boolean>
-    setIsDragging: (val: boolean) => void
-    onCardClick?: (itemId: string, event?: MouseEvent) => void
-    onFocusedItemChange?: (itemId: string | null) => void
-    onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
-    shouldShowTapHint: boolean
-    shouldShowDragHint: boolean
-    hintStage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'
-    onStageChange: (stage: 'idle' | 'tap' | 'drag' | 'cooldown' | 'finished') => void
-}> = ({ items, isPaused, onHover, dragDelta, onInteract, sharedState, isDraggingRef, setIsDragging, onCardClick, onFocusedItemChange, onFrontCardChange, shouldShowTapHint, shouldShowDragHint, hintStage, onStageChange }) => {
-    const { camera } = useThree()
-    const lastFrontCardRef = useRef<string | null>(null) // Debounce için
-    const [frontCardId, setFrontCardId] = useState<string | null>(null) // En öndeki kart ID
-    const frontCardChangeCountRef = useRef(0) // Kaç kez önde kart değişti
-    const hasBeenFocusedRef = useRef(false) // Hiç focus oldu mu?
-    const swayOffsetRef = useRef(0) // Animasyon kaynaklı ek rotasyon (delta takibi için)
-
-    // focusedItemId null olduğunda (carousel tekrar dönüyor) sayıcıyı sıfırla
-    // onFocusedItemChange null ile çağrıldığında burada da sıfırlama yapmalıyız
-    // Bu bir "side effect" olarak items değiştiğinde de sıfırlanır
-    useEffect(() => {
-        // items değiştiğinde her şeyi sıfırla
-        frontCardChangeCountRef.current = 0
-        onStageChange('idle')
-        lastFrontCardRef.current = null
-        hasBeenFocusedRef.current = false
-    }, [items.length, onStageChange])
-
-    // Kartı öne getirme
-    const handleBringToFront = useCallback((index: number) => {
-        onInteract()
-
-        const total = items.length
-        const baseAngle = (index / total) * Math.PI * 2
-        const currentRot = sharedState.current.rotation
-
-        const targetPos = -baseAngle
-        const diff = targetPos - currentRot
-        const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
-
-        if (Math.abs(shortestDiff) < 0.01 && sharedState.current.target === null) {
-            // Zaten öndeyse, kart detayını açma veya pasif durma aksiyonu buraya gelebilir
-            return
-        }
-
-        // ÖNCELİKLE: Dragging'i zorla kapat (güvenlik)
-        isDraggingRef.current = false
-
-        sharedState.current.target = currentRot + shortestDiff
-        sharedState.current.velocity = 0
-        sharedState.current.pauseUntil = Date.now() + 4000
-
-
-    }, [items.length, onInteract, sharedState, isDraggingRef])
-
-    useFrame((state, delta) => {
-        const now = Date.now()
-
-        const elapsed = (now - sharedState.current.startTime) / 2000
-        const entryProgress = Math.min(1, Math.max(0, elapsed))
-
-        const isPausedByClick = now < sharedState.current.pauseUntil
-        const friction = 0.95
-
-        // TARGET MODU AKTİF İSE: Her şeyi durdur, sadece target'a git
-        if (sharedState.current.target !== null) {
-            // Güvenlik: isDragging'i zorla kapat
-            if (isDraggingRef.current) {
-                isDraggingRef.current = false
-            }
-
-            const diff = sharedState.current.target - sharedState.current.rotation
-            if (Math.abs(diff) < 0.002) {
-                sharedState.current.rotation = sharedState.current.target
-                sharedState.current.target = null
-                sharedState.current.velocity = 0
-            } else {
-                // Daha hızlı animasyon (0.15 -> 0.2)
-                sharedState.current.rotation += diff * 0.2
-            }
-        }
-        // DRAG MODU
-        else if (isDraggingRef.current && Math.abs(dragDelta) > 0.5) {
-            const dragSpeed = dragDelta * 0.005
-            sharedState.current.rotation += dragSpeed
-            sharedState.current.velocity = dragSpeed / Math.max(delta, 0.016)
-            sharedState.current.pauseUntil = 0
-        }
-        // MOMENTUM
-        else if (Math.abs(sharedState.current.velocity) > 0.01) {
-            sharedState.current.rotation += sharedState.current.velocity * delta
-            sharedState.current.velocity *= friction
-        }
-        // OTO DÖNÜŞ + WIGGLE (Sallanma İpucu)
-        else if (!isPaused && !isPausedByClick && entryProgress >= 0.8 && !isDraggingRef.current) {
-            // Normal dönüş hızı
-            let currentSpeed = delta * CONFIG.autoRotateSpeed
-
-            // Eğer sallanma (wiggle) ipucu aktifse
-            // GÜÇLÜ SALINIM (Exaggerated Drag Simulation) - v3
-            // Önceki ve sonraki ürüne kadar geniş savrulma
-            if (shouldShowDragHint) {
-                currentSpeed *= 0.05 // Dönüşü neredeyse durdur
-
-                const t = state.clock.elapsedTime % 3 // 3 saniyelik döngü
-                const step = (Math.PI * 2) / items.length
-                const maxSway = step * 0.8 // Ürün mesafesinin %80'i
-
-                let targetSway = 0
-                if (t < 1.0) {
-                    // Sola (Next)
-                    targetSway = Math.sin(t * Math.PI) * maxSway
-                } else if (t < 2.0) {
-                    // Sağa (Prev)
-                    targetSway = -Math.sin((t - 1.0) * Math.PI) * maxSway
-                } else {
-                    // Merkeze dön ve bekle
-                    targetSway = 0
-                }
-
-                // Delta uygula (rotasyonun bozulmaması için)
-                const swayDelta = targetSway - swayOffsetRef.current
-                sharedState.current.rotation += swayDelta
-                swayOffsetRef.current = targetSway
-            } else {
-                // Hint aktif değilse ofseti sıfırla
-                if (swayOffsetRef.current !== 0) {
-                    sharedState.current.rotation -= swayOffsetRef.current
-                    swayOffsetRef.current = 0
-                }
-            }
-
-            sharedState.current.rotation -= currentSpeed
-        }
-        // SNAP-TO-CENTER (Mıknatıslanma)
-        // Eğer hiçbir hareket yoksa ve bir yere gitmiyorsak, en yakın kartı ortaya çek
-        else if (!isDraggingRef.current && sharedState.current.target === null && Math.abs(sharedState.current.velocity) < 0.01) {
-            const total = items.length
-            const currentRot = sharedState.current.rotation
-            const step = (Math.PI * 2) / total
-
-            // En yakın kartın hedefini bul
-            const closestTarget = Math.round(-currentRot / step) * step
-            const diff = -closestTarget - currentRot
-            const shortestDiff = Math.atan2(Math.sin(diff), Math.cos(diff))
-
-            // Eğer çok küçük bir fark varsa direkt eşitle (titremeyi önle)
-            if (Math.abs(shortestDiff) < 0.001) {
-                sharedState.current.rotation = -closestTarget
-            } else {
-                // Yavaşça merkeze çek (smooth snap)
-                sharedState.current.rotation += shortestDiff * 0.1
-            }
-        }
-
-        camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
-        camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
-
-        // Carousel tekrar dönmeye başladığında sayıcıyı sıfırla
-        // Koşullar: target null + pauseUntil doldu + isPaused false (mouse yok) + daha önce focus olmuştu
-        const currentTime = Date.now()
-        const isCarouselRotating = sharedState.current.target === null && currentTime > sharedState.current.pauseUntil && !isPaused
-
-        if (isCarouselRotating && hasBeenFocusedRef.current) {
-            // Carousel gerçekten döndü, tüm sistemi sıfırla
-            frontCardChangeCountRef.current = 0
-            hasBeenFocusedRef.current = false
-            onStageChange('idle')
-            // Parent'a bildir: focusedItemId artık null (sayfa ilk yüklenmiş gibi)
-            if (onFocusedItemChange) {
-                onFocusedItemChange(null)
-            }
-        }
-        else if (sharedState.current.target !== null) {
-            // Bir kart focus'ta, işaretle
-            hasBeenFocusedRef.current = true
-        }
-
-        // Dönerken önde olan kartı tespit et ve parent'a bildir
-        if (items.length > 0) {
-            const total = items.length
-            const step = (Math.PI * 2) / total
-            // En öndeki kart index'ini hesapla (rotation'a göre)
-            let frontIndex = Math.round(-sharedState.current.rotation / step) % total
-            if (frontIndex < 0) frontIndex += total
-            const frontItem = items[frontIndex]
-            if (frontItem && frontItem.id !== lastFrontCardRef.current) {
-                lastFrontCardRef.current = frontItem.id
-                setFrontCardId(frontItem.id) // Local state güncelle
-
-                // Sayacı artır
-                frontCardChangeCountRef.current += 1
-                const count = frontCardChangeCountRef.current
-
-                // Patern Ayırımı (v3 - Timer-Based):
-                // Stage Idle → frontCardChangeCount 2 olunca → Stage Tap başlar (4sn)
-                // Stage Tap → 4sn sonra → Stage Drag başlar (5sn)
-                // Stage Drag → 5sn sonra → Stage Cooldown başlar (15sn)
-
-                // ÇÖZÜM: Her stage'in MİNİMUM GÖSTERİM SÜRESİ var
-                // Stage değişimi sadece süre kontrolünden sonra olur
-
-                if (hintStage === 'idle' && count >= 2) {
-                    onStageChange('tap')
-                }
-
-                if (onFrontCardChange && sharedState.current.target === null) {
-                    onFrontCardChange(frontItem.id) // Parent'a bildir
-                }
-            }
-        }
-    })
-
-    const currentRadius = CONFIG.radius * (1 - Math.pow(1 - Math.min(1, Math.max(0, (Date.now() - sharedState.current.startTime) / 2000)), 3))
-
-    return (
-        <group>
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
-                <ringGeometry args={[Math.max(0.1, currentRadius - 0.08), currentRadius + 0.08, 64]} />
-                <meshBasicMaterial color="#0891b2" transparent opacity={0.1 * (currentRadius / CONFIG.radius)} />
-            </mesh>
-
-            {items.map((item, i) => (
-                <OrbitalCard
-                    key={item.id}
-                    item={item}
-                    index={i}
-                    total={items.length}
-                    sharedState={sharedState}
-                    isPaused={isPaused}
-                    onHover={onHover}
-                    onBringToFront={handleBringToFront}
-                    setIsDragging={setIsDragging}
-                    isDraggingRef={isDraggingRef}
-                    onCardClick={onCardClick}
-                    onFocusedItemChange={onFocusedItemChange}
-                    isFrontCard={frontCardId === item.id}
-                    shouldShowTapHint={shouldShowTapHint}
-                    shouldShowDragHint={shouldShowDragHint}
-                />
-            ))}
-
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]}>
-                <circleGeometry args={[12, 64]} />
-                <meshStandardMaterial
-                    color="#050a15"
-                    metalness={CONFIG.floorMetalness}
-                    roughness={0.3}
-                />
-            </mesh>
-            <Sparkles count={CONFIG.particleCount} scale={16} size={2} speed={0.2} opacity={0.3} color={CONFIG.glowColor} />
-        </group>
-    )
-}
-
-/**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5 }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
     const [showHint, setShowHint] = useState(true)
-    const [focusedItemId, setFocusedItemId] = useState<string | null>(null) // Odaklanmış kart
-    const [showFocusedHint, setShowFocusedHint] = useState(false) // Focus hint periyodik gösterimi
+    const [focusedItemId, setFocusedItemId] = useState<string | null>(null)
+    const [showFocusedHint, setShowFocusedHint] = useState(false)
 
-    // FIX: Canvas viewport clipping - mount sonrası zorla resize tetikle (agresif)
+    // Resize Hack (Minimal) - Keep ensuring layout
     useEffect(() => {
-        // Birden fazla zamanda resize tetikle
-        const timers = [50, 200, 500, 1000].map(delay =>
+        const timers = [50, 200, 500].map(delay =>
             setTimeout(() => {
                 window.dispatchEvent(new Event('resize'))
-                // Scroll simülasyonu - browser repaint zorla
-                window.scrollBy(0, 1)
-                window.scrollBy(0, -1)
             }, delay)
         )
         return () => timers.forEach(t => clearTimeout(t))
     }, [])
-    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>('idle')
-    const lastX = useRef(0)
 
-    // Stage Cooldown kontrolü - ARTIK DÖNGÜ YOK (Tek seferlik)
+    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>('idle')
+    const isDraggingRef = useRef(false)
+
+    // Shared State with isReady flag
+    const sharedState = useRef<SharedState>({
+        rotation: 0,
+        target: null,
+        velocity: 0,
+        pauseUntil: 0,
+        startTime: 0, // 0 means not started
+        isReady: false
+    })
+
+    // Handler for when Items are loaded
+    const handleItemsReady = useCallback(() => {
+        if (!sharedState.current.isReady) {
+            sharedState.current.isReady = true
+            sharedState.current.startTime = Date.now()
+        }
+    }, [])
+
+    // Stage Cooldown
     useEffect(() => {
         if (hintStage !== 'cooldown') return
-
-        // Kullanıcı isteği: Animasyonlar tekrar etmesin.
-        // Bu yüzden cooldown bitince 'idle' yerine 'finished' durumuna geçiyoruz
-        // veya hiçbir şey yapmıyoruz.
-
-        // Eğer ileride tekrar çalışması gerekirse burayı 'idle' yapabiliriz.
-        const timer = setTimeout(() => {
-            setHintStage('finished')
-        }, 15000)
-
+        const timer = setTimeout(() => setHintStage('finished'), 15000)
         return () => clearTimeout(timer)
     }, [hintStage])
 
-    // Stage Tap → Drag Auto-Transition (4sn sonra)
+    // Stage Tap -> Drag
     useEffect(() => {
         if (hintStage !== 'tap') return
-
-        const timer = setTimeout(() => {
-            setHintStage('drag')
-        }, 4000) // 4sn tap hint göster
-
+        const timer = setTimeout(() => setHintStage('drag'), 4000)
         return () => clearTimeout(timer)
     }, [hintStage])
 
-    // Stage Drag → Cooldown Auto-Transition (5sn sonra)
-    // Stage Drag → Cooldown Auto-Transition (3sn sonra)
+    // Stage Drag -> Cooldown
     useEffect(() => {
         if (hintStage !== 'drag') return
-
-        const timer = setTimeout(() => {
-            setHintStage('cooldown')
-        }, 3000) // 3sn drag hint göster
-
+        const timer = setTimeout(() => setHintStage('cooldown'), 3000)
         return () => clearTimeout(timer)
     }, [hintStage])
 
     const shouldShowTapHint = hintStage === 'tap'
     const shouldShowDragHint = hintStage === 'drag'
 
-    // Drag Conflict Çözümü: Ref ile anlık takip
-    const isDraggingRef = useRef(false)
-
-    const sharedState = useRef<SharedState>({
-        rotation: 0,
-        target: null,
-        velocity: 0,
-        pauseUntil: 0,
-        startTime: Date.now() // FIX: İlk frame'den itibaren doğru değer
-    })
-
-    // İlk mount'ta ve carousel dönmeye başladığında hint timer'ı başlat
-    // focusedItemId null olduğunda (carousel tekrar dönüyor) döngüyü yeniden başlat
     useEffect(() => {
-        // Eğer bir kart focus'taysa, ilk hint'i gösterme
         if (focusedItemId) {
             setShowHint(false)
             return
         }
-
         let showTimer: NodeJS.Timeout
         let hideTimer: NodeJS.Timeout
-
         const cycleHint = () => {
             setShowHint(true)
             hideTimer = setTimeout(() => {
                 setShowHint(false)
-                // 30sn sonra tekrar göster
                 showTimer = setTimeout(cycleHint, 30000)
             }, 5000)
         }
-
-        // İlk gösterim
         cycleHint()
-
         return () => {
             clearTimeout(showTimer)
             clearTimeout(hideTimer)
         }
     }, [focusedItemId])
 
-    // items değiştiğinde animasyonu yeniden başlat (level geçişleri için)
-    useEffect(() => {
-        sharedState.current.startTime = Date.now()
-        sharedState.current.rotation = 0
-        sharedState.current.target = null
-    }, [items.length])
-
-    // Focus hint periyodik timer: focusedItemId set olduğunda 5sn görünür, 30sn gizli, tekrar
-    useEffect(() => {
-        if (!focusedItemId) {
-            setShowFocusedHint(false)
-            return
-        }
-
-        let showTimer: NodeJS.Timeout
-        let hideTimer: NodeJS.Timeout
-
-        const cycleFocusedHint = () => {
-            setShowFocusedHint(true)
-            hideTimer = setTimeout(() => {
-                setShowFocusedHint(false)
-                showTimer = setTimeout(cycleFocusedHint, 30000)
-            }, 5000)
-        }
-
-        cycleFocusedHint()
-
-        return () => {
-            clearTimeout(showTimer)
-            clearTimeout(hideTimer)
-        }
-    }, [focusedItemId])
-
-    const hideHint = useCallback(() => setShowHint(false), [])
-
-    // Internal wrapper: Local state'i güncelle + parent'a bildir
-    const handleFocusedItemChangeInternal = useCallback((itemId: string | null) => {
-        setFocusedItemId(itemId)
-        setShowHint(false) // İlk hint'i kapat
-        if (onFocusedItemChange) {
-            onFocusedItemChange(itemId)
-        }
-    }, [onFocusedItemChange])
-
-    const handlePointerDown = (e: React.PointerEvent) => {
-        setIsDragging(true)
-        isDraggingRef.current = true
-        lastX.current = e.clientX
-        hideHint()
-    }
-
-    const handlePointerMove = (e: React.PointerEvent) => {
-        if (isDraggingRef.current) {
-            setDragDelta(e.clientX - lastX.current)
-            lastX.current = e.clientX
-        }
-    }
-
-    const handlePointerUp = () => {
-        setIsDragging(false)
-        isDraggingRef.current = false
-        setDragDelta(0)
-    }
-
-    // GERÇEK fonksiyon - Child'lara geçilecek
     const handleSetIsDragging = useCallback((val: boolean) => {
         setIsDragging(val)
         isDraggingRef.current = val
-        if (!val) {
-            setDragDelta(0) // Drag bitince delta'yı da sıfırla
-        }
     }, [])
+
+    const hideHint = useCallback(() => setShowHint(false), [])
+
+    const handleFocusedItemChangeInternal = useCallback((itemId: string | null) => {
+        setFocusedItemId(itemId)
+        if (onFocusedItemChange) onFocusedItemChange(itemId)
+        if (itemId) setTimeout(() => setShowFocusedHint(true), 500)
+        else setShowFocusedHint(false)
+    }, [onFocusedItemChange])
+
+    // Re-implementing pointer logic provided by parent div
+    const lastX = useRef(0)
+    const handlePointerDownFull = (e: React.PointerEvent) => {
+        if (focusedItemId) return
+        isDraggingRef.current = true
+        setIsDragging(true)
+        lastX.current = e.clientX
+        setDragDelta(0)
+    }
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!isDraggingRef.current || focusedItemId) return
+        const delta = e.clientX - lastX.current
+        lastX.current = e.clientX
+        setDragDelta(delta)
+    }
+    const handlePointerUp = () => {
+        isDraggingRef.current = false
+        setIsDragging(false)
+        setTimeout(() => setDragDelta(0), 50)
+    }
 
     return (
         <div
-            className="w-full h-[500px] md:h-[550px] relative select-none touch-none"
-            style={{ backgroundColor: CONFIG.backgroundColor }}
-            onPointerDown={handlePointerDown}
+            className="w-full h-[500px] relative touch-none cursor-grab active:cursor-grabbing select-none"
+            onPointerDown={handlePointerDownFull}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
+            style={{ backgroundColor: CONFIG.backgroundColor }}
         >
             <Canvas
                 shadows
                 frameloop="always"
-                gl={{ antialias: true }}
+                gl={{ antialias: true, alpha: true }}
                 dpr={[1, 1.5]}
                 camera={{
                     position: [0, CONFIG.cameraHeight, CONFIG.cameraDistance],
@@ -842,31 +743,37 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             >
                 <ambientLight intensity={0.5} />
                 <spotLight position={[10, 12, 10]} angle={0.3} penumbra={1} intensity={1} castShadow />
-                {/* Environment HDRI yüklemesi async - Suspense ile sararak carousel unmount'ını engelliyoruz */}
+
+                {/* Zemin ve Sparkles - HEMEN GÖRÜNÜR */}
+                <Stage sharedState={sharedState} />
+
+                {/* Ağır Modeller ve Environment - YÜKLENİNCE GELİR */}
                 <Suspense fallback={null}>
                     <Environment preset="city" />
+                    <CarouselItems
+                        items={items}
+                        isPaused={isPaused || isDragging || externalPause}
+                        onHover={setIsPaused}
+                        isDraggingRef={isDraggingRef}
+                        dragDelta={dragDelta}
+                        onInteract={hideHint}
+                        sharedState={sharedState}
+                        setIsDragging={handleSetIsDragging}
+                        onCardClick={onCardClick}
+                        onFocusedItemChange={handleFocusedItemChangeInternal}
+                        onFrontCardChange={onFrontCardChange}
+                        shouldShowTapHint={shouldShowTapHint}
+                        shouldShowDragHint={shouldShowDragHint}
+                        hintStage={hintStage}
+                        onStageChange={setHintStage}
+                        modelScale={modelScale}
+                        onReady={handleItemsReady}
+                    />
                 </Suspense>
-
-                <SceneContent
-                    items={items}
-                    isPaused={isPaused || isDragging || externalPause}
-                    onHover={setIsPaused}
-                    isDraggingRef={isDraggingRef}
-                    dragDelta={dragDelta}
-                    onInteract={hideHint}
-                    sharedState={sharedState}
-                    setIsDragging={handleSetIsDragging}
-                    onCardClick={onCardClick}
-                    onFocusedItemChange={handleFocusedItemChangeInternal}
-                    onFrontCardChange={onFrontCardChange}
-                    shouldShowTapHint={shouldShowTapHint}
-                    shouldShowDragHint={shouldShowDragHint}
-                    hintStage={hintStage}
-                    onStageChange={setHintStage}
-                />
             </Canvas>
-            {/* Initial Hint - Profesyonel */}
-            {showHint && !focusedItemId && (
+
+            {/* UI Hints */}
+            {showHint && !focusedItemId && sharedState.current.isReady && (
                 <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 hidden md:block animate-fade-in">
                     <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
                         <div className="flex items-center gap-3">
@@ -883,7 +790,6 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     </div>
                 </div>
             )}
-            {/* Focus Hint - Profesyonel */}
             {focusedItemId && showFocusedHint && (
                 <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 animate-fade-in">
                     <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
@@ -895,16 +801,16 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                             <span className="text-slate-600">•</span>
                             <div className="flex items-center gap-1.5">
                                 <span className="text-cyan-400 font-medium">Çift Tık:</span>
-                                <span className="text-slate-300">Ürün Sayfası</span>
+                                <span className="text-slate-300">Sayfaya Git</span>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
             {/* Sol-Sağ Gradient */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
             <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
-
         </div>
     )
 }
