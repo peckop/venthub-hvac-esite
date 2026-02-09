@@ -1,78 +1,111 @@
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense } from 'react'
 import { JetFanModel } from './types/JetFanModel'
 import { RoofFanModel } from './types/RoofFanModel'
-import { DuctFanModel } from './types/DuctFanModel' // RoundDuctFanModel renamed to DuctFanModel
+import { DuctFanModel, RectangularDuctFanModel } from './types/DuctFanModel'
 import { AxialFanModel } from './types/AxialFanModel'
 import { DomesticFanModel } from './types/DomesticFanModel'
 import { SilentChannelFanModel } from './types/SilentChannelFanModel'
 import { SmokeExhaustFanModel } from './types/SmokeExhaustFanModel'
-// import { PlugFanModel } from './types/PlugFanModel' // Not implemented yet
-
-
+import { NicotraFanModel } from './types/NicotraFanModel'
+import { SnailFanModel } from './types/SnailFanModel'
+import { PlugFanModel } from './types/PlugFanModel'
+import { SquarePlateFanModel } from './types/SquarePlateFanModel'
 
 interface FanRendererProps {
     slug: string
+    modelType?: string  // YENİ: Veritabanından gelen model tipi (categories.metadata.model_type)
     scale?: number
 }
 
-export const FanRenderer: React.FC<FanRendererProps> = ({ slug, scale = 1 }) => {
+// Model tipi -> Bileşen eşleştirmesi (Merkezi Kayıt)
+const MODEL_COMPONENTS = {
+    'AxialFanModel': AxialFanModel,
+    'RoofFanModel': RoofFanModel,
+    'SquarePlateFanModel': SquarePlateFanModel,
+    'DomesticFanModel': DomesticFanModel,
+    'DuctFanModel': DuctFanModel,
+    'RectangularDuctFanModel': RectangularDuctFanModel,
+    'SilentChannelFanModel': SilentChannelFanModel,
+    'SmokeExhaustFanModel': SmokeExhaustFanModel,
+    'NicotraFanModel': NicotraFanModel,
+    'SnailFanModel': SnailFanModel,
+    'PlugFanModel': PlugFanModel,
+    'JetFanModel': JetFanModel,
+} as const
 
-    useEffect(() => {
-        // Debug için slug kontrolü
-        // console.log('Current rotation:', currentRotation.y)
-    }, [slug]);
+export const FanRenderer: React.FC<FanRendererProps> = ({ slug, modelType, scale = 1 }) => {
 
-    // Slug'a göre model seçimi
     const renderFan = () => {
+        // ============================================================
+        // 1. ÖNCELİK: Veritabanından gelen model_type kullan
+        // ============================================================
+        if (modelType && modelType in MODEL_COMPONENTS) {
+            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS]
+            return <ModelComponent />
+        }
+
+        // ============================================================
+        // 2. FALLBACK: Eski slug bazlı mantık (geriye dönük uyumluluk)
+        // ============================================================
         const s = slug ? slug.toLowerCase() : '';
 
         // === JET FANLAR ===
         if (s.includes('jet') || s.includes('otopark')) return <JetFanModel />
 
         // === ÇATI FANLARI ===
-        if (s.includes('cati') || s.includes('atı') || s.includes('basinc')) return <RoofFanModel />
+        // "Basınçlandırma" buraya girmemeli, aşağıda özel kuralı var.
+        if (s.includes('cati') || s.includes('atı')) return <RoofFanModel />
 
-        // === NICOTRA / GEBHARDT ===
-        // if (s.includes('nicotra') || s.includes('gebhardt') || s.includes('ddi') || s.includes('at')) return <NicotraFanModel />
+        // === NICOTRA / GEBHARDT (Endüstriyel/Ağır Hizmet - Double Inlet) ===
+        if (s.includes('nicotra') || s.includes('gebhardt') || s.includes('ddi') || s.includes('at')) return <NicotraFanModel />
 
-        // === SNAPLGANYOZ / SANTRİFÜJ / EXPROOF ===
-        // if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz') || s.includes('exproof') || s.includes('ex-proof')) return <SnailFanModel />
+        // === PLUG FANLAR (Kasa Yok, Sadece Çark ve Motor) ===
+        if (s.includes('plug')) return <PlugFanModel />
 
-        // === PLUG FANLAR ===
-        // if (s.includes('plug')) return <PlugFanModel />
+        // === ENDÜSTRİYEL / SALYANGOZ / EXPROOF ===
+        if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz') || s.includes('exproof') || s.includes('ex-proof')) return <SnailFanModel />
 
-        // === SESSİZ (SILENT) KANAL TİPİ (ESKİ YEŞİL MODEL) ===
+        // === BASINÇLANDIRMA FANLARI ===
+        // Çatı fanı ile karışmamalı. Genellikle dik silindirik aksiyal fanlardır.
+        if (s.includes('basinc') || s.includes('yangin') || s.includes('merdiven')) return <AxialFanModel />
+
+        // === DUVAR TİPİ KOMPAKT AKSIYAL FANLAR (TURUNCU PERVANELİ KARE PLAKA) ===
+        // "Duvar Tipi Kompakt Aksiyal Fanlar" slug'ı: duvar-tipi-kompakt-aksiyal-fanlar
+        // Bu, turuncu pervaneli kare plaka fan modelidir (SquarePlateFanModel)
+        if (s.includes('duvar') && s.includes('kompakt')) return <SquarePlateFanModel />
+
+        // === AKSİYAL (SİLİNDİRİK) ===
+        if (s.includes('aksiyal') || s.includes('axial')) return <AxialFanModel />
+
+        // === DUVAR TİPİ (KARE PLAKALI - KONUT TİPİ) ===
+        // Sadece "duvar" içeren ama "aksiyal" veya "kompakt" içermeyen fanlar
+        if (s.includes('duvar')) return <DomesticFanModel />
+
+        // === SESSİZ (SILENT) KANAL TİPİ ===
         if (s.includes('sessiz') || s.includes('silent') || s.includes('lineo') || s.includes('td')) return <SilentChannelFanModel />
 
-        // === DUMAN EGZOZ FANLARI (YUVARLAK/AXIAL TİP) ===
-        // "duman" VE "egzoz" veya sadece "duman" geçiyorsa ve dikdörtgen değilse
+        // === SIĞINAK FANLARI (Taze Hava Ünitesi / Aspiratör) ===
+        // Kanal tipi ile aynı olmamalı. Genellikle kutu profillidir (Prizmatik).
+        if (s.includes('siginak') || s.includes('taze-hava') || s.includes('hücreli') || s.includes('hucreli')) return <RectangularDuctFanModel />
+
+        // === DUMAN EGZOZ FANLARI ===
+        // Nicotra ile karışmamalı (Nicotra yukarıda yakalandı).
         if ((s.includes('duman') || s.includes('smoke')) && !s.includes('dikdortgen') && !s.includes('kanal')) return <SmokeExhaustFanModel />
 
         // === KONUT / BANYO TİPİ ===
         if (s.includes('konut') || s.includes('banyo') || s.includes('wc') || s.includes('quattro')) return <DomesticFanModel />
 
-        // === DUVAR TİPİ (KARE PLAKALI) ===
-        // if (s.includes('duvar')) return <SquarePlateFanModel />
-
-        // === AKSİYAL (SİLİNDİRİK) ===
-        if (s.includes('aksiyal') || s.includes('axial')) return <AxialFanModel />
-
         // === KANAL TİPİ (DİKDÖRTGEN) ===
-        if (s.includes('dikdortgen') || s.includes('duman') || s.includes('siginak') || s.includes('sessiz') || s.includes('kabinli') || s.includes('prizmatik') || s.includes('isi-geri')) return <DuctFanModel /> // Was Rectangular...
+        if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('isi-geri')) return <RectangularDuctFanModel />
 
-        // === KANAL TİPİ (YUVARLAK) ===
-        // Default kanal tipi
+        // === KANAL TİPİ (YUVARLAK / KLASİK) ===
         if (s.includes('kanal') || s.includes('yuvarlak')) return <DuctFanModel />
 
         // === YEDEK PARÇA ===
-        // Eğer FanRenderer yanlışlıkla yedek parça için çağrılırsa diye
-        if (s.includes('yedek') || s.includes('aksesuar')) return null; // Category3DIcon halletmeli
+        if (s.includes('yedek') || s.includes('aksesuar')) return null;
 
         // === DEFAULT ===
-        // Bilinmeyen fan türü için RoundDuctFanModel
-        console.warn(`[FanRenderer] Unknown fan type: "${s}". Defaulting to RoundDuctFanModel.`);
-
-        if (s.includes('kanal-tipi-fanlar')) return <DuctFanModel />
+        // console.warn(`[FanRenderer] Unknown fan type: "${s}". Defaulting to DuctFanModel.`);
         return <DuctFanModel />
     }
 
