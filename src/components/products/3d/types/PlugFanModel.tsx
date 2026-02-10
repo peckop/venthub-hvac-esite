@@ -14,7 +14,7 @@ export const PlugFanModel: React.FC = () => {
     })
 
     return (
-        <group position={[0, -0.2, 0]} scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>
+        <group position={[0, -0.4, 0]} scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>
 
             {/* 1. EMİŞ HUNİSİ (Inlet Cone) - DÜZ SAC KONİ (Halka değil) */}
             <group position={[0, 0, 0.35]}>
