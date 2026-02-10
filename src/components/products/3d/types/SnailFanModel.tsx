@@ -17,7 +17,7 @@ export const SnailFanModel: React.FC = () => {
 
     return (
         // SCALE: 0.65 (Diğerleriyle uyumlu olması için)
-        <group position={[0, -0.2, 0]} scale={[0.65, 0.65, 0.65]}>
+        <group position={[0, -0.4, 0]} scale={[0.65, 0.65, 0.65]}>
             {/* 1. SALYANGOZ GÖVDE (Scroll Housing) - MAT SİYAH */}
             <group>
                 {/* Ana Daire */}

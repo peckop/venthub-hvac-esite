@@ -54,7 +54,7 @@ export const SquarePlateFanModel: React.FC = () => {
     }
 
     return (
-        <group position={[0, 0, 0]} scale={[0.8, 0.8, 0.8]}>
+        <group position={[0, -0.4, 0]} scale={[0.8, 0.8, 0.8]}>
 
             {/* 1. DUVAR MONTAJ PLAKASI (Galvaniz) */}
             <group>
