@@ -68,7 +68,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({ slug, modelType, scale
         if (s.includes('exproof') || s.includes('ex-proof') || s.includes('atex')) return <ExproofFanModel />
 
         // === ENDÜSTRİYEL / SANTRIFUJ / SALYANGOZ ===
-        if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz')) return <SnailFanModel />
+        if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz')) return <ExproofFanModel />
 
         // === BASINÇLANDIRMA FANLARI ===
         // Çatı fanı ile karışmamalı. Genellikle dik silindirik aksiyal fanlardır.

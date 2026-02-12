@@ -3,6 +3,7 @@ import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { Link } from 'react-router-dom'
 import type { Category } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 interface CategoriesShowcaseProps {
   categories: Category[]
@@ -20,7 +21,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
 
   const getPopularCategories = () => {
     // Return specific popular categories
-    return mainCategories.filter(cat => 
+    return mainCategories.filter(cat =>
       ['fanlar', 'isi-geri-kazanim-cihazlari', 'hava-perdeleri', 'hava-temizleyiciler'].includes(cat.slug)
     ).slice(0, 4)
   }
@@ -41,12 +42,12 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
         {/* Popular Categories */}
         <div className="mb-16">
           <div className="flex items-center justify-center mb-8">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold-accent mr-2" aria-hidden="true"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 5h7v7"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gold-accent mr-2" aria-hidden="true"><path d="M3 17l6-6 4 4 7-7" /><path d="M14 5h7v7" /></svg>
             <h3 className="text-2xl font-semibold text-industrial-gray">
               {t('products.popularCategories')}
             </h3>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {getPopularCategories().map((category) => (
               <Link
@@ -61,7 +62,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                     </div>
                   </div>
                   <h4 className="font-semibold text-industrial-gray group-hover:text-primary-navy transition-colors mb-2">
-                    {category.name}
+                    {getCategoryDisplayName(category)}
                   </h4>
                   <p className="text-sm text-steel-gray mb-3">
                     {category.description}
@@ -70,7 +71,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                     <span className="text-sm font-medium mr-1">
                       {t('categories.subCount', { count: getSubCategoryCount(category.id) })}
                     </span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></svg>
                   </div>
                 </div>
               </Link>
@@ -83,7 +84,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
           <h3 className="text-2xl font-semibold text-industrial-gray text-center mb-8">
             {t('categories.allTitle')}
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {mainCategories.map((category) => (
               <Link
@@ -96,13 +97,13 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
                 </div>
                 <div className="flex-1">
                   <h4 className="font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">
-                    {category.name}
+                    {getCategoryDisplayName(category)}
                   </h4>
                   <p className="text-sm text-steel-gray">
                     {t('categories.variantCount', { count: getSubCategoryCount(category.id) })}
                   </p>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-steel-gray group-hover:text-secondary-blue group-hover:translate-x-1 transition-all" aria-hidden="true"><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></svg>
               </Link>
             ))}
           </div>
@@ -115,7 +116,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
             className="inline-flex items-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
           >
             <span>{t('common.seeAllProducts')}</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true"><path d="M5 12h14" /><path d="M13 5l7 7-7 7" /></svg>
           </Link>
         </div>
       </div>

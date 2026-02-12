@@ -5,6 +5,10 @@ import { ChevronRight } from 'lucide-react'
 import Category3DIcon from '../products/Category3DIcon'
 import type { Category } from '../../lib/supabase'
 
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+
+// ... existing imports ...
+
 interface CategoryCard3DProps {
     category: Category
     subCategoryCount: number
@@ -56,7 +60,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
             {/* Text Content */}
             <div className="px-4 pb-4 -mt-4 relative z-10">
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-secondary-blue transition-colors">
-                    {category.name}
+                    {getCategoryDisplayName(category)}
                 </h3>
 
                 <div className="flex items-center justify-between">

@@ -38,6 +38,7 @@ import {
 } from './sections'
 import { Breadcrumb } from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface CategoryLandingProps {
     category: Category
@@ -240,7 +241,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             )}
 
                             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-                                {category.metadata?.hero_title || category.name}
+                                {getCategoryDisplayName(category)}
                             </h1>
                             <p className="text-lg text-gray-300 mb-8 max-w-xl">
                                 {category.metadata?.hero_description || category.description}

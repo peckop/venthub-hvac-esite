@@ -9,6 +9,7 @@ import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
 const MegaMenu = React.lazy(() => import('./MegaMenu'))
 const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
@@ -519,7 +520,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                                 {getCategoryIcon(cat.slug, { size: 18 })}
                               </div>
                               <span className="text-sm font-medium text-industrial-gray hover:text-primary-navy">
-                                {cat.name}
+                                {getCategoryDisplayName(cat)}
                               </span>
                             </Link>
                           ))}
