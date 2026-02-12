@@ -5,6 +5,7 @@ import {
     Wind, Fan, Droplet, Thermometer,
     AirVent, Settings, Package, Wrench
 } from 'lucide-react'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -56,7 +57,7 @@ function CategoryCard({ category }: { category: Category }) {
                 <div className="relative z-10 text-white">
                     <Icon size={32} className="mb-3 opacity-90 group-hover:scale-110 transition-transform" />
                     <h3 className="font-bold text-base sm:text-lg leading-tight line-clamp-2">
-                        {category.name}
+                        {getCategoryDisplayName(category)}
                     </h3>
                     {category.description && (
                         <p className="mt-2 text-xs sm:text-sm opacity-80 line-clamp-2">
@@ -92,8 +93,8 @@ function ScrollingLane({
         <div className="relative overflow-hidden">
             <div
                 className={`flex gap-4 ${direction === 'left'
-                        ? 'animate-category-scroll-left'
-                        : 'animate-category-scroll-right'
+                    ? 'animate-category-scroll-left'
+                    : 'animate-category-scroll-right'
                     }`}
                 style={{ animationDuration: `${speed}s` }}
             >

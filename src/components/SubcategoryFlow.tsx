@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getCategories, Category } from '../lib/supabase'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 interface SubcategoryCardProps {
     subcategory: Category
@@ -30,13 +31,13 @@ function SubcategoryCard({ subcategory, parentSlug }: SubcategoryCardProps) {
                     transition-colors
                 ">
                     <span className="text-blue-600 font-bold text-sm">
-                        {subcategory.name.charAt(0)}
+                        {getCategoryDisplayName(subcategory).charAt(0)}
                     </span>
                 </div>
 
                 {/* Content */}
                 <h4 className="font-semibold text-sm text-gray-800 line-clamp-2 group-hover:text-blue-700 transition-colors">
-                    {subcategory.name}
+                    {getCategoryDisplayName(subcategory)}
                 </h4>
 
                 {/* Hover indicator */}
@@ -68,8 +69,8 @@ function ScrollingLane({
         <div className="relative overflow-hidden">
             <div
                 className={`flex gap-3 ${direction === 'left'
-                        ? 'animate-subcat-scroll-left'
-                        : 'animate-subcat-scroll-right'
+                    ? 'animate-subcat-scroll-left'
+                    : 'animate-subcat-scroll-right'
                     }`}
                 style={{ animationDuration: `${speed}s` }}
             >
