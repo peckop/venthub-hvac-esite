@@ -23,8 +23,8 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     'fanlar': {
         display_mode: 'showcase',
         hide_price: true,
-        hero_title: 'Endüstriyel Fanlar',
-        hero_description: 'Yüksek verimli, düşük gürültülü profesyonel fan çözümleri. Çatı tipi, kanal tipi, basınçlandırma ve daha fazlası.',
+        hero_title: 'Exproof Fanlar',
+        hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri. Kimya tesisleri, boyahaneler ve endüstriyel tesisler için.',
         features: []
     },
 

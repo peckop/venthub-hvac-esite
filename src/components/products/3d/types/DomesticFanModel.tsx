@@ -23,7 +23,7 @@ export const DomesticFanModel: React.FC = () => {
 
     return (
         // SCALE FIX: 0.25 (Endüstriyeller 0.6-0.7 iken bu 0.25 olmalı)
-        <group ref={fanRef} position={[0, -0.4, 0]} scale={[0.25, 0.25, 0.25]}>
+        <group ref={fanRef} position={[0, -0.22, 0]} scale={[0.25, 0.25, 0.25]}>
             {/* 1. ÖN PANEL ÇERÇEVESİ (Krom/Parlak Metal veya Beyaz Plastik) */}
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[panelSize, panelSize, panelThickness]} />

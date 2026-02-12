@@ -62,7 +62,7 @@ export function AxialFanModel() {
     const bladeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
 
     return (
-        <group position={[0, -0.4, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>
+        <group position={[0, -0.55, 0]} scale={[0.85, 0.85, 0.85]} rotation={[0, -Math.PI / 4, 0]}>
 
             {/* 1. SİLİNDİRİK KOVAN (Black Casing) */}
             <group rotation={[Math.PI / 2, 0, 0]}>

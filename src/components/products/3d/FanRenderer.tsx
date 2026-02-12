@@ -8,6 +8,7 @@ import { SilentChannelFanModel } from './types/SilentChannelFanModel'
 import { SmokeExhaustFanModel } from './types/SmokeExhaustFanModel'
 import { NicotraFanModel } from './types/NicotraFanModel'
 import { SnailFanModel } from './types/SnailFanModel'
+import { ExproofFanModel } from './types/ExproofFanModel'
 import { PlugFanModel } from './types/PlugFanModel'
 import { SquarePlateFanModel } from './types/SquarePlateFanModel'
 
@@ -29,6 +30,7 @@ const MODEL_COMPONENTS = {
     'SmokeExhaustFanModel': SmokeExhaustFanModel,
     'NicotraFanModel': NicotraFanModel,
     'SnailFanModel': SnailFanModel,
+    'ExproofFanModel': ExproofFanModel,
     'PlugFanModel': PlugFanModel,
     'JetFanModel': JetFanModel,
 } as const
@@ -62,8 +64,11 @@ export const FanRenderer: React.FC<FanRendererProps> = ({ slug, modelType, scale
         // === PLUG FANLAR (Kasa Yok, Sadece Çark ve Motor) ===
         if (s.includes('plug')) return <PlugFanModel />
 
-        // === ENDÜSTRİYEL / SALYANGOZ / EXPROOF ===
-        if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz') || s.includes('exproof') || s.includes('ex-proof')) return <SnailFanModel />
+        // === EX-PROOF / SALYANGOZ (Özel Bakır Halkalı Model) ===
+        if (s.includes('exproof') || s.includes('ex-proof') || s.includes('atex')) return <ExproofFanModel />
+
+        // === ENDÜSTRİYEL / SANTRIFUJ / SALYANGOZ ===
+        if (s.includes('endustriyel') || s.includes('santrifuj') || s.includes('salyangoz')) return <SnailFanModel />
 
         // === BASINÇLANDIRMA FANLARI ===
         // Çatı fanı ile karışmamalı. Genellikle dik silindirik aksiyal fanlardır.
