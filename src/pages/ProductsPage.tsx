@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
