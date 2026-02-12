@@ -94,6 +94,14 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
         hero_title: 'Hava Temizleyiciler',
         hero_description: 'İç ortam hava kalitesini artıran anti-viral ve filtrasyon sistemleri.',
         features: []
+    },
+    // Sub Category (Emergency Fix): Endüstriyel Fanlar -> Exproof Fanlar
+    'endustriyel-fanlar': {
+        display_mode: 'showcase',
+        hide_price: true,
+        hero_title: 'Exproof Fanlar',
+        hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri.',
+        features: []
     }
 }
 
