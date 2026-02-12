@@ -41,16 +41,17 @@ export const useFanMaterials = () => {
 
         // 6. Mat Siyah Plastik/Boya (Izgaralar, Motor Kapakları)
         const matteBlack = new THREE.MeshStandardMaterial({
-            color: '#1e293b', // Slate-800
-            roughness: 0.8,
-            metalness: 0.1,
+            color: '#050505', // Deep Industrial Black
+            roughness: 0.9,
+            metalness: 0.05,
         })
 
-        // 7. Bakır (Motor Sargıları)
+        // 7. Bakır (High-Shine Industrial Copper)
         const copper = new THREE.MeshStandardMaterial({
-            color: '#b45309', // Amber-700
-            roughness: 0.4,
-            metalness: 0.8,
+            color: '#ca6624', // Rich, vibrant copper
+            roughness: 0.08, // Very shiny
+            metalness: 1.0,
+            side: THREE.DoubleSide,
         })
 
         // 8. Güvenlik Turuncusu (Uyarı levhaları, dönen parçalar)
@@ -58,6 +59,28 @@ export const useFanMaterials = () => {
             color: '#ea580c', // Orange-600
             roughness: 0.4,
             metalness: 0.1,
+        })
+
+        // 9. Döküm Demir (Industrial Grey - Lighter as requested)
+        const castIron = new THREE.MeshStandardMaterial({
+            color: '#4b5563', // Slate-600 (Lighter than before)
+            roughness: 0.8,
+            metalness: 0.4,
+            flatShading: false,
+        })
+
+        // 10. Pirinç (Spark-Proof Inlet Ring)
+        const brass = new THREE.MeshStandardMaterial({
+            color: '#d4af37', // Metallic Brass
+            roughness: 0.25,
+            metalness: 0.9,
+        })
+
+        // 11. Kauçuk (Kablo ve Contalar)
+        const rubber = new THREE.MeshStandardMaterial({
+            color: '#171717', // Neutral-900
+            roughness: 0.9,
+            metalness: 0.0,
         })
 
         return {
@@ -68,7 +91,10 @@ export const useFanMaterials = () => {
             brushedAluminum,
             matteBlack,
             copper,
-            safetyOrange
+            safetyOrange,
+            castIron,
+            brass,
+            rubber
         }
     }, [])
 }
