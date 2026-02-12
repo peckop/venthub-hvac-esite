@@ -84,7 +84,7 @@ const CategoryShowcaseCards: React.FC = () => {
                                 <path d="M8 28 C14 24 22 24 24 28 C22 32 14 32 8 28" fill="currentColor" opacity="0.7" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">Endüstriyel Fanlar</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">Exproof Fanlar</h3>
                         <p className="text-sm text-gray-400 leading-relaxed">
                             Geniş hacimli mekanlar için güçlü ve dayanıklı havalandırma çözümleri.
                         </p>

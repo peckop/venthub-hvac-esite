@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Category } from '../../lib/supabase'
-import { ArrowRight, Zap, Wind, ThermometerSun, CheckCircle2, ChevronDown } from 'lucide-react'
+import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2 } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
