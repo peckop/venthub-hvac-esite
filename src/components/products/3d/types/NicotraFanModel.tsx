@@ -39,7 +39,7 @@ export const NicotraFanModel: React.FC = () => {
     }, [])
 
     return (
-        <group position={[0, -0.4, 0]} scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>
+        <group position={[0, -0.65, 0]} scale={[0.7, 0.7, 0.7]} rotation={[0, Math.PI / 4, 0]}>
 
             {/* 1. X-ŞASİ (Base Frame) */}
             <group position={[0, -0.5, 0]}>

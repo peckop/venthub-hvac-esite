@@ -38,11 +38,11 @@ UPDATE categories SET metadata = jsonb_set(
     '"SmokeExhaustFanModel"'
 ) WHERE slug = 'duman-egzoz-fanlari';
 
--- Endüstriyel Fanlar → SnailFanModel (Salyangoz, ex-proof)
+-- Exproof Fanlar → ExproofFanModel (Salyangoz, bakır halkalı, ATEX)
 UPDATE categories SET metadata = jsonb_set(
     COALESCE(metadata, '{}'::jsonb),
     '{model_type}',
-    '"SnailFanModel"'
+    '"ExproofFanModel"'
 ) WHERE slug = 'endustriyel-fanlar';
 
 -- Kanal Tipi Fanlar → DuctFanModel (Yuvarlak kanal)

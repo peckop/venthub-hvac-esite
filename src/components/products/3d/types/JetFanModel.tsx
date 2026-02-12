@@ -37,7 +37,7 @@ export const JetFanModel: React.FC = () => {
     }), [])
 
     return (
-        <group position={[0, -0.4, 0]} scale={[0.75, 0.75, 0.75]} rotation={[0, -Math.PI / 4, 0]}>
+        <group position={[0, -0.7, 0]} scale={[0.9, 0.9, 0.9]} rotation={[0, -Math.PI / 4, 0]}>
 
             {/* A. ANA SİLİNDİRİK GÖVDE (Turuncu - Üç Bölümlü KAYNAKLI BİRLEŞİM) */}
             <group rotation={[0, 0, Math.PI / 2]}>

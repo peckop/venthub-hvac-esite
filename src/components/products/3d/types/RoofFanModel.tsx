@@ -56,7 +56,7 @@ export const RoofFanModel: React.FC = () => {
     }, [])
 
     return (
-        <group position={[0, -0.4, 0]} scale={[0.85, 0.85, 0.85]}>
+        <group position={[0, -1.0, 0]} scale={[0.85, 0.85, 0.85]}>
 
             {/* 1. ALT KAİDE VE TEKNİK ŞASİ (Revize Boyutlar: 1.42m / 10cm Kalınlık) */}
             <mesh position={[0, 0.05, 0]} material={matteBlackMaterial}>
