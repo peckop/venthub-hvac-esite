@@ -23,7 +23,6 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     'fanlar': {
         display_mode: 'showcase',
         hide_price: true,
-        hero_title: 'Exproof Fanlar',
         hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri. Kimya tesisleri, boyahaneler ve endüstriyel tesisler için.',
         features: []
     },
@@ -99,7 +98,6 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     'endustriyel-fanlar': {
         display_mode: 'showcase',
         hide_price: true,
-        hero_title: 'Exproof Fanlar',
         hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri.',
         features: []
     }
