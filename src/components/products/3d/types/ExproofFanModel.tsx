@@ -1,217 +1,205 @@
-import React, { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import React, { useMemo } from 'react'
 import * as THREE from 'three'
-import { useFanMaterials } from '../materials/useFanMaterials'
+
 
 /**
- * ExproofFanModel (Ultra High Fidelity Revision)
- * Referans görsellere (Vortice C ATEX) birebir sadık, yüksek detaylı endüstriyel model.
- * - IEC Standart Motor (Soğutma kanalları, Klemens Kutusu, Rakor)
- * - Kare Flanş (Delikli)
- * - Salyangoz Gövde (Spiral form simülasyonu)
- * - Bakır Emiş Halkası (Parlak)
+ * ExproofFanModel (Engineering High-Fidelity - Absolute Identity V15)
+ * 
+ * KRİTİK ANALİZ VE RENK SADAKATİ (Referans: exproof fan-2.png):
+ * 1. SALYANGOZ GÖVDE: Mat Antrasit/Siyah (#1a1a1a).
+ * 2. MOTOR VE KANATÇIKLAR: Döküm Alüminyum Grisi (#a1a1aa), metalik doku.
+ * 3. ARKA TAS (KAPAK): Parlak Gümüş/Alüminyum (#e5e7eb), yüksek yansıma.
+ * 4. KARE ÇIKIŞ: 0.45x0.45 tam kare siyah plaka.
+ * 5. BAKIR: Canlı ve radyant bakır (#f6ad55).
+ * 6. KLEMENS KUTUSU: Açık gri gövde, gümüş kapak ve sarı şimşek sembolü.
+ * 7. PEDESTAL: Koyu döküm gri blok (#374151).
  */
 export const ExproofFanModel: React.FC = () => {
-    const materials = useFanMaterials()
-    const fanRef = useRef<THREE.Group>(null)
 
-    useFrame((state, delta) => {
-        if (fanRef.current) {
-            fanRef.current.rotation.x -= delta * 15
-        }
-    })
 
-    // Vida/Somun Detayı Oluşturucu (Tekrar kullanım için)
-    const Bolt = ({ position, rotation }: { position: [number, number, number], rotation?: [number, number, number] }) => (
+    // Salyangoz Formu (Keskin Hatlı)
+    const scrollShape = useMemo(() => {
+        const shape = new THREE.Shape()
+        shape.moveTo(0, 0.44)
+        shape.lineTo(0.58, 0.44)
+        shape.lineTo(0.58, 0.08)
+        shape.lineTo(0.32, 0.08)
+        shape.quadraticCurveTo(0.44, -0.32, 0, -0.32)
+        shape.quadraticCurveTo(-0.44, -0.32, -0.44, 0)
+        shape.quadraticCurveTo(-0.44, 0.44, 0, 0.44)
+        return shape
+    }, [])
+
+    // Tek Parça Bakır Ünitesi (Torna Geometrisi)
+    const intakePoints = useMemo(() => {
+        const pts = []
+        pts.push(new THREE.Vector2(0.24, 0.006))
+        pts.push(new THREE.Vector2(0.19, 0.012))
+        pts.push(new THREE.Vector2(0.175, 0.005))
+        pts.push(new THREE.Vector2(0.17, -0.015))
+        pts.push(new THREE.Vector2(0.165, -0.12))
+        return pts
+    }, [])
+
+    // Standart Mühendislik Cıvatası
+    const StandardFastener = ({ position, rotation, doubleSided = false }: { position: [number, number, number], rotation?: [number, number, number], doubleSided?: boolean }) => (
         <group position={position} rotation={rotation ? new THREE.Euler(...rotation) : new THREE.Euler()}>
-            <mesh material={materials.galvanizedSteel}>
-                <cylinderGeometry args={[0.015, 0.015, 0.02, 6]} />
+            <mesh>
+                <cylinderGeometry args={[0.008, 0.008, 0.015, 6]} />
+                <meshStandardMaterial color="#ffffff" metalness={1} roughness={0.1} />
             </mesh>
-            <mesh position={[0, 0.01, 0]} material={materials.galvanizedSteel}>
-                <cylinderGeometry args={[0.025, 0.025, 0.01, 6]} />
+            <mesh position={[0, 0.012, 0]}>
+                <sphereGeometry args={[0.018, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                <meshStandardMaterial
+                    color="#ffffff"
+                    metalness={0.9}
+                    roughness={0.05}
+                    emissive="#666666"
+                    emissiveIntensity={0.2}
+                />
             </mesh>
+            {doubleSided && (
+                <mesh position={[0, -0.012, 0]} rotation={[Math.PI, 0, 0]}>
+                    <sphereGeometry args={[0.018, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                    <meshStandardMaterial color="#ffffff" metalness={0.9} roughness={0.05} emissive="#666666" />
+                </mesh>
+            )}
         </group>
     )
 
     return (
-        <group position={[0, -0.65, 0]} scale={[0.7, 0.7, 0.7]}>
+        <group position={[0, -0.35, 0]}>
 
-            {/* --- 1. ANA SALYANGOZ GÖVDE (SCROLL HOUSING) --- */}
-            <group>
-                {/* Sol Yan Kapak */}
-                <mesh position={[0, 0.25, 0.22]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.58, 0.58, 0.02, 64]} />
-                </mesh>
-                {/* Sağ Yan Kapak */}
-                <mesh position={[0, 0.25, -0.22]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.58, 0.58, 0.02, 64]} />
-                </mesh>
-                {/* Salyangoz Sırtı (Kıvrımlı Levha) - Spiral etkisi için parçalı yapı */}
-                <mesh position={[0, 0.25, 0]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.58, 0.58, 0.42, 64, 1, true, 0, 4.5]} />
-                    {/* Yarım silindir, geri kalanı çıkış ağzına bağlanacak */}
-                </mesh>
-                {/* İç Siyahlık (Görünürlük için) */}
-                <mesh position={[0, 0.25, 0]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.57, 0.57, 0.41, 64]} />
+            {/* --- 1. MOTOR VE MONTAJ ÜNİTESİ (FOTOĞRAF İLE BİREBİR RENKLER) --- */}
+            <group position={[0, 0.35, -0.42]}>
+
+                {/* Motor Gövdesi (Döküm Alüminyum - #a1a1aa) */}
+                <mesh rotation={[Math.PI / 2, 0, 0]}>
+                    <cylinderGeometry args={[0.22, 0.22, 0.5, 32]} />
+                    <meshStandardMaterial color="#a1a1aa" metalness={0.7} roughness={0.4} />
                 </mesh>
 
-                {/* ÇIKIŞ AĞZI (RECTANGULAR OUTLET) */}
-                <group position={[0.45, 0.55, 0]} rotation={[0, 0, 0.2]}>
-                    {/* Boğaz */}
-                    <mesh position={[-0.1, -0.1, 0]} material={materials.matteBlack}>
-                        <boxGeometry args={[0.4, 0.3, 0.44]} />
+                {/* Soğutma Kanatları (Hizalı ve Milimetrik) */}
+                {Array(24).fill(0).map((_, i) => (
+                    <mesh key={i} rotation={[0, 0, i * (Math.PI / 12)]}>
+                        <boxGeometry args={[0.012, 0.48, 0.48]} />
+                        <meshStandardMaterial color="#a1a1aa" metalness={0.7} roughness={0.4} />
                     </mesh>
+                ))}
 
-                    {/* KARE FLANŞ (SQUARE FLANGE) - Resmi Detay */}
-                    <group position={[0.1, 0, 0]}>
-                        <mesh material={materials.matteBlack}>
-                            <boxGeometry args={[0.02, 0.65, 0.65]} />
+                {/* Klemens Kutusu (Açık Gri Gövde + Gümüş Kapak + Sarı Şimşek) */}
+                <group position={[0, 0.24, 0.05]}>
+                    {/* Gövde */}
+                    <mesh>
+                        <boxGeometry args={[0.22, 0.14, 0.22]} />
+                        <meshStandardMaterial color="#a1a1aa" metalness={0.5} roughness={0.5} />
+                    </mesh>
+                    {/* Kapak (Gümüş) */}
+                    <mesh position={[0, 0.075, 0]}>
+                        <boxGeometry args={[0.24, 0.02, 0.24]} />
+                        <meshStandardMaterial color="#d1d5db" metalness={0.9} roughness={0.2} />
+                    </mesh>
+                    {/* Sarı Şimşek Sembolü */}
+                    <group position={[0, 0.086, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                        <mesh>
+                            <planeGeometry args={[0.08, 0.08]} />
+                            <meshBasicMaterial color="#ffd700" side={THREE.DoubleSide} />
                         </mesh>
-                        {/* Flanş Delikleri (Siyah Nokta ile Simüle) */}
-                        <mesh position={[0.011, 0.28, 0.28]} rotation={[0, Math.PI / 2, 0]}>
-                            <circleGeometry args={[0.015, 8]} />
-                            <meshBasicMaterial color="#000" />
-                        </mesh>
-                        <mesh position={[0.011, -0.28, 0.28]} rotation={[0, Math.PI / 2, 0]}>
-                            <circleGeometry args={[0.015, 8]} />
-                            <meshBasicMaterial color="#000" />
-                        </mesh>
-                        <mesh position={[0.011, 0.28, -0.28]} rotation={[0, Math.PI / 2, 0]}>
-                            <circleGeometry args={[0.015, 8]} />
-                            <meshBasicMaterial color="#000" />
-                        </mesh>
-                        <mesh position={[0.011, -0.28, -0.28]} rotation={[0, Math.PI / 2, 0]}>
-                            <circleGeometry args={[0.015, 8]} />
-                            <meshBasicMaterial color="#000" />
+                        <mesh position={[0, 0, 0.001]}>
+                            <shapeGeometry args={[new THREE.Shape([
+                                new THREE.Vector2(-0.01, 0.02),
+                                new THREE.Vector2(0.02, 0),
+                                new THREE.Vector2(-0.02, 0),
+                                new THREE.Vector2(0.01, -0.02)
+                            ])]} />
+                            <meshBasicMaterial color="#000000" />
                         </mesh>
                     </group>
                 </group>
-            </group>
 
-            {/* --- 2. EMİŞ AĞZI DETAYLARI --- */}
-            <group position={[0, 0.25, 0.23]}>
-                {/* BAKIR HALKA (COPPER RING) - Parlak ve Belirgin */}
-                <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.copper}>
-                    <torusGeometry args={[0.35, 0.05, 32, 100]} />
+                {/* Arka Kapak (Parlak Gümüş - #e5e7eb) */}
+                <mesh position={[0, 0, -0.31]} rotation={[Math.PI / 2, 0, 0]}>
+                    <cylinderGeometry args={[0.25, 0.24, 0.14, 32]} />
+                    <meshStandardMaterial color="#e5e7eb" metalness={0.95} roughness={0.15} />
                 </mesh>
 
-                {/* SİYAH KORUYUCU IZGARA (WIRE GUARD) */}
-                <group position={[0, 0, 0.04]}>
-                    {/* Konsantrik Teller */}
-                    {[0.1, 0.2, 0.3].map((rad, i) => (
-                        <mesh key={i} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
-                            <torusGeometry args={[rad, 0.006, 12, 48]} />
+                {/* MOTOR DESTREK BLOĞU (Koyu Döküm Gri - #374151) */}
+                <group position={[0, -0.28, 0.05]}>
+                    <mesh>
+                        <boxGeometry args={[0.34, 0.12, 0.42]} />
+                        <meshStandardMaterial color="#374151" metalness={0.2} roughness={0.7} />
+                    </mesh>
+                    <mesh position={[0, -0.07, 0]}>
+                        <boxGeometry args={[0.44, 0.04, 0.54]} />
+                        <meshStandardMaterial color="#374151" metalness={0.2} roughness={0.7} />
+                    </mesh>
+                </group>
+            </group>
+
+            {/* --- 2. SALYANGOZ GÖVDE (MAT ANTRASİT - KARE ÇIKIŞ) --- */}
+            <group position={[0, 0.35, 0]}>
+
+                {/* Spiral Kasa (Mat Antrasit/Siyah - #1a1a1a) */}
+                <group>
+                    <mesh position={[0, 0, -0.12]}>
+                        <extrudeGeometry args={[scrollShape, { depth: 0.22, bevelEnabled: true, bevelThickness: 0.005, bevelSize: 0.005 }]} />
+                        <meshStandardMaterial color="#1a1a1a" roughness={0.6} metalness={0.1} />
+                    </mesh>
+
+                    {/* HAVA ÇIKIŞ AĞZI (KARE FORM - 0.45x0.45 SİYAH PLAKA) */}
+                    <group position={[0.58, 0.26, -0.01]} rotation={[0, Math.PI / 2, 0]}>
+                        <mesh>
+                            <boxGeometry args={[0.45, 0.45, 0.02]} />
+                            <meshStandardMaterial color="#0a0a0a" roughness={0.8} metalness={0.1} />
                         </mesh>
-                    ))}
-                    {/* Radyal Teller (Haç şeklinde) */}
-                    <mesh material={materials.matteBlack}>
-                        <boxGeometry args={[0.6, 0.012, 0.01]} />
-                    </mesh>
-                    <mesh rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                        <boxGeometry args={[0.6, 0.012, 0.01]} />
-                    </mesh>
-                    {/* Izgara Montaj Vidaları (Bakır halka üzerine) */}
-                    {[45, 135, 225, 315].map((ang, i) => (
-                        <Bolt key={i} position={[Math.cos(ang * Math.PI / 180) * 0.35, Math.sin(ang * Math.PI / 180) * 0.35, 0]} rotation={[Math.PI / 2, 0, 0]} />
-                    ))}
-                </group>
-            </group>
-
-            {/* --- 3. IEC MOTOR (Yüksek Detay) --- */}
-            <group position={[0, 0.25, -0.45]}>
-                {/* Motor Gövdesi (Silindirik Çekirdek) */}
-                <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.industrialSteel}>
-                    <cylinderGeometry args={[0.26, 0.26, 0.55, 32]} />
-                </mesh>
-
-                {/* Soğutma Kanatçıkları (Fins) - Daha sık ve derin */}
-                {Array(16).fill(0).map((_, i) => (
-                    <mesh key={i} rotation={[0, 0, i * (360 / 16) * Math.PI / 180]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.04, 0.65, 0.5]} /> {/* Motor çapından taşan kanatlar */}
-                    </mesh>
-                ))}
-
-                {/* Ön Kapak (Flanş tarafı) */}
-                <mesh position={[0, 0, 0.25]} rotation={[Math.PI / 2, 0, 0]} material={materials.industrialSteel}>
-                    <cylinderGeometry args={[0.28, 0.28, 0.05, 32]} />
-                </mesh>
-
-                {/* Arka Kapak (Pervane muhafazası) */}
-                <mesh position={[0, 0, -0.3]} rotation={[Math.PI / 2, 0, 0]} material={materials.brushedAluminum}>
-                    <cylinderGeometry args={[0.27, 0.25, 0.12, 32]} />
-                </mesh>
-                {/* Arka Izgara Dokusu */}
-                <mesh position={[0, 0, -0.36]} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.2, 0.2, 0.01, 32]} />
-                </mesh>
-
-                {/* --- TERMINAL BOX (KLEMENS KUTUSU) --- */}
-                <group position={[0, 0.32, -0.05]}>
-                    <mesh material={materials.ral7035}>
-                        <boxGeometry args={[0.22, 0.12, 0.22]} />
-                    </mesh>
-                    {/* Kapak */}
-                    <mesh position={[0, 0.065, 0]} material={materials.ral7035}>
-                        <boxGeometry args={[0.24, 0.02, 0.24]} />
-                    </mesh>
-                    {/* Kapak Vidaları */}
-                    <Bolt position={[0.1, 0.075, 0.1]} />
-                    <Bolt position={[-0.1, 0.075, 0.1]} />
-                    <Bolt position={[0.1, 0.075, -0.1]} />
-                    <Bolt position={[-0.1, 0.075, -0.1]} />
-
-                    {/* ATEX ETIKETI (SARI/SIYAH) */}
-                    <mesh position={[0, 0.076, 0]} rotation={[-Math.PI / 2, 0, 0]} material={materials.safetyOrange}>
-                        <planeGeometry args={[0.1, 0.1]} />
-                    </mesh>
-                    <mesh position={[0, 0.077, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                        <planeGeometry args={[0.05, 0.05]} />
-                        <meshBasicMaterial color="#000" /> {/* Şimşek sembolü niyetine siyah kare */}
-                    </mesh>
-
-                    {/* RAKOR (CABLE GLAND) */}
-                    <mesh position={[0.11, 0, 0]} rotation={[0, 0, -Math.PI / 2]} material={materials.galvanizedSteel}>
-                        <cylinderGeometry args={[0.03, 0.03, 0.08, 16]} />
-                    </mesh>
-                    <mesh position={[0.15, 0, 0]} rotation={[0, 0, -Math.PI / 2]} material={materials.matteBlack}>
-                        <cylinderGeometry args={[0.015, 0.015, 0.05, 16]} /> {/* Kablo */}
-                    </mesh>
+                        <StandardFastener position={[0.18, 0.18, 0]} doubleSided={true} />
+                        <StandardFastener position={[-0.18, 0.18, 0]} doubleSided={true} />
+                        <StandardFastener position={[0.18, -0.18, 0]} doubleSided={true} />
+                        <StandardFastener position={[-0.18, -0.18, 0]} doubleSided={true} />
+                    </group>
                 </group>
 
-                {/* Motor Etiketi (Yan Taraf) */}
-                <mesh position={[-0.24, 0.05, -0.1]} rotation={[0, -Math.PI / 2, -0.2]} material={materials.galvanizedSteel}>
-                    <planeGeometry args={[0.12, 0.2]} />
-                </mesh>
-            </group>
+                {/* EMİŞ ÜNİTESİ (CANLI BAKIR - #f6ad55) */}
+                <group position={[0, 0, 0.1]}>
 
-            {/* --- 4. ALT MONTAJ AYAĞI (MOUNTING FOOT) --- */}
-            <group position={[0, -0.32, -0.25]}>
-                <mesh material={materials.matteBlack}>
-                    <boxGeometry args={[0.5, 0.05, 0.3]} />
-                </mesh>
-                <mesh position={[0, 0.05, 0]} material={materials.matteBlack}>
-                    <boxGeometry args={[0.2, 0.1, 0.2]} /> {/* Motora bağlantı bloğu */}
-                </mesh>
-                {/* Ayak Delikleri */}
-                <mesh position={[0.2, 0.026, 0.1]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.02, 0.02, 0.01, 8]} /></mesh>
-                <mesh position={[-0.2, 0.026, 0.1]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.02, 0.02, 0.01, 8]} /></mesh>
-                <mesh position={[0.2, 0.026, -0.1]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.02, 0.02, 0.01, 8]} /></mesh>
-                <mesh position={[-0.2, 0.026, -0.1]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.02, 0.02, 0.01, 8]} /></mesh>
-            </group>
-
-            {/* --- 5. İÇ PERVANE (ROTOS) --- */}
-            <group ref={fanRef} position={[0, 0.25, 0]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.15, 0.15, 0.38, 32]} />
-                </mesh>
-                {/* Sık Kanatlar */}
-                {Array(32).fill(0).map((_, i) => (
-                    <mesh key={i} rotation={[0, 0, i * (360 / 32) * Math.PI / 180]} position={[0.28, 0, 0]}>
-                        <boxGeometry args={[0.18, 0.015, 0.38]} />
-                        <meshStandardMaterial color="#222" metalness={0.8} roughness={0.4} />
+                    {/* Tek Parça Bakır Ünitesi (Torna) */}
+                    <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.008]}>
+                        <latheGeometry args={[intakePoints, 64]} />
+                        <meshStandardMaterial
+                            color="#f6ad55"
+                            metalness={0.85}
+                            roughness={0.1}
+                            emissive="#4a2a1a"
+                            emissiveIntensity={0.15}
+                            side={THREE.DoubleSide}
+                        />
                     </mesh>
-                ))}
+
+                    {/* 3 Standart Cıvata */}
+                    {[30, 150, 270].map((angle, i) => (
+                        <StandardFastener
+                            key={i}
+                            position={[
+                                Math.cos(angle * Math.PI / 180) * 0.21,
+                                Math.sin(angle * Math.PI / 180) * 0.21,
+                                0.015
+                            ]}
+                            rotation={[Math.PI / 2, 0, angle * Math.PI / 180]}
+                        />
+                    ))}
+
+                    {/* IZGARA (Mazgal) */}
+                    <group position={[0, 0, -0.05]}>
+                        {[0.06, 0.09, 0.12, 0.15].map((r, i) => (
+                            <mesh key={i}>
+                                <torusGeometry args={[r, 0.007, 8, 48]} />
+                                <meshStandardMaterial color="#0a0a0a" metalness={0.5} roughness={0.5} />
+                            </mesh>
+                        ))}
+                    </group>
+                </group>
+
+                {/* %100 STATİK - FOTOĞRAF KADAR GERÇEKÇİ */}
             </group>
 
         </group>
