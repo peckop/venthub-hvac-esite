@@ -6,6 +6,7 @@ import type { Category } from '../../lib/supabase'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
 import MegaMenu3DBackground from './MegaMenu3DBackground'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface EliteMegaMenuProps {
     categories: Category[]
@@ -42,7 +43,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
                                     </span>
-                                    <span>{category.name}</span>
+                                    <span>{getCategoryDisplayName(category)}</span>
                                 </Link>
                             </NavigationMenu.Item>
                         )
@@ -55,7 +56,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
                                     </span>
-                                    <span>{category.name}</span>
+                                    <span>{getCategoryDisplayName(category)}</span>
                                 </div>
                                 <ChevronDown
                                     className="relative top-[1px] ml-1 h-3 w-3 transition-transform duration-[250ms] ease-in group-data-[state=open]:-rotate-180"
@@ -74,7 +75,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                     {getCategoryIcon(category.slug, { size: 48 })}
                                                 </div>
                                                 <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
-                                                    {category.name}
+                                                    {getCategoryDisplayName(category)}
                                                 </div>
                                                 <p className="text-[14px] leading-[1.3] text-white/90">
                                                     {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
@@ -100,7 +101,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                         onClick={() => handleLinkClick(1, sub.slug, category.slug)}
                                                         className="block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
                                                     >
-                                                        <div className="mb-1 font-medium text-slate-900">{sub.name}</div>
+                                                        <div className="mb-1 font-medium text-slate-900">{getCategoryDisplayName(sub)}</div>
                                                         <p className="text-[13px] leading-[1.4] text-slate-500 line-clamp-2">
                                                             {sub.description || 'Ürünleri incele →'}
                                                         </p>
@@ -200,7 +201,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                                     <span className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 rounded-md text-primary-navy shadow-sm">
                                         {getCategoryIcon(category.slug, { size: 20 })}
                                     </span>
-                                    <span className="flex-1 font-semibold text-slate-700">{category.name}</span>
+                                    <span className="flex-1 font-semibold text-slate-700">{getCategoryDisplayName(category)}</span>
                                     {subs.length > 0 && (
                                         <ChevronDown
                                             className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -218,7 +219,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                                                 onClick={onClose}
                                                 className="block p-2 text-sm font-medium text-slate-600 hover:text-primary-navy hover:bg-white rounded-md transition-all"
                                             >
-                                                {sub.name}
+                                                {getCategoryDisplayName(sub)}
                                             </Link>
                                         ))}
                                         <Link

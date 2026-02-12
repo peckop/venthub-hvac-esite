@@ -10,6 +10,8 @@ import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 import { CategoryOrbitCarousel, ApplicationCards } from '../components/products'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
+
 
 // Helper: Get all descendant category IDs (including self)
 const getAllDescendantIds = (categories: Category[], parentId: string): string[] => {
@@ -63,7 +65,7 @@ const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { c
           `}
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
-          <span className="truncate">{node.name}</span>
+          <span className="truncate">{getCategoryDisplayName(node)}</span>
           {hasChildren && (
             <span className="text-gray-400 group-hover:text-gray-600 text-xs mr-2">
               ▼
@@ -415,9 +417,16 @@ const ProductsPage: React.FC = () => {
 
       {/* Breadcrumb */}
       <div className="flex items-center text-sm text-steel-gray mb-6">
-        <Link to="/" className="hover:text-primary-navy">{t('common.home')}</Link>
-        <span className="mx-2">/</span>
-        <span className="text-industrial-gray font-medium">{breadcrumbLabel}</span>
+        <span className="text-industrial-gray font-medium">{
+          activeQuery
+            ? breadcrumbLabel
+            : (isAll
+              ? t('common.allProducts')
+              : (catParam
+                ? (categories.find(c => c.id === catParam) ? getCategoryDisplayName(categories.find(c => c.id === catParam)!) : t('common.products'))
+                : t('common.discover'))
+            )
+        }</span>
       </div>
 
       {/* Search Header - Only in Search/Filter Mode */}

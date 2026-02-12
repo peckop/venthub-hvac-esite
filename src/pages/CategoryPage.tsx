@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 import { ChevronRight, Filter, Grid, List, ArrowLeft } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
@@ -304,7 +305,7 @@ export const CategoryPage: React.FC = () => {
     return (
       <>
         <Seo
-          title={category.seo_title || `${category.name} | VentHub`}
+          title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
           description={category.seo_desc || category.description}
           canonical={canonicalUrl}
           image={categoryImageUrl || undefined}
@@ -319,7 +320,7 @@ export const CategoryPage: React.FC = () => {
     return (
       <>
         <Seo
-          title={category.seo_title || `${category.name} | VentHub`}
+          title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
           description={category.seo_desc || category.description}
           canonical={canonicalUrl}
           image={categoryImageUrl || undefined}
@@ -332,7 +333,7 @@ export const CategoryPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-light-gray">
       <Seo
-        title={category.seo_title || `${category.name} | VentHub`}
+        title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
         description={category.seo_desc || category.description}
         canonical={canonicalUrl}
         noindex={false}
@@ -347,8 +348,8 @@ export const CategoryPage: React.FC = () => {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: t('category.breadcrumbHome'), item: `${window.location.origin}/` },
-              ...(parentCategory ? [{ '@type': 'ListItem', position: 2, name: parentCategory.name, item: `${window.location.origin}/category/${parentCategory.slug}` }] : []),
-              { '@type': 'ListItem', position: parentCategory ? 3 : 2, name: category.name, item: canonicalUrl },
+              ...(parentCategory ? [{ '@type': 'ListItem', position: 2, name: getCategoryDisplayName(parentCategory), item: `${window.location.origin}/category/${parentCategory.slug}` }] : []),
+              { '@type': 'ListItem', position: parentCategory ? 3 : 2, name: getCategoryDisplayName(category), item: canonicalUrl },
             ],
           }),
         }}
@@ -383,13 +384,13 @@ export const CategoryPage: React.FC = () => {
                   to={`/category/${parentCategory.slug}`}
                   className="text-steel-gray hover:text-primary-navy"
                 >
-                  {parentCategory.name}
+                  {getCategoryDisplayName(parentCategory)}
                 </Link>
                 <ChevronRight size={16} className="text-steel-gray" />
               </>
             )}
             <span className="text-industrial-gray font-medium">
-              {category.name}
+              {getCategoryDisplayName(category)}
             </span>
           </div>
         </div>
@@ -412,7 +413,7 @@ export const CategoryPage: React.FC = () => {
               {categoryImageUrl ? (
                 <img
                   src={categoryImageUrl}
-                  alt={category.name}
+                  alt={getCategoryDisplayName(category)}
                   className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm border border-light-gray"
                 />
               ) : (
@@ -421,7 +422,7 @@ export const CategoryPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-4xl font-bold text-industrial-gray mb-2">
-                {category.name}
+                {getCategoryDisplayName(category)}
               </h1>
               <p className="text-xl text-steel-gray mb-4">
                 {category.description}
@@ -467,7 +468,7 @@ export const CategoryPage: React.FC = () => {
                         to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                       >
-                        {sub.name}
+                        {getCategoryDisplayName(sub)}
                       </Link>
                     ))}
                   </div>
@@ -742,7 +743,7 @@ export const CategoryPage: React.FC = () => {
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                         onClick={() => setIsFilterOpen(false)}
                       >
-                        {sub.name}
+                        {getCategoryDisplayName(sub)}
                       </Link>
                     ))}
                   </div>

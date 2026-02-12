@@ -4,6 +4,7 @@ import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Dro
 import { Category } from '../lib/supabase'
 import { CATEGORY_REGISTRY } from '../config/categoryRegistry'
 import { useI18n } from '../i18n/I18nProvider'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 interface HeroCarouselProps {
     categories: Category[]
@@ -132,11 +133,11 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Category Badge */}
                                 <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/10">
                                     <Activity className="text-secondary-blue w-4 h-4" />
-                                    <span className="text-sm font-medium tracking-wide uppercase">{cat.name}</span>
+                                    <span className="text-sm font-medium tracking-wide uppercase">{getCategoryDisplayName(cat)}</span>
                                 </div>
 
                                 <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-                                    {meta.hero_title || cat.name}
+                                    {getCategoryDisplayName(cat)}
                                 </h1>
 
                                 <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">

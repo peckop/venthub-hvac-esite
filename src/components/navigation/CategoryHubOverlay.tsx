@@ -3,6 +3,7 @@ import { X, Grid3X3, ArrowLeft, ChevronRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import CategoryCard3D from './CategoryCard3D'
 import type { Category } from '../../lib/supabase'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface CategoryHubOverlayProps {
     isOpen: boolean
@@ -139,7 +140,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                     <ArrowLeft className="w-5 h-5 text-white/70 hover:text-white" />
                                 </button>
                                 <h2 className="text-xl font-bold text-white">
-                                    {selectedCategory.name}
+                                    {getCategoryDisplayName(selectedCategory)}
                                 </h2>
                                 <span className="text-sm text-white/50">
                                     ({subCategories.length} seri)
@@ -187,7 +188,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                     <ChevronRight className="w-8 h-8 text-secondary-blue" />
                                 </div>
                                 <span className="font-semibold text-secondary-blue text-center group-hover:text-white transition-colors">
-                                    Tüm {selectedCategory.name} <br /> Ürünlerini Gör
+                                    Tüm {getCategoryDisplayName(selectedCategory)} <br /> Ürünlerini Gör
                                 </span>
                             </Link>
                         </div>

@@ -11,6 +11,7 @@ import { formatCurrency } from '../i18n/format'
 import LeadModal from '../components/LeadModal'
 import legalConfig from '../config/legal'
 import { getStockInquiryLink } from '../utils/whatsapp'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 import {
   ArrowLeft,
   ShoppingCart,
