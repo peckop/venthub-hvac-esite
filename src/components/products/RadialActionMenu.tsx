@@ -56,7 +56,7 @@ const formatSubcategoryLabel = (key: string): string => {
         DUVAR_TIPI: 'Duvar Tipi Fanlar',
         KANAL_TIPI: 'Kanal Tipi Fanlar',
         OTOPARK_JET: 'Otopark Jet Fanları',
-        ENDUSTRIYEL: 'Endüstriyel Fanlar',
+        ENDUSTRIYEL: 'Exproof Fanlar',
         KONUT_TIPI: 'Konut Tipi',
         PLUG: 'Plug Fanlar',
         SANTRIFUJ: 'Santrifüj Fanlar',
