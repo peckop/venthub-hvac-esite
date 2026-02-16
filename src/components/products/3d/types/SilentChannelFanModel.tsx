@@ -47,100 +47,169 @@ const mats = {
 export function SilentChannelFanModel() {
 
     // DIMENSIONS
-    const bRad = 0.32  // Shell Radius (Reduced to 0.32 for flatter curve)
-    const sphereEndRad = 0.2625 // Radius where the sphere ("kavis") ends (FIXED)
-    const neckRad = sphereEndRad * 0.75 // (~0.197) FIXED
-    const iRad = 0.17  // Inner Liner Radius (Fits inside neckRad)
+    const bRad = 0.32  // Shell Radius (Max)
+    const sphereEndRad = 0.2625 // Radius where the sphere ("kavis") ends
+    const neckRad = sphereEndRad * 0.75 // (~0.197)
+    const wallThick = 0.006 // ~3mm Casing Thickness
+    const insThick = 0.006  // ~3mm Insulation Thickness (Yellow)
+    const linerThick = 0.004 // ~2mm Liner Thickness (Green)
+
+    // Radii transitions
+    const rCaseIn = neckRad - wallThick
+    const rInsIn = rCaseIn - insThick
 
     // Lengths
     const bodyHalfLen = 0.54
-    const neckLen = 0.075 // Reduced by 50%
-    const ductLen = 0.075 // Reduced by 50%
+    const neckLen = 0.075 * 0.75 // Reduced by 25%
+    const ductLen = 0.075 * 0.75 // Reduced by 25%
+
+    const internalAssemblyLen = bodyHalfLen * 2 // Stops exactly at the step start
 
     // Calculation for Sphere Crop
     const phiLimit = Math.asin(sphereEndRad / bRad)
     const naturalHeight = bRad * Math.cos(phiLimit)
     const compensatoryStretch = naturalHeight > 0.01 ? bodyHalfLen / naturalHeight : 1
 
-    // Total Liner Length
-    const totalLength = (bodyHalfLen + neckLen + ductLen) * 2
-
     return (
         <group position={[0, -0.6, 0]} scale={[0.8, 0.8, 0.8]} rotation={[0, -Math.PI / 4, 0]}>
             <group rotation={[0, 0, Math.PI / 2]}>
 
-                {/* 1. OUTER SHELL (Dark Grey) */}
-                <mesh scale={[1, compensatoryStretch, 1]}>
-                    <sphereGeometry args={[bRad, 64, 32, 0, Math.PI * 2, phiLimit, Math.PI - 2 * phiLimit]} />
-                    <primitive object={mats.darkPlastic} />
-                </mesh>
-
-                {/* Shell Ribs REMOVED */}
-
-                {/* 2. THE STEP TRANSITION (Solid Face - 90 Degree Step) */}
-                {/* Connection between Sphere Edge (sphereEndRad) and Neck (neckRad) */}
-
-                {/* +Y Step Face */}
-                <group position={[0, bodyHalfLen, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh rotation={[0, 0, 0]}>
-                        <ringGeometry args={[neckRad, sphereEndRad * 0.99, 32]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-                {/* -Y Step Face */}
-                <group position={[0, -bodyHalfLen, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <mesh rotation={[0, 0, 0]}>
-                        <ringGeometry args={[neckRad, sphereEndRad * 0.99, 32]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-
-                {/* 3. NECK / CLAMP SURFACE (The 25% Smaller Pipe) */}
-                {/* "Bu çap bir boru gibi olacak açılı değil" */}
-
-                {/* +Y Neck */}
-                <group position={[0, bodyHalfLen + neckLen / 2, 0]}>
-                    <mesh>
-                        <cylinderGeometry args={[neckRad, neckRad, neckLen, 64, 1, true]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-
-                {/* -Y Neck */}
-                <group position={[0, -(bodyHalfLen + neckLen / 2), 0]}>
-                    <mesh>
-                        <cylinderGeometry args={[neckRad, neckRad, neckLen, 64, 1, true]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-
-
-                {/* 4. BLACK DUCTS (Extend after neck) */}
-                <group position={[0, bodyHalfLen + neckLen + ductLen / 2, 0]}>
-                    <mesh>
-                        <cylinderGeometry args={[neckRad, neckRad, ductLen, 64, 1, true]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-                <group position={[0, -(bodyHalfLen + neckLen + ductLen / 2), 0]}>
-                    <mesh>
-                        <cylinderGeometry args={[neckRad, neckRad, ductLen, 64, 1, true]} />
-                        <primitive object={mats.darkPlastic} />
-                    </mesh>
-                </group>
-
-
-                {/* 5. INTERNAL LINER (Full Green Perforated) */}
-                {/* No Internal Fan Blades as requested */}
+                {/* 1. CASING - MONOLITHIC SHELL (Double Walled) */}
                 <group>
-                    <mesh>
-                        <cylinderGeometry args={[iRad, iRad, totalLength, 64, 1, true]} />
-                        <primitive object={mats.greenPerforated} />
+                    {/* OUTER SHELL */}
+                    <mesh scale={[1, compensatoryStretch, 1]}>
+                        <sphereGeometry args={[bRad, 64, 32, 0, Math.PI * 2, phiLimit, Math.PI - 2 * phiLimit]} />
+                        <primitive object={mats.darkPlastic} />
                     </mesh>
-                    <mesh>
-                        <cylinderGeometry args={[iRad - 0.002, iRad - 0.002, totalLength - 0.05, 32, 48, true]} />
-                        <meshBasicMaterial color="#003300" wireframe={true} transparent={true} opacity={0.35} side={THREE.DoubleSide} />
+
+                    {/* INNER SHELL (Offset by wallThick) */}
+                    <mesh scale={[1, compensatoryStretch, 1]}>
+                        <sphereGeometry args={[bRad - wallThick, 64, 32, 0, Math.PI * 2, phiLimit, Math.PI - 2 * phiLimit]} />
+                        <primitive object={mats.darkPlastic} />
                     </mesh>
+
+                    {/* STEP FACES (Outer & Inner closing the step) */}
+                    {/* +Y Step */}
+                    <group position={[0, bodyHalfLen, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh>
+                            <ringGeometry args={[neckRad, sphereEndRad * 0.99, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                        {/* Inner Step Wall */}
+                        <mesh position={[0, 0, wallThick]}>
+                            <ringGeometry args={[neckRad - wallThick, sphereEndRad - wallThick, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+                    {/* -Y Step */}
+                    <group position={[0, -bodyHalfLen, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh>
+                            <ringGeometry args={[neckRad, sphereEndRad * 0.99, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                        {/* Inner Step Wall */}
+                        <mesh position={[0, 0, -wallThick]}>
+                            <ringGeometry args={[neckRad - wallThick, sphereEndRad - wallThick, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+
+                    {/* NECK AND DUCT (Double Walled) */}
+                    {/* +Y Section */}
+                    <group position={[0, bodyHalfLen + (neckLen + ductLen) / 2, 0]}>
+                        {/* Outer Tube */}
+                        <mesh>
+                            <cylinderGeometry args={[neckRad, neckRad, neckLen + ductLen, 64, 1, true]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                        {/* Inner Tube */}
+                        <mesh>
+                            <cylinderGeometry args={[neckRad - wallThick, neckRad - wallThick, neckLen + ductLen, 64, 1, true]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+
+                    {/* -Y Section */}
+                    <group position={[0, -(bodyHalfLen + (neckLen + ductLen) / 2), 0]}>
+                        {/* Outer Tube */}
+                        <mesh>
+                            <cylinderGeometry args={[neckRad, neckRad, neckLen + ductLen, 64, 1, true]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                        {/* Inner Tube */}
+                        <mesh>
+                            <cylinderGeometry args={[neckRad - wallThick, neckRad - wallThick, neckLen + ductLen, 64, 1, true]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+
+                    {/* END CAPS (Closing the 3mm gap at the duct tips) */}
+                    <group position={[0, bodyHalfLen + neckLen + ductLen, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh>
+                            <ringGeometry args={[neckRad - wallThick, neckRad, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+                    <group position={[0, -(bodyHalfLen + neckLen + ductLen), 0]} rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh>
+                            <ringGeometry args={[neckRad - wallThick, neckRad, 32]} />
+                            <primitive object={mats.darkPlastic} />
+                        </mesh>
+                    </group>
+                </group>
+
+
+                {/* 5. INTERNAL ASSEMBLY (Insulation + Liner) */}
+                {/* User: "kademenin başladığı yere kadar sağlı sollu olsun" (Stops at step points) */}
+                <group>
+                    {/* YELLOW INSULATION (3mm Wall) */}
+                    <mesh>
+                        <cylinderGeometry args={[rCaseIn, rInsIn, internalAssemblyLen, 64, 1, true]} />
+                        <primitive object={mats.insulationYellow} />
+                    </mesh>
+
+                    {/* PERFORATED GREEN LINER (Dual Walled - 2mm Thickness) */}
+                    <group>
+                        {/* Outer face of liner */}
+                        <mesh>
+                            <cylinderGeometry args={[rInsIn, rInsIn, internalAssemblyLen, 64, 1, true]} />
+                            <primitive object={mats.greenPerforated} />
+                        </mesh>
+                        {/* Inner face of liner */}
+                        <mesh>
+                            <cylinderGeometry args={[rInsIn - linerThick, rInsIn - linerThick, internalAssemblyLen, 64, 1, true]} />
+                            <primitive object={mats.greenPerforated} />
+                        </mesh>
+                        {/* Internal Perforation Visualization (Shadow effect) */}
+                        <mesh>
+                            <cylinderGeometry args={[rInsIn - linerThick / 2, rInsIn - linerThick / 2, internalAssemblyLen - 0.02, 32, 48, true]} />
+                            <meshBasicMaterial color="#003300" wireframe={true} transparent={true} opacity={0.2} side={THREE.DoubleSide} />
+                        </mesh>
+
+                        {/* LINER END CAPS (Closing the gap at the internal assembly ends - within the sphere) */}
+                        <group position={[0, internalAssemblyLen / 2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                            <mesh>
+                                <ringGeometry args={[rInsIn - linerThick, rInsIn, 32]} />
+                                <primitive object={mats.greenPerforated} />
+                            </mesh>
+                            {/* Also closing the insulation gap at this point */}
+                            <mesh>
+                                <ringGeometry args={[rInsIn, rCaseIn, 32]} />
+                                <primitive object={mats.insulationYellow} />
+                            </mesh>
+                        </group>
+                        <group position={[0, -internalAssemblyLen / 2, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                            <mesh>
+                                <ringGeometry args={[rInsIn - linerThick, rInsIn, 32]} />
+                                <primitive object={mats.greenPerforated} />
+                            </mesh>
+                            {/* Also closing the insulation gap at this point */}
+                            <mesh>
+                                <ringGeometry args={[rInsIn, rCaseIn, 32]} />
+                                <primitive object={mats.insulationYellow} />
+                            </mesh>
+                        </group>
+                    </group>
                 </group>
 
 
