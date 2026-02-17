@@ -41,7 +41,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
 
                     <Suspense fallback={null}>
-                        <Category3DIcon categorySlug={category.slug} scale={0.9} />
+                        <Category3DIcon categorySlug={category.slug} scale={0.9} modelPosition={[0, 0, 0]} />
                         <OrbitControls
                             enableZoom={false}
                             enablePan={false}
