@@ -61,6 +61,7 @@ export interface Product {
   technical_specs?: Record<string, string | number | boolean | null>
   image_url?: string
   image_alt?: string | null
+  slug?: string // URL-friendly ID for linking/SEO
   // Stok alanları (opsiyonel; migration sonrası gelir)
   stock_qty?: number | null
   low_stock_threshold?: number | null

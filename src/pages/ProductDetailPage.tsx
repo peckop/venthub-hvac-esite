@@ -290,7 +290,7 @@ export const ProductDetailPage: React.FC = () => {
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance']) // First section open by default
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
-  const observerRef = useRef<IntersectionObserver | null>(null)
+
   const navTriggerRef = useRef<HTMLDivElement>(null)
 
   // Toggle accordion section
@@ -376,38 +376,40 @@ export const ProductDetailPage: React.FC = () => {
     }
   }, [product])
 
-  // Intersection Observer for scroll spy
+  // Scroll Spy with manual calculation (More robust than IO)
   useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '-20% 0px -35% 0px',
-      threshold: 0
+    const handleScrollSpy = () => {
+      const navEl = document.getElementById('pdp-sticky-nav')
+      const headerOffset = navEl ? navEl.offsetHeight + 100 : 180 // Buffer for sticky header + breathing room
+
+      const scrollPosition = window.scrollY + headerOffset
+
+      // Get all section offsets
+      const sectionOffsets = Object.entries(sectionRefs.current).map(([id, ref]) => {
+        if (!ref) return null
+        return {
+          id,
+          top: ref.offsetTop,
+          bottom: ref.offsetTop + ref.offsetHeight
+        }
+      }).filter(Boolean) as { id: string, top: number, bottom: number }[]
+
+      // Find the active section
+      for (const section of sectionOffsets) {
+        if (scrollPosition >= section.top && scrollPosition < section.bottom) {
+          setActiveSection(section.id)
+          return
+        }
+      }
     }
 
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const sectionId = entry.target.getAttribute('data-section')
-          if (sectionId) {
-            setActiveSection(sectionId)
-          }
-        }
-      })
-    }, options)
-
-    // Observe all sections
-    Object.values(sectionRefs.current).forEach((ref) => {
-      if (ref && observerRef.current) {
-        observerRef.current.observe(ref)
-      }
-    })
+    window.addEventListener('scroll', handleScrollSpy)
+    handleScrollSpy() // Initial check
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect()
-      }
+      window.removeEventListener('scroll', handleScrollSpy)
     }
-  }, [product])
+  }, [product, activeSection])
 
 
   const scrollToSection = (sectionId: string) => {
@@ -547,7 +549,13 @@ export const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image Gallery (Premium) */}
           <div className="sticky top-24 self-start z-10">
-            <ImageGallery key={product.id} images={images} productName={product.name} />
+            <ImageGallery
+              key={product.id}
+              images={images}
+              productName={product.name}
+              slug={product.slug || product.name} // Fallback for 3D model detection
+              modelType={mainCategory?.metadata?.model_type}
+            />
           </div>
 
           {/* Product Info */}
@@ -700,7 +708,7 @@ export const ProductDetailPage: React.FC = () => {
                     className="flex-1 bg-industrial-gray hover:bg-primary-navy text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
                   >
                     <Settings size={18} />
-                    <span>{t('pdp.techQuote') || 'Teklif İste'}</span>
+                    <span>{t('pdp.techQuote') || 'Teklif Al'}</span>
                   </button>
                 ) : (
                   <button
