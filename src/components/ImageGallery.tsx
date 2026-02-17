@@ -196,13 +196,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
 
             {/* Thumbnail Strip + 3D Toggle */}
-            <div className="grid grid-cols-5 gap-2">
+            <div className="flex flex-wrap gap-2">
 
                 {/* 3D Model Thumbnail Toggle */}
                 {slug && (
                     <button
+                        type="button"
                         onClick={() => setIs3DMode(true)}
-                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gray-50 group ${is3DMode
+                        className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gray-50 group shrink-0 ${is3DMode
                             ? 'border-primary-navy ring-2 ring-primary-navy/20'
                             : 'border-transparent hover:border-gray-300'
                             }`}
