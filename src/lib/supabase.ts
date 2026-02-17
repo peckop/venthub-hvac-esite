@@ -43,6 +43,7 @@ export interface Category {
     hero_title?: string
     hero_description?: string
     hide_price?: boolean
+    model_type?: string
   } | null
 }
 
