@@ -1,0 +1,16 @@
+﻿
+C:\Users\alize\venthub-hvac\src\components\products\3d\Product3DViewer.tsx
+  104:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  361:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  448:83  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\alize\venthub-hvac\src\components\products\3d\types\SilentChannelFanModel.tsx
+  296:197  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  297:130  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  298:240  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  299:211  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  300:200  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  301:211  warning  React Hook useMemo has an unnecessary dependency: 'isolatedPart'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+Ô£û 9 problems (0 errors, 9 warnings)
+
