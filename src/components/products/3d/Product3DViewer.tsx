@@ -30,6 +30,33 @@ function Loader() {
     return <Html center><div className="text-primary-navy font-bold text-sm bg-white/80 px-2 py-1 rounded">{progress.toFixed(0)}%</div></Html>
 }
 
+// ── HELPER COMPONENT: ERROR BOUNDARY ──────────────────────────────────────
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
+    constructor(props: { children: React.ReactNode }) {
+        super(props)
+        this.state = { hasError: false, error: null }
+    }
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true, error }
+    }
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.error("3D Viewer Error:", error, errorInfo)
+    }
+    render() {
+        if (this.state.hasError) {
+            return (
+                <Html center>
+                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg shadow-lg text-center w-64">
+                        <div className="text-red-600 font-bold mb-1 text-sm">3D Model Yüklenemedi</div>
+                        <div className="text-[10px] text-red-500 break-words">{this.state.error?.message?.slice(0, 100)}</div>
+                    </div>
+                </Html>
+            )
+        }
+        return this.props.children
+    }
+}
+
 // ── HELPER COMPONENT: OBJECT ROTATOR (Object-centric rotation) ─────────────
 function ModelRotator({ children, enabled, rotationRef }: { children: React.ReactNode, enabled: boolean, rotationRef: React.MutableRefObject<THREE.Group | null> }) {
     const { gl, camera } = useThree()
@@ -242,28 +269,30 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                 <Environment preset="city" />
 
                 <Suspense fallback={<Loader />}>
-                    {slug && (
-                        /* Model centered at origin for correct rotation pivot */
-                        <group position={[0, 0, 0]}>
-                            <ModelRotator enabled={rotationMode === 'free'} rotationRef={modelGroupRef}>
-                                <FanRenderer
-                                    slug={slug}
-                                    modelType={modelType}
-                                    scale={1}
-                                    explode={explode}
-                                    onPartClick={(name) => {
-                                        setSelectedPart(name)
-                                        setAutoRotate(false)
-                                    }}
-                                    selectedPart={selectedPart}
-                                    isolatedPart={isolatedPart}
-                                    hiddenParts={hiddenParts}
-                                    displayStyle={displayStyle}
-                                    enableTooltip={enableTooltip}
-                                />
-                            </ModelRotator>
-                        </group>
-                    )}
+                    <ErrorBoundary>
+                        {slug && (
+                            /* Model centered at origin for correct rotation pivot */
+                            <group position={[0, 0, 0]}>
+                                <ModelRotator enabled={rotationMode === 'free'} rotationRef={modelGroupRef}>
+                                    <FanRenderer
+                                        slug={slug}
+                                        modelType={modelType}
+                                        scale={1}
+                                        explode={explode}
+                                        onPartClick={(name) => {
+                                            setSelectedPart(name)
+                                            setAutoRotate(false)
+                                        }}
+                                        selectedPart={selectedPart}
+                                        isolatedPart={isolatedPart}
+                                        hiddenParts={hiddenParts}
+                                        displayStyle={displayStyle}
+                                        enableTooltip={enableTooltip}
+                                    />
+                                </ModelRotator>
+                            </group>
+                        )}
+                    </ErrorBoundary>
                 </Suspense>
 
                 {/* Ground Plane (Grid + Shadows) */}

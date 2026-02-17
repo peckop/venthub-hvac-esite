@@ -115,9 +115,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
 
     return (
         <group scale={scale}>
-            <Suspense fallback={null}>
-                {renderFan()}
-            </Suspense>
+            {renderFan()}
         </group>
     )
 }
