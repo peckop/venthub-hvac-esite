@@ -163,12 +163,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 {!is3DMode && slug && (
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
-                        className="absolute top-3 right-16 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-3 py-2 rounded-xl shadow-lg border border-gray-200/80 flex items-center gap-2 transition-all hover:shadow-xl group"
+                        className="absolute top-2 right-14 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200/80 flex flex-col items-center gap-0.5 transition-all hover:shadow-xl group min-w-[50px]"
                     >
-                        <div className="bg-blue-50 p-1 rounded-lg text-blue-600 group-hover:bg-blue-100 transition-colors">
-                            <Box size={16} strokeWidth={2} />
+                        <div className="bg-blue-50 p-1 rounded-md text-blue-600 group-hover:bg-blue-100 transition-colors">
+                            <Box size={18} strokeWidth={2} />
                         </div>
-                        <span className="text-xs font-bold tracking-wide">3D İNCELE</span>
+                        <span className="text-[9px] font-bold tracking-wide">3D</span>
                     </button>
                 )}
 
