@@ -191,7 +191,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
             modelGroupRef.current.rotation.set(0, 0, 0)
         }
 
-        const dist = 4.5
+        const dist = 3.5
         const cam = controlsRef.current.object
 
         // Reset target to center
@@ -258,7 +258,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
             <Canvas
                 shadows
                 dpr={[1, 2]}
-                camera={{ position: [2.7, 2.7, 4], fov: 40 }}
+                camera={{ position: [2, 2, 2.8], fov: 40 }} // Aggressive zoom closer
                 gl={{ alpha: true }}
                 onPointerMissed={() => setSelectedPart(null)}
             >
@@ -312,15 +312,15 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                     )}
                 </group>
 
-                {/* Orientation Gizmo (Bottom-Right) */}
+                {/* Orientation Gizmo (Bottom-Right) - PRO STYLE */}
                 <GizmoHelper alignment="bottom-right" margin={[70, 70]}>
                     <GizmoViewcube
-                        font="64px Inter"
-                        opacity={0.85}
-                        color="white"
-                        hoverColor="#1e40af"
-                        textColor="#1e3a8a"
-                        strokeColor="#bfdbfe"
+                        font="bold 50px Inter, sans-serif"
+                        opacity={0.9}
+                        color="#ffffff"
+                        hoverColor="#f8fafc"
+                        textColor="#475569" // Slate-600 (Professional Gray)
+                        strokeColor="#cbd5e1" // Slate-300 (Subtle Border)
                         faces={['Sağ', 'Sol', 'Üst', 'Alt', 'Ön', 'Arka']}
                     />
                 </GizmoHelper>
