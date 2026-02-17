@@ -100,7 +100,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
             {/* Main Container (Square) - Adjusted for Laptop Screens (max-h-55vh equiv) */}
             <div
                 ref={imageContainerRef}
-                className={`relative w - full md: max - w - [55vh] mx - auto aspect - square bg - white rounded - xl overflow - hidden border border - light - gray group ${!is3DMode ? 'cursor-zoom-in' : ''} `}
+                className={`relative w-full md:max-w-[55vh] mx-auto aspect-square bg-white rounded-xl overflow-hidden border border-light-gray group ${!is3DMode ? 'cursor-zoom-in' : ''}`}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 // Image mode click -> Open Lightbox
@@ -124,15 +124,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         <div className="w-full h-full transition-transform duration-200 ease-out relative z-0" style={zoomStyle}>
                             <picture>
                                 <source
-                                    srcSet={`${storageUrl}${activeImage.path}?format = avif & quality=90 & width=1200`}
+                                    srcSet={`${storageUrl}${activeImage.path}?format=avif&quality=90&width=1200`}
                                     type="image/avif"
                                 />
                                 <source
-                                    srcSet={`${storageUrl}${activeImage.path}?format = webp & quality=90 & width=1200`}
+                                    srcSet={`${storageUrl}${activeImage.path}?format=webp&quality=90&width=1200`}
                                     type="image/webp"
                                 />
                                 <img
-                                    src={`${storageUrl}${activeImage.path}?width = 1200`}
+                                    src={`${storageUrl}${activeImage.path}?width=1200`}
                                     alt={activeImage.alt || productName}
                                     className="w-full h-full object-contain"
                                 />
@@ -225,15 +225,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <button
                         key={idx}
                         onClick={() => { setIs3DMode(false); setActiveIdx(idx); }}
-                        className={`aspect - square rounded - lg overflow - hidden border - 2 transition - all ${!is3DMode && activeIdx === idx
+                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${!is3DMode && activeIdx === idx
                             ? 'border-primary-navy ring-2 ring-primary-navy/20'
                             : 'border-transparent hover:border-gray-300'
-                            } `}
+                            }`}
                     >
                         <picture>
                             <img
-                                src={`${storageUrl}${img.path}?format = webp & quality=70 & width=200`}
-                                alt={img.alt || `${productName} view ${idx + 1} `}
+                                src={`${storageUrl}${img.path}?format=webp&quality=70&width=200`}
+                                alt={img.alt || `${productName} view ${idx + 1}`}
                                 className="w-full h-full object-cover"
                             />
                         </picture>
@@ -254,7 +254,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <div className="w-full h-full flex items-center justify-center p-4">
                         {activeImage && (
                             <img
-                                src={`${storageUrl}${activeImage.path} `}
+                                src={`${storageUrl}${activeImage.path}`}
                                 alt={activeImage.alt || productName}
                                 className="object-contain max-h-[90vh] max-w-[90vw]"
                             />
@@ -275,9 +275,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                                     <button
                                         key={idx}
                                         onClick={() => setActiveIdx(idx)}
-                                        className={`w - 14 h - 14 rounded - md overflow - hidden border - 2 transition - all ${activeIdx === idx ? 'border-white' : 'border-transparent opacity-50 hover:opacity-100'} `}
+                                        className={`w-14 h-14 rounded-md overflow-hidden border-2 transition-all ${activeIdx === idx ? 'border-white' : 'border-transparent opacity-50 hover:opacity-100'}`}
                                     >
-                                        <img src={`${storageUrl}${img.path}?width = 100`} alt="" className="w-full h-full object-cover" />
+                                        <img src={`${storageUrl}${img.path}?width=100`} alt="" className="w-full h-full object-cover" />
                                     </button>
                                 ))}
                             </div>
