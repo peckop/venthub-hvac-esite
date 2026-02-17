@@ -89,7 +89,7 @@ export const ExproofFanModel: React.FC = () => {
     )
 
     return (
-        <group position={[0, -0.35, 0]}>
+        <group>
 
             {/* --- 1. MOTOR VE MONTAJ ÜNİTESİ (SALYANGOZ İLE TEMAS) --- */}
             <group position={[0, 0.35, -0.32]}>

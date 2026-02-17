@@ -62,7 +62,7 @@ export function SmokeExhaustFanModel() {
     const bladeGeometry = new THREE.ExtrudeGeometry(shape, extrudeSettings)
 
     return (
-        <group position={[0, -0.4, -0.2]} scale={[0.65, 0.65, 0.65]} rotation={[0, -Math.PI / 4, 0]}>
+        <group scale={[0.65, 0.65, 0.65]} rotation={[0, -Math.PI / 4, 0]}>
 
             {/* FRAME & STANDS (Preserved) */}
             <group rotation={[Math.PI / 2, 0, 0]}>

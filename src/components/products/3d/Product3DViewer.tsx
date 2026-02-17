@@ -251,6 +251,46 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [handleReset, selectedPart, handleHide, handleIsolate]) // Re-bind when selection changes
 
+    // ── MODEL POSITIONING LOGIC ───────────────────────────────────────────
+    const getModelPosition = useCallback(() => {
+        // 1. Explicit Model Type
+        if (modelType) {
+            switch (modelType) {
+                case 'RoofFanModel': return [0, -1.0, 0] as [number, number, number]
+                case 'JetFanModel': return [0, -0.7, 0] as [number, number, number]
+                case 'DuctFanModel': return [0, -0.7, 0] as [number, number, number] // Round & Rectangular
+                case 'RectangularDuctFanModel': return [0, -0.7, 0] as [number, number, number]
+                case 'SnailFanModel': return [0, -0.7, 0] as [number, number, number]
+                case 'PlugFanModel': return [0, -0.65, 0] as [number, number, number]
+                case 'NicotraFanModel': return [0, -0.65, 0] as [number, number, number]
+                case 'SquarePlateFanModel': return [0, -0.6, 0] as [number, number, number]
+                case 'SmokeExhaustFanModel': return [0, -0.4, -0.2] as [number, number, number]
+                case 'ExproofFanModel': return [0, -0.35, 0] as [number, number, number]
+                case 'DomesticFanModel': return [0, -0.22, 0] as [number, number, number]
+                case 'RoundDuctFanModel': return [0, 0.1, 0] as [number, number, number]
+                case 'AxialFanModel': return [0, -0.55, 0] as [number, number, number]
+                default: return [0, -0.55, 0] as [number, number, number]
+            }
+        }
+
+        // 2. Slug-based Fallback (Should match FanRenderer logic ideally)
+        const s = slug ? slug.toLowerCase() : ''
+        if (s.includes('cati') || s.includes('atı')) return [0, -1.0, 0] as [number, number, number]
+        if (s.includes('jet') || s.includes('otopark')) return [0, -0.7, 0] as [number, number, number]
+        if (s.includes('kanal') || s.includes('yuvarlak')) return [0, -0.7, 0] as [number, number, number] // DuctFan
+        if (s.includes('siginak') || s.includes('hücreli') || s.includes('dikdortgen') || s.includes('prizmatik')) return [0, -0.7, 0] as [number, number, number]
+        if (s.includes('salyangoz') || s.includes('santrifuj')) return [0, -0.7, 0] as [number, number, number] // Snail usually
+        if (s.includes('plug')) return [0, -0.65, 0] as [number, number, number]
+        if (s.includes('nicotra') || s.includes('gebhardt')) return [0, -0.65, 0] as [number, number, number]
+        if (s.includes('duvar') && s.includes('kompakt')) return [0, -0.6, 0] as [number, number, number] // SquarePlate
+        if ((s.includes('duman') || s.includes('smoke')) && !s.includes('dikdortgen')) return [0, -0.4, -0.2] as [number, number, number]
+        if (s.includes('exproof') || s.includes('atex')) return [0, -0.35, 0] as [number, number, number]
+        if (s.includes('konut') || s.includes('banyo') || s.includes('wc')) return [0, -0.22, 0] as [number, number, number]
+
+        // Default (Axial & Others)
+        return [0, -0.55, 0] as [number, number, number]
+    }, [modelType, slug])
+
     return (
         <div className={`relative w-full h-full bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)] ${isFullscreen ? 'fixed inset-0 z-[10000]' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
 
@@ -288,6 +328,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                                         hiddenParts={hiddenParts}
                                         displayStyle={displayStyle}
                                         enableTooltip={enableTooltip}
+                                        position={getModelPosition()}
                                     />
                                 </ModelRotator>
                             </group>

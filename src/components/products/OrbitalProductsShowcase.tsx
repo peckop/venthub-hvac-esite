@@ -496,7 +496,10 @@ const OrbitalCard: React.FC<{
                 {/* GÖRÜNÜR KART */}
                 {item.categorySlug ? (
                     <group name="icon-wrapper" scale={modelScale} rotation={[0, Math.PI, 0]}>
-                        <Category3DIcon categorySlug={item.categorySlug} scale={1} />
+                        {/* Model veya İkon */}
+                        <Suspense fallback={null}>
+                            <Category3DIcon categorySlug={item.categorySlug || ''} scale={1} modelPosition={[0, -0.6, 0]} />
+                        </Suspense>
                     </group>
                 ) : (
                     <mesh ref={meshRef}>
