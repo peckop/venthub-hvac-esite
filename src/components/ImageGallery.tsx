@@ -148,13 +148,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                 {/* Fullscreen Icon (Top Right) — Image mode only */}
                 {!is3DMode && activeImage && (
-                    <div className="absolute top-3 right-3 z-50 pointer-events-auto">
+                    <div className="absolute top-3 right-16 z-50 pointer-events-auto">
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
-                            className="bg-white/95 backdrop-blur-sm p-2.5 rounded-xl border border-gray-200/80 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-xl transition-all"
+                            className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200/80 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-xl transition-all"
                             title="Tam Ekran Görüntüle"
                         >
-                            <Maximize2 size={22} strokeWidth={1.8} />
+                            <Maximize2 size={20} strokeWidth={1.8} />
                         </button>
                     </div>
                 )}
@@ -163,7 +163,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 {!is3DMode && slug && (
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
-                        className="absolute top-2 right-14 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200/80 flex flex-col items-center gap-0.5 transition-all hover:shadow-xl group min-w-[50px]"
+                        className="absolute top-2 right-2 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200/80 flex flex-col items-center gap-0.5 transition-all hover:shadow-xl group min-w-[50px]"
                     >
                         <div className="bg-blue-50 p-1 rounded-md text-blue-600 group-hover:bg-blue-100 transition-colors">
                             <Box size={18} strokeWidth={2} />
