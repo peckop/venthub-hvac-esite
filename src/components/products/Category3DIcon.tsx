@@ -464,7 +464,7 @@ const AccessoryIcon: React.FC = () => {
     )
 }
 
-const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1 }) => {
+const Category3DIcon: React.FC<Category3DIconProps & { modelPosition?: [number, number, number] }> = ({ categorySlug, scale = 1, modelPosition = [0, 0, 0] }) => {
     // Slug'ı safe hale getir
     const safeSlug = (categorySlug || '').toLowerCase()
 
@@ -473,7 +473,11 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
         // FanRenderer içinde "fanlar" için bir case olmadığı için default (RoundDuct) dönüyordu.
         // Artık doğrudan AxialFanModel (yeni silindirik) dönecek.
         if (safeSlug === 'fanlar') {
-            return <AxialFanModel />
+            return (
+                <group position={modelPosition}>
+                    <AxialFanModel />
+                </group>
+            )
         }
 
         // 2. HIZ KONTROL
@@ -502,7 +506,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
 
             default:
                 // Diğer fan türleri için (jet, çatı, vs.) FanRenderer kullanmaya devam et
-                return <FanRenderer slug={safeSlug} />
+                return <FanRenderer slug={safeSlug} position={modelPosition} />
         }
     }
 

@@ -17,7 +17,7 @@ export const RoundDuctFanModel: React.FC = () => {
     })
 
     return (
-        <group position={[0, 0.1, 0]} scale={[0.6, 0.6, 0.6]}>
+        <group scale={[0.6, 0.6, 0.6]}>
 
             {/* 1. ANA GÖVDE (Central Body) - SİLİNDİR (Torus Yok) */}
             <group rotation={[0, 0, Math.PI / 2]}>

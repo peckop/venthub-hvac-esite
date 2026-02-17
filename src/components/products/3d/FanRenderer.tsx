@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import { JetFanModel } from './types/JetFanModel'
 import { RoofFanModel } from './types/RoofFanModel'
 import { DuctFanModel, RectangularDuctFanModel } from './types/DuctFanModel'
@@ -23,6 +23,7 @@ interface FanRendererProps {
     hiddenParts?: string[]
     displayStyle?: 'shaded' | 'shadedEdges' | 'wireframe' | 'hiddenLines'
     enableTooltip?: boolean
+    position?: [number, number, number]
 }
 
 // Model tipi -> Bileşen eşleştirmesi
@@ -52,7 +53,8 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
     isolatedPart,
     hiddenParts = [],
     displayStyle = 'shaded',
-    enableTooltip = false
+    enableTooltip = true,
+    position = [0, 0, 0]
 }) => {
 
     const renderFan = () => {
@@ -114,7 +116,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
     }
 
     return (
-        <group scale={scale}>
+        <group scale={scale} position={position}>
             {renderFan()}
         </group>
     )

@@ -31,7 +31,7 @@ export function DuctFanModel() {
 
     return (
         // SCALE: 0.6 (Diğer fanlarla uyumlu olması için küçültüldü)
-        <group position={[0, -0.7, 0]} scale={[0.8, 0.8, 0.8]} rotation={[0, -Math.PI / 4, 0]}> {/* Açılı duruş */}
+        <group scale={[0.8, 0.8, 0.8]} rotation={[0, -Math.PI / 4, 0]}> {/* Açılı duruş */}
 
             {/* 1. ANA GÖVDE */}
             <group>
@@ -94,7 +94,7 @@ export function DuctFanModel() {
 export const RectangularDuctFanModel: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        <group position={[0, -0.7, 0]}>
+        <group>
             <mesh material={materials.galvanizedSteel}>
                 <boxGeometry args={[1, 0.6, 0.6]} />
             </mesh>
