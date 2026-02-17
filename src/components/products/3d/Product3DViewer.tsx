@@ -1,8 +1,34 @@
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree } from '@react-three/fiber'
-import { OrbitControls, Grid, GizmoHelper, GizmoViewcube, Environment, ContactShadows } from '@react-three/drei'
+import { OrbitControls, Grid, GizmoHelper, GizmoViewcube, Environment, ContactShadows, Html, useProgress } from '@react-three/drei'
 import { FanRenderer } from './FanRenderer'
+import {
+    RotateCcw,
+    Triangle,
+    X,
+    Eye,
+    EyeOff,
+    Layers,
+    Maximize2,
+    Minimize2,
+    MessageSquare,
+    BoxSelect,
+    Settings2,
+    Repeat,
+    HelpCircle,
+    Box,
+    RefreshCw,
+    ChevronLeft,
+    Globe,
+    Grid3X3
+} from 'lucide-react'
+
+// ── HELPER COMPONENT: LOADER ──────────────────────────────────────────────
+function Loader() {
+    const { progress } = useProgress()
+    return <Html center><div className="text-primary-navy font-bold text-sm bg-white/80 px-2 py-1 rounded">{progress.toFixed(0)}%</div></Html>
+}
 
 // ── HELPER COMPONENT: OBJECT ROTATOR (Object-centric rotation) ─────────────
 function ModelRotator({ children, enabled, rotationRef }: { children: React.ReactNode, enabled: boolean, rotationRef: React.MutableRefObject<THREE.Group | null> }) {
@@ -52,27 +78,6 @@ function ModelRotator({ children, enabled, rotationRef }: { children: React.Reac
 
     return <group ref={rotationRef}>{children}</group>
 }
-import {
-    RotateCcw,
-    Triangle,
-    X,
-    Eye,
-    EyeOff,
-    Layers,
-    Maximize2,
-    Minimize2,
-    MessageSquare,
-    BoxSelect,
-    Settings2,
-    Repeat,
-    HelpCircle,
-    Box,
-    RefreshCw,
-    ChevronLeft,
-    Globe,
-    Grid3X3
-
-} from 'lucide-react'
 
 interface Product3DViewerProps {
     slug?: string
@@ -236,7 +241,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                 <directionalLight position={[10, 15, 10]} intensity={1.5} castShadow shadow-mapSize={2048} />
                 <Environment preset="city" />
 
-                <Suspense fallback={null}>
+                <Suspense fallback={<Loader />}>
                     {slug && (
                         /* Model centered at origin for correct rotation pivot */
                         <group position={[0, 0, 0]}>
