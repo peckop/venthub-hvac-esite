@@ -198,27 +198,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
             {/* Thumbnail Strip + 3D Toggle */}
             <div className="flex flex-wrap gap-2">
 
-                {/* 3D Model Thumbnail Toggle */}
-                {slug && (
-                    <button
-                        type="button"
-                        onClick={() => {
-                            // eslint-disable-next-line no-console
-                            console.log('[ImageGallery] Toggling 3D Mode: TRUE', { slug })
-                            setIs3DMode(true)
-                        }}
-                        className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all flex items-center justify-center bg-gray-50 group shrink-0 ${is3DMode
-                            ? 'border-primary-navy ring-2 ring-primary-navy/20'
-                            : 'border-transparent hover:border-gray-300'
-                            }`}
-                        title="3D Modeli İncele"
-                    >
-                        <div className="flex flex-col items-center gap-1">
-                            <Box size={20} className={`transition-colors ${is3DMode ? 'text-primary-navy' : 'text-gray-400 group-hover:text-primary-navy'}`} />
-                            <span className={`text-[10px] font-bold ${is3DMode ? 'text-primary-navy' : 'text-gray-500 group-hover:text-primary-navy'}`}>3D</span>
-                        </div>
-                    </button>
-                )}
+
 
                 {/* Image Thumbnails */}
                 {images.map((img, idx) => (

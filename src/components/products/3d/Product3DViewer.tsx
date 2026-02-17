@@ -122,7 +122,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
     onClose
 }) => {
     // ── STATE ─────────────────────────────────────────────────────────────
-    const [showGrid, setShowGrid] = useState(false)
+    const [showGrid, setShowGrid] = useState(true)
     const [autoRotate, setAutoRotate] = useState(false)
     const [explode, setExplode] = useState(0) // 0 to 1
     const [selectedPart, setSelectedPart] = useState<string | null>(null)
@@ -131,7 +131,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const [displayStyle, setDisplayStyle] = useState<'shaded' | 'shadedEdges' | 'wireframe' | 'hiddenLines'>('shadedEdges')
     const [showViewMenu, setShowViewMenu] = useState(false)
     const [showStyleMenu, setShowStyleMenu] = useState(false)
-    const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('free')
+    const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('orbit')
     const [enableTooltip, setEnableTooltip] = useState(false)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controlsRef = useRef<any>(null)
@@ -191,7 +191,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
             modelGroupRef.current.rotation.set(0, 0, 0)
         }
 
-        const dist = 8
+        const dist = 6
         const cam = controlsRef.current.object
 
         // Reset target to center
@@ -258,7 +258,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
             <Canvas
                 shadows
                 dpr={[1, 2]}
-                camera={{ position: [5, 5, 7], fov: 40 }}
+                camera={{ position: [3.5, 3.5, 5], fov: 40 }}
                 gl={{ alpha: true }}
                 onPointerMissed={() => setSelectedPart(null)}
             >
