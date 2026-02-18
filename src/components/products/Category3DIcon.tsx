@@ -5,6 +5,7 @@ import { FanRenderer } from './3d/FanRenderer'
 import { useFanMaterials } from './3d/materials/useFanMaterials'
 import { AxialFanModel } from './3d/types/AxialFanModel'
 import { getModelOffset, ModelContext } from '../../utils/3dModelOffsets'
+import { SmartCenterScale } from './3d/SmartCenterScale'
 
 interface Category3DIconProps {
     categorySlug: string
@@ -13,10 +14,6 @@ interface Category3DIconProps {
     modelPosition?: [number, number, number]
     offsetContext?: ModelContext // 'centered' | 'orbital' | 'grounded'
 }
-
-// ... FlexDuct, AirCurtain vs. AYNI (Kopyala) ...
-// Kodun tam çalışması için önceki adımlardaki bileşenleri buraya tekrar ekliyorum.
-// HIZ KONTROL ve CATEGORY3DICON mantığını değiştiriyorum.
 
 const FlexDuctModel: React.FC = () => {
     const meshRef = useRef<THREE.Mesh>(null)
@@ -130,8 +127,6 @@ const AirCurtainFlow: React.FC = () => {
 const DepuroIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        // FIX: position offset REMOVED — AutoCenter handles centering. 
-        // Internal offsets fight with AutoCenter and cause "strain".
         <group>
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[0.8, 1.7, 0.55]} />
@@ -172,11 +167,9 @@ const AirPurifierFlow: React.FC = () => {
         if (cleanRef.current) {
             cleanRef.current.children.forEach((child, i) => {
                 const speed = 0.4 + (i % 4) * 0.15
-                // Üst menfez Y=0.86'da — parçacıklar 0.87'den başlayıp 1.5'e kadar çıkıyor
                 const phase = (time * speed + i * 0.3) % 1.0
                 child.position.y = 0.87 + phase * 0.6
                 child.position.x = Math.sin(time * 1.5 + i) * 0.12
-                // Yukarı çıktıkça solar (0'dan 1'e gidince opacity 1'den 0'a)
                 const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
                 mat.opacity = Math.max(0, 1 - phase * 1.2)
             })
@@ -185,7 +178,6 @@ const AirPurifierFlow: React.FC = () => {
             dirtyRef.current.children.forEach((child, i) => {
                 const speed = 0.3 + (i % 3) * 0.15
                 const progress = (time * speed + i * 0.4) % 1.0
-                // Kirli hava: alt menfezden (Y=-0.5) gövde içine (Y=-0.3) çekiliyor
                 child.position.y = -0.5 + progress * 0.2
                 child.position.x = Math.cos(time * 2 + i) * 0.08
                 child.position.z = 0.28 + Math.sin(time * 4 + i) * 0.03
@@ -220,7 +212,6 @@ const AirPurifierFlow: React.FC = () => {
 const DehumidifierIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        // FIX: position offset REMOVED — AutoCenter handles centering.
         <group>
             <mesh material={materials.ral7035}>
                 <boxGeometry args={[0.9, 1.25, 0.5]} />
@@ -279,7 +270,6 @@ const CondensationDrops: React.FC = () => {
 const HRVIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        // FIX: position offset REMOVED — AutoCenter handles centering.
         <group>
             <mesh material={materials.ral7035}>
                 <boxGeometry args={[1.2, 1.3, 0.65]} />
@@ -329,63 +319,36 @@ const CrossFlowAnimation: React.FC = () => {
     )
 }
 
-// =============================================================================
-// HIZ KONTROL (Revize 5: MAT EKRAN)
-// =============================================================================
 const SpeedControlIcon: React.FC = () => {
     const materials = useFanMaterials()
-
     return (
         <group>
-            {/* --- KASA (PASLANMAZ/INOX) --- */}
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[0.7, 0.9, 0.3]} />
             </mesh>
-
-            {/* Ön Panel Çerçevesi */}
             <mesh position={[0, 0, 0.151]} material={materials.industrialSteel}>
                 <boxGeometry args={[0.62, 0.82, 0.002]} />
             </mesh>
-
-            {/* --- EKRAN (TEMİZ CAM - Digital Clear) --- */}
-            {/* Karıncalanma olmaması için texture/noise yok, saf parlak siyah malzeme */}
             <mesh position={[0, 0.15, 0.152]}>
                 <planeGeometry args={[0.58, 0.48]} />
-                <meshPhysicalMaterial
-                    color="#000000"
-                    roughness={0.05} // Çok pürüzsüz (Cam)
-                    metalness={0.9}
-                    clearcoat={1.0}
-                    clearcoatRoughness={0.0}
-                    emissive="#000000"
-                />
+                <meshPhysicalMaterial color="#000000" roughness={0.05} metalness={0.9} clearcoat={1.0} clearcoatRoughness={0.0} emissive="#000000" />
             </mesh>
-
-            {/* Ekran UI (Basit Geometri - Texture kullanmadan) */}
             <group position={[0, 0.15, 0.153]} scale={0.7}>
-                {/* 1. Fan Speed Göstergesi (Bar) */}
                 <group position={[0, 0.1, 0]}>
-                    {/* Arkaplan Barı */}
                     <mesh position={[0, 0, 0]}>
                         <planeGeometry args={[0.6, 0.04]} />
                         <meshBasicMaterial color="#1e293b" />
                     </mesh>
-                    {/* Doluluk Barı (Yeşil - %75) */}
                     <mesh position={[-0.075, 0, 0.001]}>
                         <planeGeometry args={[0.45, 0.04]} />
-                        <meshBasicMaterial color="#22c55e" toneMapped={false} /> {/* Parlak Yeşil */}
+                        <meshBasicMaterial color="#22c55e" toneMapped={false} />
                     </mesh>
                 </group>
-
-                {/* 2. Dijital Rakam (Basit kutularla 88.8 simülasyonu veya sadece bir kutu) */}
-                {/* Rakam yerine "RUN" ledi simülasyonu */}
                 <mesh position={[0, -0.15, 0]}>
                     <circleGeometry args={[0.03, 16]} />
-                    <meshBasicMaterial color="#3b82f6" toneMapped={false} /> {/* Mavi Led */}
+                    <meshBasicMaterial color="#3b82f6" toneMapped={false} />
                 </mesh>
             </group>
-
-            {/* --- BUTONLAR --- */}
             <group position={[0, -0.25, 0.155]}>
                 <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.07, 0.07, 0.03, 32]} />
@@ -393,22 +356,7 @@ const SpeedControlIcon: React.FC = () => {
                 <mesh position={[0, 0, 0.016]} rotation={[Math.PI / 2, 0, 0]} material={materials.galvanizedSteel}>
                     <boxGeometry args={[0.015, 0.08, 0.02]} />
                 </mesh>
-                <mesh position={[-0.2, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <cylinderGeometry args={[0.03, 0.03, 0.01, 16]} />
-                    <meshStandardMaterial color="#334155" />
-                </mesh>
-                <mesh position={[0.2, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                    <cylinderGeometry args={[0.03, 0.03, 0.01, 16]} />
-                    <meshStandardMaterial color="#334155" />
-                </mesh>
             </group>
-
-            {/* Kablo Rakorları */}
-            {[-0.15, 0.15].map((x, i) => (
-                <mesh key={i} position={[x, -0.5, 0]} material={materials.industrialSteel}>
-                    <cylinderGeometry args={[0.04, 0.04, 0.08, 16]} />
-                </mesh>
-            ))}
         </group>
     )
 }
@@ -416,7 +364,6 @@ const SpeedControlIcon: React.FC = () => {
 const AccessoryIcon: React.FC = () => {
     const materials = useFanMaterials()
     const bladeRef = useRef<THREE.Group>(null)
-
     useFrame((state) => {
         if (bladeRef.current) {
             const angle = Math.sin(state.clock.elapsedTime * 0.5) * 0.4
@@ -425,125 +372,65 @@ const AccessoryIcon: React.FC = () => {
             })
         }
     })
-
     return (
-        // FIX: position offset REMOVED — AutoCenter handles centering.
         <group scale={[0.65, 0.65, 0.65]}>
-
-            {/* 1. MOTORLU DAMPER (Sol-Arka) */}
             <group position={[-0.4, 0, -0.2]}>
                 <mesh material={materials.galvanizedSteel}><boxGeometry args={[0.8, 0.8, 0.3]} /></mesh>
-                <mesh position={[0, 0, 0]} material={materials.matteBlack}><planeGeometry args={[0.75, 0.75]} /><mesh position={[0, 0, 0.16]} /></mesh>
-                {/* Kanatlar */}
                 <group ref={bladeRef} position={[0, 0, 0.18]}>
                     {[0.2, 0, -0.2].map((y, i) => (
                         <mesh key={i} position={[0, y, 0]} material={materials.brushedAluminum}><boxGeometry args={[0.7, 0.18, 0.02]} /></mesh>
                     ))}
                 </group>
-                {/* Motor */}
                 <mesh position={[0.45, 0, 0]} material={materials.safetyOrange}><boxGeometry args={[0.15, 0.25, 0.15]} /></mesh>
             </group>
-
-            {/* 2. FLEXIBLE CONNECTOR (Sağ-Arka) */}
-            {/* Silindirik branda bağlantısı */}
             <group position={[0.5, 0, -0.1]} rotation={[0, 0, Math.PI / 2]}>
-                {/* Flanşlar */}
                 <mesh position={[0, 0.25, 0]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.3, 0.3, 0.05, 32]} /></mesh>
                 <mesh position={[0, -0.25, 0]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.3, 0.3, 0.05, 32]} /></mesh>
-                {/* Kumaş (Branda) */}
                 <mesh material={materials.matteBlack}><cylinderGeometry args={[0.28, 0.28, 0.45, 32]} /></mesh>
-                {/* Boğumlar */}
-                {[0.1, 0, -0.1].map((y, i) => (
-                    <mesh key={i} position={[0, y, 0]}><torusGeometry args={[0.285, 0.01, 16, 32]} /><meshStandardMaterial color="#333" /></mesh>
-                ))}
             </group>
-
-            {/* 3. MENFEZ / ANEMOSTAD (Ön-Orta) */}
-            <group position={[0.1, -0.3, 0.3]} rotation={[-Math.PI / 4, 0, 0]}>
-                <mesh material={materials.ral7035}><boxGeometry args={[0.6, 0.6, 0.05]} /></mesh>
-                {/* Kanatçıklar */}
-                {[0.15, 0.05, -0.05, -0.15].map((y, i) => (
-                    <mesh key={i} position={[0, y, 0.03]} rotation={[0.4, 0, 0]} material={materials.brushedAluminum}>
-                        <boxGeometry args={[0.5, 0.08, 0.005]} />
-                    </mesh>
-                ))}
-            </group>
-
         </group>
     )
 }
 
-// ============================================================
-// MODEL KONUMLAMA STRATEJİSİ (v6 - STABLE DETERMINISTIC)
-// ============================================================
-// AutoCenter KALDIRILDI (MegaMenu'da beyaz ekran sorununa yol açtı).
-// Tekrar deterministik offset tablosuna dönüldü.
-//
-// 1. Fanlar: getModelOffset(slug, 'centered') -> 3dModelOffsets.ts
-// 2. İkonlar: ICON_Y_OFFSETS tablosu
-// ============================================================
-
-// Fan olmayan modeller için centered offset tablosu
 const ICON_Y_OFFSETS: Record<string, number> = {
-    // AirCurtainIcon: gövde Y=0.35'te (height=0.45) → merkez Y=0.35 → offset=-0.35
     'hava-perdeleri': -0.35,
-    // DepuroIcon: gövde Y=0'da.
-    // Kullanıcı "yukarı kaymış" dedi, offset'i düşür (0.15 -> 0.05)
     'hava-temizleyiciler': 0.05,
     'hava-temizleyiciler-anti-viral-urunler': 0.05,
-    // DehumidifierIcon
     'nem-alma-cihazlari': 0,
     'nem-alma': 0,
-    // HRVIcon
     'isi-geri-kazanim-cihazlari': 0,
     'isi-geri-kazanim': 0,
-    // AccessoryIcon
     'aksesuarlar': 0,
     'yedek-parca': 0,
-    // AxialFanModel
     'fanlar': 0,
-    // FlexDuctModel
     'flexible-hava-kanallari': 0,
     'flexible': 0,
-    // Hız Kontrol
     'hiz': 0,
     'kontrol': 0,
 }
 
-// Bounding Box hatalarını manuel düzeltmek için (Gerekirse buraya ekle)
-const MANUAL_FIXAR_OFFSETS: Record<string, number> = {
-    // Örn: 'siginak': -0.1
-}
-
 const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition, offsetContext = 'centered' }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
+    // SmartCenterScale sadece 'centered' context için aktif olsun (Kategori Grid, Mega Menu)
+    // Orbital (Ana Sayfa) için manuel offsetler kullanılmalı çünkü ring üzerindeki pozisyon hassas.
+    const useSmartCenter = offsetContext === 'centered'
 
-    // Pozisyon belirleme
     let position: [number, number, number] = [0, 0, 0]
 
     if (modelPosition) {
         position = modelPosition
-    } else if (safeSlug in ICON_Y_OFFSETS) {
-        position = [0, ICON_Y_OFFSETS[safeSlug], 0]
-    } else if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) {
-        position = [0, 0, 0]
-    } else {
-        // Fan Modelleri: 3dModelOffsets.ts kullan
-        // Eğer manuel fix varsa onu ekle
-        let yBase = 0
-        for (const key in MANUAL_FIXAR_OFFSETS) {
-            if (safeSlug.includes(key)) {
-                yBase = MANUAL_FIXAR_OFFSETS[key]
-                break
-            }
+    } else if (!useSmartCenter) {
+        if (safeSlug in ICON_Y_OFFSETS) {
+            position = [0, ICON_Y_OFFSETS[safeSlug], 0]
+        } else if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) {
+            position = [0, 0, 0]
+        } else {
+            // Grounded için 3dModelOffsets.ts'den gelen değerleri kullan
+            const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
+            position = [calculatedOffset[0], calculatedOffset[1], calculatedOffset[2]]
         }
-
-        // 3dModelOffsets.ts'den gelen değer
-        const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
-        position = [0 + calculatedOffset[0], yBase + calculatedOffset[1], 0 + calculatedOffset[2]]
     }
 
-    // İçeriği memoize et
     const content = useMemo(() => {
         if (safeSlug === 'fanlar') return <AxialFanModel />
         if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) return <SpeedControlIcon />
@@ -570,6 +457,29 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
                 return <FanRenderer slug={safeSlug} />
         }
     }, [safeSlug])
+
+    if (useSmartCenter) {
+        // Centered modunda bile olsa, 3dModelOffsets.ts'den gelen Y değerini 'shift' olarak ekle
+        let yShift = 0
+        try {
+            const calculatedOffset = getModelOffset(undefined, safeSlug, 'centered')
+            if (calculatedOffset && typeof calculatedOffset[1] === 'number') {
+                yShift = calculatedOffset[1]
+            } else {
+                console.warn('[Category3DIcon] Invalid offset for slug:', safeSlug, calculatedOffset)
+            }
+        } catch (err) {
+            console.error('[Category3DIcon] Error getting offset:', err)
+        }
+
+        return (
+            <group scale={scale}>
+                <SmartCenterScale targetSize={1.4} enabled={true} shift={[0, yShift, 0]}>
+                    {content}
+                </SmartCenterScale>
+            </group>
+        )
+    }
 
     return (
         <group scale={scale} position={position}>
