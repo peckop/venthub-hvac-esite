@@ -3,8 +3,11 @@ import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useNavigate } from 'react-router-dom'
-import { MousePointerClick, Move, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config/orbitalCarouselConfig'
+
+
+
 import Category3DIcon from './Category3DIcon'
 
 interface ProductItem {
@@ -22,6 +25,7 @@ interface OrbitalProductsShowcaseProps {
     onFrontCardChange?: (itemId: string) => void // Dönerken önde olan kart
     modelScale?: number // New prop for controlling 3D model scale
     containerHeight?: string | number // New prop for container height
+    skipHints?: boolean // Alt kategoriye geçince hint animasyonunu atla
 }
 
 // Global rotation state management
@@ -56,14 +60,14 @@ const Stage: React.FC<{
 
     return (
         <group>
-            {/* Genişleyen Halka */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
+            {/* Genişleyen Halka - LIFTED to -0.8 */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.8, 0]}>
                 <ringGeometry args={[Math.max(0.1, currentRadius - 0.08), currentRadius + 0.08, 64]} />
                 <meshBasicMaterial color="#0891b2" transparent opacity={0.1 * (currentRadius / CONFIG.radius)} />
             </mesh>
 
-            {/* Zemin */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]}>
+            {/* Zemin - LIFTED to -1.6 (relative deeper) */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.6, 0]}>
                 <circleGeometry args={[12, 64]} />
                 <meshStandardMaterial
                     color="#050a15"
@@ -112,8 +116,10 @@ const CarouselItems: React.FC<{
 
     useFrame((state, delta) => {
         // ... (Kameranın nefes alma efekti vs buraya taşınmalı veya Stage'de de olabilir ama kamera manipulasyonu burada kalsın)
+        // ... (Kameranın nefes alma efekti vs buraya taşınmalı veya Stage'de de olabilir ama kamera manipulasyonu burada kalsın)
         camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
-        camera.position.y = CONFIG.cameraHeight + Math.sin(state.clock.elapsedTime * 0.08) * 0.02
+        // FIXED: Remove vertical camera wobble to stop "synchronized jumping" effect
+        camera.position.y = CONFIG.cameraHeight
 
         // ... (Mevcut mantık kodları aynen kalacak)
         const now = Date.now()
@@ -226,7 +232,7 @@ const CarouselItems: React.FC<{
                     index={i}
                     total={items.length}
                     sharedState={sharedState}
-                    isPaused={isPaused}
+
                     onHover={onHover}
                     onBringToFront={() => {
                         // Duplicate logic from handleBringToFront since it was inside SceneContent
@@ -265,7 +271,7 @@ const OrbitalCard: React.FC<{
     index: number
     total: number
     sharedState: React.MutableRefObject<SharedState>
-    isPaused: boolean
+
     onHover: (hovering: boolean) => void
     onBringToFront: (index: number) => void
     setIsDragging: (dragging: boolean) => void
@@ -276,7 +282,7 @@ const OrbitalCard: React.FC<{
     shouldShowTapHint: boolean
     shouldShowDragHint: boolean
     modelScale: number // Receive modelScale
-}> = ({ item, index, total, sharedState, isPaused, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint, modelScale }) => {
+}> = ({ item, index, total, sharedState, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint, modelScale }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
     const navigate = useNavigate()
@@ -287,6 +293,8 @@ const OrbitalCard: React.FC<{
     // Robust Click Logiği için Ref'ler
     const pointerDownPos = useRef({ x: 0, y: 0 })
     const pointerDownTime = useRef(0)
+    // FIX: Re-render storm prevention — only set state when value actually changes
+    const lastIsNearRef = useRef(false)
 
     // El ikonu görünüm timer'ı
     // SceneContent'ten externalShouldShowHint true gelirse: 4sn göster, sonra gizle
@@ -313,6 +321,8 @@ const OrbitalCard: React.FC<{
         return tex
     }, [item.image, item.categorySlug])
 
+
+
     useFrame(() => {
         if (!groupRef.current) return
 
@@ -330,15 +340,25 @@ const OrbitalCard: React.FC<{
 
         const x = Math.sin(currentAngle) * currentRadius
         const z = Math.cos(currentAngle) * currentRadius
-        const tiltRad = (CONFIG.tilt * Math.PI) / 180
-        const y = Math.sin(currentAngle) * Math.sin(tiltRad) * currentRadius * 0.25
+        // const tiltRad = (CONFIG.tilt * Math.PI) / 180
+        // REMOVED WOBBLE: Set fixed Y to 0.8.
+        // AutoCenter centers the model at 0.
+        // Ring is at -0.8.
+        // We lift the whole group to +0.8 so the CENTER is at +0.8.
+        // This ensures even tall models (bottom at -0.2) clear the ring (-0.8).
+        const y = 0.8
 
         groupRef.current.position.set(x, y, z)
-        groupRef.current.lookAt(0, 0, 0)
+        // FIXED: Look at the center but maintain same Y height to avoid tilting down
+        groupRef.current.lookAt(0, y, 0)
 
         // 3. Scale & Visibility
         const isNear = z > currentRadius * 0.3
-        setIsNearFront(isNear)
+        // FIX: Only trigger React re-render when value ACTUALLY changes
+        if (isNear !== lastIsNearRef.current) {
+            lastIsNearRef.current = isNear
+            setIsNearFront(isNear)
+        }
 
         const normalizedZ = currentRadius > 0 ? (z + currentRadius) / (currentRadius * 2) : 0.5
         const baseScale = CONFIG.backScale + (CONFIG.frontScale - CONFIG.backScale) * normalizedZ
@@ -352,22 +372,10 @@ const OrbitalCard: React.FC<{
         const targetZ = z + hoverZOffset
         groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, targetZ, 0.12)
 
-        // 🎯 PULSE EFFECT: Focus/Hint durumunda kart hareketlenir
-        let pulseMultiplier = 1
+        // 🎯 PULSE EFFECT DISABLED: Fixed scale to prevent "tick" jumping
+        const pulseMultiplier = 1
 
-        // Eğer bu kart ipucu (Heartbeat) döngüsündeyse
-        if (isFrontCard && externalShouldShowHint && sharedState.current.target === null) {
-            // KALB ATIŞI (Heartbeat): Çift vuruşlu keskin pulse
-            const t = now * 0.005
-            // Çift vuruş matematiği: ana vuruş + yankı vuruş
-            const pulse = Math.pow(Math.sin(t), 12) * 0.12 + Math.pow(Math.sin(t + 0.45), 16) * 0.08
-            pulseMultiplier = 1 + pulse
-        }
-        // Normal focus durumu (kullanıcı seçtiyse): Yumuşak nefes alma
-        else if (isFrontCard && sharedState.current.target === null) {
-            const pulseSpeed = 2
-            pulseMultiplier = 1 + Math.sin(now * 0.003 * pulseSpeed) * 0.03
-        }
+        // OLD PULSE LOGIC REMOVED
         const pulsedScale = finalScale * pulseMultiplier
 
         // Scale uygulama
@@ -474,87 +482,90 @@ const OrbitalCard: React.FC<{
 
     return (
         <group ref={groupRef}>
-            <Float
-                speed={isPaused ? 0 : 1.5}
-                rotationIntensity={0.03}
-                floatIntensity={CONFIG.floatIntensity}
+            {/* REMOVED FLOAT: Stopped bobbing effect */}
+            {/* Hitbox */}
+            <mesh
+                position={[0, 0, 0.1]}
+                onClick={handleClick}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onDoubleClick={handleDoubleClick}
+                onPointerOver={handlePointerOver}
+                onPointerOut={handlePointerOut}
             >
-                {/* Hitbox */}
-                <mesh
-                    position={[0, 0, 0.1]}
-                    onClick={handleClick}
-                    onPointerDown={handlePointerDown}
-                    onPointerUp={handlePointerUp}
-                    onDoubleClick={handleDoubleClick}
-                    onPointerOver={handlePointerOver}
-                    onPointerOut={handlePointerOut}
-                >
-                    <boxGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight, 1.5]} />
-                    <meshBasicMaterial visible={false} />
-                </mesh>
+                <boxGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight, 1.5]} />
+                <meshBasicMaterial visible={false} />
+            </mesh>
 
-                {/* GÖRÜNÜR KART */}
-                {item.categorySlug ? (
-                    <group name="icon-wrapper" scale={modelScale} rotation={[0, Math.PI, 0]}>
-                        {/* Model veya İkon */}
-                        <Suspense fallback={null}>
-                            <Category3DIcon categorySlug={item.categorySlug || ''} scale={1} modelPosition={[0, -0.6, 0]} />
-                        </Suspense>
-                    </group>
-                ) : (
-                    <mesh ref={meshRef}>
-                        <planeGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight]} />
-                        <meshStandardMaterial
-                            map={texture || undefined}
-                            transparent
-                            opacity={0}
-                            side={THREE.DoubleSide}
-                            emissive={hovered ? CONFIG.glowColor : '#000000'}
-                            emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
+            {/* GÖRÜNÜR KART */}
+            {item.categorySlug ? (
+                <group name="icon-wrapper" scale={modelScale} rotation={[0, Math.PI, 0]}>
+                    {/* Model veya İkon */}
+                    <Suspense fallback={null}>
+                        <Category3DIcon
+                            categorySlug={item.categorySlug || ''}
+                            scale={1}
+                        // modelPosition prop is removed to enable AutoCenter
                         />
-                    </mesh>
-                )}
+                    </Suspense>
+                </group>
+            ) : (
+                <mesh ref={meshRef}>
+                    <planeGeometry args={[CONFIG.cardWidth, CONFIG.cardHeight]} />
+                    <meshStandardMaterial
+                        map={texture || undefined}
+                        transparent
+                        opacity={0}
+                        side={THREE.DoubleSide}
+                        emissive={hovered ? CONFIG.glowColor : '#000000'}
+                        emissiveIntensity={hovered ? CONFIG.emissiveIntensity * 1.5 : 0}
+                    />
+                </mesh>
+            )}
 
-                {/* Drag Hint - Profesyonel */}
-                {isFrontCard && shouldShowDragHint && (
-                    <Float
-                        speed={0.5}
-                        rotationIntensity={0}
-                        floatIntensity={0.3}
+            {/* Drag Hint - Profesyonel */}
+            {isFrontCard && shouldShowDragHint && (
+                <Float
+                    speed={0.5}
+                    rotationIntensity={0}
+                    floatIntensity={0.3}
+                >
+                    <Html
+                        position={[0, 1.5, 0]}
+                        center
+                        distanceFactor={8}
+                        occlude={false}
+                        style={{ pointerEvents: 'none' }}
                     >
-                        <Html
-                            position={[0, 1.5, 0]}
-                            center
-                            distanceFactor={8}
-                            occlude={false}
-                            style={{ pointerEvents: 'none' }}
-                        >
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="flex items-center gap-24">
-                                    {/* Sol ok */}
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                        <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                            <ChevronLeft className="w-9 h-9 text-cyan-300 animate-pulse" strokeWidth={2.5} />
-                                        </div>
-                                    </div>
-
-                                    {/* Sağ ok */}
-                                    <div className="relative">
-                                        <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
-                                        <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                                            <ChevronRight className="w-9 h-9 text-cyan-300 animate-pulse" strokeWidth={2.5} />
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="flex items-center gap-24">
+                                {/* Sol ok */}
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
+                                    <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                        <div className="w-9 h-9 text-cyan-300 animate-pulse">
+                                            <ChevronLeft strokeWidth={2.5} />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
-                                    <span className="text-sm font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
+
+                                {/* Sağ ok */}
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-cyan-500/20 rounded-full blur-md animate-pulse" />
+                                    <div className="relative w-[72px] h-[72px] rounded-full border border-cyan-500/50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                        <div className="w-9 h-9 text-cyan-300 animate-pulse">
+                                            <ChevronRight strokeWidth={2.5} />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </Html>
-                    </Float>
-                )}
-            </Float>
+                            <div className="px-4 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700/50 backdrop-blur-sm">
+                                <span className="text-sm font-medium text-slate-200 uppercase tracking-wider">Tut Çevir</span>
+                            </div>
+                        </div>
+                    </Html>
+                </Float>
+            )}
 
             {/* Tap Hint - Profesyonel */}
             {isFrontCard && !hovered && showTapHint && (
@@ -607,13 +618,14 @@ const OrbitalCard: React.FC<{
 /**
  * Ana bileşen
  */
-const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5, containerHeight = 500 }) => {
+const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items, onCardClick, externalPause = false, onFocusedItemChange, onFrontCardChange, modelScale = 1.5, containerHeight = 500, skipHints = false }) => {
     const [isPaused, setIsPaused] = useState(false)
     const [isDragging, setIsDragging] = useState(false)
     const [dragDelta, setDragDelta] = useState(0)
-    const [showHint, setShowHint] = useState(true)
+    // DISABLED: Hints removed per user request
+
     const [focusedItemId, setFocusedItemId] = useState<string | null>(null)
-    const [showFocusedHint, setShowFocusedHint] = useState(false)
+
 
     // Resize Hack (Minimal) - Keep ensuring layout
     useEffect(() => {
@@ -625,7 +637,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
         return () => timers.forEach(t => clearTimeout(t))
     }, [])
 
-    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>('idle')
+    // skipHints=true ise (alt kategori seviyesi) hint animasyonlarını atla
+    const [hintStage, setHintStage] = useState<'idle' | 'tap' | 'drag' | 'cooldown' | 'finished'>(skipHints ? 'finished' : 'idle')
     const isDraggingRef = useRef(false)
 
     // Shared State with isReady flag
@@ -670,6 +683,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
     const shouldShowTapHint = hintStage === 'tap'
     const shouldShowDragHint = hintStage === 'drag'
 
+    // DISABLED: Cycle Hint Logic
+    /*
     useEffect(() => {
         if (focusedItemId) {
             setShowHint(false)
@@ -690,19 +705,18 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             clearTimeout(hideTimer)
         }
     }, [focusedItemId])
+    */
 
     const handleSetIsDragging = useCallback((val: boolean) => {
         setIsDragging(val)
         isDraggingRef.current = val
     }, [])
 
-    const hideHint = useCallback(() => setShowHint(false), [])
+
 
     const handleFocusedItemChangeInternal = useCallback((itemId: string | null) => {
         setFocusedItemId(itemId)
         if (onFocusedItemChange) onFocusedItemChange(itemId)
-        if (itemId) setTimeout(() => setShowFocusedHint(true), 500)
-        else setShowFocusedHint(false)
     }, [onFocusedItemChange])
 
     // Re-implementing pointer logic provided by parent div
@@ -760,7 +774,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                         onHover={setIsPaused}
                         isDraggingRef={isDraggingRef}
                         dragDelta={dragDelta}
-                        onInteract={hideHint}
+                        onInteract={() => { }}
                         sharedState={sharedState}
                         setIsDragging={handleSetIsDragging}
                         onCardClick={onCardClick}
@@ -777,6 +791,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             </Canvas>
 
             {/* UI Hints */}
+            {/* UI Hints DISABLED */}
+            {/* 
             {showHint && !focusedItemId && sharedState.current.isReady && (
                 <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 hidden md:block animate-fade-in">
                     <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
@@ -794,23 +810,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                     </div>
                 </div>
             )}
-            {focusedItemId && showFocusedHint && (
-                <div className="absolute bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 pointer-events-none z-20 animate-fade-in">
-                    <div className="bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-lg border border-slate-700/50 shadow-xl">
-                        <div className="flex items-center gap-3 text-xs">
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-cyan-400 font-medium">Tek Tık:</span>
-                                <span className="text-slate-300">Alt Kategoriler</span>
-                            </div>
-                            <span className="text-slate-600">•</span>
-                            <div className="flex items-center gap-1.5">
-                                <span className="text-cyan-400 font-medium">Çift Tık:</span>
-                                <span className="text-slate-300">Sayfaya Git</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            */}
+            {/* focusedItemHint REMOVED: üstteki başlık zaten aynı bilgiyi veriyor */}
 
             {/* Sol-Sağ Gradient */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />

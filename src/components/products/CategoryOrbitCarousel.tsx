@@ -382,7 +382,6 @@ const CategoryOrbitCarousel = () => {
                                     : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
                             }
                         </h2>
-                        {/* Dinamik açıklama - dönen hint bilgileri */}
                         <p className="text-white/50 text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
                                 ? (level === 'main'
@@ -417,30 +416,15 @@ const CategoryOrbitCarousel = () => {
                             externalPause={isTransitioning}
                             onFocusedItemChange={handleFocusedItemChange}
                             onFrontCardChange={handleFrontCardChange}
-                            modelScale={1.5} // Reverted to standard scale
-                            containerHeight={500} // Reverted to standard height
+                            modelScale={1.5}
+                            containerHeight={500}
+                            skipHints={level === 'subcategory'} // Alt kategoride hint animasyonunu tekrarlama
                         />
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            {/* Subcategory Count Badge */}
-            <AnimatePresence>
-                {level === 'subcategory' && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="absolute bottom-8 left-0 right-0 z-30 flex justify-center"
-                    >
-                        <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-                            <span className="text-white/70 text-sm">
-                                {subcategories.length} alt kategori mevcut
-                            </span>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Subcategory Count Badge REMOVED — müşteriyi ilgilendirmez */}
         </section>
     )
 }
