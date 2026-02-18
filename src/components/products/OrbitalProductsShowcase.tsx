@@ -505,7 +505,7 @@ const OrbitalCard: React.FC<{
                         <Category3DIcon
                             categorySlug={item.categorySlug || ''}
                             scale={1}
-                        // modelPosition prop is removed to enable AutoCenter
+                            offsetContext="orbital"
                         />
                     </Suspense>
                 </group>

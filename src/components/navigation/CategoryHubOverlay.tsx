@@ -134,17 +134,29 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                             <>
                                 <button
                                     onClick={() => setSelectedCategory(null)}
-                                    className="p-2 rounded-full hover:bg-white/10 transition-colors mr-2"
-                                    aria-label="Geri"
+                                    className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group mr-4"
                                 >
-                                    <ArrowLeft className="w-5 h-5 text-white/70 hover:text-white" />
+                                    <div className="p-1.5 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                                        <ArrowLeft className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-sm font-medium">Ana Kategoriler</span>
+                                    <ChevronRight className="w-4 h-4 text-white/30" />
                                 </button>
-                                <h2 className="text-xl font-bold text-white">
-                                    {getCategoryDisplayName(selectedCategory)}
-                                </h2>
-                                <span className="text-sm text-white/50">
-                                    ({subCategories.length} seri)
-                                </span>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-xl font-bold text-white">
+                                            {getCategoryDisplayName(selectedCategory)}
+                                        </h2>
+                                        <span className="text-sm text-white/50">
+                                            ({subCategories.length} seri)
+                                        </span>
+                                    </div>
+                                    {selectedCategory.description && (
+                                        <p className="text-sm text-gray-400 mt-0.5 line-clamp-1 max-w-xl">
+                                            {selectedCategory.description}
+                                        </p>
+                                    )}
+                                </div>
                             </>
                         ) : (
                             <>
