@@ -392,22 +392,9 @@ const AccessoryIcon: React.FC = () => {
     )
 }
 
-const ICON_Y_OFFSETS: Record<string, number> = {
-    'hava-perdeleri': -0.35,
-    'hava-temizleyiciler': 0.05,
-    'hava-temizleyiciler-anti-viral-urunler': 0.05,
-    'nem-alma-cihazlari': 0,
-    'nem-alma': 0,
-    'isi-geri-kazanim-cihazlari': 0,
-    'isi-geri-kazanim': 0,
-    'aksesuarlar': 0,
-    'yedek-parca': 0,
-    'fanlar': 0,
-    'flexible-hava-kanallari': 0,
-    'flexible': 0,
-    'hiz': 0,
-    'kontrol': 0,
-}
+// NOT: Tüm offsetler artık merkezi src/utils/3dModelOffsets.ts içinden yönetiliyor.
+// Hava perdeleri, aksesuarlar vb. için yerel liste kaldırıldı.
+
 
 const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition, offsetContext = 'centered' }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
@@ -420,15 +407,9 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
     if (modelPosition) {
         position = modelPosition
     } else if (!useSmartCenter) {
-        if (safeSlug in ICON_Y_OFFSETS) {
-            position = [0, ICON_Y_OFFSETS[safeSlug], 0]
-        } else if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) {
-            position = [0, 0, 0]
-        } else {
-            // Grounded için 3dModelOffsets.ts'den gelen değerleri kullan
-            const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
-            position = [calculatedOffset[0], calculatedOffset[1], calculatedOffset[2]]
-        }
+        // Tüm ürünler için 3dModelOffsets.ts'den gelen değerleri kullan
+        const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
+        position = [calculatedOffset[0], calculatedOffset[1], calculatedOffset[2]]
     }
 
     const content = useMemo(() => {
