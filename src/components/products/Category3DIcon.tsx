@@ -69,60 +69,8 @@ const FlexDuctModel: React.FC = () => {
     )
 }
 
-const AirCurtainIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    return (
-        <group>
-            <mesh position={[0, 0.35, 0]} material={materials.brushedAluminum}>
-                <boxGeometry args={[2.5, 0.45, 0.45]} />
-            </mesh>
-            <group position={[0, 0.35, 0.23]}>
-                {[-0.15, -0.09, -0.03, 0.03, 0.09, 0.15].map((y, i) => (
-                    <mesh key={i} position={[0, y, 0]} material={materials.industrialSteel}>
-                        <boxGeometry args={[2.3, 0.015, 0.03]} />
-                    </mesh>
-                ))}
-            </group>
-            <mesh position={[0, 0.10, 0.1]} material={materials.matteBlack}>
-                <boxGeometry args={[2.3, 0.02, 0.08]} />
-            </mesh>
-            {[-1.3, 1.3].map((x, i) => (
-                <mesh key={i} position={[x, 0.35, 0]} material={materials.industrialSteel}>
-                    <boxGeometry args={[0.06, 0.45, 0.45]} />
-                </mesh>
-            ))}
-            <AirCurtainFlow />
-        </group>
-    )
-}
-
-const AirCurtainFlow: React.FC = () => {
-    const curtainRef = useRef<THREE.Group>(null)
-    useFrame((state) => {
-        if (!curtainRef.current) return
-        const time = state.clock.elapsedTime
-        const colorPhase = (Math.sin(time * 1.0) + 1) / 2
-        curtainRef.current.children.forEach((child: THREE.Object3D, i) => {
-            const meshChild = child as THREE.Mesh
-            const material = meshChild.material as THREE.MeshBasicMaterial
-            const r = 0.055 + colorPhase * 0.88
-            const g = 0.647 - colorPhase * 0.38
-            const b = 0.914 - colorPhase * 0.65
-            material.color.setRGB(r, g, b)
-            material.opacity = 0.25 + Math.sin(time * 2 + i * 0.2) * 0.08
-        })
-    })
-    return (
-        <group ref={curtainRef} position={[0, -0.5, 0.1]}>
-            {Array(20).fill(0).map((_, i) => (
-                <mesh key={i} position={[(i - 9.5) * 0.12, 0, 0]}>
-                    <planeGeometry args={[0.08, 1.2]} />
-                    <meshBasicMaterial color="#0ea5e9" transparent opacity={0.25} side={THREE.DoubleSide} depthWrite={false} />
-                </mesh>
-            ))}
-        </group>
-    )
-}
+// Profesyonel modeller (AirCurtainModel, HRVModel vb.) artık FanRenderer üzerinden çağrılıyor.
+// Bu dosyadaki geçici çizimler kademeli olarak temizleniyor.
 
 const DepuroIcon: React.FC = () => {
     const materials = useFanMaterials()
@@ -421,7 +369,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
             case 'flexible':
                 return <FlexDuctModel />
             case 'hava-perdeleri':
-                return <AirCurtainIcon />
+                return <FanRenderer slug={safeSlug} />
             case 'hava-temizleyiciler-anti-viral-urunler':
             case 'hava-temizleyiciler':
                 return <DepuroIcon />
