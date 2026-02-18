@@ -411,8 +411,8 @@ const ICON_Y_OFFSETS: Record<string, number> = {
 
 const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition, offsetContext = 'centered' }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
-    // SmartCenterScale sadece 'centered' context için aktif olsun (Kategori Grid, Mega Menu)
-    // Orbital (Ana Sayfa) için manuel offsetler kullanılmalı çünkü ring üzerindeki pozisyon hassas.
+    // SmartCenterScale: Sadece 'centered' (Kategori Grid, Mega Menu) için aktif.
+    // 'orbital' (Ana Sayfa) ve 'grounded' (Ürün Detay) için manuel offsetler kullanılır.
     const useSmartCenter = offsetContext === 'centered'
 
     let position: [number, number, number] = [0, 0, 0]
