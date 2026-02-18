@@ -4,13 +4,14 @@ import * as THREE from 'three'
 import { FanRenderer } from './3d/FanRenderer'
 import { useFanMaterials } from './3d/materials/useFanMaterials'
 import { AxialFanModel } from './3d/types/AxialFanModel'
-import { getModelOffset } from '../../utils/3dModelOffsets'
+import { getModelOffset, ModelContext } from '../../utils/3dModelOffsets'
 
 interface Category3DIconProps {
     categorySlug: string
     color?: string
     scale?: number
-    modelPosition?: [number, number, number] // Optional override
+    modelPosition?: [number, number, number]
+    offsetContext?: ModelContext // 'centered' | 'orbital' | 'grounded'
 }
 
 // ... FlexDuct, AirCurtain vs. AYNI (Kopyala) ...
@@ -514,7 +515,7 @@ const MANUAL_FIXAR_OFFSETS: Record<string, number> = {
     // Örn: 'siginak': -0.1
 }
 
-const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition }) => {
+const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition, offsetContext = 'centered' }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
 
     // Pozisyon belirleme
@@ -538,7 +539,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
         }
 
         // 3dModelOffsets.ts'den gelen değer
-        const calculatedOffset = getModelOffset(undefined, safeSlug, 'centered')
+        const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
         position = [0 + calculatedOffset[0], yBase + calculatedOffset[1], 0 + calculatedOffset[2]]
     }
 
