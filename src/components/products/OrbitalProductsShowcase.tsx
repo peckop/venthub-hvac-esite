@@ -342,10 +342,9 @@ const OrbitalCard: React.FC<{
         const z = Math.cos(currentAngle) * currentRadius
         // const tiltRad = (CONFIG.tilt * Math.PI) / 180
         // REMOVED WOBBLE: Set fixed Y to 0.8.
-        // AutoCenter centers the model at 0.
-        // Ring is at -0.8.
-        // We lift the whole group to +0.8 so the CENTER is at +0.8.
-        // This ensures even tall models (bottom at -0.2) clear the ring (-0.8).
+        // AutoCenter removed for Orbit.
+        // We lift the whole group to +0.8 so the MANUAL offsets (usually -0.2 to -0.6)
+        // result in a net position slightly above the Ring (-0.8).
         const y = 0.8
 
         groupRef.current.position.set(x, y, z)

@@ -28,8 +28,8 @@ const DEFAULT_CONFIG: ModelConfig = {
 const MODEL_CONFIGS: Record<string, ModelConfig> = {
     'RoofFanModel': {
         grounded: [0, -1.0, 0],
-        centered: [0, -0.69, 0],
-        orbital: [0, -0.69, 0]
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     },
     'JetFanModel': {
         grounded: [0, -0.7, 0],
@@ -48,18 +48,18 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     },
     'SnailFanModel': {
         grounded: [0, -0.7, 0],
-        centered: [0, -0.2, 0],
-        orbital: [0, -0.2, 0]
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     },
     'PlugFanModel': {
         grounded: [0, -0.65, 0],
-        centered: [0, 0.04, 0],
-        orbital: [0, 0.04, 0]
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     },
     'NicotraFanModel': {
         grounded: [0, -0.65, 0],
-        centered: [0, -0.3, 0],
-        orbital: [0, -0.3, 0]
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     },
     'SquarePlateFanModel': {
         grounded: [0, -0.6, 0],
@@ -73,8 +73,8 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     },
     'ExproofFanModel': {
         grounded: [0, -0.35, 0],
-        centered: [0, -0.4, 0],
-        orbital: [0, -0.4, 0]
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     },
     'DomesticFanModel': {
         grounded: [0, -0.22, 0],
@@ -110,16 +110,18 @@ export function getModelOffset(
     const s = slug ? slug.toLowerCase() : ''
     let config = DEFAULT_CONFIG;
 
-    if (s.includes('cati') || s.includes('atı')) config = MODEL_CONFIGS['RoofFanModel']
+    // Precise matching based on Category Registry slugs
+    if (s.includes('cati') || s.includes('roof')) config = MODEL_CONFIGS['RoofFanModel']
+    else if (s.includes('basinc') || s.includes('yangin') || s.includes('aksiyal')) config = MODEL_CONFIGS['AxialFanModel']
     else if (s.includes('jet') || s.includes('otopark')) config = MODEL_CONFIGS['JetFanModel']
+    else if (s.includes('duman') || s.includes('smoke')) config = MODEL_CONFIGS['SmokeExhaustFanModel']
+    else if (s.includes('duvar') && (s.includes('kompakt') || s.includes('aksiyal'))) config = MODEL_CONFIGS['SquarePlateFanModel']
     else if (s.includes('kanal') || s.includes('yuvarlak')) config = MODEL_CONFIGS['DuctFanModel']
-    else if (s.includes('siginak') || s.includes('hücreli') || s.includes('dikdortgen') || s.includes('prizmatik')) config = MODEL_CONFIGS['RectangularDuctFanModel']
+    else if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) config = MODEL_CONFIGS['RectangularDuctFanModel']
     else if (s.includes('salyangoz') || s.includes('santrifuj')) config = MODEL_CONFIGS['SnailFanModel']
     else if (s.includes('plug')) config = MODEL_CONFIGS['PlugFanModel']
     else if (s.includes('nicotra') || s.includes('gebhardt')) config = MODEL_CONFIGS['NicotraFanModel']
-    else if (s.includes('duvar') && s.includes('kompakt')) config = MODEL_CONFIGS['SquarePlateFanModel']
-    else if ((s.includes('duman') || s.includes('smoke')) && !s.includes('dikdortgen')) config = MODEL_CONFIGS['SmokeExhaustFanModel']
-    else if (s.includes('exproof') || s.includes('atex')) config = MODEL_CONFIGS['ExproofFanModel']
+    else if (s.includes('exproof') || s.includes('atex') || s.includes('endustriyel')) config = MODEL_CONFIGS['ExproofFanModel']
     else if (s.includes('konut') || s.includes('banyo') || s.includes('wc')) config = MODEL_CONFIGS['DomesticFanModel']
 
     // Return requested context offset
