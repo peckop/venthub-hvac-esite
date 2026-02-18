@@ -9,6 +9,7 @@ import { SmokeExhaustFanModel } from './types/SmokeExhaustFanModel'
 import { NicotraFanModel } from './types/NicotraFanModel'
 import { SnailFanModel } from './types/SnailFanModel'
 import { ExproofFanModel } from './types/ExproofFanModel'
+import { AirCurtainModel } from './types/AirCurtainModel'
 import { PlugFanModel } from './types/PlugFanModel'
 import { SquarePlateFanModel } from './types/SquarePlateFanModel'
 
@@ -41,6 +42,7 @@ const MODEL_COMPONENTS = {
     'ExproofFanModel': ExproofFanModel,
     'PlugFanModel': PlugFanModel,
     'JetFanModel': JetFanModel,
+    'AirCurtainModel': AirCurtainModel,
 } as const
 
 export const FanRenderer: React.FC<FanRendererProps> = ({
@@ -108,6 +110,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
         if (s.includes('siginak') || s.includes('taze-hava') || s.includes('hücreli') || s.includes('hucreli')) return <RectangularDuctFanModel />
         if ((s.includes('duman') || s.includes('smoke')) && !s.includes('dikdortgen') && !s.includes('kanal')) return <SmokeExhaustFanModel />
         if (s.includes('konut') || s.includes('banyo') || s.includes('wc') || s.includes('quattro')) return <DomesticFanModel />
+        if (s.includes('perde')) return <AirCurtainModel />
         if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('isi-geri')) return <RectangularDuctFanModel />
         if (s.includes('kanal') || s.includes('yuvarlak')) return <DuctFanModel />
         if (s.includes('yedek') || s.includes('aksesuar')) return null;
