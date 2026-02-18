@@ -92,6 +92,42 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
         grounded: [0, -0.55, 0],
         centered: [0, 0, 0],
         orbital: [0, 0.1, 0]
+    },
+    // FAN DIŞI ÜRÜN GRUPLARI (Merkezi Yönetim)
+    'AirCurtainModel': {
+        grounded: [0, -0.35, 0],
+        centered: [0, 0, 0],
+        orbital: [0, -0.3, 0]
+    },
+    'AirPurifierModel': {
+        grounded: [0, 0.05, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0.05, 0]
+    },
+    'DehumidifierModel': {
+        grounded: [0, 0, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
+    },
+    'HRVModel': {
+        grounded: [0, 0, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
+    },
+    'FlexibleDuctModel': {
+        grounded: [0, 0, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
+    },
+    'AccessoryModel': {
+        grounded: [0, 0, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
+    },
+    'SpeedControlModel': {
+        grounded: [0, 0, 0],
+        centered: [0, 0, 0],
+        orbital: [0, 0, 0]
     }
 }
 
@@ -125,6 +161,14 @@ export function getModelOffset(
     else if (s.includes('plug')) config = MODEL_CONFIGS['PlugFanModel']
     else if (s.includes('nicotra') || s.includes('gebhardt')) config = MODEL_CONFIGS['NicotraFanModel']
     else if (s.includes('konut') || s.includes('banyo') || s.includes('wc')) config = MODEL_CONFIGS['DomesticFanModel']
+    // Yeni Ürün Grupları Eşleştirmesi
+    else if (s.includes('perde')) config = MODEL_CONFIGS['AirCurtainModel']
+    else if (s.includes('temizleyici')) config = MODEL_CONFIGS['AirPurifierModel']
+    else if (s.includes('nem-alma')) config = MODEL_CONFIGS['DehumidifierModel']
+    else if (s.includes('isi-geri')) config = MODEL_CONFIGS['HRVModel']
+    else if (s.includes('flexible') || s.includes('kanal')) config = MODEL_CONFIGS['FlexibleDuctModel']
+    else if (s.includes('aksesuar') || s.includes('yedek')) config = MODEL_CONFIGS['AccessoryModel']
+    else if (s.includes('hiz') || s.includes('kontrol')) config = MODEL_CONFIGS['SpeedControlModel']
 
     // Return requested context offset
     return config[context];
