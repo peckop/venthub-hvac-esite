@@ -4,11 +4,13 @@ import * as THREE from 'three'
 import { FanRenderer } from './3d/FanRenderer'
 import { useFanMaterials } from './3d/materials/useFanMaterials'
 import { AxialFanModel } from './3d/types/AxialFanModel'
+import { getModelOffset } from '../../utils/3dModelOffsets'
 
 interface Category3DIconProps {
     categorySlug: string
     color?: string
     scale?: number
+    modelPosition?: [number, number, number] // Optional override
 }
 
 // ... FlexDuct, AirCurtain vs. AYNI (Kopyala) ...
@@ -127,7 +129,9 @@ const AirCurtainFlow: React.FC = () => {
 const DepuroIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        <group position={[0, -0.4, 0]}>
+        // FIX: position offset REMOVED — AutoCenter handles centering. 
+        // Internal offsets fight with AutoCenter and cause "strain".
+        <group>
             <mesh material={materials.brushedAluminum}>
                 <boxGeometry args={[0.8, 1.7, 0.55]} />
             </mesh>
@@ -166,24 +170,26 @@ const AirPurifierFlow: React.FC = () => {
         const time = state.clock.elapsedTime
         if (cleanRef.current) {
             cleanRef.current.children.forEach((child, i) => {
-                const speed = 0.5 + (i % 3) * 0.2
-                child.position.y = 0.9 + ((time * speed + i) % 1.5)
-                child.position.x = Math.sin(time * 2 + i) * 0.1
-                const opacity = Math.max(0, 1 - (child.position.y - 0.9))
+                const speed = 0.4 + (i % 4) * 0.15
+                // Üst menfez Y=0.86'da — parçacıklar 0.87'den başlayıp 1.5'e kadar çıkıyor
+                const phase = (time * speed + i * 0.3) % 1.0
+                child.position.y = 0.87 + phase * 0.6
+                child.position.x = Math.sin(time * 1.5 + i) * 0.12
+                // Yukarı çıktıkça solar (0'dan 1'e gidince opacity 1'den 0'a)
                 const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
-                mat.opacity = opacity
+                mat.opacity = Math.max(0, 1 - phase * 1.2)
             })
         }
         if (dirtyRef.current) {
             dirtyRef.current.children.forEach((child, i) => {
-                const speed = 0.4 + (i % 3) * 0.2
-                const progress = (time * speed + i) % 1.0
-                child.position.y = -0.8 + progress * 0.8
-                child.position.x = Math.cos(time * 3 + i) * 0.1
-                child.position.z = 0.3 + Math.sin(time * 5 + i) * 0.05
-                const opacity = 1 - progress
+                const speed = 0.3 + (i % 3) * 0.15
+                const progress = (time * speed + i * 0.4) % 1.0
+                // Kirli hava: alt menfezden (Y=-0.5) gövde içine (Y=-0.3) çekiliyor
+                child.position.y = -0.5 + progress * 0.2
+                child.position.x = Math.cos(time * 2 + i) * 0.08
+                child.position.z = 0.28 + Math.sin(time * 4 + i) * 0.03
                 const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
-                mat.opacity = opacity * 0.7
+                mat.opacity = (1 - progress) * 0.5
             })
         }
     })
@@ -192,7 +198,7 @@ const AirPurifierFlow: React.FC = () => {
         <group>
             <group ref={cleanRef}>
                 {Array(15).fill(0).map((_, i) => (
-                    <mesh key={`c-${i}`} position={[(Math.random() - 0.5) * 0.5, 0.9, (Math.random() - 0.5) * 0.3]}>
+                    <mesh key={`c - ${i} `} position={[(Math.random() - 0.5) * 0.3, 0.5, (Math.random() - 0.5) * 0.2]}>
                         <sphereGeometry args={[0.025, 8, 8]} />
                         <meshBasicMaterial color="#67e8f9" transparent opacity={0.8} />
                     </mesh>
@@ -200,7 +206,7 @@ const AirPurifierFlow: React.FC = () => {
             </group>
             <group ref={dirtyRef}>
                 {Array(15).fill(0).map((_, i) => (
-                    <mesh key={`d-${i}`} position={[(Math.random() - 0.5) * 0.6, -0.6, 0.3]}>
+                    <mesh key={`d - ${i} `} position={[(Math.random() - 0.5) * 0.6, -0.6, 0.3]}>
                         <sphereGeometry args={[0.03, 8, 8]} />
                         <meshBasicMaterial color="#475569" transparent opacity={0.7} />
                     </mesh>
@@ -213,7 +219,8 @@ const AirPurifierFlow: React.FC = () => {
 const DehumidifierIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        <group position={[0, -0.35, 0]}>
+        // FIX: position offset REMOVED — AutoCenter handles centering.
+        <group>
             <mesh material={materials.ral7035}>
                 <boxGeometry args={[0.9, 1.25, 0.5]} />
             </mesh>
@@ -271,7 +278,8 @@ const CondensationDrops: React.FC = () => {
 const HRVIcon: React.FC = () => {
     const materials = useFanMaterials()
     return (
-        <group position={[0, -0.25, 0]}>
+        // FIX: position offset REMOVED — AutoCenter handles centering.
+        <group>
             <mesh material={materials.ral7035}>
                 <boxGeometry args={[1.2, 1.3, 0.65]} />
             </mesh>
@@ -418,8 +426,8 @@ const AccessoryIcon: React.FC = () => {
     })
 
     return (
-        // Kompozisyon Grubu - Ölçek küçültüldü (0.6)
-        <group position={[0, -0.2, 0]} scale={[0.65, 0.65, 0.65]}>
+        // FIX: position offset REMOVED — AutoCenter handles centering.
+        <group scale={[0.65, 0.65, 0.65]}>
 
             {/* 1. MOTORLU DAMPER (Sol-Arka) */}
             <group position={[-0.4, 0, -0.2]}>
@@ -464,26 +472,80 @@ const AccessoryIcon: React.FC = () => {
     )
 }
 
-const Category3DIcon: React.FC<Category3DIconProps & { modelPosition?: [number, number, number] }> = ({ categorySlug, scale = 1, modelPosition = [0, 0, 0] }) => {
-    // Slug'ı safe hale getir
+// ============================================================
+// MODEL KONUMLAMA STRATEJİSİ (v6 - STABLE DETERMINISTIC)
+// ============================================================
+// AutoCenter KALDIRILDI (MegaMenu'da beyaz ekran sorununa yol açtı).
+// Tekrar deterministik offset tablosuna dönüldü.
+//
+// 1. Fanlar: getModelOffset(slug, 'centered') -> 3dModelOffsets.ts
+// 2. İkonlar: ICON_Y_OFFSETS tablosu
+// ============================================================
+
+// Fan olmayan modeller için centered offset tablosu
+const ICON_Y_OFFSETS: Record<string, number> = {
+    // AirCurtainIcon: gövde Y=0.35'te (height=0.45) → merkez Y=0.35 → offset=-0.35
+    'hava-perdeleri': -0.35,
+    // DepuroIcon: gövde Y=0'da.
+    // Kullanıcı "yukarı kaymış" dedi, offset'i düşür (0.15 -> 0.05)
+    'hava-temizleyiciler': 0.05,
+    'hava-temizleyiciler-anti-viral-urunler': 0.05,
+    // DehumidifierIcon
+    'nem-alma-cihazlari': 0,
+    'nem-alma': 0,
+    // HRVIcon
+    'isi-geri-kazanim-cihazlari': 0,
+    'isi-geri-kazanim': 0,
+    // AccessoryIcon
+    'aksesuarlar': 0,
+    'yedek-parca': 0,
+    // AxialFanModel
+    'fanlar': 0,
+    // FlexDuctModel
+    'flexible-hava-kanallari': 0,
+    'flexible': 0,
+    // Hız Kontrol
+    'hiz': 0,
+    'kontrol': 0,
+}
+
+// Bounding Box hatalarını manuel düzeltmek için (Gerekirse buraya ekle)
+const MANUAL_FIXAR_OFFSETS: Record<string, number> = {
+    // Örn: 'siginak': -0.1
+}
+
+const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
 
-    const renderContent = () => {
-        // 1. ÖZEL DURUM: "Fanlar" ana kategorisi
-        // FanRenderer içinde "fanlar" için bir case olmadığı için default (RoundDuct) dönüyordu.
-        // Artık doğrudan AxialFanModel (yeni silindirik) dönecek.
-        if (safeSlug === 'fanlar') {
-            return (
-                <group position={modelPosition}>
-                    <AxialFanModel />
-                </group>
-            )
+    // Pozisyon belirleme
+    let position: [number, number, number] = [0, 0, 0]
+
+    if (modelPosition) {
+        position = modelPosition
+    } else if (safeSlug in ICON_Y_OFFSETS) {
+        position = [0, ICON_Y_OFFSETS[safeSlug], 0]
+    } else if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) {
+        position = [0, 0, 0]
+    } else {
+        // Fan Modelleri: 3dModelOffsets.ts kullan
+        // Eğer manuel fix varsa onu ekle
+        let yBase = 0
+        for (const key in MANUAL_FIXAR_OFFSETS) {
+            if (safeSlug.includes(key)) {
+                yBase = MANUAL_FIXAR_OFFSETS[key]
+                break
+            }
         }
 
-        // 2. HIZ KONTROL
-        if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) {
-            return <SpeedControlIcon />
-        }
+        // 3dModelOffsets.ts'den gelen değer
+        const calculatedOffset = getModelOffset(undefined, safeSlug, 'centered')
+        position = [0 + calculatedOffset[0], yBase + calculatedOffset[1], 0 + calculatedOffset[2]]
+    }
+
+    // İçeriği memoize et
+    const content = useMemo(() => {
+        if (safeSlug === 'fanlar') return <AxialFanModel />
+        if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) return <SpeedControlIcon />
 
         switch (safeSlug) {
             case 'flexible-hava-kanallari':
@@ -503,16 +565,14 @@ const Category3DIcon: React.FC<Category3DIconProps & { modelPosition?: [number, 
             case 'aksesuarlar':
             case 'yedek-parca':
                 return <AccessoryIcon />
-
             default:
-                // Diğer fan türleri için (jet, çatı, vs.) FanRenderer kullanmaya devam et
-                return <FanRenderer slug={safeSlug} position={modelPosition} />
+                return <FanRenderer slug={safeSlug} />
         }
-    }
+    }, [safeSlug])
 
     return (
-        <group scale={scale}>
-            {renderContent()}
+        <group scale={scale} position={position}>
+            {content}
         </group>
     )
 }
