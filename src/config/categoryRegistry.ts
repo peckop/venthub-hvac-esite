@@ -17,7 +17,7 @@ export const CATEGORY_REGISTRY = {
             DUVAR_TIPI: 'duvar-tipi-kompakt-aksiyal-fanlar',
             KANAL_TIPI: 'kanal-tipi-fanlar',
             OTOPARK_JET: 'otopark-jet-fanlari',
-            ENDUSTRIYEL: 'endustriyel-fanlar',
+            EXPROOF: 'exproof-fanlar', // Eski 'endustriyel-fanlar' kaldırıldı
             SIGINAK: 'siginak-havalandirma-fanlari',
             SESSIZ_KANAL: 'sessiz-kanal-tipi-fanlar',
             NICOTRA: 'nicotra-gebhardt-fanlar', // Marka adı korundu - farklı fan tipleri var

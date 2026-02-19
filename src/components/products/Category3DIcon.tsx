@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { FanRenderer } from './3d/FanRenderer'
 import { useFanMaterials } from './3d/materials/useFanMaterials'
 import { AxialFanModel } from './3d/types/AxialFanModel'
-import { getModelOffset, ModelContext } from '../../utils/3dModelOffsets'
+import { getModelPlacement, ModelContext } from '../../utils/3dModelOffsets'
 import { SmartCenterScale } from './3d/SmartCenterScale'
 
 interface Category3DIconProps {
@@ -69,93 +69,8 @@ const FlexDuctModel: React.FC = () => {
     )
 }
 
-// Profesyonel modeller (AirCurtainModel, HRVModel vb.) artık FanRenderer üzerinden çağrılıyor.
+// Profesyonel modeller (AirCurtainModel, AirPurifierModel vb.) artık FanRenderer üzerinden çağrılıyor.
 // Bu dosyadaki geçici çizimler kademeli olarak temizleniyor.
-
-const DepuroIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    return (
-        <group>
-            <mesh material={materials.brushedAluminum}>
-                <boxGeometry args={[0.8, 1.7, 0.55]} />
-            </mesh>
-            <group position={[0, -0.5, 0.28]}>
-                <mesh material={materials.matteBlack}>
-                    <boxGeometry args={[0.65, 0.5, 0.02]} />
-                </mesh>
-                {Array(5).fill(0).map((_, i) => (
-                    <mesh key={i} position={[0, (i - 2) * 0.09, 0.02]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.6, 0.012, 0.012]} />
-                    </mesh>
-                ))}
-            </group>
-            <group position={[0, 0.86, 0]}>
-                <mesh material={materials.ral7035}>
-                    <boxGeometry args={[0.7, 0.02, 0.45]} />
-                </mesh>
-            </group>
-            <mesh position={[0, 0.3, 0.29]} material={materials.matteBlack}>
-                <boxGeometry args={[0.3, 0.15, 0.02]} />
-            </mesh>
-            <mesh position={[0, 0.3, 0.31]}>
-                <circleGeometry args={[0.02, 12]} />
-                <meshBasicMaterial color="#22c55e" />
-            </mesh>
-            <AirPurifierFlow />
-        </group>
-    )
-}
-
-const AirPurifierFlow: React.FC = () => {
-    const dirtyRef = useRef<THREE.Group>(null)
-    const cleanRef = useRef<THREE.Group>(null)
-
-    useFrame((state, _delta) => {
-        const time = state.clock.elapsedTime
-        if (cleanRef.current) {
-            cleanRef.current.children.forEach((child, i) => {
-                const speed = 0.4 + (i % 4) * 0.15
-                const phase = (time * speed + i * 0.3) % 1.0
-                child.position.y = 0.87 + phase * 0.6
-                child.position.x = Math.sin(time * 1.5 + i) * 0.12
-                const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
-                mat.opacity = Math.max(0, 1 - phase * 1.2)
-            })
-        }
-        if (dirtyRef.current) {
-            dirtyRef.current.children.forEach((child, i) => {
-                const speed = 0.3 + (i % 3) * 0.15
-                const progress = (time * speed + i * 0.4) % 1.0
-                child.position.y = -0.5 + progress * 0.2
-                child.position.x = Math.cos(time * 2 + i) * 0.08
-                child.position.z = 0.28 + Math.sin(time * 4 + i) * 0.03
-                const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial
-                mat.opacity = (1 - progress) * 0.5
-            })
-        }
-    })
-
-    return (
-        <group>
-            <group ref={cleanRef}>
-                {Array(15).fill(0).map((_, i) => (
-                    <mesh key={`c - ${i} `} position={[(Math.random() - 0.5) * 0.3, 0.5, (Math.random() - 0.5) * 0.2]}>
-                        <sphereGeometry args={[0.025, 8, 8]} />
-                        <meshBasicMaterial color="#67e8f9" transparent opacity={0.8} />
-                    </mesh>
-                ))}
-            </group>
-            <group ref={dirtyRef}>
-                {Array(15).fill(0).map((_, i) => (
-                    <mesh key={`d - ${i} `} position={[(Math.random() - 0.5) * 0.6, -0.6, 0.3]}>
-                        <sphereGeometry args={[0.03, 8, 8]} />
-                        <meshBasicMaterial color="#475569" transparent opacity={0.7} />
-                    </mesh>
-                ))}
-            </group>
-        </group>
-    )
-}
 
 const DehumidifierIcon: React.FC = () => {
     const materials = useFanMaterials()
@@ -342,23 +257,20 @@ const AccessoryIcon: React.FC = () => {
 
 // NOT: Tüm offsetler artık merkezi src/utils/3dModelOffsets.ts içinden yönetiliyor.
 // Hava perdeleri, aksesuarlar vb. için yerel liste kaldırıldı.
+interface Category3DIconProps {
+    categorySlug: string
+    scale?: number
+    offsetContext?: 'grounded' | 'centered' | 'orbital'
+    modelType?: string // [NEW] Kesin model eşleşmesi için
+}
 
-
-const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, modelPosition, offsetContext = 'centered' }) => {
+const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, offsetContext = 'centered', modelType }) => {
     const safeSlug = (categorySlug || '').toLowerCase()
     // SmartCenterScale: Sadece 'centered' (Kategori Grid, Mega Menu) için aktif.
     // 'orbital' (Ana Sayfa) ve 'grounded' (Ürün Detay) için manuel offsetler kullanılır.
+    // SmartCenterScale: Sadece 'centered' (Kategori Grid, Mega Menu) için aktif.
+    // 'orbital' (Ana Sayfa) ve 'grounded' (Ürün Detay) için manuel offsetler kullanılır.
     const useSmartCenter = offsetContext === 'centered'
-
-    let position: [number, number, number] = [0, 0, 0]
-
-    if (modelPosition) {
-        position = modelPosition
-    } else if (!useSmartCenter) {
-        // Tüm ürünler için 3dModelOffsets.ts'den gelen değerleri kullan
-        const calculatedOffset = getModelOffset(undefined, safeSlug, offsetContext)
-        position = [calculatedOffset[0], calculatedOffset[1], calculatedOffset[2]]
-    }
 
     const content = useMemo(() => {
         if (safeSlug === 'fanlar') return <AxialFanModel />
@@ -372,7 +284,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
                 return <FanRenderer slug={safeSlug} />
             case 'hava-temizleyiciler-anti-viral-urunler':
             case 'hava-temizleyiciler':
-                return <DepuroIcon />
+                return <FanRenderer slug={safeSlug} />
             case 'nem-alma-cihazlari':
             case 'nem-alma':
                 return <DehumidifierIcon />
@@ -383,35 +295,43 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
             case 'yedek-parca':
                 return <AccessoryIcon />
             default:
-                return <FanRenderer slug={safeSlug} />
+                return <FanRenderer slug={safeSlug} modelType={modelType} /> // [FIX] modelType geçirildi
         }
-    }, [safeSlug])
+    }, [safeSlug, modelType])
+
+    // Placement logic
+    const placement = useMemo(() => {
+        // modelPosition prop is deprecated but kept for compatibility if passed explicitly
+        // (Though it is not part of the interface anymore, we handle it if it exists in props via ...rest or if re-added)
+
+        // DEBUG: Exproof veya diğer modellerin neden pozisyon almadığını görmek için
+        // console.log(`[Category3DIcon] Slug: ${safeSlug}, ModelType: ${modelType}, Context: ${offsetContext}`);
+
+        if (useSmartCenter) {
+            // Centered context doesn't use modelType strict layout usually, but we pass it anyway
+            const p = getModelPlacement(modelType, safeSlug, 'centered')
+            return p
+        }
+        // Orbital & Grounded (Detailed View)
+        const p = getModelPlacement(modelType, safeSlug, offsetContext)
+
+        return p
+    }, [safeSlug, offsetContext, useSmartCenter, modelType])
 
     if (useSmartCenter) {
-        // Centered modunda bile olsa, 3dModelOffsets.ts'den gelen Y değerini 'shift' olarak ekle
-        let yShift = 0
-        try {
-            const calculatedOffset = getModelOffset(undefined, safeSlug, 'centered')
-            if (calculatedOffset && typeof calculatedOffset[1] === 'number') {
-                yShift = calculatedOffset[1]
-            } else {
-                console.warn('[Category3DIcon] Invalid offset for slug:', safeSlug, calculatedOffset)
-            }
-        } catch (err) {
-            console.error('[Category3DIcon] Error getting offset:', err)
-        }
-
         return (
             <group scale={scale}>
-                <SmartCenterScale targetSize={1.4} enabled={true} shift={[0, yShift, 0]}>
-                    {content}
+                <SmartCenterScale targetSize={1.4} enabled={true} shift={placement.position}>
+                    <group rotation={placement.rotation}>
+                        {content}
+                    </group>
                 </SmartCenterScale>
             </group>
         )
     }
 
     return (
-        <group scale={scale} position={position}>
+        <group scale={scale} position={placement.position} rotation={placement.rotation}>
             {content}
         </group>
     )

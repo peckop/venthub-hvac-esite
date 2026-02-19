@@ -23,7 +23,7 @@ import {
     Globe,
     Grid3X3
 } from 'lucide-react'
-import { getModelOffset } from '../../../utils/3dModelOffsets'
+import { getModelPlacement } from '../../../utils/3dModelOffsets'
 
 // ── HELPER COMPONENT: LOADER ──────────────────────────────────────────────
 function Loader() {
@@ -255,9 +255,11 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
 
 
     // ── MODEL POSITIONING LOGIC ───────────────────────────────────────────
-    const getModelPosition = useCallback(() => {
-        return getModelOffset(modelType, slug, 'grounded')
+    const getModelPlacementData = useCallback(() => {
+        return getModelPlacement(modelType, slug, 'grounded')
     }, [modelType, slug])
+
+    const placement = getModelPlacementData()
 
     return (
         <div className={`relative w-full h-full bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#cde0f5_100%)] ${isFullscreen ? 'fixed inset-0 z-[10000]' : 'rounded-xl overflow-hidden border border-light-gray'}`}>
@@ -282,22 +284,23 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                             /* Model centered at origin for correct rotation pivot */
                             <group position={[0, 0, 0]}>
                                 <ModelRotator enabled={rotationMode === 'free'} rotationRef={modelGroupRef}>
-                                    <FanRenderer
-                                        slug={slug}
-                                        modelType={modelType}
-                                        scale={1}
-                                        explode={explode}
-                                        onPartClick={(name) => {
-                                            setSelectedPart(name)
-                                            setAutoRotate(false)
-                                        }}
-                                        selectedPart={selectedPart}
-                                        isolatedPart={isolatedPart}
-                                        hiddenParts={hiddenParts}
-                                        displayStyle={displayStyle}
-                                        enableTooltip={enableTooltip}
-                                        position={getModelPosition()}
-                                    />
+                                    <group position={placement.position} rotation={placement.rotation}>
+                                        <FanRenderer
+                                            slug={slug}
+                                            modelType={modelType}
+                                            scale={1}
+                                            explode={explode}
+                                            onPartClick={(name) => {
+                                                setSelectedPart(name)
+                                                setAutoRotate(false)
+                                            }}
+                                            selectedPart={selectedPart}
+                                            isolatedPart={isolatedPart}
+                                            hiddenParts={hiddenParts}
+                                            displayStyle={displayStyle}
+                                            enableTooltip={enableTooltip}
+                                        />
+                                    </group>
                                 </ModelRotator>
                             </group>
                         )}

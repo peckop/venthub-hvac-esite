@@ -12,164 +12,265 @@
 type ModelOffset = [number, number, number]
 
 interface ModelConfig {
-    grounded: ModelOffset
-    centered: ModelOffset
-    orbital: ModelOffset
+    grounded: { position: ModelOffset; rotation?: ModelOffset }
+    centered: { position: ModelOffset; rotation?: ModelOffset }
+    orbital: { position: ModelOffset; rotation?: ModelOffset }
 }
 
 // Default values if no specific config is found
 const DEFAULT_CONFIG: ModelConfig = {
-    grounded: [0, -0.55, 0],
-    centered: [0, 0, 0],
-    orbital: [0, 0, 0]
+    grounded: { position: [0, -0.55, 0] },
+    centered: { position: [0, 0, 0] },
+    orbital: { position: [0, 0, 0] }
 }
 
 // Configuration for each Model Type
 const MODEL_CONFIGS: Record<string, ModelConfig> = {
-    'RoofFanModel': {
-        grounded: [0, -1.0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, -0.6, 0]   // Çok büyük ve yüksekte → aşağı çek
+    // ---------------------------------------------------------
+    // 1. ANA KATEGORİLER (Main Categories)
+    // ---------------------------------------------------------
+    'AirCurtainModel': { // Hava Perdesi Modeli
+        grounded: {
+            position: [0, -0.35, 0],
+            rotation: [0, Math.PI / 2, 0]
+        },
+        centered: {
+            position: [0, 0, 0],
+            rotation: [0, Math.PI / 2, 0]
+        },
+        orbital: {
+            position: [0, 0.3, 0],
+            rotation: [0, Math.PI / 2, 0]
+        }
     },
-    'JetFanModel': {
-        grounded: [0, -0.7, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'AirPurifierModel': { // Hava Temizleyici Modeli
+        grounded: { position: [0, 0.05, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.05, 0] }
     },
-    'DuctFanModel': {
-        grounded: [0, -0.7, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'DehumidifierModel': { // Nem Alma Cihazı Modeli
+        grounded: { position: [0, 0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    'RectangularDuctFanModel': {
-        grounded: [0, -0.7, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'HRVModel': { // Isı Geri Kazanım Cihazı Modeli
+        grounded: { position: [0, 0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    // NOT: SnailFanModel ve ExproofFanModel FanRenderer'da aynı 3D modeli kullanıyor.
-    // Bu nedenle tüm context değerleri birebir aynı olmalı.
-    'SnailFanModel': {
-        grounded: [0, -0.35, 0],
-        centered: [0, 0, 0],
-        orbital: [0, -0.3, 0]
+
+    // ---------------------------------------------------------
+    // 2. FAN ALT KATEGORİLERİ (Fan Subcategories)
+    // ---------------------------------------------------------
+    'AxialFanModel': { // Aksiyal Fan Modeli
+        grounded: { position: [0, -0.55, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'PlugFanModel': {
-        grounded: [0, -0.65, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.2, 0]
+    'DomesticFanModel': { // Ev Tipi Fan (Banyo/WC) Modeli
+        grounded: { position: [0, -0.22, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'NicotraFanModel': {
-        grounded: [0, -0.65, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'DuctFanModel': { // Kanal Tipi Fan (Yuvarlak) Modeli
+        grounded: { position: [0, -0.7, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'SquarePlateFanModel': {
-        grounded: [0, -0.6, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'ExproofFanModel': { // Exproof Fan Modeli
+        grounded: { position: [0, -0.35, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, -0.35, 0] }
     },
-    'SmokeExhaustFanModel': {
-        grounded: [0, -0.4, -0.2],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'JetFanModel': { // Jet Fan (Otopark) Modeli
+        grounded: { position: [0, -0.7, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'ExproofFanModel': {
-        grounded: [0, -0.35, 0],
-        centered: [0, 0, 0],
-        orbital: [0, -0.3, 0]   // Santrifüj ile aynı model → aynı değer
+    'NicotraFanModel': { // Nicotra/Gebhardt (Geriye Eğimli) Fan Modeli
+        grounded: { position: [0, -0.65, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'DomesticFanModel': {
-        grounded: [0, -0.22, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'PlugFanModel': { // Plug Fan Modeli
+        grounded: { position: [0, -0.65, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.2, 0] }
     },
-    'RoundDuctFanModel': {
-        grounded: [0, 0.1, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'RectangularDuctFanModel': { // Dikdörtgen Kanal Tipi Fan Modeli
+        grounded: { position: [0, -0.7, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'AxialFanModel': {
-        grounded: [0, -0.55, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.1, 0]
+    'RoofFanModel': { // Çatı Tipi Fan Modeli
+        grounded: { position: [0, -1.0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, -0.6, 0] }
     },
-    // FAN DIŞI ÜRÜN GRUPLARI (Merkezi Yönetim)
-    'AirCurtainModel': {
-        grounded: [0, -0.35, 0],
-        centered: [0, 0, 0],
-        orbital: [0, -0.3, 0]
+    'RoundDuctFanModel': { // Yuvarlak Kanal Tipi Fan Modeli
+        grounded: { position: [0, 0.1, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    'AirPurifierModel': {
-        grounded: [0, 0.05, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0.05, 0]
+    'SilentChannelFanModel': { // Sessiz Kanal Tipi Fan Modeli
+        grounded: { position: [0, 0.1, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    'DehumidifierModel': {
-        grounded: [0, 0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'SmokeExhaustFanModel': { // Duman Egzoz Fan Modeli
+        grounded: { position: [0, -0.4, -0.2] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    'HRVModel': {
-        grounded: [0, 0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'SnailFanModel': { // Salyangoz / Santrifüj Fan Modeli
+        grounded: { position: [0, -0.35, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, -0.3, 0] }
     },
-    'FlexibleDuctModel': {
-        grounded: [0, 0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'WallMountedCompactFanModel': { // Duvar Tipi Kompakt Aksiyel Fan Modeli
+        grounded: { position: [0, -0.6, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0.1, 0] }
     },
-    'AccessoryModel': {
-        grounded: [0, 0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+
+    // ---------------------------------------------------------
+    // 3. DİĞER ALT KATEGORİLER (Other Subcategories)
+    // ---------------------------------------------------------
+    'AccessoryModel': { // Aksesuar Modeli
+        grounded: { position: [0, 0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     },
-    'SpeedControlModel': {
-        grounded: [0, 0, 0],
-        centered: [0, 0, 0],
-        orbital: [0, 0, 0]
+    'FlexibleDuctModel': { // Esnek Hava Kanalı Modeli
+        grounded: { position: [0, 0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
+    },
+    'SpeedControlModel': { // Hız Kontrol Cihazı / Otomasyon Modeli
+        grounded: { position: [0, 0, 0] },
+        centered: { position: [0, 0, 0] },
+        orbital: { position: [0, 0, 0] }
     }
 }
 
 export type ModelContext = 'grounded' | 'centered' | 'orbital'
 
-export function getModelOffset(
+export interface ModelPlacement {
+    position: ModelOffset
+    rotation: ModelOffset
+}
+
+export function getModelPlacement(
     modelType: string | undefined,
     slug: string | undefined,
     context: ModelContext = 'grounded'
-): ModelOffset {
+): ModelPlacement {
 
     // 1. Explicit Model Type Match
     if (modelType && MODEL_CONFIGS[modelType]) {
-        return MODEL_CONFIGS[modelType][context];
+        const p = MODEL_CONFIGS[modelType][context];
+        return {
+            position: p.position,
+            rotation: p.rotation || [0, 0, 0]
+        };
     }
 
     // 2. Slug-based Fallback (matching logic from Product3DViewer)
     const s = slug ? slug.toLowerCase() : ''
-    let config = DEFAULT_CONFIG;
+    let config: ModelConfig = DEFAULT_CONFIG;
 
     // Precise matching based on Category Registry slugs
-    if (s.includes('cati') || s.includes('roof')) config = MODEL_CONFIGS['RoofFanModel']
-    else if (s.includes('basinc') || s.includes('yangin') || s.includes('aksiyal')) config = MODEL_CONFIGS['AxialFanModel']
-    else if (s.includes('jet') || s.includes('otopark')) config = MODEL_CONFIGS['JetFanModel']
-    else if (s.includes('duman') || s.includes('smoke')) config = MODEL_CONFIGS['SmokeExhaustFanModel']
-    else if (s.includes('duvar') && (s.includes('kompakt') || s.includes('aksiyal'))) config = MODEL_CONFIGS['SquarePlateFanModel']
-    else if (s.includes('kanal') || s.includes('yuvarlak')) config = MODEL_CONFIGS['DuctFanModel']
-    else if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) config = MODEL_CONFIGS['RectangularDuctFanModel']
-    // Santrifüj ve Exproof → FanRenderer'da ikisi de ExproofFanModel kullanıyor → aynı config
-    else if (s.includes('salyangoz') || s.includes('santrifuj') || s.includes('exproof') || s.includes('atex') || s.includes('endustriyel')) config = MODEL_CONFIGS['ExproofFanModel']
-    else if (s.includes('plug')) config = MODEL_CONFIGS['PlugFanModel']
-    else if (s.includes('nicotra') || s.includes('gebhardt')) config = MODEL_CONFIGS['NicotraFanModel']
-    else if (s.includes('konut') || s.includes('banyo') || s.includes('wc')) config = MODEL_CONFIGS['DomesticFanModel']
-    // Yeni Ürün Grupları Eşleştirmesi
-    else if (s.includes('perde')) config = MODEL_CONFIGS['AirCurtainModel']
-    else if (s.includes('temizleyici')) config = MODEL_CONFIGS['AirPurifierModel']
-    else if (s.includes('nem-alma')) config = MODEL_CONFIGS['DehumidifierModel']
-    else if (s.includes('isi-geri')) config = MODEL_CONFIGS['HRVModel']
-    else if (s.includes('flexible') || s.includes('kanal')) config = MODEL_CONFIGS['FlexibleDuctModel']
-    else if (s.includes('aksesuar') || s.includes('yedek')) config = MODEL_CONFIGS['AccessoryModel']
-    else if (s.includes('hiz') || s.includes('kontrol')) config = MODEL_CONFIGS['SpeedControlModel']
+    // Hiyerarşi: FanRenderer.tsx ile BİREBİR SENKRONİZE
+    // ---------------------------------------------------------
 
-    // Return requested context offset
-    return config[context];
+    // DEBUG: Hangi modelin seçildiğini görmek için
+    // console.log(`[3D-Offset] Slug: ${s}, ModelType: ${modelType || 'N/A'}`);
+
+    // 1. SPESİFİK ÜRÜN GRUPLARI
+    if (s.includes('perde') || s.includes('isitici') || s.includes('ortam-havali')) {
+        config = MODEL_CONFIGS['AirCurtainModel'];
+    }
+    else if (s.includes('sessiz') || s.includes('silent') || s.includes('lineo') || s.includes('td')) {
+        config = MODEL_CONFIGS['DuctFanModel']; // Silent modeller Kanal Tipi/Yuvarlak offsetlerini kullanır
+    }
+    else if (s.includes('jet') || s.includes('otopark')) {
+        config = MODEL_CONFIGS['JetFanModel'];
+    }
+
+    // 2. SPESİFİK FAN TİPLERİ (Form Faktörü Öncelikli)
+
+    // Exproof & ATEX (ÖNCELİKLİ - Salyangozdan ve Çatıdan Önce)
+    else if (s.includes('exproof') || s.includes('ex-proof') || s.includes('atex') || s.includes('endustriyel')) {
+        config = MODEL_CONFIGS['ExproofFanModel'];
+    }
+    else if (s.includes('cati') || s.includes('roof')) {
+        config = MODEL_CONFIGS['RoofFanModel'];
+    }
+    // Dikdörtgen / Prizmatik / Hücreli
+    else if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('taze-hava') || s.includes('hücreli') || s.includes('hucreli') || s.includes('kabinli')) {
+        config = MODEL_CONFIGS['RectangularDuctFanModel'];
+    }
+    // Kanal Tipi (Yuvarlak)
+    else if (s.includes('kanal') || s.includes('yuvarlak')) {
+        config = MODEL_CONFIGS['DuctFanModel'];
+    }
+    // Kare Plakalı (Duvar Tipi Kompakt)
+    else if (s.includes('duvar') && s.includes('kompakt')) {
+        config = MODEL_CONFIGS['WallMountedCompactFanModel']; // [FIX] Key Updated
+    }
+    // Ev Tipi / Duvar Tipi Standart
+    else if (s.includes('konut') || s.includes('banyo') || s.includes('wc') || s.includes('quattro') || s.includes('duvar')) {
+        config = MODEL_CONFIGS['DomesticFanModel'];
+    }
+    // Hava Temizleyiciler
+    else if (s.includes('temizleyici') || s.includes('purifier') || s.includes('filtre') || s.includes('anti-viral')) {
+        config = MODEL_CONFIGS['AirPurifierModel'];
+    }
+
+    // Santrifüj / Salyangoz / Radyal
+    else if (s.includes('salyangoz') || s.includes('santrifuj') || s.includes('radyal')) {
+        config = MODEL_CONFIGS['SnailFanModel'];
+    }
+    // Duman Egzoz
+    else if (s.includes('smoke') || s.includes('duman')) {
+        config = MODEL_CONFIGS['SmokeExhaustFanModel'];
+    }
+    // Basınçlandırma / Yangın
+    else if (s.includes('basinc') || s.includes('yangin') || s.includes('merdiven')) {
+        config = MODEL_CONFIGS['AxialFanModel'];
+    }
+    // Aksiyal (Genel)
+    else if (s.includes('aksiyal') || s.includes('axial')) {
+        config = MODEL_CONFIGS['AxialFanModel'];
+    }
+    // Plug Fan
+    else if (s.includes('plug')) {
+        config = MODEL_CONFIGS['PlugFanModel'];
+    }
+    // Marka Bazlı (Nicotra)
+    else if (s.includes('nicotra') || s.includes('gebhardt') || s.includes('ddi') || s.includes('at')) {
+        config = MODEL_CONFIGS['NicotraFanModel'];
+    }
+    // Diğerleri
+    else if (s.includes('nem-alma')) {
+        config = MODEL_CONFIGS['DehumidifierModel'];
+    }
+    else if (s.includes('isi-geri')) {
+        config = MODEL_CONFIGS['HRVModel'];
+    }
+    else if (s.includes('flexible')) {
+        config = MODEL_CONFIGS['FlexibleDuctModel'];
+    }
+    else if (s.includes('aksesuar') || s.includes('yedek')) {
+        config = MODEL_CONFIGS['AccessoryModel'];
+    }
+    else if (s.includes('hiz') || s.includes('kontrol')) {
+        config = MODEL_CONFIGS['SpeedControlModel'];
+    }
+    // Return requested context placement
+    const placement = config[context];
+    return {
+        position: placement.position,
+        rotation: placement.rotation || [0, 0, 0]
+    };
 }
