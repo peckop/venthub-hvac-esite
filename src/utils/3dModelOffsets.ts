@@ -12,9 +12,9 @@
 type ModelOffset = [number, number, number]
 
 interface ModelConfig {
-    grounded: { position: ModelOffset; rotation?: ModelOffset }
-    centered: { position: ModelOffset; rotation?: ModelOffset }
-    orbital: { position: ModelOffset; rotation?: ModelOffset }
+    grounded: { position: ModelOffset; rotation?: ModelOffset; scale?: number }
+    centered: { position: ModelOffset; rotation?: ModelOffset; scale?: number }
+    orbital: { position: ModelOffset; rotation?: ModelOffset; scale?: number }
 }
 
 // Default values if no specific config is found
@@ -79,7 +79,7 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     },
     'ExproofFanModel': { // Exproof Fan Modeli
         grounded: { position: [0, -0.35, 0] },
-        centered: { position: [0, 0, 0] },
+        centered: { position: [0, -0.2, 0] },
         orbital: { position: [0, -0.35, 0] }
     },
     'JetFanModel': { // Jet Fan (Otopark) Modeli
@@ -104,7 +104,7 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     },
     'RoofFanModel': { // Çatı Tipi Fan Modeli
         grounded: { position: [0, -1.0, 0] },
-        centered: { position: [0, 0, 0] },
+        centered: { position: [0, -0.1, 0] },
         orbital: { position: [0, -0.6, 0] }
     },
     'RoundDuctFanModel': { // Yuvarlak Kanal Tipi Fan Modeli
@@ -124,7 +124,7 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
     },
     'SnailFanModel': { // Salyangoz / Santrifüj Fan Modeli
         grounded: { position: [0, -0.35, 0] },
-        centered: { position: [0, 0, 0] },
+        centered: { position: [0, -0.2, 0] },
         orbital: { position: [0, -0.3, 0] }
     },
     'WallMountedCompactFanModel': { // Duvar Tipi Kompakt Aksiyel Fan Modeli
@@ -158,6 +158,7 @@ export type ModelContext = 'grounded' | 'centered' | 'orbital'
 export interface ModelPlacement {
     position: ModelOffset
     rotation: ModelOffset
+    scale?: number
 }
 
 export function getModelPlacement(
@@ -171,7 +172,8 @@ export function getModelPlacement(
         const p = MODEL_CONFIGS[modelType][context];
         return {
             position: p.position,
-            rotation: p.rotation || [0, 0, 0]
+            rotation: p.rotation || [0, 0, 0],
+            scale: p.scale || 1
         };
     }
 
@@ -271,6 +273,7 @@ export function getModelPlacement(
     const placement = config[context];
     return {
         position: placement.position,
-        rotation: placement.rotation || [0, 0, 0]
+        rotation: placement.rotation || [0, 0, 0],
+        scale: placement.scale || 1
     };
 }
