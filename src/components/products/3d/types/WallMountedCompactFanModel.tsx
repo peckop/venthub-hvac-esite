@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-export const SquarePlateFanModel: React.FC = () => {
+export const WallMountedCompactFanModel: React.FC = () => {
     // CRITICAL FIX: DO NOT USE useFanMaterials hook for spreading props.
     // It causes "White Material" bug because THREE.Material instances cannot be spread into JSX.
     // We define plain colors here.

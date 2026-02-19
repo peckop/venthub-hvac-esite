@@ -12,7 +12,7 @@ import { ExproofFanModel } from './types/ExproofFanModel'
 import { AirCurtainModel } from './types/AirCurtainModel'
 import { AirPurifierModel } from './types/AirPurifierModel'
 import { PlugFanModel } from './types/PlugFanModel'
-import { SquarePlateFanModel } from './types/SquarePlateFanModel'
+import { WallMountedCompactFanModel } from './types/WallMountedCompactFanModel'
 
 interface FanRendererProps {
     slug: string
@@ -32,7 +32,7 @@ interface FanRendererProps {
 const MODEL_COMPONENTS = {
     'AxialFanModel': AxialFanModel,
     'RoofFanModel': RoofFanModel,
-    'WallMountedCompactFanModel': SquarePlateFanModel, // [FIX] İsim Haritalama
+    'WallMountedCompactFanModel': WallMountedCompactFanModel, // [FIX] Updated Name
     'DomesticFanModel': DomesticFanModel,
     'DuctFanModel': DuctFanModel,
     'RectangularDuctFanModel': RectangularDuctFanModel,
@@ -70,7 +70,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
             const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as any
 
             // Hava perdesi için dinamik proplar
-            const extraProps: any = {}
+            const extraProps: { isHeated?: boolean; showMixed?: boolean } = {}
             if (modelType === 'AirCurtainModel') {
                 const isHeated = s.includes('isitici') || s.includes('elektrikli')
                 const isAmbient = s.includes('ortam-havali') || s.includes('naturel')
@@ -137,7 +137,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
         if (s.includes('kanal') || s.includes('yuvarlak')) return <DuctFanModel />
 
         // Konut / Banyo / Duvar (Kompakt / Kare Plakalı)
-        if (s.includes('duvar') && s.includes('kompakt')) return <SquarePlateFanModel />
+        if (s.includes('duvar') && s.includes('kompakt')) return <WallMountedCompactFanModel />
 
         // Konut / Banyo / Duvar (Standart Yuvarlak)
         if (s.includes('konut') || s.includes('banyo') || s.includes('wc') || s.includes('quattro') || s.includes('duvar')) {
