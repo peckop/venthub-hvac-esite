@@ -7,6 +7,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Hava Perdeleri -> Showcase Mode
     'hava-perdeleri': {
         display_mode: 'showcase',
+        model_type: 'AirCurtainModel',
         hide_price: true,
         hero_title: 'Hava Perdeleri',
         hero_description: 'İç mekan konforunu korurken enerji tasarrufu sağlayan profesyonel hava perdesi çözümleri.',
@@ -22,6 +23,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Fanlar -> Showcase Mode
     'fanlar': {
         display_mode: 'showcase',
+        model_type: 'AxialFanModel', // Default fan representation
         hide_price: true,
         hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri. Kimya tesisleri, boyahaneler ve endüstriyel tesisler için.',
         features: []
@@ -30,6 +32,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Isı Geri Kazanım Cihazları -> Showcase Mode
     'isi-geri-kazanim-cihazlari': {
         display_mode: 'showcase',
+        model_type: 'RectangularDuctFanModel',
         hide_price: true,
         hero_title: 'Isı Geri Kazanım Cihazları',
         hero_description: 'Enerji tasarrufu ve temiz hava sağlayan profesyonel HRV/ERV sistemleri.',
@@ -89,6 +92,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Main Category: Hava Temizleyiciler -> Showcase Mode
     'hava-temizleyiciler-anti-viral-urunler': {
         display_mode: 'showcase',
+        model_type: 'AirPurifierModel',
         hide_price: true,
         hero_title: 'Hava Temizleyiciler',
         hero_description: 'İç ortam hava kalitesini artıran anti-viral ve filtrasyon sistemleri.',
@@ -97,6 +101,7 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     // Sub Category (Emergency Fix): Endüstriyel Fanlar -> Exproof Fanlar
     'endustriyel-fanlar': {
         display_mode: 'showcase',
+        model_type: 'ExproofFanModel',
         hide_price: true,
         hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri.',
         features: []
