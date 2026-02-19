@@ -1,8 +1,9 @@
 import Iyzipay from "npm:iyzipay";
+/* eslint-disable no-console */
 
 Deno.serve(async (req) => {
     const origin = req.headers.get('origin') || '';
-    const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean);
+    const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
     const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin));
     const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now());
     const corsHeaders = {
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Max-Age': '86400',
         'X-Request-Id': requestId,
-    } as Record<string,string>;
+    } as Record<string, string>;
 
     if (req.method === 'OPTIONS') {
         return new Response(null, { status: 200, headers: corsHeaders });
@@ -40,8 +41,8 @@ Deno.serve(async (req) => {
     try {
         const url = new URL(req.url);
         const debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
-          || (url.searchParams.get('debug') === '1')
-          || ((req.headers.get('x-debug') || '') === '1');
+            || (url.searchParams.get('debug') === '1')
+            || ((req.headers.get('x-debug') || '') === '1');
 
         // Per-IP rate limiting
         try {
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
         type BuyerMin = { email?: string; gsmNumber?: string; registrationAddress?: string; ip?: string }
         type AddressMin = { address?: string }
-        type PaymentMin = { buyer?: BuyerMin; shippingAddress?: AddressMin; billingAddress?: AddressMin; [k:string]: unknown }
+        type PaymentMin = { buyer?: BuyerMin; shippingAddress?: AddressMin; billingAddress?: AddressMin;[k: string]: unknown }
         const sanitize = (obj: PaymentMin) => ({
             ...obj,
             buyer: obj?.buyer ? { ...obj.buyer, email: mask(obj.buyer.email), gsmNumber: mask(obj.buyer.gsmNumber), registrationAddress: '***', ip: '***' } : undefined,
@@ -88,10 +89,10 @@ Deno.serve(async (req) => {
         let shipAddr = requestData?.shippingAddress || requestData?.shipping || requestData?.shipping_address || null
         const billAddr = requestData?.billingAddress || requestData?.billing || requestData?.billing_address || null
         if (!shipAddr && billAddr) shipAddr = billAddr
-        if (!ci?.name || String(ci.name).trim().length===0) {
+        if (!ci?.name || String(ci.name).trim().length === 0) {
             const emailStr = String(ci?.email || '')
             const prefix = emailStr.includes('@') ? emailStr.split('@')[0] : 'Musteri'
-            ci = { ...(ci||{}), name: prefix }
+            ci = { ...(ci || {}), name: prefix }
         }
 
         // Validate required fields (relaxed): amount/cartItems optional; we derive authoritative items/total below
@@ -126,14 +127,21 @@ Deno.serve(async (req) => {
                 'Authorization': `Bearer ${serviceRoleKey}`,
                 'apikey': serviceRoleKey,
                 'Content-Type': 'application/json'
-            } as Record<string,string>;
+            } as Record<string, string>;
             const vResp = await fetch(`${supabaseUrl}/functions/v1/order-validate`, {
                 method: 'POST',
                 headers: vHeaders,
                 body: JSON.stringify({ user_id })
             });
             if (vResp.ok) {
-                const validation = await vResp.json().catch(() => ({}));
+                interface StockIssue { product_id: string; required: number; available: number }
+                interface ValidationResponse {
+                    stock_issues?: StockIssue[];
+                    mismatches?: unknown[];
+                    items?: { product_id: string; quantity: number; unit_price: number; price_list_id: string | null }[];
+                    totals?: { subtotal: number };
+                }
+                const validation = await vResp.json().catch(() => ({})) as ValidationResponse;
                 const stockIssues = Array.isArray(validation?.stock_issues) ? validation.stock_issues : [];
                 const _mismatches = Array.isArray(validation?.mismatches) ? validation.mismatches : [];
                 // Eski davranış: 409 döndürüp akışı durdurmak. Yeni davranış: sunucu otoritesini uygula ve devam et.
@@ -142,7 +150,7 @@ Deno.serve(async (req) => {
                     return new Response(JSON.stringify({ error: { code: 'VALIDATION_STOCK', message: 'Stock issue', stock_issues: stockIssues } }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
                 }
                 // Fiyat uyuşmazlığında: authoritativeItems ve subtotal ile devam et (ödeme bloklanmasın)
-                authoritativeItems = Array.isArray(validation?.items) ? validation.items : []
+                authoritativeItems = Array.isArray(validation?.items) ? (validation.items || []) : []
                 if (validation?.totals?.subtotal != null) {
                     authoritativeTotalNum = Number(validation.totals.subtotal)
                 }
@@ -152,7 +160,7 @@ Deno.serve(async (req) => {
         }
         if (authoritativeItems.length === 0 && Array.isArray(cartItems)) {
             authoritativeItems = (cartItems as Array<{ product_id: string; quantity: number; price?: number }>)
-              .map((ci) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price ?? 0), price_list_id: null }))
+                .map((ci) => ({ product_id: ci.product_id, quantity: ci.quantity, unit_price: Number(ci.price ?? 0), price_list_id: null }))
             authoritativeTotalNum = authoritativeItems.reduce((s, it) => s + Number(it.unit_price) * Number(it.quantity), 0)
         }
 
@@ -264,10 +272,10 @@ Deno.serve(async (req) => {
             try {
                 const { slackNotify } = await import('../_shared/notify.ts')
                 await slackNotify('DB error while creating order', [
-                  { title: 'Request-Id', value: requestId, short: true },
-                  { title: 'Status', value: String(orderResponse.status), short: true },
+                    { title: 'Request-Id', value: requestId, short: true },
+                    { title: 'Status', value: String(orderResponse.status), short: true },
                 ])
-            } catch {}
+            } catch { }
             return new Response(JSON.stringify({
                 error: { code: 'DATABASE_ERROR', message: 'Sipariş oluşturulamadı' }
             }), {
@@ -297,13 +305,13 @@ Deno.serve(async (req) => {
                     }
                 })
                 if (pRes.ok) {
-                    const rows = await pRes.json().catch(()=>[])
+                    const rows = await pRes.json().catch(() => [])
                     if (Array.isArray(rows)) {
                         prodMap = new Map((rows as Array<{ id: string; name?: string; sku?: string; image_url?: string | null }>).map((p) => [p.id, p]))
                     }
                 }
             }
-        } catch {}
+        } catch { }
 
         // Fallback name/image maps from client cart (in case product metadata is missing)
         const nameMap = new Map<string, string>()
@@ -317,7 +325,7 @@ Deno.serve(async (req) => {
                     }
                 }
             }
-        } catch {}
+        } catch { }
 
         // Şema uyumlu kolonlar: order_id, product_id, product_name, unit_price, quantity, total_price,
         // opsiyonel: price_at_time, product_image_url
@@ -354,15 +362,15 @@ Deno.serve(async (req) => {
             body: JSON.stringify(orderItems)
         });
         if (!itemsResp.ok) {
-            const errTxt = await itemsResp.text().catch(()=> '')
+            const errTxt = await itemsResp.text().catch(() => '')
             console.error('Order items insert failed:', itemsResp.status, errTxt)
             return new Response(JSON.stringify({ error: { code: 'DATABASE_ERROR', message: 'Sipariş kalemleri eklenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
 
         // İyzico checkout form initialize request
         // Fiyat tutarlılığı: price == basketItems toplamı olmalı, paidPrice >= price olabilir.
-        const to2 = (n:number)=> Number(Number(n).toFixed(2))
-        const toCents = (n:number)=> Math.round(Number(n)*100)
+        const to2 = (n: number) => Number(Number(n).toFixed(2))
+        const toCents = (n: number) => Math.round(Number(n) * 100)
         const basketItems = authoritativeItems.map((item) => ({
             id: item.product_id,
             name: (typeof prodMap.get === 'function' ? (prodMap.get(item.product_id)?.name) : undefined) || 'Ürün',
@@ -372,7 +380,7 @@ Deno.serve(async (req) => {
             price: to2(Number(item.unit_price) * Number(item.quantity)).toFixed(2)
         }));
         // Toplamı kuruş bazında hesapla ve her iki alana da aynı değeri yaz
-        const subtotalCents = authoritativeItems.reduce((s:number, it)=> s + toCents(Number(it.unit_price)) * Number(it.quantity), 0)
+        const subtotalCents = authoritativeItems.reduce((s: number, it) => s + toCents(Number(it.unit_price)) * Number(it.quantity), 0)
         const normalizedTotal = subtotalCents / 100
         const itemsTotal = normalizedTotal
         const paidPriceNumber = normalizedTotal
@@ -415,7 +423,7 @@ Deno.serve(async (req) => {
                 id: user_id || 'guest_' + Date.now(),
                 name: (ci.name || '').split(' ')[0] || 'Ad',
                 surname: (ci.name || '').split(' ').slice(1).join(' ') || 'Soyad',
-                gsmNumber: (() => { const raw = ci.phone || '+905555555555'; const digits = raw.replace(/\s+/g,''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g,'')); })(),
+                gsmNumber: (() => { const raw = ci.phone || '+905555555555'; const digits = raw.replace(/\s+/g, ''); return digits.startsWith('+') ? digits : ('+' + digits.replace(/[^0-9]/g, '')); })(),
                 email: ci.email,
                 identityNumber: '11111111110',
                 lastLoginDate: new Date().toISOString().split('T')[0] + ' 12:00:00',
@@ -486,7 +494,7 @@ Deno.serve(async (req) => {
         if (debugEnabled) console.log('İyzico Result:', { status: iyzicoResult?.status, hasToken: !!iyzicoResult?.token, hasPaymentPageUrl: !!iyzicoResult?.paymentPageUrl });
         if (iyzicoResult && iyzicoResult.status === 'success' && (iyzicoResult.checkoutFormContent || iyzicoResult.paymentPageUrl || iyzicoResult.token)) {
             if (debugEnabled) console.log('✅ İyzico checkout form created successfully');
-            
+
             // Minimal token saklama: reconcile için yeterli.
             try {
                 if (iyzicoResult.token) {
@@ -505,7 +513,7 @@ Deno.serve(async (req) => {
                 const msg = e instanceof Error ? e.message : String(e ?? '')
                 console.warn('payment_data token patch skipped:', msg)
             }
-            
+
             return new Response(JSON.stringify({
                 data: {
                     status: 'success',
@@ -527,14 +535,14 @@ Deno.serve(async (req) => {
             try {
                 const { slackNotify } = await import('../_shared/notify.ts')
                 await slackNotify('İyzico checkout form creation failed', [
-                  { title: 'Request-Id', value: requestId, short: true },
-                  { title: 'Details', value: String(iyzicoResult?.errorMessage || 'unknown'), short: false },
+                    { title: 'Request-Id', value: requestId, short: true },
+                    { title: 'Details', value: String(iyzicoResult?.errorMessage || 'unknown'), short: false },
                 ])
-            } catch {}
-            
+            } catch { }
+
             return new Response(JSON.stringify({
-                error: { 
-                    code: 'IYZICO_FORM_ERROR', 
+                error: {
+                    code: 'IYZICO_FORM_ERROR',
                     message: 'İyzico ödeme formu oluşturulamadı',
                     details: iyzicoResult.errorMessage || 'Bilinmeyen hata'
                 }
@@ -545,20 +553,21 @@ Deno.serve(async (req) => {
         }
 
     } catch (error) {
-        console.error('Critical Error:', error);
+        if (debugEnabled) console.error('Critical Error:', error);
         try {
             const { slackNotify } = await import('../_shared/notify.ts')
+            const errMsg = error instanceof Error ? error.message : String(error)
             await slackNotify('iyzico-payment crashed', [
-              { title: 'Request-Id', value: requestId, short: true },
-              { title: 'Error', value: String((error as any)?.message || error), short: false },
+                { title: 'Request-Id', value: requestId, short: true },
+                { title: 'Error', value: errMsg, short: false },
             ])
-        } catch {}
-        
+        } catch { }
+
         return new Response(JSON.stringify({
             error: {
                 code: 'INTERNAL_ERROR',
                 message: 'Sunucu hatası oluştu',
-                details: (error as any)?.message
+                details: error instanceof Error ? error.message : String(error)
             }
         }), {
             status: 500,
