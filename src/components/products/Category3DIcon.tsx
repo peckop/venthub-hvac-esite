@@ -318,9 +318,12 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
         return p
     }, [safeSlug, offsetContext, useSmartCenter, modelType])
 
+    // Apply manual scale from config
+    const finalScale = scale * (placement.scale || 1)
+
     if (useSmartCenter) {
         return (
-            <group scale={scale}>
+            <group scale={finalScale}>
                 <SmartCenterScale targetSize={1.4} enabled={true} shift={placement.position}>
                     <group rotation={placement.rotation}>
                         {content}
@@ -331,7 +334,7 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
     }
 
     return (
-        <group scale={scale} position={placement.position} rotation={placement.rotation}>
+        <group scale={finalScale} position={placement.position} rotation={placement.rotation}>
             {content}
         </group>
     )
