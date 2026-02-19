@@ -38,7 +38,7 @@ const MODEL_CONFIGS: Record<string, ModelConfig> = {
         centered: {
             position: [0, 0, 0],
             rotation: [0, Math.PI / 2, 0],
-            scale: 1
+            scale: 1.2
         },
         orbital: {
             position: [0, 0.3, 0],
