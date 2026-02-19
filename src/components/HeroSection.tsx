@@ -5,26 +5,26 @@ const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
 // Responsive hero variants generated at build-time via vite-imagetools
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import avifSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=55&srcset'
+import avifSet from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=avif&quality=55&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import webpSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=72&srcset'
+import webpSet from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=webp&quality=72&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import jpgSet from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
+import jpgSet from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=640;960;1200;1600&format=jpg&quality=88&srcset'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+import hero1200 from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 // Background image responsive variants (decorative)
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgDefaultAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50'
+import bgDefaultAvif from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgLargeAvif from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45'
+import bgLargeAvif from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import bgTiny from '../../public/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'
+import bgTiny from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
@@ -95,7 +95,7 @@ export const HeroSection: React.FC = () => {
       const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
       const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 800))
       idle(() => setShowOverlay(true))
-    } catch {}
+    } catch { }
   }, [])
 
   // Defer high-res background; show tiny blurred LQIP early (via CSS var + ::before)
@@ -110,7 +110,7 @@ export const HeroSection: React.FC = () => {
         el.style.setProperty('--hero-bg-opacity', '0')
       }
 
-const setHighResNow = () => {
+      const setHighResNow = () => {
         const isLg = window.matchMedia('(min-width: 1024px)').matches
         const url = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string))
         el.style.setProperty('--hero-bg-url', `url(${url})`)
@@ -135,7 +135,7 @@ const setHighResNow = () => {
         window.removeEventListener('load', onLoad)
         cancelAnimationFrame(raf)
       }
-    } catch {}
+    } catch { }
   }, [])
 
   return (
@@ -146,8 +146,8 @@ const setHighResNow = () => {
         const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100)
         const y = Math.round(((e.clientY - rect.top) / rect.height) * 100)
-        ;(e.currentTarget as HTMLDivElement).style.setProperty('--mx', `${x}%`)
-        ;(e.currentTarget as HTMLDivElement).style.setProperty('--my', `${y}%`)
+          ; (e.currentTarget as HTMLDivElement).style.setProperty('--mx', `${x}%`)
+          ; (e.currentTarget as HTMLDivElement).style.setProperty('--my', `${y}%`)
       }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
@@ -269,40 +269,40 @@ const setHighResNow = () => {
 function ArrowRightIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      <path d="M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 function CheckIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-      <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+      <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 function TruckIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
-      <rect x="1" y="7" width="13" height="8" stroke="currentColor" strokeWidth="2"/>
-      <path d="M14 9h4l3 3v3h-7" stroke="currentColor" strokeWidth="2" fill="none"/>
-      <circle cx="6" cy="17" r="2" fill="currentColor"/>
-      <circle cx="18" cy="17" r="2" fill="currentColor"/>
+      <rect x="1" y="7" width="13" height="8" stroke="currentColor" strokeWidth="2" />
+      <path d="M14 9h4l3 3v3h-7" stroke="currentColor" strokeWidth="2" fill="none" />
+      <circle cx="6" cy="17" r="2" fill="currentColor" />
+      <circle cx="18" cy="17" r="2" fill="currentColor" />
     </svg>
   )
 }
 function ShieldIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z" stroke="currentColor" strokeWidth="2" fill="none"/>
+      <path d="M12 2l7 4v5c0 5-3 8-7 11C8 19 5 16 5 11V6l7-4z" stroke="currentColor" strokeWidth="2" fill="none" />
     </svg>
   )
 }
 function PhoneIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.16 9.81 19.8 19.8 0 0 1 .09 1.18 2 2 0 0 1 2.07-.99h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.62a2 2 0 0 1-.45 2.11L6.5 7.5a16 16 0 0 0 6 6l1.99-1.74a2 2 0 0 1 2.11-.45c.84.29 1.72.5 2.62.62A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.16 9.81 19.8 19.8 0 0 1 .09 1.18 2 2 0 0 1 2.07-.99h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.62a2 2 0 0 1-.45 2.11L6.5 7.5a16 16 0 0 0 6 6l1.99-1.74a2 2 0 0 1 2.11-.45c.84.29 1.72.5 2.62.62A2 2 0 0 1 22 16.92z" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   )
 }

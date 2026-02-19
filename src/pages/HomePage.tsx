@@ -14,7 +14,7 @@ const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
 
 // @ts-expect-error: Missing type definitions for image query params
-import hero1200 from '../../public/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+import hero1200 from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
 
 // Kritik olmayan blokları tembel yükleme
 import LazyBrandsShowcase from '../components/LazyBrandsShowcase'

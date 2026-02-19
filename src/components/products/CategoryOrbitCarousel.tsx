@@ -119,7 +119,7 @@ const formatSubcategoryLabel = (key: string): string => {
         DUVAR_TIPI: 'Duvar Tipi Fanlar',
         KANAL_TIPI: 'Kanal Tipi Fanlar',
         OTOPARK_JET: 'Otopark Jet Fanları',
-        ENDUSTRIYEL: 'Exproof Fanlar',
+        EXPROOF: 'Exproof Fanlar',
         KONUT_TIPI: 'Konut Tipi',
         PLUG: 'Plug Fanlar',
         SANTRIFUJ: 'Santrifüj Fanlar',
@@ -170,6 +170,52 @@ const getSubcategoriesForCategory = (categorySlug: string): SubcategoryItem[] =>
 
 // Carousel seviyesi
 type CarouselLevel = 'main' | 'subcategory'
+
+// [NEW] Model Tipi Belirleyici Helper
+const getModelTypeForCategory = (slug: string): string | undefined => {
+    const s = slug.toLowerCase()
+
+    // 1. Ana Kategoriler
+    if (s.includes('perde') || s === 'hava-perdeleri') return 'AirCurtainModel'
+    if (s.includes('temizleyici') || s === 'hava-temizleyiciler') return 'AirPurifierModel'
+    if (s.includes('nem') || s === 'nem-alma') return 'DehumidifierModel'
+    if (s.includes('isi-geri') || s === 'isi-geri-kazanim') return 'HRVModel'
+    if (s.includes('hiz') || s === 'hiz-kontrol') return 'SpeedControlModel'
+    if (s.includes('aksesuar') || s === 'aksesuarlar') return 'AccessoryModel'
+    if (s.includes('flexible')) return 'FlexibleDuctModel'
+
+    // 2. Alt Kategoriler (Spesifik eşleşmeler öncelikli)
+
+    // Fix: Exproof için 'endustriyel' fallback'i (Çatı'dan önce bakılmalı)
+    if (s.includes('exproof') || s.includes('atex') || s.includes('endustriyel')) return 'ExproofFanModel'
+
+    if (s.includes('cati') || s.includes('roof')) return 'RoofFanModel'
+
+    // Fix: Kanal Tipi için RoundDuctFanModel (Kullanıcının editlediği model)
+    if (s.includes('sessiz')) return 'SilentChannelFanModel' // [FIX] SilentChannelFanModel adı düzeltildi
+    if (s.includes('kanal') || s.includes('yuvarlak')) return 'RoundDuctFanModel'
+
+    if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) return 'RectangularDuctFanModel'
+
+    if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) return 'RectangularDuctFanModel'
+
+    if (s.includes('duman') || s.includes('smoke')) return 'SmokeExhaustFanModel'
+    if (s.includes('jet') || s.includes('otopark')) return 'JetFanModel'
+    if (s.includes('salyangoz') || s.includes('santrifuj') || s.includes('radyal')) return 'SnailFanModel'
+    if (s.includes('plug')) return 'PlugFanModel'
+    if (s.includes('nicotra') || s.includes('gebhardt')) return 'NicotraFanModel'
+
+    // Fix: Duvar Tipi Kompakt (WallMountedCompact) vs Konut Tipi (Domestic) Ayrımı
+    if (s.includes('duvar') && s.includes('kompakt')) return 'WallMountedCompactFanModel' // [FIX] İsim güncellendi
+    if (s.includes('duvar') || s.includes('konut') || s.includes('banyo') || s.includes('wc')) return 'DomesticFanModel'
+
+    if (s.includes('yangin') || s.includes('basinc')) return 'AxialFanModel'
+
+    // 3. Varsayılanlar
+    if (s.includes('fan')) return 'AxialFanModel'
+
+    return undefined // Fallback to slug based logic
+}
 
 const CategoryOrbitCarousel = () => {
     const navigate = useNavigate()
@@ -243,15 +289,16 @@ const CategoryOrbitCarousel = () => {
                 id: c.id,
                 title: c.title,
                 image: c.image,
-                categorySlug: c.id
+                categorySlug: c.id,
+                modelType: getModelTypeForCategory(c.id) // [NEW] Ana kategori için model tipi
             }))
         } else {
             return subcategories.map(s => ({
                 id: s.slug,
                 title: s.title,
                 image: s.image,
-                // DÜZELTME: Alt kategorinin kendi slug'ını kullan
-                categorySlug: s.slug
+                categorySlug: s.slug, // DÜZELTME: Alt kategorinin kendi slug'ını kullan
+                modelType: getModelTypeForCategory(s.slug) // [NEW] Alt kategori için model tipi
             }))
         }
     }, [level, subcategories])
