@@ -21,7 +21,7 @@ async function run() {
         await client.connect()
         console.log('Connected.')
 
-        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260122_rename_danfoss.sql')
+        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260220_optimize_performance_advisor_part3.sql')
         const sql = fs.readFileSync(sqlPath, 'utf8')
 
         console.log('Executing migration...')
