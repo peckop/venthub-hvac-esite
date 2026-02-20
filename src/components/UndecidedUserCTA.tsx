@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { MessageSquare, ArrowRight } from 'lucide-react'
 
 export const UndecidedUserCTA: React.FC = () => {
@@ -25,7 +25,7 @@ export const UndecidedUserCTA: React.FC = () => {
                 </div>
 
                 <Link
-                    to="/contact?dept=consulting"
+                    href="/contact?dept=consulting"
                     className="group relative inline-flex items-center gap-2 bg-white text-primary-navy px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all whitespace-nowrap"
                 >
                     <span>Uzman Desteği Alın</span>

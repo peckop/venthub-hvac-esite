@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { useScroll, useCursor } from '@react-three/drei'
 import { shaderMaterial } from '@react-three/drei'
 import { extend } from '@react-three/fiber'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 
 /**
  * Bent Plane Shader Material
@@ -96,10 +96,11 @@ interface BentPlaneGeometryProps {
  * Note: Position is now controlled by parent ProductCard component
  */
 const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, position = [0, 0, 0] }) => {
+  const router = useRouter()
     const meshRef = useRef<THREE.Mesh>(null)
     const materialRef = useRef<THREE.ShaderMaterial>(null)
     const scroll = useScroll()
-    const navigate = useNavigate()
+    const navigate = useRouter()
     const [hovered, setHover] = useState(false)
 
     // Change cursor on hover
@@ -126,7 +127,7 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
 
     const handleClick = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
-        navigate(`/category/${id}`)
+        router.push(`/category/${id}`)
     }
 
     return (
@@ -149,3 +150,5 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
 }
 
 export default BentPlaneGeometry
+
+

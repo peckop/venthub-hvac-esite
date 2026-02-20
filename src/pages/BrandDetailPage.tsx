@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { HVAC_BRANDS, supabase, Product } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
 import { Globe, ArrowRight, Package, Award, Shield, ExternalLink } from 'lucide-react'
@@ -7,7 +8,6 @@ import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAn
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 
-// Extended brand info
 const BRAND_DETAILS: Record<string, {
   founded?: number
   headquarters?: string
@@ -82,7 +82,8 @@ const BRAND_DETAILS: Record<string, {
 }
 
 const BrandDetailPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>()
+  const params = useParams()
+  const slug = params?.slug as string
   const brand = HVAC_BRANDS.find((b) => b.slug === slug)
   const brandDetails = slug ? BRAND_DETAILS[slug] : null
   const { t } = useI18n()
@@ -91,7 +92,13 @@ const BrandDetailPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
-  const canonicalUrl = `${window.location.origin}/brands/${slug}`
+  const [canonicalUrl, setCanonicalUrl] = useState('')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCanonicalUrl(`${window.location.origin}/brands/${slug || ''}`)
+    }
+  }, [slug])
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -125,7 +132,7 @@ const BrandDetailPage: React.FC = () => {
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('brands.notFound')}</h1>
-          <Link to="/brands" className="text-primary-navy hover:text-secondary-blue">{t('brands.backToAll')}</Link>
+          <Link href="/brands" className="text-primary-navy hover:text-secondary-blue">{t('brands.backToAll')}</Link>
         </div>
       </div>
     )
@@ -146,9 +153,9 @@ const BrandDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center text-sm text-white/60 mb-6">
-            <Link to="/" className="hover:text-white">{t('common.home')}</Link>
+            <Link href="/" className="hover:text-white">{t('common.home')}</Link>
             <span className="mx-2">/</span>
-            <Link to="/brands" className="hover:text-white">{t('common.brands')}</Link>
+            <Link href="/brands" className="hover:text-white">{t('common.brands')}</Link>
             <span className="mx-2">/</span>
             <span className="text-white font-medium">{brand.name}</span>
           </div>
@@ -226,7 +233,7 @@ const BrandDetailPage: React.FC = () => {
             </h2>
             {products.length > 0 && (
               <Link
-                to={`/products?brand=${brand.name}`}
+                href={`/products?brand=${brand.name}`}
                 className="text-primary-navy font-semibold hover:text-secondary-blue flex items-center gap-1"
               >
                 Tümünü Gör
@@ -250,7 +257,7 @@ const BrandDetailPage: React.FC = () => {
               {products.map((product, index) => (
                 <Link
                   key={product.id}
-                  to={`/products/${product.id}`}
+                  href={`/products/${product.id}`}
                   className={`group bg-white rounded-xl p-4 border border-light-gray hover:border-primary-navy/30 hover:shadow-hvac transition-all ${scrollAnimationClasses.fadeUp(productsVisible)}`}
                   style={{ transitionDelay: `${index * 50}ms` }}
                 >
@@ -292,7 +299,7 @@ const BrandDetailPage: React.FC = () => {
             Teknik özellikler, fiyat ve stok bilgisi için bizimle iletişime geçin.
           </p>
           <Link
-            to="/contact"
+            href="/contact"
             className="inline-flex items-center justify-center rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all"
           >
             İletişime Geç

@@ -41,9 +41,23 @@ const AdminCategoriesPage: React.FC = () => {
   })
   const [density, setDensity] = React.useState<Density>('comfortable')
 
-  React.useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
-  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
-  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
 
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
@@ -180,7 +194,7 @@ const AdminCategoriesPage: React.FC = () => {
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       {r.image_url ? (
                         <img
-                          src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
+                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
                           alt=""
                           className="w-10 h-10 object-cover rounded border border-gray-200"
                         />

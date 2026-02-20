@@ -54,9 +54,23 @@ const AdminProductsPage: React.FC = () => {
 
   const [covers, setCovers] = React.useState<Record<string, string>>({})
 
-  React.useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
-  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
-  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
@@ -136,7 +150,7 @@ const AdminProductsPage: React.FC = () => {
         try {
           // Chunk IDs to avoid URL length constraints (CORS/502 errors)
           const chunkSize = 20
-          const chunks = []
+          const chunks: string[][] = []
           for (let i = 0; i < ids.length; i += chunkSize) chunks.push(ids.slice(i, i + chunkSize))
 
           const results = await Promise.all(chunks.map(c =>
@@ -501,7 +515,11 @@ const AdminProductsPage: React.FC = () => {
                   {visibleCols.image && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       {covers[r.id] ? (
-                        <img src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`} alt="" className="w-10 h-10 object-cover rounded" />
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
+                          alt=""
+                          className="w-10 h-10 object-cover rounded border border-gray-200"
+                        />
                       ) : (
                         <div className="w-10 h-10 bg-gray-100 rounded" />
                       )}

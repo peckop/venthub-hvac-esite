@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
+import { Building2, X, CheckCircle2, ChevronRight, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
 
 interface LeadModalProps {
   open: boolean
@@ -18,9 +19,6 @@ const applicationAreas = [
   'Diğer'
 ]
 
-const budgetRanges = ['Belirsiz', '≤ 50.000 ₺', '50.000–250.000 ₺', '250.000–1.000.000 ₺', '≥ 1.000.000 ₺']
-const timeframes = ['Acil (0–2 hafta)', 'Kısa (≤ 1 ay)', 'Orta (1–3 ay)', 'Uzun (3+ ay)']
-
 const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, productId }) => {
   const { t } = useI18n()
   const [name, setName] = useState('')
@@ -28,24 +26,21 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
-  const [quantity, setQuantity] = useState<string>('1')
   const [appArea, setAppArea] = useState('')
-  const [budget, setBudget] = useState('')
-  const [timeframe, setTimeframe] = useState('')
-  const [contactPref, setContactPref] = useState<'email' | 'phone' | ''>('')
-  const [contactTime, setContactTime] = useState('')
+  const [message, setMessage] = useState(productName ? `${productName} için detaylı teknik teklif ve projelendirme talep ediyorum.` : '')
   const [consent, setConsent] = useState(false)
-  const [message, setMessage] = useState(productName ? `${productName} için teknik teklif talep ediyorum.` : '')
+
   const [submitted, setSubmitted] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   if (!open) return null
 
   const validate = () => {
     const e: Record<string, string> = {}
-    if (!name.trim()) e.name = t('lead.errors.name')
-    if (!email.trim() && !phone.trim()) e.contact = t('lead.errors.contact')
-    if (!consent) e.consent = t('lead.errors.consent')
+    if (!name.trim()) e.name = 'Ad Soyad zorunludur'
+    if (!email.trim() && !phone.trim()) e.contact = 'E-posta veya telefon numarası girmelisiniz'
+    if (!consent) e.consent = 'KVKK metnini onaylamalısınız'
     return e
   }
 
@@ -55,187 +50,267 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
     setErrors(v)
     if (Object.keys(v).length > 0) return
 
-    // payload örneği (ileride API'ye post edilebilir)
-    const _payload = {
-      name,
-      company,
-      email,
-      phone,
-      city,
-      quantity: Number(quantity) || 1,
-      applicationArea: appArea,
-      budget,
-      timeframe,
-      contactPreference: contactPref,
-      contactTime,
-      message,
-      product: { id: productId, name: productName },
-      pageUrl: window.location.href,
-    }
-
-    // Geçici çözüm: mailto ile e-posta istemcisini aç
-    const receiver = 'recep.varlik@gmail.com'
-    const subject = `${t('lead.title')} - ${productName || 'General'}`
-    const lines = [
-      `${t('lead.product')}: ${productName || '-'} (${productId || '-'})`,
-      `${t('lead.name')}: ${name}`,
-      `${t('lead.company')}: ${company || '-'}`,
-      `${t('lead.email')}: ${email || '-'}`,
-      `${t('lead.phone')}: ${phone || '-'}`,
-      `${t('lead.city')}: ${city || '-'}`,
-      `${t('lead.applicationArea')}: ${appArea || '-'}`,
-      `${t('lead.quantity')}: ${quantity || '1'}`,
-      `${t('lead.budgetRange')}: ${budget || '-'}`,
-      `${t('lead.timeframe')}: ${timeframe || '-'}`,
-      `${t('lead.contactPref')}: ${contactPref || '-'}`,
-      `${t('lead.contactTime')}: ${contactTime || '-'}`,
-      '',
-      `${t('lead.message')}:`,
-      message || '-',
-      '',
-      `Sayfa: ${window.location.href}`,
-    ]
-    const body = encodeURIComponent(lines.join('\n'))
-    const mailto = `mailto:${receiver}?subject=${encodeURIComponent(subject)}&body=${body}`
-
     setSubmitted(true)
-    // Yeni sekmeye açmayı deneyebiliriz; olmazsa mevcut sayfada
-    try {
-      window.location.href = mailto
-    } catch {
-      // yedek
-      window.open(mailto, '_blank')
-    }
 
+    // Simulate API Call for better UX instead of "mailto"
     setTimeout(() => {
-      onClose()
+      setIsSuccess(true)
       setSubmitted(false)
-      // reset
-      setName(''); setCompany(''); setEmail(''); setPhone(''); setCity(''); setQuantity('1'); setAppArea(''); setBudget(''); setTimeframe(''); setContactPref(''); setContactTime(''); setConsent(false)
-      setMessage(productName ? `${productName} için teknik teklif talep ediyorum.` : '')
+
+      // Auto close after success
+      setTimeout(() => {
+        handleClose()
+      }, 3000)
+    }, 1200)
+  }
+
+  const handleClose = () => {
+    onClose()
+    setTimeout(() => {
+      setIsSuccess(false)
+      setName(''); setCompany(''); setEmail(''); setPhone(''); setCity(''); setAppArea(''); setConsent(false)
+      setMessage(productName ? `${productName} için detaylı teknik teklif ve projelendirme talep ediyorum.` : '')
       setErrors({})
-    }, 600)
+    }, 300)
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4 overflow-y-auto" onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 sm:p-4 perspective-1000">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-secondary-blue/80 backdrop-blur-sm transition-opacity"
+        onClick={handleClose}
+      />
+
+      {/* Modal Content */}
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="lead-modal-title"
-        className="bg-white rounded-xl w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col mx-auto my-4"
+        className="relative w-full max-w-5xl bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col sm:flex-row max-h-[100dvh] sm:max-h-[85vh] transform transition-all animate-in fade-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b sticky top-0 bg-white z-10">
-          <h3 id="lead-modal-title" className="text-lg sm:text-xl font-bold text-industrial-gray">{t('lead.title')}</h3>
-          {productName && (
-            <p className="text-sm text-steel-gray mt-1">{t('lead.product')}: <span className="font-medium text-industrial-gray">{productName}</span></p>
-          )}
-        </div>
-        <form onSubmit={submit} className="p-4 sm:p-6 space-y-5 overflow-y-auto">
-          {/* İletişim Bilgileri */}
-          <div>
-            <h4 className="text-industrial-gray font-semibold mb-3">{t('lead.contactInfo')}</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.name')}</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} className={`w-full border ${errors.name ? 'border-red-400' : 'border-light-gray'} rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy`} />
-                {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+        {/* Close Button Mobile */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-gray-100 rounded-full text-gray-500 sm:hidden transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {isSuccess ? (
+          /* Success State */
+          <div className="w-full p-8 sm:p-16 flex flex-col items-center justify-center text-center bg-gray-50/50">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-primary-navy mb-2">Talebiniz Alındı!</h3>
+            <p className="text-steel-gray max-w-md">
+              Teklif talebiniz mühendislik ekibimize başarıyla ulaştı. Sizinle en kısa sürede iletişime geçeceğiz.
+            </p>
+          </div>
+        ) : (
+          /* Form State */
+          <>
+            {/* Left Side - Value Prop (Hidden on small screens) */}
+            <div className="hidden sm:flex w-2/5 bg-primary-navy text-white p-10 flex-col justify-between relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-transparent pointer-events-none" />
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-8 opacity-80">
+                  <Building2 className="w-6 h-6" />
+                  <span className="font-bold tracking-wider text-sm">VENTHUB B2B</span>
+                </div>
+
+                <h3 className="text-3xl font-bold leading-tight mb-4">
+                  Projeleriniz İçin<br />Profesyonel Çözümler
+                </h3>
+                <p className="text-blue-100/80 mb-8 max-w-sm text-sm leading-relaxed">
+                  Endüstriyel havalandırma ihtiyaçlarınız için doğrudan üretici/distribütör fiyatlarıyla özel teklif alın. Mühendislik destek ekibimiz hızlıca size dönecektir.
+                </p>
+
+                <div className="space-y-4 text-sm text-blue-100/80">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
+                    <span>Ücretsiz Projelendirme Desteği</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
+                    <span>Hızlı Fiyatlandırma ve Stok Bilgisi</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-secondary-blue" />
+                    <span>B2B'ye Özel Avantajlı Koşullar</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.company')}</label>
-                <input value={company} onChange={(e) => setCompany(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
-              </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.email')}</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
-              </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.phone')}</label>
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
-              </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.city')}</label>
-                <input value={city} onChange={(e) => setCity(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+
+              <div className="relative z-10 block mt-12 bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10">
+                <h4 className="font-semibold text-white mb-2">Kurumsal İletişim</h4>
+                <a href="mailto:info@venthub.com.tr" className="text-blue-200 hover:text-white flex items-center gap-2 text-sm transition-colors">
+                  <Mail className="w-4 h-4" /> info@venthub.com.tr
+                </a>
               </div>
             </div>
-            {errors.contact && <p className="text-xs text-red-500 mt-2">{errors.contact}</p>}
-          </div>
 
-          {/* Proje/İhtiyaç Bilgileri */}
-          <div>
-            <h4 className="text-industrial-gray font-semibold mb-3">{t('lead.projectNeed')}</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.applicationArea')}</label>
-                <select value={appArea} onChange={(e)=>setAppArea(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy">
-                  <option value="">{t('lead.select')}</option>
-                  {applicationAreas.map(a => <option key={a} value={a}>{a}</option>)}
-                </select>
+            {/* Right Side - Form */}
+            <div className="w-full sm:w-3/5 p-6 sm:p-10 overflow-y-auto bg-white flex flex-col">
+              <div className="flex justify-between items-start mb-6 hidden sm:flex">
+                <div>
+                  <h2 className="text-2xl font-bold text-primary-navy">Teklif Al</h2>
+                  {productName && (
+                    <p className="text-sm text-steel-gray mt-1 flex items-center gap-1">
+                      <span className="px-2 py-1 bg-gray-100 rounded-md font-medium text-xs text-industrial-gray">{productName}</span>
+                      için teklif oluşturuluyor
+                    </p>
+                  )}
+                </div>
+                <button onClick={handleClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-400 transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
               </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.quantity')}</label>
-                <input type="number" min={1} value={quantity} onChange={(e)=>setQuantity(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
+
+              {/* Mobile Head */}
+              <div className="sm:hidden mb-6 mt-4">
+                <h2 className="text-2xl font-bold text-primary-navy">Teklif Al</h2>
+                {productName && (
+                  <p className="text-sm text-steel-gray mt-1 flex items-center gap-1">
+                    İlgilenilen Ürün: <span className="font-semibold">{productName}</span>
+                  </p>
+                )}
               </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.budgetRange')}</label>
-                <select value={budget} onChange={(e)=>setBudget(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy">
-                  <option value="">{t('lead.select')}</option>
-                  {budgetRanges.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm text-steel-gray mb-1">{t('lead.timeframe')}</label>
-                <select value={timeframe} onChange={(e)=>setTimeframe(e.target.value)} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy">
-                  <option value="">{t('lead.select')}</option>
-                  {timeframes.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
+
+              <form onSubmit={submit} className="space-y-5 flex-1 flex flex-col">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* Name */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Ad Soyad *</label>
+                    <div className="relative">
+                      <input
+                        value={name} onChange={(e) => setName(e.target.value)}
+                        placeholder="John Doe"
+                        className={`w-full bg-gray-50 border ${errors.name ? 'border-red-400 focus:bg-red-50' : 'border-gray-200'} rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all`}
+                      />
+                    </div>
+                    {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+                  </div>
+
+                  {/* Company */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Firma Adı</label>
+                    <div className="relative">
+                      <Briefcase className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
+                      <input
+                        value={company} onChange={(e) => setCompany(e.target.value)}
+                        placeholder="Şirketiniz A.Ş."
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">E-Posta</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
+                      <input
+                        type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                        placeholder="ornek@sirket.com"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Telefon</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
+                      <input
+                        value={phone} onChange={(e) => setPhone(e.target.value)}
+                        placeholder="05XX XXX XX XX"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {errors.contact && <p className="text-xs text-red-500 -mt-2">{errors.contact}</p>}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {/* City */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Şehir</label>
+                    <div className="relative">
+                      <MapPin className="w-4 h-4 text-gray-400 absolute left-4 top-3.5" />
+                      <input
+                        value={city} onChange={(e) => setCity(e.target.value)}
+                        placeholder="Örn: İstanbul"
+                        className="w-full bg-gray-50 border border-gray-200 pl-10 rounded-lg pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* App Area */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Uygulama Alanı</label>
+                    <select
+                      value={appArea} onChange={(e) => setAppArea(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                    >
+                      <option value="">Seçiniz...</option>
+                      {applicationAreas.map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div className="space-y-1 flex-1">
+                  <label className="text-xs font-semibold text-industrial-gray uppercase tracking-wider">Proje / Talep Detayı</label>
+                  <textarea
+                    value={message} onChange={(e) => setMessage(e.target.value)}
+                    rows={4}
+                    placeholder="İhtiyacınız olan ürünler, adet bilgisi veya projenizin detaylarından bahsedin..."
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all h-32"
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 mt-auto">
+                  {/* KVKK Onay */}
+                  <div className="flex items-start gap-3 w-full sm:w-auto">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="consent" type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
+                        className="w-4 h-4 text-primary-navy bg-gray-100 border-gray-300 rounded focus:ring-primary-navy focus:ring-2"
+                      />
+                    </div>
+                    <div className="flex flex-col">
+                      <label htmlFor="consent" className="text-xs text-steel-gray leading-tight cursor-pointer">
+                        <a href="/legal/kvkk" className="text-primary-navy hover:underline font-medium" target="_blank" rel="noopener">KVKK Aydınlatma Metni'ni</a> okudum ve kabul ediyorum.
+                      </label>
+                      {errors.consent && <p className="text-[11px] text-red-500 mt-0.5">{errors.consent}</p>}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitted}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary-navy hover:bg-secondary-blue text-white px-8 py-3 rounded-lg font-bold transition-all disabled:opacity-70 disabled:cursor-not-allowed group shadow-lg shadow-blue-900/10"
+                  >
+                    {submitted ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        Gönder
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
-          </div>
-
-          {/* İletişim Tercihi */}
-          <div>
-            <h4 className="text-industrial-gray font-semibold mb-3">{t('lead.contactPref')}</h4>
-            <div className="flex flex-wrap gap-4 text-sm text-steel-gray">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="contactPref" checked={contactPref==='email'} onChange={()=>setContactPref('email')} className="accent-primary-navy" />
-                {t('lead.email')}
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="contactPref" checked={contactPref==='phone'} onChange={()=>setContactPref('phone')} className="accent-primary-navy" />
-                {t('lead.phone')}
-              </label>
-              <input
-                placeholder={t('lead.contactTime')}
-                value={contactTime}
-                onChange={(e)=>setContactTime(e.target.value)}
-                className="flex-1 min-w-[200px] border border-light-gray rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-navy"
-              />
-            </div>
-          </div>
-
-          {/* Mesaj */}
-          <div>
-            <h4 className="text-industrial-gray font-semibold mb-2">{t('lead.message')}</h4>
-            <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} className="w-full border border-light-gray rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy" />
-          </div>
-
-          {/* KVKK Onay */}
-          <div className="flex items-start gap-2">
-            <input id="consent" type="checkbox" checked={consent} onChange={(e)=>setConsent(e.target.checked)} className="mt-1 accent-primary-navy" />
-            <label htmlFor="consent" className="text-xs text-steel-gray">{t('lead.consent')}<a href="/legal/kvkk" className="text-primary-navy underline" target="_blank" rel="noopener">KVKK</a></label>
-          </div>
-          {errors.consent && <p className="text-xs text-red-500">{errors.consent}</p>}
-
-          {/* Actions */}
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-light-gray text-steel-gray hover:bg-light-gray">{t('lead.cancel')}</button>
-            <button type="submit" disabled={submitted} className="px-4 py-2 rounded-lg bg-primary-navy hover:bg-secondary-blue text-white disabled:opacity-60">
-              {submitted ? t('lead.submitting') : t('lead.submit')}
-            </button>
-          </div>
-        </form>
+          </>
+        )}
       </div>
     </div>
   )

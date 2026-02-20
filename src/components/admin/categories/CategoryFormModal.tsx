@@ -72,7 +72,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
 
             if (data.image_url) {
                 setImage({
-                    url: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${data.image_url}`,
+                    url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${data.image_url}`,
                     isNew: false
                 })
             } else {

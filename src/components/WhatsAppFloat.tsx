@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { WhatsAppIcon } from './HVACIcons'
 import { getSupportLink, isWhatsAppAvailable } from '../utils/whatsapp'
@@ -23,3 +25,4 @@ const WhatsAppFloat: React.FC = () => {
 }
 
 export default WhatsAppFloat
+

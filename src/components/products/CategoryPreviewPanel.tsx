@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronRight, Package, Tag, Info } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 
 export interface CategoryPreviewData {
     id: string
@@ -25,11 +25,12 @@ interface CategoryPreviewPanelProps {
  * Sağdan açılan glassmorphism temalı bilgi paneli
  */
 const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, isOpen, onClose }) => {
-    const navigate = useNavigate()
+  const router = useRouter()
+    const navigate = useRouter()
 
     const handleNavigate = () => {
         if (category) {
-            navigate(`/category/${category.id}`)
+            router.push(`/category/${category.id}`)
             onClose()
         }
     }
@@ -172,3 +173,5 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
 }
 
 export default CategoryPreviewPanel
+
+

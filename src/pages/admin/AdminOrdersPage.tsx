@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { format as _format } from 'date-fns'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
@@ -84,25 +84,26 @@ const AdminOrdersPage: React.FC = () => {
   }, [query])
 
   // Dashboard'tan preset uygula (pendingShipments)
-  const location = useLocation()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [presetPendingShipments, setPresetPendingShipments] = React.useState(false)
   React.useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const preset = params.get('preset')
+    if (!searchParams) return
+    const preset = searchParams.get('preset')
     const isPending = preset === 'pendingShipments'
     setPresetPendingShipments(isPending)
     if (isPending) {
       // UI'daki tekli status seçicisini zorlamadan, client-side olarak hem confirmed hem processing'i göstereceğiz
       setStatus('')
     }
-  }, [location.search])
+  }, [searchParams])
 
   // Fetch orders from edge function with server-side filters
   const fetchOrders = React.useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const supabaseUrl = ((import.meta as unknown) as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://tnofewwkwlyjsqgwjjga.supabase.co'
       const params = new URLSearchParams()
       if (status) params.set('status', status)
       if (fromDate) params.set('from', fromDate)
@@ -150,7 +151,7 @@ const AdminOrdersPage: React.FC = () => {
         setCarrier(dto.carrier || '')
         setTracking(dto.tracking_number || '')
       }
-    } catch {}
+    } catch { }
     setShipOpen(true)
   }
   const closeShipModal = () => setShipOpen(false)
@@ -412,7 +413,7 @@ const AdminOrdersPage: React.FC = () => {
       }
       if (toDate) {
         const to = new Date(toDate)
-        to.setHours(23,59,59,999)
+        to.setHours(23, 59, 59, 999)
         if (new Date(r.created_at) > to) return false
       }
       if (debouncedQuery) {
@@ -426,7 +427,7 @@ const AdminOrdersPage: React.FC = () => {
 
   const sorted = React.useMemo(() => {
     const arr = [...filtered]
-    arr.sort((a,b) => {
+    arr.sort((a, b) => {
       const dir = sortDir === 'asc' ? 1 : -1
       switch (sortKey) {
         case 'id':
@@ -434,9 +435,9 @@ const AdminOrdersPage: React.FC = () => {
         case 'status':
           return dir * a.status.localeCompare(b.status)
         case 'conversation':
-          return dir * String(a.conversation_id||'').localeCompare(String(b.conversation_id||''))
+          return dir * String(a.conversation_id || '').localeCompare(String(b.conversation_id || ''))
         case 'amount':
-          return dir * ((a.total_amount||0) - (b.total_amount||0))
+          return dir * ((a.total_amount || 0) - (b.total_amount || 0))
         case 'created':
           return dir * (Date.parse(a.created_at) - Date.parse(b.created_at))
         default:
@@ -448,7 +449,7 @@ const AdminOrdersPage: React.FC = () => {
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortKey(key); setSortDir(key==='created' ? 'desc' : 'asc') }
+    else { setSortKey(key); setSortDir(key === 'created' ? 'desc' : 'asc') }
   }
 
   function sortIndicator(key: SortKey) {
@@ -503,7 +504,7 @@ const AdminOrdersPage: React.FC = () => {
         formatAmount(r.total_amount, lang),
         safeDate(r.created_at, lang),
       ]
-      return cols.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+      return cols.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
     })
     const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
@@ -511,7 +512,7 @@ const AdminOrdersPage: React.FC = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `orders_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`
+    a.download = `orders_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -519,12 +520,12 @@ const AdminOrdersPage: React.FC = () => {
   function exportOrdersXls() {
     // Basit HTML tablo ile .xls uyumlu çıktı
     const rowsHtml = filtered.map(r => (
-      `<tr>`+
-        `<td>${r.id}</td>`+
-        `<td>${r.status}</td>`+
-        `<td>${r.conversation_id || ''}</td>`+
-        `<td>${formatAmount(r.total_amount, lang)}</td>`+
-        `<td>${safeDate(r.created_at, lang)}</td>`+
+      `<tr>` +
+      `<td>${r.id}</td>` +
+      `<td>${r.status}</td>` +
+      `<td>${r.conversation_id || ''}</td>` +
+      `<td>${formatAmount(r.total_amount, lang)}</td>` +
+      `<td>${safeDate(r.created_at, lang)}</td>` +
       `</tr>`
     )).join('')
     const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${t('admin.orders.export.headers.orderId')}</th><th>${t('admin.orders.export.headers.status')}</th><th>${t('admin.orders.export.headers.conversationId')}</th><th>${t('admin.orders.export.headers.amount')}</th><th>${t('admin.orders.export.headers.created')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
@@ -532,7 +533,7 @@ const AdminOrdersPage: React.FC = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `orders_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xls`
+    a.download = `orders_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.xls`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -541,18 +542,25 @@ const AdminOrdersPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:orders'
   const [visibleCols, setVisibleCols] = React.useState<{ id: boolean; status: boolean; conversation: boolean; amount: boolean; created: boolean }>({ id: true, status: true, conversation: true, amount: true, created: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  React.useEffect(()=>{
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
     try {
       const rawCols = localStorage.getItem(`${STORAGE_KEY}:cols`)
-      if (rawCols) setVisibleCols(prev=>({ ...prev, ...JSON.parse(rawCols) }))
+      if (rawCols) setVisibleCols(prev => ({ ...prev, ...JSON.parse(rawCols) }))
       const rawDen = localStorage.getItem(`${STORAGE_KEY}:density`)
       if (rawDen === 'compact' || rawDen === 'comfortable') setDensity(rawDen as Density)
-    } catch {}
-  },[])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch {} }, [visibleCols])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch {} }, [density])
-  const colCount = 1 + (visibleCols.id?1:0) + (visibleCols.status?1:0) + (visibleCols.conversation?1:0) + (visibleCols.amount?1:0) + (visibleCols.created?1:0) + 1
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
+    } catch { }
+  }, [])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
+  const colCount = 1 + (visibleCols.id ? 1 : 0) + (visibleCols.status ? 1 : 0) + (visibleCols.conversation ? 1 : 0) + (visibleCols.amount ? 1 : 0) + (visibleCols.created ? 1 : 0) + 1
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
 
   return (
     <div className="space-y-4">
@@ -570,21 +578,21 @@ const AdminOrdersPage: React.FC = () => {
           title: t('admin.orders.filters.status'),
           options: STATUSES.map(s => ({ value: s.value, label: s.label }))
         }}
-        toggles={[{ key: 'pendingShipments', label: t('admin.orders.filters.pendingShipments'), checked: presetPendingShipments, onChange: (v: boolean)=>{ setPresetPendingShipments(v); if (v) setStatus('') } }]}
-        onClear={()=>{ setPresetPendingShipments(false); setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
+        toggles={[{ key: 'pendingShipments', label: t('admin.orders.filters.pendingShipments'), checked: presetPendingShipments, onChange: (v: boolean) => { setPresetPendingShipments(v); if (v) setStatus('') } }]}
+        onClear={() => { setPresetPendingShipments(false); setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate')} />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate')} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate')} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate')} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.orders.export.csvLabel'), onSelect: exportOrdersCsv }, { key: 'xls', label: t('admin.orders.export.xlsLabel'), onSelect: exportOrdersXls }]} />
             <ColumnsMenu
               columns={[
-                { key: 'id', label: t('admin.orders.columns.orderId'), checked: visibleCols.id, onChange: (v)=>setVisibleCols(s=>({ ...s, id: v })) },
-                { key: 'status', label: t('admin.orders.columns.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'conversation', label: t('admin.orders.columns.conversationId'), checked: visibleCols.conversation, onChange: (v)=>setVisibleCols(s=>({ ...s, conversation: v })) },
-                { key: 'amount', label: t('admin.orders.columns.amount'), checked: visibleCols.amount, onChange: (v)=>setVisibleCols(s=>({ ...s, amount: v })) },
-                { key: 'created', label: t('admin.orders.columns.created'), checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
+                { key: 'id', label: t('admin.orders.columns.orderId'), checked: visibleCols.id, onChange: (v) => setVisibleCols(s => ({ ...s, id: v })) },
+                { key: 'status', label: t('admin.orders.columns.status'), checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
+                { key: 'conversation', label: t('admin.orders.columns.conversationId'), checked: visibleCols.conversation, onChange: (v) => setVisibleCols(s => ({ ...s, conversation: v })) },
+                { key: 'amount', label: t('admin.orders.columns.amount'), checked: visibleCols.amount, onChange: (v) => setVisibleCols(s => ({ ...s, amount: v })) },
+                { key: 'created', label: t('admin.orders.columns.created'), checked: visibleCols.created, onChange: (v) => setVisibleCols(s => ({ ...s, created: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -600,13 +608,13 @@ const AdminOrdersPage: React.FC = () => {
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={page <= 1}
           className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
->{t('admin.ui.prev')}</button>
+        >{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
         <button
           onClick={() => setPage(p => p + 1)}
           disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))}
           className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50"
->{t('admin.ui.next')}</button>
+        >{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk actions */}
@@ -615,7 +623,7 @@ const AdminOrdersPage: React.FC = () => {
           <div className="text-sm text-industrial-gray">{t('admin.orders.bulk.selected', { count: String(selectedIds.length) })}</div>
           <div className="flex items-center gap-2">
             <button
-              onClick={()=>{ setBulkMode(true); setShipOpen(true) }}
+              onClick={() => { setBulkMode(true); setShipOpen(true) }}
               className={adminButtonPrimaryClass}
             >
               {t('admin.orders.bulk.shipSelected')}
@@ -627,7 +635,7 @@ const AdminOrdersPage: React.FC = () => {
             >
               {t('admin.orders.bulk.cancelShipping')}
             </button>
-            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.bulk.clearSelection')}</button>
+            <button onClick={() => setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.orders.bulk.clearSelection')}</button>
           </div>
         </div>
       )}
@@ -641,11 +649,11 @@ const AdminOrdersPage: React.FC = () => {
           <thead>
             <tr>
               <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
-              {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
-              {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
-              {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
-              {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
-              {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
+              {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
+              {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
+              {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
+              {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
+              {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
               <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
             </tr>
           </thead>
@@ -657,16 +665,16 @@ const AdminOrdersPage: React.FC = () => {
             ) : (
               sorted.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                  <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>{
-                    setSelectedIds(prev => e.target.checked ? [...new Set([...prev, r.id])] : prev.filter(x=>x!==r.id))
+                  <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => {
+                    setSelectedIds(prev => e.target.checked ? [...new Set([...prev, r.id])] : prev.filter(x => x !== r.id))
                   }} /></td>
-                  {visibleCols.id && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} font-mono text-xs`}>{r.id}</td>)}
-                  {visibleCols.status && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
-                  {visibleCols.conversation && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'} text-xs text-industrial-gray`}>{r.conversation_id || '-'}</td>)}
-                  {visibleCols.amount && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{formatAmount(r.total_amount, lang)}</td>)}
-                  {visibleCols.created && (<td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>{safeDate(r.created_at, lang)}</td>)}
-                  <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
-                        <div className="flex gap-2">
+                  {visibleCols.id && (<td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'} font-mono text-xs`}>{r.id}</td>)}
+                  {visibleCols.status && (<td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
+                  {visibleCols.conversation && (<td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'} text-xs text-industrial-gray`}>{r.conversation_id || '-'}</td>)}
+                  {visibleCols.amount && (<td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>{formatAmount(r.total_amount, lang)}</td>)}
+                  {visibleCols.created && (<td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>{safeDate(r.created_at, lang)}</td>)}
+                  <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>
+                    <div className="flex gap-2">
                       <button
                         onClick={() => openShipModal(r.id)}
                         className="text-xs px-2 py-1 rounded bg-primary-navy text-white hover:opacity-90"
@@ -713,7 +721,7 @@ const AdminOrdersPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs text-industrial-gray mb-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
-                <select value={carrier} onChange={e=>setCarrier(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2">
+                <select value={carrier} onChange={e => setCarrier(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2">
                   <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
                   <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
                   <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
@@ -725,22 +733,22 @@ const AdminOrdersPage: React.FC = () => {
                   <option value="Diğer">{t('admin.orders.modals.shipping.carriers.other')}</option>
                 </select>
                 {carrier === 'Diğer' && (
-                  <input onChange={e=>setCarrier(e.target.value)} placeholder={t('admin.orders.modals.shipping.otherPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2 mt-2" />
+                  <input onChange={e => setCarrier(e.target.value)} placeholder={t('admin.orders.modals.shipping.otherPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2 mt-2" />
                 )}
               </div>
               <div>
                 <label className="block text-xs text-industrial-gray mb-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
-                <input value={tracking} onChange={e=>setTracking(e.target.value)} placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2" />
+                <input value={tracking} onChange={e => setTracking(e.target.value)} placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} className="w-full border border-gray-200 rounded px-3 py-2" />
               </div>
             </div>
             <label className="mt-3 inline-flex items-center gap-2 text-sm text-steel-gray">
-              <input type="checkbox" checked={sendEmail} onChange={e=>setSendEmail(e.target.checked)} />
+              <input type="checkbox" checked={sendEmail} onChange={e => setSendEmail(e.target.checked)} />
               {t('admin.orders.modals.shipping.sendEmailLabel')}
             </label>
             {bulkMode && (
               <div className="mt-3">
                 <label className="inline-flex items-center gap-2 text-sm text-steel-gray">
-                  <input type="checkbox" checked={advBulk} onChange={e=>setAdvBulk(e.target.checked)} />
+                  <input type="checkbox" checked={advBulk} onChange={e => setAdvBulk(e.target.checked)} />
                   {t('admin.orders.modals.shipping.advancedLabel')}
                 </label>
                 {advBulk && (
@@ -754,11 +762,11 @@ const AdminOrdersPage: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {advRows.map((r,i)=>(
+                        {advRows.map((r, i) => (
                           <tr key={r.id} className="border-t">
                             <td className="px-2 py-1 font-mono">{r.id}</td>
-                            <td className="px-2 py-1"><input value={r.carrier} onChange={e=>setAdvRows(rows=>{ const c=[...rows]; c[i]={...c[i], carrier:e.target.value}; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
-                            <td className="px-2 py-1"><input value={r.tracking} onChange={e=>setAdvRows(rows=>{ const c=[...rows]; c[i]={...c[i], tracking:e.target.value}; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
+                            <td className="px-2 py-1"><input value={r.carrier} onChange={e => setAdvRows(rows => { const c = [...rows]; c[i] = { ...c[i], carrier: e.target.value }; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
+                            <td className="px-2 py-1"><input value={r.tracking} onChange={e => setAdvRows(rows => { const c = [...rows]; c[i] = { ...c[i], tracking: e.target.value }; return c })} className="w-full border border-gray-200 rounded px-2 py-1" /></td>
                           </tr>
                         ))}
                       </tbody>
@@ -824,7 +832,7 @@ const AdminOrdersPage: React.FC = () => {
           <div className={adminCardPaddedClass + ' w-full max-w-xl'}>
             <h3 className="text-lg font-semibold text-industrial-gray mb-2">{t('admin.orders.modals.notes.title')}</h3>
             <div className="flex items-center gap-2 mb-3">
-              <input value={noteInput} onChange={e=>setNoteInput(e.target.value)} placeholder={t('admin.orders.modals.notes.inputPlaceholder')} className="flex-1 border border-gray-200 rounded px-3 py-2" />
+              <input value={noteInput} onChange={e => setNoteInput(e.target.value)} placeholder={t('admin.orders.modals.notes.inputPlaceholder')} className="flex-1 border border-gray-200 rounded px-3 py-2" />
               <button onClick={addNote} disabled={notesLoading || !noteInput.trim()} className={adminButtonPrimaryClass}>{notesLoading ? t('admin.orders.modals.notes.adding') : t('admin.orders.modals.notes.add')}</button>
             </div>
             <div className="max-h-[50vh] overflow-auto border border-gray-100 rounded">
@@ -904,3 +912,4 @@ function generateTrackingUrl(carrier: string, tracking: string): string | null {
 }
 
 export default AdminOrdersPage
+

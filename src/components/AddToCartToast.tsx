@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import type { Product } from '../lib/supabase'
 
@@ -52,7 +54,7 @@ export const AddToCartToast: React.FC = () => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 2l1 5h10l1-5"/><path d="M3 6h18l-2 14H5L3 6z"/></svg>
               <span className="text-sm font-medium">{t('cartToast.continue')}</span>
             </button>
-            <Link to="/cart" onClick={() => setVisible(false)} className="inline-flex items-center justify-center">
+            <Link href="/cart" onClick={() => setVisible(false)} className="inline-flex items-center justify-center">
               <span className="inline-flex items-center justify-center gap-2 px-3 py-3 md:py-2 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition text-sm font-medium w-full">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg> {t('cartToast.goToCart')}
               </span>
@@ -66,3 +68,4 @@ export const AddToCartToast: React.FC = () => {
 }
 
 export default AddToCartToast
+

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { Package, Calendar, CreditCard, Eye, ChevronRight, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -70,12 +70,12 @@ interface VenthubOrderRow {
   venthub_order_items?: VenthubOrderItemRow[]
 }
 
-type StatusFilter = 'all'|'pending'|'paid'|'shipped'|'delivered'|'failed'
+type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'failed'
 
 export const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -142,8 +142,10 @@ export const OrdersPage: React.FC = () => {
       setOrders(formattedOrders)
 
       // Apply product filter from URL (?product=...)
-      const productQ = searchParams.get('product')
-      if (productQ) setProductFilter(productQ)
+      if (searchParams) {
+        const productQ = searchParams.get('product')
+        if (productQ) setProductFilter(productQ)
+      }
     } catch (error) {
       console.error('Orders fetch error:', error)
       toast.error(t('orders.unexpectedError'))
@@ -154,16 +156,14 @@ export const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth/login', { 
-        state: { from: { pathname: '/orders' } }
-      })
+      router.push('/auth/login?redirect=/orders')
       return
     }
 
     if (user) {
       fetchOrders()
     }
-  }, [user, authLoading, navigate, fetchOrders])
+  }, [user, authLoading, router, fetchOrders])
 
   const formatDate = (dateString: string) => {
     return formatDateTime(dateString, lang)
@@ -214,12 +214,12 @@ export const OrdersPage: React.FC = () => {
     }
   }
 
-  const steps = ['pending','paid','shipped','delivered'] as const
-  const stepLabel: Record<string,string> = { 
-    pending: t('orders.pending'), 
-    paid: t('orders.paid'), 
-    shipped: t('orders.shipped'), 
-    delivered: t('orders.delivered') 
+  const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
+  const stepLabel: Record<string, string> = {
+    pending: t('orders.pending'),
+    paid: t('orders.paid'),
+    shipped: t('orders.shipped'),
+    delivered: t('orders.delivered')
   }
 
 
@@ -254,24 +254,24 @@ export const OrdersPage: React.FC = () => {
 
 
   return (
-      <div className="min-h-screen bg-clean-white py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-industrial-gray mb-2">
-              {t('orders.title')}
-            </h1>
-            <p className="text-steel-gray">
-              {t('orders.subtitle')}
-            </p>
-          </div>
+    <div className="min-h-screen bg-clean-white py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-industrial-gray mb-2">
+            {t('orders.title')}
+          </h1>
+          <p className="text-steel-gray">
+            {t('orders.subtitle')}
+          </p>
+        </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-hvac-md p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div>
               <label className="text-xs text-steel-gray">{t('orders.status')}</label>
-              <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value as StatusFilter)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
                 <option value="all">{t('orders.all')}</option>
                 <option value="pending">{t('orders.pending')}</option>
                 <option value="paid">{t('orders.paid')}</option>
@@ -282,23 +282,23 @@ export const OrdersPage: React.FC = () => {
             </div>
             <div>
               <label className="text-xs text-steel-gray">{t('orders.startDate')}</label>
-              <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs text-steel-gray">{t('orders.endDate')}</label>
-              <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs text-steel-gray">{t('orders.orderCode')}</label>
-              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e=>setSearchCode(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
             <div>
               <label className="text-xs text-steel-gray">{t('orders.product')}</label>
-              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e=>setProductFilter(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
             </div>
           </div>
           <div className="flex justify-end mt-3">
-            <button onClick={()=>{setStatusFilter('all');setDateFrom('');setDateTo('');setSearchCode('');setProductFilter('')}} className="text-sm text-steel-gray hover:text-primary-navy">{t('orders.clearFilters')}</button>
+            <button onClick={() => { setStatusFilter('all'); setDateFrom(''); setDateTo(''); setSearchCode(''); setProductFilter('') }} className="text-sm text-steel-gray hover:text-primary-navy">{t('orders.clearFilters')}</button>
           </div>
         </div>
 
@@ -313,7 +313,7 @@ export const OrdersPage: React.FC = () => {
               {t('orders.noOrdersDesc')}
             </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               {t('orders.exploreProducts')}
@@ -336,11 +336,11 @@ export const OrdersPage: React.FC = () => {
                         return (
                           <React.Fragment key={s}>
                             <div className="flex flex-col items-center min-w-[80px]">
-                              <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center ${active ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx+1}</div>
+                              <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center ${active ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx + 1}</div>
                               <span className="mt-1 text-[11px] text-steel-gray">{stepLabel[s]}</span>
                             </div>
-                            {idx < steps.length-1 && (
-                              <div className={`flex-1 h-1 ${activeIdx >= idx+1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
+                            {idx < steps.length - 1 && (
+                              <div className={`flex-1 h-1 ${activeIdx >= idx + 1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
                             )}
                           </React.Fragment>
                         )
@@ -383,7 +383,7 @@ export const OrdersPage: React.FC = () => {
                         </span>
                       )}
                       <button
-                        onClick={() => navigate(`/account/orders/${order.id}`)}
+                        onClick={() => router.push(`/account/orders/${order.id}`)}
                         className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
                       >
                         <Eye size={20} />
@@ -394,7 +394,7 @@ export const OrdersPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* No inline details - navigate to detail page */}
+                {/* No inline details - router to detail page */}
               </div>
             ))}
           </div>
@@ -405,3 +405,4 @@ export const OrdersPage: React.FC = () => {
 }
 
 export default OrdersPage
+

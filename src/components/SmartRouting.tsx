@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Building2, Wrench, MessageSquare, ArrowRight } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
 
@@ -127,7 +127,7 @@ const SmartRouting: React.FC = () => {
                         return (
                             <Link
                                 key={index}
-                                to={route.href}
+                                href={route.href}
                                 className={cardClasses}
                                 style={{ transitionDelay: `${index * 100}ms` }}
                             >

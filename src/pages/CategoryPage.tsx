@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
@@ -15,8 +16,10 @@ import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
 export const CategoryPage: React.FC = () => {
-  const { slug, parentSlug } = useParams<{ slug: string; parentSlug?: string }>()
-  const navigate = useNavigate()
+  const params = useParams()
+  const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
+  const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
+  const navigate = useRouter()
   const [category, setCategory] = useState<Category | null>(null)
   const [parentCategory, setParentCategory] = useState<Category | null>(null)
   const [subCategories, setSubCategories] = useState<Category[]>([])
@@ -43,7 +46,7 @@ export const CategoryPage: React.FC = () => {
   useManualScrollRestoration(loading)
 
   useEffect(() => {
-    const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+    const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
     async function attachCovers(list: Product[]): Promise<Product[]> {
       if (!Array.isArray(list) || list.length === 0) return list
       try {
@@ -231,6 +234,12 @@ export const CategoryPage: React.FC = () => {
 
   const { t, lang } = useI18n()
 
+  // SEO değerleri - Safe for SSR
+  const [origin, setOrigin] = useState('')
+  useEffect(() => {
+    if (typeof window !== 'undefined') setOrigin(window.location.origin)
+  }, [])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -247,7 +256,7 @@ export const CategoryPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('category.notFound')}</h1>
-          <Link to="/" className="text-primary-navy hover:text-secondary-blue">
+          <Link href="/" className="text-primary-navy hover:text-secondary-blue">
             {t('category.backHome')}
           </Link>
         </div>
@@ -255,14 +264,11 @@ export const CategoryPage: React.FC = () => {
     )
   }
 
-  // SEO değerleri
-  const canonicalUrl = (() => {
-    const origin = window.location.origin
-    if (parentCategory) {
-      return `${origin}/category/${parentCategory.slug}/${category.slug}`
-    }
-    return `${origin}/category/${category.slug}`
-  })()
+
+
+  const canonicalUrl = parentCategory
+    ? `${origin}/category/${parentCategory.slug}/${category.slug}`
+    : `${origin}/category/${category.slug}`
 
   // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
   const mapSlugToTopic = (s?: string | null): string | null => {
@@ -277,7 +283,7 @@ export const CategoryPage: React.FC = () => {
 
   // Construct image URL if available
   const categoryImageUrl = category.image_url
-    ? `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
+    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
     : null
 
   // --- Display Mode Handling ---
@@ -347,8 +353,8 @@ export const CategoryPage: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: t('category.breadcrumbHome'), item: `${window.location.origin}/` },
-              ...(parentCategory ? [{ '@type': 'ListItem', position: 2, name: getCategoryDisplayName(parentCategory), item: `${window.location.origin}/category/${parentCategory.slug}` }] : []),
+              { '@type': 'ListItem', position: 1, name: t('category.breadcrumbHome'), item: `${origin}/` },
+              ...(parentCategory ? [{ '@type': 'ListItem', position: 2, name: getCategoryDisplayName(parentCategory), item: `${origin}/category/${parentCategory.slug}` }] : []),
               { '@type': 'ListItem', position: parentCategory ? 3 : 2, name: getCategoryDisplayName(category), item: canonicalUrl },
             ],
           }),
@@ -364,7 +370,7 @@ export const CategoryPage: React.FC = () => {
             itemListElement: filteredProducts.map((p, idx) => ({
               '@type': 'ListItem',
               position: idx + 1,
-              url: `${window.location.origin}/products/${p.id}`,
+              url: `${origin}/products/${p.id}`,
               name: p.name,
             })),
           }),
@@ -374,14 +380,14 @@ export const CategoryPage: React.FC = () => {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
-            <Link to="/" className="text-steel-gray hover:text-primary-navy">
+            <Link href="/" className="text-steel-gray hover:text-primary-navy">
               {t('category.breadcrumbHome')}
             </Link>
             <ChevronRight size={16} className="text-steel-gray" />
             {parentCategory && (
               <>
                 <Link
-                  to={`/category/${parentCategory.slug}`}
+                  href={`/category/${parentCategory.slug}`}
                   className="text-steel-gray hover:text-primary-navy"
                 >
                   {getCategoryDisplayName(parentCategory)}
@@ -401,7 +407,7 @@ export const CategoryPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Geri Butonu */}
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate.back()}
             className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
           >
             <ArrowLeft size={20} />
@@ -465,7 +471,7 @@ export const CategoryPage: React.FC = () => {
                     {subCategories.map((sub) => (
                       <Link
                         key={sub.id}
-                        to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
+                        href={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                       >
                         {getCategoryDisplayName(sub)}
@@ -739,7 +745,7 @@ export const CategoryPage: React.FC = () => {
                     {subCategories.map((sub) => (
                       <Link
                         key={sub.id}
-                        to={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
+                        href={`/category/${parentCategory?.slug || category.slug}/${sub.slug}`}
                         className="block px-3 py-2 text-sm text-steel-gray hover:text-primary-navy hover:bg-light-gray rounded transition-colors"
                         onClick={() => setIsFilterOpen(false)}
                       >
@@ -832,3 +838,4 @@ export const CategoryPage: React.FC = () => {
 }
 
 export default CategoryPage
+

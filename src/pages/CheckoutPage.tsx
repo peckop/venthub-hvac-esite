@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react' // refresh
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
-import { useNavigate, Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { listAddresses, UserAddress, updateAddress, deleteAddress, listInvoiceProfiles, fetchDefaultInvoiceProfile, type InvoiceProfile } from '../lib/supabase'
 import { ArrowLeft, CreditCard, MapPin, User, Lock, CheckCircle } from 'lucide-react'
@@ -34,14 +35,13 @@ export const CheckoutPage: React.FC = () => {
 
   // Dev-only debug logger to avoid leaking PII in production
   const debug = (...args: unknown[]) => {
-    const env = import.meta.env
-    let on = env?.VITE_DEBUG === 'true'
+    let on = process.env.NEXT_PUBLIC_DEBUG === 'true'
     try { if (!on && typeof localStorage !== 'undefined') on = localStorage.getItem('vh_debug') === '1' } catch { }
     if (on) {
       try { console.warn(...args) } catch { }
     }
   }
-  const navigate = useNavigate()
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
   const { t, lang } = useI18n()
@@ -71,12 +71,10 @@ export const CheckoutPage: React.FC = () => {
   // Auth check - redirect to login if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth/login', {
-        state: { from: { pathname: '/checkout' } }
-      })
+      router.push('/auth/login?from=/checkout')
       return
     }
-  }, [user, authLoading, navigate])
+  }, [user, authLoading, router])
 
   // Pre-fill customer info if user is logged in
   useEffect(() => {
@@ -365,7 +363,7 @@ export const CheckoutPage: React.FC = () => {
       })
 
       const headers: Record<string, string> = {}
-      try { const e2 = (import.meta as unknown as { env?: Record<string, string> }).env; if (e2?.VITE_DEBUG === 'true' || localStorage.getItem('vh_debug') === '1') headers['x-debug'] = '1' } catch { }
+      try { if (process.env.NEXT_PUBLIC_DEBUG === 'true' || (typeof localStorage !== 'undefined' && localStorage.getItem('vh_debug') === '1')) headers['x-debug'] = '1' } catch { }
 
       const { data, error } = await supabase.functions.invoke('iyzico-payment', {
         body: requestData,
@@ -441,11 +439,10 @@ export const CheckoutPage: React.FC = () => {
 
       // Try to fetch detailed error body directly (debug only)
       try {
-        const env = (import.meta as unknown as { env?: Record<string, string> }).env
-        const dbg = env?.VITE_DEBUG === 'true' || (typeof localStorage !== 'undefined' && localStorage.getItem('vh_debug') === '1')
-        if (dbg) {
-          const base = env?.VITE_SUPABASE_URL || ''
-          const anon = env?.VITE_SUPABASE_ANON_KEY || ''
+        const isDebug = process.env.NEXT_PUBLIC_DEBUG === 'true' || (typeof localStorage !== 'undefined' && localStorage.getItem('vh_debug') === '1')
+        if (isDebug) {
+          const base = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+          const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
           if (base && anon) {
             const resp = await fetch(`${base}/functions/v1/iyzico-payment?debug=1`, {
               method: 'POST',
@@ -590,17 +587,17 @@ export const CheckoutPage: React.FC = () => {
             if (data.status === 'paid') {
               clearInterval(timer)
               clearCart()
-              navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=success`)
+              router.push(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=success`)
             } else if (data.status === 'failed') {
               clearInterval(timer)
-              navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=failure`)
+              router.push(`/payment-success?orderId=${encodeURIComponent(orderId)}&conversationId=${encodeURIComponent(convId || '')}&status=failure`)
             }
           }
         } catch { }
       }, 3000)
     }
     return () => { if (timer) clearInterval(timer) }
-  }, [step, orderId, convId, clearCart, navigate, isTest])
+  }, [step, orderId, convId, clearCart, router, isTest])
 
   // Varsayılan fatura profilini, 2. adıma girildiğinde ve alanlar boşsa bir defa uygula
   useEffect(() => {
@@ -653,7 +650,7 @@ export const CheckoutPage: React.FC = () => {
             {t('checkout.emptyCart.desc')}
           </p>
           <Link
-            to="/"
+            href="/"
             className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
           >
             <ArrowLeft size={20} className="mr-2" />
@@ -682,13 +679,13 @@ export const CheckoutPage: React.FC = () => {
           </p>
           <div className="space-y-3">
             <Link
-              to="/"
+              href="/"
               className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               Ana Sayfaya Dön
             </Link>
             <Link
-              to="/orders"
+              href="/orders"
               className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               Siparişlerim
@@ -856,7 +853,7 @@ export const CheckoutPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => navigate('/cart')}
+            onClick={() => router.push('/cart')}
             className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
@@ -1162,7 +1159,7 @@ export const CheckoutPage: React.FC = () => {
                                     >
                                       {t('checkout.saved.use')}
                                     </button>
-                                    <Link to="/account/addresses" className="text-xs text-primary-navy hover:underline">
+                                    <Link href="/account/addresses" className="text-xs text-primary-navy hover:underline">
                                       {t('checkout.saved.manage')}
                                     </Link>
                                   </div>
@@ -1422,7 +1419,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -1433,7 +1430,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">
@@ -1444,7 +1441,7 @@ export const CheckoutPage: React.FC = () => {
                           className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link to="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                       </label>
                       <label className="flex items-start gap-3">

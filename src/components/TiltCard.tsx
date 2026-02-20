@@ -5,12 +5,13 @@ const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(ma
 const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ children, maxTilt = 18 }) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const innerRef = useRef<HTMLDivElement | null>(null)
+  const [mounted, setMounted] = useState(false)
   const [hover, setHover] = useState(false)
-  const supportsTilt = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches
-  const prefersReduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (!supportsTilt || prefersReduced) {
-    return <>{children}</>
-  }
+  React.useEffect(() => setMounted(true), [])
+  const supportsTilt = mounted && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  const prefersReduced = mounted && typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const shouldSkip = !supportsTilt || prefersReduced
 
   const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     const container = wrapperRef.current
@@ -43,6 +44,10 @@ const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ chi
     el.style.boxShadow = '0 0 0 rgba(0,0,0,0)'
   }
 
+  if (shouldSkip) {
+    return <div className="relative group">{children}</div>
+  }
+
   return (
     <div ref={wrapperRef} onMouseMove={onMove} onMouseEnter={onEnter} onMouseLeave={onLeave} className="relative group">
       <div
@@ -57,7 +62,7 @@ const TiltCard: React.FC<React.PropsWithChildren<{ maxTilt?: number }>> = ({ chi
         className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
           background:
-'radial-gradient(200px circle at var(--px,50%) var(--py,50%), rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 65%)',
+            'radial-gradient(200px circle at var(--px,50%) var(--py,50%), rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 65%)',
           mixBlendMode: 'screen',
         }}
       />

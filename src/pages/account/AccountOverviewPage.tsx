@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { listAddresses, UserAddress, supabase } from '../../lib/supabase'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDate } from '../../i18n/datetime'
@@ -76,7 +76,7 @@ export default function AccountOverviewPage() {
       <section className="col-span-2 bg-white border border-gray-100 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-industrial-gray">{t('orders.title') || 'Son Siparişler'}</h2>
-          <Link to="/account/orders" className="text-sm text-primary-navy hover:underline">{t('orders.viewAll') || 'Tümünü gör'}</Link>
+          <Link href="/account/orders" className="text-sm text-primary-navy hover:underline">{t('orders.viewAll') || 'Tümünü gör'}</Link>
         </div>
         {lastOrders.length === 0 ? (
           <div className="text-sm text-steel-gray">{t('orders.noOrdersTitle') || 'Henüz sipariş yok.'}</div>
@@ -90,7 +90,7 @@ export default function AccountOverviewPage() {
                 </div>
                 <div className="text-right">
                   <div className="text-industrial-gray font-medium">{formatCurrency(o.total_amount, lang, { maximumFractionDigits: 0 })}</div>
-                  <Link to={`/account/orders/${o.id}`} className="text-primary-navy hover:underline">{t('orders.details') || 'Detay'}</Link>
+                  <Link href={`/account/orders/${o.id}`} className="text-primary-navy hover:underline">{t('orders.details') || 'Detay'}</Link>
                 </div>
               </li>
             ))}
@@ -117,7 +117,7 @@ export default function AccountOverviewPage() {
               <div className="mt-1">{t('account.overview.notSetBilling')}</div>
             )}
           </div>
-          <Link to="/account/addresses" className="inline-block mt-2 text-primary-navy hover:underline text-sm">{t('account.overview.manageAddresses')}</Link>
+          <Link href="/account/addresses" className="inline-block mt-2 text-primary-navy hover:underline text-sm">{t('account.overview.manageAddresses')}</Link>
         </div>
       </section>
     </div>

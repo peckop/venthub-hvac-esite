@@ -2,11 +2,7 @@ import React, { useEffect, useState, ReactNode, useRef } from 'react'
 import type { Product } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
-// Feature flag: server-side cart sync
-interface ImportMeta {
-  env?: Record<string, string>
-}
-const CART_SERVER_SYNC = ((import.meta as ImportMeta).env?.VITE_CART_SERVER_SYNC ?? 'true') === 'true'
+const CART_SERVER_SYNC = (process.env.NEXT_PUBLIC_CART_SERVER_SYNC ?? 'true') === 'true'
 
 // LocalStorage keys
 const CART_LOCAL_STORAGE_KEY = 'venthub-cart'
@@ -172,7 +168,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // If we have a guest cart with items, or we have a post-order clear flag, clear server cart first
         if ((isGuestCart && items.length > 0) || clearOnce) {
-          if (((import.meta as ImportMeta).env?.VITE_DEBUG ?? 'false') === 'true') {
+          if ((process.env.NEXT_PUBLIC_DEBUG ?? 'false') === 'true') {
             console.warn('Clearing server cart (guest items present or post-order flag)')
           }
           await clearDbCartItems(cart.id)

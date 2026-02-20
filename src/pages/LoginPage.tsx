@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -13,26 +14,24 @@ export const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { t } = useI18n()
-
-  const state = (location.state ?? null) as { from?: { pathname?: string } } | null
-  const from = state?.from?.pathname || '/'
+  const from = searchParams?.get('redirect') || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!email || !password) {
       toast.error(t('auth.validEmailPassRequired'))
       return
     }
 
     setLoading(true)
-    
+
     try {
       const { error } = await signIn(email, password, rememberMe)
-      
+
       if (error) {
         if (error.message?.includes('Invalid login credentials')) {
           toast.error(t('auth.invalidCreds'))
@@ -43,7 +42,7 @@ export const LoginPage: React.FC = () => {
         }
       } else {
         // Success - navigate to intended page
-        navigate(from, { replace: true })
+        router.push(from)
       }
     } catch (error) {
       toast.error(t('auth.unexpectedError'))
@@ -78,13 +77,13 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-repeat" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}} />
+        <div className="absolute inset-0 bg-repeat" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
       </div>
 
       <div className="relative max-w-md mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          to={from}
+          href={from}
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
@@ -162,7 +161,7 @@ export const LoginPage: React.FC = () => {
                 <span>{t('auth.rememberMe')}</span>
               </label>
               <Link
-                to="/auth/forgot-password"
+                href="/auth/forgot-password"
                 className="text-sm text-primary-navy hover:text-secondary-blue"
               >
                 {t('auth.forgotPassword')}
@@ -220,7 +219,7 @@ export const LoginPage: React.FC = () => {
             <p className="text-steel-gray">
               {t('auth.noAccount')} {' '}
               <Link
-                to="/auth/register"
+                href="/auth/register"
                 className="text-primary-navy hover:text-secondary-blue font-medium"
               >
                 {t('auth.register')}
@@ -252,3 +251,5 @@ export const LoginPage: React.FC = () => {
 }
 
 export default LoginPage
+
+

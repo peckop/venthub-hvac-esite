@@ -27,9 +27,9 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
     const now = Date.now()
     const ts = cache.get(key) || 0
     // prune
-    for (const [k, t] of cache.entries()) {
+    cache.forEach((t, k) => {
       if (now - t > TTL) cache.delete(k)
-    }
+    })
     if (now - ts < TTL) return false
     cache.set(key, now)
     return true
@@ -48,7 +48,7 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
           const ok = (navigator as unknown as { sendBeacon: (url: string, data?: BodyInit) => boolean }).sendBeacon(_endpoint, new Blob([body], { type: 'application/json' }))
           if (ok) return
         }
-      } catch {}
+      } catch { }
 
       // Fallback: fetch (no supabase-js import)
       try {

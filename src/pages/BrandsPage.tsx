@@ -1,7 +1,7 @@
 import React from 'react'
 import { HVAC_BRANDS } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Award, Globe, CheckCircle, ArrowRight, Star, Shield } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import Seo from '../components/Seo'
@@ -15,7 +15,7 @@ const BrandsPage: React.FC = () => {
   const { t } = useI18n()
   const [heroRef, heroVisible] = useScrollAnimation<HTMLElement>()
   const [gridRef, gridVisible] = useScrollAnimation<HTMLDivElement>()
-  const canonicalUrl = `${window.location.origin}/brands`
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || ''}/brands`
 
   // Vortice featured, others in grid
   const featuredBrand = HVAC_BRANDS.find(b => b.slug === 'vortice')
@@ -46,7 +46,7 @@ const BrandsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center text-sm text-white/60 mb-6">
-            <Link to="/" className="hover:text-white">{t('common.home')}</Link>
+            <Link href="/" className="hover:text-white">{t('common.home')}</Link>
             <span className="mx-2">/</span>
             <span className="text-white font-medium">{t('common.brands')}</span>
           </div>
@@ -117,7 +117,7 @@ const BrandsPage: React.FC = () => {
                   </span>
                 </div>
                 <Link
-                  to={`/brands/${featuredBrand.slug}`}
+                  href={`/brands/${featuredBrand.slug}`}
                   className="inline-flex items-center gap-2 text-primary-navy font-semibold hover:gap-3 transition-all"
                 >
                   Ürünleri İncele
@@ -166,7 +166,7 @@ const BrandsPage: React.FC = () => {
             {otherBrands.map((brand, index) => (
               <Link
                 key={brand.slug}
-                to={`/brands/${brand.slug}`}
+                href={`/brands/${brand.slug}`}
                 className={`group bg-white rounded-2xl p-6 border border-light-gray hover:border-primary-navy/30 hover:shadow-hvac transition-all ${scrollAnimationClasses.fadeUp(gridVisible)}`}
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
@@ -200,7 +200,7 @@ const BrandsPage: React.FC = () => {
             Teknik özellikler, fiyat listeleri ve bayilik koşulları için bizimle iletişime geçin.
           </p>
           <Link
-            to="/contact"
+            href="/contact"
             className="inline-flex items-center justify-center rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all"
           >
             İletişime Geç

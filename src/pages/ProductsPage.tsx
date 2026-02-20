@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { usePathname, useRouter } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
@@ -41,9 +41,9 @@ const CategoryTree = ({ categories, selectedCategory, onSelectCategory, t }: { c
     cats.forEach(c => map.set(c.id, { ...c, children: [] }))
     cats.forEach(c => {
       if (c.parent_id && map.has(c.parent_id)) {
-        map.get(c.parent_id)!.children.push(map.get(c.id))
+        map.get(c.parent_id)!.children.push(map.get(c.id)!)
       } else {
-        roots.push(map.get(c.id))
+        roots.push(map.get(c.id)!)
       }
     })
     return roots
@@ -178,19 +178,26 @@ const FilterSidebar = ({
 }
 
 const ProductsPage: React.FC = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const pathname = usePathname()
+  const router = useRouter()
   const { t } = useI18n()
   const [leadOpen, setLeadOpen] = useState(false)
 
-  // URL Params State
-  const params = new URLSearchParams(location.search)
-  const qParam = params.get('q')?.trim() || ''
-  const catParam = params.get('category')
-  const brandsParam = params.get('brands')?.split(',').filter(Boolean) || []
-  const minPriceParam = params.get('min_price') || ''
-  const maxPriceParam = params.get('max_price') || ''
-  const isAll = params.get('all') === '1'
+  // URL Params State - Wrapped in useMemo for safe SSR access
+  const [params, setParams] = useState<URLSearchParams | null>(null)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setParams(new URLSearchParams(window.location.search))
+    }
+  }, [pathname])
+
+  const qParam = params?.get('q')?.trim() || ''
+  const catParam = params?.get('category') || null
+  const brandsParam = params?.get('brands')?.split(',').filter(Boolean) || []
+  const minPriceParam = params?.get('min_price') || ''
+  const maxPriceParam = params?.get('max_price') || ''
+  const isAll = params?.get('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -320,7 +327,7 @@ const ProductsPage: React.FC = () => {
           }
 
           // Enhanced results with generic attachCovers + active status patch
-          const buildPublicUrl = (path: string) => `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
+          const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
 
           async function attachCovers<T extends { id: string }>(list: T[]): Promise<(T & { image_url?: string, image_alt?: string | null })[]> {
             if (!Array.isArray(list) || list.length === 0) return list
@@ -383,12 +390,13 @@ const ProductsPage: React.FC = () => {
 
   // Helper: Update URL params
   const updateUrl = (patch: Record<string, string | null>) => {
-    const next = new URLSearchParams(location.search)
+    if (typeof window === 'undefined') return
+    const next = new URLSearchParams(window.location.search)
     Object.entries(patch).forEach(([k, v]) => {
       if (v === null || v === '') next.delete(k)
       else next.set(k, v)
     })
-    navigate({ search: next.toString() }, { replace: true })
+    router.push(`?${next.toString()}`)
   }
 
 
@@ -499,7 +507,7 @@ const ProductsPage: React.FC = () => {
                   <h3 className="text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
                   <p className="text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
                   <button
-                    onClick={() => navigate('/products')}
+                    onClick={() => router.push('/products')}
                     className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
                   >
                     Filtreleri Temizle
@@ -537,7 +545,7 @@ const ProductsPage: React.FC = () => {
 const DiscoveryContent = ({
   appSectionRef
 }: {
-  appSectionRef: React.RefObject<HTMLDivElement | null>
+  appSectionRef: React.RefObject<HTMLDivElement>
 }) => {
   return (
     <div className="space-y-8">
@@ -567,3 +575,5 @@ function SearchIcon({ size = 16, className = "" }: { size?: number, className?: 
 }
 
 export default ProductsPage
+
+

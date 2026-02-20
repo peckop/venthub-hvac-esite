@@ -158,11 +158,11 @@ const AdminInventoryPage: React.FC = () => {
         const tmap: Record<string, number | null> = {}
         const omap: Record<string, boolean> = {}
         const cmap: Record<string, string | null> = {}
-        ;(prodData as { id: string; low_stock_threshold: number | null; low_stock_override?: boolean; category_id?: string | null }[] | null | undefined)?.forEach((p) => {
-          tmap[p.id] = p.low_stock_threshold
-          omap[p.id] = !!p.low_stock_override
-          cmap[p.id] = p.category_id ?? null
-        })
+          ; (prodData as { id: string; low_stock_threshold: number | null; low_stock_override?: boolean; category_id?: string | null }[] | null | undefined)?.forEach((p) => {
+            tmap[p.id] = p.low_stock_threshold
+            omap[p.id] = !!p.low_stock_override
+            cmap[p.id] = p.category_id ?? null
+          })
         setThresholdMap(tmap)
         setOverrideMap(omap)
         setProductCategoryMap(cmap)
@@ -176,7 +176,7 @@ const AdminInventoryPage: React.FC = () => {
     setLoading(LoadState.Idle)
   }, [])
 
-  React.useEffect(()=>{ load() }, [load])
+  React.useEffect(() => { load() }, [load])
 
   // Realtime: inventory_settings değiştiğinde efektif eşik değerini güncelle
   React.useEffect(() => {
@@ -304,7 +304,7 @@ const AdminInventoryPage: React.FC = () => {
       const cid = key === 'null' ? null : key
       out.push({ cid, name: getCategoryName(cid), items })
     }
-    out.sort((a,b) => a.name.localeCompare(b.name, 'tr'))
+    out.sort((a, b) => a.name.localeCompare(b.name, 'tr'))
     return out
   }, [groupByCategory, sortedRows, productCategoryMap, getCategoryName])
 
@@ -506,7 +506,7 @@ const AdminInventoryPage: React.FC = () => {
       toast.error('CSV dosyası işlenirken hata oluştu')
     }
   }
-  
+
   const processCSV = async () => {
     if (csvPreview.length === 0) {
       toast.error('İşlenecek veri yok')
@@ -544,8 +544,8 @@ const AdminInventoryPage: React.FC = () => {
           if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
             return crypto.randomUUID()
           }
-        } catch {}
-        return `${Date.now()}-${Math.random().toString(36).slice(2,10)}`
+        } catch { }
+        return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
       }
       const batchId = genBatchId()
 
@@ -587,8 +587,8 @@ const AdminInventoryPage: React.FC = () => {
 
       const downloadErrors = () => {
         if (errors.length === 0) return
-        const header = ['sku','message']
-        const lines = errors.map(e => ['"' + e.sku.replace(/"/g,'""') + '"', '"' + e.message.replace(/"/g,'""') + '"'].join(','))
+        const header = ['sku', 'message']
+        const lines = errors.map(e => ['"' + e.sku.replace(/"/g, '""') + '"', '"' + e.message.replace(/"/g, '""') + '"'].join(','))
         const csv = '\ufeff' + [header.join(','), ...lines].join('\n')
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
         const url = URL.createObjectURL(blob)
@@ -644,7 +644,7 @@ const AdminInventoryPage: React.FC = () => {
       setCsvProgress(0)
     }
   }
-  
+
   const exportCsv = async () => {
     // Görünür satırlardaki ürün ID'lerinden SKU haritasını oluştur
     const ids = Array.from(new Set(sortedRows.map(r => r.product_id)))
@@ -677,8 +677,8 @@ const AdminInventoryPage: React.FC = () => {
     const csvContent = [
       header.join(','),
       ...exportRows.map(row => [
-        '"' + row.sku.replace(/"/g,'""') + '"',
-        '"' + row.name.replace(/"/g,'""') + '"',
+        '"' + row.sku.replace(/"/g, '""') + '"',
+        '"' + row.name.replace(/"/g, '""') + '"',
         row.physical_stock,
         row.reserved_stock,
         row.available_stock
@@ -697,7 +697,7 @@ const AdminInventoryPage: React.FC = () => {
   }
 
   const exportCsvTemplate = () => {
-    const header = ['sku','qty']
+    const header = ['sku', 'qty']
     const csv = '\ufeff' + header.join(',') + '\n' + ['"PRD001"', '10'].join(',') + '\n'
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -741,12 +741,26 @@ const AdminInventoryPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:inventory'
   const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; physical: boolean; reserved: boolean; available: boolean; threshold: boolean; status: boolean }>({ name: true, physical: true, reserved: true, available: true, threshold: true, status: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
-  const visibleCount = (visibleCols.name?1:0)+(visibleCols.physical?1:0)+(visibleCols.reserved?1:0)+(visibleCols.available?1:0)+(visibleCols.threshold?1:0)+(visibleCols.status?1:0)
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
+  const visibleCount = (visibleCols.name ? 1 : 0) + (visibleCols.physical ? 1 : 0) + (visibleCols.reserved ? 1 : 0) + (visibleCols.available ? 1 : 0) + (visibleCols.threshold ? 1 : 0) + (visibleCols.status ? 1 : 0)
 
   // ESC ile çekmeceyi kapat
   React.useEffect(() => {
@@ -783,18 +797,18 @@ const AdminInventoryPage: React.FC = () => {
           ]
         }}
         chips={[
-          { key: 'out', label: 'Tükendi', active: statusFilter.out, onToggle: ()=>setStatusFilter(s=>({ ...s, out: !s.out })), classOn: 'bg-gray-200 text-gray-800 border-gray-300', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: ()=>setStatusFilter(s=>({ ...s, critical: !s.critical })), classOn: 'bg-warning-orange/10 text-warning-orange border-warning-orange/30', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'reserved', label: 'Rezervli', active: statusFilter.reserved, onToggle: ()=>setStatusFilter(s=>({ ...s, reserved: !s.reserved })), classOn: 'bg-blue-100 text-blue-700 border-blue-200', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'ok', label: 'Uygun', active: statusFilter.ok, onToggle: ()=>setStatusFilter(s=>({ ...s, ok: !s.ok })), classOn: 'bg-green-100 text-green-700 border-green-200', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'out', label: 'Tükendi', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })), classOn: 'bg-gray-200 text-gray-800 border-gray-300', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })), classOn: 'bg-warning-orange/10 text-warning-orange border-warning-orange/30', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'reserved', label: 'Rezervli', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })), classOn: 'bg-blue-100 text-blue-700 border-blue-200', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'ok', label: 'Uygun', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })), classOn: 'bg-green-100 text-green-700 border-green-200', classOff: 'bg-white text-steel-gray border-light-gray' },
         ]}
         toggles={[{ key: 'groupByCategory', label: 'Grupla: Kategori', checked: groupByCategory, onChange: setGroupByCategory }]}
-        onClear={()=>{ setQ(''); setSelectedCategory(''); setStatusFilter({ out:false, critical:false, reserved:false, ok:false }); setGroupByCategory(false) }}
+        onClear={() => { setQ(''); setSelectedCategory(''); setStatusFilter({ out: false, critical: false, reserved: false, ok: false }); setGroupByCategory(false) }}
         recordCount={filteredRows.length}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <button 
-              onClick={()=>setCsvImportOpen(true)}
+            <button
+              onClick={() => setCsvImportOpen(true)}
               className="px-3 py-2 text-sm bg-primary-navy text-white rounded-md hover:bg-primary-navy/90"
             >
               CSV İçe Aktar
@@ -805,12 +819,12 @@ const AdminInventoryPage: React.FC = () => {
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'name', label: 'Ürün', checked: visibleCols.name, onChange: (v)=>setVisibleCols(s=>({ ...s, name: v })) },
-                { key: 'physical', label: 'Fiziksel', checked: visibleCols.physical, onChange: (v)=>setVisibleCols(s=>({ ...s, physical: v })) },
-                { key: 'reserved', label: 'Rezerve', checked: visibleCols.reserved, onChange: (v)=>setVisibleCols(s=>({ ...s, reserved: v })) },
-                { key: 'available', label: 'Satılabilir', checked: visibleCols.available, onChange: (v)=>setVisibleCols(s=>({ ...s, available: v })) },
-                { key: 'threshold', label: 'Eşik', checked: visibleCols.threshold, onChange: (v)=>setVisibleCols(s=>({ ...s, threshold: v })) },
-                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
+                { key: 'name', label: 'Ürün', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
+                { key: 'physical', label: 'Fiziksel', checked: visibleCols.physical, onChange: (v) => setVisibleCols(s => ({ ...s, physical: v })) },
+                { key: 'reserved', label: 'Rezerve', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
+                { key: 'available', label: 'Satılabilir', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
+                { key: 'threshold', label: 'Eşik', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
+                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -825,42 +839,42 @@ const AdminInventoryPage: React.FC = () => {
             <tr>
               {visibleCols.name && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('name')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>
                     Ürün {sortIndicator('name')}
                   </button>
                 </th>
               )}
               {visibleCols.physical && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('physical')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('physical')}>
                     Fiziksel {sortIndicator('physical')}
                   </button>
                 </th>
               )}
               {visibleCols.reserved && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('reserved')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('reserved')}>
                     Rezerve {sortIndicator('reserved')}
                   </button>
                 </th>
               )}
               {visibleCols.available && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('available')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('available')}>
                     Satılabilir {sortIndicator('available')}
                   </button>
                 </th>
               )}
               {visibleCols.threshold && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('threshold')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('threshold')}>
                     Eşik (Efektif) {sortIndicator('threshold')}
                   </button>
                 </th>
               )}
               {visibleCols.status && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>
                     Durum {sortIndicator('status')}
                   </button>
                 </th>
@@ -872,7 +886,7 @@ const AdminInventoryPage: React.FC = () => {
               groupedRows.map(g => (
                 <React.Fragment key={g.cid ?? 'null'}>
                   <tr className="bg-gray-100">
-                    <th colSpan={visibleCount} className={`text-left ${density==='compact'?'px-2 py-2':'px-3 py-2'} text-industrial-gray font-semibold`}>{g.name}</th>
+                    <th colSpan={visibleCount} className={`text-left ${density === 'compact' ? 'px-2 py-2' : 'px-3 py-2'} text-industrial-gray font-semibold`}>{g.name}</th>
                   </tr>
                   {g.items.map(r => (
                     <tr
@@ -881,17 +895,17 @@ const AdminInventoryPage: React.FC = () => {
                       onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id); loadMovements(r.product_id) }}
                     >
                       {visibleCols.name && (<td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>)}
-                      {visibleCols.physical && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{r.physical_stock}</td>)}
-                      {visibleCols.reserved && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{r.reserved_stock}</td>)}
-                      {visibleCols.available && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
+                      {visibleCols.physical && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.physical_stock}</td>)}
+                      {visibleCols.reserved && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.reserved_stock}</td>)}
+                      {visibleCols.available && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
                       {visibleCols.threshold && (
-                        <td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>
+                        <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
                           <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
                             {(effectiveThreshold(r.product_id) ?? '-') as number | string}
                           </span>
                         </td>
                       )}
-                      {visibleCols.status && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{statusBadge(r)}</td>)}
+                      {visibleCols.status && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{statusBadge(r)}</td>)}
                     </tr>
                   ))}
                 </React.Fragment>
@@ -904,17 +918,17 @@ const AdminInventoryPage: React.FC = () => {
                   onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id); loadMovements(r.product_id) }}
                 >
                   {visibleCols.name && (<td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>)}
-                  {visibleCols.physical && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{r.physical_stock}</td>)}
-                  {visibleCols.reserved && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{r.reserved_stock}</td>)}
-                  {visibleCols.available && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
+                  {visibleCols.physical && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.physical_stock}</td>)}
+                  {visibleCols.reserved && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.reserved_stock}</td>)}
+                  {visibleCols.available && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
                   {visibleCols.threshold && (
-                    <td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>
+                    <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
                       <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
                         {(effectiveThreshold(r.product_id) ?? '-') as number | string}
                       </span>
                     </td>
                   )}
-                  {visibleCols.status && (<td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right`}>{statusBadge(r)}</td>)}
+                  {visibleCols.status && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{statusBadge(r)}</td>)}
                 </tr>
               ))
             )}
@@ -932,11 +946,11 @@ const AdminInventoryPage: React.FC = () => {
       {selected && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 bg-black/20 z-40" onClick={()=>setSelected(null)} />
+          <div className="fixed inset-0 bg-black/20 z-40" onClick={() => setSelected(null)} />
           <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-xl border-l border-light-gray flex flex-col">
             <header className="p-4 border-b border-light-gray flex items-center justify-between">
               <h2 className="text-lg font-semibold text-industrial-gray truncate pr-4">{selected.name}</h2>
-              <button className="px-3 py-1 text-sm border rounded" onClick={()=>setSelected(null)}>{t('admin.ui.close')}</button>
+              <button className="px-3 py-1 text-sm border rounded" onClick={() => setSelected(null)}>{t('admin.ui.close')}</button>
             </header>
             <div className="p-4 space-y-4 overflow-auto">
               <div className="grid grid-cols-2 gap-3">
@@ -976,9 +990,9 @@ const AdminInventoryPage: React.FC = () => {
               <section className="space-y-2">
                 <h3 className="text-sm font-semibold text-industrial-gray">Hızlı Hareket</h3>
                 <div className="flex items-center gap-2">
-                  <input type="number" className="w-24 px-2 py-2 border rounded text-sm" value={moveQty} min={1} onChange={(e)=>setMoveQty(Math.max(1, Number(e.target.value||1)))} />
-                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={()=>adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
-                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={()=>adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
+                  <input type="number" className="w-24 px-2 py-2 border rounded text-sm" value={moveQty} min={1} onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))} />
+                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
+                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
                 </div>
               </section>
 
@@ -1013,7 +1027,7 @@ const AdminInventoryPage: React.FC = () => {
               <section className="space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-industrial-gray">Hareket Geçmişi (Son 5)</h3>
-                  <button onClick={undoLastMovement} disabled={undoing || movements.length===0 || String((movements[0] as { reason?: string } | undefined)?.reason || '').startsWith('undo')} className="px-3 py-1 rounded border text-xs disabled:opacity-50">Geri Al (10 dk)</button>
+                  <button onClick={undoLastMovement} disabled={undoing || movements.length === 0 || String((movements[0] as { reason?: string } | undefined)?.reason || '').startsWith('undo')} className="px-3 py-1 rounded border text-xs disabled:opacity-50">Geri Al (10 dk)</button>
                 </div>
                 {movements.length === 0 ? (
                   <div className="text-sm text-steel-gray">Hareket yok.</div>
@@ -1031,7 +1045,7 @@ const AdminInventoryPage: React.FC = () => {
                         <tr key={m.id} className="border-b">
                           <td className="p-2">{formatDateTime(m.created_at, 'tr')}</td>
                           <td className="p-2">{m.reason}</td>
-                          <td className={`p-2 text-right ${Number(m.delta)>0?'text-green-600':Number(m.delta)<0?'text-red-600':'text-steel-gray'}`}>{Number(m.delta)>0?'+':''}{m.delta}</td>
+                          <td className={`p-2 text-right ${Number(m.delta) > 0 ? 'text-green-600' : Number(m.delta) < 0 ? 'text-red-600' : 'text-steel-gray'}`}>{Number(m.delta) > 0 ? '+' : ''}{m.delta}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1046,12 +1060,12 @@ const AdminInventoryPage: React.FC = () => {
       {/* CSV Import Modal */}
       {csvImportOpen && (
         <>
-          <div className="fixed inset-0 bg-black/50 z-50" onClick={()=>setCsvImportOpen(false)} />
+          <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setCsvImportOpen(false)} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
               <div className="p-6">
                 <h2 className="text-xl font-semibold text-industrial-gray mb-4">CSV Stok İçe Aktarma</h2>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-industrial-gray mb-2">
@@ -1108,10 +1122,9 @@ const AdminInventoryPage: React.FC = () => {
                                 <td className="px-2 py-1">{item.name}</td>
                                 <td className="px-2 py-1 text-right">{item.current}</td>
                                 <td className="px-2 py-1 text-right">{item.new}</td>
-                                <td className={`px-2 py-1 text-right ${
-                                  item.delta > 0 ? 'text-green-600' : 
-                                  item.delta < 0 ? 'text-red-600' : 'text-steel-gray'
-                                }`}>
+                                <td className={`px-2 py-1 text-right ${item.delta > 0 ? 'text-green-600' :
+                                    item.delta < 0 ? 'text-red-600' : 'text-steel-gray'
+                                  }`}>
                                   {item.delta > 0 ? '+' : ''}{item.delta}
                                 </td>
                                 <td className="px-2 py-1">
@@ -1144,7 +1157,7 @@ const AdminInventoryPage: React.FC = () => {
                     disabled={csvPreview.length === 0 || csvProcessing}
                     className="px-4 py-2 text-sm bg-primary-navy text-white rounded-md hover:bg-primary-navy/90 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {csvProcessing ? `İşleniyor... ${Math.round(csvProgress*100)}%` : (dryRun ? 'Kuru Çalıştır' : 'İçe Aktar')}
+                    {csvProcessing ? `İşleniyor... ${Math.round(csvProgress * 100)}%` : (dryRun ? 'Kuru Çalıştır' : 'İçe Aktar')}
                   </button>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import { Product } from '../lib/supabase'
 import { X, ShoppingCart, Eye } from 'lucide-react'
 import { useCart } from '../hooks/useCartHook'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 
@@ -49,7 +49,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
               <button onClick={handleAdd} className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white rounded-lg transition-colors">
                 <ShoppingCart size={18} className="mr-2" /> {t('quickView.addToCart')}
               </button>
-              <Link to={`/products/${product.id}`} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
+              <Link href={`/products/${product.id}`} onClick={onClose} className="inline-flex items-center justify-center px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white rounded-lg transition-colors">
                 <Eye size={18} className="mr-2" /> {t('quickView.viewProduct')}
               </Link>
             </div>

@@ -5,7 +5,7 @@ import { buildWhatsAppLink } from '../lib/utils'
  */
 export function getWhatsAppNumber(): string | null {
   // Not: Pre-live aşamasında fallback numarası kullanmayız. ENV yoksa WhatsApp öğeleri gizlenir.
-  const envWa = (import.meta as unknown as { env: Record<string, string> }).env?.VITE_SHOP_WHATSAPP
+  const envWa = process.env.NEXT_PUBLIC_SHOP_WHATSAPP
   const raw = (typeof envWa === 'string' && envWa.trim()) ? envWa : ''
   const normalized = raw.replace(/[^\d]/g, '')
   return normalized.length >= 10 ? normalized : null
@@ -37,7 +37,9 @@ export function generateStockInquiryMessage(productName: string, sku?: string): 
  */
 export function generateSupportMessage(subject?: string): string {
   const baseMessage = 'Merhaba! Size nasıl yardımcı olabilirim?'
-  return subject ? `${baseMessage}\n\nKonu: ${subject}` : baseMessage
+  return subject ? `${baseMessage}
+
+Konu: ${subject}` : baseMessage
 }
 
 /**
@@ -45,17 +47,20 @@ export function generateSupportMessage(subject?: string): string {
  */
 export function generateTechnicalQuoteMessage(productName?: string, projectInfo?: string): string {
   let message = 'Merhaba! Teknik teklif talebi:'
-  
+
   if (productName) {
-    message += `\n\nÜrün: ${productName}`
+    message += `
+
+Ürün: ${productName}`
   }
-  
+
   if (projectInfo) {
-    message += `\nProje Bilgileri: ${projectInfo}`
+    message += `
+Proje Bilgileri: ${projectInfo}`
   } else {
-    message += '\n\nProje detaylarınızı paylaşabilir misiniz?'
+    message += '\n\nProje detaylarınızı paylaşabilir misiniz ? '
   }
-  
+
   return message
 }
 
@@ -71,17 +76,19 @@ export function generateFAQSupportMessage(): string {
  */
 export function generateContactMessage(name?: string, subject?: string): string {
   let message = 'Merhaba!'
-  
+
   if (name) {
     message += ` Ben ${name}.`
   }
-  
+
   if (subject) {
-    message += `\n\nKonu: ${subject}`
+    message += `
+
+Konu: ${subject}`
   }
-  
-  message += '\n\nSize nasıl yardımcı olabilirim?'
-  
+
+  message += '\n\nSize nasıl yardımcı olabilirim ? '
+
   return message
 }
 
@@ -98,7 +105,7 @@ export function isWhatsAppAvailable(): boolean {
 export function getStockInquiryLink(productName: string, sku?: string): string | null {
   const phone = getWhatsAppNumber()
   if (!phone) return null
-  
+
   const message = generateStockInquiryMessage(productName, sku)
   return createWhatsAppLink(phone, message)
 }
@@ -109,7 +116,7 @@ export function getStockInquiryLink(productName: string, sku?: string): string |
 export function getSupportLink(subject?: string): string | null {
   const phone = getWhatsAppNumber()
   if (!phone) return null
-  
+
   const message = generateSupportMessage(subject)
   return createWhatsAppLink(phone, message)
 }

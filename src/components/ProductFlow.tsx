@@ -60,7 +60,7 @@ const useProductsWithImages = () => {
 const ProductFlow: React.FC = () => {
   const { items, allItems, loading, reduced } = useProductsWithImages()
   const urls = useMemo(() => items.map(p => p.image_url!).filter(Boolean), [items])
-  const isCoarse = (() => { try { return window.matchMedia('(pointer: coarse)').matches } catch { return false } })()
+  const isCoarse = (() => { try { return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches } catch { return false } })()
   const rotateProducts = (arr: LiteProduct[], n: number) => {
     if (!arr.length) return arr
     const k = ((n % arr.length) + arr.length) % arr.length

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 export const AuthCallbackPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
-  const navigate = useNavigate()
+  const router = useRouter()
 
   useEffect(() => {
     async function handleAuthCallback() {
@@ -35,7 +35,7 @@ export const AuthCallbackPage: React.FC = () => {
               setMessage('E-posta başarıyla doğrulandı! Anasayfaya yönlendiriliyorsunuz...')
               toast.success('E-posta başarıyla doğrulandı!')
               setTimeout(() => {
-                navigate('/')
+                router.push('/')
               }, 2000)
               return
             }
@@ -47,7 +47,7 @@ export const AuthCallbackPage: React.FC = () => {
             setMessage('E-posta doğrulama sırasında hata oluştu: ' + error.message)
             // Redirect to error page after 3 seconds
             setTimeout(() => {
-              navigate('/auth/login?error=' + encodeURIComponent(error.message))
+              router.push('/auth/login?error=' + encodeURIComponent(error.message))
             }, 3000)
             return
           }
@@ -58,7 +58,7 @@ export const AuthCallbackPage: React.FC = () => {
             toast.success('E-posta başarıyla doğrulandı!')
             // Successfully signed in, redirect to app
             setTimeout(() => {
-              navigate('/')
+              router.push('/')
             }, 2000)
             return
           }
@@ -68,20 +68,20 @@ export const AuthCallbackPage: React.FC = () => {
         setStatus('error')
         setMessage('Doğrulama linki geçersiz veya süresi dolmuş')
         setTimeout(() => {
-          navigate('/auth/login?error=No session found')
+          router.push('/auth/login?error=No session found')
         }, 3000)
       } catch (error: unknown) {
         console.error('Auth callback error:', error)
         setStatus('error')
         setMessage('Beklenmeyen bir hata oluştu')
         setTimeout(() => {
-          navigate('/auth/login')
+          router.push('/auth/login')
         }, 3000)
       }
     }
 
     handleAuthCallback()
-  }, [navigate])
+  }, [router])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray flex items-center justify-center">
@@ -125,7 +125,7 @@ export const AuthCallbackPage: React.FC = () => {
                 {message}
               </p>
               <button
-                onClick={() => navigate('/auth/login')}
+                onClick={() => router.push('/auth/login')}
                 className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
                 Giriş Sayfasına Dön
@@ -139,3 +139,4 @@ export const AuthCallbackPage: React.FC = () => {
 }
 
 export default AuthCallbackPage
+

@@ -1,11 +1,13 @@
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
 
 const TopicPage: React.FC = () => {
   const { t } = useI18n()
-  const { slug } = useParams<{ slug: string }>()
+  const params = useParams()
+  const slug = params?.slug as string
   const base = slug ? `knowledge.topics.${slug}` : ''
 
   const exists = slug && t(`${base}.title`) !== `${base}.title`
@@ -16,7 +18,7 @@ const TopicPage: React.FC = () => {
         <div className="max-w-3xl mx-auto px-4">
           <h1 className="text-2xl font-bold text-industrial-gray mb-2">{t('knowledge.topic.notFoundTitle')}</h1>
           <p className="text-steel-gray mb-6">{t('knowledge.topic.notFoundDesc')}</p>
-          <Link to="/destek/merkez" className="text-primary-navy hover:underline font-medium">{t('knowledge.topic.backToHub')} →</Link>
+          <Link href="/destek/merkez" className="text-primary-navy hover:underline font-medium">{t('knowledge.topic.backToHub')} →</Link>
         </div>
       </section>
     )
@@ -54,13 +56,13 @@ const TopicPage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            to={slug ? getCategoryUrlFromTopic(slug) : '/products'}
+            href={slug ? getCategoryUrlFromTopic(slug) : '/products'}
             className="inline-flex items-center justify-center rounded-lg bg-primary-navy text-white px-5 py-2.5 font-semibold shadow-sm hover:bg-secondary-blue transition"
           >
             {t('knowledge.topic.toProducts')}
           </Link>
           <Link
-            to="/support/sss#teklif"
+            href="/support/sss#teklif"
             className="inline-flex items-center justify-center rounded-lg border border-primary-navy text-primary-navy px-5 py-2.5 font-semibold hover:bg-primary-navy hover:text-white transition"
           >
             {t('knowledge.topic.getQuote')}

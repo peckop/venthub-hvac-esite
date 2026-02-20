@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
 import { formatCurrency } from '../i18n/format'
 
@@ -24,7 +24,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
 
-  const navigate = useNavigate()
+  const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Load recent searches on mount
@@ -140,7 +140,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       <button
         key={`${s.type}-${idx}`}
         onClick={() => {
-          navigate(s.url)
+          router.push(s.url)
           addToRecent(q)
           handleClose()
         }}
@@ -203,7 +203,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {['Fanlar', 'Hava Perdeleri', 'Isı Geri Kazanım'].map(cat => (
             <button
               key={cat}
-              onClick={() => { navigate(`/category/${cat.toLowerCase().replace(/ /g, '-')}`); handleClose(); }}
+              onClick={() => { router.push(`/category/${cat.toLowerCase().replace(/ /g, '-')}`); handleClose(); }}
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all"
             >
               {cat}
@@ -265,7 +265,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             <li key={r.id}>
               <button
                 className="w-full text-left px-4 py-3 hover:bg-slate-50 flex items-center justify-between group"
-                onClick={() => { navigate(`/products/${r.id}`); handleClose() }}
+                onClick={() => { router.push(`/products/${r.id}`); handleClose() }}
               >
                 <div>
                   <div className="font-medium text-industrial-gray group-hover:text-primary-navy transition-colors">{r.name}</div>
@@ -349,3 +349,4 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 }
 
 export default SearchOverlay
+

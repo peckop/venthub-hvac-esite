@@ -1,11 +1,15 @@
+'use client'
+
 import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
 import { getStockInquiryLink } from '../utils/whatsapp'
 import { formatCurrency } from '../i18n/format'
+import { trackEvent } from '../utils/analytics'
 
 interface ProductCardProps {
   product: Product
@@ -29,7 +33,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false, hidePrice = false }) => {
   const { t, lang } = useI18n()
-  const navigate = useNavigate()
+  const router = useRouter()
   const isList = layout === 'list'
   const { addToCart } = useCart()
   const price = parseFloat(product.price)
@@ -43,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
   const handleAskQuote = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate('/contact?product=' + encodeURIComponent(product.name))
+    router.push('/contact?product=' + encodeURIComponent(product.name || ''))
   }
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -68,16 +72,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
     return `${renderUrl}?${query}`
   }
 
-  const src = product.image_url ? buildImage(product.image_url, isList ? 288 : 400) : undefined
+  const src = product.image_url ? buildImage(product.image_url!, isList ? 288 : 400) : undefined
   const srcSet = product.image_url
-    ? [320, 480, 640, 768, 1024].map(w => `${buildImage(product.image_url, w)} ${w}w`).join(', ')
+    ? [320, 480, 640, 768, 1024].map(w => `${buildImage(product.image_url!, w)} ${w}w`).join(', ')
     : undefined
   const sizes = isList
     ? '(max-width: 768px) 25vw, 144px'
     : '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px'
 
   return (
-    <Link to={`/products/${product.id}`}>
+    <Link href={`/products/${product.id}`}>
       <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
         } ${isList ? 'flex items-stretch' : ''}`}>
         {/* Featured Badge */}
@@ -202,7 +206,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  navigate(`/destek/konular/${relatedTopicSlug}`)
+                  router.push(`/destek/konular/${relatedTopicSlug || ''}`)
                 }}
                 className="ml-1 text-primary-navy hover:text-secondary-blue underline bg-transparent border-none cursor-pointer"
               >
@@ -264,7 +268,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    navigate('/contact')
+                    router.push('/contact')
                   }}
                   className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
                   title={t('pdp.askStock') as string}

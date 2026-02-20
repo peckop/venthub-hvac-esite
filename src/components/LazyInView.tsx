@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 
 interface LazyInViewProps<T extends Record<string, unknown> = Record<string, unknown>> {

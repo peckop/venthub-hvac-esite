@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity, Zap } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
 
@@ -218,7 +218,7 @@ const getModelTypeForCategory = (slug: string): string | undefined => {
 }
 
 const CategoryOrbitCarousel = () => {
-    const navigate = useNavigate()
+    const router = useRouter()
 
     // Carousel State
     const [level, setLevel] = useState<CarouselLevel>('main')
@@ -321,16 +321,16 @@ const CategoryOrbitCarousel = () => {
                     }, 400)
                 } else {
                     // Alt kategori yoksa direkt sayfaya git
-                    navigate(`/category/${category.id}`)
+                    router.push(`/category/${category.id}`)
                 }
             }
         } else {
             // Alt kategoriye tıklandı - sayfaya git
             if (activeMainCategory) {
-                navigate(`/category/${activeMainCategory.id}/${itemId}`)
+                router.push(`/category/${activeMainCategory.id}/${itemId}`)
             }
         }
-    }, [level, activeMainCategory, navigate])
+    }, [level, activeMainCategory, router])
 
     // Geri dönüş
     const handleBack = useCallback(() => {
@@ -345,9 +345,9 @@ const CategoryOrbitCarousel = () => {
     // Ana kategoriye git (View All)
     const handleViewAllProducts = useCallback(() => {
         if (activeMainCategory) {
-            navigate(`/category/${activeMainCategory.id}`)
+            router.push(`/category/${activeMainCategory.id}`)
         }
-    }, [activeMainCategory, navigate])
+    }, [activeMainCategory, router])
 
     return (
         <section className="bg-[#020617] overflow-hidden relative">
@@ -477,3 +477,4 @@ const CategoryOrbitCarousel = () => {
 }
 
 export default CategoryOrbitCarousel
+

@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useEffect } from 'react'
-import LazyInView from '../components/LazyInView'
-import { Link } from 'react-router-dom'
+
+import Link from 'next/link'
 import { getCategories, Category } from '../lib/supabase'
 const HeroCarousel = React.lazy(() => import('../components/HeroCarousel').then(module => ({ default: module.HeroCarousel })))
 
@@ -13,11 +13,11 @@ import { trackEvent } from '../utils/analytics'
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 import Seo from '../components/Seo'
 
-// @ts-expect-error: Missing type definitions for image query params
-import hero1200 from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
+const hero1200 = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
-// Kritik olmayan blokları tembel yükleme
-import LazyBrandsShowcase from '../components/LazyBrandsShowcase'
+// Optimize edilmiş bağımsız bileşenler
+import BentoGrid from '../components/BentoGrid'
+import BrandsShowcase from '../components/BrandsShowcase'
 // New optimized components
 const SmartRouting = React.lazy(() => import('../components/SmartRouting'))
 const WhyVentHubEnhanced = React.lazy(() => import('../components/WhyVentHubEnhanced'))
@@ -40,7 +40,7 @@ export const HomePage: React.FC = () => {
       const link = document.createElement('link')
       link.setAttribute('rel', 'preload')
       link.setAttribute('as', 'image')
-      link.setAttribute('href', hero1200 as unknown as string)
+      link.setAttribute('href', hero1200)
       link.setAttribute('fetchpriority', 'high')
       document.head.appendChild(link)
       return () => { document.head.removeChild(link) }
@@ -50,16 +50,17 @@ export const HomePage: React.FC = () => {
 
 
 
-    // Global lead modal trigger for HeroSection button
+  // Global lead modal trigger for HeroSection button
+  if (typeof window !== 'undefined') {
     ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
-
+  }
 
   return (
     <div className="min-h-screen">
       <Seo
         title={t('home.seoTitle')}
         description={t('home.seoDesc')}
-        canonical={`${window.location.origin}/`}
+        canonical={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/`}
       />
       {/* Hero Section - Carousel or Static Fallback */}
       <Suspense fallback={<HeroSkeleton />}>
@@ -78,7 +79,7 @@ export const HomePage: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'Organization',
             name: 'VentHub',
-            url: `${window.location.origin}/`,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/`,
           }),
         }}
       />
@@ -89,10 +90,10 @@ export const HomePage: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'WebSite',
             name: 'VentHub',
-            url: `${window.location.origin}/`,
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/`,
             potentialAction: {
               '@type': 'SearchAction',
-              target: `${window.location.origin}/products?q={search_term_string}`,
+              target: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/products?q={search_term_string}`,
               'query-input': 'required name=search_term_string',
             },
           }),
@@ -101,17 +102,16 @@ export const HomePage: React.FC = () => {
 
       {/* Bento Grid (hover video önizleme) */}
       <div id="categories" className="cv-600 scroll-mt-20">
-        <LazyInView
-          loader={() => import('../components/BentoGrid')}
-          placeholder={<div className="min-h-[200px]" aria-hidden="true" />}
-          rootMargin="0px 0px"
-          once
-        />
+        <Suspense fallback={<div className="min-h-[200px]" aria-hidden="true" />}>
+          <BentoGrid />
+        </Suspense>
       </div>
 
       {/* Premium HVAC Markaları (BentoGrid sonrası) */}
       <div className="cv-320">
-        <LazyBrandsShowcase />
+        <Suspense fallback={<div className="min-h-[120px]" aria-hidden="true" />}>
+          <BrandsShowcase />
+        </Suspense>
       </div>
 
 
@@ -130,7 +130,7 @@ export const HomePage: React.FC = () => {
                   <Suspense key={card.key} fallback={<div className="rounded-xl border border-light-gray bg-white h-32 animate-pulse" />}>
                     <TiltCard>
                       <Link
-                        to={card.href}
+                        href={card.href}
                         className="group relative overflow-hidden rounded-xl border border-light-gray bg-white hover:shadow-md transition transform hover:-translate-y-0.5 ring-1 ring-black/5"
                         onClick={() => {
                           trackEvent('application_click', { key: card.key, source: 'home' })

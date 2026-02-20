@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, usePathname } from 'next/navigation'
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
 import { CartProvider } from './contexts/CartProvider'
 import { AuthProvider } from './contexts/AuthContext'
@@ -94,9 +94,9 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ContactPage = lazy(() => import('./pages/ContactPage'))
 
 function AppShell() {
-  const location = useLocation()
+  const pathname = usePathname()
   // Performance optimize edilmiş scroll handling + sync with route
-  const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: location.pathname })
+  const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname })
 
   // Prefetch ProductsPage chunk yalnızca ilk kullanıcı etkileşiminden sonra veya uzun idle sonrası
   React.useEffect(() => {
@@ -324,3 +324,4 @@ function App() {
 }
 
 export default App
+

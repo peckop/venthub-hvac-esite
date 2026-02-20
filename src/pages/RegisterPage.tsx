@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -105,13 +105,13 @@ export const RegisterPage: React.FC = () => {
             </p>
             <div className="space-y-3">
               <Link
-                to="/auth/login"
+                href="/auth/login"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 Giriş Sayfasına Dön
               </Link>
               <Link
-                to="/"
+                href="/"
                 className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 Ana Sayfaya Dön
@@ -133,7 +133,7 @@ export const RegisterPage: React.FC = () => {
       <div className="relative max-w-md mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          to="/"
+          href="/"
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />
@@ -269,7 +269,7 @@ t('auth.register')
             <p className="text-steel-gray">
               {t('auth.alreadyHave')} {' '}
               <Link
-                to="/auth/login"
+                href="/auth/login"
                 className="text-primary-navy hover:text-secondary-blue font-medium"
               >
                 {t('auth.login')}

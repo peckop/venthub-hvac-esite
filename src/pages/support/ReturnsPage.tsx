@@ -1,15 +1,15 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const ReturnsPage: React.FC = () => {
-  const navigate = useNavigate()
+  const router = useRouter()
   const { t } = useI18n()
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-4">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
+        <button onClick={() => router.back()} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
           <ArrowLeft size={18} className="mr-1" /> {t('auth.back')}
         </button>
       </div>
@@ -23,4 +23,5 @@ const ReturnsPage: React.FC = () => {
 }
 
 export default ReturnsPage
+
 

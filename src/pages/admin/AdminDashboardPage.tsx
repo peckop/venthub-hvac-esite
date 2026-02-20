@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -225,11 +225,11 @@ const AdminDashboardPage: React.FC = () => {
           <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.salesTotal')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (salesTotal != null ? formatCurrency(salesTotal, lang) : '-')}</div>
         </div>
-        <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
+        <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
           <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingReturns')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingReturns ?? '-')}</div>
         </Link>
-        <Link to="/admin/orders?preset=pendingShipments" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
+        <Link href="/admin/orders?preset=pendingShipments" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
           <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingShipments')}</div>
           <div className="text-2xl font-semibold">{loading ? '…' : (pendingShipments ?? '-')}</div>
         </Link>
@@ -264,7 +264,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">Bekleyen Kargo - Kargo Dağılımı</div>
-            <Link to="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {carrierDist.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
@@ -285,7 +285,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">Bekleyen İade - Durum Kırılımı</div>
-            <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {returnsByStatus.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
@@ -310,7 +310,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">Bekleyen Kargo - Yaş Kırılımı</div>
-            <Link to="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {shipAges.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
@@ -331,7 +331,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">İadeler - Haftalık Trend</div>
-            <Link to="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {returnsWeekly.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
@@ -354,7 +354,7 @@ const AdminDashboardPage: React.FC = () => {
       <section className="bg-white rounded-lg shadow-hvac-md p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="text-sm text-industrial-gray">{t('admin.dashboard.recent.title')}</div>
-          <Link to="/account/orders" className="text-sm text-primary-navy">{t('common.viewAll')}</Link>
+          <Link href="/account/orders" className="text-sm text-primary-navy">{t('common.viewAll')}</Link>
         </div>
         <div className="overflow-auto">
           <table className="w-full text-sm">
@@ -376,7 +376,7 @@ const AdminDashboardPage: React.FC = () => {
                   <td className="px-3 py-2 text-steel-gray">{formatDateTime(r.created_at, lang)}</td>
                   <td className="px-3 py-2 text-right">{formatCurrency(r.total_amount, lang)}</td>
                   <td className="px-3 py-2 text-steel-gray">{r.status}</td>
-                  <td className="px-3 py-2"><Link to={`/account/orders/${r.id}`} className="text-primary-navy hover:underline">{t('admin.ui.details')}</Link></td>
+                  <td className="px-3 py-2"><Link href={`/account/orders/${r.id}`} className="text-primary-navy hover:underline">{t('admin.ui.details')}</Link></td>
                 </tr>
               ))}
             </tbody>
