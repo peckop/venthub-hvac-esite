@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess, listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
@@ -30,9 +30,9 @@ interface AllUser {
 
 export default function AdminUsersPage() {
   const { user, loading } = useAuth()
-  const navigate = useNavigate()
+  const router = useRouter()
   const { t: _t, lang } = useI18n()
-  
+
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
   const [allUsers, setAllUsers] = useState<AllUser[]>([])
@@ -40,7 +40,7 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'admins' | 'all'>('admins')
-  const [actorRole, setActorRole] = useState<'user'|'moderator'|'admin'|'superadmin'>('user')
+  const [actorRole, setActorRole] = useState<'user' | 'moderator' | 'admin' | 'superadmin'>('user')
 
   // Admin kontrolü
   useEffect(() => {
@@ -54,27 +54,27 @@ export default function AdminUsersPage() {
         if (user?.id) {
           const role = await getUserRole(user.id)
           if (role === 'superadmin' || role === 'admin' || role === 'moderator') {
-            setActorRole(role as 'user'|'moderator'|'admin'|'superadmin')
+            setActorRole(role as 'user' | 'moderator' | 'admin' | 'superadmin')
           } else {
             setActorRole('user')
           }
         }
-      } catch {}
+      } catch { }
     })()
   }, [user?.id, _t])
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth/login', { replace: true, state: { from: { pathname: '/admin/users' } } })
+      router.push('/auth/login?redirect=/admin/users')
       return
     }
-  }, [user, loading, navigate, _t])
+  }, [user, loading, router, _t])
 
   // Admin kullanıcıları yükle
   useEffect(() => {
     async function loadAdminUsers() {
       if (!isAdmin || !user) return
-      
+
       try {
         setIsLoading(true)
         const data = await listAdminUsers()
@@ -94,29 +94,29 @@ export default function AdminUsersPage() {
   useEffect(() => {
     async function loadAllUsers() {
       if (!isAdmin || !user || activeTab !== 'all') return
-      
+
       try {
         setIsLoading(true)
-        
+
         // auth.users tablosundan tüm kullanıcıları getir
         const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers()
-        
+
         if (authError) {
           // Fallback: user_profiles üzerinden
           const { data: profiles, error: profileError } = await supabase
             .from('user_profiles')
             .select('id, role, created_at')
-          
+
           if (profileError) throw profileError
-          
+
           const { data: users, error: usersError } = await supabase
             .from('auth.users')
             .select('id, email, created_at')
-          
+
           if (usersError) {
             throw new Error('Kullanıcı listesi alınamadı. Bu özellik sadece admin API key ile çalışır.')
           }
-          
+
           // Manuel join
           const combined = users?.map(u => ({
             id: u.id,
@@ -124,7 +124,7 @@ export default function AdminUsersPage() {
             created_at: u.created_at,
             role: profiles?.find(p => p.id === u.id)?.role || 'user'
           })) || []
-          
+
           setAllUsers(combined)
         } else {
           // Admin API ile users listesi alındı
@@ -134,18 +134,18 @@ export default function AdminUsersPage() {
             created_at: u.created_at,
             role: 'user' // Default, profile'dan güncellenecek
           }))
-          
+
           // Profile bilgilerini al
           const { data: profiles } = await supabase
             .from('user_profiles')
             .select('id, role')
-          
+
           // Role bilgilerini birleştir
           const combined = userList.map(u => ({
             ...u,
             role: profiles?.find(p => p.id === u.id)?.role || 'user'
           }))
-          
+
           setAllUsers(combined)
         }
       } catch (error) {
@@ -161,12 +161,12 @@ export default function AdminUsersPage() {
   }, [isAdmin, user, activeTab, _t])
   const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'moderator' | 'superadmin') => {
     if (!isAdmin) return
-    
+
     try {
       setUpdatingRole(userId)
-      
+
       const success = await setUserAdminRole(userId, newRole)
-      
+
       if (success) {
         // Audit log
         try {
@@ -179,15 +179,15 @@ export default function AdminUsersPage() {
             after: { role: newRole },
             comment: 'role change'
           })
-        } catch {}
+        } catch { }
 
         toast.success(_t('admin.users.toasts.roleUpdated', { role: newRole }) as string)
-        
+
         // Local state güncelle
-        setAllUsers(prev => prev.map(u => 
+        setAllUsers(prev => prev.map(u =>
           u.id === userId ? { ...u, role: newRole } : u
         ))
-        
+
         // Admin listesini yeniden yükle
         if (newRole === 'admin' || newRole === 'moderator' || newRole === 'superadmin') {
           const data = await listAdminUsers()
@@ -204,12 +204,12 @@ export default function AdminUsersPage() {
     }
   }
 
-  const filteredAdminUsers = adminUsers.filter(user => 
+  const filteredAdminUsers = adminUsers.filter(user =>
     user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredAllUsers = allUsers.filter(user => 
+  const filteredAllUsers = allUsers.filter(user =>
     user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -235,11 +235,11 @@ export default function AdminUsersPage() {
   const STORAGE_KEY = 'toolbar:users'
   const [visibleCols, setVisibleCols] = useState<{ user: boolean; role: boolean; created: boolean; actions: boolean }>({ user: true, role: true, created: true, actions: true })
   const [density, setDensity] = useState<Density>('comfortable')
-  useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
-  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
-  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+  useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
+  useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
+  useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
   if (!isAdmin) {
     return (
@@ -262,22 +262,20 @@ export default function AdminUsersPage() {
       <div className={`${adminCardClass} p-3 flex gap-2`}>
         <button
           onClick={() => setActiveTab('admins')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'admins'
-              ? 'bg-primary-navy text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
->
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'admins'
+            ? 'bg-primary-navy text-white'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+        >
           {_t('admin.users.tabs.admins', { count: adminUsers.length })}
         </button>
         <button
           onClick={() => setActiveTab('all')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-            activeTab === 'all'
-              ? 'bg-primary-navy text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
->
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'all'
+            ? 'bg-primary-navy text-white'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+        >
           {_t('admin.users.tabs.all', { count: allUsers.length })}
         </button>
       </div>
@@ -290,10 +288,10 @@ export default function AdminUsersPage() {
         rightExtra={(
           <ColumnsMenu
             columns={[
-              { key: 'user', label: _t('admin.users.table.user'), checked: visibleCols.user, onChange: (v)=>setVisibleCols(s=>({ ...s, user: v })) },
-              { key: 'role', label: _t('admin.users.table.role'), checked: visibleCols.role, onChange: (v)=>setVisibleCols(s=>({ ...s, role: v })) },
-              { key: 'created', label: _t('admin.users.table.created'), checked: visibleCols.created, onChange: (v)=>setVisibleCols(s=>({ ...s, created: v })) },
-              ...(activeTab==='all' ? [{ key: 'actions', label: _t('admin.users.table.actions'), checked: visibleCols.actions, onChange: (v: boolean)=>setVisibleCols(s=>({ ...s, actions: v })) }] : [])
+              { key: 'user', label: _t('admin.users.table.user'), checked: visibleCols.user, onChange: (v) => setVisibleCols(s => ({ ...s, user: v })) },
+              { key: 'role', label: _t('admin.users.table.role'), checked: visibleCols.role, onChange: (v) => setVisibleCols(s => ({ ...s, role: v })) },
+              { key: 'created', label: _t('admin.users.table.created'), checked: visibleCols.created, onChange: (v) => setVisibleCols(s => ({ ...s, created: v })) },
+              ...(activeTab === 'all' ? [{ key: 'actions', label: _t('admin.users.table.actions'), checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }] : [])
             ]}
             density={density}
             onDensityChange={setDensity}
@@ -304,7 +302,7 @@ export default function AdminUsersPage() {
       {/* İçerik */}
       {isLoading ? (
         <div className={`${adminCardClass} min-h-[20vh] flex items-center justify-center`}>
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy"/>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
         </div>
       ) : (
         <div className={`${adminCardClass} overflow-hidden`}>
@@ -324,12 +322,12 @@ export default function AdminUsersPage() {
                     {visibleCols.user && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex flex-col">
-                          <span className="font-medium text-industrial-gray">{userItem.email}</span>
-                          {'full_name' in userItem && userItem.full_name && (
-                            <span className="text-xs text-steel-gray">{String(userItem.full_name)}</span>
+                          <span className="font-medium text-industrial-gray">{String((userItem as any).email || "")}</span>
+                          {('full_name' in userItem) && !!(userItem as any).full_name && (
+                            <span className="text-xs text-steel-gray">{String((userItem as any).full_name || "")}</span>
                           )}
-                          {'phone' in userItem && userItem.phone && (
-                            <span className="text-xs text-steel-gray">{String(userItem.phone)}</span>
+                          {('phone' in userItem) && !!(userItem as any).phone && (
+                            <span className="text-xs text-steel-gray">{String((userItem as any).phone || "")}</span>
                           )}
                         </div>
                       </td>
@@ -345,12 +343,12 @@ export default function AdminUsersPage() {
                     {visibleCols.created && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <span className="text-steel-gray">
-{formatDate(userItem.created_at, lang)}
+                          {formatDate(userItem.created_at, lang)}
                         </span>
                       </td>
                     )}
                     {activeTab === 'all' && visibleCols.actions && (
-                      <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
+                      <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>
                         <div className="flex gap-1">
                           {/* Süperadmin'i yalnızca süperadmin değiştirebilir; kendi rolünü değiştiremeyecek */}
                           {!(userItem.role === 'superadmin' && (actorRole !== 'superadmin' || userItem.id === user?.id)) && (
@@ -409,13 +407,13 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
-          
+
           {(activeTab === 'admins' ? filteredAdminUsers.length === 0 : filteredAllUsers.length === 0) && (
             <div className={`${adminCardClass} text-center py-8`}>
               <div className="text-steel-gray">
-                {searchQuery 
-                  ? _t('admin.users.empty.filtered') 
-                  : activeTab === 'admins' 
+                {searchQuery
+                  ? _t('admin.users.empty.filtered')
+                  : activeTab === 'admins'
                     ? _t('admin.users.empty.admins')
                     : _t('admin.users.empty.all')}
               </div>
@@ -442,3 +440,4 @@ export default function AdminUsersPage() {
     </div>
   )
 }
+

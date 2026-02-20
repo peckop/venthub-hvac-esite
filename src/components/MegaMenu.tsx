@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import type { Category } from '../lib/supabase'
 import { EliteMegaMenu, MobileMegaMenu } from './navigation/EliteMegaMenu'
@@ -105,3 +107,4 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
 }
 
 export default MegaMenu
+

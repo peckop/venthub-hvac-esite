@@ -1,7 +1,7 @@
 import React from 'react'
 import { useCart } from '../hooks/useCartHook'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { BrandIcon } from '../components/HVACIcons'
 import SecurityRibbon from '../components/SecurityRibbon'
 import { useI18n } from '../i18n/I18nProvider'
@@ -27,7 +27,7 @@ export const CartPage: React.FC = () => {
               {t('cart.emptyDesc')}
             </p>
             <Link
-              to="/"
+              href="/"
               className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
             >
               <ArrowLeft size={20} className="mr-2" />
@@ -69,7 +69,7 @@ export const CartPage: React.FC = () => {
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <Link
-                      to={`/products/${item.product.id}`}
+                      href={`/products/${item.product.id}`}
                       className="block hover:text-primary-navy transition-colors"
                     >
                       <h3 className="font-semibold text-industrial-gray mb-1">
@@ -172,7 +172,7 @@ export const CartPage: React.FC = () => {
 
               {/* Checkout Button */}
               <Link
-                to="/checkout"
+                href="/checkout"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
                 {t('cart.checkout')}
@@ -180,7 +180,7 @@ export const CartPage: React.FC = () => {
 
               {/* Continue Shopping */}
               <Link
-                to="/"
+                href="/"
                 className="w-full mt-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors text-center block"
               >
                 {t('cart.continueShopping')}

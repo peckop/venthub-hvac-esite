@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const TOPIC_SLUGS = ['hava-perdesi', 'jet-fan', 'hrv'] as const
@@ -71,7 +71,7 @@ const HubPage: React.FC = () => {
           {filtered.map((tpc) => (
             <Link
               key={tpc.slug}
-              to={`/destek/konular/${tpc.slug}`}
+              href={`/destek/konular/${tpc.slug}`}
               className="group block rounded-xl border border-light-gray p-5 hover:shadow-md transition"
             >
               <h2 className="text-lg font-semibold text-industrial-gray group-hover:text-primary-navy">{tpc.title}</h2>

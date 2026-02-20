@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { ChevronRight, Home } from 'lucide-react'
 
 export interface BreadcrumbItem {
@@ -93,7 +93,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                                     </span>
                                 ) : (
                                     <Link
-                                        to={item.href}
+                                        href={item.href}
                                         className={`${styles.link} transition-colors flex items-center`}
                                     >
                                         {isFirst && <Home size={14} className="inline mr-1.5 -mt-0.5" aria-hidden="true" />}

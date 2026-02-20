@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { getProductById, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
 import { useCart } from '../hooks/useCartHook'
@@ -167,8 +168,8 @@ const formatSpecValue = (key: string, value: unknown): string => {
   if (lowerKey.endsWith('_v')) return `${stringValue} V`;
   if (lowerKey.endsWith('_hz')) return `${stringValue} Hz`;
   if (lowerKey.endsWith('_c')) return `${stringValue} °C`;
-  if (lowerKey.endsWith('_ms')) return `${stringValue} m/s`;
-  // if (lowerKey.endsWith('_ls')) return `${stringValue} l/s`; // Filtered out
+  if (lowerKey.endsWith('_ms')) return `${stringValue} m / s`;
+  // if (lowerKey.endsWith('_ls')) return `${ stringValue } l / s`; // Filtered out
   if (lowerKey.endsWith('_a')) return `${stringValue} A`;
   if (lowerKey.endsWith('_m3h')) return `${stringValue} m³/h`;
   if (lowerKey.endsWith('_w')) return `${stringValue} W`;
@@ -273,8 +274,9 @@ const SPEC_SORT_ORDER: Record<string, number> = {
 };
 
 export const ProductDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
+  const params = useParams()
+  const id = params?.id as string
+  const router = useRouter()
   const { addToCart } = useCart()
   const [product, setProduct] = useState<Product | null>(null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
@@ -353,7 +355,7 @@ export const ProductDetailPage: React.FC = () => {
     }
 
     fetchProduct()
-  }, [id, navigate])
+  }, [id, router])
 
   // Scroll listener for sticky nav behavior
   useEffect(() => {
@@ -430,6 +432,7 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   const handleShare = () => {
+    if (typeof window === 'undefined') return
     if (navigator.share && product) {
       navigator.share({
         title: product.name,
@@ -466,6 +469,12 @@ export const ProductDetailPage: React.FC = () => {
 
   const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
 
+  // SEO values for PDP - Safe for SSR
+  const [origin, setOrigin] = useState('')
+  useEffect(() => {
+    if (typeof window !== 'undefined') setOrigin(window.location.origin)
+  }, [])
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -482,7 +491,7 @@ export const ProductDetailPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link to="/" className="text-primary-navy hover:text-secondary-blue">
+          <Link href="/" className="text-primary-navy hover:text-secondary-blue">
             {t('pdp.backHome')}
           </Link>
         </div>
@@ -490,8 +499,9 @@ export const ProductDetailPage: React.FC = () => {
     )
   }
 
-  // SEO values for PDP
-  const canonicalUrl = `${window.location.origin}/products/${product.id}`
+
+
+  const canonicalUrl = `${origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
   return (
@@ -501,19 +511,19 @@ export const ProductDetailPage: React.FC = () => {
       <div className="bg-light-gray border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
-            <Link to="/" className="text-steel-gray hover:text-primary-navy">
+            <Link href="/" className="text-steel-gray hover:text-primary-navy">
               {t('category.breadcrumbHome')}
             </Link>
             <ChevronRight size={16} className="text-steel-gray" />
             {mainCategory && (
               <>
-                <Link to={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                <Link href={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
                   {mainCategory.name}
                 </Link>
                 {subCategory && (
                   <>
                     <ChevronRight size={16} className="text-steel-gray" />
-                    <Link to={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
                       {subCategory.name}
                     </Link>
                   </>
@@ -533,11 +543,11 @@ export const ProductDetailPage: React.FC = () => {
         <button
           onClick={() => {
             if (subCategory && mainCategory) {
-              navigate(`/category/${mainCategory.slug}/${subCategory.slug}`)
+              router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
             } else if (mainCategory) {
-              navigate(`/category/${mainCategory.slug}`)
+              router.push(`/category/${mainCategory.slug}`)
             } else {
-              navigate(-1) // fallback
+              router.back() // fallback
             }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
@@ -623,7 +633,7 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="text-sm text-steel-gray">
                   <span className="font-medium text-industrial-gray">{t('pdp.relatedGuide')}:</span>
                   <Link
-                    to={`/destek/konular/${topicSlug}`}
+                    href={`/destek/konular/${topicSlug}`}
                     className="ml-2 text-primary-navy hover:text-secondary-blue underline"
                   >
                     {t(`knowledge.topics.${topicSlug}.title`)}
@@ -899,9 +909,9 @@ export const ProductDetailPage: React.FC = () => {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
-              { '@type': 'ListItem', position: 1, name: (typeof t === 'function' ? t('category.breadcrumbHome') : 'Ana Sayfa'), item: `${window.location.origin}/` },
-              ...(mainCategory ? [{ '@type': 'ListItem', position: 2, name: mainCategory.name, item: `${window.location.origin}/category/${mainCategory.slug}` }] : []),
-              ...(subCategory ? [{ '@type': 'ListItem', position: mainCategory ? 3 : 2, name: subCategory.name, item: `${window.location.origin}/category/${mainCategory?.slug}/${subCategory.slug}` }] : []),
+              { '@type': 'ListItem', position: 1, name: (typeof t === 'function' ? t('category.breadcrumbHome') : 'Ana Sayfa'), item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/` },
+              ...(mainCategory ? [{ '@type': 'ListItem', position: 2, name: mainCategory.name, item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/category/${mainCategory.slug}` }] : []),
+              ...(subCategory ? [{ '@type': 'ListItem', position: mainCategory ? 3 : 2, name: subCategory.name, item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/category/${mainCategory?.slug}/${subCategory.slug}` }] : []),
               { '@type': 'ListItem', position: (mainCategory && subCategory) ? 4 : (mainCategory ? 3 : 2), name: product.name, item: canonicalUrl },
             ],
           }),
@@ -1452,4 +1462,5 @@ export const ProductDetailPage: React.FC = () => {
 
 
 export default ProductDetailPage
+
 

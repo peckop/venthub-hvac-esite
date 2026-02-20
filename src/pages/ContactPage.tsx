@@ -15,7 +15,6 @@ const ContactPage: React.FC = () => {
   const [heroRef, heroVisible] = useScrollAnimation<HTMLElement>()
   const [formRef, formVisible] = useScrollAnimation<HTMLDivElement>()
   const [formSubmitted, setFormSubmitted] = useState(false)
-  const [selectedDept, setSelectedDept] = useState<string>('')
 
   const contactInfo = [
     {
@@ -77,15 +76,16 @@ const ContactPage: React.FC = () => {
   ], [])
 
   // URL Params for Department Pre-selection
-  const query = new URLSearchParams(window.location.search)
-  const deptParam = query.get('dept')
+  const [selectedDept, setSelectedDept] = useState<string>('')
 
-  // Auto-select department from URL if valid
   React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const query = new URLSearchParams(window.location.search)
+    const deptParam = query.get('dept')
     if (deptParam && departments.some(d => d.id === deptParam)) {
       setSelectedDept(deptParam)
     }
-  }, [deptParam, departments])
+  }, [departments])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -126,7 +126,7 @@ const ContactPage: React.FC = () => {
       <Seo
         title={`${t('contactPage.title')} | VentHub`}
         description="VentHub ile iletişime geçin. Satış, teknik destek ve proje danışmanlığı için 7/24 ulaşılabilir."
-        canonical={`${window.location.origin}/contact`}
+        canonical={typeof window !== 'undefined' ? `${window.location.origin}/contact` : ''}
       />
 
       {/* Hero Section */}

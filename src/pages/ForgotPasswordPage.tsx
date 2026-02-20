@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -60,7 +60,7 @@ toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
             </p>
             <div className="space-y-3">
               <Link
-                to="/auth/login"
+                href="/auth/login"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
                 Giriş Sayfasına Dön
@@ -88,7 +88,7 @@ toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
       <div className="relative max-w-md mx-auto px-4 py-8">
         {/* Back Button */}
         <Link
-          to="/auth/login"
+          href="/auth/login"
           className="inline-flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-colors"
         >
           <ArrowLeft size={20} />

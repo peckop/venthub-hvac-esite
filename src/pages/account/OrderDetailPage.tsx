@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -28,7 +28,7 @@ interface OrderItem {
   quantity: number
   unit_price: number
   total_price: number
-  product_image_url?: string
+  product_image_url?: string | null
 }
 
 interface Order {
@@ -95,9 +95,10 @@ interface SupabaseError {
 }
 
 export default function OrderDetailPage() {
-  const { id } = useParams()
+  const params = useParams()
+  const id = params?.id as string
   const { user, loading: authLoading } = useAuth()
-  const navigate = useNavigate()
+  const router = useRouter()
   const { t, lang } = useI18n()
   const { addToCart } = useCart()
 
@@ -107,10 +108,10 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/auth/login', { state: { from: { pathname: `/account/orders/${id}` } } })
+      router.push(`/auth/login?redirect=/account/orders/${id}`)
       return
     }
-  }, [authLoading, user, id, navigate])
+  }, [authLoading, user, id, router])
 
 
   useEffect(() => {
@@ -282,7 +283,7 @@ export default function OrderDetailPage() {
         if (!prod) prod = productMap[it.product_name]
         if (prod) { addToCart({ ...prod, price: String(prod.price) }, it.quantity); added += it.quantity }
       }
-      if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); navigate('/cart') } else { toast.error(t('orders.reorderNotFound')) }
+      if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); router.push('/cart') } else { toast.error(t('orders.reorderNotFound')) }
     } catch (e) { console.error(e); toast.error(t('orders.reorderError')) }
   }
 
@@ -331,7 +332,7 @@ export default function OrderDetailPage() {
   return (
     <div className="min-h-screen bg-clean-white py-8">
       <div className="max-w-5xl mx-auto px-4">
-        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => navigate('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
+        <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => router.push('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
 
         <div className="bg-white rounded-lg shadow-hvac-md p-6 mb-6">
           <div className="flex items-center justify-between">
@@ -350,7 +351,7 @@ export default function OrderDetailPage() {
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={() => navigate(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
+              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
               <button onClick={() => handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14} />{t('orders.reorder')}</button>
             </div>
           </div>
@@ -398,7 +399,7 @@ export default function OrderDetailPage() {
               <div>
                 <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
                 <div className="text-sm text-steel-gray">
-                  {order.shipping_address && (() => {
+                  {!!order.shipping_address && (() => {
                     const addr = order.shipping_address as ShippingAddress
                     const line1 = addr.fullAddress || addr.street
                     const line2 = [addr.city, addr.district || addr.state].filter(Boolean).join(', ')
@@ -596,4 +597,5 @@ export default function OrderDetailPage() {
     </div>
   )
 }
+
 

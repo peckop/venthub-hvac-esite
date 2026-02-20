@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { WhatsAppIcon } from '../../components/HVACIcons'
@@ -12,11 +12,11 @@ const FAQPage: React.FC = () => {
     { q: t('support.faq.q2'), a: t('support.faq.a2') },
     { q: t('support.faq.q3'), a: t('support.faq.a3') },
   ]
-  const navigate = useNavigate()
+  const router = useRouter()
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-4">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
+        <button onClick={() => router.back()} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
           <ArrowLeft size={18} className="mr-1" /> {t('auth.back')}
         </button>
       </div>
@@ -34,7 +34,7 @@ const FAQPage: React.FC = () => {
       {isWhatsAppAvailable() && (() => {
         const whatsappLink = getSupportLink('SSS sayfasında bulamadığım bilgi')
         if (!whatsappLink) return null
-        
+
         return (
           <div className="mt-10 whatsapp-container">
             <div className="text-center">
@@ -61,4 +61,5 @@ const FAQPage: React.FC = () => {
 }
 
 export default FAQPage
+
 

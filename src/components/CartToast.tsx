@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { X, CheckCircle, ShoppingBag, ArrowRight } from 'lucide-react'
 import { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 
@@ -125,7 +125,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                   <span>{t('cartToast.continue')}</span>
                 </button>
                 
-                <Link to="/cart" onClick={handleGoToCart}>
+                <Link href="/cart" onClick={handleGoToCart}>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors">
                     <ArrowRight size={20} />
                     <span>{t('cartToast.goToCart')}</span>

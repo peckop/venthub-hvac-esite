@@ -30,6 +30,8 @@ const VisualShowcase: React.FC = () => {
   const startXRef = useRef<number | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = usePrefersReducedMotion()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
   const disableFancy = reducedMotion || isCoarse || (typeof window !== 'undefined' && window.innerWidth < 640)
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 })
@@ -93,7 +95,7 @@ const VisualShowcase: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const particles = useMemo(() => {
     return Array.from({ length: 28 }, () => ({
-      x: Math.random(), y: Math.random(), vx: (Math.random()-0.5)*0.0008, vy: (Math.random()-0.5)*0.0008, r: 1 + Math.random()*2
+      x: Math.random(), y: Math.random(), vx: (Math.random() - 0.5) * 0.0008, vy: (Math.random() - 0.5) * 0.0008, r: 1 + Math.random() * 2
     }))
   }, [])
 
@@ -108,15 +110,15 @@ const VisualShowcase: React.FC = () => {
     const render = () => {
       const w = canvas.width = parent.clientWidth
       const h = canvas.height = parent.clientHeight
-      ctx.clearRect(0,0,w,h)
+      ctx.clearRect(0, 0, w, h)
       ctx.globalAlpha = 0.5
       for (const p of particles) {
         p.x += p.vx; p.y += p.vy
         if (p.x < 0 || p.x > 1) p.vx *= -1
         if (p.y < 0 || p.y > 1) p.vy *= -1
-        const px = p.x*w, py = p.y*h
+        const px = p.x * w, py = p.y * h
         ctx.beginPath()
-        ctx.arc(px, py, p.r, 0, Math.PI*2)
+        ctx.arc(px, py, p.r, 0, Math.PI * 2)
         ctx.fillStyle = 'white'
         ctx.fill()
       }
@@ -137,17 +139,17 @@ const VisualShowcase: React.FC = () => {
           aria-roledescription="carousel"
         >
           {/* Canvas particles (arka plan) */}
-          {!disableFancy && (
+          {mounted && !disableFancy && (
             <canvas ref={canvasRef} className="absolute inset-0 z-0" aria-hidden="true" />
           )}
 
           {/* Parallax Layers */}
-          {!disableFancy && (
+          {mounted && !disableFancy && (
             <>
               <div className="pointer-events-none absolute -top-10 -left-16 w-64 h-64 rounded-full bg-white/10 blur-2xl z-0"
-                   style={{ transform: `translate(${(mouse.x-0.5)*20}px, ${(mouse.y-0.5)*20}px)` }} />
+                style={{ transform: `translate(${(mouse.x - 0.5) * 20}px, ${(mouse.y - 0.5) * 20}px)` }} />
               <div className="pointer-events-none absolute -bottom-12 -right-20 w-80 h-80 rounded-full bg-white/10 blur-2xl z-0"
-                   style={{ transform: `translate(${(mouse.x-0.5)*-24}px, ${(mouse.y-0.5)*-24}px)` }} />
+                style={{ transform: `translate(${(mouse.x - 0.5) * -24}px, ${(mouse.y - 0.5) * -24}px)` }} />
             </>
           )}
 
@@ -172,7 +174,7 @@ const VisualShowcase: React.FC = () => {
 
           {/* Controls */}
           <div className="absolute inset-0 flex items-center justify-between p-2 pointer-events-none z-20">
-              <button
+            <button
               onClick={prev}
               className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
               aria-label={t('homeShowcase.prevAria')}
@@ -181,7 +183,7 @@ const VisualShowcase: React.FC = () => {
             </button>
             <div className="pointer-events-auto flex items-center gap-2">
               <button
-                onClick={() => setPlaying(p=>!p)}
+                onClick={() => setPlaying(p => !p)}
                 className="inline-flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-industrial-gray w-10 h-10 shadow"
                 aria-label={playing ? t('homeShowcase.pauseAria') : t('homeShowcase.playAria')}
               >

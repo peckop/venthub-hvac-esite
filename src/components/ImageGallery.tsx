@@ -19,7 +19,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
     const imageContainerRef = useRef<HTMLDivElement>(null)
 
     const activeImage = images.length > 0 ? images[activeIdx] : null
-    const storageUrl = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL + '/storage/v1/object/public/product-images/'
+    const storageUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '') + '/storage/v1/object/public/product-images/'
 
     // Handle Zoom Effect (Only for Image Mode)
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

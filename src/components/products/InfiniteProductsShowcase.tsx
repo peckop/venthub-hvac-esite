@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Text } from '@react-three/drei'
 import * as THREE from 'three'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 
 interface ProductItem {
     id: string
@@ -30,7 +30,7 @@ const ProductCard: React.FC<{
 }> = ({ item, index, total, gap, scrollOffset, isPaused, onHover }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
-    const navigate = useNavigate()
+    const router = useRouter()
     const [hovered, setHover] = useState(false)
 
     // Load texture
@@ -68,7 +68,7 @@ const ProductCard: React.FC<{
 
     const handleClick = (e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
-        navigate(`/category/${item.id}`)
+        router.push(`/category/${item.id}`)
     }
 
     const handlePointerOver = () => {
@@ -132,6 +132,7 @@ const ProductCard: React.FC<{
  * Scene Content with Auto-Scroll + Hover Pause
  */
 const SceneContent: React.FC<{ items: ProductItem[]; isPaused: boolean; onHover: (h: boolean) => void }> = ({ items, isPaused, onHover }) => {
+    const router = useRouter()
     const gap = 4.5
     const scrollOffset = useRef(0)
     const { camera } = useThree()
@@ -186,6 +187,7 @@ const SceneContent: React.FC<{ items: ProductItem[]; isPaused: boolean; onHover:
  * - Click navigation to categories
  */
 const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ items }) => {
+    const router = useRouter()
     const [isPaused, setIsPaused] = useState(false)
 
     return (
@@ -218,3 +220,5 @@ const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ ite
 }
 
 export default InfiniteProductsShowcase
+
+

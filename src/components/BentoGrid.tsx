@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
 import { getCategoryUrl, CATEGORY_REGISTRY } from '../config/categoryRegistry'
 
@@ -16,13 +16,15 @@ interface BentoItem {
 const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large }) => {
   const { t } = useI18n()
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => setMounted(true), [])
   const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
   return (
     <div
       className={`relative overflow-hidden rounded-2xl border border-light-gray shadow-sm group ${large ? 'md:col-span-2 md:row-span-2' : ''}`}
     >
       <img src={item.image} alt={item.title} className="w-full h-full object-cover object-center" loading="lazy" />
-      {item.video && !isCoarse && (
+      {mounted && item.video && !isCoarse && (
         <video
           ref={videoRef}
           src={item.video}
@@ -43,7 +45,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
         </div>
         <div className="flex items-center gap-2">
           <Link
-            to={item.hrefProducts || '/products#applications'}
+            href={item.hrefProducts || '/products#applications'}
             className="inline-flex items-center rounded-lg bg-white/90 hover:bg-white text-industrial-gray px-3 py-1.5 text-xs font-semibold shadow"
             onClick={() => trackEvent('home_gallery_cta', { cta: 'products', title: item.title })}
           >
@@ -51,7 +53,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
           </Link>
           {item.topic && (
             <Link
-              to={`/destek/konular/${item.topic}`}
+              href={`/destek/konular/${item.topic}`}
               className="inline-flex items-center rounded-lg bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 text-xs font-semibold shadow"
               onClick={() => trackEvent('home_gallery_cta', { cta: 'guide', topic: item.topic, title: item.title })}
             >

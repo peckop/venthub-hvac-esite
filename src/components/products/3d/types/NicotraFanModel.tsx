@@ -68,7 +68,6 @@ export const NicotraFanModel: React.FC = () => {
                 {/* Sırt Sacı (Wrapper) - Basit Silindir Parçası */}
                 <mesh rotation={[0, 0, Math.PI / 2]} material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.6, 0.6, 0.6, 32, 1, true, 0, 4.5]} />
-                    <meshStandardMaterial side={THREE.DoubleSide} {...materials.galvanizedSteel} />
                 </mesh>
 
                 {/* Atış Ağzı */}
@@ -85,7 +84,6 @@ export const NicotraFanModel: React.FC = () => {
                 {/* Sık Kanatlı Çark */}
                 <mesh material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.38, 0.38, 0.58, 32, 1, true]} />
-                    <meshStandardMaterial side={THREE.DoubleSide} {...materials.galvanizedSteel} />
                 </mesh>
                 {/* Kanatlar */}
                 {Array(24).fill(0).map((_, i) => (

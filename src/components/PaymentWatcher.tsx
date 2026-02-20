@@ -1,13 +1,15 @@
+'use client'
+
 import React, { useEffect, useRef, useCallback } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useRouter, usePathname } from 'next/navigation'
 
 const STORAGE_KEY = 'vh_pending_order'
 
 export const PaymentWatcher: React.FC = () => {
-  const navigate = useNavigate()
+  const router = useRouter()
   const checkingRef = useRef(false)
   const timerRef = useRef<number | null>(null)
-  const location = useLocation()
+  const pathname = usePathname()
 
   const checkOnce = useCallback(async () => {
     if (checkingRef.current) return
@@ -27,16 +29,16 @@ export const PaymentWatcher: React.FC = () => {
       if (!error && row?.status) {
         if (row.status === 'paid') {
           localStorage.removeItem(STORAGE_KEY)
-          navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&status=success`)
+          router.push(`/payment-success?orderId=${encodeURIComponent(orderId)}&status=success`)
         } else if (row.status === 'failed') {
           localStorage.removeItem(STORAGE_KEY)
-          navigate(`/payment-success?orderId=${encodeURIComponent(orderId)}&status=failure`)
+          router.push(`/payment-success?orderId=${encodeURIComponent(orderId)}&status=failure`)
         }
       }
     } finally {
       checkingRef.current = false
     }
-  }, [navigate])
+  }, [router])
 
   useEffect(() => {
     const onFocus = () => { checkOnce() }
@@ -55,7 +57,7 @@ export const PaymentWatcher: React.FC = () => {
       document.removeEventListener('visibilitychange', onVisibility)
       if (timerRef.current) window.clearInterval(timerRef.current)
     }
-  }, [navigate, location.pathname, checkOnce])
+  }, [router, pathname, checkOnce])
 
   return null
 }

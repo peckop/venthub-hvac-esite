@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { Package, Link as LinkIcon, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -30,7 +30,7 @@ interface SupabaseError {
 export default function AccountShipmentsPage() {
   const { user } = useAuth()
   const { t, lang } = useI18n()
-  const navigate = useNavigate()
+  const router = useRouter()
   const [rows, setRows] = useState<ShipmentRow[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -97,7 +97,7 @@ export default function AccountShipmentsPage() {
   if (loading) {
     return (
       <div className="min-h-[30vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy"/>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
       </div>
     )
   }
@@ -124,7 +124,7 @@ export default function AccountShipmentsPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => navigate(`/account/orders?open=${o.id}&tab=shipping`)}
+                  onClick={() => router.push(`/account/orders?open=${o.id}&tab=shipping`)}
                   className="text-sm text-primary-navy hover:underline"
                 >
                   {t('orders.details')}
@@ -141,14 +141,14 @@ export default function AccountShipmentsPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-industrial-gray break-all">{o.tracking_number || '-'}</span>
                     {o.tracking_number && (
-                      <button onClick={() => handleCopy(o.tracking_number)} className="text-xs text-primary-navy hover:underline flex items-center gap-1"><Copy size={12}/>{t('orders.copy')}</button>
+                      <button onClick={() => handleCopy(o.tracking_number)} className="text-xs text-primary-navy hover:underline flex items-center gap-1"><Copy size={12} />{t('orders.copy')}</button>
                     )}
                   </div>
                 </div>
                 <div>
                   <div className="text-steel-gray">{t('orders.trackingLink')}</div>
                   {o.tracking_url ? (
-                    <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14}/>{t('orders.openLink')}</a>
+                    <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14} />{t('orders.openLink')}</a>
                   ) : (
                     <div className="text-industrial-gray">-</div>
                   )}
@@ -169,4 +169,5 @@ export default function AccountShipmentsPage() {
     </div>
   )
 }
+
 

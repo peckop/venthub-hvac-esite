@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Category } from '../../lib/supabase'
 import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2 } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
@@ -122,7 +122,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                             {/* Elektrikli Card */}
                             <Link
-                                to={`/category/${category.slug}/elektrikli-isitici`}
+                                href={`/category/${category.slug}/elektrikli-isitici`}
                                 className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-all"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
@@ -142,7 +142,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
                             {/* Ortam Havalı Card */}
                             <Link
-                                to={`/category/${category.slug}/ortam-havali`}
+                                href={`/category/${category.slug}/ortam-havali`}
                                 className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all"
                             >
                                 <div className="flex items-center space-x-4 mb-4">
@@ -199,13 +199,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                     {subCategories.map((sub) => (
                         <Link
                             key={sub.id}
-                            to={`/category/${category.slug}/${sub.slug}`}
+                            href={`/category/${category.slug}/${sub.slug}`}
                             className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-all duration-300 border border-gray-100"
                         >
                             <div className="aspect-[4/3] bg-light-gray relative overflow-hidden">
                                 {sub.image_url ? (
                                     <img
-                                        src={`${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${sub.image_url}`}
+                                        src={`${(process.env.NEXT_PUBLIC_SUPABASE_URL || '')}/storage/v1/object/public/product-images/${sub.image_url}`}
                                         alt={getCategoryDisplayName(sub)}
                                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                                     />

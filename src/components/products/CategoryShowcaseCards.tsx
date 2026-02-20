@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 
 /**
@@ -12,7 +12,7 @@ const CategoryShowcaseCards: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {/* Hava Perdeleri Card */}
                 <Link
-                    to="/category/hava-perdeleri"
+                    href="/category/hava-perdeleri"
                     className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">
@@ -68,7 +68,7 @@ const CategoryShowcaseCards: React.FC = () => {
 
                 {/* Endüstriyel Fanlar Card */}
                 <Link
-                    to="/category/fanlar"
+                    href="/category/fanlar"
                     className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">
@@ -124,7 +124,7 @@ const CategoryShowcaseCards: React.FC = () => {
 
                 {/* Isı Geri Kazanım Card */}
                 <Link
-                    to="/category/isi-geri-kazanim-cihazlari"
+                    href="/category/isi-geri-kazanim-cihazlari"
                     className="group relative flex flex-col rounded-2xl overflow-hidden border border-slate-600/50 bg-gradient-to-b from-slate-700/80 via-slate-800 to-slate-900 hover:border-slate-400/50 transition-all duration-300 hover:shadow-2xl"
                 >
                     <div className="p-6 pb-2 text-center">

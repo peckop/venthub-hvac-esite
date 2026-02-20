@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 
 /**
  * Custom hook to automatically scroll to element based on URL hash
@@ -17,7 +17,7 @@ import { useLocation } from 'react-router-dom'
  * @param deps - Optional dependencies to re-trigger scroll (e.g., when content changes)
  */
 export function useScrollToHash(deps: unknown[] = []) {
-    const location = useLocation()
+    const pathname = usePathname()
 
     useEffect(() => {
         const hash = location.hash.slice(1) // Remove # prefix
@@ -56,3 +56,4 @@ export function useScrollToHash(deps: unknown[] = []) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.hash, ...deps])
 }
+

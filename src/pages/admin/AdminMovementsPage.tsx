@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -25,7 +25,7 @@ type Category = { id: string; name: string }
 enum LoadState { Idle, Loading, Error }
 
 const PAGE_SIZE = 50
-const ALL_REASONS = ['sale','po_receipt','manual_in','manual_out','adjust','return_in','transfer_out','transfer_in'] as const
+const ALL_REASONS = ['sale', 'po_receipt', 'manual_in', 'manual_out', 'adjust', 'return_in', 'transfer_out', 'transfer_in'] as const
 
 function reasonLabel(key: string | null | undefined, t: (k: string) => string): string {
   const val = String(key || '')
@@ -47,8 +47,8 @@ type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
   const { t, lang } = useI18n()
-  const location = useLocation()
-  const navigate = useNavigate()
+  const pathname = usePathname()
+  const router = useRouter()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -66,7 +66,7 @@ const AdminMovementsPage: React.FC = () => {
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
   const [batchFilter, setBatchFilter] = React.useState<string>('')
 
-  const load = React.useCallback(async(pageNum: number)=>{
+  const load = React.useCallback(async (pageNum: number) => {
     try {
       setLoading(LoadState.Loading)
       // Pagination
@@ -86,7 +86,7 @@ const AdminMovementsPage: React.FC = () => {
       setRows(movements)
 
       // Ürün bilgileri (ad, sku, category)
-      const ids = Array.from(new Set(movements.map(m=>m.product_id)))
+      const ids = Array.from(new Set(movements.map(m => m.product_id)))
       if (ids.length) {
         const [prodRes, catRes] = await Promise.all([
           supabase.from('products').select('id,name,sku,category_id').in('id', ids),
@@ -94,7 +94,7 @@ const AdminMovementsPage: React.FC = () => {
         ])
         const map: Record<string, Product> = {}
         const cmap: Record<string, string | null> = {}
-;(prodRes.data as Product[] | null | undefined)?.forEach(p => { map[p.id] = p; cmap[p.id] = p.category_id ?? null })
+          ; (prodRes.data as Product[] | null | undefined)?.forEach(p => { map[p.id] = p; cmap[p.id] = p.category_id ?? null })
         setProductMap(map)
         setProductCategoryMap(cmap)
         if (!catRes.error) setCategories((catRes.data || []) as Category[])
@@ -120,14 +120,14 @@ const AdminMovementsPage: React.FC = () => {
     }
   }, [batchFilter, t])
 
-  React.useEffect(()=>{ load(page) }, [load, page])
+  React.useEffect(() => { load(page) }, [load, page])
 
   // URL'den batch filtresi
+  const searchParams = useSearchParams()
   React.useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const b = (params.get('batch') || '').trim()
+    const b = (searchParams?.get('batch') || '').trim()
     setBatchFilter(b)
-  }, [location.search])
+  }, [searchParams])
 
   // Görünür kategoriler: sadece listelenen hareketlerde geçen kategori id’leri
   const visibleCategories = React.useMemo(() => {
@@ -139,7 +139,7 @@ const AdminMovementsPage: React.FC = () => {
     return categories.filter(c => idSet.has(c.id))
   }, [rows, categories, productCategoryMap])
 
-  const filtered = React.useMemo(()=>{
+  const filtered = React.useMemo(() => {
     let base = rows
     const term = q.trim().toLowerCase()
     if (term) {
@@ -157,14 +157,14 @@ const AdminMovementsPage: React.FC = () => {
     // Reason çoklu filtresi
     const anyReason = Object.values(reasonFilter).some(Boolean)
     if (anyReason) {
-      base = base.filter(m => reasonFilter[String(m.reason||'')] === true)
+      base = base.filter(m => reasonFilter[String(m.reason || '')] === true)
     }
     return base
   }, [rows, q, productMap, selectedCategory, productCategoryMap, reasonFilter])
 
-  const sorted = React.useMemo(()=>{
+  const sorted = React.useMemo(() => {
     const arr = [...filtered]
-    arr.sort((a,b)=>{
+    arr.sort((a, b) => {
       const dir = sortDir === 'asc' ? 1 : -1
       switch (sortKey) {
         case 'date':
@@ -177,7 +177,7 @@ const AdminMovementsPage: React.FC = () => {
         case 'delta':
           return dir * (a.delta - b.delta)
         case 'reason':
-          return dir * String(a.reason||'').localeCompare(String(b.reason||''), 'tr')
+          return dir * String(a.reason || '').localeCompare(String(b.reason || ''), 'tr')
         case 'ref': {
           const ar = a.order_id ? a.order_id : ''
           const br = b.order_id ? b.order_id : ''
@@ -215,7 +215,7 @@ const AdminMovementsPage: React.FC = () => {
         m.delta,
         reasonLabel(m.reason, t),
         m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
-      ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')
     })
     const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
@@ -253,18 +253,18 @@ const AdminMovementsPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:movements'
   const [visibleCols, setVisibleCols] = React.useState<{ date: boolean; product: boolean; delta: boolean; reason: boolean; ref: boolean }>({ date: true, product: true, delta: true, reason: true, ref: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  React.useEffect(()=>{
+  React.useEffect(() => {
     try {
       const rawCols = localStorage.getItem(`${STORAGE_KEY}:cols`)
-      if (rawCols) setVisibleCols(prev=>({ ...prev, ...JSON.parse(rawCols) }))
+      if (rawCols) setVisibleCols(prev => ({ ...prev, ...JSON.parse(rawCols) }))
       const rawDen = localStorage.getItem(`${STORAGE_KEY}:density`)
       if (rawDen === 'compact' || rawDen === 'comfortable') setDensity(rawDen as Density)
-    } catch {}
-  },[])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch {} }, [visibleCols])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch {} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+    } catch { }
+  }, [])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
   return (
     <div className="space-y-6">
@@ -275,7 +275,7 @@ const AdminMovementsPage: React.FC = () => {
           <span>{t('admin.movements.batchFilterPrefix')} <span className="font-mono">{batchFilter}</span></span>
           <button
             className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
-            onClick={() => { setBatchFilter(''); const url = new URL(window.location.href); url.searchParams.delete('batch'); navigate(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { replace: true }) }}
+            onClick={() => { setBatchFilter(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
           >{t('admin.ui.clear')}</button>
         </div>
       )}
@@ -285,7 +285,7 @@ const AdminMovementsPage: React.FC = () => {
         search={{ value: q, onChange: setQ, placeholder: t('admin.search.movements'), focusShortcut: '/' }}
         select={{
           value: selectedCategory,
-          onChange: (v)=>{ setPage(1); setSelectedCategory(v) },
+          onChange: (v) => { setPage(1); setSelectedCategory(v) },
           title: t('admin.movements.toolbar.categoryTitle'),
           options: [
             { value: '', label: t('admin.movements.toolbar.allCategories') },
@@ -296,9 +296,9 @@ const AdminMovementsPage: React.FC = () => {
           key: r,
           label: reasonLabel(r, t),
           active: !!reasonFilter[r],
-          onToggle: ()=>setReasonFilter(prev=>({ ...prev, [r]: !prev[r] }))
+          onToggle: () => setReasonFilter(prev => ({ ...prev, [r]: !prev[r] }))
         }))}
-        onClear={()=>{
+        onClear={() => {
           setPage(1);
           setQ('');
           setSelectedCategory('');
@@ -313,11 +313,11 @@ const AdminMovementsPage: React.FC = () => {
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'date', label: t('admin.movements.table.date'), checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
-                { key: 'product', label: t('admin.movements.table.product'), checked: visibleCols.product, onChange: (v)=>setVisibleCols(s=>({ ...s, product: v })) },
-                { key: 'delta', label: t('admin.movements.table.delta'), checked: visibleCols.delta, onChange: (v)=>setVisibleCols(s=>({ ...s, delta: v })) },
-                { key: 'reason', label: t('admin.movements.table.reason'), checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
-                { key: 'ref', label: t('admin.movements.table.ref'), checked: visibleCols.ref, onChange: (v)=>setVisibleCols(s=>({ ...s, ref: v })) },
+                { key: 'date', label: t('admin.movements.table.date'), checked: visibleCols.date, onChange: (v) => setVisibleCols(s => ({ ...s, date: v })) },
+                { key: 'product', label: t('admin.movements.table.product'), checked: visibleCols.product, onChange: (v) => setVisibleCols(s => ({ ...s, product: v })) },
+                { key: 'delta', label: t('admin.movements.table.delta'), checked: visibleCols.delta, onChange: (v) => setVisibleCols(s => ({ ...s, delta: v })) },
+                { key: 'reason', label: t('admin.movements.table.reason'), checked: visibleCols.reason, onChange: (v) => setVisibleCols(s => ({ ...s, reason: v })) },
+                { key: 'ref', label: t('admin.movements.table.ref'), checked: visibleCols.ref, onChange: (v) => setVisibleCols(s => ({ ...s, ref: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -332,27 +332,27 @@ const AdminMovementsPage: React.FC = () => {
             <tr>
               {visibleCols.date && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
                 </th>
               )}
               {visibleCols.product && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
                 </th>
               )}
               {visibleCols.delta && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
                 </th>
               )}
               {visibleCols.reason && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
                 </th>
               )}
               {visibleCols.ref && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
-                  <button type="button" className="hover:underline" onClick={()=>toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
+                  <button type="button" className="hover:underline" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
                 </th>
               )}
             </tr>
@@ -374,7 +374,7 @@ const AdminMovementsPage: React.FC = () => {
                   </td>
                 )}
                 {visibleCols.delta && (
-                  <td className={`${density==='compact'?'px-2 py-2':'p-3'} text-right font-mono`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
+                  <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-mono`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
                 )}
                 {visibleCols.reason && (
                   <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
@@ -395,12 +395,14 @@ const AdminMovementsPage: React.FC = () => {
       </div>
 
       <div className="flex items-center justify-between">
-        <button className="px-3 py-2 border rounded text-sm" disabled={page===1} onClick={()=>setPage(p=>Math.max(1, p-1))}>{t('admin.ui.prev')}</button>
+        <button className="px-3 py-2 border rounded text-sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">{t('admin.movements.pageLabel', { page: String(page) })}</span>
-        <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={()=>setPage(p=>p+1)}>{t('admin.ui.next')}</button>
+        <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>
   )
 }
 
 export default AdminMovementsPage
+
+

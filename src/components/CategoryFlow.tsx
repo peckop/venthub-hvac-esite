@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { getCategories, Category } from '../lib/supabase'
 import {
     Wind, Fan, Droplet, Thermometer,
@@ -37,7 +37,7 @@ function CategoryCard({ category }: { category: Category }) {
 
     return (
         <Link
-            to={`/category/${category.slug}`}
+            href={`/category/${category.slug}`}
             className="group flex-shrink-0 w-48 sm:w-56 md:w-64"
         >
             <div className={`

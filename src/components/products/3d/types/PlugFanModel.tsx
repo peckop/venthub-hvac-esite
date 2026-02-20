@@ -21,7 +21,6 @@ export const PlugFanModel: React.FC = () => {
                 <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.galvanizedSteel}>
                     {/* Halka (Torus) yerine Konik Silindir */}
                     <cylinderGeometry args={[0.38, 0.30, 0.15, 32, 1, true]} />
-                    <meshStandardMaterial side={THREE.DoubleSide} {...materials.galvanizedSteel} />
                 </mesh>
                 {/* Giriş Flanşı (Düz Şerit) */}
                 <mesh position={[0, 0, 0.08]} rotation={[Math.PI / 2, 0, 0]} material={materials.galvanizedSteel}>

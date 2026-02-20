@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
 import { useI18n } from '../i18n/I18nProvider'
 
@@ -29,7 +29,7 @@ const FAQShortSection: React.FC = () => {
                   <div className="text-sm text-steel-gray mt-1">{it.a}</div>
                   <div className="mt-3">
                     <Link
-                      to={it.href}
+                      href={it.href}
                       onClick={() => trackEvent('faq_click', { q: it.q })}
                       className="text-sm font-medium text-primary-navy hover:underline"
                     >

@@ -2,7 +2,7 @@ import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } fr
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config/orbitalCarouselConfig'
 import Category3DIcon from './Category3DIcon'
@@ -99,7 +99,7 @@ const OrbitalCard: React.FC<{
 }> = ({ item, index, total, sharedState, onHover, onBringToFront, setIsDragging, isDraggingRef, onCardClick, onFocusedItemChange, isFrontCard, shouldShowTapHint: externalShouldShowHint, shouldShowDragHint, modelScale }) => {
     const groupRef = useRef<THREE.Group>(null)
     const meshRef = useRef<THREE.Mesh>(null)
-    const navigate = useNavigate()
+    const router = useRouter()
     const [hovered, setHover] = useState(false)
     const [isNearFront, setIsNearFront] = useState(false)
     const [showTapHint, setShowTapHint] = useState(false) // El ikonu görünürlüğü
@@ -194,8 +194,8 @@ const OrbitalCard: React.FC<{
     const handleDoubleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         // Çift tık: Direkt kategori sayfasına git
-        navigate(`/category/${item.id}`)
-    }, [navigate, item.id])
+        router.push(`/category/${item.id}`)
+    }, [router, item.id])
 
     const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation() // Sadece BU kart hover alsın, arkadakiler almasın
@@ -764,3 +764,4 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
 }
 
 export default OrbitalProductsShowcase
+

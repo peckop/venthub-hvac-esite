@@ -8,13 +8,9 @@ interface PriceMismatch {
 
 export interface ValidationResult { ok: boolean; items: ValidationItem[]; mismatches: PriceMismatch[]; stock_issues?: StockIssue[]; totals: { subtotal: number }; cart_id: string }
 
-interface ImportMeta {
-  env?: Record<string, string | undefined>;
-}
-
 export async function validateServerCart(input: { cartId?: string; userId?: string }): Promise<ValidationResult> {
-  const url = (import.meta as ImportMeta).env?.VITE_SUPABASE_URL || ''
-  const anon = (import.meta as ImportMeta).env?.VITE_SUPABASE_ANON_KEY || ''
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   if (!url || !anon) throw new Error('Missing Supabase envs')
   const resp = await fetch(`${url}/functions/v1/order-validate`, {
     method: 'POST',

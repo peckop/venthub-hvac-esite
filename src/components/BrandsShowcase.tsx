@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { HVAC_BRANDS } from '../lib/brands'
 import { BrandIcon } from './HVACIcons'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 
 // CSS-only marquee lane to minimize main-thread JS work (seamless)
@@ -25,7 +25,7 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
       <div className="brands-lane">
         <div className="brands-track flex items-stretch gap-0 w-max">
           {repeated.map((brand, idx) => (
-            <Link key={brand.slug + '-' + idx} to={`/brands/${brand.slug}`} className="group block">
+            <Link key={brand.slug + '-' + idx} href={`/brands/${brand.slug}`} className="group block">
               <div className="w-44 sm:w-48 md:w-56 h-24 sm:h-28 md:h-32 bg-white shadow-sm overflow-hidden flex items-center justify-center p-3 sm:p-4 rounded-none flex-shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-50 flex items-center justify-center">
@@ -73,7 +73,7 @@ export const BrandsShowcase: React.FC = () => {
         {/* Bottom CTA */}
         <div className="text-center">
           <Link
-            to="/brands"
+            href="/brands"
             className="inline-flex items-center px-6 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
           >
             {t('brands.viewAll')}

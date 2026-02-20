@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import {
   Award, Clock, Shield, Target, Heart,
@@ -59,7 +59,7 @@ const AboutPage: React.FC = () => {
       <Seo
         title={`${t('aboutPage.title')} | VentHub`}
         description="VentHub - Türkiye'nin yeni HVAC satış platformu. Premium markalar, hızlı teslimat, profesyonel hizmet."
-        canonical={`${window.location.origin}/about`}
+        canonical={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/about`}
       />
 
       {/* Hero Section */}
@@ -89,13 +89,13 @@ const AboutPage: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/products"
+                href="/products"
                 className="inline-flex items-center justify-center rounded-xl bg-white text-primary-navy px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105"
               >
                 {t('common.exploreProducts')}
               </Link>
               <Link
-                to="/contact"
+                href="/contact"
                 className="inline-flex items-center justify-center rounded-xl border-2 border-white/30 text-white px-6 py-3 font-semibold hover:bg-white/10 transition-all"
               >
                 {t('common.getQuote')}
@@ -203,13 +203,13 @@ const AboutPage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/products"
+              href="/products"
               className="inline-flex items-center justify-center rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all"
             >
               Ürünleri Keşfet
             </Link>
             <Link
-              to="/contact"
+              href="/contact"
               className="inline-flex items-center justify-center rounded-xl border-2 border-primary-navy text-primary-navy px-6 py-3 font-semibold hover:bg-primary-navy hover:text-white transition-all"
             >
               İletişime Geç
