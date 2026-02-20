@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useRef, useState } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 
@@ -45,7 +47,7 @@ const ScrollLinkedProcess: React.FC = () => {
                 <button
                   key={s.key}
                   onClick={() => scrollTo(i)}
-                  className={`w-full text-left px-3 py-2 rounded-lg border transition ${i===active ? 'border-primary-navy bg-primary-navy/5 text-primary-navy' : 'border-light-gray bg-white text-industrial-gray hover:bg-gray-50'}`}
+                  className={`w-full text-left px-3 py-2 rounded-lg border transition ${i === active ? 'border-primary-navy bg-primary-navy/5 text-primary-navy' : 'border-light-gray bg-white text-industrial-gray hover:bg-gray-50'}`}
                 >
                   <div className="text-sm font-semibold">{s.title}</div>
                   <div className="text-xs text-steel-gray">{s.desc}</div>
@@ -55,8 +57,8 @@ const ScrollLinkedProcess: React.FC = () => {
           </aside>
           <main className="lg:col-span-3 space-y-6">
             {STEPS.map((s, i) => (
-              <div key={s.key} ref={el => refs.current[i] = el} className="rounded-2xl border border-light-gray bg-white p-6 shadow-sm">
-                <div className="text-sm text-primary-navy font-semibold mb-1">{t('homeProcess.stepPrefix')} {i+1}</div>
+              <div key={s.key} ref={el => { refs.current[i] = el }} className="rounded-2xl border border-light-gray bg-white p-6 shadow-sm">
+                <div className="text-sm text-primary-navy font-semibold mb-1">{t('homeProcess.stepPrefix')} {i + 1}</div>
                 <h3 className="text-xl font-bold text-industrial-gray mb-2">{s.title}</h3>
                 <p className="text-steel-gray">{s.desc}</p>
               </div>

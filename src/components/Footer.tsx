@@ -1,5 +1,7 @@
+'use client'
+
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import BuildTag from './BuildTag'
 
@@ -23,7 +25,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center space-x-3">
               <div className="bg-primary-navy p-2 rounded-lg">
                 <div className="text-white font-bold text-lg">VH</div>
               </div>
@@ -56,57 +58,57 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4">{t('footer.quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.home')}
                 </Link>
               </li>
               <li>
-                <Link to="/products?all=1" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/products?all=1" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.products')}
                 </Link>
               </li>
               <li>
-                <Link to="/brands" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/brands" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.brands')}
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.about')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.contact')}
                 </Link>
               </li>
               <li>
-                <Link to="/destek/merkez" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/destek/merkez" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.knowledgeHub')}
                 </Link>
               </li>
               <li>
-                <Link to="/support" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.supportCenter')}
                 </Link>
               </li>
               <li>
-                <Link to="/support/sss" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href="/support/sss" className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.faq')}
                 </Link>
               </li>
               <li>
-                <Link to="/support/iade-degisim" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href="/support/iade-degisim" className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.returns')}
                 </Link>
               </li>
               <li>
-                <Link to="/support/teslimat-kargo" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href="/support/teslimat-kargo" className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.shipping')}
                 </Link>
               </li>
               <li>
-                <Link to="/support/garanti-servis" className="text-steel-gray hover:text-white transition-colors text-sm">
+                <Link href="/support/garanti-servis" className="text-steel-gray hover:text-white transition-colors text-sm">
                   • {t('support.links.warranty')}
                 </Link>
               </li>
@@ -120,7 +122,7 @@ const Footer: React.FC = () => {
               {mainCategories.slice(0, 6).map((category) => (
                 <li key={category.slug}>
                   <Link
-                    to={`/category/${category.slug}`}
+                    href={`/category/${category.slug}`}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
                   >
                     {category.name}
@@ -135,20 +137,20 @@ const Footer: React.FC = () => {
             <h3 className="font-semibold mb-4">{t('footer.contact')}</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-secondary-blue mt-1 flex-shrink-0" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 14.5 9 2.5 2.5 0 0 1 12 11.5z" /></svg>
+                <span className="text-secondary-blue mt-1 flex-shrink-0">@</span>
                 <span className="text-gray-300 text-sm">
                   Teknokent Mah. Teknopark Blv.<br />
                   No: 1/4A 34906 Pendik/İstanbul
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-secondary-blue flex-shrink-0" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.86 19.86 0 0 1 3.09 5.18 2 2 0 0 1 5.11 3h3a2 2 0 0 1 2 1.72c.12.9.3 1.77.54 2.61a2 2 0 0 1-.45 2.11L9.1 10.9a16 16 0 0 0 4 4l1.46-1.1a2 2 0 0 1 2.11-.45c.84.24 1.71.42 2.61.54A2 2 0 0 1 22 16.92z" /></svg>
+                <span className="text-secondary-blue flex-shrink-0">P</span>
                 <span className="text-gray-300 text-sm">
                   +90 (216) 123-45-67
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-secondary-blue flex-shrink-0" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2l8 6 8-6" /></svg>
+                <span className="text-secondary-blue flex-shrink-0">M</span>
                 <span className="text-gray-300 text-sm">
                   info@venthub.com.tr
                 </span>
@@ -177,22 +179,22 @@ const Footer: React.FC = () => {
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}
               <BuildTag />
-              <Link to="/legal/kvkk" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/kvkk" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.kvkk')}
               </Link>
-              <Link to="/legal/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.distanceSales')}
               </Link>
-              <Link to="/legal/on-bilgilendirme-formu" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/on-bilgilendirme-formu" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.preInformation')}
               </Link>
-              <Link to="/legal/cerez-politikasi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/cerez-politikasi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.cookies')}
               </Link>
-              <Link to="/legal/gizlilik-politikasi" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/gizlilik-politikasi" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.privacy')}
               </Link>
-              <Link to="/legal/kullanim-kosullari" className="text-gray-300 hover:text-white transition-colors">
+              <Link href="/legal/kullanim-kosullari" className="text-gray-300 hover:text-white transition-colors">
                 {t('legalLinks.terms')}
               </Link>
             </div>

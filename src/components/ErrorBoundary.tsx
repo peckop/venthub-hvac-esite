@@ -14,7 +14,7 @@ interface State {
 
 const serializeError = (error: unknown) => {
   if (error instanceof Error) {
-    return error.message + '\n' + error.stack
+    return `${error.message}\n${error.stack}`
   }
   try {
     return JSON.stringify(error, null, 2)
@@ -25,9 +25,9 @@ const serializeError = (error: unknown) => {
 
 const isChunkLoadError = (error: unknown): boolean => {
   if (error instanceof Error) {
-    return error.message.includes('Loading chunk') || 
-           error.message.includes('ChunkLoadError') ||
-           error.message.includes('Loading CSS chunk')
+    return error.message.includes('Loading chunk') ||
+      error.message.includes('ChunkLoadError') ||
+      error.message.includes('Loading CSS chunk')
   }
   return false
 }
@@ -39,8 +39,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { 
-      hasError: true, 
+    return {
+      hasError: true,
       error,
       isChunkError: isChunkLoadError(error)
     }
@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
-    
+
     // Track chunk loading errors specifically
     if (isChunkLoadError(error)) {
       console.warn('Chunk loading error detected - user may need to refresh')
@@ -79,7 +79,7 @@ export class ErrorBoundary extends Component<Props, State> {
               {isChunkError ? 'Sayfa Güncellemesi Gerekli' : 'Sayfa Yüklenemedi'}
             </h2>
             <p className="text-gray-600 mb-6">
-              {isChunkError 
+              {isChunkError
                 ? 'Uygulama güncellenmiş görünüyor. Sayfayı yenileyip tekrar deneyin.'
                 : 'Bu sayfa yüklenirken bir hata oluştu. Lütfen tekrar deneyin.'}
             </p>

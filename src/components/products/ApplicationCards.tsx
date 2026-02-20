@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Utensils, Factory, Car, Building2, ArrowRight } from 'lucide-react'
 
 interface ApplicationCard {
@@ -53,7 +53,7 @@ const ApplicationCards: React.FC = () => {
                 {applications.map((app) => (
                     <Link
                         key={app.id}
-                        to={app.href}
+                        href={app.href}
                         className="group bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-primary-navy/30 transition-all"
                     >
                         {/* Icon */}

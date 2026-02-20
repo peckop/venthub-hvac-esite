@@ -70,3 +70,9 @@ temp/
 # İyzico API Keys - ASLA commit edilmemeli!
 iyzico-config.json
 iyzico-keys.*
+
+# Next.js Build
+.next/
+out/
+build/
+.swc/

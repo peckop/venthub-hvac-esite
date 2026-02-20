@@ -205,9 +205,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         return true
     })
 
-    // Determine hero image
     const heroImage = category.image_url
-        ? `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
         : null
 
     const features = category.metadata?.features || []

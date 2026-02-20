@@ -1,13 +1,11 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Define import.meta.env interface for Vite
-/// <reference types="vite/client" />
-
-const supabaseUrl = import.meta.env?.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY
+// Define SUPABASE config from process.env for Next.js
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 // Fallback mechanism to prevent white screen on build/env errors
-const missingEnv = !supabaseUrl || !supabaseAnonKey
+const missingEnv = !SUPABASE_URL || !SUPABASE_ANON_KEY
 if (missingEnv) {
   console.error('CRITICAL: Supabase config missing. App will strictly fail on data fetch but should render UI.')
   if (typeof window !== 'undefined') {
@@ -17,8 +15,8 @@ if (missingEnv) {
 
 // Create client with real or dummy values to prevent instant crash
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_ANON_KEY || 'placeholder-key'
 )
 
 // Database types
@@ -174,7 +172,7 @@ export async function getProductsByCategory(categoryId: string) {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`category_id.eq.${categoryId},subcategory_id.eq.${categoryId}`)
+    .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId} `)
     .eq('status', 'active')
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
@@ -223,7 +221,7 @@ export async function searchProducts(query: string) {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.%${query}%,brand.ilike.%${query}%,sku.ilike.%${query}%,model_code.ilike.%${query}%,description.ilike.%${query}%`)
+    .or(`name.ilike.% ${query}%, brand.ilike.% ${query}%, sku.ilike.% ${query}%, model_code.ilike.% ${query}%, description.ilike.% ${query}% `)
     .eq('status', 'active')
     .limit(20)
 
@@ -803,3 +801,4 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     return { unitPrice: fallback, priceListId: null }
   }
 }
+

@@ -2,7 +2,7 @@ import React from 'react'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
 import '@splidejs/react-splide/css'
 import { AutoScroll } from '@splidejs/splide-extension-auto-scroll'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 export interface TickerItem {
   src: string
@@ -56,7 +56,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
         <SplideSlide key={i} style={{ width: itemWidth }}>
           {item.href ? (
             <Link
-              to={item.href}
+              href={item.href}
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy rounded-xl"
               aria-label={item.alt || 'product'}
             >

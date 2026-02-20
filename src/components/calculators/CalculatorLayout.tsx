@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Calculator, ArrowLeft, Info, AlertTriangle } from 'lucide-react'
 import Seo from '../Seo'
 
@@ -40,7 +40,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {/* Breadcrumb */}
                     <Link
-                        to={backLink}
+                        href={backLink}
                         className="inline-flex items-center gap-2 text-white/70 hover:text-white text-sm mb-4 transition-colors"
                     >
                         <ArrowLeft size={16} />
@@ -89,7 +89,7 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
                     </p>
                     <p className="mt-1 text-xs">
                         Teknik sorularınız için{' '}
-                        <Link to="/contact" className="text-primary-navy hover:underline">
+                        <Link href="/contact" className="text-primary-navy hover:underline">
                             iletişime geçin
                         </Link>
                     </p>

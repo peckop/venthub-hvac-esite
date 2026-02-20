@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useRouter, usePathname } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
@@ -34,9 +34,9 @@ type SortKey = 'order' | 'customer' | 'reason' | 'status' | 'date' | 'amount'
 
 export default function AdminReturnsPage() {
   const { user, loading } = useAuth()
-  const navigate = useNavigate()
+  const router = useRouter()
   const { t: _t, lang } = useI18n()
-  
+
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -62,11 +62,11 @@ export default function AdminReturnsPage() {
     let mounted = true
     async function loadRole() {
       try {
-        if (!user) { 
-          setIsAdmin(false); 
-          return 
+        if (!user) {
+          setIsAdmin(false);
+          return
         }
-        
+
         // Merkezi admin kontrolü
         if (checkAdminAccess(user)) {
           if (mounted) {
@@ -74,16 +74,16 @@ export default function AdminReturnsPage() {
           }
           return
         }
-        
+
         // Production admin check
         const { data, error } = await supabase
           .from('user_profiles')
           .select('role')
           .eq('id', user.id)
           .maybeSingle()
-          
+
         if (!mounted) return
-        
+
         if (!error && data && (data as { role?: string }).role === 'admin') {
           setIsAdmin(true)
         } else {
@@ -100,15 +100,16 @@ export default function AdminReturnsPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth/login', { replace: true, state: { from: { pathname: '/admin/returns' } } })
+      router.replace('/auth/login')
       return
     }
-  }, [user, loading, navigate])
+  }, [user, loading, router])
 
   // Dashboard'tan gelen status parametresini uygula
-  const location = useLocation()
+  const pathname = usePathname()
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
     const stParam = params.get('status')
     if (stParam) {
       const next = { ...statusFilter }
@@ -124,10 +125,10 @@ export default function AdminReturnsPage() {
     let mounted = true
     async function loadReturns() {
       if (!isAdmin || !user) return
-      
+
       try {
         setIsLoading(true)
-        
+
         // İade taleplerini ve sipariş bilgilerini birlikte getir
         const { data, error } = await supabase
           .from('venthub_returns')
@@ -157,7 +158,7 @@ export default function AdminReturnsPage() {
             customer_email: item.venthub_orders?.customer_email,
             total_amount: item.venthub_orders?.total_amount,
           })) as ReturnWithOrder[]
-          
+
           setReturns(mapped)
         }
       } catch (error) {
@@ -185,7 +186,7 @@ export default function AdminReturnsPage() {
     // Arama filtresi
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(r => 
+      filtered = filtered.filter(r =>
         r.order_number?.toLowerCase().includes(query) ||
         r.customer_name?.toLowerCase().includes(query) ||
         r.customer_email?.toLowerCase().includes(query) ||
@@ -199,7 +200,7 @@ export default function AdminReturnsPage() {
   // Sıralama
   const sortedReturns = React.useMemo(() => {
     const arr = [...filteredReturns]
-    arr.sort((a,b) => {
+    arr.sort((a, b) => {
       const dir = sortDir === 'asc' ? 1 : -1
       switch (sortKey) {
         case 'order': {
@@ -208,13 +209,13 @@ export default function AdminReturnsPage() {
           return dir * String(ao).localeCompare(String(bo))
         }
         case 'customer':
-          return dir * String(a.customer_name||'').localeCompare(String(b.customer_name||''), 'tr')
+          return dir * String(a.customer_name || '').localeCompare(String(b.customer_name || ''), 'tr')
         case 'reason':
           return dir * a.reason.localeCompare(b.reason, 'tr')
         case 'status':
           return dir * a.status.localeCompare(b.status)
         case 'amount':
-          return dir * (Number(a.total_amount||0) - Number(b.total_amount||0))
+          return dir * (Number(a.total_amount || 0) - Number(b.total_amount || 0))
         case 'date':
           return dir * (Date.parse(a.created_at) - Date.parse(b.created_at))
         default:
@@ -226,7 +227,7 @@ export default function AdminReturnsPage() {
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortKey(key); setSortDir(key==='date' ? 'desc' : 'asc') }
+    else { setSortKey(key); setSortDir(key === 'date' ? 'desc' : 'asc') }
   }
 
   function sortIndicator(key: SortKey) {
@@ -236,15 +237,15 @@ export default function AdminReturnsPage() {
 
   const handleStatusUpdate = async (returnId: string, newStatus: string) => {
     if (!isAdmin) return
-    
+
     const returnItem = returns.find(r => r.id === returnId)
     if (!returnItem) return
-    
+
     try {
       setUpdatingStatus(returnId)
-      
+
       const oldStatus = returnItem.status
-      
+
       const { error } = await supabase
         .from('venthub_returns')
         .update({ status: newStatus })
@@ -263,10 +264,10 @@ export default function AdminReturnsPage() {
           after: { status: newStatus },
           comment: 'return status update'
         })
-      } catch {}
+      } catch { }
 
       // Local state güncelle
-      setReturns(prev => prev.map(r => 
+      setReturns(prev => prev.map(r =>
         r.id === returnId ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
       ))
 
@@ -306,7 +307,7 @@ export default function AdminReturnsPage() {
         console.error('Email notification failed:', emailError)
         toast.error(_t('admin.returns.toasts.emailNotifyFailed') as string)
       }
-      
+
     } catch (error) {
       console.error('Status update error:', error)
       toast.error(_t('admin.returns.toasts.statusUpdateFailed') as string)
@@ -370,11 +371,11 @@ export default function AdminReturnsPage() {
   const STORAGE_KEY = 'toolbar:returns'
   const [visibleCols, setVisibleCols] = useState<{ order: boolean; customer: boolean; reason: boolean; status: boolean; date: boolean }>({ order: true, customer: true, reason: true, status: true, date: true })
   const [density, setDensity] = useState<Density>('comfortable')
-  useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
-  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
-  useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+  useEffect(() => { try { const c = localStorage.getItem(`${STORAGE_KEY}:cols`); if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) })); const d = localStorage.getItem(`${STORAGE_KEY}:density`); if (d === 'compact' || d === 'comfortable') setDensity(d as Density) } catch { } }, [])
+  useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { } }, [visibleCols])
+  useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
   if (!isAdmin) {
     return (
@@ -405,14 +406,14 @@ export default function AdminReturnsPage() {
       getStatusLabel(r.status),
       formatDateTime(r.created_at, lang),
       typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''
-    ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',') )
+    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
     const bom = '\ufeff'
     const csv = [header.join(','), ...lines].join('\n')
     const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `returns_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`
+    a.download = `returns_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -421,22 +422,22 @@ export default function AdminReturnsPage() {
     const rowsHtml = filteredReturns.map(r => {
       const orderNo = r.order_number ? `#${r.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
       const amount = typeof r.total_amount === 'number' ? formatCurrency(Number(r.total_amount), lang) : ''
-      return `<tr>`+
-        `<td>${orderNo}</td>`+
-        `<td>${r.customer_name||''}</td>`+
-        `<td>${r.customer_email||''}</td>`+
-        `<td>${r.reason||''}</td>`+
-        `<td>${getStatusLabel(r.status)}</td>`+
-        `<td>${formatDateTime(r.created_at, lang)}</td>`+
-        `<td>${amount}</td>`+
-      `</tr>`
+      return `<tr>` +
+        `<td>${orderNo}</td>` +
+        `<td>${r.customer_name || ''}</td>` +
+        `<td>${r.customer_email || ''}</td>` +
+        `<td>${r.reason || ''}</td>` +
+        `<td>${getStatusLabel(r.status)}</td>` +
+        `<td>${formatDateTime(r.created_at, lang)}</td>` +
+        `<td>${amount}</td>` +
+        `</tr>`
     }).join('')
     const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${_t('admin.returns.export.headers.order')}</th><th>${_t('admin.returns.export.headers.customer')}</th><th>${_t('admin.returns.export.headers.email')}</th><th>${_t('admin.returns.export.headers.reason')}</th><th>${_t('admin.returns.export.headers.status')}</th><th>${_t('admin.returns.export.headers.date')}</th><th>${_t('admin.returns.export.headers.amount')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `returns_export_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.xls`
+    a.download = `returns_export_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.xls`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -460,31 +461,31 @@ export default function AdminReturnsPage() {
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'order', label: _t('admin.returns.table.order'), checked: visibleCols.order, onChange: (v)=>setVisibleCols(s=>({ ...s, order: v })) },
-                { key: 'customer', label: _t('admin.returns.table.customer'), checked: visibleCols.customer, onChange: (v)=>setVisibleCols(s=>({ ...s, customer: v })) },
-                { key: 'reason', label: _t('admin.returns.table.reason'), checked: visibleCols.reason, onChange: (v)=>setVisibleCols(s=>({ ...s, reason: v })) },
-                { key: 'status', label: _t('admin.returns.table.status'), checked: visibleCols.status, onChange: (v)=>setVisibleCols(s=>({ ...s, status: v })) },
-                { key: 'date', label: _t('admin.returns.table.date'), checked: visibleCols.date, onChange: (v)=>setVisibleCols(s=>({ ...s, date: v })) },
+                { key: 'order', label: _t('admin.returns.table.order'), checked: visibleCols.order, onChange: (v) => setVisibleCols(s => ({ ...s, order: v })) },
+                { key: 'customer', label: _t('admin.returns.table.customer'), checked: visibleCols.customer, onChange: (v) => setVisibleCols(s => ({ ...s, customer: v })) },
+                { key: 'reason', label: _t('admin.returns.table.reason'), checked: visibleCols.reason, onChange: (v) => setVisibleCols(s => ({ ...s, reason: v })) },
+                { key: 'status', label: _t('admin.returns.table.status'), checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
+                { key: 'date', label: _t('admin.returns.table.date'), checked: visibleCols.date, onChange: (v) => setVisibleCols(s => ({ ...s, date: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
             />
           </div>
         )}
-        chips={statusOptions.filter(o=>o.value!=='all').map(o => ({
+        chips={statusOptions.filter(o => o.value !== 'all').map(o => ({
           key: o.value,
           label: o.label,
           active: !!statusFilter[o.value],
-          onToggle: ()=>setStatusFilter(prev=>({ ...prev, [o.value]: !prev[o.value] }))
+          onToggle: () => setStatusFilter(prev => ({ ...prev, [o.value]: !prev[o.value] }))
         }))}
-        onClear={()=>{ setSearchQuery(''); setStatusFilter({ requested:true, approved:true, rejected:true, in_transit:true, received:true, refunded:true, cancelled:true }) }}
+        onClear={() => { setSearchQuery(''); setStatusFilter({ requested: true, approved: true, rejected: true, in_transit: true, received: true, refunded: true, cancelled: true }) }}
         recordCount={filteredReturns.length}
       />
 
       {/* İçerik */}
       {isLoading ? (
         <div className={`${adminCardClass} min-h-[20vh] flex items-center justify-center`}>
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy"/>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
         </div>
       ) : filteredReturns.length === 0 ? (
         <div className={`${adminCardClass} text-center py-8`}>
@@ -500,27 +501,27 @@ export default function AdminReturnsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
-                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
-                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
-                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
-                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
-                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={()=>toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
+                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
+                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
+                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
+                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
+                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.returns.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedReturns.map((returnItem, index) => {
-                  const orderNo = returnItem.order_number ? 
-                    `#${returnItem.order_number.split('-')[1]}` : 
+                  const orderNo = returnItem.order_number ?
+                    `#${returnItem.order_number.split('-')[1]}` :
                     `#${returnItem.order_id.slice(-8).toUpperCase()}`
-                  
+
                   return (
                     <tr key={returnItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                       {visibleCols.order && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col">
                             <button
-                              onClick={() => navigate(`/account/orders/${returnItem.order_id}`)}
+                              onClick={() => router.push(`/account/orders/${returnItem.order_id}`)}
                               className="text-primary-navy hover:underline font-medium text-left"
                             >
                               {orderNo}
@@ -569,7 +570,7 @@ export default function AdminReturnsPage() {
                           </div>
                         </td>
                       )}
-                      <td className={`px-4 ${density==='compact'?'py-2':'py-3'}`}>
+                      <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>
                         <div className="flex gap-1">
                           {nextStatuses[returnItem.status]?.map(status => (
                             <button
@@ -602,3 +603,5 @@ export default function AdminReturnsPage() {
     </div>
   )
 }
+
+

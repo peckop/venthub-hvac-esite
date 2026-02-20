@@ -1,5 +1,6 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HelpCircle, Package, Truck, ShieldCheck, ArrowLeft, BookOpen } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { WhatsAppIcon } from '../../components/HVACIcons'
@@ -15,12 +16,12 @@ const SupportHomePage: React.FC = () => {
     { title: t('common.knowledgeHub'), desc: t('support.home.knowledgeDesc'), to: '/destek/merkez', icon: BookOpen },
   ]
 
-  const navigate = useNavigate()
+  const router = useRouter()
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-4">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
+        <button onClick={() => router.back()} className="inline-flex items-center text-steel-gray hover:text-primary-navy transition-colors text-sm">
           <ArrowLeft size={18} className="mr-1" /> {t('auth.back')}
         </button>
       </div>
@@ -29,7 +30,7 @@ const SupportHomePage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {cards.map(({ title, desc, to, icon: Icon }) => (
-          <Link key={to} to={to} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-all">
+          <Link key={to} href={to} className="group block bg-white rounded-xl border border-light-gray p-6 hover:border-primary-navy/40 hover:shadow-md transition-all">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-primary-navy/10 p-3 text-primary-navy">
                 <Icon size={24} />
@@ -47,7 +48,7 @@ const SupportHomePage: React.FC = () => {
       {isWhatsAppAvailable() && (() => {
         const whatsappLink = getSupportLink('Destek talebi')
         if (!whatsappLink) return null
-        
+
         return (
           <div className="mt-8 whatsapp-container">
             <div className="flex items-center gap-4">
@@ -76,4 +77,3 @@ const SupportHomePage: React.FC = () => {
 }
 
 export default SupportHomePage
-

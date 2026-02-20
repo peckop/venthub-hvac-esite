@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
     X, ChevronRight, ChevronLeft,
     DoorOpen, Snowflake, Factory, ShoppingCart,
@@ -8,7 +9,8 @@ import {
     HelpCircle, MapPin, Clock, Home,
     CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink
 } from 'lucide-react'
-import { supabase, Product } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
+import type { Product } from '../../lib/supabase'
 import { calculateAirCurtain, type WindCondition, type TrafficIntensity, type AirCurtainApplication } from '../../lib/hvacCalculations'
 
 // Types
@@ -204,7 +206,7 @@ const calculateRecommendation = (state: WizardState): {
 
 // Main Component
 const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, parentSlug }) => {
-    const navigate = useNavigate()
+    const router = useRouter()
 
     const [state, setState] = useState<WizardState>({
         step: 1,
@@ -497,7 +499,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
     const goToResults = () => {
         const recommendation = calculateRecommendation(state)
-        navigate(`/category/${parentSlug}/${recommendation.series}`)
+        router.push(`/category/${parentSlug}/${recommendation.series}`)
         handleClose()
     }
 
@@ -1053,7 +1055,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                         {matchedProducts.map((product, index) => (
                                             <Link
                                                 key={product.id}
-                                                to={`/product/${product.id}`}
+                                                href={`/product/${product.id}`}
                                                 onClick={handleClose}
                                                 className="block p-4 border rounded-xl hover:border-secondary-blue hover:bg-blue-50/50 transition-all group"
                                             >

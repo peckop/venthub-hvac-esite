@@ -1,6 +1,9 @@
+'use client'
+
 import React, { useEffect, useState, useCallback } from 'react'
 import { X, Grid3X3, ArrowLeft, ChevronRight } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import CategoryCard3D from './CategoryCard3D'
 import type { Category } from '../../lib/supabase'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
@@ -23,7 +26,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     categories,
     onCategorySelect
 }) => {
-    const navigate = useNavigate()
+    const router = useRouter()
     const [isAnimating, setIsAnimating] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
@@ -99,10 +102,10 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     const handleSubCategoryClick = (subCategory: Category) => {
         if (selectedCategory) {
             // Alt kategori: /category/parent-slug/child-slug
-            navigate(`/category/${selectedCategory.slug}/${subCategory.slug}`)
+            router.push(`/category/${selectedCategory.slug}/${subCategory.slug}`)
         } else {
             // Ana kategori (fallback)
-            navigate(`/category/${subCategory.slug}`)
+            router.push(`/category/${subCategory.slug}`)
         }
         onClose()
     }
@@ -192,7 +195,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
                             {/* Tüm Ürünleri Gör butonu - Grid içinde şık durması için kart boyutunda */}
                             <Link
-                                to={`/category/${selectedCategory.slug}`}
+                                href={`/category/${selectedCategory.slug}`}
                                 onClick={() => onClose()}
                                 className="group relative flex flex-col items-center justify-center p-6 bg-secondary-blue/10 hover:bg-secondary-blue/20 border-2 border-dashed border-secondary-blue/30 hover:border-secondary-blue rounded-2xl transition-all duration-300 h-40"
                             >
@@ -233,3 +236,4 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 }
 
 export default CategoryHubOverlay
+

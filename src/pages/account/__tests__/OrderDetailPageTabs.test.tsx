@@ -1,13 +1,13 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'next/navigation'
 
 const mockNavigate = vi.fn()
 
-vi.mock('react-router-dom', async (orig) => {
+vi.mock('next/navigation', async (orig) => {
   const actual = await orig()
-  return { ...actual, useNavigate: () => mockNavigate }
+  return { ...actual, useRouter: () => mockNavigate }
 })
 
 vi.mock('../../../hooks/useAuth', () => ({
@@ -142,4 +142,5 @@ describe.skip('OrderDetailPage', () => {
     expect(link).toHaveAttribute('href', 'https://kargo.example.com/track/TRK123')
   })
 })
+
 

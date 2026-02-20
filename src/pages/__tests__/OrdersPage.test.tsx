@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { MemoryRouter, Routes, Route, usePathname } from 'next/navigation'
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'u1', email: 'u@u.com', user_metadata: {} }, loading: false })
@@ -93,7 +93,7 @@ vi.mock('../../lib/supabase', () => ({
 import OrdersPage from '../OrdersPage'
 
 function LocationProbe() {
-  const loc = useLocation()
+  const loc = usePathname()
   return <div data-testid="loc-path">{loc.pathname}</div>
 }
 
@@ -119,4 +119,5 @@ describe.skip('OrdersPage', () => {
     })
   })
 })
+
 

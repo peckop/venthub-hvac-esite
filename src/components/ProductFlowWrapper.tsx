@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 import ProductFlow from './ProductFlow'
 
 const ProductFlowWrapper: React.FC = () => {
   const [isActive, setIsActive] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
-  const location = useLocation()
+  const pathname = usePathname()
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Navigation değiştiğinde ProductFlow'u devre dışı bırak
@@ -16,7 +16,7 @@ const ProductFlowWrapper: React.FC = () => {
     }, 100) // Navigation tamamlandıktan sonra tekrar aktif et
     
     return () => clearTimeout(timer)
-  }, [location.pathname])
+  }, [pathname])
   
   // Intersection Observer - sadece görünür olduğunda render et
   useEffect(() => {
@@ -67,3 +67,4 @@ const ProductFlowWrapper: React.FC = () => {
 }
 
 export default ProductFlowWrapper
+

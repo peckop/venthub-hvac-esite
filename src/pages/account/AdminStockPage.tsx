@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { supabase, Product } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { Search, Plus, Minus, Save } from 'lucide-react'
 import { checkAdminAccess } from '../../config/admin'
 
 export default function AdminStockPage() {
   const { user, loading } = useAuth()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const [all, setAll] = useState<Product[]>([])
   const [q, setQ] = useState('')
@@ -18,10 +18,10 @@ export default function AdminStockPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth/login', { replace: true, state: { from: { pathname: '/account/operations/stock' } } })
+      router.push('/auth/login?redirect=/account/operations/stock')
       return
     }
-  }, [user, loading, navigate])
+  }, [user, loading, router])
 
   // Admin kontrolü
   useEffect(() => {
@@ -58,12 +58,12 @@ export default function AdminStockPage() {
       // Direkt UPDATE query - RPC yerine
       const currentProduct = all.find(p => p.id === productId)
       const newQty = Math.max(0, (currentProduct?.stock_qty ?? 0) + delta)
-      
+
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
         .eq('id', productId)
-        
+
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
     } catch (err) {
@@ -78,12 +78,12 @@ export default function AdminStockPage() {
       setSaving(productId)
       // Direkt UPDATE query - RPC yerine
       const newQty = Math.max(0, qty)
-      
+
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
         .eq('id', productId)
-        
+
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
       setTempQty(prev => ({ ...prev, [productId]: '' }))
@@ -99,12 +99,12 @@ export default function AdminStockPage() {
       setSaving(productId)
       // null değeri "varsayılan kullan" anlamına gelir
       const newThreshold = threshold !== null && threshold >= 0 ? threshold : null
-      
+
       const { error } = await supabase
         .from('products')
         .update({ low_stock_threshold: newThreshold })
         .eq('id', productId)
-        
+
       if (error) throw error
       setAll(prev => prev.map(p => p.id === productId ? { ...p, low_stock_threshold: newThreshold } : p))
       setTempThreshold(prev => ({ ...prev, [productId]: '' }))
@@ -177,18 +177,18 @@ export default function AdminStockPage() {
                         placeholder="Eşik"
                         className="w-16 px-2 py-1 border border-light-gray rounded text-xs"
                       />
-                      <button 
-                        disabled={saving === p.id || tempThreshold_val === ''} 
-                        onClick={() => setThreshold(p.id, Number(tempThreshold_val))} 
+                      <button
+                        disabled={saving === p.id || tempThreshold_val === ''}
+                        onClick={() => setThreshold(p.id, Number(tempThreshold_val))}
                         className="px-1 py-1 rounded border border-light-gray hover:border-secondary-blue disabled:opacity-50 text-xs"
                         title="Eşik kaydet"
                       >
                         <Save size={12} />
                       </button>
                       {threshold !== undefined && (
-                        <button 
-                          disabled={saving === p.id} 
-                          onClick={() => setThreshold(p.id, null)} 
+                        <button
+                          disabled={saving === p.id}
+                          onClick={() => setThreshold(p.id, null)}
                           className="px-1 py-1 rounded border border-warning-orange text-warning-orange hover:bg-warning-orange hover:text-white disabled:opacity-50 text-xs"
                           title="Varsayılan kullan"
                         >
@@ -219,3 +219,4 @@ export default function AdminStockPage() {
     </div>
   )
 }
+

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useLocation, useNavigationType } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 
 /**
  * Async veri yüklenen sayfalarda "Geri" (POP) navigasyonu sonrası scroll pozisyonunu geri yükler.
@@ -8,18 +8,17 @@ import { useLocation, useNavigationType } from 'react-router-dom'
  * @param loading Verinin yüklenme durumu. True ise restorasyon beklemede kalır.
  */
 export const useManualScrollRestoration = (loading: boolean) => {
-    const { key } = useLocation()
-    const navType = useNavigationType()
+    const pathname = usePathname()
     const restoredRef = useRef(false)
 
-    // 1. Scroll pozisyonunu key bazlı kaydet (Throttle: 100ms)
+    // 1. Scroll pozisyonunu pathname bazlı kaydet (Throttle: 100ms)
     useEffect(() => {
         let timeout: NodeJS.Timeout
         const handler = () => {
             if (timeout) return
             timeout = setTimeout(() => {
                 try {
-                    sessionStorage.setItem(`scroll_${key}`, window.scrollY.toString())
+                    sessionStorage.setItem(`scroll_${pathname}`, window.scrollY.toString())
                 } catch { }
                 timeout = undefined!
             }, 100)
@@ -30,16 +29,15 @@ export const useManualScrollRestoration = (loading: boolean) => {
             window.removeEventListener('scroll', handler)
             if (timeout) clearTimeout(timeout)
         }
-    }, [key])
+    }, [pathname])
 
-    // 2. Loading bittiğinde ve POP ise restore et
+    // 2. Loading bittiğinde restore et
     useEffect(() => {
         if (loading) return
         if (restoredRef.current) return // Sadece bir kere dene
-        if (navType !== 'POP') return
 
         try {
-            const saved = sessionStorage.getItem(`scroll_${key}`)
+            const saved = sessionStorage.getItem(`scroll_${pathname}`)
             if (saved) {
                 const y = parseInt(saved, 10)
 
@@ -64,6 +62,7 @@ export const useManualScrollRestoration = (loading: boolean) => {
         } catch { }
 
         restoredRef.current = true
-    }, [loading, key, navType])
+    }, [loading, pathname])
 }
+
 

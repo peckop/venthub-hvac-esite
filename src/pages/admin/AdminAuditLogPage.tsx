@@ -4,7 +4,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 interface AuditRow {
   id: string
@@ -22,8 +22,8 @@ const PAGE_SIZE = 50
 
 const AdminAuditLogPage: React.FC = () => {
   const { t, lang } = useI18n()
-  const location = useLocation()
-  const navigate = useNavigate()
+  const pathname = usePathname()
+  const router = useRouter()
   const [rows, setRows] = React.useState<AuditRow[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -87,11 +87,11 @@ const AdminAuditLogPage: React.FC = () => {
 
   React.useEffect(() => { fetchLogs() }, [fetchLogs])
 
+  const searchParams = useSearchParams()
   React.useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const b = (params.get('batch') || '').trim()
+    const b = (searchParams?.get('batch') || '').trim()
     setBatch(b)
-  }, [location.search])
+  }, [searchParams])
 
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
 
@@ -106,7 +106,7 @@ const AdminAuditLogPage: React.FC = () => {
             <a href={`/admin/movements?batch=${batch}`} className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100">Hareketleri Gör</a>
             <button
               className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
-              onClick={() => { setBatch(''); const url = new URL(window.location.href); url.searchParams.delete('batch'); navigate(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { replace: true }) }}
+              onClick={() => { setBatch(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
             >Temizle</button>
           </div>
         </div>
@@ -115,28 +115,30 @@ const AdminAuditLogPage: React.FC = () => {
       <AdminToolbar
         storageKey="toolbar:audit"
         search={{ value: q, onChange: setQ, placeholder: 'Tablo adı, PK veya not ara', focusShortcut: '/' }}
-        select={{ value: action, onChange: setAction, title: 'Aksiyon', options: [
-          { value: '', label: 'Tümü' },
-          { value: 'INSERT', label: 'INSERT' },
-          { value: 'UPDATE', label: 'UPDATE' },
-          { value: 'DELETE', label: 'DELETE' },
-          { value: 'CUSTOM', label: 'CUSTOM' },
-        ] }}
+        select={{
+          value: action, onChange: setAction, title: 'Aksiyon', options: [
+            { value: '', label: 'Tümü' },
+            { value: 'INSERT', label: 'INSERT' },
+            { value: 'UPDATE', label: 'UPDATE' },
+            { value: 'DELETE', label: 'DELETE' },
+            { value: 'CUSTOM', label: 'CUSTOM' },
+          ]
+        }}
         onClear={() => { setBatch(''); setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
           </div>
         )}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -172,8 +174,8 @@ const AdminAuditLogPage: React.FC = () => {
                       <td className={`${adminTableCellClass}`}>
                         <button
                           className="px-2 py-1 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs"
-                          onClick={()=> setExpandedId(id => id === r.id ? null : r.id)}
-> {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
+                          onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
+                        > {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
                     {expandedId === r.id && (
@@ -204,4 +206,6 @@ const AdminAuditLogPage: React.FC = () => {
 }
 
 export default AdminAuditLogPage
+
+
 

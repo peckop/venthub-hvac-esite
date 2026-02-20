@@ -13,14 +13,14 @@ if ((window as unknown as { __SUPABASE_CONFIG_ERROR__?: boolean }).__SUPABASE_CO
       <div style="background:white; padding:1.5rem; border-radius:8px; box-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1); margin-top:1.5rem; text-align:left;">
         <h3 style="margin-top:0;">Diagnostics:</h3>
         <ul style="margin-bottom:0; padding-left:1.2rem;">
-          <li><strong>VITE_SUPABASE_URL:</strong> ${import.meta.env?.VITE_SUPABASE_URL ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
-          <li><strong>VITE_SUPABASE_ANON_KEY:</strong> ${import.meta.env?.VITE_SUPABASE_ANON_KEY ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
-          <li><strong>Mode:</strong> ${import.meta.env?.MODE}</li>
+          <li><strong>NEXT_PUBLIC_SUPABASE_URL:</strong> ${process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
+          <li><strong>NEXT_PUBLIC_SUPABASE_ANON_KEY:</strong> ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Loaded' : '❌ MISSING (undefined)'}</li>
+          <li><strong>Mode:</strong> ${process.env.NODE_ENV}</li>
         </ul>
       </div>
       <p style="margin-top:2rem; color:#7f1d1d; font-size:0.9rem;">
         <strong>Fix for Cloudflare Pages:</strong><br>
-        Dashboard > Settings > Environment Variables > Add variables exactly as VITE_...
+        Dashboard > Settings > Environment Variables > Add variables exactly as NEXT_PUBLIC_...
       </p>
     </div>
   `
@@ -53,8 +53,8 @@ criticalPreloads.forEach(({ href, as, type, crossOrigin }) => {
 
 // Sentry init (yalnızca DSN varsa); Supabase preconnect'i globalden kaldırdık (gerektiğinde kullanılacak)
 try {
-  const viteEnv = ((import.meta as unknown) as { env?: Record<string, string> }).env || ({} as Record<string, string>)
-  const supaUrl = viteEnv.VITE_SUPABASE_URL
+  const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supaUrl = envUrl
   if (supaUrl) {
     // Lightweight error reporter to Supabase Edge Function
     const isLocal = /localhost|127\.0\.0\.1/.test(supaUrl)
@@ -62,17 +62,17 @@ try {
       ? `${supaUrl}/functions/v1/log-client-error`
       : `${supaUrl.replace('.supabase.co', '.functions.supabase.co')}/log-client-error`
     const release = (window as unknown as { __COMMIT_SHA__?: string }).__COMMIT_SHA__ || 'dev'
-    const isProd = viteEnv.MODE === 'production'
+    const isProd = process.env.NODE_ENV === 'production'
     // Production'da başlangıç ölçüm penceresinde hata raporlamayı tamamen kapat (supabase-js import'unu tetiklememek için)
     const sample = isProd ? 0 : 1.0
     const ttlMs = isProd ? 120_000 : 0
-    installErrorReporter(endpoint, { sample, release, env: viteEnv.MODE, ttlMs })
+    installErrorReporter(endpoint, { sample, release, env: process.env.NODE_ENV, ttlMs })
   }
 } catch { }
 
 // Optional: automatic test error trigger behind a flag (disabled in production; only active on localhost)
 try {
-  const envMode = ((import.meta as unknown) as { env?: Record<string, string> }).env?.MODE || 'production'
+  const envMode = process.env.NODE_ENV || 'production'
   const isProd = envMode === 'production'
   const host = location.hostname
   const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1'

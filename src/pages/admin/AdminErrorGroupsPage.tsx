@@ -44,11 +44,25 @@ const AdminErrorGroupsPage: React.FC = () => {
   const STORAGE_KEY = 'toolbar:errorgroups'
   const [visibleCols, setVisibleCols] = React.useState<{ lastSeen: boolean; level: boolean; signature: boolean; lastMsg: boolean; count: boolean; status: boolean; assigned: boolean; actions: boolean }>({ lastSeen: true, level: true, signature: true, lastMsg: true, count: true, status: true, assigned: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
-  React.useEffect(()=>{ try { const c=localStorage.getItem(`${STORAGE_KEY}:cols`); if(c) setVisibleCols(prev=>({ ...prev, ...JSON.parse(c) })); const d=localStorage.getItem(`${STORAGE_KEY}:density`); if(d==='compact'||d==='comfortable') setDensity(d as Density) } catch{} },[])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch{} }, [visibleCols])
-  React.useEffect(()=>{ try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch{} }, [density])
-  const headPad = density==='compact' ? 'px-2 py-2' : ''
-  const cellPad = density==='compact' ? 'px-2 py-2' : ''
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
+  const headPad = density === 'compact' ? 'px-2 py-2' : ''
+  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
   const [rows, setRows] = React.useState<ErrorGroup[]>([])
   const [total, setTotal] = React.useState(0)
   const [page, setPage] = React.useState(1)
@@ -69,7 +83,7 @@ const AdminErrorGroupsPage: React.FC = () => {
   const [latestClientErrors, setLatestClientErrors] = React.useState<Record<string, ClientErrorRow[]>>({})
   // Selection & bulk actions
   const [selectedIds, setSelectedIds] = React.useState<string[]>([])
-  const [bulkStatus, setBulkStatus] = React.useState<'open'|'resolved'|'ignored'>('resolved')
+  const [bulkStatus, setBulkStatus] = React.useState<'open' | 'resolved' | 'ignored'>('resolved')
   const [savingBulk, setSavingBulk] = React.useState(false)
 
   // Sorting
@@ -95,7 +109,7 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   React.useEffect(() => {
     // load admin/moderator users for assignment via secure RPC
-    ;(async () => {
+    ; (async () => {
       try {
         const { data, error } = await supabase.rpc('admin_list_users')
         if (!error && Array.isArray(data)) {
@@ -106,7 +120,7 @@ const AdminErrorGroupsPage: React.FC = () => {
           })) as AdminUserOpt[]
           setUsers(list)
         }
-      } catch {}
+      } catch { }
     })()
   }, [])
 
@@ -208,7 +222,7 @@ const AdminErrorGroupsPage: React.FC = () => {
         .order('at', { ascending: false })
         .limit(200)
       if (!error) setLatestClientErrors(prev => ({ ...prev, [groupId]: (data || []) as ClientErrorRow[] }))
-    } catch {}
+    } catch { }
   }
 
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
@@ -236,7 +250,7 @@ const AdminErrorGroupsPage: React.FC = () => {
       return q
     }
     try {
-      for (;;) {
+      for (; ;) {
         const from = offset
         const to = offset + CHUNK - 1
         const { data, error } = await makeQuery().range(from, to)
@@ -247,7 +261,7 @@ const AdminErrorGroupsPage: React.FC = () => {
         if (chunk.length < CHUNK) break
         offset += CHUNK
       }
-      const header = ['id','signature','level','last_message','url_sample','env','release','first_seen','last_seen','count','status','assigned_to','notes']
+      const header = ['id', 'signature', 'level', 'last_message', 'url_sample', 'env', 'release', 'first_seen', 'last_seen', 'count', 'status', 'assigned_to', 'notes']
       const escape = (v: unknown) => {
         const s = (v ?? '').toString().replace(/"/g, '""')
         return `"${s}` + `"`
@@ -273,7 +287,7 @@ const AdminErrorGroupsPage: React.FC = () => {
   const tableWrapRef = React.useRef<HTMLDivElement | null>(null)
   const [topScrollWidth, setTopScrollWidth] = React.useState(0)
   const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
-  React.useEffect(() => { refreshTopWidth(); const onResize=()=>refreshTopWidth(); window.addEventListener('resize', onResize); return ()=>window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
+  React.useEffect(() => { refreshTopWidth(); const onResize = () => refreshTopWidth(); window.addEventListener('resize', onResize); return () => window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
 
   // Smooth, bi-directional sync with rAF + programmatic update guard
   const rafIdRef = React.useRef<number | null>(null)
@@ -349,44 +363,46 @@ const AdminErrorGroupsPage: React.FC = () => {
       <AdminToolbar
         storageKey="toolbar:errorGroups"
         search={{ value: q, onChange: setQ, placeholder: t('admin.errorGroups.searchPlaceholder'), focusShortcut: '/' }}
-        select={{ value: level, onChange: setLevel, title: t('admin.errors.levelTitle'), options: [
-          { value: '', label: 'Tümü' },
-          { value: 'error', label: 'error' },
-          { value: 'warn', label: 'warn' },
-          { value: 'info', label: 'info' },
-        ] }}
+        select={{
+          value: level, onChange: setLevel, title: t('admin.errors.levelTitle'), options: [
+            { value: '', label: 'Tümü' },
+            { value: 'error', label: 'error' },
+            { value: 'warn', label: 'warn' },
+            { value: 'info', label: 'info' },
+          ]
+        }}
         onClear={() => { setQ(''); setLevel(''); setStatus(''); setAssigned(''); setFromDate(''); setToDate(''); setPage(1); setSelectedIds([]) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={status} onChange={(e)=>setStatus(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
               <option value="">{t('admin.errorGroups.filter.statusAll')}</option>
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
-            <select value={assigned} onChange={(e)=>setAssigned(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
               <option value="">{t('admin.errorGroups.filter.assignedAll')}</option>
               <option value="__none__">{t('admin.errorGroups.filter.unassigned')}</option>
               {users.map(u => (
                 <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
               ))}
             </select>
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.errorGroups.export.csvLabel'), onSelect: () => exportGroupsCsv() }]} />
             <ColumnsMenu
               density={density}
               onDensityChange={setDensity}
               columns={[
-                { key: 'lastSeen', label: t('admin.errorGroups.table.lastSeen'), checked: visibleCols.lastSeen, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastSeen: v })) },
-                { key: 'level', label: t('admin.errorGroups.table.level'), checked: visibleCols.level, onChange: (v)=> setVisibleCols(prev=>({ ...prev, level: v })) },
-                { key: 'signature', label: t('admin.errorGroups.table.signature'), checked: visibleCols.signature, onChange: (v)=> setVisibleCols(prev=>({ ...prev, signature: v })) },
-                { key: 'lastMsg', label: t('admin.errorGroups.table.lastMsg'), checked: visibleCols.lastMsg, onChange: (v)=> setVisibleCols(prev=>({ ...prev, lastMsg: v })) },
-                { key: 'count', label: t('admin.errorGroups.table.count'), checked: visibleCols.count, onChange: (v)=> setVisibleCols(prev=>({ ...prev, count: v })) },
-                { key: 'status', label: t('admin.errorGroups.table.status'), checked: visibleCols.status, onChange: (v)=> setVisibleCols(prev=>({ ...prev, status: v })) },
-                { key: 'assigned', label: t('admin.errorGroups.table.assigned'), checked: visibleCols.assigned, onChange: (v)=> setVisibleCols(prev=>({ ...prev, assigned: v })) },
-                { key: 'actions', label: t('admin.errorGroups.table.actions'), checked: visibleCols.actions, onChange: (v)=> setVisibleCols(prev=>({ ...prev, actions: v })) },
+                { key: 'lastSeen', label: t('admin.errorGroups.table.lastSeen'), checked: visibleCols.lastSeen, onChange: (v) => setVisibleCols(prev => ({ ...prev, lastSeen: v })) },
+                { key: 'level', label: t('admin.errorGroups.table.level'), checked: visibleCols.level, onChange: (v) => setVisibleCols(prev => ({ ...prev, level: v })) },
+                { key: 'signature', label: t('admin.errorGroups.table.signature'), checked: visibleCols.signature, onChange: (v) => setVisibleCols(prev => ({ ...prev, signature: v })) },
+                { key: 'lastMsg', label: t('admin.errorGroups.table.lastMsg'), checked: visibleCols.lastMsg, onChange: (v) => setVisibleCols(prev => ({ ...prev, lastMsg: v })) },
+                { key: 'count', label: t('admin.errorGroups.table.count'), checked: visibleCols.count, onChange: (v) => setVisibleCols(prev => ({ ...prev, count: v })) },
+                { key: 'status', label: t('admin.errorGroups.table.status'), checked: visibleCols.status, onChange: (v) => setVisibleCols(prev => ({ ...prev, status: v })) },
+                { key: 'assigned', label: t('admin.errorGroups.table.assigned'), checked: visibleCols.assigned, onChange: (v) => setVisibleCols(prev => ({ ...prev, assigned: v })) },
+                { key: 'actions', label: t('admin.errorGroups.table.actions'), checked: visibleCols.actions, onChange: (v) => setVisibleCols(prev => ({ ...prev, actions: v })) },
               ]}
             />
           </div>
@@ -395,9 +411,9 @@ const AdminErrorGroupsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
         <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk action bar */}
@@ -406,13 +422,13 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="text-sm text-industrial-gray">{t('admin.errorGroups.bulk.selected', { count: selectedIds.length })}</div>
           <div className="flex items-center gap-2">
             <label className="text-sm text-steel-gray">{t('admin.errorGroups.bulk.statusTitle')}</label>
-            <select value={bulkStatus} onChange={(e)=>setBulkStatus(e.target.value as 'open'|'resolved'|'ignored')} className="border border-light-gray rounded-md px-2 h-10 text-sm bg-white">
+            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 h-10 text-sm bg-white">
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
             <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
-            <button onClick={()=>setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.ui.clear')}</button>
+            <button onClick={() => setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.ui.clear')}</button>
           </div>
         </div>
       )}
@@ -467,15 +483,15 @@ const AdminErrorGroupsPage: React.FC = () => {
                   <React.Fragment key={r.id}>
                     <tr className="border-b border-light-gray/60 align-top">
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e)=>toggleSelect(r.id, e.target.checked)} />
+                        <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => toggleSelect(r.id, e.target.checked)} />
                       </td>
-{visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{formatDateTime(r.last_seen, lang)}</td>}
+                      {visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{formatDateTime(r.last_seen, lang)}</td>}
                       {visibleCols.level && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{r.level || 'error'}</td>}
                       {visibleCols.signature && <td className={`${adminTableCellClass} ${cellPad} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>}
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
                       {visibleCols.count && <td className={`${adminTableCellClass} ${cellPad}`}>{r.count}</td>}
                       {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <select value={r.status} onChange={(e)=>updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
+                        <select value={r.status} onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
                           <option value="open">open</option>
                           <option value="resolved">resolved</option>
                           <option value="ignored">ignored</option>
@@ -483,7 +499,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       </td>}
                       {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2">
-                          <select value={r.assigned_to || ''} onChange={(e)=>updateAssignedTo(r.id, e.target.value)} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
+                          <select value={r.assigned_to || ''} onChange={(e) => updateAssignedTo(r.id, e.target.value)} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
                             <option value="">{t('admin.errorGroups.assigned.none')}</option>
                             {users.map(u => (
                               <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
@@ -507,39 +523,39 @@ const AdminErrorGroupsPage: React.FC = () => {
                               <div className="space-y-2 max-h-72 overflow-auto overscroll-y-contain bg-white p-2 rounded border">
                                 {(latestClientErrors[r.id] || []).map((e: ClientErrorRow) => (
                                   <div key={e.id} className="border-b last:border-b-0 pb-1">
-<div className="text-steel-gray">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
+                                    <div className="text-steel-gray">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
                                     <div className="text-steel-gray break-words">{e.message}</div>
                                     <div className="text-industrial-gray break-all">{e.url || '-'}</div>
-                                    {e.stack && <details className="mt-1"><summary className="cursor-pointer">{t('admin.errorGroups.details.stackSummary')}</summary><pre className="text-[10px] overflow-auto max-h-40">{String(e.stack).slice(0,4000)}</pre></details>}
+                                    {e.stack && <details className="mt-1"><summary className="cursor-pointer">{t('admin.errorGroups.details.stackSummary')}</summary><pre className="text-[10px] overflow-auto max-h-40">{String(e.stack).slice(0, 4000)}</pre></details>}
                                   </div>
                                 ))}
                               </div>
                             </div>
                             <div>
                               <div className="font-medium text-industrial-gray mb-1">{t('admin.errorGroups.details.notes')}</div>
-                              <textarea defaultValue={rows.find(x=>x.id===r.id)?.notes || ''} onBlur={(ev)=>updateNotes(r.id, ev.target.value)} className="w-full border border-light-gray rounded p-2 bg-white" rows={7} placeholder={t('admin.errorGroups.details.notesPlaceholder') as string}/>
+                              <textarea defaultValue={rows.find(x => x.id === r.id)?.notes || ''} onBlur={(ev) => updateNotes(r.id, ev.target.value)} className="w-full border border-light-gray rounded p-2 bg-white" rows={7} placeholder={t('admin.errorGroups.details.notesPlaceholder') as string} />
                               <div className="font-medium text-industrial-gray mb-1 mt-3">{t('admin.errorGroups.details.sampleUrl')}</div>
                               <div className="text-[11px] break-all">{r.url_sample || '-'}</div>
                               <div className="font-medium text-industrial-gray mb-2 mt-3">{t('admin.errorGroups.details.top5')}</div>
                               {(() => {
                                 const list = latestClientErrors[r.id] || []
-                                const topN = (arr: ClientErrorRow[], key: (e: ClientErrorRow)=>string, n=5) => {
+                                const topN = (arr: ClientErrorRow[], key: (e: ClientErrorRow) => string, n = 5) => {
                                   const m = new Map<string, number>()
                                   for (const it of arr) {
                                     const k = key(it) || '-'
-                                    m.set(k, (m.get(k)||0) + 1)
+                                    m.set(k, (m.get(k) || 0) + 1)
                                   }
-                                  return Array.from(m.entries()).sort((a,b)=>b[1]-a[1]).slice(0,n)
+                                  return Array.from(m.entries()).sort((a, b) => b[1] - a[1]).slice(0, n)
                                 }
-                                const topUrl = topN(list, e=>String(e.url||'-'))
-                                const topRel = topN(list, e=>String(e.release||'-'))
-                                const topEnv = topN(list, e=>String(e.env||'-'))
-                                const topUA  = topN(list, e=>String(e.user_agent||'-'))
-                                const Block = ({title, items}:{title:string;items:[string,number][]}) => (
+                                const topUrl = topN(list, e => String(e.url || '-'))
+                                const topRel = topN(list, e => String(e.release || '-'))
+                                const topEnv = topN(list, e => String(e.env || '-'))
+                                const topUA = topN(list, e => String(e.user_agent || '-'))
+                                const Block = ({ title, items }: { title: string; items: [string, number][] }) => (
                                   <div className="mb-2">
                                     <div className="text-steel-gray font-medium mb-1">{title}</div>
                                     <ul className="space-y-1 list-disc pl-4">
-                                      {items.map(([k,c]) => (
+                                      {items.map(([k, c]) => (
                                         <li key={k} className="text-[11px] break-all"><span className="text-industrial-gray">{k}</span> <span className="text-steel-gray">({c})</span></li>
                                       ))}
                                       {items.length === 0 && <li className="text-[11px] text-steel-gray">-</li>}
@@ -569,7 +585,7 @@ const AdminErrorGroupsPage: React.FC = () => {
       </div>
 
       {/* Görünüm butonu artık toolbar’ın sağında; burada tekrar göstermiyoruz */}
-      
+
     </div>
   )
 }

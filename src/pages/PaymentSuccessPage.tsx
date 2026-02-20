@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { CheckCircle, AlertCircle, Loader, ShieldCheck } from 'lucide-react'
 import { useCart } from '../hooks/useCartHook'
 import { supabase } from '../lib/supabase'
@@ -11,7 +12,7 @@ import { formatDateTime } from '../i18n/datetime'
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
 export const PaymentSuccessPage: React.FC = () => {
-  const [searchParams] = useSearchParams()
+  const searchParams = useSearchParams()
   const { t, lang } = useI18n()
   const { clearCart } = useCart()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
@@ -21,11 +22,11 @@ export const PaymentSuccessPage: React.FC = () => {
   // Başarı teyit edilmeden sepeti temizleme! Yalnızca doğrulanmış başarıda temizlenecek.
 
   useEffect(() => {
-    const conversationId = searchParams.get('conversationId') || undefined
-    const token = searchParams.get('token') || undefined
-    const errorMessage = searchParams.get('errorMessage') || undefined
-    const orderId = searchParams.get('orderId') || undefined
-    const statusParam = searchParams.get('status') || undefined
+    const conversationId = searchParams?.get('conversationId') || undefined
+    const token = searchParams?.get('token') || undefined
+    const errorMessage = searchParams?.get('errorMessage') || undefined
+    const orderId = searchParams?.get('orderId') || undefined
+    const statusParam = searchParams?.get('status') || undefined
 
 
     async function fetchOrderDetails(oid?: string) {
@@ -196,13 +197,13 @@ export const PaymentSuccessPage: React.FC = () => {
           </p>
           <div className="space-y-3">
             <Link
-              to="/checkout"
+              href="/checkout"
               className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               {t('payment.retry')}
             </Link>
             <Link
-              to="/cart"
+              href="/cart"
               className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
             >
               {t('checkout.backToCart')}
@@ -256,7 +257,7 @@ export const PaymentSuccessPage: React.FC = () => {
         </div>
         <div className="space-y-3">
           <Link
-            to={`/account/orders/${encodeURIComponent(searchParams.get('orderId') || '')}`}
+            href={`/account/orders/${encodeURIComponent(searchParams?.get('orderId') || '')}`}
             className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
             {t('payment.viewOrderDetails')}

@@ -104,7 +104,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             const loadedImages = (imgs || []).map(img => ({
                 id: img.id,
                 path: img.path,
-                url: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`,
+                url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`,
                 isNew: false
             }))
             setImages(loadedImages)
@@ -112,7 +112,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             // Set Specs
             const loadedSpecs = Object.entries(product.technical_specs || {}).map(([key, value]) => ({
                 key,
-                value: String(value)
+                value: value !== undefined && value !== null ? String(value) : ''
             }))
             setSpecs(loadedSpecs)
 
@@ -211,6 +211,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             }
 
             // 3. Handle Images
+            if (!currentProductId) throw new Error("Ürün ID alınamadı.")
             if (images.some(img => img.isNew) || images.length < (await fetchExistingImageCount(currentProductId))) {
                 await processImages(currentProductId, data.name)
             }

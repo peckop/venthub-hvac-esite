@@ -9,16 +9,8 @@ export interface LiteProduct {
   sku?: string | null
 }
 
-function getEnv(key: string): string {
-  // Vite exposes env via import.meta.env
-  const env = (import.meta as unknown as { env?: Record<string, string> }).env || {}
-  const val = env[key]
-  if (!val) throw new Error(`Missing env ${key}`)
-  return val
-}
-
-const BASE = getEnv('VITE_SUPABASE_URL')
-const KEY = getEnv('VITE_SUPABASE_ANON_KEY')
+const BASE = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 async function srf(path: string, params: Record<string, string | number | boolean | string[]>): Promise<Response> {
   const usp = new URLSearchParams()

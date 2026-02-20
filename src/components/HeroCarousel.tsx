@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize } from 'lucide-react'
 import { Category } from '../lib/supabase'
 import { CATEGORY_REGISTRY } from '../config/categoryRegistry'
@@ -105,7 +105,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                 // Construct image URL
                 let bgImage = `/images/category/hero-${cat.slug}.png`
                 if (cat.image_url) {
-                    bgImage = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${cat.image_url}`
+                    bgImage = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${cat.image_url}`
                 }
 
                 return (
@@ -122,7 +122,9 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 alt={cat.name}
                                 className={`w-full h-full object-cover object-center transform transition-transform duration-[2000ms] ${isActive ? 'scale-105' : 'scale-100'}`}
                                 onError={(e) => {
-                                    (e.target as HTMLImageElement).src = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.src = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg';
                                 }}
                             />
                         </div>
@@ -168,13 +170,16 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Actions */}
                                 <div className="flex flex-wrap gap-4">
                                     <Link
-                                        to={`/category/${cat.slug}`}
+                                        href={`/category/${cat.slug}`}
                                         className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
                                     >
                                         Ürünleri İncele
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Link>
-                                    <button className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm">
+                                    <button
+                                        onClick={() => ((window as unknown) as { openLeadModal?: () => void }).openLeadModal?.()}
+                                        className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/20 rounded-lg font-bold transition-all backdrop-blur-sm"
+                                    >
                                         Hızlı Teklif Al
                                     </button>
                                 </div>
