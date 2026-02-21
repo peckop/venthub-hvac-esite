@@ -53,6 +53,10 @@ export const useScrollThrottle = (
 
     tickingRef.current = true
     requestAnimationFrame(() => {
+      if (typeof window === 'undefined') {
+        tickingRef.current = false
+        return
+      }
       const scrollTop = window.scrollY
 
       // Tepeye yakınken (<=1px) sticky'yi anında kapat (histerezisi bypass et)
@@ -95,6 +99,8 @@ export const useScrollThrottle = (
   }, [handleScroll, throttleMs])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     // İlk yüklemede kısa gecikme, sonraki syncKey değişimlerinde anında senkronizasyon
     const initialScrollTop = window.scrollY
 

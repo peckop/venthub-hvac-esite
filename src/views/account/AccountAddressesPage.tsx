@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { createAddress, deleteAddress, listAddresses, setDefaultAddress, updateAddress, UserAddress } from '../../lib/supabase'
 import toast from 'react-hot-toast'
 import { useI18n } from '../../i18n/I18nProvider'
+import { MapPin, Plus, Trash2, Edit2, CheckCircle, Truck, CreditCard, Loader2 } from 'lucide-react'
 
 interface FormState {
   id?: string
@@ -44,7 +45,7 @@ export default function AccountAddressesPage() {
       setItems(data)
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.loadError'))
+      toast.error(t('account.addresses.toasts.loadError') || 'Adresler yüklenemedi')
     } finally {
       setLoading(false)
     }
@@ -68,6 +69,8 @@ export default function AccountAddressesPage() {
       is_default_shipping: a.is_default_shipping,
       is_default_billing: a.is_default_billing,
     })
+    // Scroll to form on mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function resetForm() {
@@ -77,7 +80,7 @@ export default function AccountAddressesPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.full_address || !form.city || !form.district) {
-      toast.error(t('account.addresses.toasts.requiredFields'))
+      toast.error(t('account.addresses.toasts.requiredFields') || 'Adres, İl ve İlçe zorunludur')
       return
     }
 
@@ -96,7 +99,7 @@ export default function AccountAddressesPage() {
           is_default_shipping: form.is_default_shipping,
           is_default_billing: form.is_default_billing,
         })
-        toast.success(t('account.addresses.toasts.updated'))
+        toast.success(t('account.addresses.toasts.updated') || 'Adres güncellendi')
       } else {
         await createAddress({
           label: form.label,
@@ -110,113 +113,218 @@ export default function AccountAddressesPage() {
           is_default_shipping: form.is_default_shipping,
           is_default_billing: form.is_default_billing,
         })
-        toast.success(t('account.addresses.toasts.created'))
+        toast.success(t('account.addresses.toasts.created') || 'Adres eklendi')
       }
       resetForm()
       await refresh()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.saveError'))
+      toast.error(t('account.addresses.toasts.saveError') || 'Kayıt sırasında hata oluştu')
     } finally {
       setSaving(false)
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm(t('account.addresses.toasts.confirmDelete') as string)) return
+    if (!confirm(t('account.addresses.toasts.confirmDelete') as string || 'Bu adresi silmek istediğinize emin misiniz?')) return
     try {
       await deleteAddress(id)
-      toast.success(t('account.addresses.toasts.deleted'))
+      toast.success(t('account.addresses.toasts.deleted') || 'Adres silindi')
       await refresh()
+      if (form.id === id) resetForm()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.deleteError'))
+      toast.error(t('account.addresses.toasts.deleteError') || 'Silme işlemi başarısız')
     }
   }
 
   async function makeDefault(id: string, kind: 'shipping' | 'billing') {
     try {
       await setDefaultAddress(kind, id)
-      toast.success(kind === 'shipping' ? t('account.addresses.toasts.defaultSetShipping') : t('account.addresses.toasts.defaultSetBilling'))
+      toast.success(kind === 'shipping' ? (t('account.addresses.toasts.defaultSetShipping') || 'Varsayılan teslimat adresi yapıldı') : (t('account.addresses.toasts.defaultSetBilling') || 'Varsayılan fatura adresi yapıldı'))
       await refresh()
     } catch (e) {
       console.error(e)
-      toast.error(t('account.addresses.toasts.updateError'))
+      toast.error(t('account.addresses.toasts.updateError') || 'İşlem başarısız')
     }
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <section className="col-span-2 bg-white border border-gray-100 rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-industrial-gray mb-3">{t('account.addresses.title')}</h2>
+    <div className="flex flex-col lg:flex-row gap-8">
 
-        {loading ? (
-          <div className="text-sm text-steel-gray">{t('admin.ui.loading')}</div>
-        ) : (
-          <ul className="space-y-3">
-            {items.map((a) => (
-              <li key={a.id} className="border border-gray-100 rounded-lg p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-industrial-gray font-medium">
-                      {a.label || t('account.addresses.addressLabel')}
-                      {a.is_default_shipping && (
-                        <span className="ml-2 text-xs text-primary-navy">({t('account.addresses.defaultShippingTag')})</span>
-                      )}
-                      {a.is_default_billing && (
-                        <span className="ml-2 text-xs text-primary-navy">({t('account.addresses.defaultBillingTag')})</span>
-                      )}
-                    </div>
-                    <div className="text-sm text-steel-gray whitespace-pre-line mt-1">{a.full_address}</div>
-                    <div className="text-xs text-gray-500 mt-1">{a.district}, {a.city} {a.postal_code || ''} {a.country || ''}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => startEdit(a)} className="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50">{t('admin.ui.edit') ?? 'Edit'}</button>
-                    <button onClick={() => handleDelete(a.id)} className="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50 text-red-600">{t('admin.ui.delete')}</button>
-                  </div>
+      {/* Address Form (Sidebar layout on Desktop) */}
+      <section className="w-full lg:w-[380px] shrink-0 order-first lg:order-last">
+        <div className="bg-white border border-gray-100/80 rounded-2xl shadow-sm p-6 sm:p-8 sticky top-[100px]">
+          <h2 className="text-lg font-bold text-industrial-gray mb-6 flex items-center gap-2">
+            {isEditing ? <Edit2 className="w-5 h-5 text-primary-navy" /> : <Plus className="w-5 h-5 text-primary-navy" />}
+            {isEditing ? (t('account.addresses.formTitleEdit') || 'Adresi Düzenle') : (t('account.addresses.formTitleNew') || 'Yeni Adres Ekle')}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">Adres Başlığı</label>
+              <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder="Ev, İş, Depo vb." className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5 col-span-2 sm:col-span-1 lg:col-span-2">
+                <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">Ad Soyad / Firma</label>
+                <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="Kişi veya Firma adı" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+              </div>
+              <div className="space-y-1.5 col-span-2 sm:col-span-1 lg:col-span-2">
+                <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">Telefon</label>
+                <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+90 5XX XXX XX XX" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">Açık Adres</label>
+              <textarea value={form.full_address} onChange={(e) => setForm(f => ({ ...f, full_address: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-24 resize-y transition-all focus:bg-white" required />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">İl</label>
+                <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder="İl" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" required />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-steel-gray uppercase tracking-wider px-1">İlçe</label>
+                <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder="İlçe" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" required />
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-3 border-t border-gray-100">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center w-5 h-5 rounded border border-gray-300 group-hover:border-primary-navy transition-colors">
+                  <input type="checkbox" className="peer sr-only" checked={!!form.is_default_shipping} onChange={(e) => setForm(f => ({ ...f, is_default_shipping: e.target.checked }))} />
+                  <div className="absolute inset-0 bg-primary-navy opacity-0 peer-checked:opacity-100 rounded transition-opacity" />
+                  <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <button onClick={() => makeDefault(a.id, 'shipping')} className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50">{t('account.addresses.makeDefaultShipping')}</button>
-                  <button onClick={() => makeDefault(a.id, 'billing')} className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50">{t('account.addresses.makeDefaultBilling')}</button>
+                <span className="text-sm font-medium text-industrial-gray select-none">Varsayılan Teslimat Adresi</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative flex items-center justify-center w-5 h-5 rounded border border-gray-300 group-hover:border-primary-navy transition-colors">
+                  <input type="checkbox" className="peer sr-only" checked={!!form.is_default_billing} onChange={(e) => setForm(f => ({ ...f, is_default_billing: e.target.checked }))} />
+                  <div className="absolute inset-0 bg-primary-navy opacity-0 peer-checked:opacity-100 rounded transition-opacity" />
+                  <CheckCircle className="w-3.5 h-3.5 text-white absolute opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
-              </li>
-            ))}
-            {items.length === 0 && (
-              <li className="text-sm text-steel-gray">{t('account.addresses.noItems')}</li>
-            )}
-          </ul>
-        )}
+                <span className="text-sm font-medium text-industrial-gray select-none">Varsayılan Fatura Adresi</span>
+              </label>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-4">
+              <button disabled={saving} className="w-full bg-primary-navy hover:bg-industrial-gray text-white flex-1 px-4 py-3 rounded-xl font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                {isEditing ? (t('account.addresses.submit.update') || 'Güncelle') : (t('account.addresses.submit.add') || 'Kaydet')}
+              </button>
+              {isEditing && (
+                <button type="button" onClick={resetForm} className="w-full sm:w-auto px-4 py-3 rounded-xl border border-gray-200 text-industrial-gray font-bold hover:bg-gray-50 transition-colors">
+                  İptal
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </section>
 
-      <section className="bg-white border border-gray-100 rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-industrial-gray mb-3">{isEditing ? t('account.addresses.formTitleEdit') : t('account.addresses.formTitleNew')}</h2>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input value={form.label || ''} onChange={(e) => setForm(f => ({ ...f, label: e.target.value }))} placeholder={t('account.addresses.ph.label') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" />
-          <input value={form.full_name || ''} onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder={t('account.addresses.ph.fullName') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" />
-          <input value={form.phone || ''} onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))} placeholder={t('account.addresses.ph.phone') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" />
-          <textarea value={form.full_address} onChange={(e) => setForm(f => ({ ...f, full_address: e.target.value }))} placeholder={t('account.addresses.ph.address') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-24" required />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <input value={form.city} onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))} placeholder={t('account.addresses.ph.city') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" required />
-            <input value={form.district} onChange={(e) => setForm(f => ({ ...f, district: e.target.value }))} placeholder={t('account.addresses.ph.district') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" required />
-            <input value={form.postal_code || ''} onChange={(e) => setForm(f => ({ ...f, postal_code: e.target.value }))} placeholder={t('account.addresses.ph.postalCode') as string} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy" />
+      {/* Address List Area */}
+      <section className="flex-1 min-w-0">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-industrial-gray flex items-center gap-2">
+            <MapPin className="w-6 h-6 text-primary-navy" />
+            {t('account.addresses.title') || 'Kayıtlı Adreslerim'}
+          </h1>
+          <p className="text-sm text-steel-gray mt-1">Siparişlerinizde kolayca seçmek için adreslerinizi yönetin.</p>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center h-48 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+            <div className="flex flex-col items-center text-steel-gray gap-3">
+              <Loader2 className="w-6 h-6 animate-spin text-primary-navy" />
+              <span className="text-sm font-medium">Adresler yükleniyor...</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={!!form.is_default_shipping} onChange={(e) => setForm(f => ({ ...f, is_default_shipping: e.target.checked }))} />
-              {t('account.addresses.toggle.shippingDefault')}
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={!!form.is_default_billing} onChange={(e) => setForm(f => ({ ...f, is_default_billing: e.target.checked }))} />
-              {t('account.addresses.toggle.billingDefault')}
-            </label>
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center px-4">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+              <MapPin className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-lg font-bold text-industrial-gray mb-1">Henüz Adres Eklenmemiş</h3>
+            <p className="text-sm text-steel-gray max-w-sm">Sağ paneldeki formu kullanarak yeni bir teslimat veya fatura adresi ekleyebilirsiniz.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button disabled={saving} className="bg-primary-navy text-white px-4 py-2 rounded-lg disabled:opacity-60">{isEditing ? t('account.addresses.submit.update') : t('account.addresses.submit.add')}</button>
-            {isEditing && (
-              <button type="button" onClick={resetForm} className="px-4 py-2 rounded-lg border">{t('admin.ui.cancel') ?? 'Cancel'}</button>
-            )}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {items.map((a) => (
+              <div key={a.id} className="group bg-white border border-gray-200 hover:border-primary-navy/30 rounded-2xl shadow-sm hover:shadow relative overflow-hidden transition-all flex flex-col">
+                {/* Visual Header Indicator */}
+                <div className="h-1.5 w-full bg-gradient-to-r from-gray-200 to-gray-100 opacity-50 absolute top-0 left-0" />
+
+                <div className="p-5 flex-1 flex flex-col">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <h3 className="text-base font-bold text-industrial-gray flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-gray-400" />
+                      {a.label || 'Kayıtsız Başlık'}
+                    </h3>
+
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => startEdit(a)} className="text-gray-400 hover:text-primary-navy transition-colors" title={t('admin.ui.edit') || 'Düzenle'}>
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(a.id)} className="text-gray-400 hover:text-red-600 transition-colors" title={t('admin.ui.delete') || 'Sil'}>
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-3 mb-4 flex-1">
+                    {a.full_name && <div className="text-sm font-bold text-industrial-gray mb-1">{a.full_name}</div>}
+                    <div className="text-sm text-steel-gray font-medium leading-relaxed min-h-[40px] break-words whitespace-pre-line">
+                      {a.full_address}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2 flex items-center gap-1.5">
+                      {a.district}, {a.city} {a.postal_code || ''}
+                    </div>
+                    {a.phone && <div className="text-xs text-gray-500 mt-1">{a.phone}</div>}
+                  </div>
+
+                  {/* Badges and Default Toggles */}
+                  <div className="space-y-2 mt-auto">
+                    {/* Shipping Row */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                        <Truck className="w-3.5 h-3.5" /> Teslimat
+                      </div>
+                      {a.is_default_shipping ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                          <CheckCircle className="w-3 h-3" /> Varsayılan
+                        </span>
+                      ) : (
+                        <button onClick={() => makeDefault(a.id, 'shipping')} className="text-xs text-primary-navy hover:underline font-medium">
+                          Varsayılan Yap
+                        </button>
+                      )}
+                    </div>
+                    {/* Billing Row */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                        <CreditCard className="w-3.5 h-3.5" /> Fatura
+                      </div>
+                      {a.is_default_billing ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                          <CheckCircle className="w-3 h-3" /> Varsayılan
+                        </span>
+                      ) : (
+                        <button onClick={() => makeDefault(a.id, 'billing')} className="text-xs text-primary-navy hover:underline font-medium">
+                          Varsayılan Yap
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </form>
+        )}
       </section>
     </div>
   )
