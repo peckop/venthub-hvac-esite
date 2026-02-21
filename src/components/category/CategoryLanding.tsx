@@ -124,23 +124,12 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
         // Wait for state update and initial layout
         requestAnimationFrame(() => {
-            // Animasyonun biraz ilerlemesini bekle (350ms)
-            // ÖNEMLİ: getBoundingClientRect animasyon sırasında (height artarken) 'top' değerini yanlış verebilir.
-            // Bu yüzden hedefi 'productListRef'in o anki yerinden değil, 
-            // sayfa üzerindeki statik konumundan (window.pageYOffset + top) hesaplıyoruz.
+            // Animasyon sırasında yükseklik değişirken dahi tarayıcı scroll-margin kullanarak sayfanın başını kilitler
             setTimeout(() => {
-                const headerOffset = 80 // Sticky header payı (Optimize edildi)
                 const element = productListRef.current
                 if (!element) return
 
-                // Elemanın sayfa başından uzaklığı (statik)
-                const rect = element.getBoundingClientRect()
-                const targetY = rect.top + window.pageYOffset - headerOffset
-
-                window.scrollTo({
-                    top: targetY,
-                    behavior: 'smooth'
-                })
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' })
             }, 350)
         })
     }
@@ -157,14 +146,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         }
         setTimeout(() => {
             if (!subcategoryProductsRef.current) return
-            const headerOffset = 100
-            const elementPosition = subcategoryProductsRef.current.getBoundingClientRect().top
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            })
+            subcategoryProductsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }, 350)
     }
 
@@ -412,7 +394,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 {/* Expandable Product List Content */}
                 <div
                     ref={productListRef}
-                    className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                    className={`scroll-mt-24 ${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
                     style={{
                         maxHeight: showProducts ? '20000px' : '0',
                         minHeight: (showProducts && disableAnimation) ? '1000px' : '0'
