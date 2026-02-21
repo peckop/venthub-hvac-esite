@@ -327,7 +327,11 @@ const CategoryOrbitCarousel = () => {
         } else {
             // Alt kategoriye tıklandı - sayfaya git
             if (activeMainCategory) {
-                router.push(`/category/${activeMainCategory.id}/${itemId}`)
+                if (itemId === activeMainCategory.id) {
+                    router.push(`/category/${activeMainCategory.id}`)
+                } else {
+                    router.push(`/category/${activeMainCategory.id}/${itemId}`)
+                }
             }
         }
     }, [level, activeMainCategory, router])

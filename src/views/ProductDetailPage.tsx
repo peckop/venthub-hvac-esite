@@ -522,7 +522,7 @@ export const ProductDetailPage: React.FC = () => {
                 <Link href={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
                   {mainCategory.name}
                 </Link>
-                {subCategory && (
+                {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={16} className="text-steel-gray" />
                     <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
@@ -544,7 +544,7 @@ export const ProductDetailPage: React.FC = () => {
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
-            if (subCategory && mainCategory) {
+            if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
               router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
             } else if (mainCategory) {
               router.push(`/category/${mainCategory.slug}`)

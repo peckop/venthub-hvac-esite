@@ -268,7 +268,7 @@ export const CategoryPage: React.FC = () => {
 
 
 
-  const canonicalUrl = parentCategory
+  const canonicalUrl = (parentCategory && parentCategory.slug !== category.slug)
     ? `${origin}/category/${parentCategory.slug}/${category.slug}`
     : `${origin}/category/${category.slug}`
 
@@ -356,8 +356,8 @@ export const CategoryPage: React.FC = () => {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: t('category.breadcrumbHome'), item: `${origin}/` },
-              ...(parentCategory ? [{ '@type': 'ListItem', position: 2, name: getCategoryDisplayName(parentCategory), item: `${origin}/category/${parentCategory.slug}` }] : []),
-              { '@type': 'ListItem', position: parentCategory ? 3 : 2, name: getCategoryDisplayName(category), item: canonicalUrl },
+              ...(parentCategory && parentCategory.slug !== category.slug ? [{ '@type': 'ListItem', position: 2, name: getCategoryDisplayName(parentCategory), item: `${origin}/category/${parentCategory.slug}` }] : []),
+              { '@type': 'ListItem', position: (parentCategory && parentCategory.slug !== category.slug) ? 3 : 2, name: getCategoryDisplayName(category), item: canonicalUrl },
             ],
           }),
         }}
