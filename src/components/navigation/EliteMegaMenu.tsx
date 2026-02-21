@@ -94,7 +94,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                     {/* Subcategories Grid */}
                                     <div className="col-span-1">
                                         <ul className="grid grid-cols-2 gap-2">
-                                            {subs.map((sub) => (
+                                            {subs.filter(sub => sub.slug !== category.slug).map((sub) => (
                                                 <li key={sub.id}>
                                                     <Link
                                                         href={`/category/${category.slug}/${sub.slug}`}
@@ -212,7 +212,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
 
                                 {subs.length > 0 && isExpanded && (
                                     <div className="bg-slate-50 border-t border-slate-100 p-2 pl-4 space-y-1">
-                                        {subs.map((sub) => (
+                                        {subs.filter(sub => sub.slug !== category.slug).map((sub) => (
                                             <Link
                                                 key={sub.id}
                                                 href={`/category/${category.slug}/${sub.slug}`}

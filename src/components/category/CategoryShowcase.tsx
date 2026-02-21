@@ -196,7 +196,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {subCategories.map((sub) => (
+                    {subCategories.filter(sub => sub.slug !== category.slug).map((sub) => (
                         <Link
                             key={sub.id}
                             href={`/category/${category.slug}/${sub.slug}`}
