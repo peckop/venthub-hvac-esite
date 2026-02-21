@@ -5,15 +5,25 @@ import { supabase } from '../../../lib/supabase'
 export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('slug')
-    .eq('is_active', true)
-    .is('parent_id', null)
+  try {
+    const { data: categories } = await supabase
+      .from('categories')
+      .select('slug')
+      .eq('is_active', true)
+      .is('parent_id', null)
 
-  return (categories || []).map((c) => ({
-    categorySlug: c.slug,
-  }))
+    const paths = (categories || []).map((c) => ({
+      categorySlug: c.slug,
+    }))
+
+    if (paths.length === 0) {
+      return [{ categorySlug: 'generic' }]
+    }
+    return paths
+  } catch (e) {
+    console.error('generateStaticParams error for categories:', e)
+    return [{ categorySlug: 'generic' }]
+  }
 }
 
 export default function Page() {

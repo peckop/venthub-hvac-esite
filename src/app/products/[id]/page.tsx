@@ -4,14 +4,24 @@ import { supabase } from '../../../lib/supabase'
 export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const { data: products } = await supabase
-    .from('products')
-    .select('id')
-    .eq('status', 'active')
+  try {
+    const { data: products } = await supabase
+      .from('products')
+      .select('id')
+      .eq('status', 'active')
 
-  return (products || []).map((p) => ({
-    id: p.id,
-  }))
+    const paths = (products || []).map((p) => ({
+      id: p.id,
+    }))
+
+    if (paths.length === 0) {
+      return [{ id: 'generic' }]
+    }
+    return paths
+  } catch (e) {
+    console.error('generateStaticParams error for products:', e)
+    return [{ id: 'generic' }]
+  }
 }
 
 export default function Page() {
