@@ -39,6 +39,12 @@ export const useManualScrollRestoration = (loading: boolean) => {
         try {
             const saved = sessionStorage.getItem(`scroll_${pathname}`)
             if (saved) {
+                const isPop = sessionStorage.getItem('vh_is_pop') === 'true'
+                if (!isPop) {
+                    restoredRef.current = true
+                    return // Sadece POP (Geri/İleri) aksiyonunda restore et
+                }
+
                 const y = parseInt(saved, 10)
 
                 // DOM'un tam render olmasını bekle ve birden fazla deneme yap

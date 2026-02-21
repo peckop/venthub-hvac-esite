@@ -81,6 +81,18 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     React.useEffect(() => {
         if (typeof window === 'undefined') return
 
+        // 1. Native Tarayıcı Geri/İleri buton dinleyicisi
+        const handlePopState = () => {
+            sessionStorage.setItem('vh_is_pop', 'true')
+        }
+        window.addEventListener('popstate', handlePopState)
+
+        // 2. State temizliği (Gelecek PUSH navigasyonlarını etkilememesi için)
+        // Diğer bileşenlerin (useManualScrollRestoration) okumasına fırsat vermek için kısa bir delay ile sıfırlanır
+        const popResetTimeout = setTimeout(() => {
+            sessionStorage.setItem('vh_is_pop', 'false')
+        }, 800)
+
         // pathname + search + hash bilgisini tam olarak al
         const currentFullPath = window.location.pathname + window.location.search + window.location.hash
 
@@ -114,6 +126,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }
 
         sessionStorage.setItem('vh_nav_stack', JSON.stringify(stack))
+
+        return () => {
+            window.removeEventListener('popstate', handlePopState)
+            clearTimeout(popResetTimeout)
+        }
     }, [pathname])
 
     return (

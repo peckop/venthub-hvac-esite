@@ -544,6 +544,11 @@ export const ProductDetailPage: React.FC = () => {
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
+            // POP aksiyonu yapıldığını sisteme bildir (scroll restore için)
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('vh_is_pop', 'true');
+            }
+
             // Akıllı Navigasyon (Smart Stack): sessionStorage'daki durak geçmişini kontrol et
             let stack: string[] = [];
             try {
@@ -563,6 +568,7 @@ export const ProductDetailPage: React.FC = () => {
               router.push('/') // Tam fallback
             }
           }}
+
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
         >
           <ArrowLeft size={20} />
