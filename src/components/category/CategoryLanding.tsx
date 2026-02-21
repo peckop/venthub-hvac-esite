@@ -122,15 +122,17 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         window.history.replaceState(null, '', '#tum-modeller')
         window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-        // Wait for state update and initial layout
+        // Wait for React to apply state (e.g., removing subcategory section)
         requestAnimationFrame(() => {
-            // Animasyon sırasında yükseklik değişirken dahi tarayıcı scroll-margin kullanarak sayfanın başını kilitler
+            // Animasyon süresini beklemek yerine, DOM güncellenir güncellenmez
+            // Tıklamada ürünler açıldığında URL güncellenir
             setTimeout(() => {
-                const element = productListRef.current
-                if (!element) return
-
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            }, 350)
+                if (!selectedSubcategory) {
+                    // Sadece Tüm Modelleri incelerken products'a odaklan
+                    const anchor = document.getElementById('products-anchor')
+                    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+            }, 50)
         })
     }
 
@@ -145,9 +147,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
             window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
         setTimeout(() => {
-            if (!subcategoryProductsRef.current) return
-            subcategoryProductsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 350)
+            const anchor = document.getElementById('subcategory-anchor')
+            if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 50)
     }
 
     // Get products for selected subcategory
@@ -320,11 +322,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
                             {/* Section 6: Subcategory Products (In-Page Expansion) */}
                             {selectedSubcategory && (
-                                <div
-                                    ref={subcategoryProductsRef}
-                                    className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200"
-                                >
-                                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200">
+                                    <div id="subcategory-anchor" className="scroll-mt-24" />
+                                    <div ref={subcategoryProductsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                         {/* Section Header */}
                                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                                             <div>
@@ -391,10 +391,13 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     )
                 }
 
+                {/* Static Anchor for All Products */}
+                <div id="products-anchor" className="scroll-mt-24" />
+
                 {/* Expandable Product List Content */}
                 <div
                     ref={productListRef}
-                    className={`scroll-mt-24 ${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                    className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
                     style={{
                         maxHeight: showProducts ? '20000px' : '0',
                         minHeight: (showProducts && disableAnimation) ? '1000px' : '0'
