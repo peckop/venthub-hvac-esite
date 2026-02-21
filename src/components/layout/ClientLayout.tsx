@@ -93,42 +93,51 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             sessionStorage.setItem('vh_is_pop', 'false')
         }, 800)
 
-        // pathname + search + hash bilgisini tam olarak al
-        const currentFullPath = window.location.pathname + window.location.search + window.location.hash
+        // 3. Geçmiş Güncelleyici (Pathname veya Hash değiştiğinde tetiklenir)
+        const updateStack = () => {
+            // pathname + search + hash bilgisini tam olarak al
+            const currentFullPath = window.location.pathname + window.location.search + window.location.hash
 
-        // Ürün sayfaları "durak" sayfası sayılmaz, hiyerarşiyi bozmamak için diziye eklenmezler.
-        if (currentFullPath.includes('/products/')) return
+            // Ürün sayfaları "durak" sayfası sayılmaz, hiyerarşiyi bozmamak için diziye eklenmezler.
+            if (currentFullPath.includes('/products/')) return
 
-        let stack: string[] = [];
-        try {
-            stack = JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]');
-        } catch { stack = []; }
+            let stack: string[] = [];
+            try {
+                stack = JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]');
+            } catch { stack = []; }
 
-        const lastItem = stack[stack.length - 1]
-        const secondLastItem = stack[stack.length - 2]
+            const lastItem = stack[stack.length - 1]
+            const secondLastItem = stack[stack.length - 2]
 
-        // SADECE pathname değiştiğinde veya yeni bir hash eklendiğinde işlem yap
-        if (currentFullPath === lastItem) return
+            // SADECE pathname değiştiğinde veya yeni bir hash eklendiğinde işlem yap
+            if (currentFullPath === lastItem) return
 
-        if (currentFullPath === secondLastItem) {
-            // Geri gelmişiz (Hiyerarşide bir üst basamak), mevcut durağı temizle
-            stack.pop()
-        } else {
-            // Yeni bir durak veya mevcut durağın hash güncellemesi
-            // Eğer sadece hash değiştiyse (aynı pathname), son elemanı güncelle
-            if (lastItem && lastItem.split('#')[0] === currentFullPath.split('#')[0]) {
-                stack[stack.length - 1] = currentFullPath
+            if (currentFullPath === secondLastItem) {
+                // Geri gelmişiz (Hiyerarşide bir üst basamak), mevcut durağı temizle
+                stack.pop()
             } else {
-                // Tamamen yeni bir sayfa, stack'e ekle
-                stack.push(currentFullPath)
+                // Yeni bir durak veya mevcut durağın hash güncellemesi
+                // Eğer sadece hash değiştiyse (aynı pathname), son elemanı güncelle
+                if (lastItem && lastItem.split('#')[0] === currentFullPath.split('#')[0]) {
+                    stack[stack.length - 1] = currentFullPath
+                } else {
+                    // Tamamen yeni bir sayfa, stack'e ekle
+                    stack.push(currentFullPath)
+                }
+                if (stack.length > 10) stack.shift()
             }
-            if (stack.length > 10) stack.shift()
+
+            sessionStorage.setItem('vh_nav_stack', JSON.stringify(stack))
         }
 
-        sessionStorage.setItem('vh_nav_stack', JSON.stringify(stack))
+        updateStack()
+
+        // Hash değişikliklerini de dinle
+        window.addEventListener('hashchange', updateStack)
 
         return () => {
             window.removeEventListener('popstate', handlePopState)
+            window.removeEventListener('hashchange', updateStack)
             clearTimeout(popResetTimeout)
         }
     }, [pathname])
