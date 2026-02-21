@@ -46,24 +46,31 @@ export const useManualScrollRestoration = (loading: boolean) => {
                 }
 
                 const y = parseInt(saved, 10)
+                if (y === 0) {
+                    restoredRef.current = true
+                    return
+                }
 
                 // DOM'un tam render olmasını bekle ve birden fazla deneme yap
                 const restoreScroll = (attempt = 0) => {
+                    if (attempt >= 15) return // Max deneme sayısına ulaşıldı
+
                     requestAnimationFrame(() => {
                         window.scrollTo(0, y)
 
-                        // Eğer sayfa yüksekliği yeterli değilse ve henüz max deneme sayısına ulaşmadıysak tekrar dene
-                        if (attempt < 5 && document.documentElement.scrollHeight < y + window.innerHeight) {
+                        // Eğer sayfa yüksekliği yeterli değilse (DOM henüz uzamadıysa) tekrar dene
+                        // attempt < 15: Yaklaşık 2 saniye boyunca denemeye devam eder (Görsellerin yüklenmesi vs için)
+                        if (document.documentElement.scrollHeight < y + window.innerHeight) {
                             setTimeout(() => restoreScroll(attempt + 1), 100)
+                        } else {
+                            // Hedef yüksekliğe ulaşıldı, bir kez daha kesinleştir
+                            setTimeout(() => window.scrollTo(0, y), 50)
                         }
                     })
                 }
 
-                // İlk deneme
-                restoreScroll()
-
-                // Garantili son deneme (görseller ve layout shift için)
-                setTimeout(() => window.scrollTo(0, y), 300)
+                // İlk deneme - Çocuk bileşenlerin (useEffect/Hash) işlerini bitirmesi için biraz daha süre tanı
+                setTimeout(() => restoreScroll(), 100)
             }
         } catch { }
 

@@ -88,10 +88,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         window.addEventListener('popstate', handlePopState)
 
         // 2. State temizliği (Gelecek PUSH navigasyonlarını etkilememesi için)
-        // Diğer bileşenlerin (useManualScrollRestoration) okumasına fırsat vermek için kısa bir delay ile sıfırlanır
+        // Diğer bileşenlerin (useManualScrollRestoration) okumasına fırsat vermek için delay ile sıfırlanır
+        // 2000ms: Yavaş bağlantılarda ve uzun sayfalarda restorasyonun tamamlanması için güvenli süre
         const popResetTimeout = setTimeout(() => {
             sessionStorage.setItem('vh_is_pop', 'false')
-        }, 800)
+        }, 2000)
 
         // 3. Geçmiş Güncelleyici (Pathname veya Hash değiştiğinde tetiklenir)
         const updateStack = () => {
