@@ -87,13 +87,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }
         window.addEventListener('popstate', handlePopState)
 
-        // 2. State temizliği (Gelecek PUSH navigasyonlarını etkilememesi için)
-        // Diğer bileşenlerin (useManualScrollRestoration) okumasına fırsat vermek için delay ile sıfırlanır
-        // 2000ms: Yavaş bağlantılarda ve uzun sayfalarda restorasyonun tamamlanması için güvenli süre
-        const popResetTimeout = setTimeout(() => {
-            sessionStorage.setItem('vh_is_pop', 'false')
-        }, 2000)
-
         // 3. Geçmiş Güncelleyici (Pathname veya Hash değiştiğinde tetiklenir)
         const updateStack = () => {
             // pathname + search + hash bilgisini tam olarak al
@@ -139,8 +132,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         return () => {
             window.removeEventListener('popstate', handlePopState)
             window.removeEventListener('hashchange', updateStack)
-            clearTimeout(popResetTimeout)
         }
+    }, [])
+
+    // 2. State Temizliği (Her sayfa veya hash değişiminde 2.5s sonra vh_is_pop resetlenir)
+    // Böylece PUSH aksiyonları "stale" POP statüsünden etkilenmemiş olur
+    React.useEffect(() => {
+        const popResetTimeout = setTimeout(() => {
+            sessionStorage.setItem('vh_is_pop', 'false')
+        }, 2500) // Animasyonların ve scroll kurtarmanın (2 saniye) kesinlikle bitmesini bekle
+
+        return () => clearTimeout(popResetTimeout)
     }, [pathname])
 
     return (
