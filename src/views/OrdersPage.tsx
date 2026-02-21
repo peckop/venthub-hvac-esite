@@ -102,6 +102,10 @@ export const OrdersPage: React.FC = () => {
 
       if (ordersError) {
         console.error('Error fetching orders:', ordersError)
+        // 403 Forbidden error usually means RLS permission issue
+        if (ordersError.code === '42501' || (ordersError as any).status === 403) {
+          console.warn('RLS Permission denied. Please ensure DB migrations are applied.')
+        }
         toast.error(t('orders.fetchError'))
         return
       }
