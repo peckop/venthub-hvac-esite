@@ -112,7 +112,7 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
         {/* Bottom CTA */}
         <div className="text-center mt-12">
           <Link
-            href="/products?all=1"
+            href="/products"
             className="inline-flex items-center px-8 py-4 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors group"
           >
             <span>{t('common.seeAllProducts')}</span>
