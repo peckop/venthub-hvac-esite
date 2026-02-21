@@ -9,7 +9,11 @@ const ScrollToTop = () => {
   const pathname = usePathname()
 
   useLayoutEffect(() => {
-    // Hash anchor varsa (/#section) scroll'u engellemeyelim
+    // 1. Geri dönüş (POP) navigasyonu ise scroll'u sıfırlama (Restorasyona izin ver)
+    const isPop = typeof window !== 'undefined' && sessionStorage.getItem('vh_is_pop') === 'true'
+    if (isPop) return
+
+    // 2. Hash anchor varsa (/#section) scroll'u engellemeyelim
     if (window.location.hash) return
 
     // Instant scroll, smooth değil — gezinme sonrası titreme olmasın
