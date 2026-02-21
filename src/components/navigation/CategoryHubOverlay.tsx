@@ -184,7 +184,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                     {selectedCategory ? (
                         /* Alt Kategoriler Grid - ARTIK 3D KARTLAR */
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {subCategories.map((subCat) => (
+                            {subCategories.filter(subCat => subCat.slug !== selectedCategory.slug).map((subCat) => (
                                 <CategoryCard3D
                                     key={subCat.id}
                                     category={subCat}
