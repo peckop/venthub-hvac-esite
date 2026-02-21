@@ -9,7 +9,6 @@ export async function generateStaticParams() {
       .from('categories')
       .select('slug')
       .eq('is_active', true)
-      .is('parent_id', null)
 
     const paths = (categories || []).map((c) => ({
       categorySlug: c.slug,
@@ -20,7 +19,7 @@ export async function generateStaticParams() {
     }
     return paths
   } catch (e) {
-    console.error('generateStaticParams error for categories:', e)
+    console.error('generateStaticParams error for all categories:', e)
     return [{ categorySlug: 'generic' }]
   }
 }
