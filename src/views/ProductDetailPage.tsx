@@ -544,12 +544,19 @@ export const ProductDetailPage: React.FC = () => {
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
-            if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
+            // Akıllı Navigasyon: Eğer kullanıcı site içinden gelmişse geri git, yoksa kategoriye dön
+            const hasInternalReferrer = typeof document !== 'undefined' &&
+              document.referrer &&
+              document.referrer.includes(window.location.host);
+
+            if (hasInternalReferrer) {
+              router.back();
+            } else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
               router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
             } else if (mainCategory) {
               router.push(`/category/${mainCategory.slug}`)
             } else {
-              router.back() // fallback
+              router.push('/') // Tam fallback
             }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
