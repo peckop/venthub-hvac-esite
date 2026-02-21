@@ -544,12 +544,17 @@ export const ProductDetailPage: React.FC = () => {
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
-            // Akıllı Navigasyon (Smart Back): sessionStorage'daki gerçek geçmişi kontrol et
-            const prevPath = typeof window !== 'undefined' ? sessionStorage.getItem('vh_prev_path') : null;
+            // Akıllı Navigasyon (Smart Stack): sessionStorage'daki durak geçmişini kontrol et
+            let stack: string[] = [];
+            try {
+              stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : [];
+            } catch { stack = []; }
 
-            if (prevPath && !prevPath.includes('/products/')) {
-              // Eğer bir önceki sayfa ürün detayı değilse doğrudan oraya git
-              router.push(prevPath);
+            const lastSafeStop = stack[stack.length - 1];
+
+            if (lastSafeStop) {
+              // Eğer bir durak geçmişi varsa (Home, Kategori vb.) oraya git
+              router.push(lastSafeStop);
             } else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
               router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
             } else if (mainCategory) {
