@@ -170,3 +170,6 @@ export const ExproofFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

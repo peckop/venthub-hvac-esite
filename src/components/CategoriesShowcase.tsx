@@ -125,3 +125,6 @@ export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categori
 }
 
 export default CategoriesShowcase
+
+
+

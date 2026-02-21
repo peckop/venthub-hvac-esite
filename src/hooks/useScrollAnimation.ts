@@ -76,3 +76,6 @@ export const scrollAnimationClasses = {
 }
 
 export default useScrollAnimation
+
+
+

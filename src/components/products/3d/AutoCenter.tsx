@@ -58,3 +58,6 @@ export const AutoCenter: React.FC<{ children: React.ReactNode; enabled?: boolean
 
     return <group ref={groupRef}>{children}</group>
 }
+
+
+

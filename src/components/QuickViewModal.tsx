@@ -62,3 +62,6 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, open, onClose 
 
 export default QuickViewModal
 
+
+
+

@@ -82,3 +82,6 @@ export const PlugFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

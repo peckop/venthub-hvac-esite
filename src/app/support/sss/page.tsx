@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/support/FAQPage'
+import PageComponent from '../../../views/support/FAQPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

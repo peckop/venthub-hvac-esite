@@ -108,3 +108,6 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
     }
 }
 
+
+
+

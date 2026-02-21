@@ -35,3 +35,6 @@ export const getCategoryDescription = (category: Category | null | undefined): s
 
     return category.description || ''
 }
+
+
+

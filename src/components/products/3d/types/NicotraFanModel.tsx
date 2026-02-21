@@ -103,3 +103,6 @@ export const NicotraFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

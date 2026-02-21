@@ -20,3 +20,6 @@ export function buildWhatsAppLink(phone: string, text: string) {
     return `https://wa.me/${p}`
   }
 }
+
+
+

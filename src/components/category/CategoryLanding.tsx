@@ -493,3 +493,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 }
 
 export default CategoryLanding
+
+
+

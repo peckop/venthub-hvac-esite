@@ -292,3 +292,6 @@ export const RoofFanModel: React.FC = () => {
         </group >
     )
 }
+
+
+

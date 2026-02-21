@@ -8,3 +8,6 @@ export function formatCurrency(value: number, lang: 'tr' | 'en', options: Intl.N
     return '₺' + String(Math.round(value))
   }
 }
+
+
+

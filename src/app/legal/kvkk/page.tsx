@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/legal/KVKKPage'
+import PageComponent from '../../../views/legal/KVKKPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

@@ -48,3 +48,6 @@ export function getProductsUrlFromTopic(topicSlug: string): string {
     const appKey = TOPIC_TO_APP_KEY[topicSlug]
     return appKey ? getApplicationProductsUrl(appKey) : '/products#applications'
 }
+
+
+

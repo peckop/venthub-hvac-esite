@@ -735,3 +735,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 }
 
 export default StickyHeader
+
+
+

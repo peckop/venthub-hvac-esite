@@ -136,3 +136,6 @@ export const SnailHousing: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
         </group>
     )
 }
+
+
+

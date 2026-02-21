@@ -66,3 +66,6 @@ export const DomesticFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

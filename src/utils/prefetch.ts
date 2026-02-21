@@ -5,6 +5,9 @@ export function prefetchProductsPage() {
   flags.products = true
   try {
     // Vite will prefetch/cache the chunk; navigation becomes instant
-    import('../pages/ProductsPage')
+    import('../views/ProductsPage')
   } catch {}
 }
+
+
+

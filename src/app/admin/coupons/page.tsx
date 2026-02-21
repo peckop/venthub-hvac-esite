@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/admin/AdminCouponsPage'
+import PageComponent from '../../../views/admin/AdminCouponsPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

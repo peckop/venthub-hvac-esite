@@ -58,3 +58,6 @@ export function getActiveApplicationCards(): ApplicationCard[] {
   return APPLICATION_CARDS.filter((c) => c.active)
 }
 
+
+
+
