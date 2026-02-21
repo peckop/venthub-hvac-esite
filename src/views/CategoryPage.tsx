@@ -410,12 +410,15 @@ export const CategoryPage: React.FC = () => {
           {/* Geri Butonu */}
           <button
             onClick={() => {
-              const prevPath = typeof window !== 'undefined' ? sessionStorage.getItem('vh_prev_path') : null;
-              if (prevPath) {
-                navigate.push(prevPath);
-              } else {
-                navigate.push('/');
-              }
+              let stack: string[] = [];
+              try {
+                stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : [];
+              } catch { stack = []; }
+
+              // Mevcut sayfa stack'in en üstündeyse (normal durum), bir altındaki durağa git.
+              const prevPath = stack.length >= 2 ? stack[stack.length - 2] : '/';
+
+              navigate.push(prevPath);
             }}
             className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
           >
