@@ -124,9 +124,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
         // Wait for state update and initial layout
         requestAnimationFrame(() => {
-            // Give a slight buffer for the expansion to register visually
+            // Animasyonun (500ms) ortasını bekle ki yükseklik biraz oluşsun (Merkezleme sorunu çözümü)
             setTimeout(() => {
-                const headerOffset = 100 // Adjust based on sticky header height if any
+                const headerOffset = 100 // Sticky header payı
                 const element = productListRef.current
                 if (!element) return
 
@@ -137,7 +137,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     top: offsetPosition,
                     behavior: 'smooth'
                 })
-            }, 50)
+            }, 250)
         })
     }
 
@@ -152,8 +152,16 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
             window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
         setTimeout(() => {
-            subcategoryProductsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 100)
+            if (!subcategoryProductsRef.current) return
+            const headerOffset = 100
+            const elementPosition = subcategoryProductsRef.current.getBoundingClientRect().top
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            })
+        }, 350)
     }
 
     // Get products for selected subcategory
