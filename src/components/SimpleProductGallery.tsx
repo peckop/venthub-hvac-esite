@@ -39,3 +39,6 @@ const SimpleProductGallery: React.FC = () => {
 }
 
 export default SimpleProductGallery
+
+
+

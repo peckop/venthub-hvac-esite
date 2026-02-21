@@ -89,3 +89,6 @@ const EducationalGuide: React.FC<EducationalGuideProps> = ({ categorySlug }) => 
 }
 
 export default EducationalGuide
+
+
+

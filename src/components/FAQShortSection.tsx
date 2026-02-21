@@ -48,3 +48,6 @@ const FAQShortSection: React.FC = () => {
 
 export default FAQShortSection
 
+
+
+

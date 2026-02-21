@@ -152,3 +152,6 @@ const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, positi
 export default BentPlaneGeometry
 
 
+
+
+

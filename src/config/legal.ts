@@ -44,3 +44,6 @@ const legalConfig: LegalConfig = {
 
 export default legalConfig
 
+
+
+

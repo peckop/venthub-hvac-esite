@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../pages/ContactPage'
+import PageComponent from '../../views/ContactPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

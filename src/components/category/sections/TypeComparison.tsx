@@ -185,3 +185,6 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 }
 
 export default TypeComparison
+
+
+

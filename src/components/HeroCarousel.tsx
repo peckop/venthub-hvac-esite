@@ -220,3 +220,6 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
         </div>
     )
 }
+
+
+

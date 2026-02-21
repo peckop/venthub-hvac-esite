@@ -112,3 +112,6 @@ export const RectangularDuctFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

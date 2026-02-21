@@ -175,3 +175,6 @@ export const SnailFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

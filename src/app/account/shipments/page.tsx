@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/account/AccountShipmentsPage'
+import PageComponent from '../../../views/account/AccountShipmentsPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

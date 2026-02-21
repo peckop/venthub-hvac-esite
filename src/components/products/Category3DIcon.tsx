@@ -341,3 +341,6 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1
 }
 
 export default Category3DIcon
+
+
+

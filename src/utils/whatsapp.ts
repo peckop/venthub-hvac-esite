@@ -120,3 +120,6 @@ export function getSupportLink(subject?: string): string | null {
   const message = generateSupportMessage(subject)
   return createWhatsAppLink(phone, message)
 }
+
+
+
