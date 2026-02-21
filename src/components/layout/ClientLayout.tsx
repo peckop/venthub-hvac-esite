@@ -81,10 +81,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     React.useEffect(() => {
         if (typeof window === 'undefined') return
 
-        const currentPath = window.location.pathname + window.location.search
+        // pathname + search + hash bilgisini tam olarak al
+        const currentFullPath = window.location.pathname + window.location.search + window.location.hash
 
-        // Ürün sayfaları "durak" sayfası sayılmaz, geçmiş dizinine eklenmezler.
-        if (currentPath.includes('/products/')) return
+        // Ürün sayfaları "durak" sayfası sayılmaz, hiyerarşiyi bozmamak için diziye eklenmezler.
+        if (currentFullPath.includes('/products/')) return
 
         let stack: string[] = [];
         try {
@@ -94,17 +95,21 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         const lastItem = stack[stack.length - 1]
         const secondLastItem = stack[stack.length - 2]
 
-        if (currentPath === lastItem) {
-            // Aynı sayfadayız (refresh vb.)
-            return
-        }
+        // SADECE pathname değiştiğinde veya yeni bir hash eklendiğinde işlem yap
+        if (currentFullPath === lastItem) return
 
-        if (currentPath === secondLastItem) {
-            // Geri gelmişiz, sonuncu duraktan çık
+        if (currentFullPath === secondLastItem) {
+            // Geri gelmişiz (Hiyerarşide bir üst basamak), mevcut durağı temizle
             stack.pop()
         } else {
-            // Yeni bir durağa gelmişiz, ekle
-            stack.push(currentPath)
+            // Yeni bir durak veya mevcut durağın hash güncellemesi
+            // Eğer sadece hash değiştiyse (aynı pathname), son elemanı güncelle
+            if (lastItem && lastItem.split('#')[0] === currentFullPath.split('#')[0]) {
+                stack[stack.length - 1] = currentFullPath
+            } else {
+                // Tamamen yeni bir sayfa, stack'e ekle
+                stack.push(currentFullPath)
+            }
             if (stack.length > 10) stack.shift()
         }
 
