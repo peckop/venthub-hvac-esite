@@ -77,77 +77,34 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const isAirCurtain = category.slug === 'hava-perdeleri'
 
-    // Track if we're restoring from URL hash (to auto-scroll after)
+    // Track if we're restoring from URL hash
     const isRestoringFromHash = useRef(false)
 
     // Restore state from URL hash on mount or back navigation
     useEffect(() => {
-        const hash = window.location.hash.slice(1) // Remove the '#' prefix
+        const checkHash = () => {
+            const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
 
-        if (hash === 'tum-modeller') {
-            // "Modelleri İncele" durumunu geri yükle
-            isRestoringFromHash.current = true
-            setShowProducts(true)
-            setSelectedSubcategory(null)
-        } else if (hash && subCategories.length > 0) {
-            const matchedSubcat = subCategories.find(s => s.slug === hash)
-            if (matchedSubcat) {
-                isRestoringFromHash.current = true
-                setSelectedSubcategory(matchedSubcat.id)
-                setShowProducts(false)
+            if (hash === 'tum-modeller') {
+                setShowProducts(true)
+                setSelectedSubcategory(null)
+            } else if (hash && subCategories.length > 0) {
+                const matchedSubcat = subCategories.find(s => s.slug === hash)
+                if (matchedSubcat) {
+                    setSelectedSubcategory(matchedSubcat.id)
+                    setShowProducts(false)
+                }
             }
         }
+
+        checkHash()
+        // URL hash değişimlerini de dinle (SPA içi navigasyon için)
+        window.addEventListener('hashchange', checkHash)
+        return () => window.removeEventListener('hashchange', checkHash)
     }, [subCategories])
 
-    // Auto-scroll to products section when restored from hash (after DOM render)
-    useEffect(() => {
-        if ((selectedSubcategory || showProducts) && isRestoringFromHash.current) {
-            isRestoringFromHash.current = false
-
-            // Scroll fonksiyonu - position hesaplayıp scroll yapar
-            const scrollToTarget = () => {
-                const targetRef = showProducts
-                    ? productListRef.current
-                    : subcategoryProductsRef.current
-
-                if (targetRef) {
-                    const headerOffset = 80
-                    const elementPosition = targetRef.getBoundingClientRect().top
-                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-
-                    window.scrollTo({
-                        top: Math.max(0, offsetPosition),
-                        behavior: 'auto'
-                    })
-                    return true
-                }
-                return false
-            }
-
-            // Strateji: Birden fazla scroll denemesi yap (layout shifts için)
-            // 1. İlk scroll - immediate
-            // 2. İkinci scroll - 300ms sonra (layout stabilize olduktan sonra)
-            // 3. Üçüncü scroll - 600ms sonra (görseller yüklendikten sonra)
-
-            let attempts = 0
-            const maxAttempts = 20
-
-            const tryInitialScroll = () => {
-                attempts++
-
-                if (scrollToTarget()) {
-                    // Layout stabilize olduktan sonra tekrar scroll
-                    setTimeout(() => scrollToTarget(), 300)
-                    setTimeout(() => scrollToTarget(), 600)
-                } else if (attempts < maxAttempts) {
-                    setTimeout(tryInitialScroll, 100)
-                }
-            }
-
-            // 100ms sonra başla - React render tamamlansın
-            setTimeout(tryInitialScroll, 100)
-        }
-    }, [selectedSubcategory, showProducts])
+    // REMOVED: Auto-scroll to products section when restored from hash
+    // (User wants to land at the top/hero first, even when state is restored)
 
     const handleShowProducts = () => {
         setShowProducts(true)
