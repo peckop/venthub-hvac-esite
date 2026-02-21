@@ -409,7 +409,14 @@ export const CategoryPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Geri Butonu */}
           <button
-            onClick={() => navigate.back()}
+            onClick={() => {
+              const prevPath = typeof window !== 'undefined' ? sessionStorage.getItem('vh_prev_path') : null;
+              if (prevPath) {
+                navigate.push(prevPath);
+              } else {
+                navigate.push('/');
+              }
+            }}
             className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
           >
             <ArrowLeft size={20} />
