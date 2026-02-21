@@ -1,5 +1,7 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -95,8 +97,8 @@ interface SupabaseError {
 }
 
 export default function OrderDetailPage() {
-  const params = useParams()
-  const id = params?.id as string
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id') as string
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
@@ -108,7 +110,7 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push(`/auth/login?redirect=/account/orders/${id}`)
+      router.push(`/auth/login?redirect=/account/orders/detail?id=${id}`)
       return
     }
   }, [authLoading, user, id, router])

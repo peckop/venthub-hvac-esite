@@ -4,7 +4,16 @@ import { AuthContext } from '../contexts/AuthContextDefinition'
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    // Statik build veya izole ortamlar için güvenli geri dönüş
+    return {
+      user: null,
+      session: null,
+      loading: false,
+      signIn: async () => ({ error: { message: 'Auth not available' } }),
+      signUp: async () => ({ error: { message: 'Auth not available' } }),
+      signOut: async () => { },
+      resetPassword: async () => ({ error: { message: 'Auth not available' } })
+    }
   }
   return context
 }

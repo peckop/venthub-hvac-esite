@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -160,7 +162,7 @@ export const OrdersPage: React.FC = () => {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/login?redirect=/orders')
+      router.push('/auth/login?redirect=/account/orders')
       return
     }
 
@@ -387,7 +389,7 @@ export const OrdersPage: React.FC = () => {
                         </span>
                       )}
                       <button
-                        onClick={() => router.push(`/account/orders/${order.id}`)}
+                        onClick={() => router.push(`/account/orders/detail?id=${order.id}`)}
                         className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
                       >
                         <Eye size={20} />

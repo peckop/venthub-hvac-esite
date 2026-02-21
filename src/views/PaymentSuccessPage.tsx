@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -257,7 +259,7 @@ export const PaymentSuccessPage: React.FC = () => {
         </div>
         <div className="space-y-3">
           <Link
-            href={`/account/orders/${encodeURIComponent(searchParams?.get('orderId') || '')}`}
+            href={`/account/orders/detail?id=${encodeURIComponent(searchParams?.get('orderId') || '')}`}
             className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
             {t('payment.viewOrderDetails')}

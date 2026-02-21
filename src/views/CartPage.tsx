@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { useCart } from '../hooks/useCartHook'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
