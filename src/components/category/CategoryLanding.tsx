@@ -103,7 +103,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         window.addEventListener('hashchange', checkHash)
 
         // İlk yüklemede layout shift olmaması için animasyonu kısa süre sonra aç
-        const animTimer = setTimeout(() => setDisableAnimation(false), 100)
+        // 300ms: useManualScrollRestoration'ın ilk denemeleri için yeterli süreyi tanı
+        const animTimer = setTimeout(() => setDisableAnimation(false), 300)
 
         return () => {
             window.removeEventListener('hashchange', checkHash)
@@ -399,7 +400,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 {/* Expandable Product List Content */}
                 <div
                     ref={productListRef}
-                    className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'max-h-[10000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                    className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
+                    style={{
+                        maxHeight: showProducts ? '20000px' : '0',
+                        minHeight: (showProducts && disableAnimation) ? '1000px' : '0'
+                    }}
                 >
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
