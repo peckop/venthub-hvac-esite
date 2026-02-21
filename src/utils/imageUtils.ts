@@ -29,3 +29,6 @@ export const compressImage = async (file: File): Promise<Blob> => {
         reader.onerror = (error) => reject(error)
     })
 }
+
+
+

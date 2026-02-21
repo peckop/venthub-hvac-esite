@@ -55,3 +55,5 @@ export async function fetchHomeProducts(limit: number = 36) {
 
   return { featured, list }
 }
+
+

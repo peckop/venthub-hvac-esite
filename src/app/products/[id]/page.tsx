@@ -1,6 +1,6 @@
 'use client'
 
-import PageComponent from '../../../pages/ProductDetailPage'
+import PageComponent from '../../../views/ProductDetailPage'
 
 export default function Page() {
   return <PageComponent />

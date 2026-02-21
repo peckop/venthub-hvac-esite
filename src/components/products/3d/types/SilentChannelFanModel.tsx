@@ -446,3 +446,6 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
         </group>
     )
 }
+
+
+

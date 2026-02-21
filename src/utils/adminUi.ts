@@ -9,3 +9,6 @@ export const adminCardPaddedClass = `${adminCardClass} p-4`
 export const adminTableHeadCellClass = 'text-left p-3 text-xs font-medium text-industrial-gray uppercase tracking-wide'
 export const adminTableCellClass = 'p-3 text-steel-gray'
 export const adminButtonPrimaryClass = 'px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90'
+
+
+

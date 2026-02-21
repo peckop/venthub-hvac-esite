@@ -191,3 +191,6 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
         </group>
     )
 }
+
+
+

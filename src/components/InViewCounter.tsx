@@ -72,3 +72,6 @@ const InViewCounter: React.FC<CounterProps> = ({ label, to, suffix = '', duratio
 
 export default InViewCounter
 
+
+
+

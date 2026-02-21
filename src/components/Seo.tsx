@@ -105,3 +105,6 @@ const Seo: React.FC<SeoProps> = ({ title, description, canonical, noindex, image
 }
 
 export default Seo
+
+
+

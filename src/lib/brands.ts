@@ -14,3 +14,6 @@ export const HVAC_BRANDS: HVACBrand[] = [
   { name: 'Flexiva', slug: 'flexiva', description: 'Esnek kanal sistemleri', country: 'EU' },
   { name: 'Danfoss', slug: 'danfoss', description: 'İskandinav kontrol teknolojisi', country: 'DK' },
 ]
+
+
+

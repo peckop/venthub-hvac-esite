@@ -28,3 +28,6 @@ const SpotlightHeroOverlay: React.FC<{ radius?: number; intensity?: number }> = 
 
 export default SpotlightHeroOverlay
 
+
+
+

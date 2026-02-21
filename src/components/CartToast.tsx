@@ -146,3 +146,6 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
 }
 
 export default CartToast
+
+
+

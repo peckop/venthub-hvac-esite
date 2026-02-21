@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/legal/TermsOfUsePage'
+import PageComponent from '../../../views/legal/TermsOfUsePage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

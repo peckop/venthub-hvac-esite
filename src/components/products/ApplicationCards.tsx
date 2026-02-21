@@ -84,3 +84,6 @@ const ApplicationCards: React.FC = () => {
 }
 
 export default ApplicationCards
+
+
+

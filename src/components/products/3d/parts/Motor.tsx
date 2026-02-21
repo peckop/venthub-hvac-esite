@@ -69,3 +69,6 @@ export const Motor: React.FC<MotorProps> = ({ scale = 1, color = 'galvanized', s
         </group>
     )
 }
+
+
+

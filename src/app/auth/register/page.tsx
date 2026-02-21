@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/RegisterPage'
+import PageComponent from '../../../views/RegisterPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

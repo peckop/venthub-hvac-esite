@@ -97,3 +97,6 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
         </group>
     )
 }
+
+
+

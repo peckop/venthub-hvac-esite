@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/legal/DistanceSalesAgreementPage'
+import PageComponent from '../../../views/legal/DistanceSalesAgreementPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

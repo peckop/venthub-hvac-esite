@@ -280,3 +280,6 @@ export function getModelPlacement(
         scale: placement.scale || 1
     };
 }
+
+
+

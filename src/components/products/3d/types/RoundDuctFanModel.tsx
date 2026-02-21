@@ -105,3 +105,6 @@ export const RoundDuctFanModel: React.FC = () => {
         </group>
     )
 }
+
+
+

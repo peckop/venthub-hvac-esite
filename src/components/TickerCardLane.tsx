@@ -58,3 +58,6 @@ const TickerCardLane: React.FC<Props> = ({ items, speed = 1.4, gap = 12, width =
 }
 
 export default TickerCardLane
+
+
+

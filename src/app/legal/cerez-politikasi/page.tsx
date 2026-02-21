@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../../pages/legal/CookiePolicyPage'
+import PageComponent from '../../../views/legal/CookiePolicyPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

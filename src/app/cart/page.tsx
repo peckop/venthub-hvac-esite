@@ -1,7 +1,10 @@
 'use client'
 
-import PageComponent from '../../pages/CartPage'
+import PageComponent from '../../views/CartPage'
 
 export default function Page() {
   return <PageComponent />
 }
+
+
+

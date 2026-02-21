@@ -162,3 +162,6 @@ export const Recommendations: React.FC<RecommendationsProps> = ({
 }
 
 export default ResultCard
+
+
+
