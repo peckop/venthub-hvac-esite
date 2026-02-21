@@ -125,7 +125,7 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
                 ...sub,
                 parentSlug: parent?.slug || ''
             }
-        }).filter(s => s.parentSlug) // Sadece parent'ı olanlar
+        }).filter(s => s.parentSlug && s.slug !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
     }, [categories])
 
     // İki lane için alt kategorileri böl

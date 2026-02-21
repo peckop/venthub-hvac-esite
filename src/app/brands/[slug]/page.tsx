@@ -1,7 +1,6 @@
 import PageComponent from '../../../views/BrandDetailPage'
 import { supabase } from '../../../lib/supabase'
 
-export const dynamicParams = false
 
 export async function generateStaticParams() {
   try {
