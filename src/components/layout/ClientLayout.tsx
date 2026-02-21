@@ -85,8 +85,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         const storedCurrent = sessionStorage.getItem('vh_current_path')
 
         if (storedCurrent && storedCurrent !== currentPath) {
-            // Eğer mevcut yol değiştiyse, eski "mevcut" artık "önceki" olur
-            sessionStorage.setItem('vh_prev_path', storedCurrent)
+            // Akıllı Filtre: Ürün sayfalarını asla "önceki sayfa" olarak kaydetme.
+            // Bu sayede üründen kategoriye dönüldüğünde 'prev' hala 'Home' veya 'Arama' kalır.
+            if (!storedCurrent.includes('/products/')) {
+                sessionStorage.setItem('vh_prev_path', storedCurrent)
+            }
         }
 
         sessionStorage.setItem('vh_current_path', currentPath)
