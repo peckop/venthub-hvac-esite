@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "lint:ci": "next lint",
+    "build:ci": "next build",
     "test": "vitest run",
     "test:ui": "vitest",
     "prepare": "husky"
