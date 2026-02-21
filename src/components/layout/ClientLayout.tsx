@@ -77,22 +77,38 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         } catch { }
     }, [enableWhatsApp])
 
-    // --- Navigation History Tracker (VH Smart Back Logic) ---
+    // --- Navigation History Tracker (VH Smart Nav Stack Logic) ---
     React.useEffect(() => {
         if (typeof window === 'undefined') return
 
         const currentPath = window.location.pathname + window.location.search
-        const storedCurrent = sessionStorage.getItem('vh_current_path')
 
-        if (storedCurrent && storedCurrent !== currentPath) {
-            // Akıllı Filtre: Ürün sayfalarını asla "önceki sayfa" olarak kaydetme.
-            // Bu sayede üründen kategoriye dönüldüğünde 'prev' hala 'Home' veya 'Arama' kalır.
-            if (!storedCurrent.includes('/products/')) {
-                sessionStorage.setItem('vh_prev_path', storedCurrent)
-            }
+        // Ürün sayfaları "durak" sayfası sayılmaz, geçmiş dizinine eklenmezler.
+        if (currentPath.includes('/products/')) return
+
+        let stack: string[] = [];
+        try {
+            stack = JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]');
+        } catch { stack = []; }
+
+        const lastItem = stack[stack.length - 1]
+        const secondLastItem = stack[stack.length - 2]
+
+        if (currentPath === lastItem) {
+            // Aynı sayfadayız (refresh vb.)
+            return
         }
 
-        sessionStorage.setItem('vh_current_path', currentPath)
+        if (currentPath === secondLastItem) {
+            // Geri gelmişiz, sonuncu duraktan çık
+            stack.pop()
+        } else {
+            // Yeni bir durağa gelmişiz, ekle
+            stack.push(currentPath)
+            if (stack.length > 10) stack.shift()
+        }
+
+        sessionStorage.setItem('vh_nav_stack', JSON.stringify(stack))
     }, [pathname])
 
     return (
