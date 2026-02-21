@@ -27,9 +27,11 @@ export const useManualScrollRestoration = (loading: boolean) => {
             timeout = setTimeout(() => {
                 try {
                     const currentY = window.scrollY
-                    // Sadece makul değerleri kaydet (0 dahil, ama mount/restore anında 0'ı koru)
-                    if (currentY > 0 || restoredRef.current) {
-                        sessionStorage.setItem(`scroll_v4_${pathname}`, currentY.toString())
+                    // Next.js sayfadan ayrılırken scroll'u anlık olarak 0'a çekebiliyor.
+                    // Sayfanın en başında (0-50 px) olmak çok önemli bir geri yükleme noktası değil.
+                    // Bu yüzden 0'ı (veya 0'a yakın anlık sıfırlamaları) kaydetmiyoruz.
+                    if (currentY > 50) {
+                        sessionStorage.setItem(`scroll_v5_${pathname}`, currentY.toString())
                     }
                 } catch { }
                 timeout = undefined!
@@ -49,12 +51,12 @@ export const useManualScrollRestoration = (loading: boolean) => {
         if (restoredRef.current) return
 
         try {
-            const saved = sessionStorage.getItem(`scroll_v4_${pathname}`)
+            const saved = sessionStorage.getItem(`scroll_v5_${pathname}`)
             const isPop = sessionStorage.getItem('vh_is_pop') === 'true'
 
             if (saved && isPop) {
                 const targetY = parseInt(saved, 10)
-                if (targetY <= 0) {
+                if (targetY <= 50) {
                     restoredRef.current = true
                     return
                 }
@@ -66,16 +68,16 @@ export const useManualScrollRestoration = (loading: boolean) => {
 
                     // Sayfa yüksekliği henüz hedef scroll+ekran yüksekliğine ulaşmadıysa (render bitmediyse)
                     if (document.documentElement.scrollHeight < targetY + 100 && attempts < 20) {
-                        setTimeout(restore, 100)
+                        setTimeout(restore, 150) // Daha sabırlı ol (20 x 150ms = 3 saniye)
                     } else {
                         // Son bir kez kesinleştir
-                        setTimeout(() => window.scrollTo(0, targetY), 50)
+                        setTimeout(() => window.scrollTo(0, targetY), 100)
                         restoredRef.current = true
                     }
                 }
 
                 // İlk deneme için kısa bir pay bırak (layout shift önleme)
-                setTimeout(restore, 100)
+                setTimeout(restore, 250) // Biraz daha bekle ki Kategori Component'ı animasyon setup'ını yapsın
             } else {
                 restoredRef.current = true
             }
