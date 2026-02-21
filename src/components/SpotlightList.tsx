@@ -5,10 +5,10 @@ const SpotlightList: React.FC = () => {
   const { t } = useI18n()
   const ref = useRef<HTMLDivElement | null>(null)
   const ITEMS = [
-    { title: t('homeSpotlight.items.parkingJetFan.title'), desc: t('homeSpotlight.items.parkingJetFan.desc'), href: '/products?all=1' },
-    { title: t('homeSpotlight.items.airCurtain.title'), desc: t('homeSpotlight.items.airCurtain.desc'), href: '/products?all=1' },
-    { title: t('homeSpotlight.items.hrv.title'), desc: t('homeSpotlight.items.hrv.desc'), href: '/products?all=1' },
-    { title: t('homeSpotlight.items.smokeExhaust.title'), desc: t('homeSpotlight.items.smokeExhaust.desc'), href: '/products?all=1' },
+    { title: t('homeSpotlight.items.parkingJetFan.title'), desc: t('homeSpotlight.items.parkingJetFan.desc'), href: '/products' },
+    { title: t('homeSpotlight.items.airCurtain.title'), desc: t('homeSpotlight.items.airCurtain.desc'), href: '/products' },
+    { title: t('homeSpotlight.items.hrv.title'), desc: t('homeSpotlight.items.hrv.desc'), href: '/products' },
+    { title: t('homeSpotlight.items.smokeExhaust.title'), desc: t('homeSpotlight.items.smokeExhaust.desc'), href: '/products' },
   ] as const
 
   const onMove: React.MouseEventHandler<HTMLDivElement> = (e) => {

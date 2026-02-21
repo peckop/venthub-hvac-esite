@@ -607,7 +607,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                 <div className="flex items-center space-x-1">
                   {/* Quick Order Button */}
                   <button
-                    onClick={() => router.push('/products?sort=bestsellers')}
+                    onClick={() => router.push('/products?all=1&sort=bestsellers')}
                     className="hidden xl:flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-warning-orange/10 rounded-lg transition-all duration-200 group"
                     title={t('header.quickOrder')}
                     aria-label={t('header.quickOrder')}
