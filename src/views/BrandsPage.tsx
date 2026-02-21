@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { HVAC_BRANDS } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'

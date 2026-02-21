@@ -1,8 +1,11 @@
+'use client'
+
 import React from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
+
 
 const TopicPage: React.FC = () => {
   const { t } = useI18n()

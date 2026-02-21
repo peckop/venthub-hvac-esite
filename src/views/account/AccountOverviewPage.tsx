@@ -135,7 +135,7 @@ export default function AccountOverviewPage() {
                         <Package className="w-5 h-5" />
                       </div>
                       <div>
-                        <Link href={`/account/orders/${o.id}`} className="font-bold text-industrial-gray hover:text-primary-navy transition-colors">
+                        <Link href={`/account/orders/detail?id=${o.id}`} className="font-bold text-industrial-gray hover:text-primary-navy transition-colors">
                           {o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`}
                         </Link>
                         <div className="text-sm text-steel-gray mt-1 flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function AccountOverviewPage() {
                     </div>
                     <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto">
                       <StatusBadge status={o.status} t={t} />
-                      <Link href={`/account/orders/${o.id}`} className="p-2 text-gray-400 hover:text-primary-navy hover:bg-gray-50 rounded-lg transition-colors">
+                      <Link href={`/account/orders/detail?id=${o.id}`} className="p-2 text-gray-400 hover:text-primary-navy hover:bg-gray-50 rounded-lg transition-colors">
                         <ArrowRight className="w-5 h-5" />
                       </Link>
                     </div>

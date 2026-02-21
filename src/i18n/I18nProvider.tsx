@@ -82,9 +82,15 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 }
 
 export function useI18n() {
-
   const ctx = useContext(I18nContext)
-  if (!ctx) throw new Error('useI18n must be used within I18nProvider')
+  if (!ctx) {
+    // Statik build sırasında veya sağlayıcı dışındaki kullanımlarda hata fırlatmak yerine güvenli bir geri dönüş sağla
+    return {
+      lang: 'tr' as Lang,
+      setLang: () => { },
+      t: (key: string) => key
+    }
+  }
   return ctx
 }
 
