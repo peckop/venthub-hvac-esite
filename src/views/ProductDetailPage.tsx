@@ -544,13 +544,12 @@ export const ProductDetailPage: React.FC = () => {
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
-            // Akıllı Navigasyon: Eğer kullanıcı site içinden gelmişse geri git, yoksa kategoriye dön
-            const hasInternalReferrer = typeof document !== 'undefined' &&
-              document.referrer &&
-              document.referrer.includes(window.location.host);
+            // Akıllı Navigasyon (Smart Back): sessionStorage'daki gerçek geçmişi kontrol et
+            const prevPath = typeof window !== 'undefined' ? sessionStorage.getItem('vh_prev_path') : null;
 
-            if (hasInternalReferrer) {
-              router.back();
+            if (prevPath && !prevPath.includes('/products/')) {
+              // Eğer bir önceki sayfa ürün detayı değilse doğrudan oraya git
+              router.push(prevPath);
             } else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
               router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
             } else if (mainCategory) {
