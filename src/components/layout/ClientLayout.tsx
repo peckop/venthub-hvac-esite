@@ -55,6 +55,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }
     }, [enableToaster])
 
+    const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
     React.useEffect(() => {
         try {
             const coarse = window.matchMedia('(pointer: coarse)').matches
