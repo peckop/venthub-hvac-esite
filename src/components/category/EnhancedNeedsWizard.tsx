@@ -499,7 +499,11 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
     const goToResults = () => {
         const recommendation = calculateRecommendation(state)
-        router.push(`/category/${parentSlug}/${recommendation.series}`)
+        if (parentSlug === recommendation.series) {
+            router.push(`/category/${parentSlug}`)
+        } else {
+            router.push(`/category/${parentSlug}/${recommendation.series}`)
+        }
         handleClose()
     }
 
