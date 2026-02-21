@@ -136,7 +136,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 if (Math.abs(window.scrollY - finalY) > 5) {
                     window.scrollTo({ top: finalY, behavior: 'smooth' })
                 }
-            }, 600)
+            }, 800) // Animasyonun tamamen bitmesi için daha güvenli süre
         }, 10)
     }
 
