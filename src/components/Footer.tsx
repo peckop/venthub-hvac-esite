@@ -63,7 +63,7 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/products?all=1" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/products" className="text-gray-300 hover:text-white transition-colors">
                   {t('common.products')}
                 </Link>
               </li>
