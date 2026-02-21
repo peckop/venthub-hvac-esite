@@ -410,6 +410,9 @@ export const CategoryPage: React.FC = () => {
           {/* Geri Butonu */}
           <button
             onClick={() => {
+              if (typeof window !== 'undefined') {
+                sessionStorage.setItem('vh_is_pop', 'true');
+              }
               let stack: string[] = [];
               try {
                 stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : [];
