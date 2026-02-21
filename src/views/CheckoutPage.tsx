@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from 'react' // refresh
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
