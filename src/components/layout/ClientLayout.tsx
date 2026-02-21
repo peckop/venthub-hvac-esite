@@ -102,6 +102,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             // pathname + search + hash bilgisini tam olarak al
             const currentFullPath = window.location.pathname + window.location.search + window.location.hash
 
+            // ANA SAYFAYA dönüldüyse geçmişi temizle (Çapraz bulaşma/Cross-contamination önleyici)
+            if (window.location.pathname === '/' && !window.location.hash) {
+                sessionStorage.setItem('vh_nav_stack', JSON.stringify(['/']))
+                return
+            }
+
             // Ürün sayfaları "durak" sayfası sayılmaz, hiyerarşiyi bozmamak için diziye eklenmezler.
             if (currentFullPath.includes('/products/')) return
 
@@ -145,7 +151,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             document.removeEventListener('mousedown', handleInteraction, { capture: true })
             document.removeEventListener('keydown', handleInteraction, { capture: true })
         }
-    }, [])
+    }, [pathname])
 
     return (
         <div className="min-h-screen bg-white">
