@@ -119,6 +119,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         setSelectedSubcategory(null) // Clear subcategory selection when showing all
         // URL hash'i güncelle - geri navigasyonda restore edilebilsin
         window.history.replaceState(null, '', '#tum-modeller')
+        window.dispatchEvent(new HashChangeEvent('hashchange'))
 
         // Wait for state update and initial layout
         requestAnimationFrame(() => {
@@ -147,6 +148,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         const subcat = subCategories.find(s => s.id === subcatId)
         if (subcat) {
             window.history.replaceState(null, '', `#${subcat.slug}`)
+            window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
         setTimeout(() => {
             subcategoryProductsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
