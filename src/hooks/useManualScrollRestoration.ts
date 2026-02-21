@@ -5,13 +5,21 @@ import { usePathname } from 'next/navigation'
  * Async veri yüklenen sayfalarda "Geri" (POP) navigasyonu sonrası scroll pozisyonunu geri yükler.
  * Tarayıcı native restorasyonunun yetersiz kaldığı (skeleton loading vb.) durumlarda gereklidir.
  * 
+ *
  * @param loading Verinin yüklenme durumu. True ise restorasyon beklemede kalır.
  */
 export const useManualScrollRestoration = (loading: boolean) => {
     const pathname = usePathname()
     const restoredRef = useRef(false)
 
-    // 1. Scroll pozisyonunu pathname + hash bazlı kaydet (Throttle: 100ms)
+    // 1. Tarayıcı kontrolünü eline al
+    useEffect(() => {
+        if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual'
+        }
+    }, [])
+
+    // 2. Scroll pozisyonunu kaydet (Throttle: 100ms)
     useEffect(() => {
         let timeout: NodeJS.Timeout
         const handler = () => {
@@ -19,12 +27,9 @@ export const useManualScrollRestoration = (loading: boolean) => {
             timeout = setTimeout(() => {
                 try {
                     const currentY = window.scrollY
-                    const fullKey = pathname + window.location.hash
-
-                    // Eğer restorasyon denemeleri sırasında yanlışlıkla 0'ı kaydederse geri dönüş bozulur
-                    // Sadece kullanıcı gerçekten sayfada ise (mount bittiyse) ve makul bir değer ise kaydet
-                    if (currentY > 0 || (restoredRef.current && currentY === 0)) {
-                        sessionStorage.setItem(`scroll_${fullKey}`, currentY.toString())
+                    // Sadece makul değerleri kaydet (0 dahil, ama mount/restore anında 0'ı koru)
+                    if (currentY > 0 || restoredRef.current) {
+                        sessionStorage.setItem(`scroll_v4_${pathname}`, currentY.toString())
                     }
                 } catch { }
                 timeout = undefined!
@@ -38,52 +43,39 @@ export const useManualScrollRestoration = (loading: boolean) => {
         }
     }, [pathname])
 
-    // 2. Loading bittiğinde restore et
+    // 3. Restorasyon
     useEffect(() => {
         if (loading) return
-        if (restoredRef.current) return // Sadece bir kere dene
+        if (restoredRef.current) return
 
         try {
-            const currentHash = typeof window !== 'undefined' ? window.location.hash : ''
-            const fullKey = pathname + currentHash
-            const saved = sessionStorage.getItem(`scroll_${fullKey}`)
+            const saved = sessionStorage.getItem(`scroll_v4_${pathname}`)
+            const isPop = sessionStorage.getItem('vh_is_pop') === 'true'
 
-            if (saved) {
-                const isPop = sessionStorage.getItem('vh_is_pop') === 'true'
-                if (!isPop) {
-                    restoredRef.current = true
-                    return // Sadece POP (Geri/İleri) aksiyonunda restore et
-                }
-
-                const y = parseInt(saved, 10)
-                if (y === 0) {
+            if (saved && isPop) {
+                const targetY = parseInt(saved, 10)
+                if (targetY <= 0) {
                     restoredRef.current = true
                     return
                 }
 
-                // DOM'un tam render olmasını bekle ve birden fazla deneme yap
-                const restoreScroll = (attempt = 0) => {
-                    if (attempt >= 15) {
+                let attempts = 0
+                const restore = () => {
+                    attempts++
+                    window.scrollTo(0, targetY)
+
+                    // Sayfa yüksekliği henüz hedef scroll+ekran yüksekliğine ulaşmadıysa (render bitmediyse)
+                    if (document.documentElement.scrollHeight < targetY + 100 && attempts < 20) {
+                        setTimeout(restore, 100)
+                    } else {
+                        // Son bir kez kesinleştir
+                        setTimeout(() => window.scrollTo(0, targetY), 50)
                         restoredRef.current = true
-                        return
                     }
-
-                    requestAnimationFrame(() => {
-                        window.scrollTo(0, y)
-
-                        // Eğer sayfa yüksekliği yeterli değilse (DOM henüz uzamadıysa) tekrar dene
-                        if (document.documentElement.scrollHeight < y + window.innerHeight) {
-                            setTimeout(() => restoreScroll(attempt + 1), 100)
-                        } else {
-                            // Hedef yüksekliğe ulaşıldı, bir kez daha kesinleştir
-                            setTimeout(() => window.scrollTo(0, y), 50)
-                            restoredRef.current = true
-                        }
-                    })
                 }
 
-                // İlk deneme - Çocuk bileşenlerin (useEffect/Hash/Layout) işlerini bitirmesi için pay bırak
-                setTimeout(() => restoreScroll(), 150)
+                // İlk deneme için kısa bir pay bırak (layout shift önleme)
+                setTimeout(restore, 100)
             } else {
                 restoredRef.current = true
             }
