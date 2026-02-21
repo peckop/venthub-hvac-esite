@@ -559,13 +559,13 @@ export const ProductDetailPage: React.FC = () => {
 
             if (lastSafeStop) {
               // Eğer bir durak geçmişi varsa (Home, Kategori vb.) oraya git
-              router.push(lastSafeStop);
+              router.push(lastSafeStop, { scroll: false });
             } else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
-              router.push(`/category/${mainCategory.slug}/${subCategory.slug}`)
+              router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false })
             } else if (mainCategory) {
-              router.push(`/category/${mainCategory.slug}`)
+              router.push(`/category/${mainCategory.slug}`, { scroll: false })
             } else {
-              router.push('/') // Tam fallback
+              router.push('/', { scroll: false }) // Tam fallback
             }
           }}
 
