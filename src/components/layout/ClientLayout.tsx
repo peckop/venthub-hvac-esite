@@ -55,7 +55,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }
     }, [enableToaster])
 
-    const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
     React.useEffect(() => {
         try {
             const coarse = window.matchMedia('(pointer: coarse)').matches
@@ -76,6 +75,21 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             }
         } catch { }
     }, [enableWhatsApp])
+
+    // --- Navigation History Tracker (VH Smart Back Logic) ---
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return
+
+        const currentPath = window.location.pathname + window.location.search
+        const storedCurrent = sessionStorage.getItem('vh_current_path')
+
+        if (storedCurrent && storedCurrent !== currentPath) {
+            // Eğer mevcut yol değiştiyse, eski "mevcut" artık "önceki" olur
+            sessionStorage.setItem('vh_prev_path', storedCurrent)
+        }
+
+        sessionStorage.setItem('vh_current_path', currentPath)
+    }, [pathname])
 
     return (
         <div className="min-h-screen bg-white">
