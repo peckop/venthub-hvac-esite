@@ -87,6 +87,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         }
         window.addEventListener('popstate', handlePopState)
 
+        // 2. State temizliği (Gelecek PUSH navigasyonlarını etkilememesi için)
+        // Herhangi bir tıklama/tuş basma eylemi (ör. Linke tıklama) PUSH kabul edilir.
+        // Tıklama anında bayrağı silerek stale state (asılı kalma) sorununu engelliyoruz.
+        const handleInteraction = () => {
+            sessionStorage.setItem('vh_is_pop', 'false')
+        }
+        // Capture modunda dinle ki onClick'lerden önce çalışsın
+        document.addEventListener('mousedown', handleInteraction, { capture: true })
+        document.addEventListener('keydown', handleInteraction, { capture: true })
+
         // 3. Geçmiş Güncelleyici (Pathname veya Hash değiştiğinde tetiklenir)
         const updateStack = () => {
             // pathname + search + hash bilgisini tam olarak al
@@ -132,18 +142,10 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         return () => {
             window.removeEventListener('popstate', handlePopState)
             window.removeEventListener('hashchange', updateStack)
+            document.removeEventListener('mousedown', handleInteraction, { capture: true })
+            document.removeEventListener('keydown', handleInteraction, { capture: true })
         }
     }, [])
-
-    // 2. State Temizliği (Her sayfa veya hash değişiminde 2.5s sonra vh_is_pop resetlenir)
-    // Böylece PUSH aksiyonları "stale" POP statüsünden etkilenmemiş olur
-    React.useEffect(() => {
-        const popResetTimeout = setTimeout(() => {
-            sessionStorage.setItem('vh_is_pop', 'false')
-        }, 2500) // Animasyonların ve scroll kurtarmanın (2 saniye) kesinlikle bitmesini bekle
-
-        return () => clearTimeout(popResetTimeout)
-    }, [pathname])
 
     return (
         <div className="min-h-screen bg-white">

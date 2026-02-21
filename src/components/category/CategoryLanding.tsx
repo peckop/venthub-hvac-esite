@@ -115,24 +115,43 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     // REMOVED: Auto-scroll to products section when restored from hash
     // (User wants to land at the top/hero first, even when state is restored)
 
+    // V7: Scroll Bounding (Tarayıcının sayfa kısayken scroll'u yarıda kesmesi) sorununa Kesin Çözüm!
+    const handleScrollToTarget = (targetId: string) => {
+        const anchor = document.getElementById(targetId)
+        if (!anchor) return
+
+        // Geçici padding ekleyerek animasyon bitmemiş olsa dahi tarayıcıya "scroll yapılacak kadar yer var" diyoruz.
+        const originalPadding = document.body.style.paddingBottom
+        document.body.style.paddingBottom = '3000px'
+
+        setTimeout(() => {
+            const headerOffset = 80 // Sticky header
+            const targetY = anchor.getBoundingClientRect().top + window.pageYOffset - headerOffset
+            window.scrollTo({ top: targetY, behavior: 'smooth' })
+
+            // Animasyon (500ms) bittikten sonra sahte boşluğu temizle ve olası shift'e karşı son düzeltmeyi yap
+            setTimeout(() => {
+                document.body.style.paddingBottom = originalPadding
+                const finalY = anchor.getBoundingClientRect().top + window.pageYOffset - headerOffset
+                if (Math.abs(window.scrollY - finalY) > 5) {
+                    window.scrollTo({ top: finalY, behavior: 'smooth' })
+                }
+            }, 600)
+        }, 10)
+    }
+
     const handleShowProducts = () => {
         setShowProducts(true)
         setSelectedSubcategory(null) // Clear subcategory selection when showing all
-        // URL hash'i güncelle - geri navigasyonda restore edilebilsin
         window.history.replaceState(null, '', '#tum-modeller')
         window.dispatchEvent(new HashChangeEvent('hashchange'))
 
-        // Wait for React to apply state (e.g., removing subcategory section)
+        // React re-render sonrası
         requestAnimationFrame(() => {
-            // Animasyon süresini beklemek yerine, DOM güncellenir güncellenmez
-            // Tıklamada ürünler açıldığında URL güncellenir
-            setTimeout(() => {
-                if (!selectedSubcategory) {
-                    // Sadece Tüm Modelleri incelerken products'a odaklan
-                    const anchor = document.getElementById('products-anchor')
-                    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
-            }, 50)
+            if (!selectedSubcategory) {
+                // Scroll Bounding kırma fonksiyonunu çağır
+                handleScrollToTarget('products-anchor')
+            }
         })
     }
 
@@ -147,8 +166,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
             window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
         setTimeout(() => {
-            const anchor = document.getElementById('subcategory-anchor')
-            if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            handleScrollToTarget('subcategory-anchor')
         }, 50)
     }
 
