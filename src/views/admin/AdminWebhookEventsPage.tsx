@@ -45,7 +45,7 @@ const AdminWebhookEventsPage: React.FC = () => {
   const [colsRet, setColsRet] = React.useState({ event: true, order: true, carrier: true, status: true, received: true })
   const [colsMail, setColsMail] = React.useState({ order: true, to: true, subject: true, provider: true, created: true })
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     try {
       const d = localStorage.getItem(`${STORAGE_KEY}:density`)
       if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
@@ -53,11 +53,11 @@ const AdminWebhookEventsPage: React.FC = () => {
       if (cr) setColsRet(prev => ({ ...prev, ...JSON.parse(cr) }))
       const cm = localStorage.getItem(`${STORAGE_KEY}:mailcols`)
       if (cm) setColsMail(prev => ({ ...prev, ...JSON.parse(cm) }))
-    } catch {}
-  },[])
-  React.useEffect(()=>{ try{ localStorage.setItem(`${STORAGE_KEY}:density`, density) }catch{} }, [density])
-  React.useEffect(()=>{ try{ localStorage.setItem(`${STORAGE_KEY}:retcols`, JSON.stringify(colsRet)) }catch{} }, [colsRet])
-  React.useEffect(()=>{ try{ localStorage.setItem(`${STORAGE_KEY}:mailcols`, JSON.stringify(colsMail)) }catch{} }, [colsMail])
+    } catch { }
+  }, [])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:retcols`, JSON.stringify(colsRet)) } catch { } }, [colsRet])
+  React.useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:mailcols`, JSON.stringify(colsMail)) } catch { } }, [colsMail])
 
   const fetchData = React.useCallback(async () => {
     setLoading(true)
@@ -88,7 +88,7 @@ const AdminWebhookEventsPage: React.FC = () => {
     }
   }, [tab])
 
-  React.useEffect(()=>{ fetchData() }, [fetchData])
+  React.useEffect(() => { fetchData() }, [fetchData])
 
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
 
@@ -97,10 +97,10 @@ const AdminWebhookEventsPage: React.FC = () => {
     const s = q.toLowerCase()
     return returnsRows.filter(r =>
       r.event_id.toLowerCase().includes(s) ||
-      (r.order_id||'').toLowerCase().includes(s) ||
-      (r.return_id||'').toLowerCase().includes(s) ||
-      (r.carrier||'').toLowerCase().includes(s) ||
-      (r.status_mapped||'').toLowerCase().includes(s)
+      (r.order_id || '').toLowerCase().includes(s) ||
+      (r.return_id || '').toLowerCase().includes(s) ||
+      (r.carrier || '').toLowerCase().includes(s) ||
+      (r.status_mapped || '').toLowerCase().includes(s)
     )
   }, [returnsRows, q])
 
@@ -111,7 +111,7 @@ const AdminWebhookEventsPage: React.FC = () => {
       e.order_id.toLowerCase().includes(s) ||
       e.email_to.toLowerCase().includes(s) ||
       e.subject.toLowerCase().includes(s) ||
-      (e.provider||'').toLowerCase().includes(s)
+      (e.provider || '').toLowerCase().includes(s)
     )
   }, [emailsRows, q])
 
@@ -120,21 +120,21 @@ const AdminWebhookEventsPage: React.FC = () => {
       <header className="flex items-center justify-between">
         <h1 className={adminSectionTitleClass}>{t('admin.webhooks.title')}</h1>
         <div className="flex items-center gap-2">
-          <button onClick={()=>setTab('returns')} className={`px-3 py-2 rounded ${tab==='returns'?'bg-primary-navy text-white':'border border-gray-200'}`}>{t('admin.webhooks.tabs.returns')}</button>
-          <button onClick={()=>setTab('shipping')} className={`px-3 py-2 rounded ${tab==='shipping'?'bg-primary-navy text-white':'border border-gray-200'}`}>{t('admin.webhooks.tabs.shipping')}</button>
+          <button onClick={() => setTab('returns')} className={`px-3 py-2 rounded ${tab === 'returns' ? 'bg-primary-navy text-white' : 'border border-gray-200'}`}>{t('admin.webhooks.tabs.returns')}</button>
+          <button onClick={() => setTab('shipping')} className={`px-3 py-2 rounded ${tab === 'shipping' ? 'bg-primary-navy text-white' : 'border border-gray-200'}`}>{t('admin.webhooks.tabs.shipping')}</button>
           <button onClick={fetchData} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
         </div>
       </header>
 
       <AdminToolbar
         storageKey="toolbar:webhook-events"
-        search={{ value: q, onChange: setQ, placeholder: tab==='returns' ? t('admin.webhooks.search.returns') : t('admin.webhooks.search.shipping'), focusShortcut: '/' }}
+        search={{ value: q, onChange: setQ, placeholder: tab === 'returns' ? t('admin.webhooks.search.returns') : t('admin.webhooks.search.shipping'), focusShortcut: '/' }}
         rightExtra={null}
-        recordCount={(tab==='returns'? filteredReturns.length : filteredEmails.length)}
+        recordCount={(tab === 'returns' ? filteredReturns.length : filteredEmails.length)}
       />
 
       {tab === 'returns' ? (
-        <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <div className="p-2 text-xs text-steel-gray">{t('admin.webhooks.tip.rowAction')}</div>
           <table className="min-w-full text-sm">
             <thead>
@@ -164,7 +164,7 @@ const AdminWebhookEventsPage: React.FC = () => {
           </table>
         </section>
       ) : (
-        <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <table className="min-w-full text-sm">
             <thead>
               <tr>

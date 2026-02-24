@@ -83,7 +83,7 @@ const AdminCouponsPage: React.FC = () => {
     }
   }, [])
 
-  React.useEffect(()=>{ fetchCoupons() }, [fetchCoupons])
+  React.useEffect(() => { fetchCoupons() }, [fetchCoupons])
 
   function filtered() {
     if (!q.trim()) return rows
@@ -171,23 +171,23 @@ const AdminCouponsPage: React.FC = () => {
       <section className={adminCardPaddedClass + ' space-y-3'}>
         <h3 className="font-semibold text-industrial-gray">Yeni Kupon</h3>
         <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-          <input value={form.code || ''} onChange={e=>setForm(f=>({ ...f, code: e.target.value }))} placeholder="Kod" className="border border-gray-200 rounded px-3 py-2" />
-          <select value={form.type as string} onChange={e=>setForm(f=>({ ...f, type: e.target.value as 'percent' | 'fixed' }))} className="border border-gray-200 rounded px-3 py-2">
+          <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="Kod" className="border border-gray-200 rounded px-3 py-2" />
+          <select value={form.type as string} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} className="border border-gray-200 rounded px-3 py-2">
             <option value="percent">Yüzde</option>
             <option value="fixed">Sabit</option>
           </select>
-          <input type="number" value={(form.value as number | undefined) ?? ''} onChange={e=>setForm(f=>({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} placeholder="Değer" className="border border-gray-200 rounded px-3 py-2" />
-          <input type="datetime-local" value={(form.starts_at as string | undefined) ?? ''} onChange={e=>setForm(f=>({ ...f, starts_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
-          <input type="datetime-local" value={(form.ends_at as string | undefined) ?? ''} onChange={e=>setForm(f=>({ ...f, ends_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
+          <input type="number" value={(form.value as number | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} placeholder="Değer" className="border border-gray-200 rounded px-3 py-2" />
+          <input type="datetime-local" value={(form.starts_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
+          <input type="datetime-local" value={(form.ends_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, ends_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
           <div className="flex items-center gap-2">
-            <input type="checkbox" checked={!!form.active} onChange={e=>setForm(f=>({ ...f, active: e.target.checked }))} /> Aktif
+            <input type="checkbox" checked={!!form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} /> Aktif
           </div>
-          <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e=>setForm(f=>{ const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
-          <button onClick={saveCoupon} disabled={saving || !(String(form.code||'').trim().length >= 3 && (form.type==='percent' || form.type==='fixed') && Number(form.value)>0)} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
+          <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e => setForm(f => { const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
+          <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
         </div>
       </section>
 
-      <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
         <table className="min-w-full text-sm">
           <thead>
             <tr>
@@ -213,7 +213,7 @@ const AdminCouponsPage: React.FC = () => {
                   <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}</td>
                   <td className="px-3 py-2">
                     <label className="inline-flex items-center gap-2 text-xs">
-                      <input type="checkbox" checked={!!r.active} onChange={()=>toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
+                      <input type="checkbox" checked={!!r.active} onChange={() => toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
                     </label>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</td>
