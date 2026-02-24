@@ -641,7 +641,7 @@ const AdminOrdersPage: React.FC = () => {
       )}
 
       {/* Table */}
-      <section className="bg-white rounded-lg shadow-hvac-md overflow-auto">
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
         {error && (
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
