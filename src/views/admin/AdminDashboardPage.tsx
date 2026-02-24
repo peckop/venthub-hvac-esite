@@ -223,7 +223,7 @@ const AdminDashboardPage: React.FC = () => {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard title={t('admin.dashboard.kpis.ordersCount')} value={ordersCount} loading={loading} />
         <StatCard title={t('admin.dashboard.kpis.salesTotal')} value={salesTotal} loading={loading} isCurrency lang={lang} />
-        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" />
+        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" />
         <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" />
         <StatCard title={t('admin.dashboard.kpis.avgBasket')} value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null} loading={loading} isCurrency lang={lang} />
       </section>
@@ -264,7 +264,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">Bekleyen İade - Durum Kırılımı</div>
-            <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {returnsByStatus.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
@@ -314,7 +314,7 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-hvac-md p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="text-sm text-industrial-gray">İadeler - Haftalık Trend</div>
-            <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
           </div>
           {returnsWeekly.length === 0 ? (
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
