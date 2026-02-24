@@ -6,6 +6,8 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
+import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 
 interface ProductRow {
   id: string
@@ -36,6 +38,22 @@ const AdminProductsPage: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [editingId, setEditingId] = React.useState<string | null>(null)
+
+  // Multi-select (Bulk)
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
+  const toggleSelect = (id: string) => setSelectedIds(prev => { const next = new Set(prev); if (next.has(id)) { next.delete(id) } else { next.add(id) } return next })
+  const toggleSelectAll = () => {
+    if (selectedIds.size === rows.length) setSelectedIds(new Set())
+    else setSelectedIds(new Set(rows.map(r => r.id)))
+  }
+
+  // Inline edit
+  const [inlineEdit, setInlineEdit] = React.useState<{ id: string; field: 'price' | 'stock_qty'; value: string } | null>(null)
+
+  // Expandable rows
+  const [expandedIds, setExpandedIds] = React.useState<Set<string>>(new Set())
+  const toggleExpand = (id: string) => setExpandedIds(prev => { const next = new Set(prev); if (next.has(id)) { next.delete(id) } else { next.add(id) } return next })
+  const [techSpecs, setTechSpecs] = React.useState<Record<string, Record<string, string>>>({})
 
   // Pagination
   const PAGE_SIZE = 50
@@ -205,10 +223,6 @@ const AdminProductsPage: React.FC = () => {
 
   const handleModalSuccess = () => {
     load()
-    // Modal will be closed by the modal itself or we can close it here if needed, 
-    // but the modal calls onSuccess then onOpenChange(false) usually.
-    // Actually our modal implementation calls onSuccess then onOpenChange(false).
-    // So we just need to reload data.
   }
 
   const remove = async (id: string) => {
@@ -223,6 +237,91 @@ const AdminProductsPage: React.FC = () => {
     } catch (e) {
       alert(t('admin.products.toasts.deleteFailed', { msg: ((e as Error).message || String(e)) }))
     }
+  }
+
+  // Bulk Handlers
+  const bulkStatusChange = async (status: string) => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`Seçili ${selectedIds.size} ürünün durumunu "${status}" olarak güncellemek istediğinize emin misiniz?`)) return
+    try {
+      const ids = Array.from(selectedIds)
+      const { error } = await supabase.from('products').update({ status }).in('id', ids)
+      if (error) throw error
+      setSelectedIds(new Set())
+      await load()
+    } catch (e) { alert('Toplu güncelleme hatası: ' + (e as Error).message) }
+  }
+
+  const bulkFeatureToggle = async (featured: boolean) => {
+    if (selectedIds.size === 0) return
+    try {
+      const ids = Array.from(selectedIds)
+      const { error } = await supabase.from('products').update({ is_featured: featured }).in('id', ids)
+      if (error) throw error
+      setSelectedIds(new Set())
+      await load()
+    } catch (e) { alert('Vitrin güncelleme hatası: ' + (e as Error).message) }
+  }
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`Seçili ${selectedIds.size} ürünü SİLMEK istediğinize emin misiniz? Bu işlem geri alınamaz!`)) return
+    try {
+      const ids = Array.from(selectedIds)
+      const { error } = await supabase.from('products').delete().in('id', ids)
+      if (error) throw error
+      setSelectedIds(new Set())
+      await load()
+    } catch (e) { alert('Toplu silme hatası: ' + (e as Error).message) }
+  }
+
+  const bulkPriceAdjust = async (mode: 'percent' | 'fixed', value: number) => {
+    if (selectedIds.size === 0) return
+    const label = mode === 'percent' ? `%${value}` : `₺${value}`
+    if (!confirm(`Seçili ${selectedIds.size} ürüne ${label} fiyat güncellemesi uygulanacak. Onaylıyor musunuz?`)) return
+    try {
+      const ids = Array.from(selectedIds)
+      const { data: products, error: fetchErr } = await supabase.from('products').select('id,price').in('id', ids)
+      if (fetchErr) throw fetchErr
+      const updates = (products || []).map((p: { id: string; price: number | null }) => {
+        const currentPrice = p.price ?? 0
+        const newPrice = mode === 'percent'
+          ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
+          : Math.round((currentPrice + value) * 100) / 100
+        return { id: p.id, price: Math.max(0, newPrice) }
+      })
+      for (const u of updates) {
+        await supabase.from('products').update({ price: u.price }).eq('id', u.id)
+      }
+      setSelectedIds(new Set())
+      await load()
+    } catch (e) { alert('Fiyat güncelleme hatası: ' + (e as Error).message) }
+  }
+
+  // Inline edit save
+  const saveInlineEdit = async () => {
+    if (!inlineEdit) return
+    const numVal = parseFloat(inlineEdit.value)
+    if (isNaN(numVal)) { setInlineEdit(null); return }
+    try {
+      const { error } = await supabase.from('products').update({ [inlineEdit.field]: numVal }).eq('id', inlineEdit.id)
+      if (error) throw error
+      setRows(prev => prev.map(r => r.id === inlineEdit.id ? { ...r, [inlineEdit.field]: numVal } : r))
+      setInlineEdit(null)
+    } catch (e) { alert('Kayıt hatası: ' + (e as Error).message) }
+  }
+
+  // Load tech specs for expanded row
+  const loadTechSpecs = async (productId: string) => {
+    if (techSpecs[productId]) return
+    try {
+      const { data } = await supabase.from('products').select('technical_specs').eq('id', productId).maybeSingle()
+      if (data?.technical_specs && typeof data.technical_specs === 'object') {
+        setTechSpecs(prev => ({ ...prev, [productId]: data.technical_specs as Record<string, string> }))
+      } else {
+        setTechSpecs(prev => ({ ...prev, [productId]: {} }))
+      }
+    } catch { setTechSpecs(prev => ({ ...prev, [productId]: {} })) }
   }
 
   const toggleSort = (key: SortKey) => {
@@ -468,6 +567,12 @@ const AdminProductsPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              {/* Checkbox column */}
+              <th className={`${adminTableHeadCellClass} ${headPad} w-10`}>
+                <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+              </th>
+              {/* Expand column */}
+              <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
               {visibleCols.image && (
                 <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
               )}
@@ -506,50 +611,138 @@ const AdminProductsPage: React.FC = () => {
           </thead>
           <tbody>
             {loading && rows.length === 0 ? (
-              <tr><td className="p-4" colSpan={7}>{t('admin.ui.loading')}</td></tr>
+              <tr><td className="p-4" colSpan={10}>{t('admin.ui.loading')}</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td className="p-4" colSpan={7}>{t('admin.ui.noRecords')}</td></tr>
+              <tr><td className="p-4" colSpan={10}>{t('admin.ui.noRecords')}</td></tr>
             ) : (
               sorted.map(r => (
-                <tr key={r.id} className="border-b border-light-gray/60">
-                  {visibleCols.image && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      {covers[r.id] ? (
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
-                          alt=""
-                          className="w-10 h-10 object-cover rounded border border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-gray-100 rounded" />
-                      )}
+                <React.Fragment key={r.id}>
+                  <tr className={`border-b border-light-gray/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
+                    {/* Checkbox */}
+                    <td className={`${adminTableCellClass} ${cellPad} w-10`}>
+                      <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
                     </td>
-                  )}
-                  {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>}
-                  {visibleCols.sku && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      {r.sku}
-                      {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
+                    {/* Expand */}
+                    <td className={`${adminTableCellClass} ${cellPad} w-8`}>
+                      <button onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} className="text-gray-400 hover:text-primary-navy transition-colors">
+                        {expandedIds.has(r.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                      </button>
                     </td>
+                    {visibleCols.image && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        {covers[r.id] ? (
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
+                            alt=""
+                            className="w-10 h-10 object-cover rounded border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-100 rounded" />
+                        )}
+                      </td>
+                    )}
+                    {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
+                    {visibleCols.sku && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        {r.sku}
+                        {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
+                      </td>
+                    )}
+                    {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
+                    {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                    {/* Inline-edit Price */}
+                    {visibleCols.price && (
+                      <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                        {inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
+                          <input
+                            type="number"
+                            autoFocus
+                            value={inlineEdit.value}
+                            onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                            onBlur={saveInlineEdit}
+                            onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                            className="w-24 text-right border border-primary-navy/40 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
+                            className="hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text"
+                            title="Tıklayarak düzenle"
+                          >
+                            {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+                          </button>
+                        )}
+                      </td>
+                    )}
+                    {/* Inline-edit Stock */}
+                    {visibleCols.stock && (
+                      <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                        {inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
+                          <input
+                            type="number"
+                            autoFocus
+                            value={inlineEdit.value}
+                            onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                            onBlur={saveInlineEdit}
+                            onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                            className="w-20 text-right border border-primary-navy/40 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
+                            className="hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text"
+                            title="Tıklayarak düzenle"
+                          >
+                            {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                          </button>
+                        )}
+                      </td>
+                    )}
+                    {visibleCols.actions && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          <button className="px-2 py-1 rounded border text-xs hover:border-blue-500 hover:text-blue-600 transition-colors" onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                          <button className="px-2 py-1 rounded border text-xs text-red-600 hover:border-red-400 hover:bg-red-50 transition-colors" onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                  {/* Expanded Row - Tech Specs */}
+                  {expandedIds.has(r.id) && (
+                    <tr className="bg-gray-50/70">
+                      <td colSpan={10} className="px-6 py-3">
+                        <div className="text-xs font-semibold text-industrial-gray uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
+                        {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {Object.entries(techSpecs[r.id]).map(([key, val]) => (
+                              <div key={key} className="bg-white rounded-lg border border-gray-200 px-3 py-2">
+                                <div className="text-[11px] text-gray-400 uppercase">{key}</div>
+                                <div className="text-sm font-medium text-gray-800">{String(val)}</div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-steel-gray">Teknik veri bulunamadı.</div>
+                        )}
+                      </td>
+                    </tr>
                   )}
-                  {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
-                  {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
-                  {visibleCols.price && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</td>}
-                  {visibleCols.stock && <td className={`${adminTableCellClass} ${cellPad} text-right`}>{(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}</td>}
-                  {visibleCols.actions && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      <div className="flex items-center gap-2 whitespace-nowrap">
-                        <button className="px-2 py-1 rounded border text-xs" onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                        <button className="px-2 py-1 rounded border text-xs text-red-600" onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
+                </React.Fragment>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Bulk Action Toolbar */}
+      <BulkActionToolbar
+        selectedCount={selectedIds.size}
+        onStatusChange={bulkStatusChange}
+        onFeatureToggle={bulkFeatureToggle}
+        onDelete={bulkDelete}
+        onPriceAdjust={bulkPriceAdjust}
+        onClearSelection={() => setSelectedIds(new Set())}
+      />
 
       <ProductFormModal
         open={isModalOpen}
