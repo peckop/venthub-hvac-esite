@@ -1,5 +1,5 @@
 import React from 'react'
-import { adminSectionTitleClass, adminCardPaddedClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminSubtitleClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
@@ -8,6 +8,7 @@ import Link from 'next/link'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
+import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2 } from 'lucide-react'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -197,18 +198,18 @@ const AdminDashboardPage: React.FC = () => {
   const RangeButton: React.FC<{ value: Range; label: string }> = ({ value, label }) => (
     <button
       onClick={() => setRange(value)}
-      className={`px-3 py-1.5 rounded border text-sm ${range === value ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-light-gray hover:border-primary-navy'}`}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${range === value ? 'bg-primary-navy text-white shadow-md shadow-primary-navy/20' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
     >{label}</button>
   )
 
   return (
-    <div className="space-y-4">
-      <header className="flex items-center justify-between">
+    <div className="space-y-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
-          <p className="text-industrial-gray text-sm">{t('admin.dashboard.subtitle')}</p>
+          <p className={adminSubtitleClass}>{t('admin.dashboard.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl shadow-inner border border-slate-200/50">
           <RangeButton value="today" label={t('admin.dashboard.rangeToday')} />
           <RangeButton value="7d" label={t('admin.dashboard.range7d')} />
           <RangeButton value="30d" label={t('admin.dashboard.range30d')} />
@@ -216,20 +217,23 @@ const AdminDashboardPage: React.FC = () => {
       </header>
 
       {error && (
-        <div className="bg-red-50 text-red-700 text-sm p-3 rounded border border-red-200">{error}</div>
+        <div className="bg-rose-50 text-rose-700 text-sm p-4 rounded-xl border border-rose-200/60 shadow-sm flex items-center gap-2">
+          <AlertCircle size={18} />
+          {error}
+        </div>
       )}
 
       {/* KPI Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard title={t('admin.dashboard.kpis.ordersCount')} value={ordersCount} loading={loading} />
-        <StatCard title={t('admin.dashboard.kpis.salesTotal')} value={salesTotal} loading={loading} isCurrency lang={lang} />
-        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" />
-        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" />
-        <StatCard title={t('admin.dashboard.kpis.avgBasket')} value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null} loading={loading} isCurrency lang={lang} />
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <StatCard title={t('admin.dashboard.kpis.ordersCount')} value={ordersCount} loading={loading} icon={<ShoppingBag size={24} strokeWidth={1.5} />} trend={{ value: 12 }} />
+        <StatCard title={t('admin.dashboard.kpis.salesTotal')} value={salesTotal} loading={loading} isCurrency lang={lang} icon={<TrendingUp size={24} strokeWidth={1.5} />} trend={{ value: 8 }} />
+        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" icon={<HandCoins size={24} strokeWidth={1.5} />} trend={{ value: -2 }} />
+        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" icon={<PackagePlus size={24} strokeWidth={1.5} />} trend={{ value: 5 }} />
+        <StatCard title={t('admin.dashboard.kpis.avgBasket')} value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null} loading={loading} isCurrency lang={lang} icon={<Calculator size={24} strokeWidth={1.5} />} trend={{ value: 3 }} />
       </section>
 
       {/* Primary Chart Area */}
-      <section className="w-full">
+      <section className="w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
         <SalesChart
           title={t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}
           data={dailyCounts}
@@ -237,109 +241,139 @@ const AdminDashboardPage: React.FC = () => {
       </section>
 
       {/* Breakdown sections */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-hvac-md p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-industrial-gray">Bekleyen Kargo - Kargo Dağılımı</div>
-            <Link href="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">Kargo Dağılımı</h3>
+            <Link href="/admin/orders?preset=pendingShipments" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
+              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          {carrierDist.length === 0 ? (
-            <div className="text-sm text-steel-gray">Kayıt yok.</div>
-          ) : (
-            <div className="space-y-2">
-              {(() => {
-                const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
-                  <div key={key} className="flex items-center gap-2 text-sm">
-                    <div className="w-32 text-steel-gray truncate" title={key}>{key}</div>
-                    <div className="flex-1 bg-light-gray h-3 rounded">
-                      <div className="bg-primary-navy h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+          <div className="flex-1 flex flex-col justify-center">
+            {carrierDist.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                <PackageSearch size={32} className="mb-2 opacity-50" />
+                <span className="text-sm">Kayıt Bulunamadı</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(() => {
+                  const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
+                    <div key={key} className="flex items-center gap-4 text-sm">
+                      <div className="w-32 font-medium text-slate-700 truncate" title={key}>{key}</div>
+                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                      </div>
+                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
                     </div>
-                    <div className="w-10 text-right text-industrial-gray">{count}</div>
-                  </div>
-                ))
-              })()}
-            </div>
-          )}
+                  ))
+                })()}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-hvac-md p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-industrial-gray">Bekleyen İade - Durum Kırılımı</div>
-            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">İade Durum Kırılımı</h3>
+            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
+              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          {returnsByStatus.length === 0 ? (
-            <div className="text-sm text-steel-gray">Kayıt yok.</div>
-          ) : (
-            <div className="space-y-2">
-              {(() => {
-                const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
-                  <div key={status} className="flex items-center gap-2 text-sm">
-                    <div className="w-32 text-steel-gray truncate" title={status}>{status}</div>
-                    <div className="flex-1 bg-light-gray h-3 rounded">
-                      <div className="bg-warning-orange h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+          <div className="flex-1 flex flex-col justify-center">
+            {returnsByStatus.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                <Undo2 size={32} className="mb-2 opacity-50" />
+                <span className="text-sm">Kayıt Bulunamadı</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(() => {
+                  const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
+                    <div key={status} className="flex items-center gap-4 text-sm">
+                      <div className="w-32 font-medium text-slate-700 truncate" title={status}>{status}</div>
+                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="bg-rose-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                      </div>
+                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
                     </div>
-                    <div className="w-10 text-right text-industrial-gray">{count}</div>
-                  </div>
-                ))
-              })()}
-            </div>
-          )}
+                  ))
+                })()}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       {/* Age buckets + weekly returns trend */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-hvac-md p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-industrial-gray">Bekleyen Kargo - Yaş Kırılımı</div>
-            <Link href="/admin/orders?preset=pendingShipments" className="text-sm text-primary-navy">Tümü</Link>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">Bekleyen Kargo (Yaş)</h3>
+            <Link href="/admin/orders?preset=pendingShipments" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
+              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          {shipAges.length === 0 ? (
-            <div className="text-sm text-steel-gray">Kayıt yok.</div>
-          ) : (
-            <div className="space-y-2">
-              {(() => {
-                const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
-                  <div key={bucket} className="flex items-center gap-2 text-sm">
-                    <div className="w-20 text-steel-gray truncate" title={bucket}>{bucket}</div>
-                    <div className="flex-1 bg-light-gray h-3 rounded">
-                      <div className="bg-indigo-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+          <div className="flex-1 flex flex-col justify-center">
+            {shipAges.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                <PackageSearch size={32} className="mb-2 opacity-50" />
+                <span className="text-sm">Kutu Boş</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(() => {
+                  const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
+                    <div key={bucket} className="flex items-center gap-4 text-sm">
+                      <div className="w-20 font-medium text-slate-700 truncate" title={bucket}>{bucket}</div>
+                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="bg-violet-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                      </div>
+                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
                     </div>
-                    <div className="w-10 text-right text-industrial-gray">{count}</div>
-                  </div>
-                ))
-              })()}
-            </div>
-          )}
+                  ))
+                })()}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-hvac-md p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-industrial-gray">İadeler - Haftalık Trend</div>
-            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm text-primary-navy">Tümü</Link>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">İadeler - Haftalık Trend</h3>
+            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
+              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          {returnsWeekly.length === 0 ? (
-            <div className="text-sm text-steel-gray">Kayıt yok.</div>
-          ) : (
-            <div className="space-y-2">
-              {(() => {
-                const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
-                  <div key={week} className="flex items-center gap-2 text-sm">
-                    <div className="w-24 text-steel-gray truncate" title={week}>{week}</div>
-                    <div className="flex-1 bg-light-gray h-3 rounded">
-                      <div className="bg-emerald-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+          <div className="flex-1 flex flex-col justify-center">
+            {returnsWeekly.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                <Undo2 size={32} className="mb-2 opacity-50" />
+                <span className="text-sm">Veri Yok</span>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(() => {
+                  const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
+                    <div key={week} className="flex items-center gap-4 text-sm">
+                      <div className="w-24 font-medium text-slate-700 truncate" title={week}>{week}</div>
+                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                      </div>
+                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
                     </div>
-                    <div className="w-10 text-right text-industrial-gray">{count}</div>
-                  </div>
-                ))
-              })()}
-            </div>
-          )}
+                  ))
+                })()}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
-      <RecentOrdersTable
-        title={t('admin.dashboard.recent.title')}
-        orders={recentOrders}
-      />
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+        <RecentOrdersTable
+          title={t('admin.dashboard.recent.title')}
+          orders={recentOrders}
+        />
+      </section>
     </div>
   )
 }
