@@ -1,9 +1,5 @@
 import React from 'react'
 
-interface ImportMeta {
-  env?: Record<string, string | undefined>
-}
-
 const commit = process.env.VITE_COMMIT_SHA as string | undefined
 const branch = process.env.VITE_BRANCH as string | undefined
 
