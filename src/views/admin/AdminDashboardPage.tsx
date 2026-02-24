@@ -5,6 +5,9 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import Link from 'next/link'
+import StatCard from '../../components/admin/dashboard/StatCard'
+import SalesChart from '../../components/admin/dashboard/SalesChart'
+import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -86,7 +89,7 @@ const AdminDashboardPage: React.FC = () => {
           .from('venthub_returns')
           .select('requested_at')
           .in('status', ['requested', 'approved', 'in_transit', 'received'])
-          .gte('requested_at', new Date(Date.now() - 60*24*60*60*1000).toISOString())
+          .gte('requested_at', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString())
           .limit(5000)
       ])
 
@@ -134,7 +137,7 @@ const AdminDashboardPage: React.FC = () => {
         const key = (s.carrier || s.shipping_carrier || 'Bilinmiyor').toString()
         dist.set(key, (dist.get(key) || 0) + 1)
       })
-      setCarrierDist(Array.from(dist.entries()).map(([key, count]) => ({ key, count })).sort((a,b)=>b.count-a.count))
+      setCarrierDist(Array.from(dist.entries()).map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count))
 
       // Build returns status breakdown
       const rlist = (returnsListRes.data || []) as Array<{ status: string | null }>
@@ -143,7 +146,7 @@ const AdminDashboardPage: React.FC = () => {
         const key = (r.status || 'unknown').toString()
         byStatus.set(key, (byStatus.get(key) || 0) + 1)
       })
-      setReturnsByStatus(Array.from(byStatus.entries()).map(([status, count]) => ({ status, count })).sort((a,b)=>b.count-a.count))
+      setReturnsByStatus(Array.from(byStatus.entries()).map(([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count))
 
       // Build shipments age buckets (0–1g, 2–3g, 4g+)
       const ageList = (shipAgeRes.data || []) as Array<{ created_at: string }>
@@ -151,7 +154,7 @@ const AdminDashboardPage: React.FC = () => {
       const ages = { '0–1g': 0, '2–3g': 0, '4g+': 0 }
       ageList.forEach(x => {
         const d = new Date(x.created_at).getTime()
-        const diffDays = Math.floor((now - d) / (24*60*60*1000))
+        const diffDays = Math.floor((now - d) / (24 * 60 * 60 * 1000))
         if (diffDays <= 1) ages['0–1g']++
         else if (diffDays <= 3) ages['2–3g']++
         else ages['4g+']++
@@ -162,19 +165,19 @@ const AdminDashboardPage: React.FC = () => {
       const rw = (returnsWeeklyRes.data || []) as Array<{ requested_at: string | null }>
       const byWeek = new Map<string, number>()
       const weeks = 8
-      for (let i=weeks-1;i>=0;i--) {
+      for (let i = weeks - 1; i >= 0; i--) {
         const start = new Date()
-        start.setUTCDate(start.getUTCDate() - i*7)
-        start.setUTCHours(0,0,0,0)
-        const key = start.toISOString().slice(0,10)
+        start.setUTCDate(start.getUTCDate() - i * 7)
+        start.setUTCHours(0, 0, 0, 0)
+        const key = start.toISOString().slice(0, 10)
         byWeek.set(key, 0)
       }
       rw.forEach(r => {
         if (!r.requested_at) return
         const d = new Date(r.requested_at)
         d.setUTCDate(d.getUTCDate() - d.getUTCDay()) // hafta başına yuvarla (Pazar)
-        d.setUTCHours(0,0,0,0)
-        const key = d.toISOString().slice(0,10)
+        d.setUTCHours(0, 0, 0, 0)
+        const key = d.toISOString().slice(0, 10)
         if (byWeek.has(key)) byWeek.set(key, (byWeek.get(key) || 0) + 1)
       })
       setReturnsWeekly(Array.from(byWeek.entries()).map(([week, count]) => ({ week, count })))
@@ -216,47 +219,21 @@ const AdminDashboardPage: React.FC = () => {
         <div className="bg-red-50 text-red-700 text-sm p-3 rounded border border-red-200">{error}</div>
       )}
 
-      <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.ordersCount')}</div>
-          <div className="text-2xl font-semibold">{loading ? '…' : (ordersCount ?? '-')}</div>
-        </div>
-        <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.salesTotal')}</div>
-          <div className="text-2xl font-semibold">{loading ? '…' : (salesTotal != null ? formatCurrency(salesTotal, lang) : '-')}</div>
-        </div>
-        <Link href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
-          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingReturns')}</div>
-          <div className="text-2xl font-semibold">{loading ? '…' : (pendingReturns ?? '-')}</div>
-        </Link>
-        <Link href="/admin/orders?preset=pendingShipments" className={adminCardPaddedClass + ' block hover:shadow-md transition-shadow'}>
-          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.pendingShipments')}</div>
-          <div className="text-2xl font-semibold">{loading ? '…' : (pendingShipments ?? '-')}</div>
-        </Link>
-        <div className={adminCardPaddedClass}>
-          <div className="text-xs text-industrial-gray">{t('admin.dashboard.kpis.avgBasket')}</div>
-          <div className="text-2xl font-semibold">{loading ? '…' : ((ordersCount && ordersCount > 0 && salesTotal != null) ? formatCurrency(salesTotal / ordersCount, lang) : '-')}</div>
-        </div>
+      {/* KPI Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard title={t('admin.dashboard.kpis.ordersCount')} value={ordersCount} loading={loading} />
+        <StatCard title={t('admin.dashboard.kpis.salesTotal')} value={salesTotal} loading={loading} isCurrency lang={lang} />
+        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/account/AdminReturnsPage?status=requested,approved,in_transit,received" />
+        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" />
+        <StatCard title={t('admin.dashboard.kpis.avgBasket')} value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null} loading={loading} isCurrency lang={lang} />
       </section>
 
-      <section className="bg-white rounded-lg shadow-hvac-md p-4">
-        <div className="text-sm text-industrial-gray mb-3">{t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}</div>
-        <div className="space-y-2">
-          {dailyCounts.map(({ date, count }) => {
-            const max = Math.max(1, ...dailyCounts.map(d => d.count))
-            const width = Math.round((count / max) * 100)
-            return (
-              <div key={date} className="flex items-center gap-2 text-sm">
-                <div className="w-24 text-steel-gray">{date}</div>
-                <div className="flex-1 bg-light-gray h-3 rounded">
-                  <div className="bg-primary-navy h-3 rounded" style={{ width: `${width}%` }} />
-                </div>
-                <div className="w-8 text-right text-industrial-gray">{count}</div>
-              </div>
-            )
-          })}
-          {dailyCounts.length === 0 && <div className="text-sm text-steel-gray">{t('admin.ui.noRecords')}</div>}
-        </div>
+      {/* Primary Chart Area */}
+      <section className="w-full">
+        <SalesChart
+          title={t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}
+          data={dailyCounts}
+        />
       </section>
 
       {/* Breakdown sections */}
@@ -270,15 +247,17 @@ const AdminDashboardPage: React.FC = () => {
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
           ) : (
             <div className="space-y-2">
-              {(() => { const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
-                <div key={key} className="flex items-center gap-2 text-sm">
-                  <div className="w-32 text-steel-gray truncate" title={key}>{key}</div>
-                  <div className="flex-1 bg-light-gray h-3 rounded">
-                    <div className="bg-primary-navy h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+              {(() => {
+                const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
+                  <div key={key} className="flex items-center gap-2 text-sm">
+                    <div className="w-32 text-steel-gray truncate" title={key}>{key}</div>
+                    <div className="flex-1 bg-light-gray h-3 rounded">
+                      <div className="bg-primary-navy h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    </div>
+                    <div className="w-10 text-right text-industrial-gray">{count}</div>
                   </div>
-                  <div className="w-10 text-right text-industrial-gray">{count}</div>
-                </div>
-              )) })()}
+                ))
+              })()}
             </div>
           )}
         </div>
@@ -291,15 +270,17 @@ const AdminDashboardPage: React.FC = () => {
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
           ) : (
             <div className="space-y-2">
-              {(() => { const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
-                <div key={status} className="flex items-center gap-2 text-sm">
-                  <div className="w-32 text-steel-gray truncate" title={status}>{status}</div>
-                  <div className="flex-1 bg-light-gray h-3 rounded">
-                    <div className="bg-warning-orange h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+              {(() => {
+                const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
+                  <div key={status} className="flex items-center gap-2 text-sm">
+                    <div className="w-32 text-steel-gray truncate" title={status}>{status}</div>
+                    <div className="flex-1 bg-light-gray h-3 rounded">
+                      <div className="bg-warning-orange h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    </div>
+                    <div className="w-10 text-right text-industrial-gray">{count}</div>
                   </div>
-                  <div className="w-10 text-right text-industrial-gray">{count}</div>
-                </div>
-              )) })()}
+                ))
+              })()}
             </div>
           )}
         </div>
@@ -316,15 +297,17 @@ const AdminDashboardPage: React.FC = () => {
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
           ) : (
             <div className="space-y-2">
-              {(() => { const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
-                <div key={bucket} className="flex items-center gap-2 text-sm">
-                  <div className="w-20 text-steel-gray truncate" title={bucket}>{bucket}</div>
-                  <div className="flex-1 bg-light-gray h-3 rounded">
-                    <div className="bg-indigo-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+              {(() => {
+                const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
+                  <div key={bucket} className="flex items-center gap-2 text-sm">
+                    <div className="w-20 text-steel-gray truncate" title={bucket}>{bucket}</div>
+                    <div className="flex-1 bg-light-gray h-3 rounded">
+                      <div className="bg-indigo-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    </div>
+                    <div className="w-10 text-right text-industrial-gray">{count}</div>
                   </div>
-                  <div className="w-10 text-right text-industrial-gray">{count}</div>
-                </div>
-              )) })()}
+                ))
+              })()}
             </div>
           )}
         </div>
@@ -337,53 +320,26 @@ const AdminDashboardPage: React.FC = () => {
             <div className="text-sm text-steel-gray">Kayıt yok.</div>
           ) : (
             <div className="space-y-2">
-              {(() => { const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
-                <div key={week} className="flex items-center gap-2 text-sm">
-                  <div className="w-24 text-steel-gray truncate" title={week}>{week}</div>
-                  <div className="flex-1 bg-light-gray h-3 rounded">
-                    <div className="bg-emerald-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+              {(() => {
+                const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
+                  <div key={week} className="flex items-center gap-2 text-sm">
+                    <div className="w-24 text-steel-gray truncate" title={week}>{week}</div>
+                    <div className="flex-1 bg-light-gray h-3 rounded">
+                      <div className="bg-emerald-500 h-3 rounded" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    </div>
+                    <div className="w-10 text-right text-industrial-gray">{count}</div>
                   </div>
-                  <div className="w-10 text-right text-industrial-gray">{count}</div>
-                </div>
-              )) })()}
+                ))
+              })()}
             </div>
           )}
         </div>
       </section>
 
-      <section className="bg-white rounded-lg shadow-hvac-md p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-industrial-gray">{t('admin.dashboard.recent.title')}</div>
-          <Link href="/account/orders" className="text-sm text-primary-navy">{t('common.viewAll')}</Link>
-        </div>
-        <div className="overflow-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.order')}</th>
-                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.date')}</th>
-                <th className="px-3 py-2 text-right text-industrial-gray">{t('admin.dashboard.table.amount')}</th>
-                <th className="px-3 py-2 text-left text-industrial-gray">{t('admin.dashboard.table.status')}</th>
-                <th className="px-3 py-2 text-left"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.length === 0 ? (
-                <tr><td className="px-3 py-3" colSpan={5}>{t('admin.ui.noRecords')}</td></tr>
-              ) : recentOrders.map(r => (
-                <tr key={r.id} className="border-t">
-                  <td className="px-3 py-2 font-mono text-xs">#{(r.order_number || r.id).toString().slice(-8).toUpperCase()}</td>
-                  <td className="px-3 py-2 text-steel-gray">{formatDateTime(r.created_at, lang)}</td>
-                  <td className="px-3 py-2 text-right">{formatCurrency(r.total_amount, lang)}</td>
-                  <td className="px-3 py-2 text-steel-gray">{r.status}</td>
-                  <td className="px-3 py-2"><Link href={`/account/orders/${r.id}`} className="text-primary-navy hover:underline">{t('admin.ui.details')}</Link></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="text-sm text-industrial-gray">Sprint 2: Sipariş istatistikleri ve kısa raporlar bu alanda gösteriliyor.</div>
-      </section>
+      <RecentOrdersTable
+        title={t('admin.dashboard.recent.title')}
+        orders={recentOrders}
+      />
     </div>
   )
 }
