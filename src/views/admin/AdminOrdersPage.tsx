@@ -458,8 +458,8 @@ const AdminOrdersPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
             <ExportMenu items={[{ key: 'csv', label: t('admin.orders.export.csvLabel'), onSelect: exportCsv }]} />
             <ColumnsMenu
               columns={[
@@ -478,9 +478,9 @@ const AdminOrdersPage: React.FC = () => {
       />
 
       <div className="flex items-center justify-end gap-3 mt-4 mb-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} h-10 disabled:opacity-50`}>{t('admin.ui.prev')}</button>
-        <span className="text-sm font-medium text-slate-500 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className={`${adminButtonSecondaryClass} h-10 disabled:opacity-50`}>{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
       </div>
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
