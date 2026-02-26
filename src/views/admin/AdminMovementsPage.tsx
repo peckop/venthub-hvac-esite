@@ -401,9 +401,9 @@ const AdminMovementsPage: React.FC = () => {
       </div>
 
       <div className="flex items-center justify-between mt-4 px-2">
-        <button className={adminButtonSecondaryClass + " h-10 px-6"} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
+        <button className={adminButtonSecondaryClass} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
         <span className="text-sm font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200/50">{t('admin.movements.pageLabel', { page: String(page) })}</span>
-        <button className={adminButtonSecondaryClass + " h-10 px-6"} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
+        <button className={adminButtonSecondaryClass} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>
   )

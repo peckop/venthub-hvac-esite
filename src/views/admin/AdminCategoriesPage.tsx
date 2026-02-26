@@ -220,8 +220,8 @@ const AdminCategoriesPage: React.FC = () => {
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2">
-                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r)}>Düzenle</button>
-                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>Sil</button>
+                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
+                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
                       </div>
                     </td>
                   )}

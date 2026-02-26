@@ -123,7 +123,7 @@ const AdminWebhookEventsPage: React.FC = () => {
           <button onClick={() => setTab('returns')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${tab === 'returns' ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>{t('admin.webhooks.tabs.returns')}</button>
           <button onClick={() => setTab('shipping')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${tab === 'shipping' ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>{t('admin.webhooks.tabs.shipping')}</button>
           <div className="w-px h-6 bg-slate-200 mx-1" />
-          <button onClick={fetchData} disabled={loading} className={adminButtonSecondaryClass + " h-9 px-4 disabled:opacity-50"}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
+          <button onClick={fetchData} disabled={loading} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
         </div>
       </header>
 
