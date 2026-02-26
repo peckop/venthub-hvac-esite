@@ -138,9 +138,9 @@ const AdminAuditLogPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-3 px-1 py-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " h-10 px-4 disabled:opacity-40"}>{t('admin.ui.prev')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-40"}>{t('admin.ui.prev')}</button>
         <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " h-10 px-4 disabled:opacity-40"}>{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " disabled:opacity-40"}>{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>

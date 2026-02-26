@@ -153,7 +153,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             {search && (
               <div className="flex-1 min-w-[240px]">
                 <input
-                  className="w-full border border-slate-200 rounded-lg px-4 md:h-11 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                  className="w-full border border-slate-200 rounded-lg px-4 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
                   placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                   value={search.value}
                   onChange={(e) => search.onChange(e.target.value)}
@@ -164,7 +164,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             {select && (
               <div className="flex items-center gap-2">
                 <select
-                  className="border border-slate-200 rounded-lg px-3 md:h-11 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
+                  className="border border-slate-200 rounded-lg px-3 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
                   value={select.value}
                   onChange={(e) => select.onChange(e.target.value)}
                   title={select.title || 'Seçim'}
@@ -199,7 +199,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 <button
                   type="button"
                   onClick={onClear}
-                  className={`${adminButtonSecondaryClass} md:h-11 h-10 !px-4 text-xs`}
+                  className={`${adminButtonSecondaryClass} !px-4 text-xs`}
                 >{t('admin.toolbar.clear')}</button>
               )}
 
@@ -219,7 +219,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   key={ch.key}
                   type="button"
                   onClick={ch.onToggle}
-                  className={`px-4 md:h-9 h-10 inline-flex items-center rounded-lg border transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
+                  className={`px-4 h-10 inline-flex items-center rounded-lg border transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
                   title={ch.title || ch.label}
                   aria-pressed={ch.active}
                 >{ch.label}</button>

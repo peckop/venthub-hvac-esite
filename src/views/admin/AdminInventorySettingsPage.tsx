@@ -71,7 +71,7 @@ const AdminInventorySettingsPage: React.FC = () => {
           <label className="block text-sm font-bold text-slate-500 uppercase tracking-tight mb-2">Varsayılan Düşük Stok Eşiği</label>
           <div className="flex items-center gap-3">
             <input type="number" className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
-            <button className={adminButtonPrimaryClass + " h-10 px-6"} disabled={saving || !isAdmin} onClick={save}>Uygula</button>
+            <button className={adminButtonPrimaryClass} disabled={saving || !isAdmin} onClick={save}>Uygula</button>
           </div>
           <label className="mt-4 flex items-center gap-3 text-sm font-medium text-slate-600 cursor-pointer group">
             <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />

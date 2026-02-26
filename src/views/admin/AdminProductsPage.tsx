@@ -9,7 +9,7 @@ import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
-import { ChevronDown, ChevronRight, Pencil } from 'lucide-react'
+import { ChevronDown, ChevronRight, Pencil, Plus } from 'lucide-react'
 
 interface ProductRow {
   id: string
@@ -398,7 +398,8 @@ const AdminProductsPage: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
         <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
-          <span>+</span> {t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}
+          <Plus size={18} />
+          <span>{t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}</span>
         </button>
       </div>
 
@@ -450,8 +451,8 @@ const AdminProductsPage: React.FC = () => {
               setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
-            <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass} md:h-11 h-10`}>{t('admin.products.import.button')}</button>
-            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} md:h-11 h-10 opacity-70`} disabled>Görünüm…</button>}>
+            <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass}`}>{t('admin.products.import.button')}</button>
+            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} opacity-70`} disabled>Görünüm…</button>}>
               <ColumnsMenu
                 columns={[
                   { key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v) => setVisibleCols(s => ({ ...s, image: v })) },
@@ -467,7 +468,7 @@ const AdminProductsPage: React.FC = () => {
                 onDensityChange={setDensity}
               />
             </React.Suspense>
-            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} md:h-11 h-10 opacity-70`} disabled>İndir…</button>}>
+            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} opacity-70`} disabled>İndir…</button>}>
               <ExportMenu
                 items={[
                   {
@@ -743,8 +744,8 @@ const AdminProductsPage: React.FC = () => {
                     {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
-                          <button className="px-2 py-1 rounded border text-xs hover:border-blue-500 hover:text-blue-600 transition-colors" onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                          <button className="px-2 py-1 rounded border text-xs text-red-600 hover:border-red-400 hover:bg-red-50 transition-colors" onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
+                          <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                          <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
                         </div>
                       </td>
                     )}

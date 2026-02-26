@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 interface ErrorGroup {
@@ -375,21 +375,21 @@ const AdminErrorGroupsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer">
               <option value="">{t('admin.errorGroups.filter.statusAll')}</option>
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
-            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer">
               <option value="">{t('admin.errorGroups.filter.assignedAll')}</option>
               <option value="__none__">{t('admin.errorGroups.filter.unassigned')}</option>
               {users.map(u => (
                 <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
               ))}
             </select>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.endDate') as string} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.errorGroups.export.csvLabel'), onSelect: () => exportGroupsCsv() }]} />
             <ColumnsMenu
               density={density}
@@ -411,9 +411,9 @@ const AdminErrorGroupsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-slate-500">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk action bar */}
@@ -422,13 +422,13 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="text-sm text-slate-500">{t('admin.errorGroups.bulk.selected', { count: selectedIds.length })}</div>
           <div className="flex items-center gap-2">
             <label className="text-sm text-slate-500">{t('admin.errorGroups.bulk.statusTitle')}</label>
-            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-md px-2 h-10 text-sm bg-white">
+            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-white focus:ring-primary-navy/10">
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
             <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
-            <button onClick={() => setSelectedIds([])} className="px-3 py-2 rounded border border-gray-200">{t('admin.ui.clear')}</button>
+            <button onClick={() => setSelectedIds([])} className={adminButtonSecondaryClass}>{t('admin.ui.clear')}</button>
           </div>
         </div>
       )}
