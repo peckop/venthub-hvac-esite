@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
 import { Plus } from 'lucide-react'
@@ -220,8 +220,8 @@ const AdminCategoriesPage: React.FC = () => {
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2">
-                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
-                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
+                        <button className={adminTableActionClass} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
+                        <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
                       </div>
                     </td>
                   )}
