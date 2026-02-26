@@ -7,6 +7,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 type Movement = {
   id: string
@@ -331,27 +332,27 @@ const AdminMovementsPage: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               {visibleCols.date && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
                 </th>
               )}
               {visibleCols.product && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
                 </th>
               )}
               {visibleCols.delta && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
                 </th>
               )}
               {visibleCols.reason && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
                 </th>
               )}
               {visibleCols.ref && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
                 </th>
               )}
@@ -368,13 +369,18 @@ const AdminMovementsPage: React.FC = () => {
                     <div className="flex flex-col">
                       <span>{productMap[m.product_id]?.name || m.product_id}</span>
                       {productMap[m.product_id]?.sku && (
-                        <span className="text-xs text-steel-gray">{productMap[m.product_id]?.sku}</span>
+                        <span className="text-xs text-slate-500">{productMap[m.product_id]?.sku}</span>
                       )}
                     </div>
                   </td>
                 )}
                 {visibleCols.delta && (
-                  <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-mono`}>{m.delta > 0 ? `+${m.delta}` : m.delta}</td>
+                  <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
+                    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold font-mono px-2 py-0.5 rounded-full ${m.delta > 0 ? 'bg-emerald-50 text-emerald-700' : m.delta < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
+                      {m.delta > 0 ? <ArrowUpRight size={12} /> : m.delta < 0 ? <ArrowDownRight size={12} /> : null}
+                      {m.delta > 0 ? `+${m.delta}` : m.delta}
+                    </span>
+                  </td>
                 )}
                 {visibleCols.reason && (
                   <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
@@ -387,7 +393,7 @@ const AdminMovementsPage: React.FC = () => {
           </tbody>
         </table>
         {loading === LoadState.Loading && (
-          <div className="p-4 text-sm text-steel-gray">{t('admin.ui.loadingShort')}</div>
+          <div className="p-4 text-sm text-slate-500">{t('admin.ui.loadingShort')}</div>
         )}
         {loading === LoadState.Error && (
           <div className="p-4 text-sm text-red-600">{error}</div>
@@ -396,7 +402,7 @@ const AdminMovementsPage: React.FC = () => {
 
       <div className="flex items-center justify-between">
         <button className="px-3 py-2 border rounded text-sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
-        <span className="text-sm text-steel-gray">{t('admin.movements.pageLabel', { page: String(page) })}</span>
+        <span className="text-sm text-slate-500">{t('admin.movements.pageLabel', { page: String(page) })}</span>
         <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>

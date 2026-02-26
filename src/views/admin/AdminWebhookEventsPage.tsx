@@ -135,7 +135,7 @@ const AdminWebhookEventsPage: React.FC = () => {
 
       {tab === 'returns' ? (
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-          <div className="p-2 text-xs text-steel-gray">{t('admin.webhooks.tip.rowAction')}</div>
+          <div className="p-2 text-xs text-slate-500">{t('admin.webhooks.tip.rowAction')}</div>
           <table className="min-w-full text-sm">
             <thead>
               <tr>

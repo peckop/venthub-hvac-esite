@@ -7,6 +7,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import Link from 'next/link'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
+import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2 } from 'lucide-react'
 
@@ -17,17 +18,20 @@ const AdminDashboardPage: React.FC = () => {
   const [range, setRange] = React.useState<Range>('today')
 
   const [ordersCount, setOrdersCount] = React.useState<number | null>(null)
+  const [prevOrdersCount, setPrevOrdersCount] = React.useState<number | null>(null)
   const [salesTotal, setSalesTotal] = React.useState<number | null>(null)
+  const [prevSalesTotal, setPrevSalesTotal] = React.useState<number | null>(null)
   const [pendingReturns, setPendingReturns] = React.useState<number | null>(null)
   const [pendingShipments, setPendingShipments] = React.useState<number | null>(null)
   const [loading, setLoading] = React.useState<boolean>(false)
   const [error, setError] = React.useState<string | null>(null)
-  const [dailyCounts, setDailyCounts] = React.useState<Array<{ date: string; count: number }>>([])
+  const [dailyCounts, setDailyCounts] = React.useState<Array<{ date: string; orders: number; returns: number }>>([])
   const [recentOrders, setRecentOrders] = React.useState<Array<{ id: string; created_at: string; total_amount: number; status: string; order_number?: string | null }>>([])
   const [carrierDist, setCarrierDist] = React.useState<Array<{ key: string; count: number }>>([])
   const [returnsByStatus, setReturnsByStatus] = React.useState<Array<{ status: string; count: number }>>([])
   const [shipAges, setShipAges] = React.useState<Array<{ bucket: string; count: number }>>([])
   const [returnsWeekly, setReturnsWeekly] = React.useState<Array<{ week: string; count: number }>>([])
+  const [activityData, setActivityData] = React.useState<Array<{ day: number; hour: number; count: number }>>([])
 
   const rangeStartISO = React.useMemo(() => {
     const now = new Date()
@@ -38,6 +42,20 @@ const AdminDashboardPage: React.FC = () => {
     const days = range === '7d' ? 7 : 30
     const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
     return start.toISOString()
+  }, [range])
+
+  const prevRangeISO = React.useMemo(() => {
+    const now = new Date()
+    let start: Date, end: Date
+    if (range === 'today') {
+      start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+      end = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    } else {
+      const days = range === '7d' ? 7 : 30
+      start = new Date(now.getTime() - (days * 2 * 24 * 60 * 60 * 1000))
+      end = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000))
+    }
+    return { start: start.toISOString(), end: end.toISOString() }
   }, [range])
 
   const loadKPIs = React.useCallback(async () => {
@@ -51,10 +69,18 @@ const AdminDashboardPage: React.FC = () => {
         .select('id, total_amount, created_at, status, order_number', { count: 'exact' })
         .gte('created_at', rangeStartISO)
         .order('created_at', { ascending: false })
-        .limit(500)
+        .limit(1000)
 
-      const [ordersRes, returnsRes, shipRes, shipListRes, returnsListRes, shipAgeRes, returnsWeeklyRes] = await Promise.all([
+      // Previous period query for trends
+      const prevOrdersQuery = supabase
+        .from('venthub_orders')
+        .select('id, total_amount', { count: 'exact' })
+        .gte('created_at', prevRangeISO.start)
+        .lt('created_at', prevRangeISO.end)
+
+      const [ordersRes, prevOrdersRes, returnsRes, shipRes, shipListRes, returnsListRes, shipAgeRes, returnsWeeklyRes] = await Promise.all([
         ordersQuery,
+        prevOrdersQuery,
         // Pending returns (not time-bound): requested/approved/in_transit/received
         supabase
           .from('venthub_returns')
@@ -101,22 +127,62 @@ const AdminDashboardPage: React.FC = () => {
       setOrdersCount(typeof ordersRes.count === 'number' ? ordersRes.count : list.length)
       setSalesTotal(sum)
 
-      // build daily counts (last N days depending on range, default 7 for visualization)
+      // Previous period calculation
+      const prevList = (prevOrdersRes.data || []) as Array<{ total_amount?: number | string | null }>
+      const prevSum = prevList.reduce((acc, it) => acc + Number(it.total_amount || 0), 0)
+      setPrevOrdersCount(typeof prevOrdersRes.count === 'number' ? prevOrdersRes.count : prevList.length)
+      setPrevSalesTotal(prevSum)
+
+      // build daily counts (last N days depending on range)
       const days = range === 'today' ? 1 : (range === '7d' ? 7 : 30)
-      const byDay = new Map<string, number>()
+      const dataMap = new Map<string, { date: string; orders: number; returns: number }>()
+
       for (let i = days - 1; i >= 0; i--) {
         const d = new Date()
         d.setHours(0, 0, 0, 0)
         d.setDate(d.getDate() - i)
         const key = d.toISOString().slice(0, 10)
-        byDay.set(key, 0)
+        dataMap.set(key, { date: key, orders: 0, returns: 0 })
       }
+
+      // Fill orders
       list.forEach(o => {
         const key = new Date(o.created_at).toISOString().slice(0, 10)
-        if (byDay.has(key)) byDay.set(key, (byDay.get(key) || 0) + 1)
+        if (dataMap.has(key)) {
+          const val = dataMap.get(key)!
+          val.orders++
+        }
       })
-      const daily = Array.from(byDay.entries()).map(([date, count]) => ({ date, count }))
-      setDailyCounts(daily)
+
+      // Fill returns (if available in historical data)
+      // Since returnsWeeklyRes fetches last 60 days, we can use it to fill the daily map
+      const rlist_all = (returnsWeeklyRes.data || []) as Array<{ requested_at: string | null }>
+      rlist_all.forEach(r => {
+        if (!r.requested_at) return
+        const key = r.requested_at.slice(0, 10)
+        if (dataMap.has(key)) {
+          const val = dataMap.get(key)!
+          val.returns++
+        }
+      })
+
+      const daily = Array.from(dataMap.values()).sort((a, b) => a.date.localeCompare(b.date))
+      setDailyCounts(daily as any)
+
+      // Calculate Heatmap Data
+      const heatmapMap = new Map<string, number>()
+      list.forEach(o => {
+        const d = new Date(o.created_at)
+        const day = d.getDay() // 0-6 (Sun-Sat)
+        const hour = d.getHours() // 0-23
+        const key = `${day}-${hour}`
+        heatmapMap.set(key, (heatmapMap.get(key) || 0) + 1)
+      })
+      const heatData = Array.from(heatmapMap.entries()).map(([key, count]) => {
+        const [dayStr, hourStr] = key.split('-')
+        return { day: Number(dayStr), hour: Number(hourStr), count }
+      })
+      setActivityData(heatData)
 
       // recent orders (top 10)
       setRecentOrders(list.slice(0, 10).map(o => ({ id: o.id, created_at: o.created_at, total_amount: Number(o.total_amount || 0), status: o.status || 'pending', order_number: o.order_number || null })))
@@ -191,7 +257,7 @@ const AdminDashboardPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [rangeStartISO, range, t])
+  }, [rangeStartISO, prevRangeISO, range, t])
 
   React.useEffect(() => { loadKPIs() }, [loadKPIs])
 
@@ -225,11 +291,38 @@ const AdminDashboardPage: React.FC = () => {
 
       {/* KPI Cards */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <StatCard title={t('admin.dashboard.kpis.ordersCount')} value={ordersCount} loading={loading} icon={<ShoppingBag size={24} strokeWidth={1.5} />} trend={{ value: 12 }} />
-        <StatCard title={t('admin.dashboard.kpis.salesTotal')} value={salesTotal} loading={loading} isCurrency lang={lang} icon={<TrendingUp size={24} strokeWidth={1.5} />} trend={{ value: 8 }} />
-        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" icon={<HandCoins size={24} strokeWidth={1.5} />} trend={{ value: -2 }} />
-        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" icon={<PackagePlus size={24} strokeWidth={1.5} />} trend={{ value: 5 }} />
-        <StatCard title={t('admin.dashboard.kpis.avgBasket')} value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null} loading={loading} isCurrency lang={lang} icon={<Calculator size={24} strokeWidth={1.5} />} trend={{ value: 3 }} />
+        <StatCard
+          title={t('admin.dashboard.kpis.ordersCount')}
+          value={ordersCount}
+          loading={loading}
+          icon={<ShoppingBag size={24} strokeWidth={1.5} />}
+          trend={ordersCount != null && prevOrdersCount != null && prevOrdersCount > 0 ? { value: Math.round(((ordersCount - prevOrdersCount) / prevOrdersCount) * 100) } : undefined}
+        />
+        <StatCard
+          title={t('admin.dashboard.kpis.salesTotal')}
+          value={salesTotal}
+          loading={loading}
+          isCurrency
+          lang={lang}
+          icon={<TrendingUp size={24} strokeWidth={1.5} />}
+          trend={salesTotal != null && prevSalesTotal != null && prevSalesTotal > 0 ? { value: Math.round(((salesTotal - prevSalesTotal) / prevSalesTotal) * 100) } : undefined}
+        />
+        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" icon={<HandCoins size={24} strokeWidth={1.5} />} />
+        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" icon={<PackagePlus size={24} strokeWidth={1.5} />} />
+        <StatCard
+          title={t('admin.dashboard.kpis.avgBasket')}
+          value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null}
+          loading={loading}
+          isCurrency
+          lang={lang}
+          icon={<Calculator size={24} strokeWidth={1.5} />}
+          trend={(() => {
+            const currentAvg = (ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : 0;
+            const prevAvg = (prevOrdersCount && prevOrdersCount > 0 && prevSalesTotal != null) ? (prevSalesTotal / prevOrdersCount) : 0;
+            if (currentAvg > 0 && prevAvg > 0) return { value: Math.round(((currentAvg - prevAvg) / prevAvg) * 100) };
+            return undefined;
+          })()}
+        />
       </section>
 
       {/* Primary Chart Area */}
@@ -237,6 +330,14 @@ const AdminDashboardPage: React.FC = () => {
         <SalesChart
           title={t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}
           data={dailyCounts}
+        />
+      </section>
+
+      {/* Heatmap Area */}
+      <section className="w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
+        <ActivityHeatmap
+          title="Gelişmiş Sipariş Yoğunluk Haritası (Seçili Aralık)"
+          data={activityData}
         />
       </section>
 

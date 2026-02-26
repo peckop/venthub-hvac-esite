@@ -21,6 +21,8 @@ import {
   Tags,
   Ticket
 } from 'lucide-react'
+import CommandPalette from '../../components/admin/CommandPalette'
+import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname()
@@ -87,8 +89,20 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans">
-      <div className="max-w-[1400px] mx-auto px-4 py-8 grid grid-cols-12 gap-8">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12">
+      <div className="max-w-[1400px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <span className="bg-gradient-to-r from-primary-navy to-secondary-blue text-transparent bg-clip-text">Premium</span>
+            Yönetim
+          </h1>
+          <p className="text-xs text-slate-500 font-medium">VentHub B2B Platform</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <AdminRealtimeNotifications />
+        </div>
+      </div>
+      <div className="max-w-[1400px] mx-auto px-4 py-4 grid grid-cols-12 gap-8">
         <aside className="col-span-12 md:col-span-3 lg:col-span-2">
           <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 space-y-5">
             {navGroups.map((group, gi) => (
@@ -115,6 +129,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           </div>
         </section>
       </div>
+      <CommandPalette />
     </div>
   )
 }

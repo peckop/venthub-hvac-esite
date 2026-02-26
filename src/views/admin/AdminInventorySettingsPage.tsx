@@ -15,9 +15,9 @@ const AdminInventorySettingsPage: React.FC = () => {
   const [error, setError] = React.useState<string>('')
   const [success, setSuccess] = React.useState<string>('')
   const [isAdmin, setIsAdmin] = React.useState<boolean>(false)
-  React.useEffect(()=>{ (async()=>{ setIsAdmin(await checkAdminAccessAsync(user)) })() }, [user])
+  React.useEffect(() => { (async () => { setIsAdmin(await checkAdminAccessAsync(user)) })() }, [user])
 
-  const load = React.useCallback(async()=>{
+  const load = React.useCallback(async () => {
     try {
       setLoading(LoadState.Loading)
       const { data, error } = await supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle()
@@ -32,7 +32,7 @@ const AdminInventorySettingsPage: React.FC = () => {
     }
   }, [])
 
-  React.useEffect(()=>{ load() }, [load])
+  React.useEffect(() => { load() }, [load])
 
   async function save() {
     try {
@@ -59,7 +59,7 @@ const AdminInventorySettingsPage: React.FC = () => {
       <h1 className={adminSectionTitleClass}>Eşik & Ayarlar</h1>
 
       {!isAdmin && (
-        <div className={`${adminCardClass} p-4 border-amber-300 bg-amber-50`}> 
+        <div className={`${adminCardClass} p-4 border-amber-300 bg-amber-50`}>
           <div className="text-sm text-amber-800">
             Bu sayfada değişiklik yapmak için admin olarak giriş yapmalısınız. Lütfen giriş yapın ve tekrar deneyin.
           </div>
@@ -68,26 +68,26 @@ const AdminInventorySettingsPage: React.FC = () => {
 
       <div className={`${adminCardClass} p-4 space-y-4`}>
         <div>
-          <label className="block text-sm text-steel-gray mb-1">Varsayılan Düşük Stok Eşiği</label>
+          <label className="block text-sm text-slate-500 mb-1">Varsayılan Düşük Stok Eşiği</label>
           <div className="flex items-center gap-2">
-            <input type="number" className="w-32 px-3 py-2 border rounded" value={defaultThreshold} onChange={(e)=>setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
+            <input type="number" className="w-32 px-3 py-2 border rounded" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
             <button className="px-3 py-2 border rounded" disabled={saving || !isAdmin} onClick={save}>Uygula</button>
           </div>
           <label className="mt-3 flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={resetAll} onChange={(e)=>setResetAll(e.target.checked)} />
+            <input type="checkbox" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
             Tüm ürünlere uygula (override’ları temizle)
           </label>
-          <p className="text-xs text-steel-gray mt-1">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir).</p>
+          <p className="text-xs text-slate-500 mt-1">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir).</p>
         </div>
 
-        {loading === LoadState.Loading && <div className="text-sm text-steel-gray">Yükleniyor…</div>}
+        {loading === LoadState.Loading && <div className="text-sm text-slate-500">Yükleniyor…</div>}
         {loading === LoadState.Error && <div className="text-sm text-red-600">{error}</div>}
         {!!success && <div className="text-sm text-green-700">{success}</div>}
       </div>
 
       {/* İleri Aşama: Kategori/Depo bazlı eşik kuralları ve CSV import/export */}
       <div className={`${adminCardClass} p-4`}>
-        <div className="text-sm text-steel-gray">Geleceğe hazırlık: Kategori/Depo bazlı eşik kuralları ve CSV ile toplu eşik güncelleme burada yer alacak.</div>
+        <div className="text-sm text-slate-500">Geleceğe hazırlık: Kategori/Depo bazlı eşik kuralları ve CSV ile toplu eşik güncelleme burada yer alacak.</div>
       </div>
     </div>
   )
