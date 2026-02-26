@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass } from '../../utils/adminUi'
+import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import toast from 'react-hot-toast'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -158,7 +158,7 @@ const AdminCouponsPage: React.FC = () => {
     <div className="space-y-4">
       <header className="flex items-center justify-between">
         <h1 className={adminSectionTitleClass}>{t('admin.titles.coupons')}</h1>
-        <button onClick={fetchCoupons} disabled={loading} className="px-3 py-2 rounded border border-gray-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
+        <button onClick={fetchCoupons} disabled={loading} className={adminButtonSecondaryClass}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
       </header>
 
       <AdminToolbar
@@ -168,24 +168,53 @@ const AdminCouponsPage: React.FC = () => {
         recordCount={filtered().length}
       />
 
-      <section className={adminCardPaddedClass + ' space-y-3'}>
-        <h3 className="font-semibold text-industrial-gray">Yeni Kupon</h3>
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
-          <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="Kod" className="border border-gray-200 rounded px-3 py-2" />
-          <select value={form.type as string} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} className="border border-gray-200 rounded px-3 py-2">
-            <option value="percent">Yüzde</option>
-            <option value="fixed">Sabit</option>
-          </select>
-          <input type="number" value={(form.value as number | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} placeholder="Değer" className="border border-gray-200 rounded px-3 py-2" />
-          <input type="datetime-local" value={(form.starts_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
-          <input type="datetime-local" value={(form.ends_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, ends_at: e.target.value }))} className="border border-gray-200 rounded px-3 py-2" />
-          <div className="flex items-center gap-2">
-            <input type="checkbox" checked={!!form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} /> Aktif
-          </div>
-          <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e => setForm(f => { const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Kullanım limiti (ops.)" className="border border-gray-200 rounded px-3 py-2 md:col-span-2" />
-          <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className="px-3 py-2 rounded bg-primary-navy text-white hover:opacity-90 md:col-span-2">{saving ? 'Kaydediliyor…' : 'Ekle'}</button>
+      <div className={adminCardPaddedClass + ' space-y-5'}>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-navy"></div>
+            Yeni Kupon
+          </h3>
         </div>
-      </section>
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Kupon Kodu</label>
+            <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="Örn: VENT25" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all font-mono placeholder:text-slate-300" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">İndirim Tipi</label>
+            <select value={form.type as string} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all appearance-none cursor-pointer">
+              <option value="percent">Yüzde (%)</option>
+              <option value="fixed">Sabit (₺)</option>
+            </select>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Değer</label>
+            <input type="number" value={(form.value as number | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} placeholder="0" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Başlangıç</label>
+            <input type="datetime-local" value={(form.starts_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Bitiş</label>
+            <input type="datetime-local" value={(form.ends_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, ends_at: e.target.value }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Durum</label>
+            <div className="flex items-center gap-3 px-4 h-[42px] bg-slate-50 border border-slate-200/60 rounded-xl">
+              <input type="checkbox" id="coupon-active" checked={!!form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy/5" />
+              <label htmlFor="coupon-active" className="text-sm font-medium text-slate-600 cursor-pointer">Aktif</label>
+            </div>
+          </div>
+          <div className="md:col-span-4 flex flex-col gap-1.5">
+            <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Kullanım Limiti (Opsiyonel)</label>
+            <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e => setForm(f => { const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Sınırsız için boş bırakın" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all placeholder:text-slate-300" />
+          </div>
+          <div className="md:col-span-2 flex flex-col gap-1.5 justify-end">
+            <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className={`${adminButtonPrimaryClass} h-[42px] shadow-lg shadow-primary-navy/10 w-full`}>{saving ? 'Kaydediliyor…' : 'Kuponu Oluştur'}</button>
+          </div>
+        </div>
+      </div>
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
         <table className="min-w-full text-sm">

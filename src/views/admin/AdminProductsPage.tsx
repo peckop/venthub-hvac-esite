@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
@@ -408,7 +408,7 @@ const AdminProductsPage: React.FC = () => {
           <div className="flex-1">
             <input
               type="text"
-              className="w-full border border-slate-200 rounded-md px-3 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+              className="w-full border border-slate-200 rounded-lg px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
               placeholder={t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara'}
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -417,7 +417,7 @@ const AdminProductsPage: React.FC = () => {
           {q && (
             <button
               onClick={() => setQ('')}
-              className="text-sm text-slate-500 hover:text-primary-navy"
+              className={`${adminButtonSecondaryClass} h-11 !px-4 shadow-sm`}
             >
               Temizle
             </button>
@@ -450,8 +450,8 @@ const AdminProductsPage: React.FC = () => {
               setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
-            <button onClick={() => document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
-            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white text-sm opacity-70" disabled>Görünüm…</button>}>
+            <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass} md:h-11 h-10`}>{t('admin.products.import.button')}</button>
+            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} md:h-11 h-10 opacity-70`} disabled>Görünüm…</button>}>
               <ColumnsMenu
                 columns={[
                   { key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v) => setVisibleCols(s => ({ ...s, image: v })) },
@@ -467,7 +467,7 @@ const AdminProductsPage: React.FC = () => {
                 onDensityChange={setDensity}
               />
             </React.Suspense>
-            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white text-sm opacity-70" disabled>İndir…</button>}>
+            <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} md:h-11 h-10 opacity-70`} disabled>İndir…</button>}>
               <ExportMenu
                 items={[
                   {
@@ -513,16 +513,16 @@ const AdminProductsPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <button className="px-3 h-10 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs" onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
-            <button className="px-3 h-10 rounded-md border border-slate-200 bg-white text-xs" onClick={() => {
+          <div className="mt-4 flex items-center gap-3">
+            <button className={`${adminButtonSecondaryClass} h-10 text-xs`} onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
+            <button className={`${adminButtonSecondaryClass} h-10 text-xs`} onClick={() => {
               const h = (importPreview?.header || [])
               const required = ['name', 'sku']
               const hasRequired = required.every(k => h.includes(k))
               const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
               alert(t('admin.products.import.dryRunResult', { status: t(`admin.products.import.${hasRequired ? 'statusComplete' : 'statusMissing'}`), ok: okCount, total: importPreview?.total || 0 }))
             }}>{t('admin.products.import.dryRun')}</button>
-            <button className="px-3 h-10 rounded-md bg-primary-navy text-white text-xs" onClick={async () => {
+            <button className={`${adminButtonPrimaryClass} h-10 text-xs`} onClick={async () => {
               if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
               const h = importPreview.header
               if (!h.includes('sku') || !h.includes('name')) { alert(t('admin.products.import.minColumns')); return }
@@ -573,10 +573,10 @@ const AdminProductsPage: React.FC = () => {
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
         <div className="p-2 flex items-center justify-between text-sm text-slate-500">
           <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
-            <span>{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} h-9 !py-1 text-xs disabled:opacity-50`}>{t('admin.ui.prev')}</button>
+            <span className="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} h-9 !py-1 text-xs disabled:opacity-50`}>{t('admin.ui.next')}</button>
           </div>
         </div>
         <table className="w-full">
@@ -684,23 +684,27 @@ const AdminProductsPage: React.FC = () => {
                     {visibleCols.price && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
                         {inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
-                          <input
-                            type="number"
-                            autoFocus
-                            value={inlineEdit.value}
-                            onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                            onBlur={saveInlineEdit}
-                            onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                            className="w-24 text-right border border-primary-navy/40 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
-                          />
+                          <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                            <input
+                              type="number"
+                              autoFocus
+                              value={inlineEdit.value}
+                              onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                              onBlur={saveInlineEdit}
+                              onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                              className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                            />
+                          </div>
                         ) : (
                           <button
                             onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                            className="group hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text inline-flex items-center gap-1.5"
+                            className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
                             title="Tıklayarak düzenle"
                           >
                             <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
-                            <Pencil size={10} className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                              <Pencil size={10} className="text-primary-navy" />
+                            </div>
                           </button>
                         )}
                       </td>
@@ -709,23 +713,29 @@ const AdminProductsPage: React.FC = () => {
                     {visibleCols.stock && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
                         {inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
-                          <input
-                            type="number"
-                            autoFocus
-                            value={inlineEdit.value}
-                            onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                            onBlur={saveInlineEdit}
-                            onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                            className="w-20 text-right border border-primary-navy/40 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30"
-                          />
+                          <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                            <input
+                              type="number"
+                              autoFocus
+                              value={inlineEdit.value}
+                              onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                              onBlur={saveInlineEdit}
+                              onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                              className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                            />
+                          </div>
                         ) : (
                           <button
                             onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                            className="group hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text inline-flex items-center gap-1.5"
+                            className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
                             title="Tıklayarak düzenle"
                           >
-                            <span>{(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}</span>
-                            <Pencil size={10} className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
+                              {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                            </span>
+                            <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                              <Pencil size={10} className="text-primary-navy" />
+                            </div>
                           </button>
                         )}
                       </td>

@@ -12,3 +12,5 @@ export const adminTableHeadCellClass = 'text-left p-4 text-xs font-semibold text
 export const adminTableCellClass = 'p-4 text-sm text-slate-600 align-middle border-b border-slate-100'
 
 export const adminButtonPrimaryClass = 'inline-flex justify-center items-center gap-2 px-4 py-2 rounded-lg bg-primary-navy text-white text-sm font-medium hover:bg-primary-navy/90 hover:shadow-md hover:shadow-primary-navy/20 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-navy'
+export const adminButtonSecondaryClass = 'inline-flex justify-center items-center gap-2 px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-50 hover:border-slate-300 hover:text-primary-navy hover:shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200'
+

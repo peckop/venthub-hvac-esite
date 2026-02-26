@@ -289,7 +289,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
     const TabTrigger = ({ value, label }: { value: string, label: string }) => (
         <Tabs.Trigger
             value={value}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 hover:text-gray-900 transition-colors"
+            className="px-4 py-2.5 text-sm font-semibold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-800 transition-all duration-200 whitespace-nowrap"
         >
             {label}
         </Tabs.Trigger>
@@ -298,16 +298,19 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-                <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[90vh] bg-white rounded-xl shadow-2xl z-50 flex flex-col outline-none">
+                <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[60] transition-opacity animate-in fade-in duration-300" />
+                <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none transform transition-all animate-in fade-in zoom-in-95 duration-300 overflow-hidden">
 
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                        <Dialog.Title className="text-xl font-bold text-gray-900">
-                            {productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
-                        </Dialog.Title>
-                        <Dialog.Close className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <X size={24} />
+                    {/* Premium Header */}
+                    <div className="flex items-center justify-between p-6 bg-slate-50/50 border-b border-slate-100">
+                        <div className="flex flex-col">
+                            <Dialog.Title className="text-xl font-bold text-primary-navy">
+                                {productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
+                            </Dialog.Title>
+                            <p className="text-xs text-slate-500 mt-0.5">VentHub Katalog Yönetim Sistemi</p>
+                        </div>
+                        <Dialog.Close className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all duration-200">
+                            <X size={20} />
                         </Dialog.Close>
                     </div>
 
@@ -332,33 +335,33 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                                     <Tabs.Content value="info" className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Ürün Adı *</label>
-                                                <input {...register('name')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Ürün Adı *</label>
+                                                <input {...register('name')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                                 {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">SKU (Stok Kodu) *</label>
-                                                <input {...register('sku')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <div className="space-y-2 text-right">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SKU (Stok Kodu) *</label>
+                                                <input {...register('sku')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                                 {errors.sku && <span className="text-xs text-red-500">{errors.sku.message}</span>}
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Marka</label>
-                                                <input {...register('brand')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Marka</label>
+                                                <input {...register('brand')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
+                                            </div>
+                                            <div className="space-y-2 text-right">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Model Kodu</label>
+                                                <input {...register('model_code')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Model Kodu</label>
-                                                <input {...register('model_code')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Kategori</label>
-                                                <select {...register('category_id')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Kategori</label>
+                                                <select {...register('category_id')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer">
                                                     <option value="">Seçiniz</option>
                                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                                 </select>
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Durum</label>
-                                                <select {...register('status')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                            <div className="space-y-2 text-right">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Durum</label>
+                                                <select {...register('status')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer">
                                                     <option value="active">Aktif</option>
                                                     <option value="inactive">Pasif</option>
                                                     <option value="out_of_stock">Stok Yok</option>
@@ -366,8 +369,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Açıklama</label>
-                                            <textarea {...register('description')} rows={4} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Açıklama</label>
+                                            <textarea {...register('description')} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <input type="checkbox" {...register('is_featured')} id="is_featured" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
@@ -379,20 +382,20 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                                     <Tabs.Content value="pricing" className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Satış Fiyatı (TL)</label>
-                                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Satış Fiyatı (TL)</label>
+                                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-900" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Alış Fiyatı (TL)</label>
-                                                <input type="number" step="0.01" {...register('purchase_price', { valueAsNumber: true })} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Alış Fiyatı (TL)</label>
+                                                <input type="number" step="0.01" {...register('purchase_price', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-600" />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Stok Adedi</label>
-                                                <input type="number" {...register('stock_qty', { valueAsNumber: true })} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Stok Adedi</label>
+                                                <input type="number" {...register('stock_qty', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-slate-900" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-gray-700">Kritik Stok Seviyesi</label>
-                                                <input type="number" {...register('low_stock_threshold', { valueAsNumber: true })} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <div className="space-y-2 text-right">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Kritik Stok Seviyesi</label>
+                                                <input type="number" {...register('low_stock_threshold', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-rose-600" />
                                             </div>
                                         </div>
                                     </Tabs.Content>
@@ -467,16 +470,16 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                                     {/* SEO TAB */}
                                     <Tabs.Content value="seo" className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">SEO URL (Slug)</label>
-                                            <input {...register('slug')} placeholder="Otomatik oluşturulur" className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO URL (Slug)</label>
+                                            <input {...register('slug')} placeholder="Otomatik oluşturulur" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Meta Başlık</label>
-                                            <input {...register('meta_title')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta Başlık</label>
+                                            <input {...register('meta_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Meta Açıklama</label>
-                                            <textarea {...register('meta_description')} rows={3} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta Açıklama</label>
+                                            <textarea {...register('meta_description')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
                                         </div>
                                     </Tabs.Content>
                                 </Tabs.Root>
@@ -485,11 +488,11 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
+                    <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end gap-3 backdrop-blur-sm">
                         <button
                             type="button"
                             onClick={() => onOpenChange(false)}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                            className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200"
                         >
                             İptal
                         </button>
@@ -497,7 +500,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                             type="submit"
                             form="product-form"
                             disabled={loading || uploading}
-                            className={`${adminButtonPrimaryClass} flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`${adminButtonPrimaryClass} flex items-center gap-2 px-8 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-navy/10 transition-transform active:scale-95`}
                         >
                             {(loading || uploading) ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                             {productId ? 'Değişiklikleri Kaydet' : 'Ürünü Oluştur'}
