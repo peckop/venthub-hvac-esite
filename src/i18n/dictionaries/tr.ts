@@ -718,9 +718,10 @@ export const tr = {
       }
     },
     users: {
+      subtitle: 'Sistem kullanıcılarını ve rollerini yönetin.',
       tabs: { admins: 'Admin Kullanıcılar ({{count}})', all: 'Tüm Kullanıcılar ({{count}})' },
       searchPlaceholder: 'E-posta veya isim ile ara',
-      table: { user: 'Kullanıcı', role: 'Rol', created: 'Kayıt Tarihi', actions: 'İşlemler' },
+      table: { user: 'Kullanıcı', company: 'Şirket & B2B', role: 'Rol', created: 'Kayıt Tarihi', actions: 'İşlemler' },
       empty: { filtered: 'Arama kriterine uygun kullanıcı bulunamadı.', admins: 'Henüz admin kullanıcı yok.', all: 'Kullanıcı listesi boş.' },
       actions: { superadmin: 'Superadmin', admin: 'Admin', moderator: 'Mod', user: 'User' },
       actionTitles: { superadmin: 'Superadmin yap', admin: 'Admin yap', moderator: 'Moderator yap', user: 'Normal kullanıcı yap', cannotDemoteSelf: 'Kendi rolünüzü düşüremezsiniz' },

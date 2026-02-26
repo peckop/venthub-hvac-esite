@@ -575,9 +575,9 @@ const AdminProductsPage: React.FC = () => {
         <div className="p-2 flex items-center justify-between text-sm text-slate-500">
           <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} h-9 !py-1 text-xs disabled:opacity-50`}>{t('admin.ui.prev')}</button>
-            <span className="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} h-9 !py-1 text-xs disabled:opacity-50`}>{t('admin.ui.next')}</button>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.prev')}</button>
+            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
           </div>
         </div>
         <table className="w-full">
