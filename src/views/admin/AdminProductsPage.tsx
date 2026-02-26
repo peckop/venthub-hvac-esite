@@ -1,5 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
+import { useSearchParams } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
@@ -7,7 +8,8 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
+import { ChevronDown, ChevronRight, Pencil } from 'lucide-react'
 
 interface ProductRow {
   id: string
@@ -28,12 +30,14 @@ interface CategoryOpt { id: string; name: string }
 
 const AdminProductsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const searchParams = useSearchParams()
   const [rows, setRows] = React.useState<ProductRow[]>([])
   const [cats, setCats] = React.useState<CategoryOpt[]>([])
   const [q, setQ] = React.useState('')
   const [debouncedQ, setDebouncedQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const deepLinkAppliedRef = React.useRef(false)
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -67,7 +71,7 @@ const AdminProductsPage: React.FC = () => {
 
   // Columns & density
   const STORAGE_KEY = 'toolbar:products'
-  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, price: true, stock: true, actions: true })
+  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sku: boolean; category: boolean; status: boolean; health: boolean; price: boolean; stock: boolean; actions: boolean }>({ image: true, name: true, sku: true, category: true, status: true, health: true, price: true, stock: true, actions: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
 
   const [covers, setCovers] = React.useState<Record<string, string>>({})
@@ -106,6 +110,17 @@ const AdminProductsPage: React.FC = () => {
   })
   React.useEffect(() => { try { localStorage.setItem(SORT_KEY_STORAGE, sortKey) } catch { } }, [sortKey, SORT_KEY_STORAGE])
   React.useEffect(() => { try { localStorage.setItem(SORT_DIR_STORAGE, sortDir) } catch { } }, [sortDir, SORT_DIR_STORAGE])
+
+  // Process deep links (q parameter)
+  React.useEffect(() => {
+    if (deepLinkAppliedRef.current) return
+    const queryParam = searchParams?.get('q') || ''
+    if (queryParam) {
+      setQ(queryParam)
+      setDebouncedQ(queryParam)
+      deepLinkAppliedRef.current = true
+    }
+  }, [searchParams])
 
   const load = React.useCallback(async () => {
     setLoading(true)
@@ -393,7 +408,7 @@ const AdminProductsPage: React.FC = () => {
           <div className="flex-1">
             <input
               type="text"
-              className="w-full border border-light-gray rounded-md px-3 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+              className="w-full border border-slate-200 rounded-md px-3 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
               placeholder={t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara'}
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -402,7 +417,7 @@ const AdminProductsPage: React.FC = () => {
           {q && (
             <button
               onClick={() => setQ('')}
-              className="text-sm text-steel-gray hover:text-primary-navy"
+              className="text-sm text-slate-500 hover:text-primary-navy"
             >
               Temizle
             </button>
@@ -435,8 +450,8 @@ const AdminProductsPage: React.FC = () => {
               setImportRows(rows)
               setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
             }} />
-            <button onClick={() => document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
-            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>Görünüm…</button>}>
+            <button onClick={() => document.getElementById('prod-import-input')?.click()} className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap">{t('admin.products.import.button')}</button>
+            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white text-sm opacity-70" disabled>Görünüm…</button>}>
               <ColumnsMenu
                 columns={[
                   { key: 'image', label: t('admin.products.table.image'), checked: visibleCols.image, onChange: (v) => setVisibleCols(s => ({ ...s, image: v })) },
@@ -452,7 +467,7 @@ const AdminProductsPage: React.FC = () => {
                 onDensityChange={setDensity}
               />
             </React.Suspense>
-            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-light-gray bg-white text-sm opacity-70" disabled>İndir…</button>}>
+            <React.Suspense fallback={<button className="px-3 md:h-12 h-11 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white text-sm opacity-70" disabled>İndir…</button>}>
               <ExportMenu
                 items={[
                   {
@@ -481,7 +496,7 @@ const AdminProductsPage: React.FC = () => {
 
       {importPreview && (
         <div className={`${adminCardClass} p-4`}>
-          <div className="mb-2 text-sm text-industrial-gray">{t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}</div>
+          <div className="mb-2 text-sm text-slate-500">{t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}</div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
@@ -499,8 +514,8 @@ const AdminProductsPage: React.FC = () => {
             </table>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs" onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
-            <button className="px-3 h-10 rounded-md border border-light-gray bg-white text-xs" onClick={() => {
+            <button className="px-3 h-10 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs" onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
+            <button className="px-3 h-10 rounded-md border border-slate-200 bg-white text-xs" onClick={() => {
               const h = (importPreview?.header || [])
               const required = ['name', 'sku']
               const hasRequired = required.every(k => h.includes(k))
@@ -556,12 +571,12 @@ const AdminProductsPage: React.FC = () => {
       {/* Table */}
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
-        <div className="p-2 flex items-center justify-between text-sm text-steel-gray">
+        <div className="p-2 flex items-center justify-between text-sm text-slate-500">
           <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 py-1 rounded border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
             <span>{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-light-gray bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
+            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 py-1 rounded border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
           </div>
         </div>
         <table className="w-full">
@@ -596,6 +611,11 @@ const AdminProductsPage: React.FC = () => {
                   <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
                 </th>
               )}
+              {visibleCols.health && (
+                <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>
+                  Performans
+                </th>
+              )}
               {visibleCols.price && (
                 <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
@@ -617,7 +637,7 @@ const AdminProductsPage: React.FC = () => {
             ) : (
               sorted.map(r => (
                 <React.Fragment key={r.id}>
-                  <tr className={`border-b border-light-gray/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
+                  <tr className={`border-b border-slate-200/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
                     {/* Checkbox */}
                     <td className={`${adminTableCellClass} ${cellPad} w-10`}>
                       <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
@@ -650,6 +670,16 @@ const AdminProductsPage: React.FC = () => {
                     )}
                     {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
                     {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                    {visibleCols.health && (
+                      <td className={`${adminTableCellClass} ${cellPad} text-center`}>
+                        <ProductHealthBadge
+                          stockQty={r.stock_qty || 0}
+                          threshold={r.low_stock_threshold || 10}
+                          status={r.status || 'inactive'}
+                          isFeatured={!!r.is_featured}
+                        />
+                      </td>
+                    )}
                     {/* Inline-edit Price */}
                     {visibleCols.price && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
@@ -666,10 +696,11 @@ const AdminProductsPage: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                            className="hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text"
+                            className="group hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text inline-flex items-center gap-1.5"
                             title="Tıklayarak düzenle"
                           >
-                            {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+                            <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
+                            <Pencil size={10} className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </button>
                         )}
                       </td>
@@ -690,10 +721,11 @@ const AdminProductsPage: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                            className="hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text"
+                            className="group hover:bg-blue-50 px-2 py-0.5 rounded transition-colors text-sm cursor-text inline-flex items-center gap-1.5"
                             title="Tıklayarak düzenle"
                           >
-                            {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                            <span>{(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}</span>
+                            <Pencil size={10} className="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                           </button>
                         )}
                       </td>
@@ -711,7 +743,7 @@ const AdminProductsPage: React.FC = () => {
                   {expandedIds.has(r.id) && (
                     <tr className="bg-gray-50/70">
                       <td colSpan={10} className="px-6 py-3">
-                        <div className="text-xs font-semibold text-industrial-gray uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
+                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
                         {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {Object.entries(techSpecs[r.id]).map(([key, val]) => (
@@ -722,7 +754,7 @@ const AdminProductsPage: React.FC = () => {
                             ))}
                           </div>
                         ) : (
-                          <div className="text-sm text-steel-gray">Teknik veri bulunamadı.</div>
+                          <div className="text-sm text-slate-500">Teknik veri bulunamadı.</div>
                         )}
                       </td>
                     </tr>

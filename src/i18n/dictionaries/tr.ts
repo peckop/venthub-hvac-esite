@@ -330,6 +330,11 @@ export const tr = {
       records: 'kayıt'
     },
     menu: {
+      groupMain: 'Ana Menü',
+      groupSales: 'Satış & Operasyon',
+      groupCatalog: 'Katalog Yönetimi',
+      groupStock: 'Stok & Envanter',
+      groupSystem: 'Sistem & Yönetim',
       dashboard: 'Dashboard',
       coupons: 'Kuponlar',
       webhookEvents: 'Webhook Olayları',
@@ -480,8 +485,8 @@ export const tr = {
       errors: 'URL veya mesaj ara',
       coupons: 'Kod veya tip ile ara',
       movements: 'Ürün adı/SKU ara',
-      orders: 'Sipariş ID veya Conversation ID',
-      products: 'Ürün adı/SKU/marka/slug ara'
+      orders: 'Sipariş No, ID, E-posta veya İsim Ara...',
+      products: 'Ürün Adı, SKU, Marka veya Model Ara...'
     },
     movements: {
       toolbar: {

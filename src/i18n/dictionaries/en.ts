@@ -322,6 +322,11 @@ export const en = {
       records: 'records'
     },
     menu: {
+      groupMain: 'Main Menu',
+      groupSales: 'Sales & Operations',
+      groupCatalog: 'Catalog Management',
+      groupStock: 'Stock & Inventory',
+      groupSystem: 'System & Management',
       dashboard: 'Dashboard',
       coupons: 'Coupons',
       webhookEvents: 'Webhook Events',
@@ -333,7 +338,9 @@ export const en = {
       users: 'Users',
       logs: 'Logs',
       errors: 'Errors',
-      errorGroups: 'Error Groups'
+      errorGroups: 'Error Groups',
+      products: 'Products',
+      categories: 'Categories'
     },
     titles: {
       dashboard: 'Dashboard',

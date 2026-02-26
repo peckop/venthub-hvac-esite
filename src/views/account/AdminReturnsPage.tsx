@@ -3,7 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useRouter, usePathname } from 'next/navigation'
-import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
+import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass } from '../../utils/adminUi'
@@ -382,7 +382,7 @@ export default function AdminReturnsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center py-8">
           <h2 className="text-xl font-semibold text-red-600">{_t('admin.ui.accessDeniedTitle')}</h2>
-          <p className="text-steel-gray mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
+          <p className="text-slate-500 mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
         </div>
       </div>
     )
@@ -446,7 +446,7 @@ export default function AdminReturnsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h2>
-        <div className="text-sm text-steel-gray">{_t('admin.returns.total', { count: returns.length })}</div>
+        <div className="text-sm text-slate-500">{_t('admin.returns.total', { count: returns.length })}</div>
       </div>
 
       {/* Filtreler */}
@@ -488,8 +488,9 @@ export default function AdminReturnsPage() {
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
         </div>
       ) : filteredReturns.length === 0 ? (
-        <div className={`${adminCardClass} text-center py-8`}>
-          <div className="text-steel-gray">
+        <div className={`${adminCardClass} text-center py-12`}>
+          <PackageX size={48} className="mx-auto text-slate-300 mb-3" strokeWidth={1.5} />
+          <div className="text-slate-500 text-sm">
             {searchQuery || !Object.values(statusFilter).every(Boolean)
               ? _t('admin.returns.empty.filtered')
               : _t('admin.returns.empty.none')}
@@ -527,7 +528,7 @@ export default function AdminReturnsPage() {
                               {orderNo}
                             </button>
                             {returnItem.total_amount && (
-                              <span className="text-xs text-steel-gray">
+                              <span className="text-xs text-slate-500">
                                 {formatCurrency(Number(returnItem.total_amount), lang)}
                               </span>
                             )}
@@ -537,17 +538,17 @@ export default function AdminReturnsPage() {
                       {visibleCols.customer && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col">
-                            <span className="font-medium text-industrial-gray">{returnItem.customer_name}</span>
-                            <span className="text-xs text-steel-gray">{returnItem.customer_email}</span>
+                            <span className="font-medium text-slate-700">{returnItem.customer_name}</span>
+                            <span className="text-xs text-slate-500">{returnItem.customer_email}</span>
                           </div>
                         </td>
                       )}
                       {visibleCols.reason && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="max-w-xs">
-                            <div className="font-medium text-industrial-gray">{returnItem.reason}</div>
+                            <div className="font-medium text-slate-700">{returnItem.reason}</div>
                             {returnItem.description && (
-                              <div className="text-xs text-steel-gray mt-1 truncate" title={returnItem.description}>
+                              <div className="text-xs text-slate-500 mt-1 truncate" title={returnItem.description}>
                                 {returnItem.description}
                               </div>
                             )}
@@ -566,7 +567,7 @@ export default function AdminReturnsPage() {
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col">
                             <span className="font-medium">{formatDate(returnItem.created_at, lang)}</span>
-                            <span className="text-xs text-steel-gray">{formatTime(returnItem.created_at, lang)}</span>
+                            <span className="text-xs text-slate-500">{formatTime(returnItem.created_at, lang)}</span>
                           </div>
                         </td>
                       )}

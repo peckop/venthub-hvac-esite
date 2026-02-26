@@ -4,6 +4,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 interface AuditRow {
@@ -128,17 +129,17 @@ const AdminAuditLogPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
           </div>
         )}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-steel-gray">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <span className="text-sm text-slate-500">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -165,7 +166,7 @@ const AdminAuditLogPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-b border-light-gray/60">
+                    <tr className="border-b border-slate-200/60">
                       <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
                       <td className={`${adminTableCellClass}`}><span className="inline-block px-2 py-1 rounded border text-xs" title={r.action}>{r.action}</span></td>
                       <td className={`${adminTableCellClass}`}>{r.table_name}</td>
@@ -173,24 +174,16 @@ const AdminAuditLogPage: React.FC = () => {
                       <td className={`${adminTableCellClass}`}>{r.comment || '-'}</td>
                       <td className={`${adminTableCellClass}`}>
                         <button
-                          className="px-2 py-1 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs"
+                          className="px-2 py-1 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs"
                           onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
                         > {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
                     {expandedId === r.id && (
-                      <tr className="bg-gray-50">
-                        <td colSpan={6} className="p-3">
-                          <div className="grid md:grid-cols-2 gap-3 text-xs">
-                            <div>
-                              <div className="font-medium text-industrial-gray mb-1">Önce</div>
-                              <pre className="bg-white p-2 rounded border overflow-auto max-h-64">{JSON.stringify(r.before, null, 2)}</pre>
-                            </div>
-                            <div>
-                              <div className="font-medium text-industrial-gray mb-1">Sonra</div>
-                              <pre className="bg-white p-2 rounded border overflow-auto max-h-64">{JSON.stringify(r.after, null, 2)}</pre>
-                            </div>
-                          </div>
+                      <tr className="bg-slate-50/50">
+                        <td colSpan={6} className="p-4 border-b border-slate-200 shadow-inner">
+                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">{r.action} İşlemi Detayları</div>
+                          <JsonDiffViewer before={r.before} after={r.after} />
                         </td>
                       </tr>
                     )}

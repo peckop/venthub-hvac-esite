@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
-import { Crown, CheckCircle, AlertCircle, Users } from 'lucide-react'
+import { Crown, Shield, ShieldCheck, Users, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess, listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
@@ -215,19 +215,19 @@ export default function AdminUsersPage() {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'superadmin': return <Crown className="text-purple-700" size={16} />
-      case 'admin': return <Crown className="text-yellow-600" size={16} />
-      case 'moderator': return <CheckCircle className="text-blue-600" size={16} />
-      default: return <Users className="text-gray-600" size={16} />
+      case 'superadmin': return <Crown className="text-purple-600" size={14} />
+      case 'admin': return <Shield className="text-indigo-600" size={14} />
+      case 'moderator': return <ShieldCheck className="text-sky-600" size={14} />
+      default: return <Users className="text-slate-500" size={14} />
     }
   }
 
   const getRoleColor = (role: string): string => {
     switch (role) {
-      case 'superadmin': return 'bg-purple-100 text-purple-800 border-purple-200'
-      case 'admin': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'moderator': return 'bg-blue-100 text-blue-800 border-blue-200'
-      default: return 'bg-gray-100 text-gray-600 border-gray-200'
+      case 'superadmin': return 'bg-purple-50 text-purple-700 border-purple-200/50 ring-1 ring-purple-600/10'
+      case 'admin': return 'bg-indigo-50 text-indigo-700 border-indigo-200/50 ring-1 ring-indigo-600/10'
+      case 'moderator': return 'bg-sky-50 text-sky-700 border-sky-200/50 ring-1 ring-sky-600/10'
+      default: return 'bg-slate-50 text-slate-600 border-slate-200/50 ring-1 ring-slate-500/10'
     }
   }
 
@@ -246,7 +246,7 @@ export default function AdminUsersPage() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center py-8">
           <h2 className="text-xl font-semibold text-red-600">{_t('admin.ui.accessDeniedTitle')}</h2>
-          <p className="text-steel-gray mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
+          <p className="text-slate-500 mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
         </div>
       </div>
     )
@@ -322,12 +322,12 @@ export default function AdminUsersPage() {
                     {visibleCols.user && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex flex-col">
-                          <span className="font-medium text-industrial-gray">{String((userItem as any).email || "")}</span>
+                          <span className="font-medium text-slate-700">{String((userItem as any).email || "")}</span>
                           {('full_name' in userItem) && !!(userItem as any).full_name && (
-                            <span className="text-xs text-steel-gray">{String((userItem as any).full_name || "")}</span>
+                            <span className="text-xs text-slate-500">{String((userItem as any).full_name || "")}</span>
                           )}
                           {('phone' in userItem) && !!(userItem as any).phone && (
-                            <span className="text-xs text-steel-gray">{String((userItem as any).phone || "")}</span>
+                            <span className="text-xs text-slate-500">{String((userItem as any).phone || "")}</span>
                           )}
                         </div>
                       </td>
@@ -342,7 +342,7 @@ export default function AdminUsersPage() {
                     )}
                     {visibleCols.created && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <span className="text-steel-gray">
+                        <span className="text-slate-500">
                           {formatDate(userItem.created_at, lang)}
                         </span>
                       </td>
@@ -410,7 +410,7 @@ export default function AdminUsersPage() {
 
           {(activeTab === 'admins' ? filteredAdminUsers.length === 0 : filteredAllUsers.length === 0) && (
             <div className={`${adminCardClass} text-center py-8`}>
-              <div className="text-steel-gray">
+              <div className="text-slate-500">
                 {searchQuery
                   ? _t('admin.users.empty.filtered')
                   : activeTab === 'admins'

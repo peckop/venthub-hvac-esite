@@ -220,7 +220,7 @@ const AdminCouponsPage: React.FC = () => {
                   <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : '-'}</td>
                   <td className="px-3 py-2">{r.used_count || 0}{r.usage_limit ? ` / ${r.usage_limit}` : ''}</td>
                   <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.created_at, lang as 'tr' | 'en')}</td>
-                  <td className="px-3 py-2 text-xs text-steel-gray">—</td>
+                  <td className="px-3 py-2 text-xs text-slate-500">—</td>
                 </tr>
               ))
             )}

@@ -375,21 +375,21 @@ const AdminErrorGroupsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white">
               <option value="">{t('admin.errorGroups.filter.statusAll')}</option>
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
-            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white">
+            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white">
               <option value="">{t('admin.errorGroups.filter.assignedAll')}</option>
               <option value="__none__">{t('admin.errorGroups.filter.unassigned')}</option>
               {users.map(u => (
                 <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
               ))}
             </select>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.errorGroups.export.csvLabel'), onSelect: () => exportGroupsCsv() }]} />
             <ColumnsMenu
               density={density}
@@ -411,18 +411,18 @@ const AdminErrorGroupsPage: React.FC = () => {
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <span className="text-sm text-slate-500">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
         <div className={adminCardClass + ' flex items-center justify-between'}>
-          <div className="text-sm text-industrial-gray">{t('admin.errorGroups.bulk.selected', { count: selectedIds.length })}</div>
+          <div className="text-sm text-slate-500">{t('admin.errorGroups.bulk.selected', { count: selectedIds.length })}</div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-steel-gray">{t('admin.errorGroups.bulk.statusTitle')}</label>
-            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 h-10 text-sm bg-white">
+            <label className="text-sm text-slate-500">{t('admin.errorGroups.bulk.statusTitle')}</label>
+            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-md px-2 h-10 text-sm bg-white">
               <option value="open">open</option>
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
@@ -439,7 +439,7 @@ const AdminErrorGroupsPage: React.FC = () => {
         )}
 
         {/* Top horizontal scrollbar */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-4 bg-gray-100 border-b border-light-gray/70 select-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
+        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-4 bg-gray-100 border-b border-slate-200/70 select-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
           <div style={{ width: topScrollWidth || '100%' }} className="h-4" />
         </div>
 
@@ -481,7 +481,7 @@ const AdminErrorGroupsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-b border-light-gray/60 align-top">
+                    <tr className="border-b border-slate-200/60 align-top">
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => toggleSelect(r.id, e.target.checked)} />
                       </td>
@@ -491,7 +491,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
                       {visibleCols.count && <td className={`${adminTableCellClass} ${cellPad}`}>{r.count}</td>}
                       {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <select value={r.status} onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
+                        <select value={r.status} onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white">
                           <option value="open">open</option>
                           <option value="resolved">resolved</option>
                           <option value="ignored">ignored</option>
@@ -499,7 +499,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                       </td>}
                       {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2">
-                          <select value={r.assigned_to || ''} onChange={(e) => updateAssignedTo(r.id, e.target.value)} className="border border-light-gray rounded-md px-2 py-1 text-xs bg-white">
+                          <select value={r.assigned_to || ''} onChange={(e) => updateAssignedTo(r.id, e.target.value)} className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white">
                             <option value="">{t('admin.errorGroups.assigned.none')}</option>
                             {users.map(u => (
                               <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
@@ -519,24 +519,24 @@ const AdminErrorGroupsPage: React.FC = () => {
                         <td colSpan={8} className="p-3">
                           <div className="grid md:grid-cols-3 gap-3 text-xs">
                             <div className="md:col-span-2">
-                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errorGroups.details.latest')}</div>
+                              <div className="font-medium text-slate-500 mb-1">{t('admin.errorGroups.details.latest')}</div>
                               <div className="space-y-2 max-h-72 overflow-auto overscroll-y-contain bg-white p-2 rounded border">
                                 {(latestClientErrors[r.id] || []).map((e: ClientErrorRow) => (
                                   <div key={e.id} className="border-b last:border-b-0 pb-1">
-                                    <div className="text-steel-gray">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
-                                    <div className="text-steel-gray break-words">{e.message}</div>
-                                    <div className="text-industrial-gray break-all">{e.url || '-'}</div>
+                                    <div className="text-slate-500">{formatDateTime(e.at, lang)} • {e.level || 'error'}</div>
+                                    <div className="text-slate-500 break-words">{e.message}</div>
+                                    <div className="text-slate-500 break-all">{e.url || '-'}</div>
                                     {e.stack && <details className="mt-1"><summary className="cursor-pointer">{t('admin.errorGroups.details.stackSummary')}</summary><pre className="text-[10px] overflow-auto max-h-40">{String(e.stack).slice(0, 4000)}</pre></details>}
                                   </div>
                                 ))}
                               </div>
                             </div>
                             <div>
-                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errorGroups.details.notes')}</div>
-                              <textarea defaultValue={rows.find(x => x.id === r.id)?.notes || ''} onBlur={(ev) => updateNotes(r.id, ev.target.value)} className="w-full border border-light-gray rounded p-2 bg-white" rows={7} placeholder={t('admin.errorGroups.details.notesPlaceholder') as string} />
-                              <div className="font-medium text-industrial-gray mb-1 mt-3">{t('admin.errorGroups.details.sampleUrl')}</div>
+                              <div className="font-medium text-slate-500 mb-1">{t('admin.errorGroups.details.notes')}</div>
+                              <textarea defaultValue={rows.find(x => x.id === r.id)?.notes || ''} onBlur={(ev) => updateNotes(r.id, ev.target.value)} className="w-full border border-slate-200 rounded p-2 bg-white" rows={7} placeholder={t('admin.errorGroups.details.notesPlaceholder') as string} />
+                              <div className="font-medium text-slate-500 mb-1 mt-3">{t('admin.errorGroups.details.sampleUrl')}</div>
                               <div className="text-[11px] break-all">{r.url_sample || '-'}</div>
-                              <div className="font-medium text-industrial-gray mb-2 mt-3">{t('admin.errorGroups.details.top5')}</div>
+                              <div className="font-medium text-slate-500 mb-2 mt-3">{t('admin.errorGroups.details.top5')}</div>
                               {(() => {
                                 const list = latestClientErrors[r.id] || []
                                 const topN = (arr: ClientErrorRow[], key: (e: ClientErrorRow) => string, n = 5) => {
@@ -553,12 +553,12 @@ const AdminErrorGroupsPage: React.FC = () => {
                                 const topUA = topN(list, e => String(e.user_agent || '-'))
                                 const Block = ({ title, items }: { title: string; items: [string, number][] }) => (
                                   <div className="mb-2">
-                                    <div className="text-steel-gray font-medium mb-1">{title}</div>
+                                    <div className="text-slate-500 font-medium mb-1">{title}</div>
                                     <ul className="space-y-1 list-disc pl-4">
                                       {items.map(([k, c]) => (
-                                        <li key={k} className="text-[11px] break-all"><span className="text-industrial-gray">{k}</span> <span className="text-steel-gray">({c})</span></li>
+                                        <li key={k} className="text-[11px] break-all"><span className="text-slate-500">{k}</span> <span className="text-slate-500">({c})</span></li>
                                       ))}
-                                      {items.length === 0 && <li className="text-[11px] text-steel-gray">-</li>}
+                                      {items.length === 0 && <li className="text-[11px] text-slate-500">-</li>}
                                     </ul>
                                   </div>
                                 )

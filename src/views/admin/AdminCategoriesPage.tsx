@@ -189,7 +189,7 @@ const AdminCategoriesPage: React.FC = () => {
               <tr><td className="p-4" colSpan={6}>Kayıt yok</td></tr>
             ) : (
               filtered.map(r => (
-                <tr key={r.id} className="border-b border-light-gray/60 hover:bg-gray-50/50 transition-colors">
+                <tr key={r.id} className="border-b border-slate-200/60 hover:bg-gray-50/50 transition-colors">
                   {visibleCols.image && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       {r.image_url ? (
@@ -207,8 +207,11 @@ const AdminCategoriesPage: React.FC = () => {
                   )}
                   {visibleCols.name && (
                     <td className={`${adminTableCellClass} ${cellPad} font-medium text-gray-900`}>
-                      {r.name}
-                      {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
+                      <div className="flex items-center">
+                        {r.parent_id && <span className="text-slate-300 mr-2">└─</span>}
+                        <span className={r.parent_id ? 'pl-1 text-slate-600 font-normal' : ''}>{r.name}</span>
+                        {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
+                      </div>
                     </td>
                   )}
                   {visibleCols.slug && <td className={`${adminTableCellClass} ${cellPad} text-gray-500`}>{r.slug}</td>}
