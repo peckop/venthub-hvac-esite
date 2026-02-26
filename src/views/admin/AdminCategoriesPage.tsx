@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
 import { Plus } from 'lucide-react'
@@ -220,8 +220,8 @@ const AdminCategoriesPage: React.FC = () => {
                   {visibleCols.actions && (
                     <td className={`${adminTableCellClass} ${cellPad}`}>
                       <div className="flex items-center gap-2">
-                        <button className="px-2 py-1 rounded border text-xs bg-white hover:border-blue-500 hover:text-blue-600 transition-colors" onClick={() => handleEdit(r)}>Düzenle</button>
-                        <button className="px-2 py-1 rounded border text-xs text-red-600 bg-white hover:border-red-400 hover:bg-red-50 transition-colors" onClick={() => remove(r.id)}>Sil</button>
+                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r)}>Düzenle</button>
+                        <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>Sil</button>
                       </div>
                     </td>
                   )}

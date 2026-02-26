@@ -4,7 +4,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Upload, Trash2, Save, Loader2 } from 'lucide-react'
+import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
@@ -188,7 +188,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
     const TabTrigger = ({ value, label }: { value: string, label: string }) => (
         <Tabs.Trigger
             value={value}
-            className="px-4 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 hover:text-gray-900 transition-colors"
+            className="px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-900 transition-all uppercase tracking-tight"
         >
             {label}
         </Tabs.Trigger>
@@ -197,15 +197,15 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-                <Dialog.Content aria-describedby={undefined} className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] bg-white rounded-xl shadow-2xl z-50 flex flex-col outline-none">
+                <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 animate-in fade-in duration-300" />
+                <Dialog.Content aria-describedby={undefined} className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
 
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                        <Dialog.Title className="text-xl font-bold text-gray-900">
+                    <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+                        <Dialog.Title className="text-xl font-bold text-primary-navy">
                             {categoryId ? 'Kategoriyi Düzenle' : 'Yeni Kategori'}
                         </Dialog.Title>
-                        <Dialog.Close className="text-gray-400 hover:text-gray-600 transition-colors">
-                            <X size={24} />
+                        <Dialog.Close className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
+                            <X size={20} />
                         </Dialog.Close>
                     </div>
 
@@ -225,33 +225,33 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
 
                                     <Tabs.Content value="info" className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Ad *</label>
-                                            <input {...register('name')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
-                                            {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Ad *</label>
+                                            <input {...register('name')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-900" />
+                                            {errors.name && <span className="text-xs text-rose-500 font-bold">{errors.name.message}</span>}
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Slug</label>
-                                            <input {...register('slug')} placeholder="Otomatik (boş bırakılabilir)" className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Slug</label>
+                                            <input {...register('slug')} placeholder="Otomatik (boş bırakılabilir)" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Üst Kategori</label>
-                                            <select {...register('parent_id')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Üst Kategori</label>
+                                            <select {...register('parent_id')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer font-medium text-slate-700">
                                                 <option value="">(Ana Kategori)</option>
                                                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Açıklama</label>
-                                            <textarea {...register('description')} rows={3} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Açıklama</label>
+                                            <textarea {...register('description')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
                                         </div>
-                                        <div className="flex items-center gap-6">
-                                            <div className="flex items-center gap-2">
-                                                <input type="checkbox" {...register('is_featured')} id="is_featured" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                                <label htmlFor="is_featured" className="text-sm font-medium text-gray-700">Öne Çıkan</label>
+                                        <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="flex items-center gap-3">
+                                                <input type="checkbox" {...register('is_featured')} id="is_featured" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy/20" />
+                                                <label htmlFor="is_featured" className="text-sm font-bold text-slate-700 uppercase tracking-tight cursor-pointer">Öne Çıkan</label>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <label className="text-sm font-medium text-gray-700">Sıralama:</label>
-                                                <input type="number" {...register('sort_order', { valueAsNumber: true })} className="w-20 border rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                                            <div className="flex items-center gap-3 ml-auto">
+                                                <label className="text-sm font-bold text-slate-500 uppercase tracking-tight">Sıralama:</label>
+                                                <input type="number" {...register('sort_order', { valueAsNumber: true })} className="w-20 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-center" />
                                             </div>
                                         </div>
                                     </Tabs.Content>
@@ -273,16 +273,17 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                     </Tabs.Content>
 
                                     <Tabs.Content value="seo" className="space-y-4">
-                                        <div className="bg-blue-50 p-3 rounded-lg text-xs text-blue-700 mb-2">
-                                            Bu bilgiler arama motorlarında (Google) kategori sayfasının nasıl görüneceğini belirler.
+                                        <div className="bg-primary-navy/5 p-4 rounded-xl border border-primary-navy/10 text-xs text-primary-navy mb-2 flex items-start gap-3">
+                                            <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                                            <p className="leading-relaxed font-medium">Bu bilgiler arama motorlarında (Google) kategori sayfasının nasıl görüneceğini belirler.</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">SEO Başlığı (Title)</label>
-                                            <input {...register('seo_title')} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Örn: En Kaliteli Fan Modelleri - VentHub" />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Başlığı (Title)</label>
+                                            <input {...register('seo_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" placeholder="Örn: En Kaliteli Fan Modelleri - VentHub" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">SEO Açıklaması (Description)</label>
-                                            <textarea {...register('seo_desc')} rows={3} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Sayfa içeriğini özetleyen kısa bir açıklama..." />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Açıklaması (Description)</label>
+                                            <textarea {...register('seo_desc')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" placeholder="Sayfa içeriğini özetleyen kısa bir açıklama..." />
                                         </div>
                                     </Tabs.Content>
                                 </Tabs.Root>
@@ -290,9 +291,9 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                         )}
                     </div>
 
-                    <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
-                        <button type="button" onClick={() => onOpenChange(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors">Vazgeç</button>
-                        <button type="submit" form="category-form" disabled={loading || uploading} className={`${adminButtonPrimaryClass} flex items-center gap-2 disabled:opacity-50`}>
+                    <div className="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/80 backdrop-blur-sm">
+                        <button type="button" onClick={() => onOpenChange(false)} className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200">Vazgeç</button>
+                        <button type="submit" form="category-form" disabled={loading || uploading} className={`${adminButtonPrimaryClass} flex items-center gap-2 px-8 py-2.5 rounded-xl shadow-lg shadow-primary-navy/10 transition-transform active:scale-95 disabled:opacity-50`}>
                             {(loading || uploading) ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                             Kaydet
                         </button>

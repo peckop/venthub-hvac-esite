@@ -1,7 +1,7 @@
 import React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { format as _format } from 'date-fns'
-import { adminSectionTitleClass, adminButtonPrimaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -11,6 +11,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
+import { X, Search, Truck, FileText, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil } from 'lucide-react'
 
 interface AdminOrderRow {
   id: string
@@ -471,15 +472,15 @@ const AdminOrdersPage: React.FC = () => {
               density={density}
               onDensityChange={setDensity}
             />
-            <button onClick={fetchOrders} disabled={loading} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm">{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
+            <button onClick={fetchOrders} disabled={loading} className={`${adminButtonSecondaryClass} md:h-11 h-10`}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
           </div>
         )}
       />
 
-      <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-slate-500">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white disabled:opacity-50">{t('admin.ui.next')}</button>
+      <div className="flex items-center justify-end gap-3 mt-4 mb-2">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} h-10 disabled:opacity-50`}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-medium text-slate-500 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">{t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className={`${adminButtonSecondaryClass} h-10 disabled:opacity-50`}>{t('admin.ui.next')}</button>
       </div>
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
@@ -524,62 +525,141 @@ const AdminOrdersPage: React.FC = () => {
       </section>
 
       {shipOpen && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className={adminCardPaddedClass + ' w-full max-w-lg'}>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">{t('admin.orders.modals.shipping.title')}</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
-                <select value={carrier} onChange={e => setCarrier(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2">
-                  <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
-                  <option value="Yurtiçi">Yurtiçi</option>
-                  <option value="Aras">Aras</option>
-                  <option value="MNG">MNG</option>
-                  <option value="PTT">PTT</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-slate-500 mb-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
-                <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2" />
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="text-xl font-bold text-primary-navy">{t('admin.orders.modals.shipping.title')}</h3>
+              <button onClick={closeShipModal} className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">{t('admin.orders.modals.shipping.carrierLabel')}</label>
+                  <select value={carrier} onChange={e => setCarrier(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer font-medium text-slate-700">
+                    <option value="">{t('admin.orders.modals.shipping.carrierSelect')}</option>
+                    <option value="Yurtiçi">Yurtiçi</option>
+                    <option value="Aras">Aras</option>
+                    <option value="MNG">MNG</option>
+                    <option value="PTT">PTT</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">{t('admin.orders.modals.shipping.trackingLabel')}</label>
+                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-mono font-medium text-slate-700" placeholder="Kargo Takip No" />
+                </div>
               </div>
             </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={closeShipModal} className="px-3 py-2 border rounded">{t('admin.orders.modals.shipping.cancel')}</button>
-              <button onClick={submitShip} className={adminButtonPrimaryClass}>{t('admin.orders.modals.shipping.save')}</button>
+            <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end gap-3 backdrop-blur-sm">
+              <button onClick={closeShipModal} className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200">
+                {t('admin.orders.modals.shipping.cancel')}
+              </button>
+              <button onClick={submitShip} className={`${adminButtonPrimaryClass} px-8 py-2.5 rounded-xl shadow-lg shadow-primary-navy/10 transition-transform active:scale-95`}>
+                {t('admin.orders.modals.shipping.save')}
+              </button>
             </div>
           </div>
         </div>
       )}
 
       {logsOpen && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className={adminCardPaddedClass + ' w-full max-w-2xl'}>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">{t('admin.orders.modals.logs.title')}</h3>
-            <div className="max-h-[60vh] overflow-auto border rounded">
-              {logsLoading ? <div className="p-4">Loading...</div> : (
-                <table className="min-w-full text-sm">
-                  <thead><tr><th className="px-3 py-2 text-left">Date</th><th className="px-3 py-2 text-left">Subject</th></tr></thead>
-                  <tbody>{emailLogs.map((l, i) => <tr key={i}><td className="px-3 py-2">{safeDate(l.created_at)}</td><td className="px-3 py-2">{l.subject}</td></tr>)}</tbody>
-                </table>
-              )}
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="text-xl font-bold text-primary-navy">{t('admin.orders.modals.logs.title')}</h3>
+              <button onClick={closeLogsModal} className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
+                <X size={20} />
+              </button>
             </div>
-            <button onClick={closeLogsModal} className="mt-4 px-3 py-2 border rounded">Close</button>
+            <div className="p-6">
+              <div className="max-h-[50vh] overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/30">
+                {logsLoading ? (
+                  <div className="p-12 text-center text-slate-400">
+                    <div className="animate-spin w-8 h-8 border-2 border-primary-navy/20 border-t-primary-navy rounded-full mx-auto mb-3" />
+                    Yükleniyor...
+                  </div>
+                ) : (
+                  <table className="min-w-full text-sm divide-y divide-slate-100">
+                    <thead className="bg-slate-50 sticky top-0">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tarih</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Konu</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {emailLogs.map((l, i) => (
+                        <tr key={i} className="hover:bg-white transition-colors">
+                          <td className="px-4 py-3 text-slate-600 font-medium whitespace-nowrap">{safeDate(l.created_at)}</td>
+                          <td className="px-4 py-3 text-slate-700">{l.subject}</td>
+                        </tr>
+                      ))}
+                      {emailLogs.length === 0 && !logsLoading && (
+                        <tr><td colSpan={2} className="px-4 py-8 text-center text-slate-400 italic">Kayıt bulunamadı</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+            <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end backdrop-blur-sm">
+              <button onClick={closeLogsModal} className="px-8 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200">
+                Kapat
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {notesOpen && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className={adminCardPaddedClass + ' w-full max-w-xl'}>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">Notes</h3>
-            <div className="flex gap-2 mb-3">
-              <input value={noteInput} onChange={e => setNoteInput(e.target.value)} className="flex-1 border rounded px-3 py-2" />
-              <button onClick={addNote} className={adminButtonPrimaryClass}>Add</button>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="text-xl font-bold text-primary-navy">Sipariş Notları</h3>
+              <button onClick={closeNotesModal} className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
+                <X size={20} />
+              </button>
             </div>
-            <div className="max-h-[50vh] overflow-auto border rounded">
-              {notes.map(n => <div key={n.id} className="p-2 border-b text-sm"><div>{n.note}</div><div className="text-xs text-slate-400">{safeDate(n.created_at)}</div><button onClick={() => deleteNote(n.id)} className="text-red-500 text-xs mt-1">Delete</button></div>)}
+            <div className="p-6 space-y-6">
+              <div className="flex gap-3">
+                <input
+                  value={noteInput}
+                  onChange={e => setNoteInput(e.target.value)}
+                  placeholder="Not ekle..."
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+                />
+                <button
+                  onClick={addNote}
+                  className={`${adminButtonPrimaryClass} px-6 rounded-lg transition-transform active:scale-95`}
+                >
+                  Ekle
+                </button>
+              </div>
+              <div className="max-h-[40vh] overflow-y-auto space-y-3 pr-1">
+                {notes.map(n => (
+                  <div key={n.id} className="p-4 bg-slate-50/50 rounded-xl border border-slate-100 group">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 text-sm text-slate-700 leading-relaxed font-medium">{n.note}</div>
+                      <button
+                        onClick={() => deleteNote(n.id)}
+                        className="p-1 px-2 text-[10px] font-bold text-rose-500 hover:bg-rose-50 rounded-md opacity-0 group-hover:opacity-100 transition-all border border-transparent hover:border-rose-100"
+                      >
+                        SİL
+                      </button>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-widest">{safeDate(n.created_at)}</div>
+                  </div>
+                ))}
+                {notes.length === 0 && (
+                  <div className="text-center py-12 text-slate-400 italic text-sm">Henüz bir not eklenmemiş.</div>
+                )}
+              </div>
             </div>
-            <button onClick={closeNotesModal} className="mt-4 px-3 py-2 border rounded">Close</button>
+            <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end backdrop-blur-sm">
+              <button onClick={closeNotesModal} className="px-8 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200">
+                Kapat
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -607,12 +687,20 @@ function prettyStatus(s: string, t: any) {
 }
 
 function badgeClass(s: string) {
-  const base = 'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full'
+  const base = 'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-full border shadow-sm'
   switch (s) {
-    case 'paid': return `${base} bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20`
-    case 'confirmed': return `${base} bg-sky-50 text-sky-700 ring-1 ring-sky-600/20`
-    case 'shipped': return `${base} bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/20`
-    default: return `${base} bg-slate-50 text-slate-600 ring-1 ring-slate-500/20`
+    case 'paid':
+      return `${base} bg-emerald-50 text-emerald-700 border-emerald-200/50 ring-1 ring-emerald-600/10`
+    case 'confirmed':
+      return `${base} bg-sky-50 text-sky-700 border-sky-200/50 ring-1 ring-sky-600/10`
+    case 'shipped':
+      return `${base} bg-indigo-50 text-indigo-700 border-indigo-200/50 ring-1 ring-indigo-600/10`
+    case 'cancelled':
+      return `${base} bg-rose-50 text-rose-700 border-rose-200/50 ring-1 ring-rose-600/10`
+    case 'refunded':
+      return `${base} bg-amber-50 text-amber-700 border-amber-200/50 ring-1 ring-amber-600/10`
+    default:
+      return `${base} bg-slate-50 text-slate-600 border-slate-200/50 ring-1 ring-slate-500/10`
   }
 }
 

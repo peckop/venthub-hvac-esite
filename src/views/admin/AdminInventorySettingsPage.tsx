@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useAuth } from '../../hooks/useAuth'
 import { checkAdminAccessAsync } from '../../config/admin'
 
@@ -68,16 +68,18 @@ const AdminInventorySettingsPage: React.FC = () => {
 
       <div className={`${adminCardClass} p-4 space-y-4`}>
         <div>
-          <label className="block text-sm text-slate-500 mb-1">Varsayılan Düşük Stok Eşiği</label>
-          <div className="flex items-center gap-2">
-            <input type="number" className="w-32 px-3 py-2 border rounded" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
-            <button className="px-3 py-2 border rounded" disabled={saving || !isAdmin} onClick={save}>Uygula</button>
+          <label className="block text-sm font-bold text-slate-500 uppercase tracking-tight mb-2">Varsayılan Düşük Stok Eşiği</label>
+          <div className="flex items-center gap-3">
+            <input type="number" className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
+            <button className={adminButtonPrimaryClass + " h-10 px-6"} disabled={saving || !isAdmin} onClick={save}>Uygula</button>
           </div>
-          <label className="mt-3 flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
-            Tüm ürünlere uygula (override’ları temizle)
+          <label className="mt-4 flex items-center gap-3 text-sm font-medium text-slate-600 cursor-pointer group">
+            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
+            <span className="group-hover:text-slate-900 transition-colors">Tüm ürünlere uygula (override’ları temizle)</span>
           </label>
-          <p className="text-xs text-slate-500 mt-1">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir).</p>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mt-3">
+            <p className="text-xs text-slate-500 leading-relaxed">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir). Bu işlem geri alınamaz.</p>
+          </div>
         </div>
 
         {loading === LoadState.Loading && <div className="text-sm text-slate-500">Yükleniyor…</div>}

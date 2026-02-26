@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
@@ -104,9 +104,9 @@ const AdminAuditLogPage: React.FC = () => {
         <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
           <span>Filtre: Batch <span className="font-mono">{batch}</span></span>
           <div className="flex items-center gap-2">
-            <a href={`/admin/movements?batch=${batch}`} className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100">Hareketleri Gör</a>
+            <a href={`/admin/movements?batch=${batch}`} className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] !border-amber-300 !text-amber-700 hover:!bg-amber-100`}>Hareketleri Gör</a>
             <button
-              className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
+              className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] !border-amber-300 !text-amber-700 hover:!bg-amber-100`}
               onClick={() => { setBatch(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
             >Temizle</button>
           </div>
@@ -128,18 +128,19 @@ const AdminAuditLogPage: React.FC = () => {
         onClear={() => { setBatch(''); setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
-          <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Başlangıç" />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title="Bitiş" />
+          <div className="flex items-center gap-3">
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 md:h-12 h-11 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 transition-all font-medium text-slate-600" title="Başlangıç" />
+            <span className="text-slate-400">—</span>
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 md:h-12 h-11 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 transition-all font-medium text-slate-600" title="Bitiş" />
           </div>
         )}
       />
 
       {/* Pagination */}
-      <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-slate-500">Sayfa {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+      <div className="flex items-center justify-end gap-3 px-1 py-2">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " h-10 px-4 disabled:opacity-40"}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " h-10 px-4 disabled:opacity-40"}>{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -174,7 +175,7 @@ const AdminAuditLogPage: React.FC = () => {
                       <td className={`${adminTableCellClass}`}>{r.comment || '-'}</td>
                       <td className={`${adminTableCellClass}`}>
                         <button
-                          className="px-2 py-1 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs"
+                          className={adminButtonSecondaryClass + " h-8 px-3 text-[11px] font-bold uppercase tracking-tight"}
                           onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
                         > {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
