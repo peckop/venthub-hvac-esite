@@ -399,7 +399,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'superadmin')}
                               disabled={updatingRole === userItem.id}
-                              className={`${adminButtonSecondaryClass} !p-1.5 !bg-purple-50 !text-purple-600 !border-purple-200/50 hover:!bg-purple-100 disabled:opacity-50 transition-all shadow-sm`}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-purple-50 text-purple-600 border-purple-200/50 hover:bg-purple-100"
                               title="Süperadmin yap"
                             >
                               <Crown size={14} strokeWidth={2.5} />
@@ -409,7 +409,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'admin')}
                               disabled={updatingRole === userItem.id}
-                              className={`${adminButtonSecondaryClass} !p-1.5 !bg-indigo-50 !text-indigo-600 !border-indigo-200/50 hover:!bg-indigo-100 disabled:opacity-50 transition-all shadow-sm`}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200/50 hover:bg-indigo-100"
                               title="Admin yap"
                             >
                               <Shield size={14} strokeWidth={2.5} />
@@ -419,7 +419,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'moderator')}
                               disabled={updatingRole === userItem.id}
-                              className={`${adminButtonSecondaryClass} !p-1.5 !bg-sky-50 !text-sky-600 !border-sky-200/50 hover:!bg-sky-100 disabled:opacity-50 transition-all shadow-sm`}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-sky-50 text-sky-600 border-sky-200/50 hover:bg-sky-100"
                               title="Moderatör yap"
                             >
                               <ShieldCheck size={14} strokeWidth={2.5} />
@@ -429,7 +429,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'user')}
                               disabled={updatingRole === userItem.id || userItem.id === user?.id}
-                              className={`${adminButtonSecondaryClass} !p-1.5 !bg-slate-50 !text-slate-600 !border-slate-200 hover:!bg-slate-100 disabled:opacity-50 transition-all shadow-sm`}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                               title="Normal kullanıcı yap"
                             >
                               <Users size={14} strokeWidth={2.5} />

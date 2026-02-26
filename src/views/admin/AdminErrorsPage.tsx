@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass, adminTableActionClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
@@ -177,7 +177,7 @@ const AdminErrorsPage: React.FC = () => {
                       <td className={`${adminTableCellClass}`}>{r.url || '-'}</td>
                       <td className={`${adminTableCellClass}`}>
                         <button
-                          className={adminButtonSecondaryClass + " !px-2 !py-1 text-xs"}
+                          className={adminTableActionClass}
                           onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
                         >{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>

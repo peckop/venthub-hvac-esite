@@ -1,7 +1,11 @@
 import React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { format as _format } from 'date-fns'
-import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass, adminCardPaddedClass } from '../../utils/adminUi'
+import {
+  adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass,
+  adminTableHeadCellClass, adminCardPaddedClass,
+  adminTableActionPrimaryClass, adminTableActionWarningClass, adminTableActionNeutralClass
+} from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -512,9 +516,9 @@ const AdminOrdersPage: React.FC = () => {
                   {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => openShipModal(r.id)} className="text-xs px-2 py-1 rounded bg-primary-navy text-white">{t('admin.orders.actions.shipping')}</button>
-                      <button onClick={() => openLogsModal(r.id)} className="text-xs px-2 py-1 rounded bg-amber-500 text-white">{t('admin.orders.actions.logs')}</button>
-                      <button onClick={() => openNotesModal(r.id)} className="text-xs px-2 py-1 rounded bg-gray-700 text-white">{t('admin.orders.actions.notes')}</button>
+                      <button onClick={() => openShipModal(r.id)} className={adminTableActionPrimaryClass}>{t('admin.orders.actions.shipping')}</button>
+                      <button onClick={() => openLogsModal(r.id)} className={adminTableActionWarningClass}>{t('admin.orders.actions.logs')}</button>
+                      <button onClick={() => openNotesModal(r.id)} className={adminTableActionNeutralClass}>{t('admin.orders.actions.notes')}</button>
                     </div>
                   </td>
                 </tr>
