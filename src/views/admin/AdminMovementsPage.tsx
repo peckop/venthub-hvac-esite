@@ -1,7 +1,7 @@
 import React from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -275,7 +275,7 @@ const AdminMovementsPage: React.FC = () => {
         <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
           <span>{t('admin.movements.batchFilterPrefix')} <span className="font-mono">{batchFilter}</span></span>
           <button
-            className="px-2 py-1 text-xs rounded border border-amber-300 hover:bg-amber-100"
+            className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] !border-amber-300 !text-amber-700 hover:!bg-amber-100 shadow-sm`}
             onClick={() => { setBatchFilter(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
           >{t('admin.ui.clear')}</button>
         </div>
@@ -400,10 +400,10 @@ const AdminMovementsPage: React.FC = () => {
         )}
       </div>
 
-      <div className="flex items-center justify-between">
-        <button className="px-3 py-2 border rounded text-sm" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
-        <span className="text-sm text-slate-500">{t('admin.movements.pageLabel', { page: String(page) })}</span>
-        <button className="px-3 py-2 border rounded text-sm" disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
+      <div className="flex items-center justify-between mt-4 px-2">
+        <button className={adminButtonSecondaryClass + " h-10 px-6"} disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200/50">{t('admin.movements.pageLabel', { page: String(page) })}</span>
+        <button className={adminButtonSecondaryClass + " h-10 px-6"} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
     </div>
   )

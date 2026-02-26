@@ -1,5 +1,5 @@
 import React from 'react'
-import { adminCardClass } from '../../utils/adminUi'
+import { adminCardClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -47,8 +47,8 @@ export type AdminToolbarProps = {
   persist?: { search?: boolean; select?: boolean; chips?: boolean; toggles?: boolean }
 }
 
-const defaultChipOn = 'bg-light-gray text-industrial-gray border-light-gray'
-const defaultChipOff = 'bg-white text-steel-gray border-light-gray'
+const defaultChipOn = 'bg-slate-100 text-primary-navy border-slate-200 font-bold shadow-sm'
+const defaultChipOff = 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700'
 
 export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   search,
@@ -146,14 +146,14 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
 
   return (
     <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
-      <div className="rounded-md bg-gray-50 border border-light-gray p-3 md:p-3">
+      <div className="rounded-xl bg-white border border-slate-100 p-2 md:p-3 shadow-sm">
         <div className="flex flex-col gap-3">
           {/* Üst sıra: arama + select + sağ aksiyonlar */}
           <div className="flex flex-wrap items-center gap-3">
             {search && (
               <div className="flex-1 min-w-[240px]">
                 <input
-                  className="w-full border border-light-gray rounded-md px-3 md:h-12 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1 bg-white"
+                  className="w-full border border-slate-200 rounded-lg px-4 md:h-11 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
                   placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                   value={search.value}
                   onChange={(e) => search.onChange(e.target.value)}
@@ -164,7 +164,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             {select && (
               <div className="flex items-center gap-2">
                 <select
-                  className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm min-w-[180px] bg-white focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1"
+                  className="border border-slate-200 rounded-lg px-3 md:h-11 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
                   value={select.value}
                   onChange={(e) => select.onChange(e.target.value)}
                   title={select.title || 'Seçim'}
@@ -199,7 +199,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                 <button
                   type="button"
                   onClick={onClear}
-                  className="px-3 md:h-12 h-11 text-xs rounded-md border border-light-gray bg-white hover:border-primary-navy whitespace-nowrap"
+                  className={`${adminButtonSecondaryClass} md:h-11 h-10 !px-4 text-xs`}
                 >{t('admin.toolbar.clear')}</button>
               )}
 
@@ -219,7 +219,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   key={ch.key}
                   type="button"
                   onClick={ch.onToggle}
-                  className={`px-3 md:h-8 h-9 inline-flex items-center rounded-full border transition ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/30 ring-offset-1`}
+                  className={`px-4 md:h-9 h-10 inline-flex items-center rounded-lg border transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
                   title={ch.title || ch.label}
                   aria-pressed={ch.active}
                 >{ch.label}</button>

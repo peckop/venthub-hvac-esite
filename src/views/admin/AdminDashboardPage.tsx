@@ -1,5 +1,5 @@
 import React from 'react'
-import { adminSectionTitleClass, adminSubtitleClass, adminCardPaddedClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminSubtitleClass, adminCardPaddedClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
@@ -264,7 +264,7 @@ const AdminDashboardPage: React.FC = () => {
   const RangeButton: React.FC<{ value: Range; label: string }> = ({ value, label }) => (
     <button
       onClick={() => setRange(value)}
-      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${range === value ? 'bg-primary-navy text-white shadow-md shadow-primary-navy/20' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`}
+      className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${range === value ? 'bg-primary-navy text-white shadow-lg shadow-primary-navy/20 scale-[1.02]' : 'bg-white text-slate-500 border border-slate-200/60 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800'}`}
     >{label}</button>
   )
 
