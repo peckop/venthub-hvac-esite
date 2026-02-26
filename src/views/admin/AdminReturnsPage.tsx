@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
-import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -578,7 +578,7 @@ export default function AdminReturnsPage() {
                               key={status}
                               onClick={() => handleStatusUpdate(returnItem.id, status)}
                               disabled={updatingStatus === returnItem.id}
-                              className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider bg-primary-navy text-white rounded-lg hover:bg-primary-navy/90 hover:shadow-md hover:shadow-primary-navy/20 transition-all disabled:opacity-50 flex items-center gap-1"
+                              className={`${adminTableActionPrimaryClass} disabled:opacity-50 gap-1`}
                               title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
                             >
                               {updatingStatus === returnItem.id ? (

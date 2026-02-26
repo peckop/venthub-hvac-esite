@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
@@ -744,8 +744,8 @@ const AdminProductsPage: React.FC = () => {
                     {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
-                          <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider`} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                          <button className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] uppercase tracking-wider !text-rose-600 hover:!bg-rose-50 hover:!border-rose-200`} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
+                          <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                          <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
                         </div>
                       </td>
                     )}
