@@ -708,9 +708,10 @@ export const en = {
       }
     },
     users: {
+      subtitle: 'Manage system users and their roles.',
       tabs: { admins: 'Admin Users ({{count}})', all: 'All Users ({{count}})' },
       searchPlaceholder: 'Search by email or name',
-      table: { user: 'User', role: 'Role', created: 'Created', actions: 'Actions' },
+      table: { user: 'User', company: 'Company & B2B', role: 'Role', created: 'Created', actions: 'Actions' },
       empty: { filtered: 'No users match your search.', admins: 'No admin users yet.', all: 'User list is empty.' },
       actions: { superadmin: 'Superadmin', admin: 'Admin', moderator: 'Mod', user: 'User' },
       actionTitles: { superadmin: 'Make superadmin', admin: 'Make admin', moderator: 'Make moderator', user: 'Make user', cannotDemoteSelf: "You can't demote yourself" },
