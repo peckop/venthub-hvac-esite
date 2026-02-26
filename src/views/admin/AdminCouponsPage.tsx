@@ -211,7 +211,7 @@ const AdminCouponsPage: React.FC = () => {
             <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e => setForm(f => { const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Sınırsız için boş bırakın" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all placeholder:text-slate-300" />
           </div>
           <div className="md:col-span-2 flex flex-col gap-1.5 justify-end">
-            <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className={`${adminButtonPrimaryClass} h-[42px] shadow-lg shadow-primary-navy/10 w-full`}>{saving ? 'Kaydediliyor…' : 'Kuponu Oluştur'}</button>
+            <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className={`${adminButtonPrimaryClass} shadow-lg shadow-primary-navy/10 w-full`}>{saving ? 'Kaydediliyor…' : 'Kuponu Oluştur'}</button>
           </div>
         </div>
       </div>

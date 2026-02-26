@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
@@ -128,23 +128,23 @@ const AdminErrorsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={env} onChange={(e) => setEnv(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.errors.envTitle') as string}>
+            <select value={env} onChange={(e) => setEnv(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer" title={t('admin.errors.envTitle') as string}>
               <option value="production">production</option>
               <option value="preview">preview</option>
               <option value="development">development</option>
               <option value="">({t('admin.ui.all')})</option>
             </select>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.endDate') as string} />
           </div>
         )}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-slate-500">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.prev')}</button>
+        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -177,7 +177,7 @@ const AdminErrorsPage: React.FC = () => {
                       <td className={`${adminTableCellClass}`}>{r.url || '-'}</td>
                       <td className={`${adminTableCellClass}`}>
                         <button
-                          className="px-2 py-1 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs"
+                          className={adminButtonSecondaryClass + " !px-2 !py-1 text-xs"}
                           onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
                         >{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>

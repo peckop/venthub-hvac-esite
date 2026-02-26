@@ -808,7 +808,7 @@ const AdminInventoryPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCsvImportOpen(true)}
-              className={`${adminButtonPrimaryClass} h-10 shadow-md shadow-primary-navy/10`}
+              className={`${adminButtonPrimaryClass} shadow-md shadow-primary-navy/10`}
             >
               CSV İçe Aktar
             </button>
@@ -1149,5 +1149,6 @@ const AdminInventoryPage: React.FC = () => {
     </div >
   )
 }
+export default AdminInventoryPage
 
 

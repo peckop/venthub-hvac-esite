@@ -472,7 +472,7 @@ const AdminOrdersPage: React.FC = () => {
               density={density}
               onDensityChange={setDensity}
             />
-            <button onClick={fetchOrders} disabled={loading} className={`${adminButtonSecondaryClass} md:h-11 h-10`}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
+            <button onClick={fetchOrders} disabled={loading} className={`${adminButtonSecondaryClass}`}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
           </div>
         )}
       />
