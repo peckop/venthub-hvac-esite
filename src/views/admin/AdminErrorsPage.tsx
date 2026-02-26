@@ -113,36 +113,38 @@ const AdminErrorsPage: React.FC = () => {
     <div className="space-y-4">
       <h1 className={adminSectionTitleClass}>{t('admin.titles.errors')}</h1>
 
-        <AdminToolbar
+      <AdminToolbar
         storageKey="toolbar:errors"
         search={{ value: q, onChange: setQ, placeholder: t('admin.search.errors'), focusShortcut: '/' }}
-        select={{ value: level, onChange: setLevel, title: t('admin.errors.levelTitle'), options: [
-          { value: '', label: t('admin.ui.all') },
-          { value: 'error', label: 'error' },
-          { value: 'warn', label: 'warn' },
-          { value: 'info', label: 'info' },
-        ] }}
+        select={{
+          value: level, onChange: setLevel, title: t('admin.errors.levelTitle'), options: [
+            { value: '', label: t('admin.ui.all') },
+            { value: 'error', label: 'error' },
+            { value: 'warn', label: 'warn' },
+            { value: 'info', label: 'info' },
+          ]
+        }}
         onClear={() => { setQ(''); setLevel(''); setFromDate(defaultFromDate); setToDate(defaultToDate); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={env} onChange={(e)=>setEnv(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.errors.envTitle') as string}>
+            <select value={env} onChange={(e) => setEnv(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.errors.envTitle') as string}>
               <option value="production">production</option>
               <option value="preview">preview</option>
               <option value="development">development</option>
               <option value="">({t('admin.ui.all')})</option>
             </select>
-            <input type="date" value={fromDate} onChange={(e)=>setFromDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e)=>setToDate(e.target.value)} className="border border-light-gray rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.startDate') as string} />
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-md px-2 md:h-12 h-11 text-sm bg-white" title={t('admin.ui.endDate') as string} />
           </div>
         )}
       />
 
       {/* Pagination */}
       <div className="flex items-center justify-end gap-2">
-        <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page<=1} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
-        <span className="text-sm text-steel-gray">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-        <button onClick={()=>setPage(p=>p+1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-light-gray bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.prev')}</button>
+        <span className="text-sm text-slate-500">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-3 md:h-12 h-11 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-sm whitespace-nowrap disabled:opacity-50">{t('admin.ui.next')}</button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -168,15 +170,15 @@ const AdminErrorsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-b border-light-gray/60">
-<td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
-                      <td className={`${adminTableCellClass}`}>{r.level || 'error'}</td>
+                    <tr className="border-b border-slate-200/60">
+                      <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
+                      <td className={`${adminTableCellClass}`}><span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${r.level === 'error' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20' : r.level === 'warn' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20' : 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20'}`}>{r.level || 'error'}</span></td>
                       <td className={`${adminTableCellClass}`}>{r.message}</td>
                       <td className={`${adminTableCellClass}`}>{r.url || '-'}</td>
                       <td className={`${adminTableCellClass}`}>
                         <button
-                          className="px-2 py-1 rounded-md border border-light-gray bg-white hover:border-primary-navy text-xs"
-                          onClick={()=> setExpandedId(id => id === r.id ? null : r.id)}
+                          className="px-2 py-1 rounded-md border border-slate-200 bg-white hover:border-primary-navy text-xs"
+                          onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
                         >{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
@@ -185,15 +187,15 @@ const AdminErrorsPage: React.FC = () => {
                         <td colSpan={5} className="p-3">
                           <div className="grid md:grid-cols-2 gap-3 text-xs">
                             <div>
-                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errors.labels.stack')}</div>
-                              <pre className="bg-white p-2 rounded border overflow-auto max-h-64">{String(r.stack || '').slice(0, 8000)}</pre>
+                              <div className="font-medium text-slate-500 mb-1">{t('admin.errors.labels.stack')}</div>
+                              <pre className="bg-slate-950 text-amber-300 font-mono p-3 rounded-lg overflow-auto max-h-64 text-[11px] leading-relaxed">{String(r.stack || '').slice(0, 8000)}</pre>
                             </div>
                             <div>
-                              <div className="font-medium text-industrial-gray mb-1">{t('admin.errors.detailsTitle')}</div>
+                              <div className="font-medium text-slate-500 mb-1">{t('admin.errors.detailsTitle')}</div>
                               <div className="space-y-1">
-                                <div><span className="text-industrial-gray">{t('admin.errors.labels.ua')}: </span>{r.user_agent || '-'}</div>
-                                <div><span className="text-industrial-gray">{t('admin.errors.labels.release')}: </span>{r.release || '-'}</div>
-                                <div><span className="text-industrial-gray">{t('admin.errors.labels.env')}: </span>{r.env || '-'}</div>
+                                <div><span className="text-slate-500">{t('admin.errors.labels.ua')}: </span>{r.user_agent || '-'}</div>
+                                <div><span className="text-slate-500">{t('admin.errors.labels.release')}: </span>{r.release || '-'}</div>
+                                <div><span className="text-slate-500">{t('admin.errors.labels.env')}: </span>{r.env || '-'}</div>
                               </div>
                             </div>
                           </div>

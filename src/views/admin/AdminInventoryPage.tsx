@@ -601,15 +601,15 @@ const AdminInventoryPage: React.FC = () => {
 
       // Geri Al + Hata indirme butonlu toast
       toast.custom((t) => (
-        <div className="rounded-lg border border-light-gray bg-white shadow px-3 py-2 text-sm flex items-center gap-3">
+        <div className="rounded-lg border border-slate-200 bg-white shadow px-3 py-2 text-sm flex items-center gap-3">
           <span>{successCount} ürün güncellendi.</span>
           <a
             href={`/admin/movements?batch=${batchId}`}
-            className="px-2 py-1 text-xs rounded border border-light-gray hover:border-primary-navy text-primary-navy"
+            className="px-2 py-1 text-xs rounded border border-slate-200 hover:border-primary-navy text-primary-navy"
           >Hareketleri Gör</a>
           {errors.length > 0 && (
             <button
-              className="px-2 py-1 text-xs rounded border border-light-gray hover:border-primary-navy"
+              className="px-2 py-1 text-xs rounded border border-slate-200 hover:border-primary-navy"
               onClick={() => { downloadErrors(); toast.dismiss(t.id) }}
             >Hataları İndir</button>
           )}
@@ -797,10 +797,10 @@ const AdminInventoryPage: React.FC = () => {
           ]
         }}
         chips={[
-          { key: 'out', label: 'Tükendi', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })), classOn: 'bg-gray-200 text-gray-800 border-gray-300', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })), classOn: 'bg-warning-orange/10 text-warning-orange border-warning-orange/30', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'reserved', label: 'Rezervli', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })), classOn: 'bg-blue-100 text-blue-700 border-blue-200', classOff: 'bg-white text-steel-gray border-light-gray' },
-          { key: 'ok', label: 'Uygun', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })), classOn: 'bg-green-100 text-green-700 border-green-200', classOff: 'bg-white text-steel-gray border-light-gray' },
+          { key: 'out', label: 'Tükendi', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })), classOn: 'bg-gray-200 text-gray-800 border-gray-300', classOff: 'bg-white text-slate-500 border-slate-200' },
+          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })), classOn: 'bg-warning-orange/10 text-warning-orange border-warning-orange/30', classOff: 'bg-white text-slate-500 border-slate-200' },
+          { key: 'reserved', label: 'Rezervli', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })), classOn: 'bg-blue-100 text-blue-700 border-blue-200', classOff: 'bg-white text-slate-500 border-slate-200' },
+          { key: 'ok', label: 'Uygun', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })), classOn: 'bg-green-100 text-green-700 border-green-200', classOff: 'bg-white text-slate-500 border-slate-200' },
         ]}
         toggles={[{ key: 'groupByCategory', label: 'Grupla: Kategori', checked: groupByCategory, onChange: setGroupByCategory }]}
         onClear={() => { setQ(''); setSelectedCategory(''); setStatusFilter({ out: false, critical: false, reserved: false, ok: false }); setGroupByCategory(false) }}
@@ -838,42 +838,42 @@ const AdminInventoryPage: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               {visibleCols.name && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>
                     Ürün {sortIndicator('name')}
                   </button>
                 </th>
               )}
               {visibleCols.physical && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('physical')}>
                     Fiziksel {sortIndicator('physical')}
                   </button>
                 </th>
               )}
               {visibleCols.reserved && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('reserved')}>
                     Rezerve {sortIndicator('reserved')}
                   </button>
                 </th>
               )}
               {visibleCols.available && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('available')}>
                     Satılabilir {sortIndicator('available')}
                   </button>
                 </th>
               )}
               {visibleCols.threshold && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('threshold')}>
                     Eşik (Efektif) {sortIndicator('threshold')}
                   </button>
                 </th>
               )}
               {visibleCols.status && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-industrial-gray text-right`}>
+                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
                   <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>
                     Durum {sortIndicator('status')}
                   </button>
@@ -886,21 +886,24 @@ const AdminInventoryPage: React.FC = () => {
               groupedRows.map(g => (
                 <React.Fragment key={g.cid ?? 'null'}>
                   <tr className="bg-gray-100">
-                    <th colSpan={visibleCount} className={`text-left ${density === 'compact' ? 'px-2 py-2' : 'px-3 py-2'} text-industrial-gray font-semibold`}>{g.name}</th>
+                    <th colSpan={visibleCount} className={`text-left ${density === 'compact' ? 'px-2 py-2' : 'px-3 py-2'} text-slate-500 font-semibold`}>{g.name}</th>
                   </tr>
                   {g.items.map(r => (
                     <tr
                       key={r.product_id}
-                      className="border-b hover:bg-gray-50 cursor-pointer"
+                      className={`border-b hover:bg-gray-50 cursor-pointer relative ${r.available_stock <= (effectiveThreshold(r.product_id) || 0) ? 'bg-rose-50/30' : ''}`}
                       onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id); loadMovements(r.product_id) }}
                     >
+                      {r.available_stock <= (effectiveThreshold(r.product_id) || 0) && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 animate-pulse z-10" title="Kritik Stok!" />
+                      )}
                       {visibleCols.name && (<td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>)}
                       {visibleCols.physical && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.physical_stock}</td>)}
                       {visibleCols.reserved && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.reserved_stock}</td>)}
                       {visibleCols.available && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
                       {visibleCols.threshold && (
                         <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
-                          <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
+                          <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">
                             {(effectiveThreshold(r.product_id) ?? '-') as number | string}
                           </span>
                         </td>
@@ -914,16 +917,19 @@ const AdminInventoryPage: React.FC = () => {
               sortedRows.map(r => (
                 <tr
                   key={r.product_id}
-                  className="border-b hover:bg-gray-50 cursor-pointer"
+                  className={`border-b hover:bg-gray-50 cursor-pointer relative ${r.available_stock <= (effectiveThreshold(r.product_id) || 0) ? 'bg-rose-50/30' : ''}`}
                   onClick={() => { setSelected(r); loadProductDetails(r.product_id); loadReserved(r.product_id); loadMovements(r.product_id) }}
                 >
+                  {r.available_stock <= (effectiveThreshold(r.product_id) || 0) && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 animate-pulse z-10" title="Kritik Stok!" />
+                  )}
                   {visibleCols.name && (<td className={`${adminTableCellClass} ${cellPad}`}>{r.name}</td>)}
                   {visibleCols.physical && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.physical_stock}</td>)}
                   {visibleCols.reserved && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>{r.reserved_stock}</td>)}
                   {visibleCols.available && (<td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right font-semibold`}>{r.available_stock}</td>)}
                   {visibleCols.threshold && (
                     <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
-                      <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-light-gray text-steel-gray">
+                      <span className="inline-flex items-center text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-500">
                         {(effectiveThreshold(r.product_id) ?? '-') as number | string}
                       </span>
                     </td>
@@ -935,7 +941,7 @@ const AdminInventoryPage: React.FC = () => {
           </tbody>
         </table>
         {loading === LoadState.Loading && (
-          <div className="p-4 text-sm text-steel-gray">Yükleniyor…</div>
+          <div className="p-4 text-sm text-slate-500">Yükleniyor…</div>
         )}
         {loading === LoadState.Error && (
           <div className="p-4 text-sm text-red-600">{error}</div>
@@ -946,38 +952,38 @@ const AdminInventoryPage: React.FC = () => {
       {selected && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 bg-black/20 z-40" onClick={() => setSelected(null)} />
-          <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-xl border-l border-light-gray flex flex-col">
-            <header className="p-4 border-b border-light-gray flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-industrial-gray truncate pr-4">{selected.name}</h2>
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={() => setSelected(null)} />
+          <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white/95 backdrop-blur z-50 shadow-2xl border-l border-slate-200/80 flex flex-col animate-in slide-in-from-right duration-200">
+            <header className="p-4 border-b border-slate-200 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-500 truncate pr-4">{selected.name}</h2>
               <button className="px-3 py-1 text-sm border rounded" onClick={() => setSelected(null)}>{t('admin.ui.close')}</button>
             </header>
             <div className="p-4 space-y-4 overflow-auto">
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white border border-light-gray rounded-lg p-3">
-                  <div className="text-xs text-steel-gray mb-1">Güncel Stok</div>
-                  <div className="text-xl font-semibold text-industrial-gray">{selectedStock ?? '-'}</div>
+                <div className="bg-white border border-slate-200 rounded-lg p-3">
+                  <div className="text-xs text-slate-500 mb-1">Güncel Stok</div>
+                  <div className="text-xl font-semibold text-slate-500">{selectedStock ?? '-'}</div>
                 </div>
-                <div className="bg-white border border-light-gray rounded-lg p-3">
-                  <div className="text-xs text-steel-gray mb-1">Etkili Eşik</div>
-                  <div className="text-xl font-semibold text-industrial-gray">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as number | string}</div>
+                <div className="bg-white border border-slate-200 rounded-lg p-3">
+                  <div className="text-xs text-slate-500 mb-1">Etkili Eşik</div>
+                  <div className="text-xl font-semibold text-slate-500">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as number | string}</div>
                 </div>
               </div>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-industrial-gray">Eşik Düzenle</h3>
+                <h3 className="text-sm font-semibold text-slate-500">Eşik Düzenle</h3>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
                     value={selectedThreshold}
                     onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
                     placeholder="Eşik"
-                    className="w-28 px-3 py-2 border border-light-gray rounded text-sm"
+                    className="w-28 px-3 py-2 border border-slate-200 rounded text-sm"
                   />
                   <button
                     disabled={saving}
                     onClick={() => saveThreshold(selected.product_id)}
-                    className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy disabled:opacity-50 text-sm"
+                    className="px-3 py-2 rounded border border-slate-200 hover:border-primary-navy disabled:opacity-50 text-sm"
                   >Uygula</button>
                   <button
                     disabled={saving}
@@ -988,34 +994,34 @@ const AdminInventoryPage: React.FC = () => {
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-industrial-gray">Hızlı Hareket</h3>
+                <h3 className="text-sm font-semibold text-slate-500">Hızlı Hareket</h3>
                 <div className="flex items-center gap-2">
                   <input type="number" className="w-24 px-2 py-2 border rounded text-sm" value={moveQty} min={1} onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))} />
-                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
-                  <button disabled={moving} className="px-3 py-2 rounded border border-light-gray hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
+                  <button disabled={moving} className="px-3 py-2 rounded border border-slate-200 hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
+                  <button disabled={moving} className="px-3 py-2 rounded border border-slate-200 hover:border-primary-navy text-sm" onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
                 </div>
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-industrial-gray">Rezerve Eden Siparişler</h3>
+                <h3 className="text-sm font-semibold text-slate-500">Rezerve Eden Siparişler</h3>
                 {reservedOrders.length === 0 ? (
-                  <div className="text-sm text-steel-gray">Bekleyen (kargolanmamış) sipariş yok.</div>
+                  <div className="text-sm text-slate-500">Bekleyen (kargolanmamış) sipariş yok.</div>
                 ) : (
                   <table className="w-full">
-                    <thead className="bg-light-gray">
+                    <thead className="bg-slate-100">
                       <tr>
-                        <th className="text-left p-2 text-xs text-industrial-gray">Sipariş</th>
-                        <th className="text-left p-2 text-xs text-industrial-gray">Tarih</th>
-                        <th className="text-left p-2 text-xs text-industrial-gray">Durum</th>
-                        <th className="text-right p-2 text-xs text-industrial-gray">Adet</th>
+                        <th className="text-left p-2 text-xs text-slate-500">Sipariş</th>
+                        <th className="text-left p-2 text-xs text-slate-500">Tarih</th>
+                        <th className="text-left p-2 text-xs text-slate-500">Durum</th>
+                        <th className="text-right p-2 text-xs text-slate-500">Adet</th>
                       </tr>
                     </thead>
                     <tbody>
                       {reservedOrders.map(ro => (
                         <tr key={ro.order_id} className="border-b">
                           <td className="p-2 text-primary-navy text-xs">{ro.order_id.slice(-8).toUpperCase()}</td>
-                          <td className="p-2 text-steel-gray text-xs">{formatDateTime(ro.created_at, 'tr')}</td>
-                          <td className="p-2 text-steel-gray text-xs">{ro.status}{ro.payment_status ? ` • ${ro.payment_status}` : ''}</td>
+                          <td className="p-2 text-slate-500 text-xs">{formatDateTime(ro.created_at, 'tr')}</td>
+                          <td className="p-2 text-slate-500 text-xs">{ro.status}{ro.payment_status ? ` • ${ro.payment_status}` : ''}</td>
                           <td className="p-2 text-right text-xs">{ro.quantity}</td>
                         </tr>
                       ))}
@@ -1026,18 +1032,18 @@ const AdminInventoryPage: React.FC = () => {
 
               <section className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-industrial-gray">Hareket Geçmişi (Son 5)</h3>
+                  <h3 className="text-sm font-semibold text-slate-500">Hareket Geçmişi (Son 5)</h3>
                   <button onClick={undoLastMovement} disabled={undoing || movements.length === 0 || String((movements[0] as { reason?: string } | undefined)?.reason || '').startsWith('undo')} className="px-3 py-1 rounded border text-xs disabled:opacity-50">Geri Al (10 dk)</button>
                 </div>
                 {movements.length === 0 ? (
-                  <div className="text-sm text-steel-gray">Hareket yok.</div>
+                  <div className="text-sm text-slate-500">Hareket yok.</div>
                 ) : (
                   <table className="w-full text-xs">
-                    <thead className="bg-light-gray">
+                    <thead className="bg-slate-100">
                       <tr>
-                        <th className="text-left p-2 text-industrial-gray">Tarih</th>
-                        <th className="text-left p-2 text-industrial-gray">Sebep</th>
-                        <th className="text-right p-2 text-industrial-gray">Delta</th>
+                        <th className="text-left p-2 text-slate-500">Tarih</th>
+                        <th className="text-left p-2 text-slate-500">Sebep</th>
+                        <th className="text-right p-2 text-slate-500">Delta</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1045,7 +1051,7 @@ const AdminInventoryPage: React.FC = () => {
                         <tr key={m.id} className="border-b">
                           <td className="p-2">{formatDateTime(m.created_at, 'tr')}</td>
                           <td className="p-2">{m.reason}</td>
-                          <td className={`p-2 text-right ${Number(m.delta) > 0 ? 'text-green-600' : Number(m.delta) < 0 ? 'text-red-600' : 'text-steel-gray'}`}>{Number(m.delta) > 0 ? '+' : ''}{m.delta}</td>
+                          <td className={`p-2 text-right ${Number(m.delta) > 0 ? 'text-green-600' : Number(m.delta) < 0 ? 'text-red-600' : 'text-slate-500'}`}>{Number(m.delta) > 0 ? '+' : ''}{m.delta}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1064,11 +1070,11 @@ const AdminInventoryPage: React.FC = () => {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
               <div className="p-6">
-                <h2 className="text-xl font-semibold text-industrial-gray mb-4">CSV Stok İçe Aktarma</h2>
+                <h2 className="text-xl font-semibold text-slate-500 mb-4">CSV Stok İçe Aktarma</h2>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-industrial-gray mb-2">
+                    <label className="block text-sm font-medium text-slate-500 mb-2">
                       CSV Dosyası Seç
                     </label>
                     <input
@@ -1078,9 +1084,9 @@ const AdminInventoryPage: React.FC = () => {
                         const file = e.target.files?.[0]
                         if (file) handleCsvImport(file)
                       }}
-                      className="block w-full text-sm text-steel-gray file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-primary-navy file:text-white hover:file:bg-primary-navy/90"
+                      className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-primary-navy file:text-white hover:file:bg-primary-navy/90"
                     />
-                    <p className="text-xs text-steel-gray mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       Format: SKU,Miktar (örn: "PRD001",25)
                     </p>
                   </div>
@@ -1093,14 +1099,14 @@ const AdminInventoryPage: React.FC = () => {
                       onChange={(e) => setDryRun(e.target.checked)}
                       className="mr-2"
                     />
-                    <label htmlFor="dryRun" className="text-sm text-industrial-gray">
+                    <label htmlFor="dryRun" className="text-sm text-slate-500">
                       Kuru Çalıştırma (gerçek işlem yapma)
                     </label>
                   </div>
 
                   {csvPreview.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-medium text-industrial-gray mb-2">
+                      <h3 className="text-sm font-medium text-slate-500 mb-2">
                         Önizleme ({csvPreview.length} ürün)
                       </h3>
                       <div className="border rounded max-h-60 overflow-y-auto">
@@ -1123,7 +1129,7 @@ const AdminInventoryPage: React.FC = () => {
                                 <td className="px-2 py-1 text-right">{item.current}</td>
                                 <td className="px-2 py-1 text-right">{item.new}</td>
                                 <td className={`px-2 py-1 text-right ${item.delta > 0 ? 'text-green-600' :
-                                    item.delta < 0 ? 'text-red-600' : 'text-steel-gray'
+                                  item.delta < 0 ? 'text-red-600' : 'text-slate-500'
                                   }`}>
                                   {item.delta > 0 ? '+' : ''}{item.delta}
                                 </td>
@@ -1148,7 +1154,7 @@ const AdminInventoryPage: React.FC = () => {
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={() => setCsvImportOpen(false)}
-                    className="px-4 py-2 text-sm text-steel-gray border border-light-gray rounded-md hover:bg-gray-50"
+                    className="px-4 py-2 text-sm text-slate-500 border border-slate-200 rounded-md hover:bg-gray-50"
                   >
                     İptal
                   </button>
