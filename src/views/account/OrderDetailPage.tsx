@@ -314,14 +314,15 @@ export default function OrderDetailPage() {
             <div className="flex items-center space-x-4">
               <div className="bg-primary-navy/5 text-primary-navy rounded-xl w-12 h-12 flex items-center justify-center"><Package size={24} /></div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                  {t('orders.title')} {prettyNo}
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                  <Package size={24} className="text-primary-navy" />
+                  {t('orders.orderNumber')}: #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
                   {order.is_demo && (
                     <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
                       DEMO
                     </span>
                   )}
-                </h1>
+                </h2>
                 <div className="flex items-center space-x-4 text-sm font-medium text-slate-500 mt-1.5">
                   <div className="flex items-center space-x-1.5"><Calendar size={14} /><span>{formatDate(order.created_at)}</span></div>
                   <div className="flex items-center space-x-1.5"><CreditCard size={14} /><span>{formatPrice(order.total_amount)}</span></div>

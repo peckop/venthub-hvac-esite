@@ -182,8 +182,8 @@ export default function AccountShipmentsPage() {
                 key={opt.value}
                 onClick={() => setFilter(opt.value)}
                 className={`h-8 px-4 rounded-lg text-xs font-bold transition-all border ${filter === opt.value
-                    ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
+                  ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
                   }`}
               >
                 {opt.label}
@@ -217,7 +217,7 @@ export default function AccountShipmentsPage() {
           {displayed.map((o) => {
             const shipStatus = getShipStatus(o)
             const activeStepIdx = getStepIndex(shipStatus)
-            const orderCode = o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`
+            const orderCode = o.order_number ? `#${o.order_number.split('-').pop()}` : `#${o.id.slice(-8).toUpperCase()}`
 
             return (
               <div key={o.id} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden hover:shadow-md transition-shadow">

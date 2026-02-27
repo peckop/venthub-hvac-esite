@@ -98,7 +98,7 @@ export const OrdersPage: React.FC = () => {
       // Gerçek siparişler: venthub_orders + venthub_order_items (nested)
       const { data: ordersData, error: ordersError } = await supabase
         .from('venthub_orders')
-        .select('id, user_id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
+        .select('id, user_id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )')
         .eq('user_id', user?.id || '')
         .order('created_at', { ascending: false })
 
@@ -244,7 +244,7 @@ export const OrdersPage: React.FC = () => {
       if (new Date(o.created_at) > new Date(dateTo)) return false
     }
     if (searchCode) {
-      const code = o.id.slice(-8).toUpperCase()
+      const code = o.order_number?.split('-').pop() || o.id.slice(-8).toUpperCase()
       if (!code.includes(searchCode.toUpperCase())) return false
     }
     return true
@@ -365,7 +365,7 @@ export const OrdersPage: React.FC = () => {
                       <div>
                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                           <Package className="text-primary-navy" size={20} />
-                          {order.order_number ? `Sipariş #${order.order_number.split('-')[1]}` : `Sipariş #${order.id.slice(-8).toUpperCase()}`}
+                          Sipariş #{order.order_number?.split('-').pop() || order.id.slice(-8).toUpperCase()}
                           {order.is_demo && (
                             <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
                               DEMO

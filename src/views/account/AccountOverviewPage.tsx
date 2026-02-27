@@ -206,7 +206,7 @@ export default function AccountOverviewPage() {
                 </h3>
                 {activeShipment ? (
                   <p className="text-sm font-medium text-slate-500 mt-1">
-                    Sipariş <span className="font-bold text-slate-900">#{activeShipment.order_number?.split('-')[1] || activeShipment.id.slice(-8).toUpperCase()}</span> yolda.
+                    Sipariş <span className="font-bold text-slate-900">#{activeShipment.order_number?.split('-').pop() || activeShipment.id.slice(-8).toUpperCase()}</span> yolda.
                   </p>
                 ) : (
                   <p className="text-sm font-medium text-slate-500 mt-1">Şu anda yolda olan aktif bir siparişiniz bulunmuyor.</p>
