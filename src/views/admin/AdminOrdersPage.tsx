@@ -18,6 +18,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 import { X, Search, Truck, FileText, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare } from 'lucide-react'
 import AdminOrdersBoard from './AdminOrdersBoard'
+import { updateOrderStatus } from '../../lib/orderStatusService'
 
 interface AdminOrderRow {
   id: string
@@ -290,11 +291,17 @@ const AdminOrdersPage: React.FC = () => {
     if (!ok) return
     try {
       setSaving(true)
-      const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-        body: { order_id: id, cancel: true, send_email: false }
+      const curRow = rows.find(r => r.id === id)
+      // Merkezi servis: hem sipariş statüsünü günceller hem returns'e yansıtır hem audit log yazar
+      const res = await updateOrderStatus({
+        orderId: id,
+        newStatus: 'cancelled',
+        oldStatus: curRow?.status,
+        reason: 'Sipariş Tablo Üzerinden İptal Edildi',
+        auditComment: 'table cancel shipping',
       })
-      if (fnErr) throw fnErr
-      setRows(prev => prev.map(r => r.id === id ? { ...r, status: 'confirmed' } : r))
+      if (!res.ok) throw new Error(res.error)
+      setRows(prev => prev.map(r => r.id === id ? { ...r, status: 'cancelled' } : r))
       toast.success(t('admin.orders.toasts.shippingCancelSuccess'))
     } catch (e) {
       toast.error(t('admin.orders.toasts.shippingCancelFailed'))
