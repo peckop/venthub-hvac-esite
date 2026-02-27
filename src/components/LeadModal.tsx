@@ -19,8 +19,8 @@ const applicationAreas = [
   'Diğer'
 ]
 
-const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, productId }) => {
-  const { t } = useI18n()
+const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, productId: _productId }) => {
+  const { } = useI18n()
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
   const [email, setEmail] = useState('')

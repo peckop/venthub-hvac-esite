@@ -96,11 +96,11 @@ interface BentPlaneGeometryProps {
  * Note: Position is now controlled by parent ProductCard component
  */
 const BentPlaneGeometry: React.FC<BentPlaneGeometryProps> = ({ image, id, position = [0, 0, 0] }) => {
-  const router = useRouter()
+    const router = useRouter()
     const meshRef = useRef<THREE.Mesh>(null)
     const materialRef = useRef<THREE.ShaderMaterial>(null)
     const scroll = useScroll()
-    const navigate = useRouter()
+
     const [hovered, setHover] = useState(false)
 
     // Change cursor on hover

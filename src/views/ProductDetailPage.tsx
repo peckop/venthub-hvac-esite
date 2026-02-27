@@ -456,7 +456,7 @@ export const ProductDetailPage: React.FC = () => {
     try {
       setIsGeneratingPdf(true);
 
-      let fullImageUrl = undefined;
+      let fullImageUrl: string | undefined = undefined;
 
       if (images?.length > 0 && images[0]?.path) {
         // Resolve absolute URL via Supabase Storage

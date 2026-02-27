@@ -1,8 +1,7 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Product } from './supabase';
-import { PDF_FONTS, PDF_COLORS, VENTHUB_LOGO_BASE64, getBase64ImageFromUrl } from './pdfAssets';
-import { formatCurrency } from '../i18n/format';
+import { PDF_FONTS, PDF_COLORS, getBase64ImageFromUrl } from './pdfAssets';
 
 /**
  * PDF Üretim Servisi (Premium Tasarım & Türkçe Karakter Destekli)
@@ -34,7 +33,7 @@ export async function generateProductDatasheet(
         const fontBoldBuffer = await fontBoldResponse.arrayBuffer();
         const fontBoldBase64 = arrayBufferToBase64(fontBoldBuffer);
 
-        doc.addFileToVFS('Roboto-Bold.ttf', fontBase64); // Fallback to regular if bold fails for some reason
+        doc.addFileToVFS('Roboto-Bold.ttf', fontBoldBase64);
         doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
 
         doc.setFont('Roboto');
