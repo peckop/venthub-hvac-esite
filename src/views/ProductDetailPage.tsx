@@ -14,7 +14,8 @@ import { formatCurrency } from '../i18n/format'
 import LeadModal from '../components/LeadModal'
 import legalConfig from '../config/legal'
 import { getStockInquiryLink } from '../utils/whatsapp'
-
+import toast from 'react-hot-toast'
+import { generateProductDatasheet } from '../lib/pdfGenerator'
 import {
   ArrowLeft,
   ShoppingCart,
@@ -293,6 +294,7 @@ export const ProductDetailPage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance']) // First section open by default
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
 
   const navTriggerRef = useRef<HTMLDivElement>(null)
@@ -448,6 +450,21 @@ export const ProductDetailPage: React.FC = () => {
   }
 
   const { t, lang } = useI18n()
+
+  const handleDownloadPdf = async () => {
+    if (!product) return;
+    try {
+      setIsGeneratingPdf(true);
+      // images[0]?.path resolves to the main image url if exists
+      await generateProductDatasheet(product, images[0]?.path, translateSpecKey);
+      toast.success(t('pdp.pdfSuccess') || 'Teknik PDF Föyü başarıyla indirildi.');
+    } catch (err) {
+      console.error(err);
+      toast.error(t('pdp.pdfError') || 'PDF oluşturulurken bir hata meydana geldi.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
@@ -810,6 +827,22 @@ export const ProductDetailPage: React.FC = () => {
                   )
                 })()}
               </div>
+            </div>
+
+            {/* PDF Generate Button */}
+            <div className="pt-4 mt-2">
+              <button
+                onClick={handleDownloadPdf}
+                disabled={isGeneratingPdf}
+                className="w-full bg-air-blue/10 hover:bg-air-blue/20 text-primary-navy border border-air-blue/30 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {isGeneratingPdf ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-navy"></div>
+                ) : (
+                  <FileText size={20} />
+                )}
+                <span>{isGeneratingPdf ? 'PDF Hazırlanıyor...' : 'Teknik Ürün Föyü İndir (PDF)'}</span>
+              </button>
             </div>
 
             {/* Value Props - DIFFERENT from Trust Signals above */}
@@ -1305,9 +1338,17 @@ export const ProductDetailPage: React.FC = () => {
                                 <p className="text-sm text-steel-gray">PDF - 4.2 MB</p>
                               </div>
                             </div>
-                            <button className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-                              <Download size={20} />
-                              <span>{t('pdp.actions.downloadBrochure')}</span>
+                            <button
+                              onClick={handleDownloadPdf}
+                              disabled={isGeneratingPdf}
+                              className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                            >
+                              {isGeneratingPdf ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              ) : (
+                                <Download size={20} />
+                              )}
+                              <span>{isGeneratingPdf ? 'Hazırlanıyor...' : t('pdp.actions.downloadBrochure')}</span>
                             </button>
                           </div>
                         </div>
