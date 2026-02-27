@@ -12,6 +12,7 @@ import { Clock, CheckCircle2, Package, Truck, XCircle, AlertCircle, GripVertical
 interface AdminOrderRow {
     id: string
     status: string
+    user_id?: string | null
     total_amount?: number | null
     created_at: string
     customer_name?: string | null
@@ -47,7 +48,7 @@ export default function AdminOrdersBoard() {
         try {
             const { data, error } = await supabase
                 .from('view_admin_orders')
-                .select('id,status,total_amount,created_at,order_number,customer_name')
+                .select('id,status,user_id,total_amount,created_at,order_number,customer_name')
                 .order('created_at', { ascending: false })
                 .limit(200) // Kanban for recent orders
 
@@ -102,6 +103,22 @@ export default function AdminOrdersBoard() {
             // Detaylı kargo/iptal işlemi için tablo görünümündeki fonksiyonlar kullanılmalı.
             const res = await supabase.from('venthub_orders').update({ status: targetStatus }).eq('id', draggableId)
             let error = res.error
+
+            // İptal veya İade sütununa çekildiyse venthub_returns tablosuna da yansıt (İadeler sayfasında görünsün)
+            if (!error && (targetStatus === 'cancelled' || targetStatus === 'refunded')) {
+                const { data: existingRet } = await supabase.from('venthub_returns').select('id').eq('order_id', draggableId).maybeSingle()
+
+                if (!existingRet) {
+                    await supabase.from('venthub_returns').insert({
+                        order_id: draggableId,
+                        user_id: targetOrder.user_id || '00000000-0000-0000-0000-000000000000', // anonymous fallback
+                        reason: targetStatus === 'cancelled' ? 'Sipariş Kanban Üzerinden İptal Edildi' : 'Sipariş Kanban Üzerinden İade Edildi',
+                        status: targetStatus === 'cancelled' ? 'cancelled' : 'refunded',
+                    })
+                } else {
+                    await supabase.from('venthub_returns').update({ status: targetStatus }).eq('id', existingRet.id)
+                }
+            }
 
             if (error) throw error
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
