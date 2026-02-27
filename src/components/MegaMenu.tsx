@@ -68,11 +68,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   // Desktop: Full-screen overlay with Radix NavigationMenu
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm"
+      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm animate-in fade-in duration-300"
       onClick={onClose}
     >
       <div
-        className="absolute top-0 left-0 w-full bg-white/98 backdrop-blur-xl shadow-2xl animate-slideDown"
+        className="absolute top-0 left-0 w-full bg-white/95 backdrop-blur-md shadow-2xl animate-in slide-in-from-top-4 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -80,10 +80,10 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           <h2 className="text-lg font-bold text-industrial-gray">Ürün Kategorileri</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
+            className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-slate-400 group"
           >
-            <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-90 transition-transform duration-300">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
