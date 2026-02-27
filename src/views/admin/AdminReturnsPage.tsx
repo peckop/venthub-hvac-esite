@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
+import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -270,6 +271,13 @@ export default function AdminReturnsPage() {
       setReturns(prev => prev.map(r =>
         r.id === returnId ? { ...r, status: newStatus, updated_at: new Date().toISOString() } : r
       ))
+
+      // İki yönlü sync: Returns statü değişikliğini Orders tablosuna da yansıt
+      try {
+        await syncOrderFromReturn(returnItem.order_id, newStatus)
+      } catch {
+        // Orders sync hatası kullanıcıyı bloklamasın
+      }
 
       toast.success(_t('admin.returns.toasts.statusUpdated', { status: getStatusLabel(newStatus) }) as string)
 
