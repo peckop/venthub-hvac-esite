@@ -78,9 +78,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const isAirCurtain = category.slug === 'hava-perdeleri'
 
-    // Track if we're restoring from URL hash
-    const isRestoringFromHash = useRef(false)
-
     // Restore state from URL hash on mount or back navigation
     useEffect(() => {
         const checkHash = () => {

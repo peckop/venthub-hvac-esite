@@ -132,7 +132,6 @@ const ProductCard: React.FC<{
  * Scene Content with Auto-Scroll + Hover Pause
  */
 const SceneContent: React.FC<{ items: ProductItem[]; isPaused: boolean; onHover: (h: boolean) => void }> = ({ items, isPaused, onHover }) => {
-    const router = useRouter()
     const gap = 4.5
     const scrollOffset = useRef(0)
     const { camera } = useThree()
@@ -187,7 +186,6 @@ const SceneContent: React.FC<{ items: ProductItem[]; isPaused: boolean; onHover:
  * - Click navigation to categories
  */
 const InfiniteProductsShowcase: React.FC<InfiniteProductsShowcaseProps> = ({ items }) => {
-    const router = useRouter()
     const [isPaused, setIsPaused] = useState(false)
 
     return (

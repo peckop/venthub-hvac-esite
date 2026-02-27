@@ -17,8 +17,6 @@ import { usePathname } from 'next/navigation'
  * @param deps - Optional dependencies to re-trigger scroll (e.g., when content changes)
  */
 export function useScrollToHash(deps: unknown[] = []) {
-    const pathname = usePathname()
-
     useEffect(() => {
         const hash = location.hash.slice(1) // Remove # prefix
         if (!hash) return

@@ -59,44 +59,6 @@ interface Order {
   legal_consents?: unknown
 }
 
-interface SupabaseOrderData {
-  id: string
-  total_amount: number | string
-  status: string
-  payment_status?: string | null
-  created_at: string
-  customer_name: string
-  customer_email: string
-  shipping_address: unknown
-  order_number: string
-  conversation_id: string | null
-  carrier: string | null
-  tracking_number: string | null
-  tracking_url: string | null
-  shipped_at: string | null
-  delivered_at: string | null
-  shipping_method?: string | null
-  invoice_type?: string | null
-  invoice_info?: unknown
-  legal_consents?: unknown
-  venthub_order_items: SupabaseOrderItem[]
-}
-
-interface SupabaseOrderItem {
-  id: string
-  product_id: string | null
-  product_name: string
-  quantity: number
-  price_at_time: number | string
-  product_image_url: string | null
-}
-
-interface SupabaseError {
-  code?: string
-  status?: number
-  message?: string
-}
-
 export default function OrderDetailPage() {
   const searchParams = useSearchParams()
   const id = searchParams.get('id') as string
@@ -270,8 +232,6 @@ export default function OrderDetailPage() {
       </div>
     )
   }
-
-  const prettyNo = order.order_number ? `#${order.order_number.split('-')[1]}` : `#${order.id.slice(-8).toUpperCase()}`
 
   // Status helpers
   const getStatusColor = (status: string) => {
@@ -598,8 +558,3 @@ export default function OrderDetailPage() {
     </div>
   )
 }
-
-
-
-
-

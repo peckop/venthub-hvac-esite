@@ -195,7 +195,7 @@ const AdminRealtimeNotifications: React.FC = () => {
             supabase.removeChannel(ordersChannel)
             supabase.removeChannel(stockChannel)
         }
-    }, [])
+    }, [router])
 
     // Close dropdown
     useEffect(() => {
@@ -276,7 +276,7 @@ const AdminRealtimeNotifications: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col">
-                                {notifications.map((notif, index) => (
+                                {notifications.map((notif) => (
                                     <div
                                         key={notif.id}
                                         onClick={() => {
