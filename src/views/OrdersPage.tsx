@@ -264,20 +264,23 @@ export const OrdersPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-industrial-gray mb-2">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mb-1">
+            <div className="w-10 h-10 rounded-xl bg-primary-navy/5 flex items-center justify-center text-primary-navy">
+              <ShoppingBag size={20} />
+            </div>
             {t('orders.title')}
           </h1>
-          <p className="text-steel-gray">
+          <p className="text-sm text-slate-500 font-medium">
             {t('orders.subtitle')}
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-hvac-md p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <div>
-              <label className="text-xs text-steel-gray">{t('orders.status')}</label>
-              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.status')}</label>
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as StatusFilter)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
                 <option value="all">{t('orders.all')}</option>
                 <option value="pending">{t('orders.pending')}</option>
                 <option value="paid">{t('orders.paid')}</option>
@@ -286,41 +289,44 @@ export const OrdersPage: React.FC = () => {
                 <option value="failed">{t('orders.failed')}</option>
               </select>
             </div>
-            <div>
-              <label className="text-xs text-steel-gray">{t('orders.startDate')}</label>
-              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.startDate')}</label>
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
             </div>
-            <div>
-              <label className="text-xs text-steel-gray">{t('orders.endDate')}</label>
-              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.endDate')}</label>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
             </div>
-            <div>
-              <label className="text-xs text-steel-gray">{t('orders.orderCode')}</label>
-              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.orderCode')}</label>
+              <input type="text" placeholder={t('orders.orderCodePlaceholder')} value={searchCode} onChange={e => setSearchCode(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
             </div>
-            <div>
-              <label className="text-xs text-steel-gray">{t('orders.product')}</label>
-              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full border border-light-gray rounded px-2 py-2 text-sm" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.product')}</label>
+              <input type="text" placeholder={t('orders.productSearchPlaceholder')} value={productFilter} onChange={e => setProductFilter(e.target.value)} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
             </div>
           </div>
-          <div className="flex justify-end mt-3">
-            <button onClick={() => { setStatusFilter('all'); setDateFrom(''); setDateTo(''); setSearchCode(''); setProductFilter('') }} className="text-sm text-steel-gray hover:text-primary-navy">{t('orders.clearFilters')}</button>
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{filtered.length} / {orders.length} sipariş gösteriliyor</span>
+            <button onClick={() => { setStatusFilter('all'); setDateFrom(''); setDateTo(''); setSearchCode(''); setProductFilter('') }} className="text-sm font-bold text-slate-500 hover:text-primary-navy transition-colors">{t('orders.clearFilters')}</button>
           </div>
         </div>
 
         {/* Orders List */}
         {orders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-hvac-md p-12 text-center">
-            <ShoppingBag size={64} className="mx-auto text-steel-gray mb-4" />
-            <h3 className="text-xl font-semibold text-industrial-gray mb-2">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12 text-center">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ShoppingBag size={32} className="text-slate-300" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1">
               {t('orders.noOrdersTitle')}
             </h3>
-            <p className="text-steel-gray mb-6">
+            <p className="text-sm text-slate-500 mb-6">
               {t('orders.noOrdersDesc')}
             </p>
             <button
               onClick={() => router.push('/')}
-              className="bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-colors inline-flex items-center justify-center"
             >
               {t('orders.exploreProducts')}
             </button>
@@ -328,11 +334,11 @@ export const OrdersPage: React.FC = () => {
         ) : (
           <div className="space-y-6">
             {filtered.map((order) => (
-              <div key={order.id} className="bg-white rounded-lg shadow-hvac-md overflow-hidden">
+              <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
                 {/* Order Header */}
-                <div className="p-6 border-b border-light-gray">
+                <div className="p-6 border-b border-slate-100">
                   {/* Status Stepper */}
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <div className="flex items-center gap-2">
                       {steps.map((s, idx) => {
                         // Normalize 'confirmed' status to 'paid' for progress bar
@@ -342,59 +348,57 @@ export const OrdersPage: React.FC = () => {
                         return (
                           <React.Fragment key={s}>
                             <div className="flex flex-col items-center min-w-[80px]">
-                              <div className={`w-6 h-6 rounded-full text-xs flex items-center justify-center ${active ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx + 1}</div>
-                              <span className="mt-1 text-[11px] text-steel-gray">{stepLabel[s]}</span>
+                              <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${active ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
+                              <span className={`mt-2 text-[10px] font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{stepLabel[s]}</span>
                             </div>
                             {idx < steps.length - 1 && (
-                              <div className={`flex-1 h-1 ${activeIdx >= idx + 1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
+                              <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
                             )}
                           </React.Fragment>
                         )
                       })}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-4">
-                      <div className="bg-primary-navy text-white rounded-full w-12 h-12 flex items-center justify-center">
-                        <Package size={24} />
-                      </div>
+
                       <div>
-                        <h3 className="text-lg font-semibold text-industrial-gray">
+                        <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                          <Package className="text-primary-navy" size={20} />
                           {order.order_number ? `Sipariş #${order.order_number.split('-')[1]}` : `Sipariş #${order.id.slice(-8).toUpperCase()}`}
                           {order.is_demo && (
-                            <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-medium">
+                            <span className="ml-2 px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
                               DEMO
                             </span>
                           )}
                         </h3>
-                        <div className="flex items-center space-x-4 text-sm text-steel-gray">
-                          <div className="flex items-center space-x-1">
-                            <Calendar size={16} />
+                        <div className="flex items-center space-x-4 text-sm font-medium text-slate-500 mt-1">
+                          <div className="flex items-center space-x-1.5">
+                            <Calendar size={14} />
                             <span>{formatDate(order.created_at)}</span>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <CreditCard size={16} />
+                          <div className="flex items-center space-x-1.5">
+                            <CreditCard size={14} />
                             <span>{formatPrice(order.total_amount)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(order.status)}`}>
                         {getStatusText(order.status)}
                       </span>
                       {order.payment_status?.toLowerCase() === 'partial_refunded' && (
-                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">
                           {t('orders.partialRefunded')}
                         </span>
                       )}
                       <button
                         onClick={() => router.push(`/account/orders/detail?id=${order.id}`)}
-                        className="flex items-center space-x-1 text-primary-navy hover:text-secondary-blue"
+                        className="flex items-center space-x-1 bg-slate-50 hover:bg-slate-100 text-primary-navy border border-slate-200 h-10 px-4 rounded-lg text-sm font-bold shadow-sm transition-all hover:scale-[1.02]"
                       >
-                        <Eye size={20} />
-                        <span className="text-sm font-medium">{t('orders.details')}</span>
-                        <ChevronRight size={16} />
+                        <Eye size={16} />
+                        <span>{t('orders.details')}</span>
                       </button>
                     </div>
                   </div>

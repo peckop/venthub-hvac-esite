@@ -5,7 +5,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Clock, CheckCircle, XCircle, Truck, Package, RefreshCw } from 'lucide-react'
+import { Clock, CheckCircle, XCircle, Truck, Package, RefreshCw, Filter } from 'lucide-react'
 
 interface ReturnRow {
   id: string
@@ -31,6 +31,7 @@ export default function AccountReturnsPage() {
   const [orders, setOrders] = useState<OrderLite[]>([])
   const [loading, setLoading] = useState(true)
   const [openModal, setOpenModal] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -198,76 +199,120 @@ export default function AccountReturnsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-industrial-gray">{t('returns.title')}</h2>
-        <button onClick={() => setOpenModal(true)} className="px-4 py-2 text-sm bg-primary-navy text-white rounded hover:bg-secondary-blue">{t('returns.new')}</button>
+    <div className="min-h-[50vh]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-primary-navy/5 flex items-center justify-center text-primary-navy">
+              <RefreshCw size={20} />
+            </div>
+            {t('returns.title')}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">İade taleplerinizi oluşturun ve süreç durumunu takip edin.</p>
+        </div>
+        <button onClick={() => setOpenModal(true)} className="bg-primary-navy hover:bg-industrial-gray text-white font-bold h-10 px-6 rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] flex items-center gap-2 self-start sm:self-auto">
+          {t('returns.new')}
+        </button>
       </div>
+
+      {/* Status Filter */}
+      {rows.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-4 mb-6">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Filter size={12} /> Durum:</span>
+            {[
+              { value: 'all', label: `Tümü (${rows.length})` },
+              { value: 'requested', label: 'Talep Edildi' },
+              { value: 'approved', label: 'Onaylandı' },
+              { value: 'in_transit', label: 'Kargoda' },
+              { value: 'refunded', label: 'İade Edildi' },
+              { value: 'rejected', label: 'Reddedildi' },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setStatusFilter(opt.value)}
+                className={`h-8 px-3.5 rounded-lg text-xs font-bold transition-all border ${statusFilter === opt.value
+                    ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
+                  }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="min-h-[20vh] flex items-center justify-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
         </div>
       ) : rows.length === 0 ? (
-        <div className="text-sm text-steel-gray">{t('returns.empty')}</div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-12 text-center">
+          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <RefreshCw size={32} className="text-slate-300" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 mb-1">Henüz hiç iade talebiniz yok</h3>
+          <p className="text-sm text-slate-500">{t('returns.empty')}</p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {rows.map(r => {
+          {rows.filter(r => statusFilter === 'all' || r.status === statusFilter).map(r => {
             const o = orders.find(x => x.id === r.order_id)
             const code = o?.order_number ? `#${o.order_number.split('-')[1]}` : `#${r.order_id.slice(-8).toUpperCase()}`
             const timeline = getReturnTimeline(r.status)
 
             return (
-              <div key={r.id} className="bg-white rounded-xl border border-gray-100 p-4">
+              <div key={r.id} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 hover:shadow-md transition-shadow">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="bg-primary-navy text-white rounded-full w-10 h-10 flex items-center justify-center">
-                      <Package size={18} />
+                    <div className="bg-primary-navy/5 text-primary-navy rounded-xl w-12 h-12 flex items-center justify-center">
+                      <Package size={20} />
                     </div>
                     <div>
                       <button
-                        onClick={() => router.push(`/account/orders/${r.order_id}`)}
-                        className="font-semibold text-primary-navy hover:underline"
+                        onClick={() => router.push(`/account/orders/detail?id=${r.order_id}`)}
+                        className="text-lg font-bold text-slate-900 hover:text-primary-navy transition-colors"
                       >
-                        {code}
+                        Sipariş {code}
                       </button>
-                      <div className="text-xs text-steel-gray">{formatDate(r.created_at, lang)}</div>
+                      <div className="text-sm font-medium text-slate-500 mt-0.5">{formatDate(r.created_at, lang)}</div>
                     </div>
                   </div>
-                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${statusClass(r.status)}`}>
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${statusClass(r.status)}`}>
                     {getStatusIcon(r.status)}
                     {getStatusLabel(r.status)}
                   </div>
                 </div>
 
                 {/* Return Details */}
-                <div className="mb-4">
-                  <div className="text-sm">
-                    <span className="font-medium text-steel-gray">İade Sebebi:</span>
-                    <span className="text-industrial-gray ml-2">{r.reason}</span>
+                <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-4">
+                    <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">İade Sebebi</span>
+                    <span className="font-bold text-slate-900">{r.reason}</span>
                   </div>
                   {r.description && (
-                    <div className="text-sm mt-1">
-                      <span className="font-medium text-steel-gray">Açıklama:</span>
-                      <span className="text-industrial-gray ml-2">{r.description}</span>
+                    <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-4">
+                      <span className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Açıklama</span>
+                      <span className="font-bold text-slate-900">{r.description}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Progress Timeline */}
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xs font-medium text-steel-gray mb-3">İade Süreci</div>
-                  <div className="flex items-center justify-between">
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5 mt-4">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-5">İade Süreci</div>
+                  <div className="flex items-center justify-between max-w-2xl mx-auto">
                     {timeline.map((step, index) => (
                       <React.Fragment key={step.key}>
-                        <div className="flex flex-col items-center min-w-[60px]">
+                        <div className="flex flex-col items-center min-w-[80px]">
                           <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${step.completed
+                            className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm text-xs font-bold transition-all ${step.completed
                               ? step.isTerminal && (step.key === 'rejected' || step.key === 'cancelled')
                                 ? 'bg-red-500 text-white'
-                                : 'bg-success-green text-white'
-                              : 'bg-gray-200 text-gray-600'
+                                : 'bg-primary-navy text-white'
+                              : 'bg-white border border-slate-200 text-slate-400'
                               }`}
                           >
                             {step.completed ? (
@@ -276,13 +321,13 @@ export default function AccountReturnsPage() {
                                 : '✓'
                             ) : index + 1}
                           </div>
-                          <span className={`mt-1 text-[10px] text-center leading-tight ${step.completed ? 'text-industrial-gray font-medium' : 'text-steel-gray'
+                          <span className={`mt-2 text-[10px] uppercase font-bold tracking-wider text-center ${step.completed ? 'text-primary-navy' : 'text-slate-400'
                             }`}>
                             {step.label}
                           </span>
                         </div>
                         {index < timeline.length - 1 && !step.isTerminal && (
-                          <div className={`flex-1 h-0.5 mx-2 ${step.completed ? 'bg-success-green' : 'bg-gray-200'
+                          <div className={`flex-1 h-1 rounded-full mx-2 ${step.completed ? 'bg-primary-navy' : 'bg-slate-100'
                             }`}></div>
                         )}
                       </React.Fragment>
@@ -296,14 +341,22 @@ export default function AccountReturnsPage() {
       )}
 
       {openModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setOpenModal(false)}>
-          <div className="bg-white rounded-xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('returns.new')}</h3>
+        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setOpenModal(false)}>
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 w-full max-w-md p-6 animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <RefreshCw size={20} className="text-primary-navy" />
+                {t('returns.new')}
+              </h3>
+              <button onClick={() => setOpenModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <XCircle size={20} />
+              </button>
+            </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs text-steel-gray mb-1">{t('returns.order')}</label>
-                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.order')}</label>
+                <select value={form.order_id} onChange={e => setForm(s => ({ ...s, order_id: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
                   <option value="">{t('returns.selectOrder')}</option>
                   {orders.map(o => (
                     <option key={o.id} value={o.id}>{o.order_number ? `#${o.order_number.split('-')[1]}` : `#${o.id.slice(-8).toUpperCase()}`} • {formatDate(o.created_at, lang)}</option>
@@ -311,21 +364,21 @@ export default function AccountReturnsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-steel-gray mb-1">{t('returns.reason')}</label>
-                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full border border-light-gray rounded px-2 py-2 text-sm">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.reason')}</label>
+                <select value={form.reason} onChange={e => setForm(s => ({ ...s, reason: e.target.value }))} className="w-full h-10 bg-slate-50 border border-slate-200 rounded-lg px-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all">
                   <option value="">{t('returns.selectReason')}</option>
                   {reasonOptions.map(r => (<option key={r} value={r}>{r}</option>))}
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-steel-gray mb-1">{t('returns.description')}</label>
-                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full border border-light-gray rounded px-2 py-2 text-sm" rows={4} placeholder={t('returns.descriptionPh')} />
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">{t('returns.description')}</label>
+                <textarea value={form.description} onChange={e => setForm(s => ({ ...s, description: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all resize-none" rows={4} placeholder={t('returns.descriptionPh')} />
               </div>
             </div>
 
-            <div className="mt-4 flex justify-end gap-2">
-              <button onClick={() => setOpenModal(false)} className="px-4 py-2 text-sm text-steel-gray hover:text-industrial-gray">{t('common.cancel') || 'İptal'}</button>
-              <button onClick={handleCreate} className="px-4 py-2 text-sm bg-primary-navy text-white rounded hover:bg-secondary-blue">{t('returns.submit')}</button>
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
+              <button onClick={() => setOpenModal(false)} className="h-10 px-5 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-slate-200">{t('common.cancel') || 'İptal'}</button>
+              <button onClick={handleCreate} className="h-10 px-5 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-navy/50">{t('returns.submit')}</button>
             </div>
           </div>
         </div>

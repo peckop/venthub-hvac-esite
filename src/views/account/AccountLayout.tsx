@@ -5,7 +5,8 @@ import { useAuth } from '../../hooks/useAuth'
 import { useI18n } from '../../i18n/I18nProvider'
 import { LayoutDashboard, Package, Truck, MapPin, FileText, RefreshCcw, User, Shield } from 'lucide-react'
 
-type TabItem = { to: string; label: string; icon: React.ReactNode; end?: boolean }
+type TabItem = { to: string; label: string; icon: React.ReactNode }
+type TabGroup = { label: string; items: TabItem[] }
 
 export default function AccountLayout({ children }: { children?: React.ReactNode }) {
   const router = useRouter()
@@ -13,59 +14,85 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
   const { user, loading } = useAuth()
   const pathname = usePathname()
 
-  const tabs: TabItem[] = [
-    { to: '/account', label: t('account.tabs.overview'), icon: <LayoutDashboard className="w-5 h-5" />, end: true },
-    { to: '/account/orders', label: t('account.tabs.orders'), icon: <Package className="w-5 h-5" /> },
-    { to: '/account/shipments', label: t('account.tabs.shipments'), icon: <Truck className="w-5 h-5" /> },
-    { to: '/account/addresses', label: t('account.tabs.addresses'), icon: <MapPin className="w-5 h-5" /> },
-    { to: '/account/invoices', label: t('account.tabs.invoices'), icon: <FileText className="w-5 h-5" /> },
-    { to: '/account/returns', label: t('account.tabs.returns'), icon: <RefreshCcw className="w-5 h-5" /> },
-    { to: '/account/profile', label: t('account.tabs.profile'), icon: <User className="w-5 h-5" /> },
-    { to: '/account/security', label: t('account.tabs.security'), icon: <Shield className="w-5 h-5" /> },
+  const navGroups: TabGroup[] = [
+    {
+      label: t('account.tabs.overview') || 'Özet',
+      items: [
+        { to: '/account', label: t('account.tabs.overview') || 'Hesap Özeti', icon: <LayoutDashboard size={18} className="shrink-0" /> },
+      ]
+    },
+    {
+      label: 'Sipariş & Kargo',
+      items: [
+        { to: '/account/orders', label: t('account.tabs.orders') || 'Siparişler', icon: <Package size={18} className="shrink-0" /> },
+        { to: '/account/shipments', label: t('account.tabs.shipments') || 'Kargo Takibi', icon: <Truck size={18} className="shrink-0" /> },
+        { to: '/account/returns', label: t('account.tabs.returns') || 'İadeler', icon: <RefreshCcw size={18} className="shrink-0" /> },
+      ]
+    },
+    {
+      label: 'Hesap Yönetimi',
+      items: [
+        { to: '/account/profile', label: t('account.tabs.profile') || 'Kişisel Bilgiler', icon: <User size={18} className="shrink-0" /> },
+        { to: '/account/addresses', label: t('account.tabs.addresses') || 'Adreslerim', icon: <MapPin size={18} className="shrink-0" /> },
+        { to: '/account/invoices', label: t('account.tabs.invoices') || 'Fatura Bilgileri', icon: <FileText size={18} className="shrink-0" /> },
+        { to: '/account/security', label: t('account.tabs.security') || 'Güvenlik', icon: <Shield size={18} className="shrink-0" /> },
+      ]
+    }
   ]
 
   React.useEffect(() => {
-    if (!loading && !user) {
+    let active = true
+    if (!loading && !user && active) {
       router.replace('/auth/login')
     }
+    return () => { active = false }
   }, [user, loading, router])
 
-  if (loading) return null
-  if (!user) return null
+  if (loading || !user) return null
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar */}
         <aside className="w-full md:w-64 shrink-0">
-          <div className="sticky top-[80px]">
-            <h1 className="text-2xl font-bold text-industrial-gray mb-6 px-2">{t('header.account')}</h1>
-            <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible no-scrollbar pb-4 md:pb-0">
-              {tabs.map((tab) => {
-                const isActive = pathname === tab.to
-                return (
-                  <Link
-                    key={tab.to}
-                    href={tab.to}
-                    className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${isActive
-                        ? 'bg-primary-navy/5 text-primary-navy'
-                        : 'text-steel-gray hover:text-primary-navy hover:bg-gray-50'
-                      }`}
-                  >
-                    <span className={isActive ? 'text-primary-navy' : 'text-gray-400 group-hover:text-primary-navy transition-colors'}>
-                      {tab.icon}
-                    </span>
-                    {tab.label}
-                  </Link>
-                )
-              })}
+          <div className="sticky top-24 space-y-6">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight px-1 hidden md:block">{t('header.account') || 'Hesabım'}</h1>
+
+            <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 space-y-6 overflow-x-auto md:overflow-visible no-scrollbar flex md:block">
+              {navGroups.map((group, gi) => (
+                <div key={gi} className="shrink-0 md:shrink">
+                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2 hidden md:block">
+                    {group.label}
+                  </h3>
+                  <div className="flex gap-2 md:flex-col md:space-y-0.5">
+                    {group.items.map((tab) => {
+                      const isActive = pathname === tab.to
+                      return (
+                        <Link
+                          key={tab.to}
+                          href={tab.to}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${isActive
+                              ? 'bg-primary-navy text-white shadow-md shadow-primary-navy/20'
+                              : 'text-slate-600 hover:bg-slate-100 hover:text-primary-navy hover:translate-x-0.5'
+                            }`}
+                        >
+                          <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-primary-navy'}`}>
+                            {tab.icon}
+                          </span>
+                          {tab.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
             </nav>
           </div>
         </aside>
 
         {/* Content */}
         <main className="flex-1 min-w-0">
-          <div className="bg-white rounded-2xl md:border md:border-gray-100 md:p-8 min-h-[500px]">
+          <div className="bg-white rounded-2xl md:border md:border-slate-200/60 md:shadow-sm md:p-8 min-h-[500px]">
             {children}
           </div>
         </main>
