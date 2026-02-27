@@ -444,7 +444,7 @@ export default function OrderDetailPage() {
                       <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="p-4 text-sm font-medium text-slate-900">
                           {item.product_id ? (
-                            <Link href={`/product/${item.product_id}`} className="hover:text-primary-navy transition-colors">
+                            <Link href={`/products/${item.product_id}`} className="hover:text-primary-navy transition-colors">
                               {item.product_name}
                             </Link>
                           ) : (
@@ -454,7 +454,7 @@ export default function OrderDetailPage() {
                         <td className="p-4">
                           {item.product_image_url ? (
                             item.product_id ? (
-                              <Link href={`/product/${item.product_id}`}>
+                              <Link href={`/products/${item.product_id}`}>
                                 <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity" />
                               </Link>
                             ) : (
