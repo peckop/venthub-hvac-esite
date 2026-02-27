@@ -455,8 +455,19 @@ export const ProductDetailPage: React.FC = () => {
     if (!product) return;
     try {
       setIsGeneratingPdf(true);
-      // images[0]?.path resolves to the main image url if exists
-      await generateProductDatasheet(product, images[0]?.path, translateSpecKey);
+
+      let fullImageUrl = undefined;
+
+      if (images?.length > 0 && images[0]?.path) {
+        // Resolve absolute URL via Supabase Storage
+        const { data } = supabase.storage.from('product-images').getPublicUrl(images[0].path);
+        fullImageUrl = data?.publicUrl;
+      } else if (product.image_url) {
+        // Fallback to legacy field
+        fullImageUrl = product.image_url;
+      }
+
+      await generateProductDatasheet(product, fullImageUrl, translateSpecKey, lang);
       toast.success(t('pdp.pdfSuccess') || 'Teknik PDF Föyü başarıyla indirildi.');
     } catch (err) {
       console.error(err);

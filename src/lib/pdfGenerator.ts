@@ -1,122 +1,211 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Product } from './supabase';
-import { LOGOS } from './pdfAssets';
+import { PDF_FONTS, PDF_COLORS, VENTHUB_LOGO_BASE64, getBase64ImageFromUrl } from './pdfAssets';
 import { formatCurrency } from '../i18n/format';
 
 /**
- * PDF Üretim Servisi (Client-side)
- * @param product - PDF'i üretilecek ürün
- * @param imageUrl - Ürün görseli (Zorunlu değil, opsiyonel)
- * @param translateKey - Yerelleştirme için (örn. Teknik terimleri Türkçeleştirmek için)
+ * PDF Üretim Servisi (Premium Tasarım & Türkçe Karakter Destekli)
  */
 export async function generateProductDatasheet(
     product: Product,
     imageUrl?: string,
-    translateKey?: (key: string) => string
+    translateKey?: (key: string) => string,
+    lang: string = 'tr'
 ): Promise<void> {
-
-    // A4 Portrait boyutlarında oluştur.
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
     });
 
-    // Not: Standart jsPDF fontlarında Türkçe Karakter (ş, ğ, ı vb.) sorun çıkarabilir.
-    // Gerçek projede base64 edilmiş Roboto, Inter gibi bir fontu vfs'e eklemek gerekir.
-    // Örn: doc.addFileToVFS("Roboto-Regular.ttf", base64FontString);
-    // doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-    // doc.setFont("Roboto");
+    // ----- FONT YÜKLEME -----
+    try {
+        // Roboto fontunu CDN'den yükle (Türkçe karakter desteği için)
+        const fontResponse = await fetch(PDF_FONTS.Roboto.regular);
+        const fontBuffer = await fontResponse.arrayBuffer();
+        const fontBase64 = arrayBufferToBase64(fontBuffer);
+
+        doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+        doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+
+        // Bold versiyonu
+        const fontBoldResponse = await fetch(PDF_FONTS.Roboto.bold);
+        const fontBoldBuffer = await fontBoldResponse.arrayBuffer();
+        const fontBoldBase64 = arrayBufferToBase64(fontBoldBuffer);
+
+        doc.addFileToVFS('Roboto-Bold.ttf', fontBase64); // Fallback to regular if bold fails for some reason
+        doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+
+        doc.setFont('Roboto');
+    } catch (error) {
+        console.error('Font loading failed, falling back to standard fonts:', error);
+    }
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Renk Paleti (VentHub Kurumsal)
-    const colors = {
-        primaryNsavy: '#0b1e36',
-        secondaryBlue: '#1c64f2',
-        industrialGray: '#2d333a',
-        lightGray: '#f8fafc',
-        steelGray: '#64748b',
-        white: '#ffffff',
-    };
+    const margin = 15;
 
     // ----- HEADER (ÜST BİLGİ) -----
-    // Arka plan bandı
-    doc.setFillColor(colors.primaryNsavy);
-    doc.rect(0, 0, pageWidth, 28, 'F');
+    const drawHeader = () => {
+        // Üst şerit (Accent Orange)
+        doc.setFillColor(PDF_COLORS.accent[0], PDF_COLORS.accent[1], PDF_COLORS.accent[2]);
+        doc.rect(0, 0, pageWidth, 4, 'F');
 
-    // VentHub Başlık (Beyaz)
-    doc.setTextColor(colors.white);
-    doc.setFontSize(18);
-    doc.text('VentHub Teknik Föy', 14, 18);
+        // Arka plan (Solid Navy)
+        doc.setFillColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+        doc.rect(0, 4, pageWidth, 32, 'F');
 
-    // Sağ üst köşe Marka / Tarih
-    doc.setFontSize(10);
-    doc.text(new Date().toLocaleDateString('tr-TR'), pageWidth - 14, 18, { align: 'right' });
+        // Logo (Native Drawing for Premium Look & Reliability)
+        // Kutu
+        doc.setFillColor(PDF_COLORS.secondary[0], PDF_COLORS.secondary[1], PDF_COLORS.secondary[2]);
+        doc.roundedRect(margin, 10, 20, 20, 3, 3, 'F');
+        // VH Metni
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('Roboto', 'bold');
+        doc.setFontSize(14);
+        doc.text('VH', margin + 10, 23.5, { align: 'center' });
 
+        // Marka İsmi
+        doc.setFontSize(22);
+        doc.text('VentHub', margin + 28, 24);
+        // Alt başlık
+        doc.setFont('Roboto', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(200, 200, 200);
+        doc.text('HVAC PREMIUM', margin + 28, 30);
 
-    // ----- ÜRÜN BİLGİLERİ (İSİM & MARKA) -----
-    let currentY = 40;
+        // Sağ Taraf Başlık
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('Roboto', 'bold');
+        doc.setFontSize(14);
+        const title = lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET';
+        doc.text(title, pageWidth - margin, 20, { align: 'right' });
 
-    doc.setTextColor(colors.primaryNsavy);
-    doc.setFontSize(16);
-    // Uzun isimleri böl (wrap)
-    const splitTitle = doc.splitTextToSize(product.name, pageWidth - 28);
-    doc.text(splitTitle, 14, currentY);
-    currentY += (splitTitle.length * 7) + 2;
+        doc.setFont('Roboto', 'normal');
+        doc.setFontSize(9);
+        doc.text(`Ref: ${product.sku || product.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 26, { align: 'right' });
+    };
 
+    // ----- FOOTER (ALT BİLGİ) -----
+    const drawFooter = (pageNum: number, totalPages: number) => {
+        doc.setDrawColor(PDF_COLORS.border[0], PDF_COLORS.border[1], PDF_COLORS.border[2]);
+        doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+
+        doc.setFontSize(8);
+        doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
+
+        const footerText = lang === 'tr'
+            ? 'VentHub Akıllı Sistemi ile oluşturulmuştur.'
+            : 'Generated by VentHub Smart System.';
+        doc.text(footerText, margin, pageHeight - 12);
+
+        // URL'yi sağ tarafa (sayfa numarasının üstüne) veya ortaya çakışmayacak şekilde koyalım
+        doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+        doc.setFont('Roboto', 'bold');
+        doc.text('www.venthub.com', pageWidth / 2, pageHeight - 12, { align: 'center' });
+
+        doc.setFont('Roboto', 'normal');
+        doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
+        const pageText = lang === 'tr' ? `Sayfa ${pageNum} / ${totalPages}` : `Page ${pageNum} / ${totalPages}`;
+        doc.text(pageText, pageWidth - margin, pageHeight - 12, { align: 'right' });
+    };
+
+    drawHeader();
+
+    // ----- İÇERİK -----
+    let currentY = 45;
+
+    // Ürün İsmi
+    doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+    doc.setFont('Roboto', 'bold');
+    doc.setFontSize(20);
+    const splitTitle = doc.splitTextToSize(product.name, pageWidth - (margin * 2));
+    doc.text(splitTitle, margin, currentY);
+    currentY += (splitTitle.length * 8) + 5;
+
+    // Marka & Model
+    doc.setFont('Roboto', 'normal');
     doc.setFontSize(11);
-    doc.setTextColor(colors.steelGray);
-    doc.text(`Marka: ${product.brand} | Model: ${product.model_code || product.sku}`, 14, currentY);
+    doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);
+    const brandModelText = lang === 'tr'
+        ? `Marka: ${product.brand} | Model Kodu: ${product.model_code || product.sku}`
+        : `Brand: ${product.brand} | Model Code: ${product.model_code || product.sku}`;
+    doc.text(brandModelText, margin, currentY);
     currentY += 15;
 
+    // Görsel ve Açıklama Bölümü
+    const contentWidth = pageWidth - (margin * 2);
+    const imageSize = 70;
 
-    // ----- ÜRÜN GÖRSELİ -----
-    // Görsel varsa ekle, yoksa boşluk bırak
+    const renderDescriptionFallback = () => {
+        if (!product.description) return;
+        doc.setFont('Roboto', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+        doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin, currentY);
+
+        doc.setFont('Roboto', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
+        const splitDesc = doc.splitTextToSize(product.description, contentWidth);
+        doc.text(splitDesc, margin, currentY + 7);
+        currentY += (splitDesc.length * 5) + 15;
+    };
+
     if (imageUrl) {
         try {
-            const base64Img = await LOGOS.getBase64FromUrl(imageUrl);
+            const base64Img = await getBase64ImageFromUrl(imageUrl);
             if (base64Img) {
-                // Görseli sağ tarafa veya ortaya hizalayalım, 80x80 boyutunda.
-                doc.addImage(base64Img, 'JPEG', 14, currentY, 70, 70);
-                // Yanına kısa açıklama
+                doc.addImage(base64Img, 'JPEG', margin, currentY, imageSize, imageSize);
+
+                // Yanına açıklama
                 if (product.description) {
-                    const splitDesc = doc.splitTextToSize(product.description.replace(/(\r\n|\n|\r)/gm, " "), pageWidth - 100);
+                    doc.setFont('Roboto', 'bold');
+                    doc.setFontSize(11);
+                    doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+                    doc.text(lang === 'tr' ? 'Ürün Açıklaması' : 'Product Description', margin + imageSize + 10, currentY + 5);
+
+                    doc.setFont('Roboto', 'normal');
                     doc.setFontSize(10);
-                    doc.text(splitDesc, 90, currentY + 5);
+                    doc.setTextColor(PDF_COLORS.text[0], PDF_COLORS.text[1], PDF_COLORS.text[2]);
+                    const descText = product.description.replace(/(\r\n|\n|\r)/gm, " ");
+                    const splitDesc = doc.splitTextToSize(descText, contentWidth - imageSize - 10);
+                    doc.text(splitDesc, margin + imageSize + 10, currentY + 12);
                 }
-                currentY += 80;
+                currentY += imageSize + 15;
+            } else {
+                renderDescriptionFallback();
             }
-        } catch (err) {
-            console.warn('PDF görsel ekleme hatası:', err);
+        } catch (e) {
+            console.warn('Image embedding failed:', e);
+            renderDescriptionFallback();
         }
-    } else if (product.description) {
-        const splitDesc = doc.splitTextToSize(product.description.replace(/(\r\n|\n|\r)/gm, " "), pageWidth - 28);
-        doc.setFontSize(10);
-        doc.text(splitDesc, 14, currentY);
-        currentY += (splitDesc.length * 5) + 10;
+    } else {
+        renderDescriptionFallback();
     }
 
-    // Yeterli alan var mı kontrolü
-    if (currentY > pageHeight - 50) {
-        doc.addPage();
-        currentY = 20;
-    }
-
-    // ----- TEKNİK ÖZELLİKLER TABLOSU -----
+    // Teknik Özellikler Tablosu
     if (product.technical_specs && Object.keys(product.technical_specs).length > 0) {
+        // Sayfa sonu kontrolü
+        if (currentY > pageHeight - 60) {
+            doc.addPage();
+            drawHeader();
+            currentY = 45;
+        }
 
-        doc.setFontSize(12);
-        doc.setTextColor(colors.industrialGray);
-        doc.text('Teknik Özellikler', 14, currentY);
-        currentY += 5;
+        // Accent line for title
+        doc.setFillColor(PDF_COLORS.accent[0], PDF_COLORS.accent[1], PDF_COLORS.accent[2]);
+        doc.rect(margin, currentY - 5, 2, 6, 'F');
 
-        // Obje içindeki verileri 2 sütunlu array'e hazırla
+        doc.setFont('Roboto', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
+        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications', margin + 4, currentY);
+        currentY += 8;
+
         const tableData: string[][] = [];
         Object.entries(product.technical_specs).forEach(([key, value]) => {
-            // Çevirmen fonksiyonu varsa kullan, yoksa anahtarı koy
             const label = translateKey ? translateKey(key) : key;
             const valText = value !== null && value !== undefined ? String(value) : '-';
             tableData.push([label, valText]);
@@ -124,39 +213,56 @@ export async function generateProductDatasheet(
 
         autoTable(doc, {
             startY: currentY,
-            head: [['Özellik', 'Değer']],
+            head: [[lang === 'tr' ? 'Özellik' : 'Property', lang === 'tr' ? 'Değer' : 'Value']],
             body: tableData,
-            theme: 'striped',
+            theme: 'plain',
             headStyles: {
-                fillColor: [11, 30, 54], // primaryNavy
-                textColor: 255,
-                fontStyle: 'bold'
-            },
-            styles: {
+                fillColor: [248, 250, 252], // bg-slate-50
+                textColor: [27, 43, 75],
+                font: 'Roboto',
+                fontStyle: 'bold',
                 fontSize: 10,
-                cellPadding: 4,
-                overflow: 'linebreak'
+                cellPadding: { top: 6, right: 6, bottom: 6, left: 6 } // Premium padding
+            },
+            bodyStyles: {
+                font: 'Roboto',
+                fontSize: 9,
+                textColor: [55, 65, 81],
+                cellPadding: { top: 5, right: 6, bottom: 5, left: 6 },
+                lineColor: [229, 231, 235], // border-gray-200
+                lineWidth: { bottom: 0.1 } // Very thin elegant borders
+            },
+            alternateRowStyles: {
+                fillColor: [255, 255, 255]
             },
             columnStyles: {
-                0: { cellWidth: 80, fontStyle: 'bold' },
-                1: { cellWidth: 'auto' }
+                0: { cellWidth: 70, fontStyle: 'bold', textColor: [27, 43, 75] }
             },
+            margin: { left: margin, right: margin }
         });
-
     }
 
-    // ----- FOOTER (ALT BİLGİ) -----
-    const footerY = pageHeight - 15;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, footerY - 5, pageWidth - 14, footerY - 5);
+    // Sayfa numaraları ve footer'ları ekle
+    const totalPages = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        drawFooter(i, totalPages);
+    }
 
-    doc.setFontSize(8);
-    doc.setTextColor(colors.steelGray);
-    doc.text('Bu belge VentHub B2B Havalandırma Sistemleri tarafından otomatik oluşturulmuştur.', 14, footerY);
-    doc.text('www.venthub.com', pageWidth - 14, footerY, { align: 'right' });
-
-
-    // PDF Kaydet! Dosya ismini temizleyelim
+    // PDF Kaydet
     const cleanName = product.name.replace(/[^a-zA-Z0-9-_\.]/g, '_').substring(0, 30);
     doc.save(`${product.brand}_${cleanName}_Datasheet.pdf`);
+}
+
+/**
+ * ArrayBuffer to Base64 utility
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
 }
