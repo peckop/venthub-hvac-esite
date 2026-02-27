@@ -97,24 +97,11 @@ export default function AdminOrdersBoard() {
 
         try {
             // API call
-            let error;
-
-            if (targetStatus === 'shipped') {
-                // Shipped needs special edge function to optionally send email/tracking
-                const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-                    body: { order_id: draggableId, carrier: '', tracking_number: '', send_email: false }
-                })
-                error = fnErr
-            } else if (targetStatus === 'cancelled') {
-                const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
-                    body: { order_id: draggableId, cancel: true, send_email: false }
-                })
-                error = fnErr
-            } else {
-                // Direct table update for other generic statuses
-                const res = await supabase.from('venthub_orders').update({ status: targetStatus }).eq('id', draggableId)
-                error = res.error
-            }
+            // Kanban board'da sürükle-bırak sonrası hızlı statü değişikliği için 
+            // edge-function (şartlı tracking_number isteyen) yerine doğrudan db update yapıyoruz.
+            // Detaylı kargo/iptal işlemi için tablo görünümündeki fonksiyonlar kullanılmalı.
+            const res = await supabase.from('venthub_orders').update({ status: targetStatus }).eq('id', draggableId)
+            let error = res.error
 
             if (error) throw error
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
