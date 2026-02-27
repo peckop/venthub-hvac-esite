@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -122,57 +122,52 @@ export default function AdminReturnsPage() {
   }, [location.search, _t])
 
   // İade taleplerini yükle
-  useEffect(() => {
-    let mounted = true
-    async function loadReturns() {
-      if (!isAdmin || !user) return
+  const loadReturns = useCallback(async () => {
+    if (!isAdmin || !user) return
 
-      try {
-        setIsLoading(true)
+    try {
+      setIsLoading(true)
 
-        // İade taleplerini ve sipariş bilgilerini birlikte getir
-        const { data, error } = await supabase
-          .from('venthub_returns')
-          .select(`
-            id, order_id, user_id, reason, description, status, created_at, updated_at,
-            venthub_orders!inner (
-              order_number, customer_name, customer_email, total_amount
-            )
-          `)
-          .order('created_at', { ascending: false })
+      const { data, error } = await supabase
+        .from('venthub_returns')
+        .select(`
+          id, order_id, user_id, reason, description, status, created_at, updated_at,
+          venthub_orders!inner (
+            order_number, customer_name, customer_email, total_amount
+          )
+        `)
+        .order('created_at', { ascending: false })
 
-        if (error) throw error
+      if (error) throw error
 
-        if (mounted) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const mapped = (data || []).map((item: any) => ({
-            id: item.id,
-            order_id: item.order_id,
-            user_id: item.user_id,
-            reason: item.reason,
-            description: item.description,
-            status: item.status,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            order_number: item.venthub_orders?.order_number,
-            customer_name: item.venthub_orders?.customer_name,
-            customer_email: item.venthub_orders?.customer_email,
-            total_amount: item.venthub_orders?.total_amount,
-          })) as ReturnWithOrder[]
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mapped = (data || []).map((item: any) => ({
+        id: item.id,
+        order_id: item.order_id,
+        user_id: item.user_id,
+        reason: item.reason,
+        description: item.description,
+        status: item.status,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        order_number: item.venthub_orders?.order_number,
+        customer_name: item.venthub_orders?.customer_name,
+        customer_email: item.venthub_orders?.customer_email,
+        total_amount: item.venthub_orders?.total_amount,
+      })) as ReturnWithOrder[]
 
-          setReturns(mapped)
-        }
-      } catch (error) {
-        console.error('Returns load error:', error)
-        toast.error(_t('admin.returns.toasts.returnsLoadFailed') as string)
-      } finally {
-        if (mounted) setIsLoading(false)
-      }
+      setReturns(mapped)
+    } catch (error) {
+      console.error('Returns load error:', error)
+      toast.error(_t('admin.returns.toasts.returnsLoadFailed') as string)
+    } finally {
+      setIsLoading(false)
     }
-
-    loadReturns()
-    return () => { mounted = false }
   }, [isAdmin, user, _t])
+
+  useEffect(() => {
+    loadReturns()
+  }, [loadReturns])
 
   // Filtreleme
   useEffect(() => {
@@ -454,7 +449,16 @@ export default function AdminReturnsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h2>
-        <div className="text-sm text-slate-500">{_t('admin.returns.total', { count: returns.length })}</div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={loadReturns}
+            disabled={isLoading}
+            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+          >
+            {isLoading ? 'İadeler Yükleniyor...' : 'Yenile'}
+          </button>
+          <div className="text-sm text-slate-500">{_t('admin.returns.total', { count: returns.length })}</div>
+        </div>
       </div>
 
       {/* Filtreler */}
