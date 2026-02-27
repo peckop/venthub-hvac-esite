@@ -78,66 +78,66 @@ export default function AccountSecurityPage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-industrial-gray flex items-center gap-2">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
           <ShieldCheck className="w-6 h-6 text-primary-navy" />
           {t('account.security.title') || 'Güvenlik Ayarları'}
         </h2>
-        <p className="text-sm text-steel-gray mt-1">
+        <p className="text-sm text-slate-500 mt-1">
           Hesap güvenliğiniz için şifrenizi güncel tutun ve bağlı giriş yöntemlerinizi yönetin.
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Şifre Değiştirme Kartı */}
-        <div className="bg-white border border-gray-100/80 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 sm:p-8">
-            <h3 className="text-lg font-bold text-industrial-gray mb-1 flex items-center gap-2">
-              <Key className="w-5 h-5 text-steel-gray" />
+            <h3 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <Key className="w-5 h-5 text-slate-500" />
               Şifre Değiştir
             </h3>
-            <p className="text-sm text-steel-gray mb-6">Hesap güvenliğiniz için harf, rakam ve özel karakter içeren güçlü bir şifre seçin.</p>
+            <p className="text-sm text-slate-500 mb-6 pt-2">Hesap güvenliğiniz için harf, rakam ve özel karakter içeren güçlü bir şifre seçin.</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-industrial-gray block">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                   Mevcut Şifre
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="w-4 h-4 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Lock className="w-4 h-4 text-slate-400" />
                   </div>
-                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel') || 'Mevcut şifreniz'} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+                  <input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder={t('account.security.currentLabel') || 'Mevcut şifreniz'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-industrial-gray block">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                     Yeni Şifre
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Key className="w-4 h-4 text-gray-400" />
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Key className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel') || 'En az 8 karakter'} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('account.security.newLabel') || 'En az 8 karakter'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-industrial-gray block">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                     Yeni Şifre (Tekrar)
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Check className="w-4 h-4 text-gray-400" />
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                      <Check className="w-4 h-4 text-slate-400" />
                     </div>
-                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel') || 'Şifreyi tekrar girin'} className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white" />
+                    <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t('account.security.confirmLabel') || 'Şifreyi tekrar girin'} className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all" />
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end">
-                <button disabled={saving} className="bg-primary-navy text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-colors flex items-center gap-2">
+              <div className="pt-4 flex justify-end border-t border-slate-100 mt-2">
+                <button disabled={saving} className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-all hover:scale-[1.02] flex items-center gap-2">
                   {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Güncelleniyor...</> : <><Check className="w-4 h-4" /> {t('account.security.save') || 'Şifreyi Güncelle'}</>}
                 </button>
               </div>
@@ -146,54 +146,54 @@ export default function AccountSecurityPage() {
         </div>
 
         {/* Bağlı Hesaplar Kartı */}
-        <div className="bg-white border border-gray-100/80 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6 sm:p-8">
-            <h3 className="text-lg font-bold text-industrial-gray mb-1 flex items-center gap-2">
-              <LinkIcon className="w-5 h-5 text-steel-gray" />
+            <h3 className="text-lg font-bold text-slate-900 mb-1 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <LinkIcon className="w-5 h-5 text-slate-500" />
               Bağlı Giriş Yöntemleri
             </h3>
-            <p className="text-sm text-steel-gray mb-6">Tek tıkla giriş yapabilmek için sosyal hesaplarınızı bağlayabilirsiniz.</p>
+            <p className="text-sm text-slate-500 mb-6 pt-2">Tek tıkla giriş yapabilmek için sosyal hesaplarınızı bağlayabilirsiniz.</p>
 
             <div className="space-y-4">
               {/* E-posta/Şifre */}
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500">
+                  <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 shadow-sm">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-industrial-gray">E-posta ve Şifre</h4>
-                    <p className="text-xs text-steel-gray">Standart giriş yöntemi</p>
+                    <h4 className="text-sm font-bold text-slate-900">E-posta ve Şifre</h4>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Standart giriş yöntemi</p>
                   </div>
                 </div>
                 {hasProvider('email') ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-green-50 text-green-700 border border-green-200">
-                    <Check className="w-3 h-3" /> Bağlı
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                    <Check className="w-3.5 h-3.5" /> Bağlı
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-500 border border-gray-200">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
                     Pasif
                   </span>
                 )}
               </div>
 
               {/* Google */}
-              <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500">
+                  <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-sm">
                     <Chrome className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-industrial-gray">Google</h4>
-                    <p className="text-xs text-steel-gray">Google hesabınızla tek tıkla giriş</p>
+                    <h4 className="text-sm font-bold text-slate-900">Google</h4>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Tek tıkla giriş</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   {hasProvider('google') ? (
                     <>
-                      <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-green-50 text-green-700 border border-green-200">
-                        <Check className="w-3 h-3" /> Bağlı
+                      <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-200 shadow-sm">
+                        <Check className="w-3.5 h-3.5" /> Bağlı
                       </span>
                       <button
                         type="button"
@@ -223,7 +223,7 @@ export default function AccountSecurityPage() {
                             toast.error('Google bağlantısı kaldırılamadı')
                           }
                         }}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100 focus:outline-none"
                         title="Bağlantıyı Kaldır"
                       >
                         <Unlink className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function AccountSecurityPage() {
                           toast.error('Google bağlama başarısız')
                         }
                       }}
-                      className="px-4 py-2 bg-white border border-gray-200 hover:border-primary-navy hover:text-primary-navy text-industrial-gray text-sm font-bold rounded-xl transition-colors"
+                      className="h-8 px-4 bg-white border border-slate-200 shadow-sm hover:border-primary-navy hover:text-primary-navy text-slate-700 text-xs font-bold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-navy/20"
                     >
                       Bağla
                     </button>
@@ -260,7 +260,7 @@ export default function AccountSecurityPage() {
               </div>
             </div>
 
-            <p className="text-xs text-steel-gray mt-5 px-1">
+            <p className="text-xs text-slate-500 mt-5 px-1 leading-relaxed">
               Aynı e‑posta ile farklı giriş yöntemleri ayrı hesaplar oluşturabilir. Buradan Google hesabınızı mevcut hesabınıza bağlayarak hesap yönetimini tek bir merkezde toplayabilirsiniz.
             </p>
           </div>

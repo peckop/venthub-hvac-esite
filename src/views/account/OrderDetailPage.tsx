@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -118,114 +119,86 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     async function load() {
+      if (!user || !id) return
       try {
         setLoading(true)
-        const baseSelect = 'id, total_amount, status, payment_status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, carrier, tracking_number, tracking_url, shipped_at, delivered_at, shipping_method, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
-        const baseRes = await supabase
+
+        // 1. Sipariş ana verilerini çek
+        const { data: orderData, error: orderError } = await supabase
           .from('venthub_orders')
-          .select(baseSelect)
+          .select(`
+            id, total_amount, status, payment_status, created_at, 
+            customer_name, customer_email, shipping_address, order_number, 
+            conversation_id, carrier, tracking_number, tracking_url, 
+            shipped_at, delivered_at, shipping_method, invoice_type, 
+            invoice_info, legal_consents
+          `)
           .eq('id', id)
-          .limit(1)
           .single()
 
-        let data: SupabaseOrderData | null = null
-        let error: SupabaseError | null = baseRes.error as SupabaseError | null
+        if (orderError) throw orderError
+        if (!orderData) throw new Error('Order not found')
 
-        if (!baseRes.error) {
-          data = baseRes.data as unknown as SupabaseOrderData
-        } else if (((baseRes.error as SupabaseError).code === '42703') || ((baseRes.error as SupabaseError).status === 400)) {
-          // Fallback: bazı kolonlar yoksa daha dar bir seçimle tekrar dene
-          const fallbackSelect = 'id, total_amount, status, created_at, customer_name, customer_email, shipping_address, order_number, conversation_id, invoice_type, invoice_info, legal_consents, venthub_order_items ( id, product_id, product_name, quantity, price_at_time, product_image_url )'
-          const fb = await supabase
-            .from('venthub_orders')
-            .select(fallbackSelect)
-            .eq('id', id)
-            .limit(1)
-            .single()
-          data = (fb.data as unknown as SupabaseOrderData) ?? null
-          error = (fb.error as SupabaseError | null)
+        // 2. Sipariş kalemlerini (items) çek
+        // Not: RLS politikası user_id bazlı koruma sağladığı için doğrudan çekiyoruz
+        const { data: itemsData, error: itemsError } = await supabase
+          .from('venthub_order_items')
+          .select('id, product_id, product_name, quantity, price_at_time, product_image_url')
+          .eq('order_id', id)
+
+        if (itemsError) {
+          console.error('Order items load error:', itemsError)
         }
 
-        if (error || !data) throw (error || { message: 'Order not found' })
-        // Ensure all required fields have fallback values
-        const orderDataWithDefaults: SupabaseOrderData = {
-          ...data,
-          customer_name: data.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
-          customer_email: data.customer_email || (user?.email || '-'),
-          order_number: data.order_number || data.id,
-        }
+        const mappedItems: OrderItem[] = (itemsData || []).map((it) => {
+          const unit = Number(it.price_at_time) || 0
+          const qty = Number(it.quantity) || 0
+          return {
+            id: it.id,
+            product_id: it.product_id ?? undefined,
+            product_name: it.product_name,
+            quantity: qty,
+            unit_price: unit,
+            total_price: unit * qty,
+            product_image_url: it.product_image_url,
+          }
+        })
 
-        // If relationship-based items are missing (FK veya ilişki ayarı yoksa), doğrudan tablodan çek
-        let itemsData: SupabaseOrderItem[] = Array.isArray(orderDataWithDefaults.venthub_order_items) ? orderDataWithDefaults.venthub_order_items : []
-        if (!itemsData || itemsData.length === 0) {
-          try {
-            // RLS altında kullanıcıya ait siparişi garantiye almak için orders ile inner join yap
-            const itemsRes = await supabase
-              .from('venthub_order_items')
-              .select('id, product_id, product_name, quantity, price_at_time, product_image_url, venthub_orders!inner(user_id)')
-              .eq('order_id', orderDataWithDefaults.id)
-              .eq('venthub_orders.user_id', user?.id || '')
-            if (!itemsRes.error && Array.isArray(itemsRes.data)) {
-              // Join ile gelen ekstra alanları yok say
-              type JoinedRow = { id: string; product_id: string | null; product_name: string; quantity: number; price_at_time: number | string; product_image_url: string | null }
-              itemsData = (itemsRes.data as unknown as JoinedRow[]).map((r) => ({
-                id: r.id,
-                product_id: r.product_id,
-                product_name: r.product_name,
-                quantity: r.quantity,
-                price_at_time: r.price_at_time,
-                product_image_url: r.product_image_url,
-              })) as unknown as SupabaseOrderItem[]
-            }
-          } catch { }
-        }
-
-        const mapped: Order = {
-          id: orderDataWithDefaults.id,
-          total_amount: Number(orderDataWithDefaults.total_amount) || 0,
-          status: orderDataWithDefaults.status || 'pending',
-          payment_status: orderDataWithDefaults.payment_status || undefined,
-          created_at: orderDataWithDefaults.created_at,
-          customer_name: orderDataWithDefaults.customer_name,
-          customer_email: orderDataWithDefaults.customer_email,
-          shipping_address: orderDataWithDefaults.shipping_address,
-          order_items: (itemsData || []).map((it: SupabaseOrderItem) => {
-            const unit = Number(it.price_at_time) || 0
-            const total = unit * Number(it.quantity || 0)
-            return {
-              id: it.id,
-              product_id: it.product_id ?? undefined,
-              product_name: it.product_name,
-              quantity: it.quantity,
-              unit_price: unit,
-              total_price: total,
-              product_image_url: it.product_image_url,
-            }
-          }),
-          order_number: orderDataWithDefaults.order_number || undefined,
+        const mappedOrder: Order = {
+          id: orderData.id,
+          total_amount: Number(orderData.total_amount) || 0,
+          status: orderData.status || 'pending',
+          payment_status: orderData.payment_status || undefined,
+          created_at: orderData.created_at,
+          customer_name: orderData.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+          customer_email: orderData.customer_email || (user?.email || '-'),
+          shipping_address: orderData.shipping_address,
+          order_items: mappedItems,
+          order_number: orderData.order_number || undefined,
           is_demo: false,
           payment_data: undefined,
-          conversation_id: orderDataWithDefaults.conversation_id || undefined,
-          carrier: orderDataWithDefaults.carrier || undefined,
-          tracking_number: orderDataWithDefaults.tracking_number || undefined,
-          tracking_url: orderDataWithDefaults.tracking_url || undefined,
-          shipped_at: orderDataWithDefaults.shipped_at || undefined,
-          delivered_at: orderDataWithDefaults.delivered_at || undefined,
-          shipping_method: (orderDataWithDefaults.shipping_method || undefined) as string | undefined,
-          invoice_type: orderDataWithDefaults.invoice_type || undefined,
-          invoice_info: orderDataWithDefaults.invoice_info || undefined,
-          legal_consents: orderDataWithDefaults.legal_consents || undefined,
+          conversation_id: orderData.conversation_id || undefined,
+          carrier: orderData.carrier || undefined,
+          tracking_number: orderData.tracking_number || undefined,
+          tracking_url: orderData.tracking_url || undefined,
+          shipped_at: orderData.shipped_at || undefined,
+          delivered_at: orderData.delivered_at || undefined,
+          shipping_method: (orderData.shipping_method || undefined) as string | undefined,
+          invoice_type: orderData.invoice_type || undefined,
+          invoice_info: orderData.invoice_info || undefined,
+          legal_consents: orderData.legal_consents || undefined,
         }
-        setOrder(mapped)
+
+        setOrder(mappedOrder)
       } catch (e) {
-        console.error('Order load error', e)
+        console.error('Order load error:', e)
         toast.error(t('orders.unexpectedError'))
       } finally {
         setLoading(false)
       }
     }
-    if (user && id) load()
-  }, [user, id, t])
+    load()
+  }, [user, id, t, router])
 
   const formatDate = (d?: string | null) => (d ? formatDateTime(d, lang) : '-')
   const formatPrice = (n: number | string) => formatCurrency(Number(n) || 0, lang, { maximumFractionDigits: 0 })
@@ -336,38 +309,45 @@ export default function OrderDetailPage() {
       <div className="max-w-5xl mx-auto px-4">
         <button className="mb-4 inline-flex items-center text-steel-gray hover:text-primary-navy text-sm" onClick={() => router.push('/account/orders')}><ArrowLeft size={18} className="mr-1" />{t('auth.back')}</button>
 
-        <div className="bg-white rounded-lg shadow-hvac-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-6 mb-6">
             <div className="flex items-center space-x-4">
-              <div className="bg-primary-navy text-white rounded-full w-12 h-12 flex items-center justify-center"><Package size={24} /></div>
+              <div className="bg-primary-navy/5 text-primary-navy rounded-xl w-12 h-12 flex items-center justify-center"><Package size={24} /></div>
               <div>
-                <h1 className="text-xl font-semibold text-industrial-gray">{t('orders.title')} {prettyNo}</h1>
-                <div className="flex items-center space-x-4 text-sm text-steel-gray mt-1">
-                  <div className="flex items-center space-x-1"><Calendar size={16} /><span>{formatDate(order.created_at)}</span></div>
-                  <div className="flex items-center space-x-1"><CreditCard size={16} /><span>{formatPrice(order.total_amount)}</span></div>
+                <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                  {t('orders.title')} {prettyNo}
+                  {order.is_demo && (
+                    <span className="px-2.5 py-0.5 bg-orange-100/80 border border-orange-200 text-orange-700 text-[10px] uppercase font-bold tracking-wider rounded-lg shadow-sm">
+                      DEMO
+                    </span>
+                  )}
+                </h1>
+                <div className="flex items-center space-x-4 text-sm font-medium text-slate-500 mt-1.5">
+                  <div className="flex items-center space-x-1.5"><Calendar size={14} /><span>{formatDate(order.created_at)}</span></div>
+                  <div className="flex items-center space-x-1.5"><CreditCard size={14} /><span>{formatPrice(order.total_amount)}</span></div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
+            <div className="flex items-center gap-3">
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
-                <span className="px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
+                <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
-              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="text-sm px-3 py-2 border rounded text-steel-gray border-light-gray hover:bg-gray-50">{t('returns.requestReturn')}</button>
-              <button onClick={() => handleReorder(order)} className="text-sm px-3 py-2 border rounded text-success-green border-success-green hover:bg-success-green hover:text-white flex items-center gap-1"><RefreshCcw size={14} />{t('orders.reorder')}</button>
+              <button onClick={() => router.push(`/account/returns?new=${order.id}`)} className="h-10 px-4 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-all hover:scale-[1.02] shadow-sm">{t('returns.requestReturn')}</button>
+              <button onClick={() => handleReorder(order)} className="h-10 px-4 text-sm font-bold text-white bg-primary-navy hover:bg-industrial-gray rounded-lg shadow-sm shadow-primary-navy/20 flex items-center gap-2 transition-all hover:scale-[1.02]"><RefreshCcw size={16} />{t('orders.reorder')}</button>
             </div>
           </div>
-          {/* Compact stepper */}
-          <div className="mt-4">
-            <div className="flex items-center gap-2">
+          {/* Detailed Stepper */}
+          <div className="mt-2 py-2">
+            <div className="flex items-center gap-2 max-w-2xl mx-auto">
               {steps.map((s, idx) => (
                 <React.Fragment key={s}>
-                  <div className="flex flex-col items-center min-w-[60px]">
-                    <div className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center ${idx <= activeIdx ? 'bg-success-green text-white' : 'bg-light-gray text-steel-gray'}`}>{idx + 1}</div>
-                    <span className="mt-1 text-[10px] text-steel-gray">{getStatusText(s)}</span>
+                  <div className="flex flex-col items-center min-w-[80px]">
+                    <div className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${idx <= activeIdx ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
+                    <span className={`mt-2 text-[10px] uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                   </div>
                   {idx < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 ${activeIdx >= idx + 1 ? 'bg-success-green' : 'bg-light-gray'}`}></div>
+                    <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
                   )}
                 </React.Fragment>
               ))}
@@ -375,11 +355,11 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-hvac-md p-6">
-          <div className="border-b border-light-gray mb-4">
-            <nav className="flex flex-wrap gap-2">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 min-h-[400px]">
+          <div className="mb-8">
+            <nav className="flex flex-wrap gap-1 p-1 bg-slate-100/80 rounded-xl max-w-fit">
               {(['overview', 'items', 'shipping', 'invoice'] as const).map(tt => (
-                <button key={tt} onClick={() => setTab(tt)} className={`px-3 py-2 text-sm rounded-t ${tab === tt ? 'bg-white border border-light-gray border-b-transparent text-primary-navy' : 'text-steel-gray hover:text-primary-navy'}`}>
+                <button key={tt} onClick={() => setTab(tt)} className={`px-4 py-2 text-sm font-bold rounded-lg transition-all ${tab === tt ? 'bg-white text-primary-navy shadow-sm' : 'text-slate-500 hover:text-primary-navy hover:bg-slate-200/50'}`}>
                   {tt === 'overview' && (t('orders.tabs.overview') || 'Özet')}
                   {tt === 'items' && (t('orders.tabs.items') || 'Ürünler')}
                   {tt === 'shipping' && (t('orders.tabs.shipping') || 'Kargo Takibi')}
@@ -392,15 +372,15 @@ export default function OrderDetailPage() {
           {tab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <div>
-                <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.customerInfo')}</h4>
-                <div className="space-y-2 text-sm">
-                  <p><span className="font-medium">{t('orders.name')}:</span> {order.customer_name}</p>
-                  <p><span className="font-medium">{t('orders.email')}:</span> {order.customer_email}</p>
+                <h4 className="font-bold text-slate-900 mb-3">{t('orders.customerInfo')}</h4>
+                <div className="space-y-2 text-sm text-slate-600">
+                  <p><span className="font-bold text-slate-700">{t('orders.name')}:</span> {order.customer_name}</p>
+                  <p><span className="font-bold text-slate-700">{t('orders.email')}:</span> {order.customer_email}</p>
                 </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.deliveryAddress')}</h4>
-                <div className="text-sm text-steel-gray">
+              <div className="pt-4 lg:pt-0 lg:border-l lg:border-slate-100 lg:pl-6">
+                <h4 className="font-bold text-slate-900 mb-3">{t('orders.deliveryAddress')}</h4>
+                <div className="text-sm text-slate-600 space-y-1">
                   {!!order.shipping_address && (() => {
                     const addr = order.shipping_address as ShippingAddress
                     const line1 = addr.fullAddress || addr.street
@@ -416,26 +396,28 @@ export default function OrderDetailPage() {
                   })()}
                 </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderInfo')}</h4>
-                <div className="text-sm text-steel-gray space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">{t('orders.orderId')}</span>
-                    <button onClick={() => handleCopy(order.id)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
+              <div className="pt-4 lg:pt-0 lg:border-l lg:border-slate-100 lg:pl-6">
+                <h4 className="font-bold text-slate-900 mb-3">{t('orders.orderInfo')}</h4>
+                <div className="text-sm text-slate-600 space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-bold text-slate-700">{t('orders.orderId')}</span>
+                      <button onClick={() => handleCopy(order.id)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus:outline-none">{t('orders.copy')}</button>
+                    </div>
+                    <div className="p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg break-all text-xs font-mono text-slate-500" title={order.id}>{order.id}</div>
                   </div>
-                  <div className="p-2 bg-light-gray rounded break-all" title={order.id}>{order.id}</div>
                   {order.conversation_id && (
-                    <>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-medium">{t('orders.conversationId')}</span>
-                        <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs text-primary-navy hover:underline">{t('orders.copy')}</button>
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="font-bold text-slate-700">{t('orders.conversationId')}</span>
+                        <button onClick={() => handleCopy(order.conversation_id!)} className="text-xs font-bold text-primary-navy hover:text-secondary-blue transition-colors focus:outline-none">{t('orders.copy')}</button>
                       </div>
-                      <div className="p-2 bg-light-gray rounded break-all" title={order.conversation_id}>{order.conversation_id}</div>
-                    </>
+                      <div className="p-2.5 bg-slate-50 border border-slate-200/60 rounded-lg break-all text-xs font-mono text-slate-500" title={order.conversation_id}>{order.conversation_id}</div>
+                    </div>
                   )}
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">Teslimat Yöntemi</span>
-                    <span className="text-industrial-gray">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</span>
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span className="font-bold text-slate-700">Teslimat Yöntemi</span>
+                    <span className="font-medium text-slate-900">{(order.shipping_method === 'express') ? 'Ekspres' : 'Standart'}</span>
                   </div>
                 </div>
               </div>
@@ -444,39 +426,53 @@ export default function OrderDetailPage() {
 
           {tab === 'items' && (
             <div>
-              <h4 className="font-semibold text-industrial-gray mb-3">{t('orders.orderDetails')}</h4>
-              <div className="bg-white rounded-lg overflow-hidden">
+              <h4 className="font-bold text-slate-900 mb-4">{t('orders.orderDetails')}</h4>
+              <div className="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-sm">
                 <table className="w-full">
-                  <thead className="bg-light-gray">
+                  <thead className="bg-slate-50/80 border-b border-slate-200/60">
                     <tr>
-                      <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.productCol')}</th>
-                      <th className="text-left p-4 text-sm font-medium text-industrial-gray">{t('orders.imageCol')}</th>
-                      <th className="text-center p-4 text-sm font-medium text-industrial-gray">{t('orders.qtyCol')}</th>
-                      <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.unitPriceCol')}</th>
-                      <th className="text-right p-4 text-sm font-medium text-industrial-gray">{t('orders.totalCol')}</th>
+                      <th className="text-left p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.productCol')}</th>
+                      <th className="text-left p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.imageCol')}</th>
+                      <th className="text-center p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.qtyCol')}</th>
+                      <th className="text-right p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.unitPriceCol')}</th>
+                      <th className="text-right p-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('orders.totalCol')}</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {order.order_items?.map((item, index) => (
-                      <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-air-blue/5'}>
-                        <td className="p-4 text-sm text-industrial-gray">{item.product_name}</td>
-                        <td className="p-4 text-sm">
-                          {item.product_image_url ? (
-                            <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded" />
+                  <tbody className="divide-y divide-slate-100">
+                    {order.order_items?.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-4 text-sm font-medium text-slate-900">
+                          {item.product_id ? (
+                            <Link href={`/product/${item.product_id}`} className="hover:text-primary-navy transition-colors">
+                              {item.product_name}
+                            </Link>
                           ) : (
-                            <div className="w-12 h-12 bg-light-gray rounded flex items-center justify-center text-xs text-steel-gray">{t('orders.noImage')}</div>
+                            item.product_name
                           )}
                         </td>
-                        <td className="p-4 text-sm text-center text-steel-gray">{item.quantity}</td>
-                        <td className="p-4 text-sm text-right text-steel-gray">{formatPrice(item.unit_price)}</td>
-                        <td className="p-4 text-sm text-right font-medium text-industrial-gray">{formatPrice(item.total_price)}</td>
+                        <td className="p-4">
+                          {item.product_image_url ? (
+                            item.product_id ? (
+                              <Link href={`/product/${item.product_id}`}>
+                                <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity" />
+                              </Link>
+                            ) : (
+                              <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]" />
+                            )
+                          ) : (
+                            <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders.noImage')}</div>
+                          )}
+                        </td>
+                        <td className="p-4 text-sm font-medium text-slate-600 text-center">{item.quantity}</td>
+                        <td className="p-4 text-sm font-medium text-slate-600 text-right">{formatPrice(item.unit_price)}</td>
+                        <td className="p-4 text-sm font-bold text-slate-900 text-right">{formatPrice(item.total_price)}</td>
                       </tr>
                     ))}
                   </tbody>
-                  <tfoot>
-                    <tr className="bg-primary-navy text-white">
-                      <td colSpan={4} className="p-4 text-sm font-semibold text-right">{t('orders.grandTotal')}:</td>
-                      <td className="p-4 text-sm font-bold text-right">{formatPrice(order.total_amount)}</td>
+                  <tfoot className="bg-slate-50 border-t border-slate-200/60">
+                    <tr>
+                      <td colSpan={4} className="p-4 text-sm font-bold text-slate-700 text-right">{t('orders.grandTotal')}:</td>
+                      <td className="p-4 text-sm font-black text-primary-navy text-right">{formatPrice(order.total_amount)}</td>
                     </tr>
                   </tfoot>
                 </table>
@@ -486,71 +482,75 @@ export default function OrderDetailPage() {
 
           {tab === 'shipping' && (
             <div className="space-y-6">
-
-              {/* Mevcut Kargo Bilgileri */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <div className="text-steel-gray">Teslimat Yöntemi</div>
-                  <div className="font-medium text-industrial-gray">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Teslimat Yöntemi</div>
+                  <div className="font-bold text-slate-900">{(order.shipping_method === 'express') ? 'Ekspres (1–2 iş günü)' : 'Standart (3–5 iş günü)'}</div>
                 </div>
-                <div>
-                  <div className="text-steel-gray">{t('orders.carrier')}</div>
-                  <div className="font-medium text-industrial-gray">{order.carrier || '-'}</div>
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.carrier')}</div>
+                  <div className="font-bold text-slate-900">{order.carrier || '-'}</div>
                 </div>
-                <div>
-                  <div className="text-steel-gray">{t('orders.trackingNumber')}</div>
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.trackingNumber')}</div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-industrial-gray break-all">{order.tracking_number || '-'}</span>
+                    <span className="font-bold text-slate-900 break-all">{order.tracking_number || '-'}</span>
                     {order.tracking_number && (
-                      <button onClick={() => handleCopy(order.tracking_number)} className="text-xs text-primary-navy hover:underline"><Copy size={12} />{t('orders.copy')}</button>
+                      <button onClick={() => handleCopy(order.tracking_number)} className="w-6 h-6 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-primary-navy hover:bg-primary-navy hover:text-white hover:border-primary-navy transition-all shadow-sm focus:outline-none"><Copy size={12} /></button>
                     )}
                   </div>
                 </div>
-                <div>
-                  <div className="text-steel-gray">{t('orders.trackingLink')}</div>
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.trackingLink')}</div>
                   {order.tracking_url ? (
-                    <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="text-primary-navy hover:underline break-all inline-flex items-center gap-1"><LinkIcon size={14} />{t('orders.openLink')}</a>
+                    <a href={order.tracking_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-bold text-primary-navy hover:text-secondary-blue transition-colors break-all bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:shadow group"><LinkIcon size={14} className="group-hover:scale-110 transition-transform" />{t('orders.openLink')}</a>
                   ) : (
-                    <div className="text-industrial-gray">-</div>
+                    <div className="font-bold text-slate-400">-</div>
                   )}
                 </div>
-                <div>
-                  <div className="text-steel-gray">{t('orders.shippedAt')}</div>
-                  <div className="font-medium text-industrial-gray">{formatDate(order.shipped_at)}</div>
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.shippedAt')}</div>
+                  <div className="font-bold text-slate-900">{formatDate(order.shipped_at)}</div>
                 </div>
-                <div>
-                  <div className="text-steel-gray">{t('orders.deliveredAt')}</div>
-                  <div className="font-medium text-industrial-gray">{formatDate(order.delivered_at)}</div>
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-5">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{t('orders.deliveredAt')}</div>
+                  <div className="font-bold text-slate-900">{formatDate(order.delivered_at)}</div>
                 </div>
               </div>
             </div>
           )}
 
           {tab === 'invoice' && (
-            <div className="space-y-4">
-              <h4 className="font-semibold text-industrial-gray">{t('orders.tabs.invoice')}</h4>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-bold text-slate-900 border-l-4 border-primary-navy pl-3">{t('orders.tabs.invoice')}</h4>
+                <button onClick={() => handleInvoicePdf(order)} className="h-10 px-4 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-primary-navy rounded-lg transition-all shadow-sm flex items-center gap-2">
+                  <RefreshCcw size={16} className="text-slate-400" />
+                  {t('orders.invoicePdf')}
+                </button>
+              </div>
 
               {/* Invoice Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-steel-gray mb-2 font-medium">Fatura Bilgileri</div>
-                  <div className="space-y-1">
-                    <div><span className="text-steel-gray">Tip:</span> <span className="text-industrial-gray font-medium">{order.invoice_type || '-'}</span></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-6 shadow-sm">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Fatura Bilgileri</div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Tip:</span> <span className="text-sm font-bold text-slate-900 bg-white px-2 py-1 rounded border border-slate-100">{order.invoice_type || '-'}</span></div>
                     {(() => {
                       const info = (order.invoice_info || {}) as Record<string, unknown>
                       const iv = (k: string) => (info?.[k] ? String(info[k]) : '-')
                       if ((order.invoice_type || '').toLowerCase() === 'corporate') {
                         return (
-                          <div className="space-y-1">
-                            <div><span className="text-steel-gray">Ünvan:</span> <span className="text-industrial-gray font-medium">{iv('companyName')}</span></div>
-                            <div><span className="text-steel-gray">VKN:</span> <span className="text-industrial-gray font-medium">{iv('vkn')}</span></div>
-                            <div><span className="text-steel-gray">Vergi Dairesi:</span> <span className="text-industrial-gray font-medium">{iv('taxOffice')}</span></div>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Ünvan:</span> <span className="text-sm font-medium text-slate-900 text-right max-w-[60%] truncate" title={iv('companyName')}>{iv('companyName')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">VKN:</span> <span className="text-sm font-medium text-slate-900">{iv('vkn')}</span></div>
+                            <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">Vergi Dairesi:</span> <span className="text-sm font-medium text-slate-900">{iv('taxOffice')}</span></div>
                           </div>
                         )
                       }
                       return (
-                        <div className="space-y-1">
-                          <div><span className="text-steel-gray">TCKN:</span> <span className="text-industrial-gray font-medium">{iv('tckn')}</span></div>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between"><span className="text-sm font-bold text-slate-600">TCKN:</span> <span className="text-sm font-medium text-slate-900">{iv('tckn')}</span></div>
                         </div>
                       )
                     })()}
@@ -558,9 +558,9 @@ export default function OrderDetailPage() {
                 </div>
 
                 {/* Legal Consents */}
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-steel-gray mb-2 font-medium">Yasal Onaylar</div>
-                  <div className="space-y-1">
+                <div className="bg-slate-50/80 rounded-xl border border-slate-200/60 p-6 shadow-sm">
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Yasal Onaylar</div>
+                  <div className="space-y-3">
                     {(() => {
                       const cons = (order.legal_consents || {}) as Record<string, { accepted?: boolean; ts?: string | null }>
                       const row = (label: string, k: string) => {
@@ -568,10 +568,12 @@ export default function OrderDetailPage() {
                         const ok = !!c?.accepted
                         const ts = c?.ts ? formatDateTime(c.ts, lang) : '-'
                         return (
-                          <div key={k} className="flex items-center justify-between">
-                            <span className="text-steel-gray">{label}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${ok ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>{ok ? 'Kabul' : '—'}</span>
-                            <span className="text-xs text-industrial-gray">{ok ? ts : ''}</span>
+                          <div key={k} className="flex items-center justify-between group">
+                            <span className="text-sm font-bold text-slate-600 group-hover:text-primary-navy transition-colors">{label}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[10px] text-slate-400 font-medium">{ok ? ts : ''}</span>
+                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm ${ok ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-slate-200 text-slate-500 border border-slate-300'}`}>{ok ? 'Kabul Edildi' : 'Onay Yok'}</span>
+                            </div>
                           </div>
                         )
                       }
@@ -587,10 +589,6 @@ export default function OrderDetailPage() {
                     })()}
                   </div>
                 </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                <button onClick={() => handleInvoicePdf(order)} className="text-sm px-4 py-2 border rounded text-industrial-gray border-light-gray hover:bg-gray-50">{t('orders.invoicePdf')}</button>
               </div>
             </div>
           )}

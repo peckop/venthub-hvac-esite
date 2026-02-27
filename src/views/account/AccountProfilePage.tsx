@@ -42,49 +42,60 @@ export default function AccountProfilePage() {
   return (
     <div className="max-w-2xl">
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-industrial-gray">Profil Bilgileri</h2>
-        <p className="text-sm text-steel-gray mt-1">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <User className="w-6 h-6 text-primary-navy" />
+          Profil Bilgileri
+        </h2>
+        <p className="text-sm text-slate-500 mt-1">
           Hesabınıza ait temel kişisel bilgileri buradan güncelleyebilirsiniz.
         </p>
       </div>
 
-      <div className="bg-white border border-gray-100/80 rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden">
         <div className="p-6 sm:p-8">
           <form onSubmit={onSave} className="space-y-6">
             <div className="space-y-5">
               {/* İsim Alanı */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-industrial-gray flex items-center gap-2">
-                  <User className="w-4 h-4 text-steel-gray" />
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                   Ad Soyad
                 </label>
-                <input
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  placeholder="Örn: Ahmet Yılmaz"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <User className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <input
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    placeholder="Örn: Ahmet Yılmaz"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                  />
+                </div>
               </div>
 
               {/* Telefon Alanı */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-industrial-gray flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-steel-gray" />
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">
                   Telefon Numarası
                 </label>
-                <input
-                  value={phone}
-                  onChange={e => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
-                  placeholder="Örn: +90 555 123 4567"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-industrial-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all focus:bg-white"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Phone className="w-4 h-4 text-slate-400" />
+                  </div>
+                  <input
+                    value={phone}
+                    onChange={e => setPhone(e.target.value.replace(/[^0-9+\s-]/g, ''))}
+                    placeholder="Örn: +90 555 123 4567"
+                    className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-gray-100 flex justify-end">
+            <div className="pt-4 border-t border-slate-100 flex justify-end mt-2">
               <button
                 disabled={saving}
-                className="bg-primary-navy text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-colors flex items-center gap-2"
+                className="h-10 px-6 bg-primary-navy text-white rounded-lg text-sm font-bold shadow-sm shadow-primary-navy/20 disabled:opacity-60 disabled:cursor-not-allowed hover:bg-industrial-gray transition-all hover:scale-[1.02] flex items-center gap-2"
               >
                 {saving ? (
                   <>

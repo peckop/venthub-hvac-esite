@@ -971,7 +971,7 @@ export const CheckoutPage: React.FC = () => {
                         type="text"
                         value={customerInfo.name}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
-                        className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                         placeholder={t('checkout.personal.namePlaceholder')}
                       />
                     </div>
@@ -983,7 +983,7 @@ export const CheckoutPage: React.FC = () => {
                         type="email"
                         value={customerInfo.email}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                        className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                         placeholder={t('checkout.personal.emailPlaceholder')}
                       />
                     </div>
@@ -995,7 +995,7 @@ export const CheckoutPage: React.FC = () => {
                         type="tel"
                         value={customerInfo.phone}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                        className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                         placeholder={t('checkout.personal.phonePlaceholder')}
                       />
                     </div>
@@ -1007,7 +1007,7 @@ export const CheckoutPage: React.FC = () => {
                         type="text"
                         value={customerInfo.identityNumber}
                         onChange={(e) => setCustomerInfo({ ...customerInfo, identityNumber: e.target.value })}
-                        className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                         placeholder={t('checkout.personal.idPlaceholder')}
                         maxLength={11}
                       />
@@ -1181,7 +1181,7 @@ export const CheckoutPage: React.FC = () => {
                         <textarea
                           value={shippingAddress.fullAddress}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
-                          className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                           rows={3}
                           placeholder={t('checkout.shipping.addressPlaceholder')}
                         />
@@ -1194,7 +1194,7 @@ export const CheckoutPage: React.FC = () => {
                           type="text"
                           value={shippingAddress.city}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                          className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                           placeholder={t('checkout.shipping.cityPlaceholder')}
                         />
                       </div>
@@ -1206,7 +1206,7 @@ export const CheckoutPage: React.FC = () => {
                           type="text"
                           value={shippingAddress.district}
                           onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
-                          className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                           placeholder={t('checkout.shipping.districtPlaceholder')}
                         />
                       </div>
@@ -1222,7 +1222,7 @@ export const CheckoutPage: React.FC = () => {
                             const v = e.target.value.replace(/\D/g, '').slice(0, 10)
                             setShippingAddress({ ...shippingAddress, postalCode: v })
                           }}
-                          className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                           placeholder={t('checkout.shipping.postalPlaceholder')}
                         />
                       </div>
@@ -1262,7 +1262,7 @@ export const CheckoutPage: React.FC = () => {
                           <textarea
                             value={billingAddress.fullAddress}
                             onChange={(e) => setBillingAddress({ ...billingAddress, fullAddress: e.target.value })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             rows={3}
                             placeholder={t('checkout.billing.addressPlaceholder')}
                           />
@@ -1275,7 +1275,7 @@ export const CheckoutPage: React.FC = () => {
                             type="text"
                             value={billingAddress.city}
                             onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.billing.cityPlaceholder')}
                           />
                         </div>
@@ -1287,7 +1287,7 @@ export const CheckoutPage: React.FC = () => {
                             type="text"
                             value={billingAddress.district}
                             onChange={(e) => setBillingAddress({ ...billingAddress, district: e.target.value })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.billing.districtPlaceholder')}
                           />
                         </div>
@@ -1303,7 +1303,7 @@ export const CheckoutPage: React.FC = () => {
                               const v = e.target.value.replace(/\D/g, '').slice(0, 10)
                               setBillingAddress({ ...billingAddress, postalCode: v })
                             }}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.billing.postalPlaceholder')}
                           />
                         </div>
@@ -1355,7 +1355,7 @@ export const CheckoutPage: React.FC = () => {
                             inputMode="numeric"
                             value={invoiceInfo.tckn || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.invoice.tcknPlaceholder')}
                             maxLength={11}
                           />
@@ -1369,7 +1369,7 @@ export const CheckoutPage: React.FC = () => {
                             type="text"
                             value={invoiceInfo.companyName || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.invoice.companyPlaceholder')}
                           />
                         </div>
@@ -1380,7 +1380,7 @@ export const CheckoutPage: React.FC = () => {
                             inputMode="numeric"
                             value={invoiceInfo.vkn || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.invoice.vknPlaceholder')}
                             maxLength={10}
                           />
@@ -1391,7 +1391,7 @@ export const CheckoutPage: React.FC = () => {
                             type="text"
                             value={invoiceInfo.taxOffice || ''}
                             onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
-                            className="w-full px-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
+                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.invoice.taxOfficePlaceholder')}
                           />
                         </div>

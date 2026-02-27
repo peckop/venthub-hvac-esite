@@ -82,7 +82,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
 
   return (
     <Link href={`/products/${product.id}`}>
-      <div className={`product-card group relative bg-white rounded-xl shadow hover:shadow-lg hover:bg-gray-50 motion-safe:transition-all motion-safe:duration-200 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-transparent'
+      <div className={`product-card group relative bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:bg-slate-50 motion-safe:transition-all motion-safe:duration-300 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-slate-100 hover:border-slate-200'
         } ${isList ? 'flex items-stretch' : ''}`}>
         {/* Featured Badge */}
         {product.is_featured && (
@@ -105,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
         </div>
 
         {/* Product Image */}
-        <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-lg overflow-hidden' : 'aspect-square rounded-t-xl overflow-hidden'} bg-gradient-to-br from-air-blue to-light-gray flex items-center justify-center`}>
+        <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-xl overflow-hidden' : 'aspect-square rounded-t-2xl overflow-hidden'} bg-gradient-to-br from-air-blue/50 to-slate-100 flex items-center justify-center relative`}>
           {product.image_url ? (
             <img
               src={src}
@@ -220,7 +220,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
             {hidePrice ? (
               <button
                 onClick={handleAskQuote}
-                className="flex-1 bg-industrial-gray hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2"
+                className="flex-1 h-10 bg-slate-700 hover:bg-primary-navy text-white px-4 rounded-lg motion-safe:transition-all flex items-center justify-center space-x-2"
               >
                 <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -231,7 +231,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <button
                 onClick={handleAddToCart}
                 disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="flex-1 bg-secondary-blue hover:bg-primary-navy text-white px-4 py-2 rounded-lg motion-safe:transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 h-10 bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy shadow hover:shadow-md text-white px-4 rounded-lg motion-safe:transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
               >
                 <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
@@ -255,7 +255,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => { e.stopPropagation() }}
-                    className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
+                    className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors text-sm text-slate-500 hover:text-secondary-blue"
                     title={t('pdp.askStock') as string}
                   >
                     {t('pdp.askStock')}
@@ -270,7 +270,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                     e.stopPropagation()
                     router.push('/contact')
                   }}
-                  className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors text-sm text-steel-gray hover:text-secondary-blue"
+                  className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors text-sm text-slate-500 hover:text-secondary-blue"
                   title={t('pdp.askStock') as string}
                 >
                   {t('pdp.askStock')}
@@ -282,9 +282,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
               <button
                 type="button"
                 onClick={handleQuickView}
-                className="px-3 py-2 border border-light-gray hover:border-secondary-blue rounded-lg transition-colors"
+                className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors"
               >
-                <span className="text-sm text-steel-gray hover:text-secondary-blue">
+                <span className="text-sm text-slate-500 hover:text-secondary-blue">
                   {t('quickView.title')}
                 </span>
               </button>

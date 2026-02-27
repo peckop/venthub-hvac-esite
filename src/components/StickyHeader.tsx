@@ -238,7 +238,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       </a>
 
       {/* Main Header */}
-      <header className="bg-white/98 border-b border-light-gray/40 shadow-sm relative z-30">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm relative z-30 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -363,7 +363,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
                     {/* Enhanced User Dropdown */}
                     {isUserMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+                      <div className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-1">
                           <div className="px-4 py-3 border-b border-gray-100">
                             <div className="text-sm font-medium text-industrial-gray">
@@ -481,7 +481,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
             />
           </div>
 
-          <div className="fixed top-0 left-0 right-0 z-50 bg-white/98 backdrop-blur-xl border-b border-gray-200/50 shadow-lg">
+          <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-md animate-in slide-in-from-top-2 duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex items-center justify-between h-16">
                 {/* Logo */}
@@ -512,7 +512,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     </button>
 
                     {isCategoriesOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-64 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl overflow-hidden">
+                      <div className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-2 max-h-96 overflow-y-auto">
                           {categoriesLoaded && categories.length === 0 && (
                             <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
@@ -567,7 +567,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                         placeholder={t('common.quickSearch')}
                         value={stickySearchQuery}
                         onChange={(e) => setStickySearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-steel-gray focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
+                        className="w-full pl-10 pr-3 h-10 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
                       />
                       {/* Quick search hint */}
                       <kbd className="hidden lg:block absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-steel-gray/50 font-mono">/</kbd>
@@ -576,7 +576,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
                   {/* Sticky Search Results */}
                   {isStickySearchOpen && stickySearchResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white/98 backdrop-blur-lg border border-gray-200/50 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
                       {stickySearchResults.map((product) => (
                         <button
                           key={product.id}
