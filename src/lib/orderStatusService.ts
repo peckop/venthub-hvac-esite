@@ -6,24 +6,32 @@
  * İşlem  → venthub_orders güncelle → gerekirse venthub_returns upsert → audit log yaz
  * Çıktı  → { ok, error? }
  *
- * Tablo, Kanban ve Returns sayfalarının hepsinin aynı akıştan geçmesini sağlar.
+ * DB Kısıtlaması:
+ * venthub_orders.status  → pending | confirmed | processing | shipped | delivered | cancelled
+ * venthub_orders.payment_status → pending | paid | failed | refunded | partial_refunded
+ *
+ * "refunded" bir sipariş statüsü DEĞİL, ödeme statüsüdür.
+ * Bu yüzden iade durumunda: status=cancelled + payment_status=refunded yapılır.
  */
 
 import { supabase } from './supabase'
 import { logAdminAction } from './audit'
 
-// İade/İptal olarak kabul edilen statüler
+// İade/İptal olarak kabul edilen statüler (UI tarafında kullanılan)
 const RETURN_STATUSES = ['cancelled', 'refunded', 'partial_refunded'] as const
+
+// Geçerli sipariş statüleri (DB check constraint)
+const VALID_ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as const
 
 interface UpdateOrderStatusInput {
     orderId: string
-    newStatus: string
+    newStatus: string           // UI'dan gelen statü (cancelled, refunded vb.)
     oldStatus?: string
-    userId?: string | null       // sipariş sahibi (returns kaydı için)
-    reason?: string              // returns kaydının açıklaması
-    auditComment?: string        // audit log yorumu
-    skipReturnsSync?: boolean    // returns tablosuna yazmayı atla (Returns sayfasından çağrılıyorsa)
-    skipOrdersSync?: boolean     // orders tablosuna yazmayı atla (Orders sayfasından çağrılıyorsa)
+    userId?: string | null      // sipariş sahibi (returns kaydı için)
+    reason?: string             // returns kaydının açıklaması
+    auditComment?: string       // audit log yorumu
+    skipReturnsSync?: boolean   // returns tablosuna yazmayı atla
+    skipOrdersSync?: boolean    // orders tablosuna yazmayı atla
 }
 
 interface UpdateOrderStatusResult {
@@ -32,12 +40,29 @@ interface UpdateOrderStatusResult {
 }
 
 /**
- * Merkezi sipariş statüsü güncelleme fonksiyonu.
+ * UI statüsünü DB'ye uygun status + payment_status çiftine çevirir.
  *
- * Akış:
- * 1. venthub_orders.status → newStatus (skipOrdersSync=false ise)
- * 2. Eğer newStatus cancelled/refunded ise → venthub_returns'e upsert (skipReturnsSync=false ise)
- * 3. Audit log kaydı
+ * Örnek:
+ * "refunded" → { status: "cancelled", payment_status: "refunded" }
+ * "shipped"  → { status: "shipped", payment_status: undefined }
+ */
+function resolveDbFields(uiStatus: string): { status: string; payment_status?: string } {
+    if (uiStatus === 'refunded') {
+        return { status: 'cancelled', payment_status: 'refunded' }
+    }
+    if (uiStatus === 'partial_refunded') {
+        return { status: 'cancelled', payment_status: 'partial_refunded' }
+    }
+    // Geçerli sipariş statüsü mü kontrol et
+    if ((VALID_ORDER_STATUSES as readonly string[]).includes(uiStatus)) {
+        return { status: uiStatus }
+    }
+    // Bilinmeyen statü → cancelled olarak kaydet (güvenli varsayılan)
+    return { status: 'cancelled' }
+}
+
+/**
+ * Merkezi sipariş statüsü güncelleme fonksiyonu.
  */
 export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<UpdateOrderStatusResult> {
     const {
@@ -54,9 +79,15 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
     try {
         // --- 1. Sipariş statüsünü güncelle ---
         if (!skipOrdersSync) {
+            const dbFields = resolveDbFields(newStatus)
+            const updatePayload: Record<string, string> = { status: dbFields.status }
+            if (dbFields.payment_status) {
+                updatePayload.payment_status = dbFields.payment_status
+            }
+
             const { error: orderErr } = await supabase
                 .from('venthub_orders')
-                .update({ status: newStatus })
+                .update(updatePayload)
                 .eq('id', orderId)
 
             if (orderErr) throw new Error('Sipariş güncellenemedi: ' + orderErr.message)
@@ -67,7 +98,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
             await syncReturnsRecord(orderId, newStatus, userId, reason)
         }
 
-        // --- 3. Audit log ---
+        // --- 3. Audit log (hata UI'ı bloklamasın) ---
         try {
             await logAdminAction(supabase, {
                 table_name: 'venthub_orders',
@@ -78,7 +109,7 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
                 comment: auditComment || `status → ${newStatus}`
             })
         } catch {
-            // audit log hataları UI'ı bloklamasın
+            // audit log hataları sessizce yutulur
         }
 
         return { ok: true }
@@ -94,34 +125,38 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
  * (İki yönlü senkronizasyon — Returns→Orders tarafı)
  */
 export async function syncOrderFromReturn(orderId: string, returnStatus: string): Promise<UpdateOrderStatusResult> {
-    // Returns statülerini Orders statülerine map'le
-    const orderStatusMap: Record<string, string> = {
-        refunded: 'refunded',
-        cancelled: 'cancelled',
-        approved: 'processing',     // iade onaylandı → sipariş hâlâ işlemde
-        rejected: 'delivered',      // iade reddedildi → sipariş teslim edilmiş sayılır
-        received: 'refunded',       // iade teslim alındı → iade süreci tamamlanıyor
+    // Returns statülerini Orders statülerine map'le (DB kısıtlamalarına uygun)
+    const orderStatusMap: Record<string, { status: string; payment_status?: string }> = {
+        refunded: { status: 'cancelled', payment_status: 'refunded' },
+        cancelled: { status: 'cancelled' },
+        approved: { status: 'processing' },
+        rejected: { status: 'delivered' },
+        received: { status: 'cancelled', payment_status: 'refunded' },
     }
 
-    const mappedOrderStatus = orderStatusMap[returnStatus]
-    if (!mappedOrderStatus) return { ok: true } // bilinmeyen statü ise bir şey yapma
+    const mapped = orderStatusMap[returnStatus]
+    if (!mapped) return { ok: true }
 
     try {
+        const updatePayload: Record<string, string> = { status: mapped.status }
+        if (mapped.payment_status) {
+            updatePayload.payment_status = mapped.payment_status
+        }
+
         const { error } = await supabase
             .from('venthub_orders')
-            .update({ status: mappedOrderStatus })
+            .update(updatePayload)
             .eq('id', orderId)
 
         if (error) throw error
 
-        // Audit log
         try {
             await logAdminAction(supabase, {
                 table_name: 'venthub_orders',
                 row_pk: orderId,
                 action: 'UPDATE',
-                after: { status: mappedOrderStatus },
-                comment: `returns sync: return_status=${returnStatus} → order_status=${mappedOrderStatus}`
+                after: updatePayload,
+                comment: `returns sync: return_status=${returnStatus}`
             })
         } catch { /* swallow */ }
 
@@ -137,11 +172,6 @@ function isReturnStatus(status: string): boolean {
     return (RETURN_STATUSES as readonly string[]).includes(status)
 }
 
-/**
- * venthub_returns tablosuna upsert mantığı:
- * - Kayıt yoksa insert
- * - Kayıt varsa statü güncelle
- */
 async function syncReturnsRecord(
     orderId: string,
     newStatus: string,
@@ -155,7 +185,6 @@ async function syncReturnsRecord(
         .maybeSingle()
 
     if (!existing) {
-        // Yeni return kaydı oluştur
         const defaultReason = newStatus === 'cancelled'
             ? 'Sipariş İptal Edildi'
             : 'Sipariş İade Edildi'
@@ -167,7 +196,6 @@ async function syncReturnsRecord(
             status: newStatus === 'cancelled' ? 'cancelled' : 'refunded',
         })
     } else {
-        // Mevcut return kaydını güncelle
         await supabase
             .from('venthub_returns')
             .update({ status: newStatus })

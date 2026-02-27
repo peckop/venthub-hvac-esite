@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { supabase } from '../../lib/supabase'
 import { updateOrderStatus } from '../../lib/orderStatusService'
@@ -7,7 +7,7 @@ import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import { adminSectionTitleClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Clock, CheckCircle2, Package, Truck, XCircle, GripVertical, X, MessageSquare, Mail, ChevronRight } from 'lucide-react'
+import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft } from 'lucide-react'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -20,26 +20,43 @@ interface AdminOrderRow {
     customer_email?: string | null
     customer_phone?: string | null
     order_number?: string | null
+    payment_status?: string | null
 }
 
-type ColumnId = 'col_new' | 'col_prep' | 'col_shipped' | 'col_done' | 'col_cancel'
+type ColumnId = 'col_new' | 'col_prep' | 'col_shipped' | 'col_done' | 'col_cancel' | 'col_refund'
 
 interface ColumnDef {
     id: ColumnId
     title: string
-    statuses: string[] // Which DB statuses map to this column
+    statuses: string[]
     icon: React.ElementType
     colorClass: string
     bgClass: string
+    /** UI'dan DB'ye gönderilecek hedef statü */
+    targetStatus: string
 }
 
+// İptal ve İade ayrı sütunlar
 const COLUMNS: ColumnDef[] = [
-    { id: 'col_new', title: 'Yeni / Bekliyor', statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-600', bgClass: 'bg-amber-50 ring-amber-100' },
-    { id: 'col_prep', title: 'Hazırlanıyor', statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-indigo-600', bgClass: 'bg-indigo-50 ring-indigo-100' },
-    { id: 'col_shipped', title: 'Kargoda', statuses: ['shipped'], icon: Truck, colorClass: 'text-sky-600', bgClass: 'bg-sky-50 ring-sky-100' },
-    { id: 'col_done', title: 'Teslim Edildi', statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-600', bgClass: 'bg-emerald-50 ring-emerald-100' },
-    { id: 'col_cancel', title: 'İptal / İade', statuses: ['cancelled', 'refunded', 'partial_refunded'], icon: XCircle, colorClass: 'text-rose-600', bgClass: 'bg-rose-50 ring-rose-100' },
+    { id: 'col_new', title: 'Yeni / Bekliyor', statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-600', bgClass: 'bg-amber-50 ring-amber-100', targetStatus: 'pending' },
+    { id: 'col_prep', title: 'Hazırlanıyor', statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-indigo-600', bgClass: 'bg-indigo-50 ring-indigo-100', targetStatus: 'confirmed' },
+    { id: 'col_shipped', title: 'Kargoda', statuses: ['shipped'], icon: Truck, colorClass: 'text-sky-600', bgClass: 'bg-sky-50 ring-sky-100', targetStatus: 'shipped' },
+    { id: 'col_done', title: 'Teslim Edildi', statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-600', bgClass: 'bg-emerald-50 ring-emerald-100', targetStatus: 'delivered' },
+    { id: 'col_cancel', title: 'İptal', statuses: ['cancelled'], icon: XCircle, colorClass: 'text-rose-600', bgClass: 'bg-rose-50 ring-rose-100', targetStatus: 'cancelled' },
+    { id: 'col_refund', title: 'İade', statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-orange-600', bgClass: 'bg-orange-50 ring-orange-100', targetStatus: 'refunded' },
 ]
+
+/**
+ * Sipariş satırının hangi sütuna ait olduğunu belirler.
+ * payment_status "refunded" veya "partial_refunded" ise → İade sütunu
+ * status "cancelled" ise → İptal sütunu
+ */
+function getEffectiveStatus(order: AdminOrderRow): string {
+    if (order.payment_status === 'refunded' || order.payment_status === 'partial_refunded') {
+        return order.payment_status
+    }
+    return order.status || 'pending'
+}
 
 // --- Mini Detay Paneli ---
 interface OrderDetail {
@@ -199,13 +216,14 @@ export default function AdminOrdersBoard() {
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
+    const scrollRef = useRef<HTMLDivElement>(null)
 
     const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
             const { data, error } = await supabase
                 .from('view_admin_orders')
-                .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone')
+                .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status')
                 .order('created_at', { ascending: false })
                 .limit(200)
 
@@ -222,23 +240,25 @@ export default function AdminOrdersBoard() {
         fetchOrders()
     }, [fetchOrders])
 
-    // Map orders to columns
+    // Yatay scroll butonları
+    const scrollBoard = (direction: 'left' | 'right') => {
+        if (!scrollRef.current) return
+        const amount = 340 // bir sütun genişliği kadar
+        scrollRef.current.scrollBy({
+            left: direction === 'left' ? -amount : amount,
+            behavior: 'smooth',
+        })
+    }
+
+    // Siparişleri sütunlara eşle (payment_status da dikkate alınır)
     const getOrdersByCol = (colId: ColumnId) => {
         const colDef = COLUMNS.find(c => c.id === colId)
         if (!colDef) return []
-        return orders.filter(o => colDef.statuses.includes(o.status || 'pending'))
+        return orders.filter(o => colDef.statuses.includes(getEffectiveStatus(o)))
     }
 
-    // --- Sürükle-bırak onay/seçim popup state'i ---
-    const [pendingDrop, setPendingDrop] = useState<{
-        orderId: string
-        oldStatus: string
-        destCol: ColumnDef
-        order: AdminOrderRow
-        needsChoice: boolean // İptal/İade seçimi gerekiyor mu?
-    } | null>(null)
-
-    const onDragEnd = (result: DropResult) => {
+    // Sürükle-bırak: Anında uygula, popup yok, sadece toast bildirimi
+    const onDragEnd = async (result: DropResult) => {
         const { destination, source, draggableId } = result
 
         if (!destination) return
@@ -250,94 +270,111 @@ export default function AdminOrdersBoard() {
         const targetOrder = orders.find(o => o.id === draggableId)
         if (!targetOrder) return
 
-        const targetStatus = destCol.statuses[0]
-        if (targetOrder.status === targetStatus) return
+        const targetStatus = destCol.targetStatus
+        const effectiveCurrent = getEffectiveStatus(targetOrder)
+        if (effectiveCurrent === targetStatus) return
 
-        // İptal/İade sütununa bırakıldıysa → "İptal mi? İade mi?" seçtir
-        // Diğer sütunlara bırakıldıysa → onay iste
-        setPendingDrop({
-            orderId: draggableId,
-            oldStatus: targetOrder.status,
-            destCol,
-            order: targetOrder,
-            needsChoice: destCol.id === 'col_cancel',
-        })
-    }
+        const oldStatus = targetOrder.status
 
-    const executeDrop = async (finalStatus: string) => {
-        if (!pendingDrop) return
-        const { orderId, oldStatus, destCol, order } = pendingDrop
-        setPendingDrop(null)
+        // Optimistic UI: hemen görsel güncelleme
+        setOrders(prev => prev.map(o => {
+            if (o.id !== draggableId) return o
+            // İade sütununa taşınıyorsa payment_status da güncelle
+            if (targetStatus === 'refunded') {
+                return { ...o, status: 'cancelled', payment_status: 'refunded' }
+            }
+            return { ...o, status: targetStatus, payment_status: targetStatus === 'cancelled' ? o.payment_status : null }
+        }))
 
-        // Optimistic UI
-        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: finalStatus } : o))
-
+        // Merkezi servis üzerinden güncelle
         const res = await updateOrderStatus({
-            orderId,
-            newStatus: finalStatus,
+            orderId: draggableId,
+            newStatus: targetStatus,
             oldStatus,
-            userId: order.user_id,
-            reason: finalStatus === 'cancelled'
+            userId: targetOrder.user_id,
+            reason: targetStatus === 'cancelled'
                 ? 'Sipariş Kanban Üzerinden İptal Edildi'
-                : finalStatus === 'refunded'
+                : targetStatus === 'refunded'
                     ? 'Sipariş Kanban Üzerinden İade Edildi'
                     : undefined,
-            auditComment: `kanban drag: ${oldStatus} → ${finalStatus}`,
+            auditComment: `kanban drag: ${oldStatus} → ${targetStatus}`,
         })
 
         if (res.ok) {
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
         } else {
-            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: oldStatus } : o))
+            // Revert
+            setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
             toast.error('Güncelleme başarısız: ' + (res.error || ''))
             fetchOrders()
         }
     }
-
-    const cancelDrop = () => setPendingDrop(null)
 
     if (loading && orders.length === 0) {
         return <div className="p-8 text-center text-slate-500 animate-pulse">Panoya Siparişler Yükleniyor...</div>
     }
 
     return (
-        <div className="space-y-6 h-[calc(100vh-120px)] flex flex-col">
+        <div className="space-y-4 flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
+            {/* Header + Yatay Scroll Butonları */}
             <header className="flex items-center justify-between shrink-0">
                 <div>
                     <h1 className={adminSectionTitleClass}>Sipariş Panosu</h1>
-                    <p className="text-sm text-slate-500 mt-1">Siparişleri sürükleyerek durumlarını güncelleyin. Karta tıklayarak detay görün. Son 200 sipariş.</p>
+                    <p className="text-sm text-slate-500 mt-1">Siparişleri sürükleyerek durumlarını güncelleyin. Karta tıklayarak detay görün.</p>
                 </div>
-                <button onClick={fetchOrders} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
-                    Panoyu Yenile
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => scrollBoard('left')}
+                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                        title="Sola kaydır"
+                    >
+                        <ChevronLeft size={18} />
+                    </button>
+                    <button
+                        onClick={() => scrollBoard('right')}
+                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                        title="Sağa kaydır"
+                    >
+                        <ChevronRight size={18} />
+                    </button>
+                    <button onClick={fetchOrders} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+                        Yenile
+                    </button>
+                </div>
             </header>
 
+            {/* Board — tek scroll katmanı, nested scroll yok */}
             <DragDropContext onDragEnd={onDragEnd}>
-                <div className="flex gap-6 overflow-x-auto pb-4 h-full flex-1 items-start snap-x">
+                <div
+                    ref={scrollRef}
+                    className="flex gap-4 flex-1 overflow-x-auto overflow-y-hidden pb-2 snap-x scroll-smooth"
+                    style={{ scrollbarGutter: 'stable' }}
+                >
                     {COLUMNS.map(col => {
                         const colOrders = getOrdersByCol(col.id)
                         const Icon = col.icon
 
                         return (
-                            <div key={col.id} className="flex flex-col w-[320px] shrink-0 h-full max-h-full bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center overflow-hidden">
-                                {/* Column Header */}
-                                <div className={`p-4 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset`}>
+                            <div key={col.id} className="flex flex-col w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center" style={{ maxHeight: '100%' }}>
+                                {/* Sütun Başlık */}
+                                <div className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset rounded-t-2xl`}>
                                     <div className="flex items-center gap-2">
-                                        <Icon className={`w-5 h-5 ${col.colorClass}`} />
-                                        <h2 className={`font-bold ${col.colorClass}`}>{col.title}</h2>
+                                        <Icon className={`w-4 h-4 ${col.colorClass}`} />
+                                        <h2 className={`font-bold text-sm ${col.colorClass}`}>{col.title}</h2>
                                     </div>
-                                    <span className="bg-white px-2.5 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
+                                    <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
                                         {colOrders.length}
                                     </span>
                                 </div>
 
-                                {/* Droppable Area */}
+                                {/* Droppable — overflow-y-auto SADECE burada (tek scroll parent) */}
                                 <Droppable droppableId={col.id}>
                                     {(provided, snapshot) => (
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.droppableProps}
-                                            className={`flex-1 overflow-y-auto p-3 space-y-3 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''}`}
+                                            className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''}`}
+                                            style={{ overflowY: 'auto', minHeight: 60 }}
                                         >
                                             {colOrders.map((order, index) => (
                                                 <Draggable key={order.id} draggableId={order.id} index={index}>
@@ -347,32 +384,26 @@ export default function AdminOrdersBoard() {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                             onClick={() => setSelectedOrder(order)}
-                                                            className={`bg-white p-4 rounded-xl shadow-sm border border-slate-200/50 flex flex-col gap-3 transition-shadow cursor-pointer ${snapshot.isDragging ? 'shadow-lg ring-2 ring-primary-navy/20 cursor-grabbing' : 'hover:shadow-md hover:border-primary-navy/20'}`}
+                                                            className={`bg-white p-3 rounded-xl shadow-sm border border-slate-200/50 flex flex-col gap-2 transition-shadow cursor-pointer ${snapshot.isDragging ? 'shadow-lg ring-2 ring-primary-navy/20 cursor-grabbing' : 'hover:shadow-md hover:border-primary-navy/20'}`}
                                                             style={{ ...provided.draggableProps.style }}
                                                         >
                                                             <div className="flex items-start justify-between gap-2">
                                                                 <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 mb-1">
+                                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 mb-0.5">
                                                                         <GripVertical className="w-3 h-3 opacity-50" />
                                                                         #{order.order_number || order.id.substring(0, 8)}
                                                                     </div>
-                                                                    <h4 className="font-semibold text-slate-800 text-sm truncate">{order.customer_name || 'İsimsiz Müşteri'}</h4>
-                                                                    {order.customer_email && (
-                                                                        <div className="text-[10px] text-slate-400 truncate mt-0.5">{order.customer_email}</div>
-                                                                    )}
+                                                                    <h4 className="font-semibold text-slate-800 text-xs truncate">{order.customer_name || 'İsimsiz Müşteri'}</h4>
                                                                 </div>
-                                                                <div className="text-right shrink-0">
-                                                                    <div className="font-bold text-slate-700 text-sm">
-                                                                        {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
-                                                                    </div>
+                                                                <div className="font-bold text-slate-700 text-xs shrink-0">
+                                                                    {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
                                                                 </div>
                                                             </div>
-
-                                                            <div className="flex items-center justify-between mt-1 border-t border-slate-50 pt-3">
-                                                                <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                                                            <div className="flex items-center justify-between border-t border-slate-50 pt-2">
+                                                                <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
                                                                     {formatDateTime(order.created_at, lang).split(' ')[0]}
                                                                 </span>
-                                                                <span className="text-[10px] text-primary-navy/60 font-medium">Detay için tıkla →</span>
+                                                                <span className="text-[9px] text-primary-navy/50 font-medium">detay →</span>
                                                             </div>
                                                         </div>
                                                     )}
@@ -391,70 +422,6 @@ export default function AdminOrdersBoard() {
             {/* Mini Detay Paneli */}
             {selectedOrder && (
                 <MiniDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} />
-            )}
-
-            {/* Sürükle-bırak Onay / İptal-İade Seçim Popup'ı */}
-            {pendingDrop && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200" onClick={cancelDrop}>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                        <div className="p-5 border-b border-slate-100 bg-slate-50/50">
-                            <h3 className="text-lg font-bold text-primary-navy">
-                                {pendingDrop.needsChoice ? 'İptal mi, İade mi?' : 'Durumu Değiştir'}
-                            </h3>
-                            <p className="text-sm text-slate-500 mt-1">
-                                <span className="font-bold">#{pendingDrop.order.order_number || pendingDrop.orderId.substring(0, 8)}</span>
-                                {' — '}
-                                {pendingDrop.order.customer_name || 'İsimsiz Müşteri'}
-                            </p>
-                        </div>
-
-                        <div className="p-5 space-y-3">
-                            {pendingDrop.needsChoice ? (
-                                <>
-                                    <p className="text-sm text-slate-600 mb-3">Bu siparişi hangi duruma taşımak istiyorsunuz?</p>
-                                    <button
-                                        onClick={() => executeDrop('cancelled')}
-                                        className="w-full px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-sm rounded-xl border border-rose-200 transition-colors flex items-center gap-3"
-                                    >
-                                        <XCircle size={18} />
-                                        <div className="text-left">
-                                            <div>İptal Et</div>
-                                            <div className="text-[10px] text-rose-500 font-medium">Sipariş tamamen iptal edilir</div>
-                                        </div>
-                                    </button>
-                                    <button
-                                        onClick={() => executeDrop('refunded')}
-                                        className="w-full px-4 py-3 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-sm rounded-xl border border-amber-200 transition-colors flex items-center gap-3"
-                                    >
-                                        <Package size={18} />
-                                        <div className="text-left">
-                                            <div>İade Et</div>
-                                            <div className="text-[10px] text-amber-500 font-medium">Ürün iadesi ve geri ödeme başlatılır</div>
-                                        </div>
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <p className="text-sm text-slate-600">
-                                        Bu siparişin durumunu <span className="font-bold text-slate-800">&quot;{pendingDrop.destCol.title}&quot;</span> olarak değiştirmek istediğinize emin misiniz?
-                                    </p>
-                                    <button
-                                        onClick={() => executeDrop(pendingDrop.destCol.statuses[0])}
-                                        className="w-full px-4 py-3 bg-primary-navy hover:bg-primary-navy/90 text-white font-bold text-sm rounded-xl transition-colors"
-                                    >
-                                        Evet, Değiştir
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
-                        <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex justify-end">
-                            <button onClick={cancelDrop} className="px-6 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white rounded-lg transition-all">
-                                Vazgeç
-                            </button>
-                        </div>
-                    </div>
-                </div>
             )}
         </div>
     )
