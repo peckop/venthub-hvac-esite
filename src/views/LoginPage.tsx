@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react'

@@ -5,7 +5,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface AuditRow {
   id: string
@@ -23,7 +23,6 @@ const PAGE_SIZE = 50
 
 const AdminAuditLogPage: React.FC = () => {
   const { t, lang } = useI18n()
-  const pathname = usePathname()
   const router = useRouter()
   const [rows, setRows] = React.useState<AuditRow[]>([])
   const [loading, setLoading] = React.useState(false)

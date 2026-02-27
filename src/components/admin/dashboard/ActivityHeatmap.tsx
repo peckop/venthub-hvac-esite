@@ -23,9 +23,7 @@ interface ActivityHeatmapProps {
 }
 
 const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
-    const { t } = useI18n()
-
-    // Map JS days to labels (starting from Monday for better B2B UX)
+    // Transform data for the chart
     // JS getDay(): 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
     // Our chart Y axis: 0=Mon, 1=Tue, ..., 6=Sun (to keep Monday on top or bottom)
 

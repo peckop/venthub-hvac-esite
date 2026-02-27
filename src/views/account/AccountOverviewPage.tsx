@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDate } from '../../i18n/datetime'
-import { MapPin, Package, Clock, CheckCircle, ArrowRight, ShieldCheck, CreditCard, Truck, AlertTriangle, TrendingUp, Search, Calendar, MapPin as MapPinIcon } from 'lucide-react'
+import { MapPin, Package, Clock, CheckCircle, ArrowRight, ShieldCheck, CreditCard, Truck, AlertTriangle, TrendingUp, Calendar, MapPin as MapPinIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface OrderRecord {
@@ -25,7 +25,7 @@ interface ShipmentRecord extends OrderRecord {
 
 export default function AccountOverviewPage() {
   const { user } = useAuth()
-  const { t, lang } = useI18n()
+  const { lang } = useI18n()
   const router = useRouter()
 
   const [addresses, setAddresses] = useState<UserAddress[]>([])
