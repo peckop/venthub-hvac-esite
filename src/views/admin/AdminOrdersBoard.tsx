@@ -229,7 +229,16 @@ export default function AdminOrdersBoard() {
         return orders.filter(o => colDef.statuses.includes(o.status || 'pending'))
     }
 
-    const onDragEnd = async (result: DropResult) => {
+    // --- Sürükle-bırak onay/seçim popup state'i ---
+    const [pendingDrop, setPendingDrop] = useState<{
+        orderId: string
+        oldStatus: string
+        destCol: ColumnDef
+        order: AdminOrderRow
+        needsChoice: boolean // İptal/İade seçimi gerekiyor mu?
+    } | null>(null)
+
+    const onDragEnd = (result: DropResult) => {
         const { destination, source, draggableId } = result
 
         if (!destination) return
@@ -238,38 +247,54 @@ export default function AdminOrdersBoard() {
         const destCol = COLUMNS.find(c => c.id === destination.droppableId)
         if (!destCol) return
 
-        const targetStatus = destCol.statuses[0]
         const targetOrder = orders.find(o => o.id === draggableId)
-        if (!targetOrder || targetOrder.status === targetStatus) return
+        if (!targetOrder) return
 
-        const oldStatus = targetOrder.status
+        const targetStatus = destCol.statuses[0]
+        if (targetOrder.status === targetStatus) return
+
+        // İptal/İade sütununa bırakıldıysa → "İptal mi? İade mi?" seçtir
+        // Diğer sütunlara bırakıldıysa → onay iste
+        setPendingDrop({
+            orderId: draggableId,
+            oldStatus: targetOrder.status,
+            destCol,
+            order: targetOrder,
+            needsChoice: destCol.id === 'col_cancel',
+        })
+    }
+
+    const executeDrop = async (finalStatus: string) => {
+        if (!pendingDrop) return
+        const { orderId, oldStatus, destCol, order } = pendingDrop
+        setPendingDrop(null)
 
         // Optimistic UI
-        setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: targetStatus } : o))
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: finalStatus } : o))
 
-        // Merkezi servis üzerinden güncelle
-        const result2 = await updateOrderStatus({
-            orderId: draggableId,
-            newStatus: targetStatus,
+        const res = await updateOrderStatus({
+            orderId,
+            newStatus: finalStatus,
             oldStatus,
-            userId: targetOrder.user_id,
-            reason: targetStatus === 'cancelled'
+            userId: order.user_id,
+            reason: finalStatus === 'cancelled'
                 ? 'Sipariş Kanban Üzerinden İptal Edildi'
-                : targetStatus === 'refunded'
+                : finalStatus === 'refunded'
                     ? 'Sipariş Kanban Üzerinden İade Edildi'
                     : undefined,
-            auditComment: `kanban drag: ${oldStatus} → ${targetStatus}`,
+            auditComment: `kanban drag: ${oldStatus} → ${finalStatus}`,
         })
 
-        if (result2.ok) {
+        if (res.ok) {
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
         } else {
-            // Revert
-            setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
-            toast.error('Güncelleme başarısız: ' + (result2.error || ''))
+            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: oldStatus } : o))
+            toast.error('Güncelleme başarısız: ' + (res.error || ''))
             fetchOrders()
         }
     }
+
+    const cancelDrop = () => setPendingDrop(null)
 
     if (loading && orders.length === 0) {
         return <div className="p-8 text-center text-slate-500 animate-pulse">Panoya Siparişler Yükleniyor...</div>
@@ -366,6 +391,70 @@ export default function AdminOrdersBoard() {
             {/* Mini Detay Paneli */}
             {selectedOrder && (
                 <MiniDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+            )}
+
+            {/* Sürükle-bırak Onay / İptal-İade Seçim Popup'ı */}
+            {pendingDrop && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200" onClick={cancelDrop}>
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <div className="p-5 border-b border-slate-100 bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-primary-navy">
+                                {pendingDrop.needsChoice ? 'İptal mi, İade mi?' : 'Durumu Değiştir'}
+                            </h3>
+                            <p className="text-sm text-slate-500 mt-1">
+                                <span className="font-bold">#{pendingDrop.order.order_number || pendingDrop.orderId.substring(0, 8)}</span>
+                                {' — '}
+                                {pendingDrop.order.customer_name || 'İsimsiz Müşteri'}
+                            </p>
+                        </div>
+
+                        <div className="p-5 space-y-3">
+                            {pendingDrop.needsChoice ? (
+                                <>
+                                    <p className="text-sm text-slate-600 mb-3">Bu siparişi hangi duruma taşımak istiyorsunuz?</p>
+                                    <button
+                                        onClick={() => executeDrop('cancelled')}
+                                        className="w-full px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-sm rounded-xl border border-rose-200 transition-colors flex items-center gap-3"
+                                    >
+                                        <XCircle size={18} />
+                                        <div className="text-left">
+                                            <div>İptal Et</div>
+                                            <div className="text-[10px] text-rose-500 font-medium">Sipariş tamamen iptal edilir</div>
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={() => executeDrop('refunded')}
+                                        className="w-full px-4 py-3 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-sm rounded-xl border border-amber-200 transition-colors flex items-center gap-3"
+                                    >
+                                        <Package size={18} />
+                                        <div className="text-left">
+                                            <div>İade Et</div>
+                                            <div className="text-[10px] text-amber-500 font-medium">Ürün iadesi ve geri ödeme başlatılır</div>
+                                        </div>
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-sm text-slate-600">
+                                        Bu siparişin durumunu <span className="font-bold text-slate-800">&quot;{pendingDrop.destCol.title}&quot;</span> olarak değiştirmek istediğinize emin misiniz?
+                                    </p>
+                                    <button
+                                        onClick={() => executeDrop(pendingDrop.destCol.statuses[0])}
+                                        className="w-full px-4 py-3 bg-primary-navy hover:bg-primary-navy/90 text-white font-bold text-sm rounded-xl transition-colors"
+                                    >
+                                        Evet, Değiştir
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex justify-end">
+                            <button onClick={cancelDrop} className="px-6 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white rounded-lg transition-all">
+                                Vazgeç
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )
