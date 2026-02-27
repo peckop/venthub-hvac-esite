@@ -169,7 +169,9 @@ const AdminOrdersPage: React.FC = () => {
     }
   }, [status, fromDate, toDate, page, debouncedQuery, presetPendingShipments, t])
 
-  React.useEffect(() => { fetchOrders() }, [fetchOrders])
+  React.useEffect(() => {
+    if (viewMode === 'list') fetchOrders()
+  }, [fetchOrders, viewMode])
 
   const openShipModal = async (id: string) => {
     setBulkMode(false)
