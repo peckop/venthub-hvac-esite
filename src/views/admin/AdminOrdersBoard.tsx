@@ -6,7 +6,7 @@ import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import { adminSectionTitleClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Clock, CheckCircle2, Package, Truck, XCircle, AlertCircle, GripVertical } from 'lucide-react'
+import { Clock, CheckCircle2, Package, Truck, XCircle, GripVertical } from 'lucide-react'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -39,7 +39,7 @@ const COLUMNS: ColumnDef[] = [
 ]
 
 export default function AdminOrdersBoard() {
-    const { t, lang } = useI18n()
+    const { lang } = useI18n()
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -54,8 +54,8 @@ export default function AdminOrdersBoard() {
 
             if (error) throw error
             setOrders(data as AdminOrderRow[])
-        } catch (err: any) {
-            toast.error('Siparişler yüklenemedi: ' + err.message)
+        } catch (err: unknown) {
+            toast.error('Siparişler yüklenemedi: ' + (err as Error).message)
         } finally {
             setLoading(false)
         }
@@ -102,7 +102,7 @@ export default function AdminOrdersBoard() {
             // edge-function (şartlı tracking_number isteyen) yerine doğrudan db update yapıyoruz.
             // Detaylı kargo/iptal işlemi için tablo görünümündeki fonksiyonlar kullanılmalı.
             const res = await supabase.from('venthub_orders').update({ status: targetStatus }).eq('id', draggableId)
-            let error = res.error
+            const error = res.error
 
             // İptal veya İade sütununa çekildiyse venthub_returns tablosuna da yansıt (İadeler sayfasında görünsün)
             if (!error && (targetStatus === 'cancelled' || targetStatus === 'refunded')) {
@@ -123,10 +123,10 @@ export default function AdminOrdersBoard() {
             if (error) throw error
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Revert Optimistic UI
             setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
-            toast.error('Güncelleme başarısız: ' + err.message)
+            toast.error('Güncelleme başarısız: ' + (err as Error).message)
             fetchOrders() // Refresh state just in case
         }
     }
