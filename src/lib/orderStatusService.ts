@@ -93,9 +93,14 @@ export async function updateOrderStatus(input: UpdateOrderStatusInput): Promise<
             if (orderErr) throw new Error('Sipariş güncellenemedi: ' + orderErr.message)
         }
 
-        // --- 2. İade/İptal → venthub_returns senkronizasyonu ---
+        // --- 2. İade/İptal → venthub_returns senkronizasyonu ve Stok Restorasyonu ---
         if (!skipReturnsSync && isReturnStatus(newStatus)) {
             await syncReturnsRecord(orderId, newStatus, userId, reason)
+
+            // Eğer daha önceden iptal/iade HALE GELMEMİŞSE stokları iade et
+            if (oldStatus && !isReturnStatus(oldStatus)) {
+                await restoreStockForOrder(orderId)
+            }
         }
 
         // --- 3. Audit log (hata UI'ı bloklamasın) ---
@@ -202,3 +207,35 @@ async function syncReturnsRecord(
             .eq('id', existing.id)
     }
 }
+
+async function restoreStockForOrder(orderId: string): Promise<void> {
+    try {
+        const { data: items } = await supabase
+            .from('venthub_order_items')
+            .select('product_id, quantity')
+            .eq('order_id', orderId)
+
+        if (!items || items.length === 0) return
+
+        for (const item of items) {
+            // Mevcut durumu al (JS ile incremental update; admin paneli için kabul edilebilir risk)
+            const { data: product } = await supabase.from('products').select('stock_qty').eq('id', item.product_id).single()
+            if (product) {
+                const newStock = (product.stock_qty || 0) + item.quantity
+                await supabase.from('products').update({ stock_qty: newStock }).eq('id', item.product_id)
+
+                // Movement kaydı at
+                await supabase.from('inventory_movements').insert({
+                    product_id: item.product_id,
+                    delta: item.quantity,
+                    reason: 'return',
+                    reference_id: orderId,
+                    metadata: { note: 'Otomatik İade / İptal Stok Geri Alımı' }
+                })
+            }
+        }
+    } catch (err) {
+        console.error('[restoreStockForOrder] Hata:', err)
+    }
+}
+

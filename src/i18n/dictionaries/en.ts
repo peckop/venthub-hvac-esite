@@ -333,6 +333,7 @@ export const en = {
       orders: 'Orders',
       inventory: 'Inventory',
       movements: 'Movements',
+      inventoryReport: 'Inventory Report',
       inventorySettings: 'Thresholds & Settings',
       returns: 'Returns',
       users: 'Users',
@@ -340,7 +341,8 @@ export const en = {
       errors: 'Errors',
       errorGroups: 'Error Groups',
       products: 'Products',
-      categories: 'Categories'
+      categories: 'Categories',
+      logistics: 'Shipping & Logistics'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -511,9 +513,11 @@ export const en = {
     orders: {
       statusLabels: {
         all: 'All',
+        pending: 'Pending',
         paid: 'Paid',
         confirmed: 'Confirmed',
         shipped: 'Shipped',
+        delivered: 'Delivered',
         cancelled: 'Cancelled',
         refunded: 'Refunded',
         partialRefunded: 'Partial Refunded'

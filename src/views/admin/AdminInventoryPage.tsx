@@ -8,9 +8,20 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
 
-type Row = { product_id: string; name: string; physical_stock: number; reserved_stock: number; available_stock: number }
+type Row = {
+  product_id: string;
+  name: string;
+  physical_stock: number;
+  reserved_stock: number;
+  available_stock: number;
+  warehouse_location?: string | null;
+  supplier_name?: string | null;
+  daily_velocity?: number;
+  days_until_empty?: number;
+  abc_class?: 'A' | 'B' | 'C' | null;
+}
 
-type SortKey = 'name' | 'physical' | 'reserved' | 'available' | 'threshold' | 'status'
+type SortKey = 'name' | 'physical' | 'reserved' | 'available' | 'threshold' | 'status' | 'location' | 'supplier' | 'days_empty' | 'abc'
 
 type Category = { id: string; name: string }
 
@@ -39,6 +50,12 @@ const AdminInventoryPage: React.FC = () => {
   const [sortKey, setSortKey] = React.useState<SortKey>('name')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('asc')
   const [groupByCategory, setGroupByCategory] = React.useState<boolean>(false)
+
+  const [editingLocation, setEditingLocation] = React.useState<string | null>(null)
+  const [editLocationVal, setEditLocationVal] = React.useState<string>('')
+  const [editingSupplier, setEditingSupplier] = React.useState<string | null>(null)
+  const [editSupplierVal, setEditSupplierVal] = React.useState<string>('')
+  const [printingQr, setPrintingQr] = React.useState(false)
 
   // Arama
   const [q, setQ] = React.useState<string>('')
@@ -134,13 +151,20 @@ const AdminInventoryPage: React.FC = () => {
   const load = React.useCallback(async () => {
     try {
       setLoading(LoadState.Loading)
-      const [invRes, settingsRes, catRes] = await Promise.all([
+      const [invRes, velRes, settingsRes, catRes] = await Promise.all([
         supabase.from('inventory_summary').select('*'),
+        supabase.from('inventory_velocity').select('product_id, daily_velocity, days_until_empty, abc_class'),
         supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
         supabase.from('categories').select('id,name').order('name', { ascending: true })
       ])
       if (invRes.error) throw invRes.error
-      const invRows = (invRes.data || []) as Row[]
+      const vMap = new Map((velRes.data || []).map((v: any) => [v.product_id, v]))
+      const invRows = (invRes.data || []).map((r: any) => ({
+        ...r,
+        daily_velocity: vMap.get(r.product_id)?.daily_velocity,
+        days_until_empty: vMap.get(r.product_id)?.days_until_empty,
+        abc_class: vMap.get(r.product_id)?.abc_class
+      })) as Row[]
       setRows(invRows)
       if (!settingsRes.error) {
         setDefaultThreshold((settingsRes.data?.default_low_stock_threshold as number | null) ?? null)
@@ -276,6 +300,10 @@ const AdminInventoryPage: React.FC = () => {
         }
         case 'status':
           return dir * (statusRank(a) - statusRank(b))
+        case 'location': return dir * String(a.warehouse_location || '').localeCompare(String(b.warehouse_location || ''), 'tr')
+        case 'supplier': return dir * String(a.supplier_name || '').localeCompare(String(b.supplier_name || ''), 'tr')
+        case 'days_empty': return dir * ((a.days_until_empty ?? 9999) - (b.days_until_empty ?? 9999))
+        case 'abc': return dir * String(a.abc_class || 'Z').localeCompare(String(b.abc_class || 'Z'), 'tr')
         default:
           return 0
       }
@@ -739,7 +767,7 @@ const AdminInventoryPage: React.FC = () => {
 
   // Görünür kolonlar ve yoğunluk
   const STORAGE_KEY = 'toolbar:inventory'
-  const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; physical: boolean; reserved: boolean; available: boolean; threshold: boolean; status: boolean }>({ name: true, physical: true, reserved: true, available: true, threshold: true, status: true })
+  const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; physical: boolean; reserved: boolean; available: boolean; threshold: boolean; status: boolean; location: boolean; supplier: boolean; abc: boolean; days: boolean }>({ name: true, physical: true, reserved: true, available: true, threshold: true, status: true, location: true, supplier: false, abc: true, days: true })
   const [density, setDensity] = React.useState<Density>('comfortable')
   React.useEffect(() => {
     if (typeof window === 'undefined') return
@@ -760,7 +788,130 @@ const AdminInventoryPage: React.FC = () => {
   }, [density])
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
-  const visibleCount = (visibleCols.name ? 1 : 0) + (visibleCols.physical ? 1 : 0) + (visibleCols.reserved ? 1 : 0) + (visibleCols.available ? 1 : 0) + (visibleCols.threshold ? 1 : 0) + (visibleCols.status ? 1 : 0)
+  const visibleCount = (visibleCols.name ? 1 : 0) + (visibleCols.physical ? 1 : 0) + (visibleCols.reserved ? 1 : 0) + (visibleCols.available ? 1 : 0) + (visibleCols.threshold ? 1 : 0) + (visibleCols.status ? 1 : 0) + (visibleCols.location ? 1 : 0) + (visibleCols.supplier ? 1 : 0) + (visibleCols.abc ? 1 : 0) + (visibleCols.days ? 1 : 0)
+
+  // Save inline edits
+  const saveLocation = async (r: Row, newVal: string) => {
+    try {
+      if (r.warehouse_location === newVal) return
+      const { error } = await supabase.from('products').update({ warehouse_location: newVal || null }).eq('id', r.product_id)
+      if (error) throw error
+      setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: newVal || null } : row))
+      toast.success('Raf konumu güncellendi')
+    } catch {
+      toast.error('Raf konumu güncellenemedi')
+    }
+    setEditingLocation(null)
+  }
+
+  const saveSupplier = async (r: Row, newVal: string) => {
+    try {
+      if (r.supplier_name === newVal) return
+      const { error } = await supabase.from('products').update({ supplier_name: newVal || null }).eq('id', r.product_id)
+      if (error) throw error
+      setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: newVal || null } : row))
+      toast.success('Tedarikçi güncellendi')
+    } catch {
+      toast.error('Tedarikçi güncellenemedi')
+    }
+    setEditingSupplier(null)
+  }
+
+  const printQrLabel = async (r: Row) => {
+    try {
+      setPrintingQr(true)
+      const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.product_id)}`
+
+      const iframe = document.createElement('iframe')
+      iframe.style.display = 'none'
+      document.body.appendChild(iframe)
+
+      const safeName = (r.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      const safeSku = r.product_id.slice(0, 8).toUpperCase().replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      const safeLoc = (r.warehouse_location || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Etiket Yazdir - ${safeSku}</title>
+          <style>
+            @page {
+              size: 50mm 40mm;
+              margin: 0;
+            }
+            body {
+              width: 50mm;
+              height: 40mm;
+              margin: 0;
+              padding: 2mm 3mm;
+              box-sizing: border-box;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: flex-start;
+              text-align: center;
+              background: white;
+              color: black;
+            }
+            .qr {
+              width: 17mm;
+              height: 17mm;
+              margin-bottom: 2mm;
+              margin-top: 1mm;
+            }
+            .title {
+              font-size: 8pt;
+              font-weight: 700;
+              line-height: 1.15;
+              margin: 0 0 1.5mm 0;
+              width: 100%;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            .meta {
+              font-size: 7pt;
+              line-height: 1.3;
+              margin: 0;
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${url}" class="qr" onload="window.print();" />
+          <div class="title">${safeName}</div>
+          <div class="meta">
+            SKU: ${safeSku}<br/>
+            Raf: ${safeLoc}<br/>
+            Stok: ${r.physical_stock}
+          </div>
+        </body>
+        </html>
+      `
+
+      const doc = iframe.contentWindow?.document
+      if (doc) {
+        doc.open()
+        doc.write(htmlContent)
+        doc.close()
+      }
+
+      // 5 saniye sonra gizli çerçeveyi DOM'dan temizle
+      setTimeout(() => {
+        if (iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe)
+        }
+      }, 5000)
+
+    } catch (e) {
+      toast.error('Etiket oluşturulamadı')
+    } finally {
+      setPrintingQr(false)
+    }
+  }
 
   // ESC ile çekmeceyi kapat
   React.useEffect(() => {
@@ -832,6 +983,10 @@ const AdminInventoryPage: React.FC = () => {
                 { key: 'reserved', label: 'Rezerve', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
                 { key: 'available', label: 'Satılabilir', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
                 { key: 'threshold', label: 'Eşik', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
+                { key: 'location', label: 'Raf', checked: visibleCols.location, onChange: (v) => setVisibleCols(s => ({ ...s, location: v })) },
+                { key: 'supplier', label: 'Tedarikçi', checked: visibleCols.supplier, onChange: (v) => setVisibleCols(s => ({ ...s, supplier: v })) },
+                { key: 'abc', label: 'ABC Sınıfı', checked: visibleCols.abc, onChange: (v) => setVisibleCols(s => ({ ...s, abc: v })) },
+                { key: 'days', label: 'Tükenme Hızı', checked: visibleCols.days, onChange: (v) => setVisibleCols(s => ({ ...s, days: v })) },
                 { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
               ]}
               density={density}
@@ -845,27 +1000,72 @@ const AdminInventoryPage: React.FC = () => {
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
-              <th className={adminTableHeadCellClass + " " + headPad}>
-                <button onClick={() => toggleSort('name')} className="hover:underline flex items-center gap-1 uppercase tracking-wider">
-                  Ürün {sortIndicator('name')}
-                </button>
-              </th>
-              <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                <button onClick={() => toggleSort('physical')} className="hover:underline ml-auto flex items-center gap-1">
-                  Fiziksel {sortIndicator('physical')}
-                </button>
-              </th>
-              <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                <button onClick={() => toggleSort('reserved')} className="hover:underline ml-auto flex items-center gap-1">
-                  Rezerve {sortIndicator('reserved')}
-                </button>
-              </th>
-              <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                <button onClick={() => toggleSort('available')} className="hover:underline ml-auto flex items-center gap-1 text-primary-navy">
-                  Müsait {sortIndicator('available')}
-                </button>
-              </th>
-              <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider"}>Durum</th>
+              {visibleCols.name && (
+                <th className={adminTableHeadCellClass + " " + headPad}>
+                  <button onClick={() => toggleSort('name')} className="hover:underline flex items-center gap-1 uppercase tracking-wider">
+                    Ürün {sortIndicator('name')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.physical && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('physical')} className="hover:underline ml-auto flex items-center gap-1">
+                    Fiziksel {sortIndicator('physical')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.reserved && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('reserved')} className="hover:underline ml-auto flex items-center gap-1">
+                    Rezerve {sortIndicator('reserved')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.available && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('available')} className="hover:underline ml-auto flex items-center gap-1 text-primary-navy">
+                    Müsait {sortIndicator('available')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.threshold && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('threshold')} className="hover:underline ml-auto flex items-center gap-1">
+                    Eşik {sortIndicator('threshold')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.location && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('location')} className="hover:underline flex items-center gap-1">
+                    Raf {sortIndicator('location')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.supplier && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('supplier')} className="hover:underline flex items-center gap-1">
+                    Tedarikçi {sortIndicator('supplier')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.abc && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('abc')} className="hover:underline mx-auto flex items-center gap-1">
+                    Sınıf {sortIndicator('abc')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.days && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
+                  <button onClick={() => toggleSort('days_empty')} className="hover:underline ml-auto flex items-center gap-1">
+                    Tükenme Hızı {sortIndicator('days_empty')}
+                  </button>
+                </th>
+              )}
+              {visibleCols.status && (
+                <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider"}>Durum</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -887,16 +1087,56 @@ const AdminInventoryPage: React.FC = () => {
                       className={`group hover:bg-slate-50/50 cursor-pointer transition-colors ${r.available_stock <= 0 ? 'bg-rose-50/20' : r.available_stock <= (thresholdMap[r.product_id] ?? defaultThreshold ?? 10) ? 'bg-amber-50/20' : ''}`}
                       onClick={() => { setSelected(r); setSelectedThreshold(thresholdMap[r.product_id] ?? ''); setSelectedStock(r.physical_stock); loadMovements(r.product_id); }}
                     >
-                      <td className={adminTableCellClass + " " + cellPad}>
-                        <div className="flex flex-col">
-                          <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
-                          <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
-                        </div>
-                      </td>
-                      <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{r.physical_stock}</td>
-                      <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400"}>{r.reserved_stock}</td>
-                      <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>
-                      <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>
+                      {visibleCols.name && (
+                        <td className={adminTableCellClass + " " + cellPad}>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
+                            <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
+                          </div>
+                        </td>
+                      )}
+                      {visibleCols.physical && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{r.physical_stock}</td>}
+                      {visibleCols.reserved && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400"}>{r.reserved_stock}</td>}
+                      {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
+                      {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
+                      {visibleCols.location && (
+                        <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingLocation(r.product_id); setEditLocationVal(r.warehouse_location || ''); }}>
+                          {editingLocation === r.product_id ? (
+                            <input autoFocus type="text" className="w-20 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editLocationVal} onChange={e => setEditLocationVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveLocation(r, editLocationVal); if (e.key === 'Escape') setEditingLocation(null); }} onBlur={() => void saveLocation(r, editLocationVal)} />
+                          ) : (
+                            <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.warehouse_location || '-'}</span>
+                          )}
+                        </td>
+                      )}
+                      {visibleCols.supplier && (
+                        <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingSupplier(r.product_id); setEditSupplierVal(r.supplier_name || ''); }}>
+                          {editingSupplier === r.product_id ? (
+                            <input autoFocus type="text" className="w-24 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editSupplierVal} onChange={e => setEditSupplierVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveSupplier(r, editSupplierVal); if (e.key === 'Escape') setEditingSupplier(null); }} onBlur={() => void saveSupplier(r, editSupplierVal)} />
+                          ) : (
+                            <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.supplier_name || '-'}</span>
+                          )}
+                        </td>
+                      )}
+                      {visibleCols.abc && (
+                        <td className={adminTableCellClass + " " + cellPad + " text-center"}>
+                          {r.abc_class === 'A' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs" title="Sermayenin büyük kısmı ve yüksek hız">A</span> :
+                            r.abc_class === 'B' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-xs">B</span> :
+                              r.abc_class === 'C' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs" title="Düşük hareket/sermaye">C</span> : '-'}
+                        </td>
+                      )}
+                      {visibleCols.days && (
+                        <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>
+                          {r.days_until_empty === 9999 ? (
+                            <span className="text-slate-400 text-xs">Hareketsiz</span>
+                          ) : (
+                            <span className={`text-xs ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-600 font-bold flex justify-end items-center gap-1 animate-pulse' : 'text-slate-600'}`}>
+                              {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
+                              ≈ {r.days_until_empty} gün
+                            </span>
+                          )}
+                        </td>
+                      )}
+                      {visibleCols.status && <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>}
                     </tr>
                   ))}
                 </React.Fragment>
@@ -908,16 +1148,56 @@ const AdminInventoryPage: React.FC = () => {
                   className={`group hover:bg-slate-50/50 cursor-pointer transition-colors ${r.available_stock <= 0 ? 'bg-rose-50/20' : r.available_stock <= (thresholdMap[r.product_id] ?? defaultThreshold ?? 10) ? 'bg-amber-50/20' : ''}`}
                   onClick={() => { setSelected(r); setSelectedThreshold(thresholdMap[r.product_id] ?? ''); setSelectedStock(r.physical_stock); loadMovements(r.product_id); }}
                 >
-                  <td className={adminTableCellClass + " " + cellPad}>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
-                      <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
-                    </div>
-                  </td>
-                  <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{r.physical_stock}</td>
-                  <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400"}>{r.reserved_stock}</td>
-                  <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>
-                  <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>
+                  {visibleCols.name && (
+                    <td className={adminTableCellClass + " " + cellPad}>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
+                        <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
+                      </div>
+                    </td>
+                  )}
+                  {visibleCols.physical && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{r.physical_stock}</td>}
+                  {visibleCols.reserved && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400"}>{r.reserved_stock}</td>}
+                  {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
+                  {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
+                  {visibleCols.location && (
+                    <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingLocation(r.product_id); setEditLocationVal(r.warehouse_location || ''); }}>
+                      {editingLocation === r.product_id ? (
+                        <input autoFocus type="text" className="w-20 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editLocationVal} onChange={e => setEditLocationVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveLocation(r, editLocationVal); if (e.key === 'Escape') setEditingLocation(null); }} onBlur={() => void saveLocation(r, editLocationVal)} />
+                      ) : (
+                        <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.warehouse_location || '-'}</span>
+                      )}
+                    </td>
+                  )}
+                  {visibleCols.supplier && (
+                    <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingSupplier(r.product_id); setEditSupplierVal(r.supplier_name || ''); }}>
+                      {editingSupplier === r.product_id ? (
+                        <input autoFocus type="text" className="w-24 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editSupplierVal} onChange={e => setEditSupplierVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveSupplier(r, editSupplierVal); if (e.key === 'Escape') setEditingSupplier(null); }} onBlur={() => void saveSupplier(r, editSupplierVal)} />
+                      ) : (
+                        <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.supplier_name || '-'}</span>
+                      )}
+                    </td>
+                  )}
+                  {visibleCols.abc && (
+                    <td className={adminTableCellClass + " " + cellPad + " text-center"}>
+                      {r.abc_class === 'A' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs" title="Sermayenin büyük kısmı ve yüksek hız">A</span> :
+                        r.abc_class === 'B' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-xs">B</span> :
+                          r.abc_class === 'C' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs" title="Düşük hareket/sermaye">C</span> : '-'}
+                    </td>
+                  )}
+                  {visibleCols.days && (
+                    <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>
+                      {r.days_until_empty === 9999 ? (
+                        <span className="text-slate-400 text-xs">Hareketsiz</span>
+                      ) : (
+                        <span className={`text-xs ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-600 font-bold flex justify-end items-center gap-1 animate-pulse' : 'text-slate-600'}`}>
+                          {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
+                          ≈ {r.days_until_empty} gün
+                        </span>
+                      )}
+                    </td>
+                  )}
+                  {visibleCols.status && <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>}
                 </tr>
               ))
             )}
@@ -942,19 +1222,60 @@ const AdminInventoryPage: React.FC = () => {
           <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white/95 backdrop-blur z-50 shadow-2xl border-l border-slate-200/80 flex flex-col animate-in slide-in-from-right duration-200">
             <header className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
               <h2 className="text-lg font-bold text-slate-800 truncate pr-4">{selected.name}</h2>
-              <button className={adminButtonSecondaryClass + " h-9"} onClick={() => setSelected(null)}>{t('admin.ui.close') || 'Kapat'}</button>
+              <div className="flex items-center gap-2">
+                <button disabled={printingQr} className={adminButtonPrimaryClass + " h-9 text-xs px-3 shadow-md shadow-primary-navy/10"} onClick={() => void printQrLabel(selected)}>
+                  {printingQr ? 'Hazırlanıyor...' : 'QR Etiket'}
+                </button>
+                <button className={adminButtonSecondaryClass + " h-9"} onClick={() => setSelected(null)}>{t('admin.ui.close') || 'Kapat'}</button>
+              </div>
             </header>
             <div className="p-4 space-y-4 overflow-auto">
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-500 mb-1">Güncel Stok</div>
-                  <div className="text-xl font-semibold text-slate-900">{selectedStock ?? '-'}</div>
+                <div className="bg-white border border-slate-200 rounded-lg p-3 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-primary-navy"></div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 ml-1">Güncel Stok</div>
+                  <div className="text-2xl font-black text-slate-800 ml-1">{selectedStock ?? '-'}</div>
                 </div>
-                <div className="bg-white border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-500 mb-1">Etkili Eşik</div>
-                  <div className="text-xl font-semibold text-slate-900">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
+                <div className="bg-white border border-slate-200 rounded-lg p-3 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 ml-1">Eşik (Alarm)</div>
+                  <div className="text-2xl font-black text-slate-800 ml-1">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
                 </div>
               </div>
+
+              {selected.daily_velocity !== undefined && selected.daily_velocity > 0 && (
+                <section className="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100/50 rounded-xl p-4 shadow-sm relative overflow-hidden">
+                  <div className="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl"></div>
+                  <h3 className="text-xs font-black text-indigo-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                    </span>
+                    Zeki Satın Alma Önerisi
+                  </h3>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Satış Hızı (30 Gün)</div>
+                      <div className="font-mono text-sm font-semibold text-slate-800">{selected.daily_velocity.toFixed(2)} / gün</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">Tahmini {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-indigo-500 font-bold uppercase tracking-wider mb-1">Önerilen Sipariş</div>
+                      <div className="font-mono text-2xl font-black text-indigo-600">
+                        {Math.max(0, Math.ceil((selected.daily_velocity * 30)) - selected.available_stock)} <span className="text-sm font-semibold">adet</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">30 günlük buffer için</div>
+                    </div>
+                  </div>
+
+                  {selected.abc_class === 'A' && (
+                    <div className="mt-3 text-[10px] bg-indigo-100/50 text-indigo-800 px-2 py-1.5 rounded-md border border-indigo-200/50 flex items-center gap-1.5">
+                      <span className="font-bold">A Sınıfı:</span> Bu ürün kritik ciro kaynağıdır, stokta daima bulunmalıdır.
+                    </div>
+                  )}
+                </section>
+              )}
 
               <section className="space-y-2">
                 <h3 className="text-sm font-bold text-slate-500 uppercase tracking-tight">Eşik Düzenle</h3>

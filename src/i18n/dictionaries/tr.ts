@@ -341,6 +341,7 @@ export const tr = {
       orders: 'Siparişler',
       inventory: 'Stok Özeti',
       movements: 'Hareket Defteri',
+      inventoryReport: 'Stok Raporu',
       inventorySettings: 'Eşik & Ayarlar',
       returns: 'İadeler',
       users: 'Kullanıcılar',
@@ -348,7 +349,8 @@ export const tr = {
       errors: 'Hatalar',
       errorGroups: 'Hata Grupları',
       products: 'Ürünler',
-      categories: 'Kategoriler'
+      categories: 'Kategoriler',
+      logistics: 'Kargo & Lojistik'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -521,9 +523,11 @@ export const tr = {
     orders: {
       statusLabels: {
         all: 'Tümü',
+        pending: 'Bekliyor',
         paid: 'Ödendi',
         confirmed: 'Onaylı',
         shipped: 'Kargolandı',
+        delivered: 'Teslim Edildi',
         cancelled: 'İptal',
         refunded: 'İade',
         partialRefunded: 'Kısmi İade'

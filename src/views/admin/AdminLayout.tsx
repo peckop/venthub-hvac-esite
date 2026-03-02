@@ -19,7 +19,9 @@ import {
   FolderX,
   Package,
   Tags,
-  Ticket
+  Ticket,
+  PieChart,
+  Truck
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
@@ -57,6 +59,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       label: t('admin.menu.groupSales') || 'Satış & Operasyon',
       items: [
         { href: '/admin/orders', label: t('admin.menu.orders') || 'Siparişler', icon: ShoppingCart },
+        { href: '/admin/logistics', label: t('admin.menu.logistics') || 'Kargo & Lojistik', icon: Truck },
         { href: '/admin/returns', label: t('admin.menu.returns') || 'İadeler', icon: Undo2 },
         { href: '/admin/coupons', label: t('admin.menu.coupons') || 'Kuponlar', icon: Ticket },
       ]
@@ -73,6 +76,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       items: [
         { href: '/admin/inventory', label: t('admin.menu.inventory') || 'Stok Özeti', icon: PackageSearch },
         { href: '/admin/movements', label: t('admin.menu.movements') || 'Hareket Defteri', icon: ArrowRightLeft },
+        { href: '/admin/inventory/report', label: t('admin.menu.inventoryReport') || 'Stok Raporu', icon: PieChart },
         { href: '/admin/inventory/settings', label: t('admin.menu.inventorySettings') || 'Eşik & Ayarlar', icon: Settings },
       ]
     },
