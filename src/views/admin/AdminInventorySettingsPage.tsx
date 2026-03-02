@@ -12,18 +12,28 @@ const AdminInventorySettingsPage: React.FC = () => {
   const [resetAll, setResetAll] = React.useState<boolean>(false)
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [saving, setSaving] = React.useState<boolean>(false)
+  const [savingGeneral, setSavingGeneral] = React.useState<boolean>(false)
   const [error, setError] = React.useState<string>('')
   const [success, setSuccess] = React.useState<string>('')
+
+  // Yeni ayarlar
+  const [alertEmail, setAlertEmail] = React.useState<string>('')
+  const [alertWebhook, setAlertWebhook] = React.useState<string>('')
+  const [resTimeout, setResTimeout] = React.useState<number>(24)
+
   const [isAdmin, setIsAdmin] = React.useState<boolean>(false)
   React.useEffect(() => { (async () => { setIsAdmin(await checkAdminAccessAsync(user)) })() }, [user])
 
   const load = React.useCallback(async () => {
     try {
       setLoading(LoadState.Loading)
-      const { data, error } = await supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle()
+      const { data, error } = await supabase.from('inventory_settings').select('*').maybeSingle()
       if (error) throw error
       const val = (data?.default_low_stock_threshold as number | null)
       setDefaultThreshold(val == null ? '' : Number(val))
+      setAlertEmail(data?.alert_email || '')
+      setAlertWebhook(data?.alert_webhook_url || '')
+      setResTimeout(data?.reservation_timeout_hours || 24)
       setError('')
       setLoading(LoadState.Idle)
     } catch {
@@ -51,6 +61,31 @@ const AdminInventorySettingsPage: React.FC = () => {
       setError(msg)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function saveGeneralSettings() {
+    try {
+      setSavingGeneral(true)
+      setSuccess('')
+      setError('')
+      const { error } = await supabase.from('inventory_settings')
+        .update({
+          alert_email: alertEmail || null,
+          alert_webhook_url: alertWebhook || null,
+          reservation_timeout_hours: resTimeout || 24,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1)
+      if (error) throw error
+      setSuccess('Genel ayarlar kaydedildi')
+      await load()
+    } catch (e: unknown) {
+      console.error('saveGeneralSettings error:', e)
+      const msg = e instanceof Error ? e.message : 'Kaydedilemedi'
+      setError(msg)
+    } finally {
+      setSavingGeneral(false)
     }
   }
 
@@ -87,9 +122,66 @@ const AdminInventorySettingsPage: React.FC = () => {
         {!!success && <div className="text-sm text-green-700">{success}</div>}
       </div>
 
-      {/* İleri Aşama: Kategori/Depo bazlı eşik kuralları ve CSV import/export */}
-      <div className={`${adminCardClass} p-4`}>
-        <div className="text-sm text-slate-500">Geleceğe hazırlık: Kategori/Depo bazlı eşik kuralları ve CSV ile toplu eşik güncelleme burada yer alacak.</div>
+      <div className={`${adminCardClass} p-6 space-y-6`}>
+        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
+          Alarm ve Otomasyon Ayarları
+        </h2>
+
+        <section className="space-y-4">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">E-Posta Bildirimleri</h3>
+          <div>
+            <label className="block text-sm font-medium text-slate-500 mb-1">Kritik Stok Uyarı E-Postası</label>
+            <input
+              type="email"
+              className="w-full sm:w-2/3 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+              placeholder="ornek@sirket.com"
+              value={alertEmail}
+              onChange={e => setAlertEmail(e.target.value)}
+            />
+            <p className="text-xs text-slate-400 mt-1">Stok eşiğin altına düşünce bu adrese otomatik bilgilendirme gönderilecektir.</p>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mt-6">Webhook Entegrasyonu</h3>
+          <div>
+            <label className="block text-sm font-medium text-slate-500 mb-1">Webhook URL (Opsiyonel)</label>
+            <input
+              type="url"
+              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+              placeholder="https://api.sirketiniz.com/webhook/stok-alarm"
+              value={alertWebhook}
+              onChange={e => setAlertWebhook(e.target.value)}
+            />
+            <p className="text-xs text-slate-400 mt-1">Slack, Discord veya ERP (SAP) sistemlerinize stok alarm verisini HTTP POST ile anlık iletmek için kullanabilirsiniz.</p>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mt-6">Rezervasyon Kuralları</h3>
+          <div>
+            <label className="block text-sm font-medium text-slate-500 mb-1">Otomatik Rezervasyon İptal Süresi (Saat)</label>
+            <input
+              type="number"
+              min="1"
+              max="720"
+              className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+              value={resTimeout}
+              onChange={e => setResTimeout(parseInt(e.target.value) || 24)}
+            />
+            <p className="text-xs text-slate-400 mt-1">Siparişi tamamlanmayan rezerve ürünlerin tekrar "Satılabilir" duruma dönmesi için geçmesi gereken bekleme süresi.</p>
+          </div>
+        </section>
+
+        <div className="pt-4 border-t border-slate-100 flex justify-end">
+          <button
+            disabled={savingGeneral || !isAdmin}
+            onClick={saveGeneralSettings}
+            className={adminButtonPrimaryClass + " px-6 py-2.5"}
+          >
+            {savingGeneral ? 'Kaydediliyor...' : 'Genel Ayarları Kaydet'}
+          </button>
+        </div>
       </div>
     </div>
   )

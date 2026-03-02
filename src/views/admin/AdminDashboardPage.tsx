@@ -9,7 +9,8 @@ import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
-import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2 } from 'lucide-react'
+import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
+import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2, BellRing, Database } from 'lucide-react'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -32,6 +33,11 @@ const AdminDashboardPage: React.FC = () => {
   const [shipAges, setShipAges] = React.useState<Array<{ bucket: string; count: number }>>([])
   const [returnsWeekly, setReturnsWeekly] = React.useState<Array<{ week: string; count: number }>>([])
   const [activityData, setActivityData] = React.useState<Array<{ day: number; hour: number; count: number }>>([])
+
+  // Yeni Dashboard Kartları
+  const [tiedCapital, setTiedCapital] = React.useState<number | null>(null)
+  const [abcDist, setAbcDist] = React.useState<Array<{ name: string; value: number; color: string }>>([])
+  const [alarmCount, setAlarmCount] = React.useState<number | null>(null)
 
   const rangeStartISO = React.useMemo(() => {
     const now = new Date()
@@ -117,8 +123,38 @@ const AdminDashboardPage: React.FC = () => {
           .select('requested_at')
           .in('status', ['requested', 'approved', 'in_transit', 'received'])
           .gte('requested_at', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString())
-          .limit(5000)
+          .limit(5000),
+        // Envanter özetleri: Bağlı Sermaye, ABC, Alarmlar
+        supabase
+          .from('products')
+          .select('stock_qty, price, abc_class, low_stock_threshold')
+          .is('parent_id', null)
+          .gt('stock_qty', 0) // Sadece stoku olan veya eksi olan (genelde 0 üstü sermaye sayılır ama alarm için 0'lar da önemli, o yüzden .gt(stock_qty, -9999) diyebiliriz. Veya limitsiz çekelim)
       ])
+
+      // ... Stok verilerini ayrı bir state veya call ile çeksek daha güvenli? (Fazla ürün yoksa sorun olmaz)
+      const productsRes = await supabase.from('products').select('stock_qty, price, abc_class, low_stock_threshold').is('parent_id', null)
+      if (!productsRes.error && productsRes.data) {
+        const prods = productsRes.data as any[]
+
+        // Bağlı Sermaye
+        const capital = prods.reduce((acc, p) => acc + ((p.stock_qty || 0) > 0 ? (p.stock_qty * (p.price || 0)) : 0), 0)
+        setTiedCapital(capital)
+
+        // Alarm sayısı (stoku eşik altında olanlar)
+        const alarms = prods.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length
+        setAlarmCount(alarms)
+
+        // ABC
+        const a = prods.filter(p => p.abc_class === 'A').length
+        const b = prods.filter(p => p.abc_class === 'B').length
+        const c = prods.filter(p => p.abc_class === 'C').length
+        setAbcDist([
+          { name: 'A', value: a, color: '#10b981' }, // emerald
+          { name: 'B', value: b, color: '#3b82f6' }, // blue
+          { name: 'C', value: c, color: '#f59e0b' }  // amber
+        ])
+      }
 
       if (ordersRes.error) throw ordersRes.error
 
@@ -323,6 +359,14 @@ const AdminDashboardPage: React.FC = () => {
             return undefined;
           })()}
         />
+        <StatCard title="Bağlı Sermaye (Envanter Değeri)" value={tiedCapital} loading={loading} isCurrency lang={lang} icon={<Database size={24} strokeWidth={1.5} />} />
+        <StatCard
+          title="Stok Alarmları (Kritik Stok)"
+          value={alarmCount}
+          loading={loading}
+          href="/admin/inventory"
+          icon={<BellRing size={24} strokeWidth={1.5} className="text-rose-500" />}
+        />
       </section>
 
       {/* Primary Chart Area */}
@@ -467,6 +511,11 @@ const AdminDashboardPage: React.FC = () => {
             )}
           </div>
         </div>
+      </section>
+
+      {/* ABC Sınıflandırması */}
+      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
+        <AbcPieChart data={abcDist} />
       </section>
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">

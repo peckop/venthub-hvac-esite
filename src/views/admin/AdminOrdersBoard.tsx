@@ -58,6 +58,64 @@ function getEffectiveStatus(order: AdminOrderRow): string {
     return order.status || 'pending'
 }
 
+// --- Stepper Bileşeni ---
+function OrderStepper({ status }: { status: string }) {
+    const steps = [
+        { key: 'pending', label: 'Alındı' },
+        { key: 'paid', label: 'Ödendi' },
+        { key: 'confirmed', label: 'Hazırlanıyor' },
+        { key: 'shipped', label: 'Kargoda' },
+        { key: 'delivered', label: 'Teslim' }
+    ]
+
+    const getStepIndex = (s: string) => {
+        if (s === 'completed' || s === 'delivered') return 4
+        if (s === 'shipped') return 3
+        if (s === 'confirmed' || s === 'processing') return 2
+        if (s === 'paid') return 1
+        return 0 // pending
+    }
+
+    const currentIndex = getStepIndex(status)
+    const isCancelled = status === 'cancelled' || status === 'refunded' || status === 'partial_refunded'
+
+    if (isCancelled) {
+        return (
+            <div className="bg-rose-50 border border-rose-100 p-3 rounded-lg flex items-center gap-2 text-rose-700 text-xs font-bold">
+                <XCircle size={16} /> Sipariş iptal veya iade edilmiş.
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex items-center justify-between relative mt-2 mb-4">
+            <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 -z-10"></div>
+            <div className="absolute left-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-primary-navy -z-10 transition-all duration-500" style={{ width: `${(Math.min(currentIndex, 4) / 4) * 80}%` }}></div>
+
+            {steps.map((step, idx) => {
+                const isPast = idx < currentIndex
+                const isCurrent = idx === currentIndex
+                const isFuture = idx > currentIndex
+
+                return (
+                    <div key={step.key} className="flex flex-col items-center gap-1.5 z-10 w-1/5">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ring-4 ring-white transition-all
+                            ${isPast ? 'bg-primary-navy text-white' :
+                                isCurrent ? 'bg-primary-navy text-white ring-primary-navy/20 scale-125' :
+                                    'bg-slate-200 text-slate-400'}`}
+                        >
+                            {isPast ? <CheckCircle2 size={12} strokeWidth={3} /> : (idx + 1)}
+                        </div>
+                        <span className={`text-[10px] font-bold text-center ${isCurrent ? 'text-primary-navy' : isPast ? 'text-slate-600' : 'text-slate-400'}`}>
+                            {step.label}
+                        </span>
+                    </div>
+                )
+            })}
+        </div>
+    )
+}
+
 // --- Mini Detay Paneli ---
 interface OrderDetail {
     notes: { id: string; note: string; created_at: string }[]
@@ -140,6 +198,12 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
                         <div className="py-8 text-center text-slate-400 animate-pulse">Yükleniyor...</div>
                     ) : detail ? (
                         <>
+                            {/* Durum Takibi */}
+                            <section>
+                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Durum Takibi</h4>
+                                <OrderStepper status={getEffectiveStatus(order)} />
+                            </section>
+
                             {/* Müşteri Bilgileri */}
                             <section>
                                 <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Müşteri</h4>
@@ -153,10 +217,13 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
                             {/* Kargo Bilgisi */}
                             {(detail.carrier || detail.tracking_number) && (
                                 <section>
-                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Kargo</h4>
-                                    <div className="text-sm bg-sky-50 p-3 rounded-lg border border-sky-100">
-                                        <span className="font-bold text-sky-700">{detail.carrier || '-'}</span>
-                                        {detail.tracking_number && <span className="ml-2 font-mono text-xs text-sky-600">{detail.tracking_number}</span>}
+                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Kargo Bilgileri</h4>
+                                    <div className="text-sm bg-sky-50 p-3 rounded-lg border border-sky-100 flex justify-between items-center">
+                                        <div>
+                                            <span className="font-bold text-sky-700">{detail.carrier || '-'}</span>
+                                            {detail.tracking_number && <span className="ml-2 font-mono text-xs text-sky-600">{detail.tracking_number}</span>}
+                                        </div>
+                                        <Truck className="text-sky-400 w-5 h-5" />
                                     </div>
                                 </section>
                             )}
