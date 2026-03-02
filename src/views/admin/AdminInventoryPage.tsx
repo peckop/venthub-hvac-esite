@@ -837,6 +837,8 @@ const AdminInventoryPage: React.FC = () => {
           <meta charset="utf-8">
           <title>Etiket Yazdir - ${safeSku}</title>
           <style>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
             @page {
               size: 50mm 40mm;
               margin: 0;
@@ -847,7 +849,7 @@ const AdminInventoryPage: React.FC = () => {
               margin: 0;
               padding: 1.5mm 2mm;
               box-sizing: border-box;
-              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
               display: flex;
               flex-direction: column;
               align-items: center;
@@ -856,35 +858,98 @@ const AdminInventoryPage: React.FC = () => {
               background: white;
               color: black;
             }
-            .qr {
-              width: 17mm;
-              height: 17mm;
-              margin-bottom: 2mm;
+            .qr-wrapper {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-bottom: 1.5mm;
+              margin-top: 0.5mm;
               flex-shrink: 0;
+            }
+            .qr {
+              width: 17.5mm;
+              height: 17.5mm;
+              display: block;
             }
             .title {
               font-size: 8pt;
-              font-weight: 700;
-              line-height: 1.25;
+              font-weight: 800;
+              letter-spacing: -0.2px;
+              line-height: 1.15;
               margin: 0 0 1.5mm 0;
               width: 100%;
+              text-transform: uppercase;
+              flex-shrink: 0;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            .separator {
+              width: 85%;
+              height: 1px;
+              background-color: #e2e8f0;
+              border-bottom: 0.5px solid #000;
+              margin: 0 auto 1.5mm auto;
               flex-shrink: 0;
             }
-            .meta {
-              font-size: 7.5pt;
-              line-height: 1.3;
-              margin: 0;
+            .meta-grid {
+              display: flex;
+              width: 100%;
+              justify-content: space-around;
+              align-items: flex-end;
               flex-shrink: 0;
+              margin-bottom: 1.5mm;
+            }
+            .meta-item {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 0.5mm;
+            }
+            .meta-label {
+              font-size: 5.5pt;
+              color: #475569;
+              text-transform: uppercase;
+              font-weight: 600;
+              letter-spacing: 0.3px;
+            }
+            .meta-value {
+              font-weight: 800;
+              font-size: 7.5pt;
+              color: #000;
+            }
+            .meta-footer {
+              font-size: 7pt;
+              font-weight: 700;
+              text-transform: uppercase;
+              background-color: #f1f5f9;
+              padding: 0.5mm 3mm;
+              border-radius: 2mm;
+              border: 0.5px solid #cbd5e1;
+              flex-shrink: 0;
+              display: inline-block;
             }
           </style>
         </head>
         <body>
-          <img src="${url}" class="qr" onload="window.print();" />
+          <div class="qr-wrapper">
+            <img src="${url}" class="qr" onload="window.print();" />
+          </div>
           <div class="title">${safeName}</div>
-          <div class="meta">
-            SKU: ${safeSku}<br/>
-            Raf: ${safeLoc}<br/>
-            Stok: ${r.physical_stock}
+          <div class="separator"></div>
+          <div class="meta-grid">
+            <div class="meta-item">
+              <span class="meta-label">SKU Kodu</span>
+              <span class="meta-value">${safeSku}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Depo Rafı</span>
+              <span class="meta-value">${safeLoc}</span>
+            </div>
+          </div>
+          <div class="meta-footer">
+            MEVCUT STOK: ${r.physical_stock} ADET
           </div>
         </body>
         </html>
