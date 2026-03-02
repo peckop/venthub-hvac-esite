@@ -845,7 +845,7 @@ const AdminInventoryPage: React.FC = () => {
               width: 50mm;
               height: 40mm;
               margin: 0;
-              padding: 2mm 3mm;
+              padding: 1.5mm 2mm;
               box-sizing: border-box;
               font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
               display: flex;
@@ -860,23 +860,21 @@ const AdminInventoryPage: React.FC = () => {
               width: 17mm;
               height: 17mm;
               margin-bottom: 2mm;
-              margin-top: 1mm;
+              flex-shrink: 0;
             }
             .title {
               font-size: 8pt;
               font-weight: 700;
-              line-height: 1.15;
+              line-height: 1.25;
               margin: 0 0 1.5mm 0;
               width: 100%;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
+              flex-shrink: 0;
             }
             .meta {
-              font-size: 7pt;
+              font-size: 7.5pt;
               line-height: 1.3;
               margin: 0;
+              flex-shrink: 0;
             }
           </style>
         </head>
