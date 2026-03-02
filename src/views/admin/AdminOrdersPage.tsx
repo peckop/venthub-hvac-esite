@@ -715,27 +715,40 @@ function safeDate(iso: string, lang: any = 'tr') {
 }
 
 function prettyStatus(s: string, t: any) {
-  switch (s) {
+  if (!s) return s
+  const key = s.toLowerCase()
+  switch (key) {
+    case 'pending': return t('admin.orders.statusLabels.pending')
     case 'paid': return t('admin.orders.statusLabels.paid')
     case 'confirmed': return t('admin.orders.statusLabels.confirmed')
     case 'shipped': return t('admin.orders.statusLabels.shipped')
+    case 'delivered': return t('admin.orders.statusLabels.delivered')
     case 'cancelled': return t('admin.orders.statusLabels.cancelled')
+    case 'refunded': return t('admin.orders.statusLabels.refunded')
+    case 'partial_refunded': return t('admin.orders.statusLabels.partialRefunded')
     default: return s
   }
 }
 
 function badgeClass(s: string) {
+  if (!s) return 'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-full border shadow-sm bg-slate-50 text-slate-600 border-slate-200/50 ring-1 ring-slate-500/10'
   const base = 'inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-full border shadow-sm'
-  switch (s) {
+  const key = s.toLowerCase()
+  switch (key) {
+    case 'pending':
+      return `${base} bg-slate-50 text-slate-700 border-slate-200/50 ring-1 ring-slate-600/10`
     case 'paid':
       return `${base} bg-emerald-50 text-emerald-700 border-emerald-200/50 ring-1 ring-emerald-600/10`
     case 'confirmed':
       return `${base} bg-sky-50 text-sky-700 border-sky-200/50 ring-1 ring-sky-600/10`
     case 'shipped':
       return `${base} bg-indigo-50 text-indigo-700 border-indigo-200/50 ring-1 ring-indigo-600/10`
+    case 'delivered':
+      return `${base} bg-purple-50 text-purple-700 border-purple-200/50 ring-1 ring-purple-600/10`
     case 'cancelled':
       return `${base} bg-rose-50 text-rose-700 border-rose-200/50 ring-1 ring-rose-600/10`
     case 'refunded':
+    case 'partial_refunded':
       return `${base} bg-amber-50 text-amber-700 border-amber-200/50 ring-1 ring-amber-600/10`
     default:
       return `${base} bg-slate-50 text-slate-600 border-slate-200/50 ring-1 ring-slate-500/10`
