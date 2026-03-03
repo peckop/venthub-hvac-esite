@@ -3,9 +3,16 @@ import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
 import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp } from 'lucide-react'
+import DateRangePicker from '../../components/admin/DateRangePicker'
+import { DateRange } from 'react-day-picker'
+import { endOfDay, startOfDay, subDays } from 'date-fns'
 
 export default function AdminInventoryReportPage() {
     const [loading, setLoading] = React.useState(true)
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+        from: subDays(startOfDay(new Date()), 30),
+        to: endOfDay(new Date())
+    })
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
     const [topProducts, setTopProducts] = React.useState<{ name: string, amount: number }[]>([])
@@ -14,13 +21,15 @@ export default function AdminInventoryReportPage() {
         async function loadData() {
             try {
                 setLoading(true)
-                const THIRTY_DAYS_AGO = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-                // 1. Son 30 günlük tüm hareketleri çek
-                const { data: movements, error: movementsError } = await supabase
+                let query = supabase
                     .from('inventory_movements')
                     .select('delta, reason, product_id, products(name)')
-                    .gte('created_at', THIRTY_DAYS_AGO)
+
+                if (dateRange?.from) query = query.gte('created_at', dateRange.from.toISOString())
+                if (dateRange?.to) query = query.lte('created_at', endOfDay(dateRange.to).toISOString())
+
+                const { data: movements, error: movementsError } = await query
 
                 if (movementsError) throw movementsError
 
@@ -69,15 +78,18 @@ export default function AdminInventoryReportPage() {
             }
         }
         void loadData()
-    }, [])
+    }, [dateRange])
 
     if (loading) return <div className="p-8 text-slate-500 animate-pulse">Raporlar hesaplanıyor...</div>
 
     return (
         <div className="space-y-6 max-w-[1400px]">
-            <div>
-                <h1 className={adminSectionTitleClass}>📊 Stok Hareket Raporu (Son 30 Gün)</h1>
-                <p className="text-slate-500 text-sm mt-1">Depo giriş/çıkış trendleri ve en çok satan ürünlerin özeti.</p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className={adminSectionTitleClass}>📊 Stok Hareket Raporu</h1>
+                    <p className="text-slate-500 text-sm mt-1">Depo giriş/çıkış trendleri ve en çok satan ürünlerin özeti.</p>
+                </div>
+                <DateRangePicker value={dateRange} onChange={setDateRange} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

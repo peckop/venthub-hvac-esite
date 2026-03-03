@@ -8,6 +8,9 @@ import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import DateRangePicker from '../../components/admin/DateRangePicker'
+import { DateRange } from 'react-day-picker'
+import { endOfDay } from 'date-fns'
 
 type Movement = {
   id: string
@@ -65,6 +68,7 @@ const AdminMovementsPage: React.FC = () => {
   const [sortKey, setSortKey] = React.useState<SortKey>('date')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
   const [batchFilter, setBatchFilter] = React.useState<string>('')
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>()
 
   const load = React.useCallback(async (pageNum: number) => {
     try {
@@ -78,6 +82,8 @@ const AdminMovementsPage: React.FC = () => {
         .from('inventory_movements')
         .select('id, product_id, delta, reason, order_id, created_at, batch_id', { count: 'exact' })
       if (batchFilter) query = query.eq('batch_id', batchFilter)
+      if (dateRange?.from) query = query.gte('created_at', dateRange.from.toISOString())
+      if (dateRange?.to) query = query.lte('created_at', endOfDay(dateRange.to).toISOString())
       const { data, error, count } = await query
         .order('created_at', { ascending: false })
         .range(from, to)
@@ -118,7 +124,7 @@ const AdminMovementsPage: React.FC = () => {
       setHasMore(false)
       setLoading(LoadState.Error)
     }
-  }, [batchFilter, t])
+  }, [batchFilter, dateRange, t])
 
   React.useEffect(() => { load(page) }, [load, page])
 
@@ -304,11 +310,13 @@ const AdminMovementsPage: React.FC = () => {
           setPage(1);
           setQ('');
           setSelectedCategory('');
+          setDateRange(undefined);
           setReasonFilter(Object.fromEntries(ALL_REASONS.map(r => [r, true])) as Record<string, boolean>);
         }}
         recordCount={filtered.length}
         rightExtra={(
           <div className="flex items-center gap-2">
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
             <ExportMenu items={[
               { key: 'csv', label: t('admin.movements.export.csvLabel'), onSelect: exportCsv },
               { key: 'xls', label: t('admin.orders.export.xlsLabel'), onSelect: exportXls }
