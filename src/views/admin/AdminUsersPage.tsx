@@ -4,12 +4,13 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { checkAdminAccess, listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
+import { listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
+import { useRole } from '../../hooks/useRole'
 
 interface AdminUser {
   id: string
@@ -45,28 +46,14 @@ export default function AdminUsersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [updatingRole, setUpdatingRole] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'admins' | 'all'>('admins')
-  const [actorRole, setActorRole] = useState<'user' | 'moderator' | 'admin' | 'superadmin'>('user')
 
-  // Admin kontrolü
-  useEffect(() => {
-    setIsAdmin(checkAdminAccess(user))
-  }, [user])
+  const { role, canWrite } = useRole()
+  const hasWriteAccess = canWrite('users')
 
-  // Aktör rolünü yükle (yetki kontrolleri için)
+  // Use the global role state instead of local checks
   useEffect(() => {
-    (async () => {
-      try {
-        if (user?.id) {
-          const role = await getUserRole(user.id)
-          if (role === 'superadmin' || role === 'admin' || role === 'moderator') {
-            setActorRole(role as 'user' | 'moderator' | 'admin' | 'superadmin')
-          } else {
-            setActorRole('user')
-          }
-        }
-      } catch { }
-    })()
-  }, [user?.id])
+    setIsAdmin(!!role && (role === 'super_admin' || role === 'admin'))
+  }, [role])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -136,8 +123,11 @@ export default function AdminUsersPage() {
     loadAllUsers()
   }, [isAdmin, user, activeTab, _t])
 
-  const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'moderator' | 'superadmin') => {
-    if (!isAdmin) return
+  const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') => {
+    if (!hasWriteAccess) {
+      toast.error('Kullanıcı rolleri değiştirme yetkiniz yok.')
+      return
+    }
 
     try {
       setUpdatingRole(userId)
@@ -193,20 +183,22 @@ export default function AdminUsersPage() {
     user.vkn?.includes(searchQuery)
   )
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'superadmin': return <Crown className="text-purple-600" size={14} />
+  const getRoleIcon = (roleCode: string) => {
+    switch (roleCode) {
+      case 'super_admin': return <Crown className="text-purple-600" size={14} />
       case 'admin': return <Shield className="text-indigo-600" size={14} />
-      case 'moderator': return <ShieldCheck className="text-sky-600" size={14} />
+      case 'warehouse':
+      case 'sales': return <ShieldCheck className="text-sky-600" size={14} />
       default: return <Users className="text-slate-500" size={14} />
     }
   }
 
-  const getRoleColor = (role: string): string => {
-    switch (role) {
-      case 'superadmin': return 'bg-purple-50 text-purple-700 border-purple-200/50 ring-1 ring-purple-600/10'
+  const getRoleColor = (roleCode: string): string => {
+    switch (roleCode) {
+      case 'super_admin': return 'bg-purple-50 text-purple-700 border-purple-200/50 ring-1 ring-purple-600/10'
       case 'admin': return 'bg-indigo-50 text-indigo-700 border-indigo-200/50 ring-1 ring-indigo-600/10'
-      case 'moderator': return 'bg-sky-50 text-sky-700 border-sky-200/50 ring-1 ring-sky-600/10'
+      case 'warehouse':
+      case 'sales': return 'bg-sky-50 text-sky-700 border-sky-200/50 ring-1 ring-sky-600/10'
       default: return 'bg-slate-50 text-slate-600 border-slate-200/50 ring-1 ring-slate-500/10'
     }
   }
@@ -395,40 +387,30 @@ export default function AdminUsersPage() {
                     {activeTab === 'all' && visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
                         <div className="flex gap-1.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                          {userItem.role !== 'superadmin' && actorRole === 'superadmin' && (
+                          {userItem.role !== 'super_admin' && role === 'super_admin' && (
                             <button
-                              onClick={() => handleRoleChange(userItem.id, 'superadmin')}
-                              disabled={updatingRole === userItem.id}
+                              onClick={() => handleRoleChange(userItem.id, 'super_admin')}
+                              disabled={updatingRole === userItem.id || !hasWriteAccess}
                               className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-purple-50 text-purple-600 border-purple-200/50 hover:bg-purple-100"
                               title="Süperadmin yap"
                             >
                               <Crown size={14} strokeWidth={2.5} />
                             </button>
                           )}
-                          {userItem.role !== 'admin' && (actorRole === 'superadmin' || actorRole === 'admin') && (
+                          {userItem.role !== 'admin' && (role === 'super_admin' || role === 'admin') && (
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'admin')}
-                              disabled={updatingRole === userItem.id}
+                              disabled={updatingRole === userItem.id || !hasWriteAccess}
                               className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200/50 hover:bg-indigo-100"
                               title="Admin yap"
                             >
                               <Shield size={14} strokeWidth={2.5} />
                             </button>
                           )}
-                          {userItem.role !== 'moderator' && (actorRole === 'superadmin' || actorRole === 'admin') && (
-                            <button
-                              onClick={() => handleRoleChange(userItem.id, 'moderator')}
-                              disabled={updatingRole === userItem.id}
-                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-sky-50 text-sky-600 border-sky-200/50 hover:bg-sky-100"
-                              title="Moderatör yap"
-                            >
-                              <ShieldCheck size={14} strokeWidth={2.5} />
-                            </button>
-                          )}
-                          {userItem.role !== 'user' && actorRole === 'superadmin' && (
+                          {userItem.role !== 'user' && role === 'super_admin' && (
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'user')}
-                              disabled={updatingRole === userItem.id || userItem.id === user?.id}
+                              disabled={updatingRole === userItem.id || userItem.id === user?.id || !hasWriteAccess}
                               className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
                               title="Normal kullanıcı yap"
                             >

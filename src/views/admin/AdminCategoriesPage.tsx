@@ -8,6 +8,7 @@ import { Plus } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
 import toast from 'react-hot-toast'
+import { useRole } from '../../hooks/useRole'
 
 // Lazy load menus
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))
@@ -32,6 +33,9 @@ const AdminCategoriesPage: React.FC = () => {
   const [q, setQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('categories')
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -121,10 +125,12 @@ const AdminCategoriesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className={adminSectionTitleClass}>{t('admin.titles.categories') ?? 'Kategoriler'}</h1>
-        <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
-          <Plus size={18} />
-          <span>Yeni Kategori</span>
-        </button>
+        {hasWriteAccess && (
+          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
+            <Plus size={18} />
+            <span>Yeni Kategori</span>
+          </button>
+        )}
       </div>
 
       <AdminToolbar
@@ -221,19 +227,23 @@ const AdminCategoriesPage: React.FC = () => {
                         <div className="flex items-center">
                           {r.parent_id && <span className="text-slate-300 mr-2">└─</span>}
                           <div className={r.parent_id ? 'pl-1' : ''}>
-                            <EditableCell
-                              value={r.name}
-                              placeholder="Kategori Adı"
-                              inputWidth="w-full"
-                              className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}
-                              onSave={async (val) => {
-                                if (!val || r.name === val) return
-                                const { error } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
-                                if (error) throw error
-                                setRows(prev => prev.map(row => row.id === r.id ? { ...row, name: val } : row))
-                                toast.success('Kategori adı güncellendi')
-                              }}
-                            />
+                            {hasWriteAccess ? (
+                              <EditableCell
+                                value={r.name}
+                                placeholder="Kategori Adı"
+                                inputWidth="w-full"
+                                className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}
+                                onSave={async (val) => {
+                                  if (!val || r.name === val) return
+                                  const { error } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
+                                  if (error) throw error
+                                  setRows(prev => prev.map(row => row.id === r.id ? { ...row, name: val } : row))
+                                  toast.success('Kategori adı güncellendi')
+                                }}
+                              />
+                            ) : (
+                              <span className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}>{r.name}</span>
+                            )}
                           </div>
                           {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
                         </div>
@@ -241,22 +251,26 @@ const AdminCategoriesPage: React.FC = () => {
                     )}
                     {visibleCols.sortOrder && (
                       <td className={`${adminTableCellClass} ${cellPad} text-center`}>
-                        <EditableCell
-                          value={r.sort_order?.toString() || '0'}
-                          placeholder="0"
-                          type="number"
-                          inputWidth="w-16"
-                          onSave={async (val) => {
-                            const num = parseInt(val || '0', 10)
-                            if (isNaN(num)) return
-                            if (r.sort_order === num) return
-                            const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
-                            if (error) throw error
-                            setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
-                            toast.success('Sıra güncellendi')
-                            load()
-                          }}
-                        />
+                        {hasWriteAccess ? (
+                          <EditableCell
+                            value={r.sort_order?.toString() || '0'}
+                            placeholder="0"
+                            type="number"
+                            inputWidth="w-16"
+                            onSave={async (val) => {
+                              const num = parseInt(val || '0', 10)
+                              if (isNaN(num)) return
+                              if (r.sort_order === num) return
+                              const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
+                              if (error) throw error
+                              setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
+                              toast.success('Sıra güncellendi')
+                              load()
+                            }}
+                          />
+                        ) : (
+                          <span>{r.sort_order || 0}</span>
+                        )}
                       </td>
                     )}
                     {visibleCols.slug && <td className={`${adminTableCellClass} ${cellPad} text-gray-500`}>{r.slug}</td>}
@@ -265,8 +279,17 @@ const AdminCategoriesPage: React.FC = () => {
                     {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2">
-                          <button className={adminTableActionClass} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
-                          <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
+                          <button
+                            className={adminTableActionClass}
+                            onClick={() => handleEdit(r)}
+                            disabled={!hasWriteAccess}
+                            title={!hasWriteAccess ? "Düzenleme yetkiniz yok" : ""}
+                          >
+                            {t('admin.ui.edit') || 'Düzenle'}
+                          </button>
+                          {hasWriteAccess && (
+                            <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
+                          )}
                         </div>
                       </td>
                     )}

@@ -2,7 +2,7 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useAuth } from '../../hooks/useAuth'
-import { checkAdminAccessAsync } from '../../config/admin'
+import { useRole } from '../../hooks/useRole'
 
 enum LoadState { Idle, Loading, Error }
 
@@ -21,8 +21,8 @@ const AdminInventorySettingsPage: React.FC = () => {
   const [alertWebhook, setAlertWebhook] = React.useState<string>('')
   const [resTimeout, setResTimeout] = React.useState<number>(24)
 
-  const [isAdmin, setIsAdmin] = React.useState<boolean>(false)
-  React.useEffect(() => { (async () => { setIsAdmin(await checkAdminAccessAsync(user)) })() }, [user])
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('inventory_settings')
 
   const load = React.useCallback(async () => {
     try {
@@ -93,10 +93,10 @@ const AdminInventorySettingsPage: React.FC = () => {
     <div className="space-y-6">
       <h1 className={adminSectionTitleClass}>Eşik & Ayarlar</h1>
 
-      {!isAdmin && (
+      {!hasWriteAccess && (
         <div className={`${adminCardClass} p-4 border-amber-300 bg-amber-50`}>
           <div className="text-sm text-amber-800">
-            Bu sayfada değişiklik yapmak için admin olarak giriş yapmalısınız. Lütfen giriş yapın ve tekrar deneyin.
+            Bu sayfada değişiklik yapmak yetkisizsiniz. Sadece görüntüleyebilirsiniz.
           </div>
         </div>
       )}
@@ -106,7 +106,7 @@ const AdminInventorySettingsPage: React.FC = () => {
           <label className="block text-sm font-bold text-slate-500 uppercase tracking-tight mb-2">Varsayılan Düşük Stok Eşiği</label>
           <div className="flex items-center gap-3">
             <input type="number" className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
-            <button className={adminButtonPrimaryClass} disabled={saving || !isAdmin} onClick={save}>Uygula</button>
+            <button className={adminButtonPrimaryClass} disabled={saving || !hasWriteAccess} onClick={save}>Uygula</button>
           </div>
           <label className="mt-4 flex items-center gap-3 text-sm font-medium text-slate-600 cursor-pointer group">
             <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
@@ -175,7 +175,7 @@ const AdminInventorySettingsPage: React.FC = () => {
 
         <div className="pt-4 border-t border-slate-100 flex justify-end">
           <button
-            disabled={savingGeneral || !isAdmin}
+            disabled={savingGeneral || !hasWriteAccess}
             onClick={saveGeneralSettings}
             className={adminButtonPrimaryClass + " px-6 py-2.5"}
           >

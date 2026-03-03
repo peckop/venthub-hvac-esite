@@ -77,7 +77,7 @@ export async function getUserRole(userId: string): Promise<string> {
  */
 export async function isUserAdminAsync(userId: string): Promise<boolean> {
   const role = await getUserRole(userId)
-  return role === 'admin' || role === 'moderator' || role === 'superadmin'
+  return ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(role)
 }
 
 /**
@@ -108,7 +108,7 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
 
   // 1) Supabase metadata rolü
   const metadataRole = user.user_metadata?.role
-  if (metadataRole === 'admin' || metadataRole === 'moderator' || metadataRole === 'superadmin') {
+  if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {
     return true
   }
 
@@ -157,7 +157,7 @@ export async function checkAdminAccessAsync(user: { id?: string; email?: string 
  * Kullanıcıya admin rolü ata (sadece client tarafında bilgi için)
  * Gerçek database güncellemesi için admin paneli gerekir
  */
-export async function setUserAdminRole(userId: string, role: 'user' | 'admin' | 'moderator' | 'superadmin'): Promise<boolean> {
+export async function setUserAdminRole(userId: string, role: string): Promise<boolean> {
   try {
     const { supabase } = await import('../lib/supabase')
     // Database RPC (SECURITY DEFINER) – sunucu tarafında gerçek rol ataması

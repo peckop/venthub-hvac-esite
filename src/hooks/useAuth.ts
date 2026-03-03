@@ -8,6 +8,7 @@ export function useAuth() {
     return {
       user: null,
       session: null,
+      role: null,
       loading: false,
       signIn: async () => ({ error: { message: 'Auth not available' } }),
       signUp: async () => ({ error: { message: 'Auth not available' } }),
