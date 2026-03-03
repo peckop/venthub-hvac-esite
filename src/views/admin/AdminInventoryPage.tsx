@@ -9,6 +9,7 @@ import InfoTooltip from '../../components/admin/InfoTooltip'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
+import { useRole } from '../../hooks/useRole'
 
 type Row = {
   product_id: string;
@@ -33,6 +34,9 @@ enum LoadState { Idle, Loading, Error }
 
 const AdminInventoryPage: React.FC = () => {
   const { t } = useI18n()
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('inventory')
+
   const [rows, setRows] = React.useState<Row[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
   const [error, setError] = React.useState<string>('')
@@ -979,9 +983,11 @@ const AdminInventoryPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className={adminSectionTitleClass}>{t('admin.titles.inventory') ?? 'Stok Özeti'}</h1>
-        <button onClick={() => window.location.href = '/admin/inventory/settings'} className={adminButtonPrimaryClass}>
-          Stok Ayarları
-        </button>
+        {hasWriteAccess && (
+          <button onClick={() => window.location.href = '/admin/inventory/settings'} className={adminButtonPrimaryClass}>
+            Stok Ayarları
+          </button>
+        )}
       </div>
 
       <AdminToolbar
@@ -1003,12 +1009,14 @@ const AdminInventoryPage: React.FC = () => {
         recordCount={filteredRows.length}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCsvImportOpen(true)}
-              className={`${adminButtonPrimaryClass} shadow-md shadow-primary-navy/10`}
-            >
-              CSV İçe Aktar
-            </button>
+            {hasWriteAccess && (
+              <button
+                onClick={() => setCsvImportOpen(true)}
+                className={`${adminButtonPrimaryClass} shadow-md shadow-primary-navy/10`}
+              >
+                CSV İçe Aktar
+              </button>
+            )}
             <ExportMenu items={[
               {
                 key: 'csv', label: 'CSV Aktar', onSelect: () => {
@@ -1165,35 +1173,43 @@ const AdminInventoryPage: React.FC = () => {
                       {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
                       {visibleCols.location && (
                         <td className={adminTableCellClass + " " + cellPad}>
-                          <EditableCell
-                            value={r.warehouse_location || ''}
-                            placeholder="-"
-                            inputWidth="w-20"
-                            onSave={async (val) => {
-                              if (r.warehouse_location === val) return
-                              const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
-                              if (error) throw error
-                              setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
-                              toast.success('Raf konumu güncellendi')
-                            }}
-                          />
+                          {hasWriteAccess ? (
+                            <EditableCell
+                              value={r.warehouse_location || ''}
+                              placeholder="-"
+                              inputWidth="w-20"
+                              onSave={async (val) => {
+                                if (r.warehouse_location === val) return
+                                const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
+                                if (error) throw error
+                                setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
+                                toast.success('Raf konumu güncellendi')
+                              }}
+                            />
+                          ) : (
+                            <span className="w-20 inline-block">{r.warehouse_location || '-'}</span>
+                          )}
                         </td>
                       )}
                       {visibleCols.supplier && (
                         <td className={adminTableCellClass + " " + cellPad}>
-                          <EditableCell
-                            value={r.supplier_name || ''}
-                            placeholder="-"
-                            inputWidth="w-24"
-                            className="max-w-[120px] truncate block"
-                            onSave={async (val) => {
-                              if (r.supplier_name === val) return
-                              const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
-                              if (error) throw error
-                              setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
-                              toast.success('Tedarikçi güncellendi')
-                            }}
-                          />
+                          {hasWriteAccess ? (
+                            <EditableCell
+                              value={r.supplier_name || ''}
+                              placeholder="-"
+                              inputWidth="w-24"
+                              className="max-w-[120px] truncate block"
+                              onSave={async (val) => {
+                                if (r.supplier_name === val) return
+                                const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
+                                if (error) throw error
+                                setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
+                                toast.success('Tedarikçi güncellendi')
+                              }}
+                            />
+                          ) : (
+                            <span className="max-w-[120px] truncate block">{r.supplier_name || '-'}</span>
+                          )}
                         </td>
                       )}
                       {visibleCols.abc && (
@@ -1241,35 +1257,43 @@ const AdminInventoryPage: React.FC = () => {
                   {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
                   {visibleCols.location && (
                     <td className={adminTableCellClass + " " + cellPad}>
-                      <EditableCell
-                        value={r.warehouse_location || ''}
-                        placeholder="-"
-                        inputWidth="w-20"
-                        onSave={async (val) => {
-                          if (r.warehouse_location === val) return
-                          const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
-                          if (error) throw error
-                          setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
-                          toast.success('Raf konumu güncellendi')
-                        }}
-                      />
+                      {hasWriteAccess ? (
+                        <EditableCell
+                          value={r.warehouse_location || ''}
+                          placeholder="-"
+                          inputWidth="w-20"
+                          onSave={async (val) => {
+                            if (r.warehouse_location === val) return
+                            const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
+                            if (error) throw error
+                            setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
+                            toast.success('Raf konumu güncellendi')
+                          }}
+                        />
+                      ) : (
+                        <span className="w-20 inline-block">{r.warehouse_location || '-'}</span>
+                      )}
                     </td>
                   )}
                   {visibleCols.supplier && (
                     <td className={adminTableCellClass + " " + cellPad}>
-                      <EditableCell
-                        value={r.supplier_name || ''}
-                        placeholder="-"
-                        inputWidth="w-24"
-                        className="max-w-[120px] truncate block"
-                        onSave={async (val) => {
-                          if (r.supplier_name === val) return
-                          const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
-                          if (error) throw error
-                          setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
-                          toast.success('Tedarikçi güncellendi')
-                        }}
-                      />
+                      {hasWriteAccess ? (
+                        <EditableCell
+                          value={r.supplier_name || ''}
+                          placeholder="-"
+                          inputWidth="w-24"
+                          className="max-w-[120px] truncate block"
+                          onSave={async (val) => {
+                            if (r.supplier_name === val) return
+                            const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
+                            if (error) throw error
+                            setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
+                            toast.success('Tedarikçi güncellendi')
+                          }}
+                        />
+                      ) : (
+                        <span className="max-w-[120px] truncate block">{r.supplier_name || '-'}</span>
+                      )}
                     </td>
                   )}
                   {visibleCols.abc && (
@@ -1371,35 +1395,39 @@ const AdminInventoryPage: React.FC = () => {
                 </section>
               )}
 
-              <section className="space-y-2">
-                <h3 className="text-sm font-bold text-slate-500 uppercase tracking-tight">Eşik Düzenle</h3>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={selectedThreshold}
-                    onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
-                    placeholder="Eşik"
-                    className="w-28 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
-                  />
-                  <button
-                    disabled={saving}
-                    onClick={() => saveThreshold(selected.product_id)}
-                    className={adminButtonPrimaryClass + " h-9 text-xs px-4"}>Uygula</button>
-                  <button
-                    disabled={saving}
-                    onClick={() => setSelectedThreshold('')}
-                    className={adminButtonSecondaryClass + " h-9 text-xs px-4 text-warning-orange border-warning-orange/30 hover:bg-warning-orange/5"}>Varsayılan</button>
-                </div>
-              </section>
+              {hasWriteAccess && (
+                <section className="space-y-2">
+                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-tight">Eşik Düzenle</h3>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={selectedThreshold}
+                      onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder="Eşik"
+                      className="w-28 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+                    />
+                    <button
+                      disabled={saving}
+                      onClick={() => saveThreshold(selected.product_id)}
+                      className={adminButtonPrimaryClass + " h-9 text-xs px-4"}>Uygula</button>
+                    <button
+                      disabled={saving}
+                      onClick={() => setSelectedThreshold('')}
+                      className={adminButtonSecondaryClass + " h-9 text-xs px-4 text-warning-orange border-warning-orange/30 hover:bg-warning-orange/5"}>Varsayılan</button>
+                  </div>
+                </section>
+              )}
 
-              <section className="space-y-2">
-                <h3 className="text-sm font-semibold text-slate-500">Hızlı Hareket</h3>
-                <div className="flex items-center gap-2">
-                  <input type="number" className="w-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={moveQty} min={1} onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))} />
-                  <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
-                  <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
-                </div>
-              </section>
+              {hasWriteAccess && (
+                <section className="space-y-2">
+                  <h3 className="text-sm font-semibold text-slate-500">Hızlı Hareket</h3>
+                  <div className="flex items-center gap-2">
+                    <input type="number" className="w-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={moveQty} min={1} onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))} />
+                    <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
+                    <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
+                  </div>
+                </section>
+              )}
 
               <section className="space-y-2">
                 <h3 className="text-sm font-semibold text-slate-500">Rezerve Eden Siparişler</h3>

@@ -22,6 +22,7 @@ import { updateOrderStatus } from '../../lib/orderStatusService'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
+import { useRole } from '../../hooks/useRole'
 
 interface AdminOrderRow {
   id: string
@@ -39,6 +40,8 @@ type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
 const AdminOrdersPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const { canWrite, isReadOnly } = useRole()
+  const hasWriteAccess = canWrite('orders')
 
   const STATUSES: { value: string; label: string }[] = React.useMemo(() => ([
     { value: '', label: t('admin.orders.statusLabels.all') },
@@ -134,6 +137,30 @@ const AdminOrdersPage: React.FC = () => {
       setPresetPendingShipments(false)
     }
   }, [searchParams])
+
+  const changeTargetStatus = React.useCallback(async (id: string, newStats: string) => {
+    if (!hasWriteAccess) {
+      toast.error('Bu işlem için yetkiniz bulunmuyor.')
+      return
+    }
+    const o = rows.find(x => x.id === id)
+    setError(null)
+    try {
+      // Merkezi servis: hem sipariş statüsünü günceller hem returns'e yansıtır hem audit log yazar
+      const res = await updateOrderStatus({
+        orderId: id,
+        newStatus: newStats,
+        oldStatus: o?.status,
+        reason: 'Sipariş Tablo Üzerinden Güncellendi',
+        auditComment: `table status update to ${newStats}`,
+      })
+      if (!res.ok) throw new Error(res.error)
+      setRows(prev => prev.map(r => r.id === id ? { ...r, status: newStats } : r))
+      toast.success(t('admin.orders.toasts.statusUpdateSuccess'))
+    } catch (e) {
+      toast.error(t('admin.orders.toasts.statusUpdateFailed'))
+    }
+  }, [hasWriteAccess, rows, t])
 
   const fetchOrders = React.useCallback(async () => {
     setLoading(true)
@@ -550,7 +577,9 @@ const AdminOrdersPage: React.FC = () => {
                         {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
                         <td className="px-4 py-3">
                           <div className="flex gap-2">
-                            <button onClick={() => openShipModal(r.id)} className={adminTableActionPrimaryClass}>{t('admin.orders.actions.shipping')}</button>
+                            {hasWriteAccess && (
+                              <button onClick={() => openShipModal(r.id)} className={adminTableActionPrimaryClass}>{t('admin.orders.actions.shipping')}</button>
+                            )}
                             <button onClick={() => openLogsModal(r.id)} className={adminTableActionWarningClass}>{t('admin.orders.actions.logs')}</button>
                             <button onClick={() => openNotesModal(r.id)} className={adminTableActionNeutralClass}>{t('admin.orders.actions.notes')}</button>
                           </div>
@@ -561,6 +590,25 @@ const AdminOrdersPage: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            {/* Toplu İşlem Toolbar */}
+            {bulkMode && hasWriteAccess && (
+              <div className="bg-primary-navy text-white px-4 py-3 rounded-xl flex items-center justify-between shadow-lg shadow-primary-navy/20 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold">{selectedIds.length} {t('admin.orders.bulk.selected')}</span>
+                  <button onClick={() => setSelectedIds([])} className="text-xs font-bold text-white/80 hover:text-white transition-colors">
+                    {t('admin.orders.bulk.clearSelection')}
+                  </button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => { setShipOpen(true); setBulkMode(true) }} className="px-4 py-2 text-sm font-bold rounded-lg bg-white text-primary-navy hover:bg-slate-100 transition-colors">
+                    <Truck size={16} className="inline-block mr-2" /> {t('admin.orders.bulk.shipSelected')}
+                  </button>
+                  <button onClick={bulkCancelShipping} className="px-4 py-2 text-sm font-bold rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition-colors">
+                    <X size={16} className="inline-block mr-2" /> {t('admin.orders.bulk.cancelShipping')}
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         </>
       )}

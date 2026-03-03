@@ -10,6 +10,7 @@ import { ProductFormModal } from '../../components/admin/products/ProductFormMod
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { ChevronDown, ChevronRight, Pencil, Plus } from 'lucide-react'
+import { useRole } from '../../hooks/useRole'
 
 interface ProductRow {
   id: string
@@ -30,6 +31,9 @@ interface CategoryOpt { id: string; name: string }
 
 const AdminProductsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('products')
+
   const searchParams = useSearchParams()
   const [rows, setRows] = React.useState<ProductRow[]>([])
   const [cats, setCats] = React.useState<CategoryOpt[]>([])
@@ -397,10 +401,12 @@ const AdminProductsPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
-        <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
-          <Plus size={18} />
-          <span>{t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}</span>
-        </button>
+        {hasWriteAccess && (
+          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
+            <Plus size={18} />
+            <span>{t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}</span>
+          </button>
+        )}
       </div>
 
       {/* SIMPLE DIRECT SEARCH INPUT - NO ADMIN TOOLBAR COMPLEXITY */}
@@ -440,18 +446,22 @@ const AdminProductsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e) => {
-              const f = e.target.files?.[0]
-              if (!f) return
-              const text = await f.text()
-              const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim().length > 0)
-              const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
-              const header = split(lines[0]).map(h => h.trim().toLowerCase())
-              const rows = lines.slice(1).map(l => { const cells = split(l); const obj: Record<string, string> = {}; header.forEach((h, i) => obj[h] = cells[i] || ''); return obj })
-              setImportRows(rows)
-              setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
-            }} />
-            <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass}`}>{t('admin.products.import.button')}</button>
+            {hasWriteAccess && (
+              <>
+                <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e) => {
+                  const f = e.target.files?.[0]
+                  if (!f) return
+                  const text = await f.text()
+                  const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim().length > 0)
+                  const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
+                  const header = split(lines[0]).map(h => h.trim().toLowerCase())
+                  const rows = lines.slice(1).map(l => { const cells = split(l); const obj: Record<string, string> = {}; header.forEach((h, i) => obj[h] = cells[i] || ''); return obj })
+                  setImportRows(rows)
+                  setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
+                }} />
+                <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass}`}>{t('admin.products.import.button')}</button>
+              </>
+            )}
             <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} opacity-70`} disabled>Görünüm…</button>}>
               <ColumnsMenu
                 columns={[
@@ -586,7 +596,9 @@ const AdminProductsPage: React.FC = () => {
               <tr>
                 {/* Checkbox column */}
                 <th className={`${adminTableHeadCellClass} ${headPad} w-10`}>
-                  <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                  {hasWriteAccess && (
+                    <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                  )}
                 </th>
                 {/* Expand column */}
                 <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
@@ -642,7 +654,9 @@ const AdminProductsPage: React.FC = () => {
                     <tr className={`border-b border-slate-200/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
                       {/* Checkbox */}
                       <td className={`${adminTableCellClass} ${cellPad} w-10`}>
-                        <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                        {hasWriteAccess && (
+                          <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                        )}
                       </td>
                       {/* Expand */}
                       <td className={`${adminTableCellClass} ${cellPad} w-8`}>
@@ -685,69 +699,83 @@ const AdminProductsPage: React.FC = () => {
                       {/* Inline-edit Price */}
                       {visibleCols.price && (
                         <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                          {inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
-                            <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                              <input
-                                type="number"
-                                autoFocus
-                                value={inlineEdit.value}
-                                onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                                onBlur={saveInlineEdit}
-                                onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
-                              />
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                              className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
-                              title="Tıklayarak düzenle"
-                            >
-                              <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
-                              <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                                <Pencil size={10} className="text-primary-navy" />
+                          {hasWriteAccess ? (
+                            inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
+                              <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  value={inlineEdit.value}
+                                  onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                  onBlur={saveInlineEdit}
+                                  onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                  className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                                />
                               </div>
-                            </button>
+                            ) : (
+                              <button
+                                onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
+                                className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
+                                title="Tıklayarak düzenle"
+                              >
+                                <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
+                                <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                                  <Pencil size={10} className="text-primary-navy" />
+                                </div>
+                              </button>
+                            )
+                          ) : (
+                            <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
                           )}
                         </td>
                       )}
                       {/* Inline-edit Stock */}
                       {visibleCols.stock && (
                         <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                          {inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
-                            <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                              <input
-                                type="number"
-                                autoFocus
-                                value={inlineEdit.value}
-                                onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                                onBlur={saveInlineEdit}
-                                onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
-                              />
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                              className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
-                              title="Tıklayarak düzenle"
-                            >
-                              <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
-                                {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
-                              </span>
-                              <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                                <Pencil size={10} className="text-primary-navy" />
+                          {hasWriteAccess ? (
+                            inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
+                              <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                                <input
+                                  type="number"
+                                  autoFocus
+                                  value={inlineEdit.value}
+                                  onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                  onBlur={saveInlineEdit}
+                                  onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                  className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                                />
                               </div>
-                            </button>
+                            ) : (
+                              <button
+                                onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
+                                className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
+                                title="Tıklayarak düzenle"
+                              >
+                                <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
+                                  {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                                </span>
+                                <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                                  <Pencil size={10} className="text-primary-navy" />
+                                </div>
+                              </button>
+                            )
+                          ) : (
+                            <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600 font-bold' : 'font-bold'}>
+                              {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                            </span>
                           )}
                         </td>
                       )}
                       {visibleCols.actions && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className="flex items-center gap-2 whitespace-nowrap">
-                            <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                            <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
-                          </div>
+                          {hasWriteAccess ? (
+                            <div className="flex items-center gap-2 whitespace-nowrap">
+                              <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                              <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-slate-400">Yetki Yok</div>
+                          )}
                         </td>
                       )}
                     </tr>
@@ -780,14 +808,16 @@ const AdminProductsPage: React.FC = () => {
       </div>
 
       {/* Bulk Action Toolbar */}
-      <BulkActionToolbar
-        selectedCount={selectedIds.size}
-        onStatusChange={bulkStatusChange}
-        onFeatureToggle={bulkFeatureToggle}
-        onDelete={bulkDelete}
-        onPriceAdjust={bulkPriceAdjust}
-        onClearSelection={() => setSelectedIds(new Set())}
-      />
+      {hasWriteAccess && (
+        <BulkActionToolbar
+          selectedCount={selectedIds.size}
+          onStatusChange={bulkStatusChange}
+          onFeatureToggle={bulkFeatureToggle}
+          onDelete={bulkDelete}
+          onPriceAdjust={bulkPriceAdjust}
+          onClearSelection={() => setSelectedIds(new Set())}
+        />
+      )}
 
       <ProductFormModal
         open={isModalOpen}
@@ -801,6 +831,3 @@ const AdminProductsPage: React.FC = () => {
 }
 
 export default AdminProductsPage
-
-
-
