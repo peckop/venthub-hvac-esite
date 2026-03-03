@@ -6,6 +6,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
 import { Plus } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
+import InfoTooltip from '../../components/admin/InfoTooltip'
 import toast from 'react-hot-toast'
 
 // Lazy load menus
@@ -180,7 +181,12 @@ const AdminCategoriesPage: React.FC = () => {
               <tr>
                 {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}
                 {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
-                {visibleCols.sortOrder && <th className={`${adminTableHeadCellClass} ${headPad} w-24 text-center`}>Sıra</th>}
+                {visibleCols.sortOrder && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} w-24 text-center`}>
+                    Sıra
+                    <InfoTooltip text="Kategorilerin sitedeki listelenme sırasını belirler. 1 değeri en üstte görünür." />
+                  </th>
+                )}
                 {visibleCols.slug && <th className={`${adminTableHeadCellClass} ${headPad}`}>Slug</th>}
                 {visibleCols.parent && <th className={`${adminTableHeadCellClass} ${headPad}`}>Üst</th>}
                 {visibleCols.description && <th className={`${adminTableHeadCellClass} ${headPad}`}>Açıklama</th>}
@@ -238,7 +244,7 @@ const AdminCategoriesPage: React.FC = () => {
                         <EditableCell
                           value={r.sort_order?.toString() || '0'}
                           placeholder="0"
-                          inputType="number"
+                          type="number"
                           inputWidth="w-16"
                           onSave={async (val) => {
                             const num = parseInt(val || '0', 10)
