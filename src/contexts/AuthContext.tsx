@@ -2,6 +2,8 @@ import React, { useEffect, useState, ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 
 import { AuthContext } from './AuthContextDefinition'
+import { getUserRole } from '../config/admin'
+import type { UserRole } from '../lib/rbac'
 
 
 
@@ -13,6 +15,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
+  const [role, setRole] = useState<UserRole | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Oturum başlatmayı başlangıç LCP sonrasına ertele (gerektiğinde hemen yükle)
@@ -31,13 +34,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
           if (isMounted) {
             setSession(initialSession)
             setUser(initialSession?.user || null)
+
+            if (initialSession?.user) {
+              const r = await getUserRole(initialSession.user.id)
+              setRole(r as UserRole)
+            } else {
+              setRole(null)
+            }
           }
         }
         // Dinleyici kur
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
           if (!isMounted) return
           setSession(newSession)
           setUser(newSession?.user || null)
+
+          if (newSession?.user) {
+            const r = await getUserRole(newSession.user.id)
+            setRole(r as UserRole)
+          } else {
+            setRole(null)
+          }
+
           switch (event) {
             case 'SIGNED_IN':
               if (newSession?.user?.email) {
@@ -271,6 +289,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value = {
     user,
     session,
+    role,
     loading,
     signIn,
     signUp,

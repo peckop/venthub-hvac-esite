@@ -5,7 +5,6 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { checkAdminAccess } from '../../config/admin'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -13,6 +12,8 @@ import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
 import { formatDateTime, formatDate, formatTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
+import { useRole } from '../../hooks/useRole'
+
 interface ReturnWithOrder {
   id: string
   order_id: string
@@ -41,7 +42,8 @@ export default function AdminReturnsPage() {
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('returns')
   const [searchQuery, setSearchQuery] = useState('')
   // Çoklu durum filtresi
   const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({
@@ -57,47 +59,6 @@ export default function AdminReturnsPage() {
   // Sıralama durumu
   const [sortKey, setSortKey] = useState<SortKey>('date')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
-
-  // Admin kontrolü
-  useEffect(() => {
-    let mounted = true
-    async function loadRole() {
-      try {
-        if (!user) {
-          setIsAdmin(false);
-          return
-        }
-
-        // Merkezi admin kontrolü
-        if (checkAdminAccess(user)) {
-          if (mounted) {
-            setIsAdmin(true)
-          }
-          return
-        }
-
-        // Production admin check
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle()
-
-        if (!mounted) return
-
-        if (!error && data && (data as { role?: string }).role === 'admin') {
-          setIsAdmin(true)
-        } else {
-          setIsAdmin(false)
-        }
-      } catch (err) {
-        console.error('loadRole error:', err)
-        if (mounted) setIsAdmin(false)
-      }
-    }
-    loadRole()
-    return () => { mounted = false }
-  }, [user])
 
   useEffect(() => {
     if (!loading && !user) {
@@ -122,7 +83,7 @@ export default function AdminReturnsPage() {
 
   // İade taleplerini yükle
   const loadReturns = useCallback(async () => {
-    if (!isAdmin || !user) return
+    if (!user) return
 
     try {
       setIsLoading(true)
@@ -162,7 +123,7 @@ export default function AdminReturnsPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [isAdmin, user, _t])
+  }, [user, _t])
 
   useEffect(() => {
     loadReturns()
@@ -231,7 +192,7 @@ export default function AdminReturnsPage() {
   }
 
   const handleStatusUpdate = async (returnId: string, newStatus: string) => {
-    if (!isAdmin) return
+    if (!hasWriteAccess) return
 
     const returnItem = returns.find(r => r.id === returnId)
     if (!returnItem) return
@@ -379,16 +340,7 @@ export default function AdminReturnsPage() {
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
-  if (!isAdmin) {
-    return (
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center py-8">
-          <h2 className="text-xl font-semibold text-red-600">{_t('admin.ui.accessDeniedTitle')}</h2>
-          <p className="text-slate-500 mt-2">{_t('admin.ui.accessDeniedDesc')}</p>
-        </div>
-      </div>
-    )
-  }
+  // Sayfa izli kisiden de erisilebilmesi icin access-denied kontrolu artik AdminLayout'tan yapilmaktadir
 
   function exportCsv() {
     const header = [
@@ -585,26 +537,30 @@ export default function AdminReturnsPage() {
                         </td>
                       )}
                       <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>
-                        <div className="flex gap-1">
-                          {nextStatuses[returnItem.status]?.map(status => (
-                            <button
-                              key={status}
-                              onClick={() => handleStatusUpdate(returnItem.id, status)}
-                              disabled={updatingStatus === returnItem.id}
-                              className={`${adminTableActionPrimaryClass} disabled:opacity-50 gap-1`}
-                              title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
-                            >
-                              {updatingStatus === returnItem.id ? (
-                                <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <>
-                                  {getStatusLabel(status)}
-                                  <ChevronRight size={12} />
-                                </>
-                              )}
-                            </button>
-                          ))}
-                        </div>
+                        {hasWriteAccess ? (
+                          <div className="flex gap-1">
+                            {nextStatuses[returnItem.status]?.map(status => (
+                              <button
+                                key={status}
+                                onClick={() => handleStatusUpdate(returnItem.id, status)}
+                                disabled={updatingStatus === returnItem.id}
+                                className={`${adminTableActionPrimaryClass} disabled:opacity-50 gap-1`}
+                                title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
+                              >
+                                {updatingStatus === returnItem.id ? (
+                                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <>
+                                    {getStatusLabel(status)}
+                                    <ChevronRight size={12} />
+                                  </>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-400">&mdash;</div>
+                        )}
                       </td>
                     </tr>
                   )

@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
+import { useRole } from '../../hooks/useRole'
 import { checkAdminAccessAsync } from '../../config/admin'
 import { adminNavClass } from '../../utils/adminUi'
+import AccessDenied from '../../components/admin/AccessDenied'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   BarChart3,
@@ -32,6 +34,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const { user, loading } = useAuth()
+  const { canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
   const { t } = useI18n()
 
@@ -46,8 +49,13 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     return () => { active = false }
   }, [user, loading, router])
 
-  if (loading) {
+  if (loading || roleLoading) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Yükleniyor...</div>
+  }
+
+  // URL Doğrudan erişim koruması
+  if (!canAccess(pathname)) {
+    return <AccessDenied />
   }
 
   // Grouped navigation items
@@ -147,27 +155,32 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
             </div>
 
             <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 space-y-5">
-              {navGroups.map((group, gi) => (
-                <div key={gi}>
-                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">{group.label}</h3>
-                  <div className="space-y-0.5">
-                    {group.items.map((item) => {
-                      const Icon = item.icon
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={adminNavClass(pathname === item.href)}
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          <Icon size={18} className="shrink-0" />
-                          <span className="truncate">{item.label}</span>
-                        </Link>
-                      )
-                    })}
+              {navGroups.map((group, gi) => {
+                const visibleItems = group.items.filter(item => canAccess(item.href))
+                if (visibleItems.length === 0) return null
+
+                return (
+                  <div key={gi}>
+                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">{group.label}</h3>
+                    <div className="space-y-0.5">
+                      {visibleItems.map((item) => {
+                        const Icon = item.icon
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={adminNavClass(pathname === item.href)}
+                            onClick={() => setSidebarOpen(false)}
+                          >
+                            <Icon size={18} className="shrink-0" />
+                            <span className="truncate">{item.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </nav>
           </div>
         </aside>

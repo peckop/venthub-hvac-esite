@@ -4,6 +4,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
 import { Truck, CheckCircle2 } from 'lucide-react'
+import { useRole } from '../../hooks/useRole'
 
 // Sadece kargo ataması bekleyen siparişler (confirmed)
 interface LogisticsRow {
@@ -17,6 +18,9 @@ interface LogisticsRow {
 }
 
 export default function AdminLogisticsPage() {
+    const { canWrite } = useRole()
+    const hasWriteAccess = canWrite('logistics')
+
     const [rows, setRows] = useState<LogisticsRow[]>([])
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -145,9 +149,11 @@ export default function AdminLogisticsPage() {
                         <option value="PTT">PTT Kargo</option>
                     </select>
                 </div>
-                <button onClick={applyGlobalCarrier} className="px-4 py-2 text-sm font-bold text-primary-navy bg-primary-navy/5 hover:bg-primary-navy/10 rounded-lg transition-colors">
-                    Tümüne Uygula
-                </button>
+                {hasWriteAccess && (
+                    <button onClick={applyGlobalCarrier} className="px-4 py-2 text-sm font-bold text-primary-navy bg-primary-navy/5 hover:bg-primary-navy/10 rounded-lg transition-colors">
+                        Tümüne Uygula
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
@@ -161,58 +167,58 @@ export default function AdminLogisticsPage() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto w-full">
-                      <table className="min-w-full text-sm max-md:text-xs">
-                          <thead className="bg-slate-50">
-                              <tr>
-                                  <th className={adminTableHeadCellClass}>Sipariş No</th>
-                                  <th className={adminTableHeadCellClass}>Müşteri</th>
-                                  <th className={adminTableHeadCellClass}>Kargo Firması</th>
-                                  <th className={adminTableHeadCellClass}>Takip Numarası</th>
-                                  <th className={adminTableHeadCellClass + " text-center"}>Durum</th>
-                              </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                              {rows.map((row, i) => (
-                                  <tr key={row.id} className={row.saved ? 'bg-emerald-50/30' : 'hover:bg-slate-50/50'}>
-                                      <td className="px-4 py-3 font-mono text-xs text-slate-600">#{row.order_number}</td>
-                                      <td className="px-4 py-3 font-semibold text-slate-800">{row.customer_name}</td>
-                                      <td className="px-4 py-3">
-                                          <select
-                                              disabled={row.saved || saving}
-                                              value={row.carrier}
-                                              onChange={e => updateRow(row.id, 'carrier', e.target.value)}
-                                              className="w-32 bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:border-primary-navy disabled:opacity-60"
-                                          >
-                                              <option value="Yurtiçi">Yurtiçi</option>
-                                              <option value="Aras">Aras</option>
-                                              <option value="MNG">MNG</option>
-                                              <option value="PTT">PTT</option>
-                                          </select>
-                                      </td>
-                                      <td className="px-4 py-3">
-                                          <input
-                                              type="text"
-                                              disabled={row.saved || saving}
-                                              value={row.tracking_number}
-                                              onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
-                                              placeholder="Barkod okutun veya girin..."
-                                              className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-primary-navy focus:ring-1 focus:ring-primary-navy/20 disabled:opacity-60"
-                                              autoFocus={i === 0}
-                                          />
-                                      </td>
-                                      <td className="px-4 py-3 text-center">
-                                          {row.saved ? (
-                                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
-                                                  <CheckCircle2 size={12} /> EKLENDİ
-                                              </span>
-                                          ) : (
-                                              <span className="text-[10px] font-medium text-slate-400">Bekliyor</span>
-                                          )}
-                                      </td>
-                                  </tr>
-                              ))}
-                          </tbody>
-                      </table>
+                        <table className="min-w-full text-sm max-md:text-xs">
+                            <thead className="bg-slate-50">
+                                <tr>
+                                    <th className={adminTableHeadCellClass}>Sipariş No</th>
+                                    <th className={adminTableHeadCellClass}>Müşteri</th>
+                                    <th className={adminTableHeadCellClass}>Kargo Firması</th>
+                                    <th className={adminTableHeadCellClass}>Takip Numarası</th>
+                                    <th className={adminTableHeadCellClass + " text-center"}>Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {rows.map((row, i) => (
+                                    <tr key={row.id} className={row.saved ? 'bg-emerald-50/30' : 'hover:bg-slate-50/50'}>
+                                        <td className="px-4 py-3 font-mono text-xs text-slate-600">#{row.order_number}</td>
+                                        <td className="px-4 py-3 font-semibold text-slate-800">{row.customer_name}</td>
+                                        <td className="px-4 py-3">
+                                            <select
+                                                disabled={!hasWriteAccess || row.saved || saving}
+                                                value={row.carrier}
+                                                onChange={e => updateRow(row.id, 'carrier', e.target.value)}
+                                                className="w-32 bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:border-primary-navy disabled:opacity-60"
+                                            >
+                                                <option value="Yurtiçi">Yurtiçi</option>
+                                                <option value="Aras">Aras</option>
+                                                <option value="MNG">MNG</option>
+                                                <option value="PTT">PTT</option>
+                                            </select>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <input
+                                                type="text"
+                                                disabled={!hasWriteAccess || row.saved || saving}
+                                                value={row.tracking_number}
+                                                onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
+                                                placeholder="Barkod okutun veya girin..."
+                                                className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-primary-navy focus:ring-1 focus:ring-primary-navy/20 disabled:opacity-60"
+                                                autoFocus={i === 0}
+                                            />
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            {row.saved ? (
+                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
+                                                    <CheckCircle2 size={12} /> EKLENDİ
+                                                </span>
+                                            ) : (
+                                                <span className="text-[10px] font-medium text-slate-400">Bekliyor</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
 
@@ -221,14 +227,16 @@ export default function AdminLogisticsPage() {
                         <div className="text-sm font-medium text-slate-500">
                             <span className="text-primary-navy font-bold">{rows.filter(r => r.tracking_number).length}</span> satır hazır.
                         </div>
-                        <button
-                            disabled={saving || rows.filter(r => r.tracking_number && !r.saved).length === 0}
-                            onClick={handleBulkSubmit}
-                            className={`${adminButtonPrimaryClass} px-8 py-2.5 shadow-lg flex items-center gap-2`}
-                        >
-                            <Truck size={18} />
-                            {saving ? 'Gönderiliyor...' : 'Tüm Hazır Kargo Bilgilerini Kaydet'}
-                        </button>
+                        {hasWriteAccess && (
+                            <button
+                                disabled={saving || rows.filter(r => r.tracking_number && !r.saved).length === 0}
+                                onClick={handleBulkSubmit}
+                                className={`${adminButtonPrimaryClass} px-8 py-2.5 shadow-lg flex items-center gap-2`}
+                            >
+                                <Truck size={18} />
+                                {saving ? 'Gönderiliyor...' : 'Tüm Hazır Kargo Bilgilerini Kaydet'}
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
