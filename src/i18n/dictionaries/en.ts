@@ -279,9 +279,13 @@ export const en = {
     cart: 'Cart'
   },
   roles: {
-    superadmin: 'Superadmin',
+    superadmin: 'Super Admin',
+    super_admin: 'Super Admin',
     admin: 'Admin',
     moderator: 'Moderator',
+    warehouse: 'Warehouse',
+    sales: 'Sales',
+    viewer: 'Viewer',
     user: 'User'
   },
   legalLinks: {

@@ -287,9 +287,13 @@ export const tr = {
     cart: 'Sepet'
   },
   roles: {
-    superadmin: 'Superadmin',
-    admin: 'Admin',
+    superadmin: 'Süper Admin',
+    super_admin: 'Süper Admin',
+    admin: 'Yönetici',
     moderator: 'Moderatör',
+    warehouse: 'Depo',
+    sales: 'Satış',
+    viewer: 'İzleyici',
     user: 'Kullanıcı'
   },
   legalLinks: {
