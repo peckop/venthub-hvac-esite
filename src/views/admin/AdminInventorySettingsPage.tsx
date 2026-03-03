@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import { useAuth } from '../../hooks/useAuth'
 import { checkAdminAccessAsync } from '../../config/admin'
 

@@ -7,7 +7,8 @@ import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import { adminSectionTitleClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft } from 'lucide-react'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -195,7 +196,7 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
 
                 <div className="p-5 space-y-5 max-h-[60vh] overflow-y-auto">
                     {loading ? (
-                        <div className="py-8 text-center text-slate-400 animate-pulse">Yükleniyor...</div>
+                        <AdminSkeleton variant="form" fields={3} />
                     ) : detail ? (
                         <>
                             {/* Durum Takibi */}
@@ -283,6 +284,7 @@ export default function AdminOrdersBoard() {
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
+    const [expandedCol, setExpandedCol] = useState<ColumnId | null>('col_new')
     const scrollRef = useRef<HTMLDivElement>(null)
 
     const fetchOrders = useCallback(async () => {
@@ -378,7 +380,11 @@ export default function AdminOrdersBoard() {
     }
 
     if (loading && orders.length === 0) {
-        return <div className="p-8 text-center text-slate-500 animate-pulse">Panoya Siparişler Yükleniyor...</div>
+        return (
+            <div className="p-6">
+                <AdminSkeleton variant="cards" count={8} />
+            </div>
+        )
     }
 
     return (
@@ -414,24 +420,31 @@ export default function AdminOrdersBoard() {
             <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     ref={scrollRef}
-                    className="flex gap-4 flex-1 overflow-x-auto overflow-y-hidden pb-2 snap-x scroll-smooth"
+                    className="flex flex-col md:flex-row gap-4 flex-1 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-2 snap-x scroll-smooth"
                     style={{ scrollbarGutter: 'stable' }}
                 >
                     {COLUMNS.map(col => {
                         const colOrders = getOrdersByCol(col.id)
                         const Icon = col.icon
+                        const isExpanded = expandedCol === col.id
 
                         return (
-                            <div key={col.id} className="flex flex-col w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center" style={{ maxHeight: '100%' }}>
+                            <div key={col.id} className={`flex flex-col w-full md:w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center ${!isExpanded ? 'h-auto md:h-full' : ''}`} style={{ maxHeight: '100%' }}>
                                 {/* Sütun Başlık */}
-                                <div className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset rounded-t-2xl`}>
+                                <div
+                                    className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset ${isExpanded ? 'rounded-t-2xl' : 'rounded-2xl md:rounded-t-2xl'} cursor-pointer md:cursor-default`}
+                                    onClick={() => setExpandedCol(isExpanded ? null : col.id)}
+                                >
                                     <div className="flex items-center gap-2">
                                         <Icon className={`w-4 h-4 ${col.colorClass}`} />
                                         <h2 className={`font-bold text-sm ${col.colorClass}`}>{col.title}</h2>
                                     </div>
-                                    <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
-                                        {colOrders.length}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
+                                            {colOrders.length}
+                                        </span>
+                                        <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-400 ${isExpanded ? 'rotate-180' : ''}`} />
+                                    </div>
                                 </div>
 
                                 {/* Droppable — overflow-y-auto SADECE burada (tek scroll parent) */}
@@ -440,7 +453,7 @@ export default function AdminOrdersBoard() {
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.droppableProps}
-                                            className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''}`}
+                                            className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
                                             style={{ overflowY: 'auto', minHeight: 60 }}
                                         >
                                             {colOrders.map((order, index) => (

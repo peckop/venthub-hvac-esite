@@ -1,5 +1,5 @@
 import React from 'react'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -48,7 +48,6 @@ type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
   const { t, lang } = useI18n()
-  const pathname = usePathname()
   const router = useRouter()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
@@ -240,7 +239,9 @@ const AdminMovementsPage: React.FC = () => {
       const ref = m.order_id ? m.order_id.slice(-8).toUpperCase() : ''
       return `<tr><td>${date}</td><td>${prod}</td><td>${sku}</td><td>${delta}</td><td>${reason}</td><td>${ref}</td></tr>`
     }).join('')
-    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${t('admin.movements.export.headers.date')}</th><th>${t('admin.movements.export.headers.product')}</th><th>SKU</th><th>${t('admin.movements.export.headers.delta')}</th><th>${t('admin.movements.export.headers.reason')}</th><th>${t('admin.movements.export.headers.ref')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><div className="overflow-x-auto w-full">
+  <table className="max-md:text-xs" border="1"><thead><tr><th>${t('admin.movements.export.headers.date')}</th><th>${t('admin.movements.export.headers.product')}</th><th>SKU</th><th>${t('admin.movements.export.headers.delta')}</th><th>${t('admin.movements.export.headers.reason')}</th><th>${t('admin.movements.export.headers.ref')}</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+</div></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -328,70 +329,72 @@ const AdminMovementsPage: React.FC = () => {
       />
 
       <div className={`${adminCardClass} overflow-hidden`}>
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              {visibleCols.date && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
-                </th>
-              )}
-              {visibleCols.product && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
-                </th>
-              )}
-              {visibleCols.delta && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
-                </th>
-              )}
-              {visibleCols.reason && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
-                </th>
-              )}
-              {visibleCols.ref && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map(m => (
-              <tr key={m.id} className="border-b">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full max-md:text-xs">
+            <thead className="bg-gray-50">
+              <tr>
                 {visibleCols.date && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>{formatDateTime(m.created_at, lang)}</td>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{t('admin.movements.table.date')} {sortIndicator('date')}</button>
+                  </th>
                 )}
                 {visibleCols.product && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>
-                    <div className="flex flex-col">
-                      <span>{productMap[m.product_id]?.name || m.product_id}</span>
-                      {productMap[m.product_id]?.sku && (
-                        <span className="text-xs text-slate-500">{productMap[m.product_id]?.sku}</span>
-                      )}
-                    </div>
-                  </td>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('product')}>{t('admin.movements.table.product')} {sortIndicator('product')}</button>
+                  </th>
                 )}
                 {visibleCols.delta && (
-                  <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
-                    <span className={`inline-flex items-center gap-0.5 text-xs font-semibold font-mono px-2 py-0.5 rounded-full ${m.delta > 0 ? 'bg-emerald-50 text-emerald-700' : m.delta < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
-                      {m.delta > 0 ? <ArrowUpRight size={12} /> : m.delta < 0 ? <ArrowDownRight size={12} /> : null}
-                      {m.delta > 0 ? `+${m.delta}` : m.delta}
-                    </span>
-                  </td>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500 text-right`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('delta')}>{t('admin.movements.table.delta')} {sortIndicator('delta')}</button>
+                  </th>
                 )}
                 {visibleCols.reason && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{t('admin.movements.table.reason')} {sortIndicator('reason')}</button>
+                  </th>
                 )}
                 {visibleCols.ref && (
-                  <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-sm font-semibold text-slate-500`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('ref')}>{t('admin.movements.table.ref')} {sortIndicator('ref')}</button>
+                  </th>
                 )}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sorted.map(m => (
+                <tr key={m.id} className="border-b">
+                  {visibleCols.date && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>{formatDateTime(m.created_at, lang)}</td>
+                  )}
+                  {visibleCols.product && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>
+                      <div className="flex flex-col">
+                        <span>{productMap[m.product_id]?.name || m.product_id}</span>
+                        {productMap[m.product_id]?.sku && (
+                          <span className="text-xs text-slate-500">{productMap[m.product_id]?.sku}</span>
+                        )}
+                      </div>
+                    </td>
+                  )}
+                  {visibleCols.delta && (
+                    <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
+                      <span className={`inline-flex items-center gap-0.5 text-xs font-semibold font-mono px-2 py-0.5 rounded-full ${m.delta > 0 ? 'bg-emerald-50 text-emerald-700' : m.delta < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {m.delta > 0 ? <ArrowUpRight size={12} /> : m.delta < 0 ? <ArrowDownRight size={12} /> : null}
+                        {m.delta > 0 ? `+${m.delta}` : m.delta}
+                      </span>
+                    </td>
+                  )}
+                  {visibleCols.reason && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
+                  )}
+                  {visibleCols.ref && (
+                    <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {loading === LoadState.Loading && (
           <div className="p-4 text-sm text-slate-500">{t('admin.ui.loadingShort')}</div>
         )}

@@ -2,12 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { checkAdminAccess } from '../../config/admin'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
-import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -107,7 +107,6 @@ export default function AdminReturnsPage() {
   }, [user, loading, router])
 
   // Dashboard'tan gelen status parametresini uygula
-  const pathname = usePathname()
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
@@ -435,7 +434,9 @@ export default function AdminReturnsPage() {
         `<td>${amount}</td>` +
         `</tr>`
     }).join('')
-    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr><th>${_t('admin.returns.export.headers.order')}</th><th>${_t('admin.returns.export.headers.customer')}</th><th>${_t('admin.returns.export.headers.email')}</th><th>${_t('admin.returns.export.headers.reason')}</th><th>${_t('admin.returns.export.headers.status')}</th><th>${_t('admin.returns.export.headers.date')}</th><th>${_t('admin.returns.export.headers.amount')}</th></tr></thead><tbody>${rowsHtml}</tbody></table></body></html>`
+    const table = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><div className="overflow-x-auto w-full">
+  <table className="max-md:text-xs" border="1"><thead><tr><th>${_t('admin.returns.export.headers.order')}</th><th>${_t('admin.returns.export.headers.customer')}</th><th>${_t('admin.returns.export.headers.email')}</th><th>${_t('admin.returns.export.headers.reason')}</th><th>${_t('admin.returns.export.headers.status')}</th><th>${_t('admin.returns.export.headers.date')}</th><th>${_t('admin.returns.export.headers.amount')}</th></tr></thead><tbody>${rowsHtml}</tbody></table>
+</div></body></html>`
     const blob = new Blob([table], { type: 'application/vnd.ms-excel' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

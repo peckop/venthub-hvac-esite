@@ -5,6 +5,8 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
 import { Plus } from 'lucide-react'
+import EditableCell from '../../components/admin/EditableCell'
+import toast from 'react-hot-toast'
 
 // Lazy load menus
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))
@@ -36,8 +38,8 @@ const AdminCategoriesPage: React.FC = () => {
 
   // Columns & density
   const STORAGE_KEY = 'toolbar:categories'
-  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; slug: boolean; parent: boolean; description: boolean; actions: boolean }>({
-    image: true, name: true, slug: true, parent: true, description: false, actions: true
+  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sortOrder: boolean; slug: boolean; parent: boolean; description: boolean; actions: boolean }>({
+    image: true, name: true, sortOrder: true, slug: true, parent: true, description: false, actions: true
   })
   const [density, setDensity] = React.useState<Density>('comfortable')
 
@@ -137,6 +139,7 @@ const AdminCategoriesPage: React.FC = () => {
                 columns={[
                   { key: 'image', label: 'Görsel', checked: visibleCols.image, onChange: (v) => setVisibleCols(s => ({ ...s, image: v })) },
                   { key: 'name', label: 'Ad', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
+                  { key: 'sortOrder', label: 'Sıra', checked: visibleCols.sortOrder, onChange: (v) => setVisibleCols(s => ({ ...s, sortOrder: v })) },
                   { key: 'slug', label: 'Slug', checked: visibleCols.slug, onChange: (v) => setVisibleCols(s => ({ ...s, slug: v })) },
                   { key: 'parent', label: 'Üst', checked: visibleCols.parent, onChange: (v) => setVisibleCols(s => ({ ...s, parent: v })) },
                   { key: 'description', label: 'Açıklama', checked: visibleCols.description, onChange: (v) => setVisibleCols(s => ({ ...s, description: v })) },
@@ -149,9 +152,9 @@ const AdminCategoriesPage: React.FC = () => {
                 items={[
                   {
                     key: 'csv', label: 'CSV (UTF-8 BOM)', onSelect: () => {
-                      const cols = ['id', 'name', 'slug', 'parent_id', 'description']
+                      const cols = ['id', 'name', 'sort_order', 'slug', 'parent_id', 'description']
                       const header = cols.join(',')
-                      const lines = filtered.map(r => [r.id, `"${r.name.replace(/"/g, '""')}"`, r.slug, r.parent_id || '', `"${(r.description || '').replace(/"/g, '""')}"`].join(','))
+                      const lines = filtered.map(r => [r.id, `"${r.name.replace(/"/g, '""')}"`, r.sort_order || 0, r.slug, r.parent_id || '', `"${(r.description || '').replace(/"/g, '""')}"`].join(','))
                       const csv = '\ufeff' + [header, ...lines].join('\n')
                       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
                       const url = URL.createObjectURL(blob)
@@ -171,65 +174,102 @@ const AdminCategoriesPage: React.FC = () => {
 
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}
-              {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
-              {visibleCols.slug && <th className={`${adminTableHeadCellClass} ${headPad}`}>Slug</th>}
-              {visibleCols.parent && <th className={`${adminTableHeadCellClass} ${headPad}`}>Üst</th>}
-              {visibleCols.description && <th className={`${adminTableHeadCellClass} ${headPad}`}>Açıklama</th>}
-              {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {loading && rows.length === 0 ? (
-              <tr><td className="p-4" colSpan={6}>Yükleniyor…</td></tr>
-            ) : filtered.length === 0 ? (
-              <tr><td className="p-4" colSpan={6}>Kayıt yok</td></tr>
-            ) : (
-              filtered.map(r => (
-                <tr key={r.id} className="border-b border-slate-200/60 hover:bg-gray-50/50 transition-colors">
-                  {visibleCols.image && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      {r.image_url ? (
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
-                          alt=""
-                          className="w-10 h-10 object-cover rounded border border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-gray-300">
-                          -
+        <div className="overflow-x-auto w-full">
+          <table className="w-full max-md:text-xs">
+            <thead className="bg-gray-50">
+              <tr>
+                {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}
+                {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
+                {visibleCols.sortOrder && <th className={`${adminTableHeadCellClass} ${headPad} w-24 text-center`}>Sıra</th>}
+                {visibleCols.slug && <th className={`${adminTableHeadCellClass} ${headPad}`}>Slug</th>}
+                {visibleCols.parent && <th className={`${adminTableHeadCellClass} ${headPad}`}>Üst</th>}
+                {visibleCols.description && <th className={`${adminTableHeadCellClass} ${headPad}`}>Açıklama</th>}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {loading && rows.length === 0 ? (
+                <tr><td className="p-4" colSpan={7}>Yükleniyor…</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
+              ) : (
+                filtered.map(r => (
+                  <tr key={r.id} className="border-b border-slate-200/60 hover:bg-gray-50/50 transition-colors">
+                    {visibleCols.image && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        {r.image_url ? (
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
+                            alt=""
+                            className="w-10 h-10 object-cover rounded border border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-gray-300">
+                            -
+                          </div>
+                        )}
+                      </td>
+                    )}
+                    {visibleCols.name && (
+                      <td className={`${adminTableCellClass} ${cellPad} font-medium text-gray-900`}>
+                        <div className="flex items-center">
+                          {r.parent_id && <span className="text-slate-300 mr-2">└─</span>}
+                          <div className={r.parent_id ? 'pl-1' : ''}>
+                            <EditableCell
+                              value={r.name}
+                              placeholder="Kategori Adı"
+                              inputWidth="w-full"
+                              className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}
+                              onSave={async (val) => {
+                                if (!val || r.name === val) return
+                                const { error } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
+                                if (error) throw error
+                                setRows(prev => prev.map(row => row.id === r.id ? { ...row, name: val } : row))
+                                toast.success('Kategori adı güncellendi')
+                              }}
+                            />
+                          </div>
+                          {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
                         </div>
-                      )}
-                    </td>
-                  )}
-                  {visibleCols.name && (
-                    <td className={`${adminTableCellClass} ${cellPad} font-medium text-gray-900`}>
-                      <div className="flex items-center">
-                        {r.parent_id && <span className="text-slate-300 mr-2">└─</span>}
-                        <span className={r.parent_id ? 'pl-1 text-slate-600 font-normal' : ''}>{r.name}</span>
-                        {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
-                      </div>
-                    </td>
-                  )}
-                  {visibleCols.slug && <td className={`${adminTableCellClass} ${cellPad} text-gray-500`}>{r.slug}</td>}
-                  {visibleCols.parent && <td className={`${adminTableCellClass} ${cellPad}`}>{rows.find(x => x.id === r.parent_id)?.name || <span className="text-gray-400">-</span>}</td>}
-                  {visibleCols.description && <td className={`${adminTableCellClass} ${cellPad} text-gray-500 truncate max-w-[200px]`}>{r.description}</td>}
-                  {visibleCols.actions && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      <div className="flex items-center gap-2">
-                        <button className={adminTableActionClass} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
-                        <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                      </td>
+                    )}
+                    {visibleCols.sortOrder && (
+                      <td className={`${adminTableCellClass} ${cellPad} text-center`}>
+                        <EditableCell
+                          value={r.sort_order?.toString() || '0'}
+                          placeholder="0"
+                          inputType="number"
+                          inputWidth="w-16"
+                          onSave={async (val) => {
+                            const num = parseInt(val || '0', 10)
+                            if (isNaN(num)) return
+                            if (r.sort_order === num) return
+                            const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
+                            if (error) throw error
+                            setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
+                            toast.success('Sıra güncellendi')
+                            load()
+                          }}
+                        />
+                      </td>
+                    )}
+                    {visibleCols.slug && <td className={`${adminTableCellClass} ${cellPad} text-gray-500`}>{r.slug}</td>}
+                    {visibleCols.parent && <td className={`${adminTableCellClass} ${cellPad}`}>{rows.find(x => x.id === r.parent_id)?.name || <span className="text-gray-400">-</span>}</td>}
+                    {visibleCols.description && <td className={`${adminTableCellClass} ${cellPad} text-gray-500 truncate max-w-[200px]`}>{r.description}</td>}
+                    {visibleCols.actions && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className="flex items-center gap-2">
+                          <button className={adminTableActionClass} onClick={() => handleEdit(r)}>{t('admin.ui.edit') || 'Düzenle'}</button>
+                          <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <CategoryFormModal
@@ -244,6 +284,3 @@ const AdminCategoriesPage: React.FC = () => {
 }
 
 export default AdminCategoriesPage
-
-
-
