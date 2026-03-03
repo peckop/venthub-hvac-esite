@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
-import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search } from 'lucide-react'
+import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search, Package, Tag, Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { listAdminUsers, setUserAdminRole, getUserRole } from '../../config/admin'
+import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -301,7 +301,7 @@ export default function AdminUsersPage() {
               { key: 'company', label: _t('admin.users.table.company') || 'Şirket/B2B', checked: visibleCols.company, onChange: (v) => setVisibleCols(s => ({ ...s, company: v })) },
               { key: 'role', label: _t('admin.users.table.role') || 'Rol', checked: visibleCols.role, onChange: (v) => setVisibleCols(s => ({ ...s, role: v })) },
               { key: 'created', label: _t('admin.users.table.created') || 'Kayıt', checked: visibleCols.created, onChange: (v) => setVisibleCols(s => ({ ...s, created: v })) },
-              ...(activeTab === 'all' ? [{ key: 'actions', label: _t('admin.users.table.actions') || 'Aksiyonlar', checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }] : [])
+              { key: 'actions', label: _t('admin.users.table.actions') || 'Aksiyonlar', checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }
             ]}
             density={density}
             onDensityChange={setDensity}
@@ -326,7 +326,7 @@ export default function AdminUsersPage() {
                   {visibleCols.company && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.company') || 'Şirket & B2B'}</th>)}
                   {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.role') || 'Rol'}</th>)}
                   {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.created') || 'Kayıt'}</th>)}
-                  {activeTab === 'all' && visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>{_t('admin.users.table.actions') || 'Aksiyonlar'}</th>}
+                  {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>{_t('admin.users.table.actions') || 'Aksiyonlar'}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -384,15 +384,15 @@ export default function AdminUsersPage() {
                       </td>
                     )}
 
-                    {activeTab === 'all' && visibleCols.actions && (
+                    {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad} text-right`}>
                         <div className="flex gap-1.5 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                           {userItem.role !== 'super_admin' && role === 'super_admin' && (
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'super_admin')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess}
-                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-purple-50 text-purple-600 border-purple-200/50 hover:bg-purple-100"
-                              title="Süperadmin yap"
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-rose-50 text-rose-600 border-rose-200/50 hover:bg-rose-100 mt-1 mb-1"
+                              title={_t('roles.super_admin') || "Süperadmin yap"}
                             >
                               <Crown size={14} strokeWidth={2.5} />
                             </button>
@@ -400,19 +400,49 @@ export default function AdminUsersPage() {
                           {userItem.role !== 'admin' && (role === 'super_admin' || role === 'admin') && (
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'admin')}
-                              disabled={updatingRole === userItem.id || !hasWriteAccess}
-                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200/50 hover:bg-indigo-100"
-                              title="Admin yap"
+                              disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-indigo-50 text-indigo-600 border-indigo-200/50 hover:bg-indigo-100 mt-1 mb-1"
+                              title={_t('roles.admin') || "Admin yap"}
                             >
                               <Shield size={14} strokeWidth={2.5} />
                             </button>
                           )}
-                          {userItem.role !== 'user' && role === 'super_admin' && (
+                          {userItem.role !== 'warehouse' && (role === 'super_admin' || role === 'admin') && (
+                            <button
+                              onClick={() => handleRoleChange(userItem.id, 'warehouse')}
+                              disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-orange-50 text-orange-600 border-orange-200/50 hover:bg-orange-100 mt-1 mb-1"
+                              title={_t('roles.warehouse') || "Depo yetkisi ver"}
+                            >
+                              <Package size={14} strokeWidth={2.5} />
+                            </button>
+                          )}
+                          {userItem.role !== 'sales' && (role === 'super_admin' || role === 'admin') && (
+                            <button
+                              onClick={() => handleRoleChange(userItem.id, 'sales')}
+                              disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-blue-50 text-blue-600 border-blue-200/50 hover:bg-blue-100 mt-1 mb-1"
+                              title={_t('roles.sales') || "Satış yetkisi ver"}
+                            >
+                              <Tag size={14} strokeWidth={2.5} />
+                            </button>
+                          )}
+                          {userItem.role !== 'viewer' && (role === 'super_admin' || role === 'admin') && (
+                            <button
+                              onClick={() => handleRoleChange(userItem.id, 'viewer')}
+                              disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-emerald-50 text-emerald-600 border-emerald-200/50 hover:bg-emerald-100 mt-1 mb-1"
+                              title={_t('roles.viewer') || "İzleyici yetkisi ver"}
+                            >
+                              <Eye size={14} strokeWidth={2.5} />
+                            </button>
+                          )}
+                          {userItem.role !== 'user' && (role === 'super_admin' || role === 'admin') && (
                             <button
                               onClick={() => handleRoleChange(userItem.id, 'user')}
-                              disabled={updatingRole === userItem.id || userItem.id === user?.id || !hasWriteAccess}
-                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-                              title="Normal kullanıcı yap"
+                              disabled={updatingRole === userItem.id || userItem.id === user?.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
+                              className="inline-flex justify-center items-center w-8 h-8 rounded-md border transition-all disabled:opacity-50 shadow-sm bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 mt-1 mb-1"
+                              title={_t('roles.user') || "Normal kullanıcı yap"}
                             >
                               <Users size={14} strokeWidth={2.5} />
                             </button>
@@ -475,17 +505,24 @@ export default function AdminUsersPage() {
             </div>
             <div className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-colors">
               <div className="flex items-center gap-2 mb-1">
-                <ShieldCheck size={14} className="text-sky-300" />
-                <span className="text-xs font-bold uppercase tracking-widest text-white/90">Moderatör</span>
+                <Package size={14} className="text-orange-300" />
+                <span className="text-xs font-bold uppercase tracking-widest text-white/90">Depo</span>
               </div>
-              <p className="text-[10px] text-white/60 leading-relaxed">Yorumlar, destek talepleri ve temel veri takibi yetkisi.</p>
+              <p className="text-[10px] text-white/60 leading-relaxed">Stok yönetimi, envanter hareketleri ve depo ayarları yetkisi.</p>
             </div>
             <div className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-colors">
               <div className="flex items-center gap-2 mb-1">
-                <Users size={14} className="text-white/40" />
-                <span className="text-xs font-bold uppercase tracking-widest text-white/90">Kullanıcı</span>
+                <Tag size={14} className="text-blue-300" />
+                <span className="text-xs font-bold uppercase tracking-widest text-white/90">Satış</span>
               </div>
-              <p className="text-[10px] text-white/60 leading-relaxed">Standart e-ticaret müşteri yetkileri.</p>
+              <p className="text-[10px] text-white/60 leading-relaxed">Sipariş, kargo, iade ve kupon yönetimi yetkisi.</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-2 mb-1">
+                <Eye size={14} className="text-emerald-300" />
+                <span className="text-xs font-bold uppercase tracking-widest text-white/90">İzleyici</span>
+              </div>
+              <p className="text-[10px] text-white/60 leading-relaxed">Tüm modülleri salt-okunur olarak görüntüleme yetkisi.</p>
             </div>
           </div>
         </div>

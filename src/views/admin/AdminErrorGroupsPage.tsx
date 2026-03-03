@@ -6,6 +6,7 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import { useRole } from '../../hooks/useRole'
 interface ErrorGroup {
   id: string
   signature: string
@@ -40,6 +41,8 @@ const PAGE_SIZE = 50
 
 const AdminErrorGroupsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const { canWrite } = useRole()
+  const hasWriteAccess = canWrite('error_groups')
   // Columns & density (like Inventory)
   const STORAGE_KEY = 'toolbar:errorgroups'
   const [visibleCols, setVisibleCols] = React.useState<{ lastSeen: boolean; level: boolean; signature: boolean; lastMsg: boolean; count: boolean; status: boolean; assigned: boolean; actions: boolean }>({ lastSeen: true, level: true, signature: true, lastMsg: true, count: true, status: true, assigned: true, actions: true })
@@ -427,7 +430,7 @@ const AdminErrorGroupsPage: React.FC = () => {
               <option value="resolved">resolved</option>
               <option value="ignored">ignored</option>
             </select>
-            <button onClick={bulkApplyStatus} disabled={savingBulk} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
+            <button onClick={bulkApplyStatus} disabled={savingBulk || !hasWriteAccess} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
             <button onClick={() => setSelectedIds([])} className={adminButtonSecondaryClass}>{t('admin.ui.clear')}</button>
           </div>
         </div>
@@ -491,7 +494,12 @@ const AdminErrorGroupsPage: React.FC = () => {
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
                       {visibleCols.count && <td className={`${adminTableCellClass} ${cellPad}`}>{r.count}</td>}
                       {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <select value={r.status} onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white">
+                        <select
+                          disabled={!hasWriteAccess}
+                          value={r.status}
+                          onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')}
+                          className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50"
+                        >
                           <option value="open">open</option>
                           <option value="resolved">resolved</option>
                           <option value="ignored">ignored</option>
@@ -499,7 +507,12 @@ const AdminErrorGroupsPage: React.FC = () => {
                       </td>}
                       {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-2">
-                          <select value={r.assigned_to || ''} onChange={(e) => updateAssignedTo(r.id, e.target.value)} className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white">
+                          <select
+                            disabled={!hasWriteAccess}
+                            value={r.assigned_to || ''}
+                            onChange={(e) => updateAssignedTo(r.id, e.target.value)}
+                            className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50"
+                          >
                             <option value="">{t('admin.errorGroups.assigned.none')}</option>
                             {users.map(u => (
                               <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
@@ -533,7 +546,14 @@ const AdminErrorGroupsPage: React.FC = () => {
                             </div>
                             <div>
                               <div className="font-medium text-slate-500 mb-1">{t('admin.errorGroups.details.notes')}</div>
-                              <textarea defaultValue={rows.find(x => x.id === r.id)?.notes || ''} onBlur={(ev) => updateNotes(r.id, ev.target.value)} className="w-full border border-slate-200 rounded p-2 bg-white" rows={7} placeholder={t('admin.errorGroups.details.notesPlaceholder') as string} />
+                              <textarea
+                                disabled={!hasWriteAccess}
+                                defaultValue={rows.find(x => x.id === r.id)?.notes || ''}
+                                onBlur={(ev) => updateNotes(r.id, ev.target.value)}
+                                className="w-full border border-slate-200 rounded p-2 bg-white disabled:opacity-50"
+                                rows={7}
+                                placeholder={t('admin.errorGroups.details.notesPlaceholder') as string}
+                              />
                               <div className="font-medium text-slate-500 mb-1 mt-3">{t('admin.errorGroups.details.sampleUrl')}</div>
                               <div className="text-[11px] break-all">{r.url_sample || '-'}</div>
                               <div className="font-medium text-slate-500 mb-2 mt-3">{t('admin.errorGroups.details.top5')}</div>
