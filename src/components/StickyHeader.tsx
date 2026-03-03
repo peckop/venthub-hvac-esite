@@ -102,9 +102,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
   const roleLabel = useCallback((r: string) => {
     switch (r) {
-      case 'superadmin': return t('roles.superadmin')
+      case 'superadmin':
+      case 'super_admin': return t('roles.super_admin') || t('roles.superadmin')
       case 'admin': return t('roles.admin')
       case 'moderator': return t('roles.moderator')
+      case 'warehouse': return t('roles.warehouse') || 'Warehouse'
+      case 'sales': return t('roles.sales') || 'Sales'
+      case 'viewer': return t('roles.viewer') || 'Viewer'
       default: return t('roles.user')
     }
   }, [t])
@@ -346,8 +350,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                         {user.user_metadata?.full_name || user.email?.split('@')[0]}
                       </span>
                       <span className="hidden xl:inline-flex min-w-[96px] justify-center">
-                        {(userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderator') ? (
-                          <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${userRole === 'superadmin' ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
+                        {(['superadmin', 'super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(userRole)) ? (
+                          <span className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full border ${(userRole === 'superadmin' || userRole === 'super_admin') ? 'bg-amber-50 text-amber-700 border-amber-200' : userRole === 'admin' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-violet-50 text-violet-700 border-violet-200'
                             }`} title={`${t('header.roleLabel')}: ${roleLabel(userRole)}`}>
                             {roleLabel(userRole)}
                           </span>

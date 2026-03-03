@@ -121,13 +121,12 @@ const AdminDashboardPage: React.FC = () => {
         // Envanter özetleri: Bağlı Sermaye, ABC, Alarmlar
         supabase
           .from('products')
-          .select('stock_qty, price, abc_class, low_stock_threshold')
-          .is('parent_id', null)
-          .gt('stock_qty', 0) // Sadece stoku olan veya eksi olan (genelde 0 üstü sermaye sayılır ama alarm için 0'lar da önemli, o yüzden .gt(stock_qty, -9999) diyebiliriz. Veya limitsiz çekelim)
+          .select('stock_qty, price, low_stock_threshold')
+          .gt('stock_qty', 0)
       ])
 
       // ... Stok verilerini ayrı bir state veya call ile çeksek daha güvenli? (Fazla ürün yoksa sorun olmaz)
-      const productsRes = await supabase.from('products').select('stock_qty, price, abc_class, low_stock_threshold').is('parent_id', null)
+      const productsRes = await supabase.from('products').select('stock_qty, price, low_stock_threshold')
       if (!productsRes.error && productsRes.data) {
         const prods = productsRes.data as any[]
 
@@ -139,14 +138,11 @@ const AdminDashboardPage: React.FC = () => {
         const alarms = prods.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length
         setAlarmCount(alarms)
 
-        // ABC
-        const a = prods.filter(p => p.abc_class === 'A').length
-        const b = prods.filter(p => p.abc_class === 'B').length
-        const c = prods.filter(p => p.abc_class === 'C').length
+        // ABC (Geri bildirime göre daha sonra eklenecek veya view üzerinden çekilecek)
         setAbcDist([
-          { name: 'A', value: a, color: '#10b981' }, // emerald
-          { name: 'B', value: b, color: '#3b82f6' }, // blue
-          { name: 'C', value: c, color: '#f59e0b' }  // amber
+          { name: 'A', value: 0, color: '#10b981' },
+          { name: 'B', value: 0, color: '#3b82f6' },
+          { name: 'C', value: 0, color: '#f59e0b' }
         ])
       }
 
@@ -313,12 +309,13 @@ const AdminDashboardPage: React.FC = () => {
       )}
 
       {/* KPI Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <StatCard
           title={t('admin.dashboard.kpis.ordersCount')}
           value={ordersCount}
           loading={loading}
-          icon={<ShoppingBag size={24} strokeWidth={1.5} />}
+          accent="navy"
+          icon={<ShoppingBag />}
           trend={ordersCount != null && prevOrdersCount != null && prevOrdersCount > 0 ? { value: Math.round(((ordersCount - prevOrdersCount) / prevOrdersCount) * 100) } : undefined}
         />
         <StatCard
@@ -327,18 +324,34 @@ const AdminDashboardPage: React.FC = () => {
           loading={loading}
           isCurrency
           lang={lang}
-          icon={<TrendingUp size={24} strokeWidth={1.5} />}
+          accent="emerald"
+          icon={<TrendingUp />}
           trend={salesTotal != null && prevSalesTotal != null && prevSalesTotal > 0 ? { value: Math.round(((salesTotal - prevSalesTotal) / prevSalesTotal) * 100) } : undefined}
         />
-        <StatCard title={t('admin.dashboard.kpis.pendingReturns')} value={pendingReturns} loading={loading} href="/admin/returns?status=requested,approved,in_transit,received" icon={<HandCoins size={24} strokeWidth={1.5} />} />
-        <StatCard title={t('admin.dashboard.kpis.pendingShipments')} value={pendingShipments} loading={loading} href="/admin/orders?preset=pendingShipments" icon={<PackagePlus size={24} strokeWidth={1.5} />} />
+        <StatCard
+          title={t('admin.dashboard.kpis.pendingReturns')}
+          value={pendingReturns}
+          loading={loading}
+          accent="rose"
+          href="/admin/returns?status=requested,approved,in_transit,received"
+          icon={<HandCoins />}
+        />
+        <StatCard
+          title={t('admin.dashboard.kpis.pendingShipments')}
+          value={pendingShipments}
+          loading={loading}
+          accent="amber"
+          href="/admin/orders?preset=pendingShipments"
+          icon={<PackagePlus />}
+        />
         <StatCard
           title={t('admin.dashboard.kpis.avgBasket')}
           value={(ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : null}
           loading={loading}
           isCurrency
           lang={lang}
-          icon={<Calculator size={24} strokeWidth={1.5} />}
+          accent="violet"
+          icon={<Calculator />}
           trend={(() => {
             const currentAvg = (ordersCount && ordersCount > 0 && salesTotal != null) ? (salesTotal / ordersCount) : 0;
             const prevAvg = (prevOrdersCount && prevOrdersCount > 0 && prevSalesTotal != null) ? (prevSalesTotal / prevOrdersCount) : 0;
@@ -346,13 +359,24 @@ const AdminDashboardPage: React.FC = () => {
             return undefined;
           })()}
         />
-        <StatCard title="Bağlı Sermaye (Envanter Değeri)" value={tiedCapital} loading={loading} isCurrency lang={lang} icon={<Database size={24} strokeWidth={1.5} />} />
         <StatCard
-          title="Stok Alarmları (Kritik Stok)"
+          title="Bağlı Sermaye"
+          subtitle="Envanter Değeri"
+          value={tiedCapital}
+          loading={loading}
+          isCurrency
+          lang={lang}
+          accent="sky"
+          icon={<Database />}
+        />
+        <StatCard
+          title="Stok Alarmları"
+          subtitle="Kritik Seviye"
           value={alarmCount}
           loading={loading}
+          accent="orange"
           href="/admin/inventory"
-          icon={<BellRing size={24} strokeWidth={1.5} className="text-rose-500" />}
+          icon={<BellRing />}
         />
       </section>
 

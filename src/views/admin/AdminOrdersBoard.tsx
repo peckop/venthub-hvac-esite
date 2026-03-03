@@ -9,6 +9,7 @@ import { adminSectionTitleClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
+import { useRole } from '../../hooks/useRole'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -125,7 +126,7 @@ interface OrderDetail {
     tracking_number?: string | null
 }
 
-function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: () => void }) {
+function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrderRow; onClose: () => void; hasWriteAccess: boolean }) {
     const { lang } = useI18n()
     const [detail, setDetail] = useState<OrderDetail | null>(null)
     const [loading, setLoading] = useState(true)
@@ -161,6 +162,10 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
     }, [order.id])
 
     const addNote = async () => {
+        if (!hasWriteAccess) {
+            toast.error('Not eklemek için yetkiniz yok.')
+            return
+        }
         if (!noteInput.trim()) return
         setSaving(true)
         try {
@@ -251,7 +256,7 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
                                         placeholder="Hızlı not ekle..."
                                         className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
                                     />
-                                    <button onClick={addNote} disabled={saving} className="px-3 py-2 bg-primary-navy text-white text-xs font-bold rounded-lg hover:bg-primary-navy/90 transition-colors disabled:opacity-50">
+                                    <button onClick={addNote} disabled={saving || !hasWriteAccess} className="px-3 py-2 bg-primary-navy text-white text-xs font-bold rounded-lg hover:bg-primary-navy/90 transition-colors disabled:opacity-50">
                                         Ekle
                                     </button>
                                 </div>
@@ -281,6 +286,8 @@ function MiniDetailPanel({ order, onClose }: { order: AdminOrderRow; onClose: ()
 // --- Ana Board Bileşeni ---
 export default function AdminOrdersBoard() {
     const { lang } = useI18n()
+    const { canWrite } = useRole()
+    const hasWriteAccess = canWrite('orders')
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
@@ -328,6 +335,10 @@ export default function AdminOrdersBoard() {
 
     // Sürükle-bırak: Anında uygula, popup yok, sadece toast bildirimi
     const onDragEnd = async (result: DropResult) => {
+        if (!hasWriteAccess) {
+            toast.error('Durum değiştirmek için yetkiniz yok.')
+            return
+        }
         const { destination, source, draggableId } = result
 
         if (!destination) return
@@ -500,9 +511,7 @@ export default function AdminOrdersBoard() {
             </DragDropContext>
 
             {/* Mini Detay Paneli */}
-            {selectedOrder && (
-                <MiniDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} />
-            )}
+            {selectedOrder && <MiniDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} hasWriteAccess={hasWriteAccess} />}
         </div>
     )
 }
