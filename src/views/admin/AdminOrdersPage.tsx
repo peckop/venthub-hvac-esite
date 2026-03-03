@@ -19,6 +19,9 @@ import toast from 'react-hot-toast'
 import { X, Search, Truck, FileText, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare } from 'lucide-react'
 import AdminOrdersBoard from './AdminOrdersBoard'
 import { updateOrderStatus } from '../../lib/orderStatusService'
+import DateRangePicker from '../../components/admin/DateRangePicker'
+import { DateRange } from 'react-day-picker'
+import { endOfDay } from 'date-fns'
 
 interface AdminOrderRow {
   id: string
@@ -59,8 +62,7 @@ const AdminOrdersPage: React.FC = () => {
   const PAGE_SIZE = 50
 
   const [status, setStatus] = React.useState('')
-  const [fromDate, setFromDate] = React.useState('')
-  const [toDate, setToDate] = React.useState('')
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>()
   const [query, setQuery] = React.useState('')
   const [debouncedQuery, setDebouncedQuery] = React.useState('')
 
@@ -148,8 +150,8 @@ const AdminOrdersPage: React.FC = () => {
         qb = qb.eq('status', status)
       }
 
-      if (fromDate) qb = qb.gte('created_at', `${fromDate}T00:00:00Z`)
-      if (toDate) qb = qb.lte('created_at', `${toDate}T23:59:59Z`)
+      if (dateRange?.from) qb = qb.gte('created_at', dateRange.from.toISOString())
+      if (dateRange?.to) qb = qb.lte('created_at', endOfDay(dateRange.to).toISOString())
 
       if (debouncedQuery) {
         const q = debouncedQuery.trim()
@@ -169,7 +171,7 @@ const AdminOrdersPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [status, fromDate, toDate, page, debouncedQuery, presetPendingShipments, t])
+  }, [status, dateRange, page, debouncedQuery, presetPendingShipments, t])
 
   React.useEffect(() => {
     if (viewMode === 'list') fetchOrders()
@@ -470,12 +472,11 @@ const AdminOrdersPage: React.FC = () => {
         search={{ value: query, onChange: setQuery, placeholder: t('admin.search.orders'), focusShortcut: '/' }}
         select={{ value: status, onChange: setStatus, title: t('admin.orders.filters.status'), options: STATUSES.map(s => ({ value: s.value, label: s.label })) }}
         toggles={[{ key: 'pendingShipments', label: t('admin.orders.filters.pendingShipments'), checked: presetPendingShipments, onChange: (v) => { setPresetPendingShipments(v); if (v) setStatus('') } }]}
-        onClear={() => { setPresetPendingShipments(false); setStatus(''); setFromDate(''); setToDate(''); setQuery(''); setPage(1) }}
+        onClear={() => { setPresetPendingShipments(false); setStatus(''); setDateRange(undefined); setQuery(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
+            <DateRangePicker value={dateRange} onChange={(d) => setDateRange(d)} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.orders.export.csvLabel'), onSelect: exportCsv }]} />
             <ColumnsMenu
               columns={[

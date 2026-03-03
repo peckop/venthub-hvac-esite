@@ -9,12 +9,17 @@ import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
 import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2, BellRing, Database } from 'lucide-react'
+import { DateRange } from 'react-day-picker'
+import DateRangePicker from '../../components/admin/DateRangePicker'
+import { startOfDay, endOfDay, differenceInDays, subDays } from 'date-fns'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
 
-  type Range = 'today' | '7d' | '30d'
-  const [range, setRange] = React.useState<Range>('today')
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: startOfDay(new Date()),
+    to: endOfDay(new Date())
+  })
 
   const [ordersCount, setOrdersCount] = React.useState<number | null>(null)
   const [prevOrdersCount, setPrevOrdersCount] = React.useState<number | null>(null)
@@ -38,29 +43,20 @@ const AdminDashboardPage: React.FC = () => {
   const [alarmCount, setAlarmCount] = React.useState<number | null>(null)
 
   const rangeStartISO = React.useMemo(() => {
-    const now = new Date()
-    if (range === 'today') {
-      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-      return start.toISOString()
-    }
-    const days = range === '7d' ? 7 : 30
-    const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
-    return start.toISOString()
-  }, [range])
+    return dateRange?.from ? dateRange.from.toISOString() : startOfDay(new Date()).toISOString()
+  }, [dateRange])
 
   const prevRangeISO = React.useMemo(() => {
-    const now = new Date()
-    let start: Date, end: Date
-    if (range === 'today') {
-      start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
-      end = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    } else {
-      const days = range === '7d' ? 7 : 30
-      start = new Date(now.getTime() - (days * 2 * 24 * 60 * 60 * 1000))
-      end = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000))
+    if (!dateRange?.from || !dateRange?.to) {
+      const start = subDays(startOfDay(new Date()), 1)
+      const end = subDays(endOfDay(new Date()), 1)
+      return { start: start.toISOString(), end: end.toISOString() }
     }
+    const diff = differenceInDays(endOfDay(dateRange.to), startOfDay(dateRange.from)) + 1
+    const start = subDays(dateRange.from, diff)
+    const end = subDays(dateRange.to, diff)
     return { start: start.toISOString(), end: end.toISOString() }
-  }, [range])
+  }, [dateRange])
 
   const loadKPIs = React.useCallback(async () => {
     try {
@@ -168,7 +164,9 @@ const AdminDashboardPage: React.FC = () => {
       setPrevSalesTotal(prevSum)
 
       // build daily counts (last N days depending on range)
-      const days = range === 'today' ? 1 : (range === '7d' ? 7 : 30)
+      const r_start = dateRange?.from ? startOfDay(dateRange.from) : startOfDay(new Date())
+      const r_end = dateRange?.to ? endOfDay(dateRange.to) : endOfDay(new Date())
+      const days = Math.max(1, differenceInDays(r_end, r_start) + 1)
       const dataMap = new Map<string, { date: string; orders: number; returns: number }>()
 
       for (let i = days - 1; i >= 0; i--) {
@@ -291,16 +289,9 @@ const AdminDashboardPage: React.FC = () => {
     } finally {
       setLoading(false)
     }
-  }, [rangeStartISO, prevRangeISO, range, t])
+  }, [rangeStartISO, prevRangeISO, dateRange, t])
 
   React.useEffect(() => { loadKPIs() }, [loadKPIs])
-
-  const RangeButton: React.FC<{ value: Range; label: string }> = ({ value, label }) => (
-    <button
-      onClick={() => setRange(value)}
-      className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${range === value ? 'bg-primary-navy text-white shadow-lg shadow-primary-navy/20 scale-[1.02]' : 'bg-white text-slate-500 border border-slate-200/60 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800'}`}
-    >{label}</button>
-  )
 
   return (
     <div className="space-y-6">
@@ -309,10 +300,8 @@ const AdminDashboardPage: React.FC = () => {
           <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
           <p className={adminSubtitleClass}>{t('admin.dashboard.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl shadow-inner border border-slate-200/50">
-          <RangeButton value="today" label={t('admin.dashboard.rangeToday')} />
-          <RangeButton value="7d" label={t('admin.dashboard.range7d')} />
-          <RangeButton value="30d" label={t('admin.dashboard.range30d')} />
+        <div className="flex items-center gap-2">
+          <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
       </header>
 
@@ -370,7 +359,7 @@ const AdminDashboardPage: React.FC = () => {
       {/* Primary Chart Area */}
       <section className="w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
         <SalesChart
-          title={t('admin.dashboard.trend', { days: range === 'today' ? '1' : (range === '7d' ? '7' : '30') })}
+          title="Sipariş Trendi"
           data={dailyCounts}
         />
       </section>
@@ -522,7 +511,7 @@ const AdminDashboardPage: React.FC = () => {
           orders={recentOrders}
         />
       </section>
-    </div>
+    </div >
   )
 }
 
