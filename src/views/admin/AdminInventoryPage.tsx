@@ -5,6 +5,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
 import EditableCell from '../../components/admin/EditableCell'
+import InfoTooltip from '../../components/admin/InfoTooltip'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
@@ -1054,30 +1055,42 @@ const AdminInventoryPage: React.FC = () => {
               )}
               {visibleCols.physical && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('physical')} className="hover:underline ml-auto flex items-center gap-1">
-                    Fiziksel {sortIndicator('physical')}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => toggleSort('physical')} className="hover:underline flex items-center gap-1">
+                      Fiziksel {sortIndicator('physical')}
+                    </button>
+                    <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
+                  </div>
                 </th>
               )}
               {visibleCols.reserved && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('reserved')} className="hover:underline ml-auto flex items-center gap-1">
-                    Rezerve {sortIndicator('reserved')}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => toggleSort('reserved')} className="hover:underline flex items-center gap-1">
+                      Rezerve {sortIndicator('reserved')}
+                    </button>
+                    <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş (siparişi verilmiş) ürün miktarı." />
+                  </div>
                 </th>
               )}
               {visibleCols.available && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('available')} className="hover:underline ml-auto flex items-center gap-1 text-primary-navy">
-                    Müsait {sortIndicator('available')}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => toggleSort('available')} className="hover:underline flex items-center gap-1 text-primary-navy">
+                      Müsait {sortIndicator('available')}
+                    </button>
+                    <InfoTooltip text="Müşterilere satılabilecek durumdaki net stok adedi. (Fiziksel - Rezerve)" />
+                  </div>
                 </th>
               )}
               {visibleCols.threshold && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('threshold')} className="hover:underline ml-auto flex items-center gap-1">
-                    Eşik {sortIndicator('threshold')}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => toggleSort('threshold')} className="hover:underline flex items-center gap-1">
+                      Eşik {sortIndicator('threshold')}
+                    </button>
+                    <InfoTooltip text="Müsait stok bu rakamın altına indiğinde sistem 'Kritik Stok' uyarısı verir." />
+                  </div>
                 </th>
               )}
               {visibleCols.location && (
@@ -1096,16 +1109,22 @@ const AdminInventoryPage: React.FC = () => {
               )}
               {visibleCols.abc && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('abc')} className="hover:underline mx-auto flex items-center gap-1">
-                    Sınıf {sortIndicator('abc')}
-                  </button>
+                  <div className="flex items-center justify-center gap-1">
+                    <button onClick={() => toggleSort('abc')} className="hover:underline flex items-center gap-1">
+                      Sınıf {sortIndicator('abc')}
+                    </button>
+                    <InfoTooltip text="Satış hacmine göre ürünün önem derecesi: A (En Popüler), B (Orta), C (Az Satan)." />
+                  </div>
                 </th>
               )}
               {visibleCols.days && (
                 <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <button onClick={() => toggleSort('days_empty')} className="hover:underline ml-auto flex items-center gap-1">
-                    Tükenme Hızı {sortIndicator('days_empty')}
-                  </button>
+                  <div className="flex items-center justify-end gap-1">
+                    <button onClick={() => toggleSort('days_empty')} className="hover:underline flex items-center gap-1">
+                      Tükenme Hızı {sortIndicator('days_empty')}
+                    </button>
+                    <InfoTooltip text="Son 30 günlük satış ivmesine göre eldeki müsait stoğun kaç gün içinde biteceği tahmini." />
+                  </div>
                 </th>
               )}
               {visibleCols.status && (
