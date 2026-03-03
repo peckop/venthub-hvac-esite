@@ -76,3 +76,12 @@ iyzico-keys.*
 out/
 build/
 .swc/
+
+# Lint & Build çıktı dosyaları (büyük dosya koruması)
+lint-output.json
+lint-final.txt
+lint_results.txt
+src_lint_utf8.txt
+build_error.txt
+out.txt
+lint.txt
