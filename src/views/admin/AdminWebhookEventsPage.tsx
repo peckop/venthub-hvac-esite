@@ -1,5 +1,5 @@
 import React from 'react'
-import { adminSectionTitleClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminTableHeadCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { Density } from '../../components/admin/ColumnsMenu'
@@ -137,61 +137,65 @@ const AdminWebhookEventsPage: React.FC = () => {
       {tab === 'returns' ? (
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <div className="p-2 text-xs text-slate-500">{t('admin.webhooks.tip.rowAction')}</div>
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr>
-                {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
-                {colsRet.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.order')}</th>)}
-                {colsRet.carrier && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.carrier')}</th>)}
-                {colsRet.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.statusMapped')}</th>)}
-                {colsRet.received && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.received')}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredReturns.length === 0 ? (
-                <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
-              ) : (
-                filteredReturns.map((r) => (
-                  <tr key={String(r.id)} className="border-t border-gray-100">
-                    {colsRet.event && (<td className="px-3 py-2 font-mono text-xs">{r.event_id}</td>)}
-                    {colsRet.order && (<td className="px-3 py-2 font-mono text-xs">{r.order_id || '-'}</td>)}
-                    {colsRet.carrier && (<td className="px-3 py-2">{r.carrier || '-'}</td>)}
-                    {colsRet.status && (<td className="px-3 py-2">{r.status_mapped || r.status_raw || '-'}</td>)}
-                    {colsRet.received && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.received_at, lang)}</td>)}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full text-sm max-md:text-xs">
+              <thead>
+                <tr>
+                  {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
+                  {colsRet.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.order')}</th>)}
+                  {colsRet.carrier && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.carrier')}</th>)}
+                  {colsRet.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.statusMapped')}</th>)}
+                  {colsRet.received && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.received')}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredReturns.length === 0 ? (
+                  <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
+                ) : (
+                  filteredReturns.map((r) => (
+                    <tr key={String(r.id)} className="border-t border-gray-100">
+                      {colsRet.event && (<td className="px-3 py-2 font-mono text-xs">{r.event_id}</td>)}
+                      {colsRet.order && (<td className="px-3 py-2 font-mono text-xs">{r.order_id || '-'}</td>)}
+                      {colsRet.carrier && (<td className="px-3 py-2">{r.carrier || '-'}</td>)}
+                      {colsRet.status && (<td className="px-3 py-2">{r.status_mapped || r.status_raw || '-'}</td>)}
+                      {colsRet.received && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.received_at, lang)}</td>)}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       ) : (
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr>
-                {colsMail.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.order')}</th>)}
-                {colsMail.to && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.to')}</th>)}
-                {colsMail.subject && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.subject')}</th>)}
-                {colsMail.provider && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.provider')}</th>)}
-                {colsMail.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.date')}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredEmails.length === 0 ? (
-                <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
-              ) : (
-                filteredEmails.map((e, idx) => (
-                  <tr key={idx} className="border-t border-gray-100">
-                    {colsMail.order && (<td className="px-3 py-2 font-mono text-xs">{e.order_id}</td>)}
-                    {colsMail.to && (<td className="px-3 py-2">{e.email_to}</td>)}
-                    {colsMail.subject && (<td className="px-3 py-2">{e.subject}</td>)}
-                    {colsMail.provider && (<td className="px-3 py-2">{e.provider || '-'}</td>)}
-                    {colsMail.created && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(e.created_at, lang)}</td>)}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full text-sm max-md:text-xs">
+              <thead>
+                <tr>
+                  {colsMail.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.order')}</th>)}
+                  {colsMail.to && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.to')}</th>)}
+                  {colsMail.subject && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.subject')}</th>)}
+                  {colsMail.provider && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.provider')}</th>)}
+                  {colsMail.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.date')}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmails.length === 0 ? (
+                  <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
+                ) : (
+                  filteredEmails.map((e, idx) => (
+                    <tr key={idx} className="border-t border-gray-100">
+                      {colsMail.order && (<td className="px-3 py-2 font-mono text-xs">{e.order_id}</td>)}
+                      {colsMail.to && (<td className="px-3 py-2">{e.email_to}</td>)}
+                      {colsMail.subject && (<td className="px-3 py-2">{e.subject}</td>)}
+                      {colsMail.provider && (<td className="px-3 py-2">{e.provider || '-'}</td>)}
+                      {colsMail.created && (<td className="px-3 py-2 whitespace-nowrap">{formatDateTime(e.created_at, lang)}</td>)}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
     </div>

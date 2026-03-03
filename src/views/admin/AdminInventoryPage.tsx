@@ -4,6 +4,7 @@ import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, a
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
+import EditableCell from '../../components/admin/EditableCell'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
@@ -51,10 +52,6 @@ const AdminInventoryPage: React.FC = () => {
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('asc')
   const [groupByCategory, setGroupByCategory] = React.useState<boolean>(false)
 
-  const [editingLocation, setEditingLocation] = React.useState<string | null>(null)
-  const [editLocationVal, setEditLocationVal] = React.useState<string>('')
-  const [editingSupplier, setEditingSupplier] = React.useState<string | null>(null)
-  const [editSupplierVal, setEditSupplierVal] = React.useState<string>('')
   const [printingQr, setPrintingQr] = React.useState(false)
 
   // Arama
@@ -790,33 +787,6 @@ const AdminInventoryPage: React.FC = () => {
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
   const visibleCount = (visibleCols.name ? 1 : 0) + (visibleCols.physical ? 1 : 0) + (visibleCols.reserved ? 1 : 0) + (visibleCols.available ? 1 : 0) + (visibleCols.threshold ? 1 : 0) + (visibleCols.status ? 1 : 0) + (visibleCols.location ? 1 : 0) + (visibleCols.supplier ? 1 : 0) + (visibleCols.abc ? 1 : 0) + (visibleCols.days ? 1 : 0)
 
-  // Save inline edits
-  const saveLocation = async (r: Row, newVal: string) => {
-    try {
-      if (r.warehouse_location === newVal) return
-      const { error } = await supabase.from('products').update({ warehouse_location: newVal || null }).eq('id', r.product_id)
-      if (error) throw error
-      setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: newVal || null } : row))
-      toast.success('Raf konumu güncellendi')
-    } catch {
-      toast.error('Raf konumu güncellenemedi')
-    }
-    setEditingLocation(null)
-  }
-
-  const saveSupplier = async (r: Row, newVal: string) => {
-    try {
-      if (r.supplier_name === newVal) return
-      const { error } = await supabase.from('products').update({ supplier_name: newVal || null }).eq('id', r.product_id)
-      if (error) throw error
-      setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: newVal || null } : row))
-      toast.success('Tedarikçi güncellendi')
-    } catch {
-      toast.error('Tedarikçi güncellenemedi')
-    }
-    setEditingSupplier(null)
-  }
-
   const printQrLabel = async (r: Row) => {
     try {
       setPrintingQr(true)
@@ -837,119 +807,131 @@ const AdminInventoryPage: React.FC = () => {
           <meta charset="utf-8">
           <title>Etiket Yazdir - ${safeSku}</title>
           <style>
-          <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
             @page {
-              size: 50mm 40mm;
               margin: 0;
+              size: auto;
             }
             body {
-              width: 50mm;
-              height: 40mm;
               margin: 0;
-              padding: 1.5mm 2mm;
+              padding: 0;
               box-sizing: border-box;
-              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", 'Inter', Roboto, sans-serif;
               display: flex;
               flex-direction: column;
               align-items: center;
               justify-content: flex-start;
+              min-height: 100vh;
               text-align: center;
-              background: white;
+              background: #f8fafc;
               color: black;
+            }
+            .card-wrapper {
+              width: 100%;
+              padding: 40px 20px;
+              display: flex;
+              justify-content: center;
+            }
+            .card {
+              background: white;
+              border: 2px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 40px;
+              width: 100%;
+              max-width: 450px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             }
             .qr-wrapper {
               display: flex;
               align-items: center;
               justify-content: center;
-              margin-bottom: 1.5mm;
-              margin-top: 0.5mm;
-              flex-shrink: 0;
+              margin-bottom: 24px;
             }
             .qr {
-              width: 17.5mm;
-              height: 17.5mm;
+              width: 180px;
+              height: 180px;
               display: block;
             }
             .title {
-              font-size: 8pt;
+              font-size: 20px;
               font-weight: 800;
-              letter-spacing: -0.2px;
-              line-height: 1.15;
-              margin: 0 0 1.5mm 0;
-              width: 100%;
+              letter-spacing: -0.5px;
+              line-height: 1.3;
+              margin: 0 0 24px 0;
               text-transform: uppercase;
-              flex-shrink: 0;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
+              color: #0f172a;
             }
             .separator {
-              width: 85%;
-              height: 1px;
+              width: 100%;
+              height: 2px;
               background-color: #e2e8f0;
-              border-bottom: 0.5px solid #000;
-              margin: 0 auto 1.5mm auto;
-              flex-shrink: 0;
+              margin: 24px 0;
             }
             .meta-grid {
               display: flex;
               width: 100%;
-              justify-content: space-around;
-              align-items: flex-end;
-              flex-shrink: 0;
-              margin-bottom: 1.5mm;
+              justify-content: space-between;
+              margin-bottom: 32px;
             }
             .meta-item {
               display: flex;
               flex-direction: column;
               align-items: center;
-              gap: 0.5mm;
+              width: 50%;
             }
             .meta-label {
-              font-size: 5.5pt;
-              color: #475569;
+              font-size: 11px;
+              color: #64748b;
               text-transform: uppercase;
-              font-weight: 600;
-              letter-spacing: 0.3px;
+              font-weight: 700;
+              letter-spacing: 1px;
+              margin-bottom: 6px;
             }
             .meta-value {
               font-weight: 800;
-              font-size: 7.5pt;
-              color: #000;
+              font-size: 18px;
+              color: #0f172a;
             }
             .meta-footer {
-              font-size: 7pt;
-              font-weight: 700;
+              font-size: 15px;
+              font-weight: 800;
               text-transform: uppercase;
               background-color: #f1f5f9;
-              padding: 0.5mm 3mm;
-              border-radius: 2mm;
-              border: 0.5px solid #cbd5e1;
-              flex-shrink: 0;
+              color: #0f172a;
+              padding: 14px 24px;
+              border-radius: 8px;
+              border: 2px dashed #cbd5e1;
               display: inline-block;
+            }
+            @media print {
+              body { background: white; }
+              .card-wrapper { padding: 0; flex-direction: column; justify-content: flex-start; align-items: flex-start; }
+              .card { border: none; box-shadow: none; padding: 0; max-width: 100%; }
             }
           </style>
         </head>
         <body>
-          <div class="qr-wrapper">
-            <img src="${url}" class="qr" onload="window.print();" />
-          </div>
-          <div class="title">${safeName}</div>
-          <div class="separator"></div>
-          <div class="meta-grid">
-            <div class="meta-item">
-              <span class="meta-label">SKU Kodu</span>
-              <span class="meta-value">${safeSku}</span>
+          <div class="card-wrapper">
+            <div class="card">
+              <div class="qr-wrapper">
+                <img src="${url}" class="qr" onload="window.print();" />
+              </div>
+              <div class="title">${safeName}</div>
+              <div class="separator"></div>
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">SKU Kodu</span>
+                  <span class="meta-value">${safeSku}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Depo Rafı</span>
+                  <span class="meta-value">${safeLoc}</span>
+                </div>
+              </div>
+              <div class="meta-footer">
+                MEVCUT STOK: ${r.physical_stock} ADET
+              </div>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">Depo Rafı</span>
-              <span class="meta-value">${safeLoc}</span>
-            </div>
-          </div>
-          <div class="meta-footer">
-            MEVCUT STOK: ${r.physical_stock} ADET
           </div>
         </body>
         </html>
@@ -1163,21 +1145,36 @@ const AdminInventoryPage: React.FC = () => {
                       {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
                       {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
                       {visibleCols.location && (
-                        <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingLocation(r.product_id); setEditLocationVal(r.warehouse_location || ''); }}>
-                          {editingLocation === r.product_id ? (
-                            <input autoFocus type="text" className="w-20 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editLocationVal} onChange={e => setEditLocationVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveLocation(r, editLocationVal); if (e.key === 'Escape') setEditingLocation(null); }} onBlur={() => void saveLocation(r, editLocationVal)} />
-                          ) : (
-                            <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.warehouse_location || '-'}</span>
-                          )}
+                        <td className={adminTableCellClass + " " + cellPad}>
+                          <EditableCell
+                            value={r.warehouse_location || ''}
+                            placeholder="-"
+                            inputWidth="w-20"
+                            onSave={async (val) => {
+                              if (r.warehouse_location === val) return
+                              const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
+                              if (error) throw error
+                              setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
+                              toast.success('Raf konumu güncellendi')
+                            }}
+                          />
                         </td>
                       )}
                       {visibleCols.supplier && (
-                        <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingSupplier(r.product_id); setEditSupplierVal(r.supplier_name || ''); }}>
-                          {editingSupplier === r.product_id ? (
-                            <input autoFocus type="text" className="w-24 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editSupplierVal} onChange={e => setEditSupplierVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveSupplier(r, editSupplierVal); if (e.key === 'Escape') setEditingSupplier(null); }} onBlur={() => void saveSupplier(r, editSupplierVal)} />
-                          ) : (
-                            <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.supplier_name || '-'}</span>
-                          )}
+                        <td className={adminTableCellClass + " " + cellPad}>
+                          <EditableCell
+                            value={r.supplier_name || ''}
+                            placeholder="-"
+                            inputWidth="w-24"
+                            className="max-w-[120px] truncate block"
+                            onSave={async (val) => {
+                              if (r.supplier_name === val) return
+                              const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
+                              if (error) throw error
+                              setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
+                              toast.success('Tedarikçi güncellendi')
+                            }}
+                          />
                         </td>
                       )}
                       {visibleCols.abc && (
@@ -1224,21 +1221,36 @@ const AdminInventoryPage: React.FC = () => {
                   {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
                   {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
                   {visibleCols.location && (
-                    <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingLocation(r.product_id); setEditLocationVal(r.warehouse_location || ''); }}>
-                      {editingLocation === r.product_id ? (
-                        <input autoFocus type="text" className="w-20 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editLocationVal} onChange={e => setEditLocationVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveLocation(r, editLocationVal); if (e.key === 'Escape') setEditingLocation(null); }} onBlur={() => void saveLocation(r, editLocationVal)} />
-                      ) : (
-                        <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.warehouse_location || '-'}</span>
-                      )}
+                    <td className={adminTableCellClass + " " + cellPad}>
+                      <EditableCell
+                        value={r.warehouse_location || ''}
+                        placeholder="-"
+                        inputWidth="w-20"
+                        onSave={async (val) => {
+                          if (r.warehouse_location === val) return
+                          const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
+                          if (error) throw error
+                          setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
+                          toast.success('Raf konumu güncellendi')
+                        }}
+                      />
                     </td>
                   )}
                   {visibleCols.supplier && (
-                    <td className={adminTableCellClass + " " + cellPad} onClick={(e) => { e.stopPropagation(); setEditingSupplier(r.product_id); setEditSupplierVal(r.supplier_name || ''); }}>
-                      {editingSupplier === r.product_id ? (
-                        <input autoFocus type="text" className="w-24 px-1 py-0.5 text-xs border border-primary-navy rounded" value={editSupplierVal} onChange={e => setEditSupplierVal(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void saveSupplier(r, editSupplierVal); if (e.key === 'Escape') setEditingSupplier(null); }} onBlur={() => void saveSupplier(r, editSupplierVal)} />
-                      ) : (
-                        <span className="text-slate-500 border-b border-dashed border-slate-300 hover:border-primary-navy">{r.supplier_name || '-'}</span>
-                      )}
+                    <td className={adminTableCellClass + " " + cellPad}>
+                      <EditableCell
+                        value={r.supplier_name || ''}
+                        placeholder="-"
+                        inputWidth="w-24"
+                        className="max-w-[120px] truncate block"
+                        onSave={async (val) => {
+                          if (r.supplier_name === val) return
+                          const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
+                          if (error) throw error
+                          setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
+                          toast.success('Tedarikçi güncellendi')
+                        }}
+                      />
                     </td>
                   )}
                   {visibleCols.abc && (

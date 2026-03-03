@@ -580,201 +580,203 @@ const AdminProductsPage: React.FC = () => {
             <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
           </div>
         </div>
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              {/* Checkbox column */}
-              <th className={`${adminTableHeadCellClass} ${headPad} w-10`}>
-                <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
-              </th>
-              {/* Expand column */}
-              <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
-              {visibleCols.image && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
-              )}
-              {visibleCols.name && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full max-md:text-xs">
+            <thead className="bg-gray-50">
+              <tr>
+                {/* Checkbox column */}
+                <th className={`${adminTableHeadCellClass} ${headPad} w-10`}>
+                  <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
                 </th>
-              )}
-              {visibleCols.sku && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
-                </th>
-              )}
-              {visibleCols.category && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
-                </th>
-              )}
-              {visibleCols.status && (
-                <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
-                </th>
-              )}
-              {visibleCols.health && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>
-                  Performans
-                </th>
-              )}
-              {visibleCols.price && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
-                </th>
-              )}
-              {visibleCols.stock && (
-                <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                  <button type="button" className="hover:underline" onClick={() => toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
-                </th>
-              )}
-              {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.actions')}</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {loading && rows.length === 0 ? (
-              <tr><td className="p-4" colSpan={10}>{t('admin.ui.loading')}</td></tr>
-            ) : filtered.length === 0 ? (
-              <tr><td className="p-4" colSpan={10}>{t('admin.ui.noRecords')}</td></tr>
-            ) : (
-              sorted.map(r => (
-                <React.Fragment key={r.id}>
-                  <tr className={`border-b border-slate-200/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
-                    {/* Checkbox */}
-                    <td className={`${adminTableCellClass} ${cellPad} w-10`}>
-                      <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
-                    </td>
-                    {/* Expand */}
-                    <td className={`${adminTableCellClass} ${cellPad} w-8`}>
-                      <button onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} className="text-gray-400 hover:text-primary-navy transition-colors">
-                        {expandedIds.has(r.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                      </button>
-                    </td>
-                    {visibleCols.image && (
-                      <td className={`${adminTableCellClass} ${cellPad}`}>
-                        {covers[r.id] ? (
-                          <img
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
-                            alt=""
-                            className="w-10 h-10 object-cover rounded border border-gray-200"
+                {/* Expand column */}
+                <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
+                {visibleCols.image && (
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
+                )}
+                {visibleCols.name && (
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
+                  </th>
+                )}
+                {visibleCols.sku && (
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
+                  </th>
+                )}
+                {visibleCols.category && (
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
+                  </th>
+                )}
+                {visibleCols.status && (
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
+                  </th>
+                )}
+                {visibleCols.health && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>
+                    Performans
+                  </th>
+                )}
+                {visibleCols.price && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
+                  </th>
+                )}
+                {visibleCols.stock && (
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
+                    <button type="button" className="hover:underline" onClick={() => toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
+                  </th>
+                )}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.actions')}</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {loading && rows.length === 0 ? (
+                <tr><td className="p-4" colSpan={10}>{t('admin.ui.loading')}</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td className="p-4" colSpan={10}>{t('admin.ui.noRecords')}</td></tr>
+              ) : (
+                sorted.map(r => (
+                  <React.Fragment key={r.id}>
+                    <tr className={`border-b border-slate-200/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
+                      {/* Checkbox */}
+                      <td className={`${adminTableCellClass} ${cellPad} w-10`}>
+                        <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                      </td>
+                      {/* Expand */}
+                      <td className={`${adminTableCellClass} ${cellPad} w-8`}>
+                        <button onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} className="text-gray-400 hover:text-primary-navy transition-colors">
+                          {expandedIds.has(r.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        </button>
+                      </td>
+                      {visibleCols.image && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          {covers[r.id] ? (
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
+                              alt=""
+                              className="w-10 h-10 object-cover rounded border border-gray-200"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-100 rounded" />
+                          )}
+                        </td>
+                      )}
+                      {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
+                      {visibleCols.sku && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          {r.sku}
+                          {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
+                        </td>
+                      )}
+                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
+                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                      {visibleCols.health && (
+                        <td className={`${adminTableCellClass} ${cellPad} text-center`}>
+                          <ProductHealthBadge
+                            stockQty={r.stock_qty || 0}
+                            threshold={r.low_stock_threshold || 10}
+                            status={r.status || 'inactive'}
+                            isFeatured={!!r.is_featured}
                           />
-                        ) : (
-                          <div className="w-10 h-10 bg-gray-100 rounded" />
-                        )}
-                      </td>
-                    )}
-                    {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
-                    {visibleCols.sku && (
-                      <td className={`${adminTableCellClass} ${cellPad}`}>
-                        {r.sku}
-                        {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
-                      </td>
-                    )}
-                    {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
-                    {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
-                    {visibleCols.health && (
-                      <td className={`${adminTableCellClass} ${cellPad} text-center`}>
-                        <ProductHealthBadge
-                          stockQty={r.stock_qty || 0}
-                          threshold={r.low_stock_threshold || 10}
-                          status={r.status || 'inactive'}
-                          isFeatured={!!r.is_featured}
-                        />
-                      </td>
-                    )}
-                    {/* Inline-edit Price */}
-                    {visibleCols.price && (
-                      <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                        {inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
-                          <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                            <input
-                              type="number"
-                              autoFocus
-                              value={inlineEdit.value}
-                              onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                              onBlur={saveInlineEdit}
-                              onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                              className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
-                            />
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                            className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
-                            title="Tıklayarak düzenle"
-                          >
-                            <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
-                            <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                              <Pencil size={10} className="text-primary-navy" />
+                        </td>
+                      )}
+                      {/* Inline-edit Price */}
+                      {visibleCols.price && (
+                        <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                          {inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
+                            <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                              <input
+                                type="number"
+                                autoFocus
+                                value={inlineEdit.value}
+                                onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                onBlur={saveInlineEdit}
+                                onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                              />
                             </div>
-                          </button>
-                        )}
-                      </td>
-                    )}
-                    {/* Inline-edit Stock */}
-                    {visibleCols.stock && (
-                      <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                        {inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
-                          <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                            <input
-                              type="number"
-                              autoFocus
-                              value={inlineEdit.value}
-                              onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                              onBlur={saveInlineEdit}
-                              onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                              className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
-                            />
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                            className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
-                            title="Tıklayarak düzenle"
-                          >
-                            <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
-                              {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
-                            </span>
-                            <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                              <Pencil size={10} className="text-primary-navy" />
-                            </div>
-                          </button>
-                        )}
-                      </td>
-                    )}
-                    {visibleCols.actions && (
-                      <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <div className="flex items-center gap-2 whitespace-nowrap">
-                          <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                          <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                  {/* Expanded Row - Tech Specs */}
-                  {expandedIds.has(r.id) && (
-                    <tr className="bg-gray-50/70">
-                      <td colSpan={10} className="px-6 py-3">
-                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
-                        {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {Object.entries(techSpecs[r.id]).map(([key, val]) => (
-                              <div key={key} className="bg-white rounded-lg border border-gray-200 px-3 py-2">
-                                <div className="text-[11px] text-gray-400 uppercase">{key}</div>
-                                <div className="text-sm font-medium text-gray-800">{String(val)}</div>
+                          ) : (
+                            <button
+                              onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
+                              className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
+                              title="Tıklayarak düzenle"
+                            >
+                              <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
+                              <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                                <Pencil size={10} className="text-primary-navy" />
                               </div>
-                            ))}
+                            </button>
+                          )}
+                        </td>
+                      )}
+                      {/* Inline-edit Stock */}
+                      {visibleCols.stock && (
+                        <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                          {inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
+                            <div className="relative inline-block animate-in fade-in zoom-in duration-200">
+                              <input
+                                type="number"
+                                autoFocus
+                                value={inlineEdit.value}
+                                onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                onBlur={saveInlineEdit}
+                                onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                              />
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
+                              className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
+                              title="Tıklayarak düzenle"
+                            >
+                              <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
+                                {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                              </span>
+                              <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
+                                <Pencil size={10} className="text-primary-navy" />
+                              </div>
+                            </button>
+                          )}
+                        </td>
+                      )}
+                      {visibleCols.actions && (
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                          <div className="flex items-center gap-2 whitespace-nowrap">
+                            <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
+                            <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
                           </div>
-                        ) : (
-                          <div className="text-sm text-slate-500">Teknik veri bulunamadı.</div>
-                        )}
-                      </td>
+                        </td>
+                      )}
                     </tr>
-                  )}
-                </React.Fragment>
-              ))
-            )}
-          </tbody>
-        </table>
+                    {/* Expanded Row - Tech Specs */}
+                    {expandedIds.has(r.id) && (
+                      <tr className="bg-gray-50/70">
+                        <td colSpan={10} className="px-6 py-3">
+                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
+                          {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {Object.entries(techSpecs[r.id]).map(([key, val]) => (
+                                <div key={key} className="bg-white rounded-lg border border-gray-200 px-3 py-2">
+                                  <div className="text-[11px] text-gray-400 uppercase">{key}</div>
+                                  <div className="text-sm font-medium text-gray-800">{String(val)}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-slate-500">Teknik veri bulunamadı.</div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Bulk Action Toolbar */}

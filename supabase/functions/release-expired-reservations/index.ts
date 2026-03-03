@@ -71,8 +71,7 @@ serve(async (_req) => {
                             product_id: item.product_id,
                             delta: item.quantity,
                             reason: 'return', // Rezervasyon iptali
-                            reference_id: order.id,
-                            metadata: { note: 'Rezervasyon Süresi Doldu. Otomatik Sistem İadesi.' }
+                            order_id: order.id
                         })
                     }
                 }
@@ -86,8 +85,9 @@ serve(async (_req) => {
             message: `Released ${releasedCount} expired orders and their stock reservations.`
         }), { headers: { 'Content-Type': 'application/json' } })
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Edge Function Error:', error)
-        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+        const msg = error instanceof Error ? error.message : String(error)
+        return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { 'Content-Type': 'application/json' } })
     }
 })

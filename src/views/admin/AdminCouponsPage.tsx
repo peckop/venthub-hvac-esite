@@ -217,44 +217,46 @@ const AdminCouponsPage: React.FC = () => {
       </div>
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr>
-              <th className={`${adminTableHeadCellClass}`}>Kod</th>
-              <th className={`${adminTableHeadCellClass}`}>Tip</th>
-              <th className={`${adminTableHeadCellClass}`}>Değer</th>
-              <th className={`${adminTableHeadCellClass}`}>Aktif</th>
-              <th className={`${adminTableHeadCellClass}`}>Başlangıç</th>
-              <th className={`${adminTableHeadCellClass}`}>Bitiş</th>
-              <th className={`${adminTableHeadCellClass}`}>Kullanım</th>
-              <th className={`${adminTableHeadCellClass}`}>Oluşturulma</th>
-              <th className={`${adminTableHeadCellClass}`}>İşlemler</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered().length === 0 ? (
-              <tr><td className="px-4 py-6">Kayıt yok</td></tr>
-            ) : (
-              filtered().map(r => (
-                <tr key={r.id} className="border-t border-gray-100">
-                  <td className="px-3 py-2 font-mono text-xs">{r.code}</td>
-                  <td className="px-3 py-2">{r.type}</td>
-                  <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}</td>
-                  <td className="px-3 py-2">
-                    <label className="inline-flex items-center gap-2 text-xs">
-                      <input type="checkbox" checked={!!r.active} onChange={() => toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
-                    </label>
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : '-'}</td>
-                  <td className="px-3 py-2">{r.used_count || 0}{r.usage_limit ? ` / ${r.usage_limit}` : ''}</td>
-                  <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.created_at, lang as 'tr' | 'en')}</td>
-                  <td className="px-3 py-2 text-xs text-slate-500">—</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto w-full">
+          <table className="min-w-full text-sm max-md:text-xs">
+            <thead>
+              <tr>
+                <th className={`${adminTableHeadCellClass}`}>Kod</th>
+                <th className={`${adminTableHeadCellClass}`}>Tip</th>
+                <th className={`${adminTableHeadCellClass}`}>Değer</th>
+                <th className={`${adminTableHeadCellClass}`}>Aktif</th>
+                <th className={`${adminTableHeadCellClass}`}>Başlangıç</th>
+                <th className={`${adminTableHeadCellClass}`}>Bitiş</th>
+                <th className={`${adminTableHeadCellClass}`}>Kullanım</th>
+                <th className={`${adminTableHeadCellClass}`}>Oluşturulma</th>
+                <th className={`${adminTableHeadCellClass}`}>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered().length === 0 ? (
+                <tr><td className="px-4 py-6">Kayıt yok</td></tr>
+              ) : (
+                filtered().map(r => (
+                  <tr key={r.id} className="border-t border-gray-100">
+                    <td className="px-3 py-2 font-mono text-xs">{r.code}</td>
+                    <td className="px-3 py-2">{r.type}</td>
+                    <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}</td>
+                    <td className="px-3 py-2">
+                      <label className="inline-flex items-center gap-2 text-xs">
+                        <input type="checkbox" checked={!!r.active} onChange={() => toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
+                      </label>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : '-'}</td>
+                    <td className="px-3 py-2">{r.used_count || 0}{r.usage_limit ? ` / ${r.usage_limit}` : ''}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.created_at, lang as 'tr' | 'en')}</td>
+                    <td className="px-3 py-2 text-xs text-slate-500">—</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   )

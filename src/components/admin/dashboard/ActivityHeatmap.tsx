@@ -9,7 +9,6 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts'
-import { useI18n } from '../../../i18n/I18nProvider'
 
 interface HeatmapData {
     day: number // 0: Sun, 1: Mon, ..., 6: Sat

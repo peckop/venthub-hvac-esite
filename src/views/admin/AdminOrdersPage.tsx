@@ -520,44 +520,46 @@ const AdminOrdersPage: React.FC = () => {
           </div>
 
           <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr>
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
-                  {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
-                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
-                  {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
-                  {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
-                  {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading && rows.length === 0 ? (
-                  <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.loading')}</td></tr>
-                ) : sorted.length === 0 ? (
-                  <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.noRecords')}</td></tr>
-                ) : (
-                  sorted.map((r) => (
-                    <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} /></td>
-                      {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs">{r.id}</td>)}
-                      {visibleCols.status && (<td className="px-4 py-3"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
-                      {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500">{r.conversation_id || '-'}</td>)}
-                      {visibleCols.amount && (<td className="px-4 py-3">{formatAmount(r.total_amount, lang)}</td>)}
-                      {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          <button onClick={() => openShipModal(r.id)} className={adminTableActionPrimaryClass}>{t('admin.orders.actions.shipping')}</button>
-                          <button onClick={() => openLogsModal(r.id)} className={adminTableActionWarningClass}>{t('admin.orders.actions.logs')}</button>
-                          <button onClick={() => openNotesModal(r.id)} className={adminTableActionNeutralClass}>{t('admin.orders.actions.notes')}</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto w-full">
+              <table className="min-w-full text-sm max-md:text-xs">
+                <thead>
+                  <tr>
+                    <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
+                    {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
+                    {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
+                    {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
+                    {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
+                    {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
+                    <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading && rows.length === 0 ? (
+                    <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.loading')}</td></tr>
+                  ) : sorted.length === 0 ? (
+                    <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.noRecords')}</td></tr>
+                  ) : (
+                    sorted.map((r) => (
+                      <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
+                        <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} /></td>
+                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs">{r.id}</td>)}
+                        {visibleCols.status && (<td className="px-4 py-3"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
+                        {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500">{r.conversation_id || '-'}</td>)}
+                        {visibleCols.amount && (<td className="px-4 py-3">{formatAmount(r.total_amount, lang)}</td>)}
+                        {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2">
+                            <button onClick={() => openShipModal(r.id)} className={adminTableActionPrimaryClass}>{t('admin.orders.actions.shipping')}</button>
+                            <button onClick={() => openLogsModal(r.id)} className={adminTableActionWarningClass}>{t('admin.orders.actions.logs')}</button>
+                            <button onClick={() => openNotesModal(r.id)} className={adminTableActionNeutralClass}>{t('admin.orders.actions.notes')}</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </section>
         </>
       )}
@@ -618,25 +620,27 @@ const AdminOrdersPage: React.FC = () => {
                     Yükleniyor...
                   </div>
                 ) : (
-                  <table className="min-w-full text-sm divide-y divide-slate-100">
-                    <thead className="bg-slate-50 sticky top-0">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tarih</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Konu</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {emailLogs.map((l, i) => (
-                        <tr key={i} className="hover:bg-white transition-colors">
-                          <td className="px-4 py-3 text-slate-600 font-medium whitespace-nowrap">{safeDate(l.created_at)}</td>
-                          <td className="px-4 py-3 text-slate-700">{l.subject}</td>
+                  <div className="overflow-x-auto w-full">
+                    <table className="min-w-full text-sm divide-y divide-slate-100 max-md:text-xs">
+                      <thead className="bg-slate-50 sticky top-0">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tarih</th>
+                          <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Konu</th>
                         </tr>
-                      ))}
-                      {emailLogs.length === 0 && !logsLoading && (
-                        <tr><td colSpan={2} className="px-4 py-8 text-center text-slate-400 italic">Kayıt bulunamadı</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-50">
+                        {emailLogs.map((l, i) => (
+                          <tr key={i} className="hover:bg-white transition-colors">
+                            <td className="px-4 py-3 text-slate-600 font-medium whitespace-nowrap">{safeDate(l.created_at)}</td>
+                            <td className="px-4 py-3 text-slate-700">{l.subject}</td>
+                          </tr>
+                        ))}
+                        {emailLogs.length === 0 && !logsLoading && (
+                          <tr><td colSpan={2} className="px-4 py-8 text-center text-slate-400 italic">Kayıt bulunamadı</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>
