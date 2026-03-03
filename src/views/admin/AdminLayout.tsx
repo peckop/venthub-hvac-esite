@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
@@ -21,12 +21,15 @@ import {
   Tags,
   Ticket,
   PieChart,
-  Truck
+  Truck,
+  Menu,
+  X
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -94,38 +97,79 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12">
-      <div className="max-w-[1400px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center">
-        <div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <span className="bg-gradient-to-r from-primary-navy to-secondary-blue text-transparent bg-clip-text">Premium</span>
-            Yönetim
-          </h1>
-          <p className="text-xs text-slate-500 font-medium">VentHub B2B Platform</p>
+      <div className="max-w-[1400px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center relative z-20">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 focus:outline-none"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <span className="bg-gradient-to-r from-primary-navy to-secondary-blue text-transparent bg-clip-text">Premium</span>
+              Yönetim
+            </h1>
+            <p className="text-xs text-slate-500 font-medium hidden sm:block">VentHub B2B Platform</p>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <AdminRealtimeNotifications />
         </div>
       </div>
       <div className="max-w-[1400px] mx-auto px-4 py-4 grid grid-cols-12 gap-8">
-        <aside className="col-span-12 md:col-span-3 lg:col-span-2">
-          <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 space-y-5">
-            {navGroups.map((group, gi) => (
-              <div key={gi}>
-                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">{group.label}</h3>
-                <div className="space-y-0.5">
-                  {group.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <Link key={item.href} href={item.href} className={adminNavClass(pathname === item.href)}>
-                        <Icon size={18} className="shrink-0" />
-                        <span className="truncate">{item.label}</span>
-                      </Link>
-                    )
-                  })}
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <aside className={`
+          fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 shadow-2xl transform transition-transform duration-300 ease-in-out
+          md:relative md:inset-auto md:w-auto md:bg-transparent md:shadow-none md:transform-none
+          col-span-12 md:col-span-3 lg:col-span-2
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}>
+          <div className="h-full overflow-y-auto p-4 md:p-0 md:h-auto md:overflow-visible">
+            {/* Mobile Header in Drawer */}
+            <div className="flex items-center justify-between mb-4 md:hidden px-2">
+              <span className="font-bold text-lg text-slate-900">Yönetim Menüsü</span>
+              <button
+                type="button"
+                className="p-2 -mr-2 text-slate-500 hover:text-slate-900 focus:outline-none bg-slate-200/50 rounded-full"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 space-y-5">
+              {navGroups.map((group, gi) => (
+                <div key={gi}>
+                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">{group.label}</h3>
+                  <div className="space-y-0.5">
+                    {group.items.map((item) => {
+                      const Icon = item.icon
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={adminNavClass(pathname === item.href)}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <Icon size={18} className="shrink-0" />
+                          <span className="truncate">{item.label}</span>
+                        </Link>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </nav>
+              ))}
+            </nav>
+          </div>
         </aside>
         <section className="col-span-12 md:col-span-9 lg:col-span-10">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 lg:p-8 min-h-[calc(100vh-8rem)]">

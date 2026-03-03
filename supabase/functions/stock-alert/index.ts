@@ -36,15 +36,15 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-  if (!supabaseUrl || !serviceRoleKey) {
+
+    if (!supabaseUrl || !serviceRoleKey) {
       throw new Error('Missing Supabase configuration')
     }
 
     interface AlertSendResult { type: 'whatsapp' | 'sms' | 'email'; recipient: string; success: boolean; result?: unknown; error?: string }
     interface ProductAlertResult { product: string; alertType: string; priority: string; stock: number; threshold: number; notifications: AlertSendResult[]; totalNotifications: number; successfulNotifications: number }
     let alertResults: ProductAlertResult[] = []
-    
+
     if (req.method === 'GET') {
       // Check all products for stock alerts
       alertResults = await checkAllProducts(supabaseUrl, serviceRoleKey)
@@ -69,7 +69,7 @@ serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Stock alert error:', error)
-    
+
     const msg = error instanceof Error ? error.message : 'Unknown error'
     return new Response(JSON.stringify({
       error: msg,
@@ -102,7 +102,7 @@ async function checkAllProducts(supabaseUrl: string, serviceRoleKey: string) {
   console.log(`Found ${products.length} products requiring alerts`)
 
   const alertResults: ProductAlertResult[] = []
-  
+
   for (const product of products) {
     try {
       const result = await processProductAlert(product, supabaseUrl, serviceRoleKey)
@@ -149,7 +149,7 @@ async function checkSpecificProduct(productId: string, supabaseUrl: string, serv
   }
 
   const product = products[0]
-  
+
   // Check if alert is needed
   if (product.stock_qty > (product.low_stock_threshold || 5)) {
     return [{
@@ -163,14 +163,14 @@ async function checkSpecificProduct(productId: string, supabaseUrl: string, serv
   return [result]
 }
 
-async function processProductAlert(product: Product, _supabaseUrl: string, _serviceRoleKey: string) {
+async function processProductAlert(product: Product, supabaseUrl: string, serviceRoleKey: string) {
   // Get alert recipients configuration
-  const recipients = getAlertRecipients()
-  
+  const recipients = await getAlertRecipients(supabaseUrl, serviceRoleKey)
+
   // Determine alert type
-  const alertType = product.stock_qty === 0 ? 'out_of_stock' : 'low_stock'
-  const priority = product.stock_qty === 0 ? 'critical' : 'high'
-  
+  const alertType: 'low_stock' | 'out_of_stock' = product.stock_qty <= 0 ? 'out_of_stock' : 'low_stock'
+  const priority = product.stock_qty <= 0 ? 'critical' : 'high'
+
   // Prepare notification data
   const alertData = {
     productName: product.name,
@@ -181,11 +181,11 @@ async function processProductAlert(product: Product, _supabaseUrl: string, _serv
   }
 
   const notifications = []
-  
+
   for (const recipient of recipients) {
     // Skip if recipient doesn't want this type of alert
     if (!recipient.notifications[alertType]) continue
-    
+
     // Send WhatsApp if enabled
     if (recipient.notifications.whatsapp && recipient.whatsapp) {
       try {
@@ -268,7 +268,7 @@ async function processProductAlert(product: Product, _supabaseUrl: string, _serv
 interface AlertData { productName: string; productId: string; currentStock: number; threshold: number; alertType: 'low_stock' | 'out_of_stock' }
 async function sendNotification(type: 'whatsapp' | 'sms' | 'email', to: string, data: AlertData, priority: string) {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
-  
+
   // Template messages
   const templates = {
     whatsapp: {
@@ -281,7 +281,7 @@ async function sendNotification(type: 'whatsapp' | 'sms' | 'email', to: string, 
 Tedarik gerekli!
 
 VentHub Stok Yönetimi`,
-      
+
       out_of_stock: `🔴 KRİTİK: STOK TÜKENDİ! 🔴
 
 📦 Ürün: {{productName}}
@@ -291,12 +291,12 @@ ACİL TEDARİK GEREKLİ!
 
 VentHub Stok Yönetimi`
     },
-    
+
     sms: {
       low_stock: `VentHub UYARI: {{productName}} stoku düşük ({{currentStock}}/{{threshold}}). Tedarik gerekli.`,
       out_of_stock: `VentHub KRİTİK: {{productName}} stokta yok! Acil tedarik gerekli.`
     },
-    
+
     email: {
       low_stock: `STOK UYARISI
 
@@ -307,7 +307,7 @@ Eşik Değeri: {{threshold}} adet
 Lütfen tedarik planlaması yapınız.
 
 VentHub Stok Yönetim Sistemi`,
-      
+
       out_of_stock: `KRİTİK STOK UYARISI
 
 Ürün: {{productName}}
@@ -320,7 +320,7 @@ VentHub Stok Yönetim Sistemi`
   }
 
   const template = templates[type][data.alertType] || templates[type].low_stock
-  
+
   const notificationPayload = {
     type,
     to,
@@ -350,24 +350,51 @@ VentHub Stok Yönetim Sistemi`
   return await response.json()
 }
 
-function getAlertRecipients(): AlertRecipient[] {
-  // Bu konfigürasyon normalde database'den gelecek
-  // Şimdilik environment variable'dan okuyoruz
-  const recipientsJson = Deno.env.get('STOCK_ALERT_RECIPIENTS')
-  
-  if (recipientsJson) {
-    try {
-      return JSON.parse(recipientsJson)
-    } catch {
-      console.warn('Failed to parse STOCK_ALERT_RECIPIENTS, using defaults')
-    }
+async function getAlertRecipients(supabaseUrl: string, serviceRoleKey: string): Promise<AlertRecipient[]> {
+  const headers = {
+    'Authorization': `Bearer ${serviceRoleKey}`,
+    'apikey': serviceRoleKey,
+    'Content-Type': 'application/json'
   }
 
-  // Default recipients - kurumsal numara gelince güncellenecek
+  try {
+    const settingsResp = await fetch(
+      `${supabaseUrl}/rest/v1/inventory_settings?select=alert_email,alert_webhook_url&limit=1`,
+      { headers }
+    )
+
+    if (settingsResp.ok) {
+      const settings = await settingsResp.json()
+      if (settings && settings.length > 0) {
+        const setting = settings[0]
+        const baseRecipient: AlertRecipient = {
+          name: 'Stok Yöneticisi',
+          phone: '',
+          email: setting.alert_email || '',
+          whatsapp: '',
+          role: 'manager',
+          notifications: {
+            low_stock: true,
+            out_of_stock: true,
+            sms: false,
+            whatsapp: false,
+            email: !!setting.alert_email
+          }
+        }
+
+        // Eğer veritabanından geçerli bir email gelirse tek recipient olarak dönüyor
+        return [baseRecipient]
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to parse inventory_settings, falling back to defaults', err)
+  }
+
+  // Default recipients - fallback
   return [
     {
       name: 'Stok Yöneticisi',
-      phone: '+905551234567', // Test numarası - değiştirilecek
+      phone: '+905551234567',
       email: 'stok@venthub.com',
       whatsapp: '+905551234567',
       role: 'manager',

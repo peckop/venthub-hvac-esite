@@ -2,8 +2,6 @@ import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
 import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp } from 'lucide-react'
 
 export default function AdminInventoryReportPage() {
