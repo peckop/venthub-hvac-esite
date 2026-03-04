@@ -88,7 +88,7 @@ export function useI18n() {
     return {
       lang: 'tr' as Lang,
       setLang: () => { },
-      t: (key: string) => key
+      t: (key: string, _params?: Record<string, unknown>) => key
     }
   }
   return ctx

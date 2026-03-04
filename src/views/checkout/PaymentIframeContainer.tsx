@@ -10,7 +10,7 @@ interface PaymentIframeContainerProps {
     setShowHelp: (v: boolean | ((p: boolean) => boolean)) => void
     progressPct: number
     overlayStep: number
-    t: (key: string) => string
+    t: (key: string, params?: Record<string, any>) => string
 }
 
 const PaymentIframeContainer: React.FC<PaymentIframeContainerProps> = ({
