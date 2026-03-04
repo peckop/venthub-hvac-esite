@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { adminCardClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
+import { SlidersHorizontal, ChevronDown } from 'lucide-react'
 
 export type AdminToolbarChip = {
   key: string
@@ -64,6 +65,14 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
 }) => {
   const { t } = useI18n()
   const hydratedRef = React.useRef(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  // Mobil filtre badge sayısı
+  const activeFilterCount = [
+    select && select.value ? 1 : 0,
+    ...(toggles || []).map(tog => tog.checked ? 1 : 0 as number),
+    ...(chips || []).map(ch => ch.active ? 1 : 0 as number),
+  ].reduce((a, b) => a + b, 0)
 
   // NOTE: Removed inputRef and focus shortcut handler - they were causing cursor position issues
 
@@ -144,14 +153,16 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   // This caused React to see a NEW component on every render, destroying and recreating all children
   // (including the input), which reset cursor position. Fixed by using direct JSX instead.
 
+  const hasFilters = !!(select || (toggles && toggles.length > 0) || (chips && chips.length > 0) || rightExtra || onClear)
+
   return (
     <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
       <div className="rounded-xl bg-white border border-slate-100 p-2 md:p-3 shadow-sm">
         <div className="flex flex-col gap-3">
-          {/* Üst sıra: arama + select + sağ aksiyonlar */}
+          {/* Üst sıra: arama + mobil filtre butonu */}
           <div className="flex flex-wrap items-center gap-3">
             {search && (
-              <div className="flex-1 min-w-[240px]">
+              <div className="flex-1 min-w-0">
                 <input
                   className="w-full border border-slate-200 rounded-lg px-4 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
                   placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
@@ -161,8 +172,25 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
               </div>
             )}
 
+            {/* Mobil: Filtreler butonu (md üstünde gizli) */}
+            {hasFilters && (
+              <button
+                type="button"
+                onClick={() => setFiltersOpen(prev => !prev)}
+                className={`md:hidden inline-flex items-center gap-2 h-10 px-4 rounded-lg border text-sm font-bold transition-all ${filtersOpen ? 'bg-primary-navy text-white border-primary-navy' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+              >
+                <SlidersHorizontal size={16} />
+                <span>Filtreler</span>
+                {activeFilterCount > 0 && (
+                  <span className={`text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${filtersOpen ? 'bg-white/20 text-white' : 'bg-primary-navy text-white'}`}>{activeFilterCount}</span>
+                )}
+                <ChevronDown size={14} className={`transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+              </button>
+            )}
+
+            {/* Desktop: select her zaman görünür */}
             {select && (
-              <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 <select
                   className="border border-slate-200 rounded-lg px-3 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
                   value={select.value}
@@ -176,7 +204,8 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
               </div>
             )}
 
-            <div className="ml-auto flex items-center gap-3 flex-wrap w-full sm:w-auto justify-end">
+            {/* Desktop: toggles + onClear + recordCount + rightExtra her zaman görünür */}
+            <div className="ml-auto hidden md:flex items-center gap-3 flex-wrap justify-end">
               {toggles && toggles.length > 0 && (
                 <div className="flex items-center gap-4">
                   {toggles.map(tog => (
@@ -211,9 +240,9 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
             </div>
           </div>
 
-          {/* Alt sıra: chip'ler */}
+          {/* Desktop: chip'ler her zaman görünür */}
           {chips && chips.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 text-xs">
+            <div className="hidden md:flex flex-wrap items-center gap-2 text-xs">
               {chips.map(ch => (
                 <button
                   key={ch.key}
@@ -224,6 +253,78 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
                   aria-pressed={ch.active}
                 >{ch.label}</button>
               ))}
+            </div>
+          )}
+
+          {/* ===== MOBİL: Katlanabilir filtre paneli ===== */}
+          {filtersOpen && (
+            <div className="flex flex-col gap-3 md:hidden pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200">
+              {select && (
+                <select
+                  className="border border-slate-200 rounded-lg px-3 h-10 text-sm w-full bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
+                  value={select.value}
+                  onChange={(e) => select.onChange(e.target.value)}
+                  title={select.title || 'Seçim'}
+                >
+                  {select.options.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              )}
+
+              {toggles && toggles.length > 0 && (
+                <div className="flex flex-wrap items-center gap-4">
+                  {toggles.map(tog => (
+                    <div key={tog.key} className="flex items-center gap-2 text-xs">
+                      <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
+                      <Switch.Root
+                        checked={tog.checked}
+                        onCheckedChange={tog.onChange}
+                        className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
+                        aria-label={tog.title || tog.label}
+                      >
+                        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
+                      </Switch.Root>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {chips && chips.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {chips.map(ch => (
+                    <button
+                      key={ch.key}
+                      type="button"
+                      onClick={ch.onToggle}
+                      className={`px-4 h-8 inline-flex items-center rounded-lg border transition-all text-xs ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
+                      title={ch.title || ch.label}
+                      aria-pressed={ch.active}
+                    >{ch.label}</button>
+                  ))}
+                </div>
+              )}
+
+              {rightExtra && (
+                <div className="flex flex-wrap items-center gap-2">
+                  {rightExtra}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {onClear && (
+                    <button
+                      type="button"
+                      onClick={onClear}
+                      className={`${adminButtonSecondaryClass} !px-4 text-xs`}
+                    >{t('admin.toolbar.clear')}</button>
+                  )}
+                </div>
+                {typeof recordCount === 'number' && (
+                  <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
+                )}
+              </div>
             </div>
           )}
         </div>
