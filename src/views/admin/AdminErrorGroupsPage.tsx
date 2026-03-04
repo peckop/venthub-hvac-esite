@@ -1,4 +1,5 @@
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
@@ -163,7 +164,8 @@ const AdminErrorGroupsPage: React.FC = () => {
     }
   }, [fromDate, toDate, level, status, assigned, debouncedQ, page, sortBy, sortDir])
 
-  React.useEffect(() => { fetchGroups() }, [fetchGroups])
+  const pathname = usePathname()
+  React.useEffect(() => { fetchGroups() }, [fetchGroups, pathname])
 
   // Keep a stable ref to fetchGroups so we don't have to re-subscribe the channel
   const fetchRef = React.useRef(fetchGroups)

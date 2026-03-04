@@ -159,175 +159,184 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
       <div className="rounded-xl bg-white border border-slate-100 p-2 md:p-3 shadow-sm">
         <div className="flex flex-col gap-3">
-          {/* Üst sıra: arama + mobil filtre butonu */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Mobil: Arama + Filtre Butonu (Yan yana) */}
+          <div className="flex md:hidden items-center gap-2 w-full">
             {search && (
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 relative">
                 <input
-                  className="w-full border border-slate-200 rounded-lg px-4 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                  className="w-full border border-slate-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400 shadow-inner"
                   placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                   value={search.value}
                   onChange={(e) => search.onChange(e.target.value)}
                 />
               </div>
             )}
-
-            {/* Mobil: Filtreler butonu (md üstünde gizli) */}
             {hasFilters && (
               <button
                 type="button"
                 onClick={() => setFiltersOpen(prev => !prev)}
-                className={`md:hidden inline-flex items-center gap-2 h-10 px-4 rounded-lg border text-sm font-bold transition-all ${filtersOpen ? 'bg-primary-navy text-white border-primary-navy' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                className={`flex-none inline-flex items-center gap-2 h-11 px-3 rounded-xl border text-xs font-bold transition-all ${filtersOpen ? 'bg-primary-navy text-white border-primary-navy shadow-lg shadow-blue-900/10' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
               >
-                <SlidersHorizontal size={16} />
-                <span>Filtreler</span>
+                <SlidersHorizontal size={14} />
                 {activeFilterCount > 0 && (
-                  <span className={`text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${filtersOpen ? 'bg-white/20 text-white' : 'bg-primary-navy text-white'}`}>{activeFilterCount}</span>
+                  <span className={`text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center ${filtersOpen ? 'bg-white/20 text-white' : 'bg-primary-navy text-white'}`}>{activeFilterCount}</span>
                 )}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
               </button>
             )}
+          </div>
 
-            {/* Desktop: select her zaman görünür */}
-            {select && (
-              <div className="hidden md:flex items-center gap-2">
-                <select
-                  className="border border-slate-200 rounded-lg px-3 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
-                  value={select.value}
-                  onChange={(e) => select.onChange(e.target.value)}
-                  title={select.title || 'Seçim'}
-                >
-                  {select.options.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+          {/* Desktop: Arama Çubuğu */}
+          {search && (
+            <div className="hidden md:block flex-1 min-w-0">
+              <input
+                className="w-full border border-slate-200 rounded-lg px-4 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
+                value={search.value}
+                onChange={(e) => search.onChange(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Desktop: select her zaman görünür */}
+          {select && (
+            <div className="hidden md:flex items-center gap-2">
+              <select
+                className="border border-slate-200 rounded-lg px-3 h-10 text-sm min-w-[180px] bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
+                value={select.value}
+                onChange={(e) => select.onChange(e.target.value)}
+                title={select.title || 'Seçim'}
+              >
+                {select.options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Desktop: toggles + onClear + recordCount + rightExtra her zaman görünür */}
+          <div className="ml-auto hidden md:flex items-center gap-3 flex-wrap justify-end">
+            {toggles && toggles.length > 0 && (
+              <div className="flex items-center gap-4">
+                {toggles.map(tog => (
+                  <div key={tog.key} className="flex items-center gap-2 text-xs">
+                    <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
+                    <Switch.Root
+                      checked={tog.checked}
+                      onCheckedChange={tog.onChange}
+                      className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
+                      aria-label={tog.title || tog.label}
+                    >
+                      <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
+                    </Switch.Root>
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* Desktop: toggles + onClear + recordCount + rightExtra her zaman görünür */}
-            <div className="ml-auto hidden md:flex items-center gap-3 flex-wrap justify-end">
-              {toggles && toggles.length > 0 && (
-                <div className="flex items-center gap-4">
-                  {toggles.map(tog => (
-                    <div key={tog.key} className="flex items-center gap-2 text-xs">
-                      <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
-                      <Switch.Root
-                        checked={tog.checked}
-                        onCheckedChange={tog.onChange}
-                        className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
-                        aria-label={tog.title || tog.label}
-                      >
-                        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
-                      </Switch.Root>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {onClear && (
+              <button
+                type="button"
+                onClick={onClear}
+                className={`${adminButtonSecondaryClass} !px-4 text-xs`}
+              >{t('admin.toolbar.clear')}</button>
+            )}
 
-              {onClear && (
-                <button
-                  type="button"
-                  onClick={onClear}
-                  className={`${adminButtonSecondaryClass} !px-4 text-xs`}
-                >{t('admin.toolbar.clear')}</button>
-              )}
+            {typeof recordCount === 'number' && (
+              <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
+            )}
 
+            {rightExtra}
+          </div>
+        </div>
+
+        {/* Desktop: chip'ler her zaman görünür */}
+        {chips && chips.length > 0 && (
+          <div className="hidden md:flex flex-wrap items-center gap-2 text-xs">
+            {chips.map(ch => (
+              <button
+                key={ch.key}
+                type="button"
+                onClick={ch.onToggle}
+                className={`px-4 h-10 inline-flex items-center rounded-lg border transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
+                title={ch.title || ch.label}
+                aria-pressed={ch.active}
+              >{ch.label}</button>
+            ))}
+          </div>
+        )}
+
+        {/* ===== MOBİL: Katlanabilir filtre paneli ===== */}
+        {filtersOpen && (
+          <div className="flex flex-col gap-4 md:hidden pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200">
+            {select && (
+              <select
+                className="border border-slate-200 rounded-lg px-3 h-10 text-sm w-full bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
+                value={select.value}
+                onChange={(e) => select.onChange(e.target.value)}
+                title={select.title || 'Seçim'}
+              >
+                {select.options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            )}
+
+            {toggles && toggles.length > 0 && (
+              <div className="flex flex-wrap items-center gap-4">
+                {toggles.map(tog => (
+                  <div key={tog.key} className="flex items-center gap-2 text-xs">
+                    <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
+                    <Switch.Root
+                      checked={tog.checked}
+                      onCheckedChange={tog.onChange}
+                      className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
+                      aria-label={tog.title || tog.label}
+                    >
+                      <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
+                    </Switch.Root>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {chips && chips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {chips.map(ch => (
+                  <button
+                    key={ch.key}
+                    type="button"
+                    onClick={ch.onToggle}
+                    className={`px-4 h-8 inline-flex items-center rounded-lg border transition-all text-xs ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
+                    title={ch.title || ch.label}
+                    aria-pressed={ch.active}
+                  >{ch.label}</button>
+                ))}
+              </div>
+            )}
+
+            {rightExtra && (
+              <div className="flex flex-wrap items-center gap-2">
+                {rightExtra}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {onClear && (
+                  <button
+                    type="button"
+                    onClick={onClear}
+                    className={`${adminButtonSecondaryClass} !px-4 text-xs`}
+                  >{t('admin.toolbar.clear')}</button>
+                )}
+              </div>
               {typeof recordCount === 'number' && (
                 <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
               )}
-
-              {rightExtra}
             </div>
           </div>
-
-          {/* Desktop: chip'ler her zaman görünür */}
-          {chips && chips.length > 0 && (
-            <div className="hidden md:flex flex-wrap items-center gap-2 text-xs">
-              {chips.map(ch => (
-                <button
-                  key={ch.key}
-                  type="button"
-                  onClick={ch.onToggle}
-                  className={`px-4 h-10 inline-flex items-center rounded-lg border transition-all ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
-                  title={ch.title || ch.label}
-                  aria-pressed={ch.active}
-                >{ch.label}</button>
-              ))}
-            </div>
-          )}
-
-          {/* ===== MOBİL: Katlanabilir filtre paneli ===== */}
-          {filtersOpen && (
-            <div className="flex flex-col gap-3 md:hidden pt-3 border-t border-slate-100 animate-in fade-in slide-in-from-top-2 duration-200">
-              {select && (
-                <select
-                  className="border border-slate-200 rounded-lg px-3 h-10 text-sm w-full bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer"
-                  value={select.value}
-                  onChange={(e) => select.onChange(e.target.value)}
-                  title={select.title || 'Seçim'}
-                >
-                  {select.options.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              )}
-
-              {toggles && toggles.length > 0 && (
-                <div className="flex flex-wrap items-center gap-4">
-                  {toggles.map(tog => (
-                    <div key={tog.key} className="flex items-center gap-2 text-xs">
-                      <span className="text-industrial-gray whitespace-nowrap">{tog.label}</span>
-                      <Switch.Root
-                        checked={tog.checked}
-                        onCheckedChange={tog.onChange}
-                        className="relative w-10 h-5 bg-light-gray rounded-full data-[state=checked]:bg-primary-navy outline-none cursor-pointer transition-colors"
-                        aria-label={tog.title || tog.label}
-                      >
-                        <Switch.Thumb className="block w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-1 data-[state=checked]:translate-x-5" />
-                      </Switch.Root>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {chips && chips.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  {chips.map(ch => (
-                    <button
-                      key={ch.key}
-                      type="button"
-                      onClick={ch.onToggle}
-                      className={`px-4 h-8 inline-flex items-center rounded-lg border transition-all text-xs ${ch.active ? (ch.classOn || defaultChipOn) : (ch.classOff || defaultChipOff)} focus:outline-none focus:ring-2 focus:ring-primary-navy/10`}
-                      title={ch.title || ch.label}
-                      aria-pressed={ch.active}
-                    >{ch.label}</button>
-                  ))}
-                </div>
-              )}
-
-              {rightExtra && (
-                <div className="flex flex-wrap items-center gap-2">
-                  {rightExtra}
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {onClear && (
-                    <button
-                      type="button"
-                      onClick={onClear}
-                      className={`${adminButtonSecondaryClass} !px-4 text-xs`}
-                    >{t('admin.toolbar.clear')}</button>
-                  )}
-                </div>
-                {typeof recordCount === 'number' && (
-                  <span className="text-xs text-steel-gray whitespace-nowrap" aria-live="polite">{recordCount} {t('admin.toolbar.records')}</span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )

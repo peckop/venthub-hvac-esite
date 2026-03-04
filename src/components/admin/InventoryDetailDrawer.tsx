@@ -1,28 +1,10 @@
 import React from 'react'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
-import { formatDateTime } from '../../i18n/datetime'
 import { printQrLabel } from './InventoryQrLabel'
-
-export type InventoryRow = {
-    product_id: string;
-    name: string;
-    physical_stock: number;
-    reserved_stock: number;
-    available_stock: number;
-    warehouse_location?: string | null;
-    supplier_name?: string | null;
-    daily_velocity?: number;
-    days_until_empty?: number;
-    abc_class?: 'A' | 'B' | 'C' | null;
-}
-
-export type ReservedRow = {
-    order_id: string;
-    created_at: string;
-    status: string;
-    payment_status: string | null;
-    quantity: number
-}
+import { InventoryRow, ReservedRow } from '../../types/inventory'
+import InventoryStockAdjust from './InventoryStockAdjust'
+import InventoryReservedTable from './InventoryReservedTable'
+import InventoryMovementHistory from './InventoryMovementHistory'
 
 interface InventoryDetailDrawerProps {
     selected: InventoryRow | null
@@ -39,7 +21,7 @@ interface InventoryDetailDrawerProps {
     moveQty: number
     setMoveQty: (v: number) => void
     moving: boolean
-    adjustStock: (id: string, delta: number, type: 'manual_in' | 'manual_out') => void
+    adjustStock: (id: string, delta: number, reason: string) => void
     reservedOrders: ReservedRow[]
     movements: { id: string; delta: number; reason: string; created_at: string }[]
     undoLastMovement: () => void
@@ -77,7 +59,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                         <button className={adminButtonSecondaryClass + " h-9"} onClick={() => setSelected(null)}>{t('admin.ui.close') || 'Kapat'}</button>
                     </div>
                 </header>
-                <div className="p-4 space-y-4 overflow-auto">
+                <div className="p-4 space-y-6 overflow-auto">
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-white border border-slate-200 rounded-lg p-3 relative overflow-hidden group">
                             <div className="absolute top-0 left-0 w-1 h-full bg-primary-navy"></div>
@@ -149,76 +131,22 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     )}
 
                     {hasWriteAccess && (
-                        <section className="space-y-2">
-                            <h3 className="text-sm font-semibold text-slate-500">Hızlı Hareket</h3>
-                            <div className="flex items-center gap-2">
-                                <input type="number" className="w-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={moveQty} min={1} onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))} />
-                                <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, Math.abs(moveQty), 'manual_in')}>Giriş</button>
-                                <button disabled={moving} className={adminButtonSecondaryClass + " h-9 text-xs px-4"} onClick={() => adjustStock(selected.product_id, -Math.abs(moveQty), 'manual_out')}>Çıkış</button>
-                            </div>
-                        </section>
+                        <InventoryStockAdjust
+                            productId={selected.product_id}
+                            onAdjust={adjustStock}
+                            moving={moving}
+                            moveQty={moveQty}
+                            setMoveQty={setMoveQty}
+                        />
                     )}
 
-                    <section className="space-y-2">
-                        <h3 className="text-sm font-semibold text-slate-500">Rezerve Eden Siparişler</h3>
-                        {reservedOrders.length === 0 ? (
-                            <div className="text-sm text-slate-500">Bekleyen sipariş yok.</div>
-                        ) : (
-                            <div className="border border-slate-100 rounded-lg overflow-hidden">
-                                <table className="w-full text-xs">
-                                    <thead className="bg-slate-50">
-                                        <tr>
-                                            <th className="text-left p-2 text-slate-500">Sipariş</th>
-                                            <th className="text-left p-2 text-slate-500">Tarih</th>
-                                            <th className="text-right p-2 text-slate-500">Adet</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {reservedOrders.map(ro => (
-                                            <tr key={ro.order_id}>
-                                                <td className="p-2 text-primary-navy font-medium uppercase">{ro.order_id.slice(-8)}</td>
-                                                <td className="p-2 text-slate-500">{formatDateTime(ro.created_at, 'tr')}</td>
-                                                <td className="p-2 text-right">{ro.quantity}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </section>
+                    <InventoryReservedTable reservedOrders={reservedOrders} />
 
-                    <section className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-tight">Hareket Geçmişi</h3>
-                            <button onClick={undoLastMovement} disabled={undoing || movements.length === 0} className={adminButtonSecondaryClass + " h-8 !px-2 text-[10px] uppercase font-bold tracking-wider"}>Geri Al</button>
-                        </div>
-                        {movements.length === 0 ? (
-                            <div className="text-sm text-slate-500">Hareket yok.</div>
-                        ) : (
-                            <div className="border border-slate-100 rounded-lg overflow-hidden">
-                                <table className="w-full text-xs">
-                                    <thead className="bg-slate-50">
-                                        <tr>
-                                            <th className="text-left p-2 text-slate-500">Tarih</th>
-                                            <th className="text-left p-2 text-slate-500">Sebep</th>
-                                            <th className="text-right p-2 text-slate-500">Delta</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {movements.map(m => (
-                                            <tr key={m.id}>
-                                                <td className="p-2 text-slate-400">{formatDateTime(m.created_at, 'tr')}</td>
-                                                <td className="p-2 text-slate-600">{m.reason}</td>
-                                                <td className={`p-2 text-right font-medium ${Number(m.delta) > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                    {Number(m.delta) > 0 ? '+' : ''}{m.delta}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </section>
+                    <InventoryMovementHistory
+                        movements={movements}
+                        onUndo={undoLastMovement}
+                        undoing={undoing}
+                    />
                 </div>
             </aside>
         </>

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass } from '../../utils/adminUi'
@@ -54,9 +55,10 @@ export default function AdminLogisticsPage() {
         }
     }, [])
 
+    const pathname = usePathname()
     useEffect(() => {
         fetchPendingOrders()
-    }, [fetchPendingOrders])
+    }, [fetchPendingOrders, pathname])
 
     const updateRow = (id: string, field: 'carrier' | 'tracking_number', val: string) => {
         setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: val, saved: false } : r))
@@ -166,8 +168,8 @@ export default function AdminLogisticsPage() {
                         <p className="text-sm text-slate-500 mt-1">Tüm siparişlerin kargo işlemi tamamlanmış görünüyor.</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto w-full">
-                        <table className="min-w-full text-sm max-md:text-xs">
+                    <div className="overflow-x-auto w-full" ref={el => { if (el) el.scrollLeft = 0 }}>
+                        <table className="min-w-[1000px] text-sm max-md:text-xs">
                             <thead className="bg-slate-50">
                                 <tr>
                                     <th className={adminTableHeadCellClass}>Sipariş No</th>
@@ -203,7 +205,7 @@ export default function AdminLogisticsPage() {
                                                 onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
                                                 placeholder="Barkod okutun veya girin..."
                                                 className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-primary-navy focus:ring-1 focus:ring-primary-navy/20 disabled:opacity-60"
-                                                autoFocus={i === 0}
+                                            // autoFocus kaldırıldı çünkü mobil scroll'u bozuyor. Bunun yerine kullanıcı gerekiyorsa tıklasın veya manual focus (preventScroll) yapalım.
                                             />
                                         </td>
                                         <td className="px-4 py-3 text-center">
