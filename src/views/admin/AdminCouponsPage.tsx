@@ -73,6 +73,9 @@ const AdminCouponsPage: React.FC = () => {
   const fetchCoupons = React.useCallback(async () => {
     setLoading(true)
     try {
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       const { data, error } = await supabase
         .from('coupons')
         .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')

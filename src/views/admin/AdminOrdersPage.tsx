@@ -167,6 +167,9 @@ const AdminOrdersPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      // Proaktif oturum kontrolü: Token süresi dolmuşsa yenilemeyi deni
+      await supabase.auth.getSession()
+
       let qb = supabase
         .from('view_admin_orders')
         .select('id,status,conversation_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone', { count: 'exact' })

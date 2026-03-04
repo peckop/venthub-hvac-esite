@@ -16,7 +16,14 @@ if (missingEnv) {
 // Create client with real or dummy values to prevent instant crash
 export const supabase = createClient(
   SUPABASE_URL || 'https://placeholder.supabase.co',
-  SUPABASE_ANON_KEY || 'placeholder-key'
+  SUPABASE_ANON_KEY || 'placeholder-key',
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  }
 )
 
 // Database types

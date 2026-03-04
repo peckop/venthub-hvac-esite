@@ -74,6 +74,11 @@ const AdminCategoriesPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      setLoading(true)
+      setError(null)
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       const { data, error } = await supabase
         .from('categories')
         .select('*')

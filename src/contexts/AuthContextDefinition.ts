@@ -13,6 +13,7 @@ export interface AuthContextType {
     signUp: (email: string, password: string, name: string) => Promise<{ error?: AuthError }>
     signOut: () => Promise<void>
     resetPassword: (email: string) => Promise<{ error?: AuthError }>
+    refreshSession: () => Promise<Session | null>
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)

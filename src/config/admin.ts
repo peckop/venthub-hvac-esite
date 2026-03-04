@@ -134,6 +134,8 @@ export async function checkAdminAccessAsync(user: { id?: string; email?: string 
   // 1) DB'den gerçek rol kontrolü
   if (user.id) {
     try {
+      const { supabase } = await import('../lib/supabase')
+      await supabase.auth.getSession()
       const isAdmin = await isUserAdminAsync(user.id)
       if (isAdmin) return true
     } catch (error) {
@@ -184,6 +186,7 @@ export async function setUserAdminRole(userId: string, role: string): Promise<bo
 export async function listAdminUsers(): Promise<AdminUser[]> {
   try {
     const { supabase } = await import('../lib/supabase')
+    await supabase.auth.getSession()
     // Güvenli RPC (SECURITY DEFINER + role kontrolü) – tek kaynak
     const rpcRes = await supabase.rpc('admin_list_users')
     const rpcErr = (rpcRes as { error?: unknown }).error
