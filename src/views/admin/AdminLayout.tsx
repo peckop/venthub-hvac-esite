@@ -38,6 +38,39 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   const router = useRouter()
   const { t } = useI18n()
 
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const minSwipeDistance = 50
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    if (isLeftSwipe && sidebarOpen) {
+      setSidebarOpen(false)
+    }
+  }
+
+  React.useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [sidebarOpen])
+
   React.useEffect(() => {
     let active = true
     async function guard() {
@@ -135,7 +168,11 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           />
         )}
 
-        <aside className={`
+        <aside
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className={`
           fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 shadow-2xl transform transition-transform duration-300 ease-in-out
           md:relative md:inset-auto md:w-auto md:bg-transparent md:shadow-none md:transform-none
           col-span-12 md:col-span-3 lg:col-span-2
@@ -143,11 +180,18 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
         `}>
           <div className="h-full overflow-y-auto p-4 md:p-0 md:h-auto md:overflow-visible">
             {/* Mobile Header in Drawer */}
-            <div className="flex items-center justify-between mb-4 md:hidden px-2">
-              <span className="font-bold text-lg text-slate-900">Yönetim Menüsü</span>
+            <div className="flex items-center justify-between mb-6 md:hidden px-2 pb-4 border-b border-slate-200">
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-slate-900 truncate max-w-[180px]">
+                  {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Kullanıcı'}
+                </span>
+                <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1 w-max">
+                  {user?.user_metadata?.role || 'Üye'}
+                </span>
+              </div>
               <button
                 type="button"
-                className="p-2 -mr-2 text-slate-500 hover:text-slate-900 focus:outline-none bg-slate-200/50 rounded-full"
+                className="p-2 -mr-2 text-slate-500 hover:text-slate-900 focus:outline-none bg-slate-200/50 hover:bg-slate-200 rounded-full transition-colors"
                 onClick={() => setSidebarOpen(false)}
               >
                 <X size={18} />

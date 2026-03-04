@@ -20,6 +20,14 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
 
     const [isOpen, setIsOpen] = useState(false)
     const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(value)
+    const [months, setMonths] = useState(2)
+
+    React.useEffect(() => {
+        const checkMobile = () => setMonths(window.innerWidth < 768 ? 1 : 2)
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
 
     // Geriye dönük senkronizasyon (value dışarıdan değişirse)
     React.useEffect(() => {
@@ -113,7 +121,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
         <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
             <Popover.Trigger asChild>
                 <button
-                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-all ${className}`}
+                    className={`inline-flex items-center gap-2 justify-between bg-white border border-slate-200 shadow-sm px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 transition-all w-full sm:w-auto max-w-full ${className}`}
                 >
                     <div className="flex items-center gap-2 text-slate-600">
                         <CalendarIcon size={16} className={value?.from ? 'text-primary-navy' : 'text-slate-400'} />
@@ -126,10 +134,12 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
             </Popover.Trigger>
             <Popover.Portal>
                 <Popover.Content
-                    className="z-[9999] mt-2 mr-4 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-                    align="end"
+                    className="z-[9999] mt-2 bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl p-0 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200 max-h-[85vh] md:max-h-none overflow-y-auto w-[calc(100vw-32px)] md:w-auto"
+                    align="center"
                     sideOffset={5}
+                    collisionPadding={16}
                 >
+
                     {/* Preset Buttons - Left Sidebar */}
                     <div className="md:w-48 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200/60 p-3 overflow-y-auto max-h-[60vh]">
                         <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 px-2">Hızlı Seçim</div>
@@ -160,7 +170,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
                             defaultMonth={selectedRange?.from || new Date()}
                             selected={selectedRange}
                             onSelect={handleSelect}
-                            numberOfMonths={2}
+                            numberOfMonths={months}
                             locale={locale}
                             showOutsideDays
                             classNames={dayPickerClassNames}
