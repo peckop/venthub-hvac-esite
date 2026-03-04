@@ -22,6 +22,7 @@ import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
 import { useRole } from '../../hooks/useRole'
+import { Lang } from '../../i18n/I18nContext'
 
 interface AdminOrderRow {
   id: string
@@ -769,16 +770,16 @@ const AdminOrdersPage: React.FC = () => {
   )
 }
 
-function formatAmount(v?: number | null, lang: string = 'tr') {
+function formatAmount(v?: number | null, lang: Lang = 'tr') {
   if (typeof v === 'number') return formatCurrency(v, lang, { maximumFractionDigits: 0 })
   return '-'
 }
 
-function safeDate(iso: string, lang: string = 'tr') {
+function safeDate(iso: string, lang: Lang = 'tr') {
   try { return formatDateTime(iso, lang) } catch { return iso }
 }
 
-function prettyStatus(s: string, t: (key: string) => string) {
+function prettyStatus(s: string, t: (key: string, params?: Record<string, any>) => string) {
   if (!s) return s
   const key = s.toLowerCase()
   switch (key) {

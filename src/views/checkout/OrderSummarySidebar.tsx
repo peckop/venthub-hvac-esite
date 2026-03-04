@@ -3,6 +3,7 @@
 import React from 'react'
 import { Lock } from 'lucide-react'
 import { formatCurrency } from '../../i18n/format'
+import { Lang } from '../../i18n/I18nContext'
 
 interface OrderSummarySidebarProps {
     items: any[]
@@ -14,8 +15,8 @@ interface OrderSummarySidebarProps {
     setCouponCode: (v: string) => void
     onApplyCoupon: () => void
     onRemoveCoupon: () => void
-    t: (key: string) => string
-    lang: string
+    t: (key: string, params?: Record<string, any>) => string
+    lang: Lang
 }
 
 const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
