@@ -1,4 +1,5 @@
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -87,7 +88,8 @@ const AdminCouponsPage: React.FC = () => {
     }
   }, [])
 
-  React.useEffect(() => { fetchCoupons() }, [fetchCoupons])
+  const pathname = usePathname()
+  React.useEffect(() => { fetchCoupons() }, [fetchCoupons, pathname])
 
   function filtered() {
     if (!q.trim()) return rows
@@ -224,7 +226,7 @@ const AdminCouponsPage: React.FC = () => {
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
         <div className="overflow-x-auto w-full">
-          <table className="min-w-full text-sm max-md:text-xs">
+          <table className="min-w-[1000px] text-sm max-md:text-xs">
             <thead>
               <tr>
                 <th className={`${adminTableHeadCellClass}`}>Kod</th>

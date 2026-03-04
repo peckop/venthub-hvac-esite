@@ -515,6 +515,8 @@ export const en = {
       }
     },
     orders: {
+      view_list: 'List View',
+      view_board: 'Board View',
       statusLabels: {
         all: 'All',
         pending: 'Pending',

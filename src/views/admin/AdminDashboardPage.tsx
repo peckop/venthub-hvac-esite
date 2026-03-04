@@ -3,6 +3,7 @@ import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
@@ -287,7 +288,8 @@ const AdminDashboardPage: React.FC = () => {
     }
   }, [rangeStartISO, prevRangeISO, dateRange, t])
 
-  React.useEffect(() => { loadKPIs() }, [loadKPIs])
+  const pathname = usePathname()
+  React.useEffect(() => { loadKPIs() }, [loadKPIs, pathname])
 
   return (
     <div className="space-y-6">

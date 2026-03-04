@@ -13,6 +13,15 @@ import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import ReviewSummary from './checkout/ReviewSummary'
+import CheckoutProgress from './checkout/CheckoutProgress'
+import StepCustomerInfo from './checkout/StepCustomerInfo'
+import StepAddressInfo from './checkout/StepAddressInfo'
+import OrderSummarySidebar from './checkout/OrderSummarySidebar'
+import PaymentIframeContainer from './checkout/PaymentIframeContainer'
+import SecurePaymentOverlay from './checkout/SecurePaymentOverlay'
+import AddressSelectModal from './checkout/AddressSelectModal'
+import InvoiceProfileModal from './checkout/InvoiceProfileModal'
+import AddressFormModal from './checkout/AddressFormModal'
 import { validateServerCart } from '../lib/order'
 
 interface CustomerInfo {
@@ -97,9 +106,7 @@ export const CheckoutPage: React.FC = () => {
   const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<InvoiceProfile[]>([])
   const [showInvoiceModal, setShowInvoiceModal] = useState(false)
   const [defaultInvoiceApplied, setDefaultInvoiceApplied] = useState(false)
-  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
-  const [savingEdit, setSavingEdit] = useState(false)
-  const [editForm, setEditForm] = useState<{ label?: string; full_name?: string; phone?: string; full_address: string; city: string; district: string; postal_code?: string; is_default_shipping?: boolean; is_default_billing?: boolean }>({ full_address: '', city: '', district: '', postal_code: '', is_default_shipping: false, is_default_billing: false })
+  const [addressToEdit, setAddressToEdit] = useState<UserAddress | null>(null)
   useEffect(() => {
     let mounted = true
     async function prefillAddresses() {
@@ -699,97 +706,24 @@ export const CheckoutPage: React.FC = () => {
   }
 
   const totalAmount = getCartTotal()
-  // KDV dahil fiyat varsayımı: brüt = net * 1.20 => KDV payı = brüt - (brüt / 1.20)
   const vatAmount = Number((totalAmount - totalAmount / 1.2).toFixed(2))
-  const finalAmount = Number((totalAmount - (couponApplied?.discount || 0)).toFixed(2)) // Toplam - kupon indirimi (KDV dahil varsayımı)
+  const finalAmount = Number((totalAmount - (couponApplied?.discount || 0)).toFixed(2))
 
-  // Overlay görünürlüğü ve adımları (1: başlatılıyor, 2: form yükleniyor, 3: banka 3D)
   const overlayVisible = step === 4 && !formReady
   const overlayStep = loading ? 1 : (step === 4 && iyzToken && !formReady ? (iyzScriptLoaded ? 3 : 2) : 3)
   const overlayPercent = overlayStep === 1 ? 33 : overlayStep === 2 ? 66 : (formReady ? 100 : 90)
 
-  // Address selection modal
-  const AddressSelectModal: React.FC<{ title: string; addresses: UserAddress[]; onClose: () => void; onPick: (a: UserAddress) => void }>
-    = ({ title, addresses, onClose, onPick }) => (
-      <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
-        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
-          <div className="px-5 py-4 border-b flex items-center justify-between">
-            <div className="text-industrial-gray font-semibold">{title}</div>
-            <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
-          </div>
-          <div className="p-5 overflow-y-auto">
-            {addresses.length === 0 ? (
-              <div className="text-sm text-steel-gray">—</div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {addresses.map((a) => (
-                  <div key={a.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
-                    <div className="text-sm text-industrial-gray font-medium">
-                      {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
-                    </div>
-                    <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">{a.full_address}</div>
-                    <div className="mt-2 flex justify-end">
-                      <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(a)}>
-                        {t('checkout.saved.use')}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-
-  const InvoiceProfileModal: React.FC<{ title: string; profiles: InvoiceProfile[]; onClose: () => void; onPick: (p: InvoiceProfile) => void }>
-    = ({ title, profiles, onClose, onPick }) => (
-      <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
-        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
-          <div className="px-5 py-4 border-b flex items-center justify-between">
-            <div className="text-industrial-gray font-semibold">{title}</div>
-            <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
-          </div>
-          <div className="p-5 overflow-y-auto">
-            {profiles.length === 0 ? (
-              <div className="text-sm text-steel-gray">—</div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {profiles.map((p) => (
-                  <div key={p.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
-                    <div className="text-sm text-industrial-gray font-medium">
-                      {(p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate')))} {p.is_default && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
-                    </div>
-                    <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
-                      {p.type === 'individual' ? (
-                        <div>TCKN: {p.tckn || '-'}</div>
-                      ) : (
-                        <div>
-                          <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
-                          <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
-                          <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-2 flex justify-end">
-                      <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(p)}>
-                        {t('checkout.saved.use')}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    )
+  // Modals are now handled by sub-components
 
   return (
     <div className="min-h-screen bg-light-gray">
-      {overlayVisible && (
-        <></>
-      )}
+      <SecurePaymentOverlay
+        overlayVisible={overlayVisible}
+        overlayStep={overlayStep}
+        overlayPercent={overlayPercent}
+        t={t}
+      />
+
       {showAddressModal && step === 2 && (
         <AddressSelectModal
           title={t('checkout.saved.select')}
@@ -803,691 +737,118 @@ export const CheckoutPage: React.FC = () => {
             }
             setShowAddressModal(false)
           }}
+          onEdit={(a) => {
+            setAddressToEdit(a)
+            setShowAddressModal(false)
+          }}
+          onDelete={async (id) => {
+            if (!confirm(t('checkout.saved.confirmDelete'))) return
+            try {
+              await deleteAddress(id)
+              toast.success(t('checkout.saved.deleted'))
+              const rows = await listAddresses(); setSavedAddresses(rows)
+            } catch (e) {
+              console.error(e)
+              toast.error(t('checkout.saved.deleteError'))
+            }
+          }}
+          t={t}
         />
       )}
-      {overlayVisible && (
-        <div className="fixed inset-0 z-50 bg-black/35 flex items-center justify-center">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label={t('checkout.overlay.dialogLabel')}
-            className="bg-white/90 backdrop-saturate-150 border border-white/60 shadow-2xl rounded-2xl p-0 w-[92%] max-w-xl overflow-hidden"
-          >
-            {/* Header */}
-            <div className="px-6 md:px-8 py-5 border-b border-light-gray/60 bg-white/80 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="shrink-0 w-9 h-9 rounded-full bg-primary-navy/10 flex items-center justify-center">
-                  <Lock className="text-primary-navy" size={18} />
-                </div>
-                <div>
-                  <div className="text-industrial-gray font-semibold">{t('checkout.overlay.header')}</div>
-                  <div className="text-xs text-steel-gray" aria-live="polite">
-                    {overlayStep === 1 ? t('checkout.overlay.starting') : overlayStep === 2 ? t('checkout.overlay.secureForm') : t('checkout.overlay.bank3d')}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-primary-navy">Venthub HVAC</div>
-                <div className="text-[11px] text-steel-gray">iyzico ile güvenli ödeme</div>
-              </div>
-            </div>
-            {/* Body */}
-            <div className="px-6 md:px-8 py-6 bg-white/85">
-              <div className="flex items-center justify-center">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-2 border-primary-navy border-t-transparent animate-spin" aria-hidden />
-              </div>
-              <div className="mt-4 grid grid-cols-3 text-xs text-industrial-gray">
-                <div className={`text-center ${overlayStep >= 1 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageInit')}</div>
-                <div className={`text-center ${overlayStep >= 2 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageForm')}</div>
-                <div className={`text-center ${overlayStep >= 3 ? 'font-medium text-primary-navy' : ''}`}>{t('checkout.overlay.stageBank')}</div>
-              </div>
-              <div className="mt-3 w-full h-2 bg-light-gray/70 rounded-full overflow-hidden" aria-hidden>
-                <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-500" style={{ width: `${overlayPercent}%` }} />
-              </div>
-              <div className="mt-3 text-[11px] text-steel-gray">
-                {t('checkout.overlay.dontClose')}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => router.push('/cart')}
-            className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-4 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span>{t('checkout.backToCart')}</span>
-          </button>
-          <h1 className="text-3xl font-bold text-industrial-gray">
-            {t('checkout.title')}
-          </h1>
-        </div>
 
-        <div className="mb-4">
-          <SecurityRibbon />
-        </div>
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex flex-wrap items-center gap-2">
-            {[1, 2, 3, 4].map((n, idx) => (
-              <React.Fragment key={n}>
-                <div className="flex flex-col items-center min-w-[110px]">
-                  <div className={`w-8 h-8 rounded-full font-semibold text-sm flex items-center justify-center ${step >= n ? 'bg-primary-navy text-white' : 'bg-light-gray text-steel-gray border-2 border-light-gray'}`}>{n}</div>
-                  <span className={`mt-1 text-sm ${step >= n ? 'text-primary-navy font-medium' : 'text-steel-gray'}`}>
-                    {n === 1 ? t('checkout.steps.step1') : n === 2 ? t('checkout.steps.step2') : n === 3 ? t('checkout.steps.step3') : t('checkout.steps.step4')}
-                  </span>
-                </div>
-                {idx < 2 && (
-                  <div className={`hidden sm:flex flex-1 h-1 ${step > n ? 'bg-primary-navy' : 'bg-light-gray'}`}></div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+      {showInvoiceModal && step === 2 && (
+        <InvoiceProfileModal
+          title={t('account.invoices.title')}
+          profiles={savedInvoiceProfiles}
+          onClose={() => setShowInvoiceModal(false)}
+          onPick={(p) => {
+            if (p.type === 'individual') {
+              setInvoiceType('individual')
+              setInvoiceInfo({ type: 'individual', tckn: p.tckn || '' })
+            } else {
+              setInvoiceType('corporate')
+              setInvoiceInfo({ type: 'corporate', companyName: p.company_name || '', vkn: p.vkn || '', taxOffice: p.tax_office || '', eInvoice: !!p.e_invoice })
+            }
+            setShowInvoiceModal(false)
+          }}
+          t={t}
+        />
+      )}
+
+      {addressToEdit && (
+        <AddressFormModal
+          address={addressToEdit}
+          onClose={() => setAddressToEdit(null)}
+          onSaved={async () => {
+            const rows = await listAddresses()
+            setSavedAddresses(rows)
+          }}
+          t={t}
+        />
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <CheckoutProgress
+          step={step}
+          t={t}
+          onBackToCart={() => router.push('/cart')}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {/* Step 4: Payment - İyzico Checkout Form gömme */}
+              {/* Step 4: Payment */}
               {step === 4 && (
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="bg-primary-navy text-white p-2 rounded-lg">
-                      <CreditCard size={20} />
-                    </div>
-                    <h2 className="text-xl font-semibold text-industrial-gray">{t('checkout.paymentSectionTitle')}</h2>
-                  </div>
-                  {/* Güvenli ödeme üst barı (her zaman görünür) */}
-                  <div className="rounded-lg border border-primary-navy/30 bg-white/90 p-3 flex flex-col gap-2 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-primary-navy">
-                        <Lock size={18} />
-                        <div className="text-sm font-semibold">{t('checkout.securePaymentBrand', { brand: 'Venthub HVAC' })}</div>
-                      </div>
-                      <div className="text-[11px] text-steel-gray">{t('checkout.securePaymentProvider', { provider: 'iyzico' })}</div>
-                    </div>
-                    {/* İlerleme barı */}
-                    <div className="w-full h-2 bg-light-gray/80 rounded-full overflow-hidden" aria-hidden>
-                      <div className="h-full bg-gradient-to-r from-primary-navy to-secondary-blue transition-all" style={{ width: `${progressPct}%` }} />
-                    </div>
-                    <div className="text-[11px] text-steel-gray">{overlayStep === 1 ? t('checkout.overlay.starting') : overlayStep === 2 ? t('checkout.overlay.secureForm') : t('checkout.overlay.bank3d')}</div>
-                  </div>
-                  <p className="text-steel-gray text-sm">{t('checkout.paymentLoading')}</p>
-                  <div className="mt-4">
-                    {iyzToken ? (
-                      <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]">
-                        <div id="iyzipay-checkout-form" className="responsive" data-pay-with-iyzico="true" data-token={iyzToken} />
-                      </div>
-                    ) : paymentFrameContent ? (
-                      <div className="rounded-xl border border-light-gray shadow-lg ring-1 ring-black/5 bg-white p-4 min-h-[520px]" dangerouslySetInnerHTML={{ __html: paymentFrameContent }} />
-                    ) : (
-                      <div className="flex items-center gap-3 text-steel-gray">
-                        <CheckCircle className="animate-pulse" />
-                        <span>{t('checkout.formPreparing')}</span>
-                      </div>
-                    )}
-                    <div className="mt-3">
-                      <button
-                        onClick={() => setShowHelp(v => !v)}
-                        type="button"
-                        className="text-sm text-primary-navy hover:text-secondary-blue"
-                      >
-                        {t('checkout.help.smsTitle')}
-                      </button>
-                      {showHelp && (
-                        <div className="mt-2 text-xs text-steel-gray space-y-1 bg-air-blue/20 rounded-lg p-3">
-                          <p>• {t('checkout.help.tip1')}</p>
-                          <p>• {t('checkout.help.tip2')}</p>
-                          <p>• {t('checkout.help.tip3')}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <PaymentIframeContainer
+                  iyzToken={iyzToken}
+                  paymentFrameContent={paymentFrameContent}
+                  showHelp={showHelp}
+                  setShowHelp={setShowHelp}
+                  progressPct={progressPct}
+                  overlayStep={overlayStep}
+                  t={t}
+                />
               )}
 
               {/* Step 1: Customer Information */}
               {step === 1 && (
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="bg-primary-navy text-white p-2 rounded-lg">
-                      <User size={20} />
-                    </div>
-                    <h2 className="text-xl font-semibold text-industrial-gray">
-                      {t('checkout.personal.title')}
-                    </h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        {t('checkout.personal.nameLabel')}
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.name}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                        placeholder={t('checkout.personal.namePlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        {t('checkout.personal.emailLabel')}
-                      </label>
-                      <input
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                        placeholder={t('checkout.personal.emailPlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        {t('checkout.personal.phoneLabel')}
-                      </label>
-                      <input
-                        type="tel"
-                        value={customerInfo.phone}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                        placeholder={t('checkout.personal.phonePlaceholder')}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-industrial-gray mb-2">
-                        {t('checkout.personal.idLabel')}
-                      </label>
-                      <input
-                        type="text"
-                        value={customerInfo.identityNumber}
-                        onChange={(e) => setCustomerInfo({ ...customerInfo, identityNumber: e.target.value })}
-                        className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                        placeholder={t('checkout.personal.idPlaceholder')}
-                        maxLength={11}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <StepCustomerInfo
+                  customerInfo={customerInfo}
+                  setCustomerInfo={setCustomerInfo}
+                  t={t}
+                />
               )}
 
               {/* Step 2: Address Information */}
               {step === 2 && (
-                <div className="space-y-8">
-                  {/* Shipping Method (Service Level) */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{tf('checkout.shipping.methodTitle', 'Teslimat Yöntemi')}</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'standard' ? 'border-primary-navy' : 'border-light-gray'}`}>
-                        <div>
-                          <div className="text-sm font-medium text-industrial-gray">Standart</div>
-                          <div className="text-xs text-steel-gray">3–5 iş günü</div>
-                        </div>
-                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'standard'} onChange={() => setShippingMethod('standard')} />
-                      </label>
-                      <label className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${shippingMethod === 'express' ? 'border-primary-navy' : 'border-light-gray'}`}>
-                        <div>
-                          <div className="text-sm font-medium text-industrial-gray">Ekspres</div>
-                          <div className="text-xs text-steel-gray">1–2 iş günü</div>
-                        </div>
-                        <input type="radio" name="shipmethod" className="ml-3" checked={shippingMethod === 'express'} onChange={() => setShippingMethod('express')} />
-                      </label>
-                    </div>
-                  </div>
-
-                  {/* Shipping Address */}
-                  <div>
-                    <div className="flex items-center space-x-3 mb-6">
-                      <div className="bg-primary-navy text-white p-2 rounded-lg">
-                        <MapPin size={20} />
-                      </div>
-                      <h2 className="text-xl font-semibold text-industrial-gray">
-                        {t('checkout.shipping.title')}
-                      </h2>
-                    </div>
-
-                    {/* Saved addresses quick pick */}
-                    {savedAddresses.length > 0 && (
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="text-sm text-industrial-gray font-medium">{t('checkout.saved.title')}</div>
-                          <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => { setAddressPickTarget('shipping'); setShowAddressModal(true) }}>
-                            {t('checkout.saved.seeAll')}
-                          </button>
-                        </div>
-                        <div className="flex gap-3 overflow-x-auto no-scrollbar">
-                          {savedAddresses.map((a) => (
-                            <div key={a.id} className="min-w-[260px] border rounded-lg p-3 bg-white/90">
-                              <div className="flex items-center justify-between">
-                                <div className="text-sm text-industrial-gray font-medium">
-                                  {a.label || t('checkout.saved.address')} {a.is_default_shipping && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
-                                </div>
-                                <div className="flex items-center gap-2 ml-2">
-                                  <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50" onClick={() => {
-                                    setEditingAddressId(a.id)
-                                    setEditForm({
-                                      label: a.label || '',
-                                      full_name: a.full_name || '',
-                                      phone: a.phone || '',
-                                      full_address: a.full_address || '',
-                                      city: a.city || '',
-                                      district: a.district || '',
-                                      postal_code: a.postal_code || '',
-                                      is_default_shipping: a.is_default_shipping,
-                                      is_default_billing: a.is_default_billing,
-                                    })
-                                  }}>
-                                    {t('checkout.saved.edit')}
-                                  </button>
-                                  <button type="button" className="text-[11px] px-2 py-1 rounded border hover:bg-gray-50 text-red-600" onClick={async () => {
-                                    if (!confirm(t('checkout.saved.confirmDelete'))) return
-                                    try {
-                                      await deleteAddress(a.id)
-                                      toast.success(t('checkout.saved.deleted'))
-                                      const rows = await listAddresses(); setSavedAddresses(rows)
-                                    } catch (e) {
-                                      console.error(e)
-                                      toast.error(t('checkout.saved.deleteError'))
-                                    }
-                                  }}>
-                                    {t('checkout.saved.delete')}
-                                  </button>
-                                </div>
-                              </div>
-                              <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
-                                {a.full_address}
-                              </div>
-                              {editingAddressId === a.id ? (
-                                <div className="mt-2 border-t pt-2 space-y-2">
-                                  <input type="text" value={editForm.label || ''} onChange={(e) => setEditForm(f => ({ ...f, label: e.target.value }))} placeholder={t('checkout.saved.address')} className="w-full px-3 py-2 border rounded text-xs" />
-                                  <textarea value={editForm.full_address} onChange={(e) => setEditForm(f => ({ ...f, full_address: e.target.value }))} placeholder={t('checkout.shipping.addressPlaceholder')} className="w-full px-3 py-2 border rounded text-xs min-h-20" />
-                                  <div className="grid grid-cols-3 gap-2">
-                                    <input type="text" value={editForm.city} onChange={(e) => setEditForm(f => ({ ...f, city: e.target.value }))} placeholder={t('checkout.shipping.cityPlaceholder')} className="px-3 py-2 border rounded text-xs" />
-                                    <input type="text" value={editForm.district} onChange={(e) => setEditForm(f => ({ ...f, district: e.target.value }))} placeholder={t('checkout.shipping.districtPlaceholder')} className="px-3 py-2 border rounded text-xs" />
-                                    <input type="text" value={editForm.postal_code || ''} onChange={(e) => setEditForm(f => ({ ...f, postal_code: e.target.value.replace(/\D/g, '') }))} placeholder={t('checkout.shipping.postalPlaceholder')} className="px-3 py-2 border rounded text-xs" />
-                                  </div>
-                                  <div className="flex items-center gap-4">
-                                    <label className="flex items-center gap-2 text-[11px]">
-                                      <input type="checkbox" checked={!!editForm.is_default_shipping} onChange={(e) => setEditForm(f => ({ ...f, is_default_shipping: e.target.checked }))} />
-                                      {t('checkout.saved.defaultShipping')}
-                                    </label>
-                                    <label className="flex items-center gap-2 text-[11px]">
-                                      <input type="checkbox" checked={!!editForm.is_default_billing} onChange={(e) => setEditForm(f => ({ ...f, is_default_billing: e.target.checked }))} />
-                                      {t('checkout.saved.defaultBilling')}
-                                    </label>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <button type="button" disabled={savingEdit} className="text-[12px] px-3 py-1.5 rounded bg-primary-navy text-white disabled:opacity-60" onClick={async () => {
-                                      try {
-                                        setSavingEdit(true)
-                                        await updateAddress(a.id, {
-                                          label: editForm.label,
-                                          full_name: editForm.full_name,
-                                          phone: editForm.phone,
-                                          full_address: editForm.full_address,
-                                          city: editForm.city,
-                                          district: editForm.district,
-                                          postal_code: editForm.postal_code,
-                                          is_default_shipping: editForm.is_default_shipping,
-                                          is_default_billing: editForm.is_default_billing,
-                                        })
-                                        toast.success(t('checkout.saved.updated'))
-                                        const rows = await listAddresses(); setSavedAddresses(rows)
-                                        setEditingAddressId(null)
-                                      } catch (e) {
-                                        console.error(e)
-                                        toast.error(t('checkout.saved.updateError'))
-                                      } finally { setSavingEdit(false) }
-                                    }}>
-                                      {t('checkout.saved.save')}
-                                    </button>
-                                    <button type="button" className="text-[12px] px-3 py-1.5 rounded border" onClick={() => setEditingAddressId(null)}>
-                                      {t('checkout.saved.cancel')}
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="mt-2">
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      type="button"
-                                      className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50"
-                                      onClick={() => setShippingAddress({ fullAddress: a.full_address || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' })}
-                                    >
-                                      {t('checkout.saved.use')}
-                                    </button>
-                                    <Link href="/account/addresses" className="text-xs text-primary-navy hover:underline">
-                                      {t('checkout.saved.manage')}
-                                    </Link>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          {t('checkout.shipping.addressLabel')}
-                        </label>
-                        <textarea
-                          value={shippingAddress.fullAddress}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
-                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                          rows={3}
-                          placeholder={t('checkout.shipping.addressPlaceholder')}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          {t('checkout.shipping.cityLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                          placeholder={t('checkout.shipping.cityPlaceholder')}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          {t('checkout.shipping.districtLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          value={shippingAddress.district}
-                          onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
-                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                          placeholder={t('checkout.shipping.districtPlaceholder')}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-industrial-gray mb-2">
-                          {t('checkout.shipping.postalLabel')}
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={shippingAddress.postalCode}
-                          onChange={(e) => {
-                            const v = e.target.value.replace(/\D/g, '').slice(0, 10)
-                            setShippingAddress({ ...shippingAddress, postalCode: v })
-                          }}
-                          className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                          placeholder={t('checkout.shipping.postalPlaceholder')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Billing Address */}
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-industrial-gray">
-                        {t('checkout.billing.title')}
-                      </h3>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={sameAsShipping}
-                          onChange={(e) => setSameAsShipping(e.target.checked)}
-                          className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.billing.sameAsShipping')}
-                        </span>
-                      </label>
-                    </div>
-
-                    {!sameAsShipping && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2 flex items-center justify-end -mt-2">
-                          <button type="button" className="text-xs text-primary-navy hover:underline" onClick={() => { setAddressPickTarget('billing'); setShowAddressModal(true) }}>
-                            {t('checkout.saved.seeAll')}
-                          </button>
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            {t('checkout.billing.addressLabel')}
-                          </label>
-                          <textarea
-                            value={billingAddress.fullAddress}
-                            onChange={(e) => setBillingAddress({ ...billingAddress, fullAddress: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            rows={3}
-                            placeholder={t('checkout.billing.addressPlaceholder')}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            {t('checkout.billing.cityLabel')}
-                          </label>
-                          <input
-                            type="text"
-                            value={billingAddress.city}
-                            onChange={(e) => setBillingAddress({ ...billingAddress, city: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.billing.cityPlaceholder')}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            {t('checkout.billing.districtLabel')}
-                          </label>
-                          <input
-                            type="text"
-                            value={billingAddress.district}
-                            onChange={(e) => setBillingAddress({ ...billingAddress, district: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.billing.districtPlaceholder')}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">
-                            {t('checkout.billing.postalLabel')}
-                          </label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={billingAddress.postalCode}
-                            onChange={(e) => {
-                              const v = e.target.value.replace(/\D/g, '').slice(0, 10)
-                              setBillingAddress({ ...billingAddress, postalCode: v })
-                            }}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.billing.postalPlaceholder')}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Invoice Type & Info */}
-                  <div className="mt-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-industrial-gray">{t('checkout.invoice.title')}</h3>
-                      <button type="button" className="text-xs text-primary-navy hover:underline" onClick={async () => { try { const rows = await listInvoiceProfiles(); setSavedInvoiceProfiles(rows) } catch { } finally { setShowInvoiceModal(true) } }}>
-                        {t('checkout.saved.seeAll')}
-                      </button>
-                    </div>
-                    {/* Tip seçimi */}
-                    <div className="flex items-center gap-6 mb-4">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="invoiceType"
-                          value="individual"
-                          checked={invoiceType === 'individual'}
-                          onChange={() => { setInvoiceType('individual'); setInvoiceInfo({ type: 'individual', tckn: '' }) }}
-                          className="text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-industrial-gray">{t('checkout.invoice.individual')}</span>
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="invoiceType"
-                          value="corporate"
-                          checked={invoiceType === 'corporate'}
-                          onChange={() => { setInvoiceType('corporate'); setInvoiceInfo({ type: 'corporate', companyName: '', vkn: '', taxOffice: '' }) }}
-                          className="text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-industrial-gray">{t('checkout.invoice.corporate')}</span>
-                      </label>
-                    </div>
-
-                    {/* Koşullu alanlar */}
-                    {invoiceType === 'individual' ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.tcknLabel')}</label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={invoiceInfo.tckn || ''}
-                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, tckn: e.target.value.replace(/\D/g, '').slice(0, 11) })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.invoice.tcknPlaceholder')}
-                            maxLength={11}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.companyLabel')}</label>
-                          <input
-                            type="text"
-                            value={invoiceInfo.companyName || ''}
-                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, companyName: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.invoice.companyPlaceholder')}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.vknLabel')}</label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={invoiceInfo.vkn || ''}
-                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, vkn: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.invoice.vknPlaceholder')}
-                            maxLength={10}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-industrial-gray mb-2">{t('checkout.invoice.taxOfficeLabel')}</label>
-                          <input
-                            type="text"
-                            value={invoiceInfo.taxOffice || ''}
-                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, taxOffice: e.target.value })}
-                            className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
-                            placeholder={t('checkout.invoice.taxOfficePlaceholder')}
-                          />
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <input
-                            id="einvoice"
-                            type="checkbox"
-                            checked={!!invoiceInfo.eInvoice}
-                            onChange={(e) => setInvoiceInfo({ ...invoiceInfo, eInvoice: e.target.checked })}
-                            className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                          />
-                          <label htmlFor="einvoice" className="ml-2 text-sm text-steel-gray">{t('checkout.invoice.eInvoice')}</label>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Legal Consents */}
-                  <div className="mt-10">
-                    <h3 className="text-lg font-semibold text-industrial-gray mb-3">{t('checkout.consents.title')}</h3>
-                    <div className="space-y-2">
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={legalConsents.kvkk}
-                          onChange={(e) => setLegalConsents({ ...legalConsents, kvkk: e.target.checked })}
-                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
-                        </span>
-                      </label>
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={legalConsents.distanceSales}
-                          onChange={(e) => setLegalConsents({ ...legalConsents, distanceSales: e.target.checked })}
-                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
-                        </span>
-                      </label>
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={legalConsents.preInfo}
-                          onChange={(e) => setLegalConsents({ ...legalConsents, preInfo: e.target.checked })}
-                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
-                        </span>
-                      </label>
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={legalConsents.orderConfirm}
-                          onChange={(e) => setLegalConsents({ ...legalConsents, orderConfirm: e.target.checked })}
-                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.orderConfirmText')}
-                        </span>
-                      </label>
-                      <label className="flex items-start gap-3">
-                        <input
-                          type="checkbox"
-                          checked={!!legalConsents.marketing}
-                          onChange={(e) => setLegalConsents({ ...legalConsents, marketing: e.target.checked })}
-                          className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">
-                          {t('checkout.consents.marketingText')}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {showInvoiceModal && step === 2 && (
-                <InvoiceProfileModal
-                  title={t('account.invoices.title')}
-                  profiles={savedInvoiceProfiles}
-                  onClose={() => setShowInvoiceModal(false)}
-                  onPick={(p) => {
-                    if (p.type === 'individual') {
-                      setInvoiceType('individual')
-                      setInvoiceInfo({ type: 'individual', tckn: p.tckn || '' })
-                    } else {
-                      setInvoiceType('corporate')
-                      setInvoiceInfo({ type: 'corporate', companyName: p.company_name || '', vkn: p.vkn || '', taxOffice: p.tax_office || '', eInvoice: !!p.e_invoice })
+                <StepAddressInfo
+                  shippingAddress={shippingAddress}
+                  setShippingAddress={setShippingAddress}
+                  billingAddress={billingAddress}
+                  setBillingAddress={setBillingAddress}
+                  sameAsShipping={sameAsShipping}
+                  setSameAsShipping={setSameAsShipping}
+                  shippingMethod={shippingMethod}
+                  setShippingMethod={setShippingMethod}
+                  invoiceType={invoiceType}
+                  setInvoiceType={setInvoiceType}
+                  invoiceInfo={invoiceInfo}
+                  setInvoiceInfo={setInvoiceInfo}
+                  legalConsents={legalConsents}
+                  setLegalConsents={setLegalConsents}
+                  savedAddresses={savedAddresses}
+                  onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
+                  onOpenInvoiceModal={async () => {
+                    try {
+                      const rows = await listInvoiceProfiles()
+                      setSavedInvoiceProfiles(rows)
+                    } catch { } finally {
+                      setShowInvoiceModal(true)
                     }
-                    setShowInvoiceModal(false)
                   }}
+                  t={t}
+                  tf={tf}
                 />
               )}
 
@@ -1541,111 +902,40 @@ export const CheckoutPage: React.FC = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6 sticky top-8">
-              <h3 className="text-lg font-semibold text-industrial-gray mb-4">
-                {t('checkout.summaryTitle')}
-              </h3>
-
-              {/* Items */}
-              <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-light-gray rounded-lg flex items-center justify-center">
-                      <span className="text-xs text-steel-gray">{t('checkout.summaryThumb')}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-industrial-gray text-sm truncate">
-                        {item.product.name}
-                      </p>
-                      <p className="text-xs text-steel-gray">
-                        {item.quantity} {t('orders.qtyCol')} x {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)), lang, { maximumFractionDigits: 0 })}
-                      </p>
-                    </div>
-                    <div className="text-sm font-medium text-industrial-gray">
-                      {formatCurrency((Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity), lang, { maximumFractionDigits: 0 })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Totals */}
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between text-steel-gray">
-                  <span>{t('cart.subtotal')}</span>
-                  <span>{formatCurrency(totalAmount, lang, { maximumFractionDigits: 0 })}</span>
-                </div>
-                <div className="flex justify-between text-steel-gray">
-                  <span>{t('cart.vatIncluded')}</span>
-                  <span>{formatCurrency(vatAmount, lang, { maximumFractionDigits: 0 })}</span>
-                </div>
-                <div className="flex justify-between text-steel-gray">
-                  <span>{t('cart.shipping')}</span>
-                  <span className="text-success-green">{t('cart.free')}</span>
-                </div>
-                {couponApplied ? (
-                  <div className="flex justify-between text-success-green">
-                    <span>Kupon indirimi ({couponApplied.code})</span>
-                    <span>-{formatCurrency(couponApplied.discount, lang, { maximumFractionDigits: 0 })}</span>
-                  </div>
-                ) : null}
-                <div className="mt-3 flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder="Kupon kodu"
-                    className="flex-1 border border-light-gray rounded px-3 py-2 text-sm"
-                  />
-                  <button
-                    type="button"
-                    className="px-3 py-2 rounded bg-primary-navy text-white text-sm"
-                    onClick={async () => {
-                      const code = couponCode.trim();
-                      if (code.length < 3) { toast.error('Kupon kodu geçersiz'); return }
-                      try {
-                        const base = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL) || ''
-                        const resp = await fetch(`${base}/functions/v1/apply-coupon`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ code, subtotal: totalAmount })
-                        });
-                        const json = await resp.json().catch(() => ({}));
-                        if (!resp.ok || !json?.valid) {
-                          toast.error('Kupon uygulanamadı');
-                          setCouponApplied(null)
-                          return;
-                        }
-                        setCouponApplied({ code: json.normalized_code || code, discount: Number(json.discount_amount || 0) })
-                        toast.success('Kupon uygulandı');
-                      } catch (e) {
-                        console.error(e); toast.error('Kupon doğrulanamadı');
-                      }
-                    }}
-                  >Uygula</button>
-                  {couponApplied ? (
-                    <button type="button" className="px-3 py-2 rounded border text-sm" onClick={() => { setCouponApplied(null); setCouponCode(''); }}>Kaldır</button>
-                  ) : null}
-                </div>
-                <hr className="border-light-gray" />
-                <div className="flex justify-between text-lg font-semibold text-industrial-gray">
-                  <span>{t('cart.total')}</span>
-                  <span className="text-primary-navy">
-                    {formatCurrency(finalAmount, lang, { maximumFractionDigits: 0 })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Security Info */}
-              <div className="bg-air-blue rounded-lg p-3 text-center">
-                <div className="flex items-center justify-center space-x-2 text-primary-navy mb-1">
-                  <Lock size={16} />
-                  <span className="text-sm font-medium">256-bit SSL</span>
-                </div>
-                <p className="text-xs text-steel-gray">
-                  {t('checkout.security.secureNote')}
-                </p>
-              </div>
-            </div>
+            <OrderSummarySidebar
+              items={items}
+              totalAmount={totalAmount}
+              vatAmount={vatAmount}
+              finalAmount={finalAmount}
+              couponApplied={couponApplied}
+              couponCode={couponCode}
+              setCouponCode={setCouponCode}
+              onApplyCoupon={async () => {
+                const code = couponCode.trim();
+                if (code.length < 3) { toast.error('Kupon kodu geçersiz'); return }
+                try {
+                  const base = ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL) || ''
+                  const resp = await fetch(`${base}/functions/v1/apply-coupon`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, subtotal: totalAmount })
+                  });
+                  const json = await resp.json().catch(() => ({}));
+                  if (!resp.ok || !json?.valid) {
+                    toast.error('Kupon uygulanamadı');
+                    setCouponApplied(null)
+                    return;
+                  }
+                  setCouponApplied({ code: json.normalized_code || code, discount: Number(json.discount_amount || 0) })
+                  toast.success('Kupon uygulandı');
+                } catch (e) {
+                  console.error(e); toast.error('Kupon doğrulanamadı');
+                }
+              }}
+              onRemoveCoupon={() => { setCouponApplied(null); setCouponCode(''); }}
+              t={t}
+              lang={lang}
+            />
           </div>
         </div>
       </div>

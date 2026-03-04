@@ -1,4 +1,5 @@
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -88,7 +89,8 @@ const AdminWebhookEventsPage: React.FC = () => {
     }
   }, [tab])
 
-  React.useEffect(() => { fetchData() }, [fetchData])
+  const pathname = usePathname()
+  React.useEffect(() => { fetchData() }, [fetchData, pathname])
 
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
 
@@ -138,7 +140,7 @@ const AdminWebhookEventsPage: React.FC = () => {
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <div className="p-2 text-xs text-slate-500">{t('admin.webhooks.tip.rowAction')}</div>
           <div className="overflow-x-auto w-full">
-            <table className="min-w-full text-sm max-md:text-xs">
+            <table className="min-w-[800px] text-sm max-md:text-xs">
               <thead>
                 <tr>
                   {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
@@ -169,7 +171,7 @@ const AdminWebhookEventsPage: React.FC = () => {
       ) : (
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <div className="overflow-x-auto w-full">
-            <table className="min-w-full text-sm max-md:text-xs">
+            <table className="min-w-[800px] text-sm max-md:text-xs">
               <thead>
                 <tr>
                   {colsMail.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.emailsTable.order')}</th>)}
@@ -203,6 +205,3 @@ const AdminWebhookEventsPage: React.FC = () => {
 }
 
 export default AdminWebhookEventsPage
-
-
-

@@ -229,7 +229,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           </div>
         </aside>
         <section className="col-span-12 md:col-span-9 lg:col-span-10">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 lg:p-8 min-h-[calc(100vh-8rem)]">
+          <div key={pathname} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 lg:p-8 min-h-[calc(100vh-8rem)] flex flex-col">
             {children}
           </div>
         </section>

@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { format as _format } from 'date-fns'
 import {
   adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass,
-  adminTableHeadCellClass, adminCardPaddedClass,
+  adminTableHeadCellClass,
   adminTableActionPrimaryClass, adminTableActionWarningClass, adminTableActionNeutralClass
 } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
@@ -16,7 +15,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
-import { X, Search, Truck, FileText, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare } from 'lucide-react'
+import { X, Truck, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare } from 'lucide-react'
 import AdminOrdersBoard from './AdminOrdersBoard'
 import { updateOrderStatus } from '../../lib/orderStatusService'
 import DateRangePicker from '../../components/admin/DateRangePicker'
@@ -83,13 +82,15 @@ const AdminOrdersPage: React.FC = () => {
   const [logsOpen, setLogsOpen] = React.useState(false)
   const [logsLoading, setLogsLoading] = React.useState(false)
   const [logsOrderId, setLogsOrderId] = React.useState<string>('')
-  const [emailLogs, setEmailLogs] = React.useState<{ subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }[]>([])
+  interface EmailLog { subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }
+  const [emailLogs, setEmailLogs] = React.useState<EmailLog[]>([])
 
+  interface OrderNote { id: string; note: string; created_at: string; user_id: string | null }
   const [notesOpen, setNotesOpen] = React.useState(false)
   const [notesLoading, setNotesLoading] = React.useState(false)
   const [notesOrderId, setNotesOrderId] = React.useState<string>('')
   const [noteInput, setNoteInput] = React.useState('')
-  const [notes, setNotes] = React.useState<{ id: string; note: string; created_at: string; user_id: string | null }[]>([])
+  const [notes, setNotes] = React.useState<OrderNote[]>([])
 
   React.useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300)
@@ -200,9 +201,10 @@ const AdminOrdersPage: React.FC = () => {
     }
   }, [status, dateRange, page, debouncedQuery, presetPendingShipments, t])
 
+  const pathname = usePathname()
   React.useEffect(() => {
     if (viewMode === 'list') fetchOrders()
-  }, [fetchOrders, viewMode])
+  }, [fetchOrders, viewMode, pathname])
 
   const openShipModal = async (id: string) => {
     setBulkMode(false)
@@ -245,7 +247,7 @@ const AdminOrdersPage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(20)
       if (error) throw error
-      setEmailLogs(Array.isArray(data) ? (data as any[]) : [])
+      setEmailLogs(Array.isArray(data) ? (data as EmailLog[]) : [])
     } catch (e) {
       toast.error(t('admin.orders.toasts.emailLogsFailed'))
       setEmailLogs([])
@@ -267,7 +269,7 @@ const AdminOrdersPage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(50)
       if (error) throw error
-      setNotes(Array.isArray(data) ? (data as any[]) : [])
+      setNotes(Array.isArray(data) ? (data as OrderNote[]) : [])
     } catch (e) {
       toast.error(t('admin.orders.toasts.notesFailed'))
       setNotes([])
@@ -287,7 +289,7 @@ const AdminOrdersPage: React.FC = () => {
         .select('id,note,created_at,user_id')
         .single()
       if (error) throw error
-      setNotes(prev => [data as any, ...prev])
+      setNotes(prev => [data as OrderNote, ...prev])
       setNoteInput('')
     } catch (e) {
       toast.error(t('admin.orders.toasts.noteAddFailed'))
@@ -489,12 +491,33 @@ const AdminOrdersPage: React.FC = () => {
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
 
   return (
-    <div className="space-y-4">
-      <header className="flex items-center justify-between">
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.orders')}</h1>
+    <div className="h-full flex flex-col space-y-4">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.orders')}</h1>
+          {viewMode === 'board' && (
+            <p className="text-sm text-slate-500 mt-1">Siparişleri sürükleyerek durumlarını güncelleyin. Karta tıklayarak detay görün.</p>
+          )}
+        </div>
+
+        {/* View Mode Tabs */}
+        <div className="flex items-center gap-1 bg-slate-100/50 p-1 rounded-lg w-max border border-slate-200/60 shrink-0">
+          <button
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${viewMode === 'list' ? 'bg-white text-primary-navy shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/30'}`}
+          >
+            <LayoutList size={14} /> {t('admin.orders.view_list') || 'Tablo'}
+          </button>
+          <button
+            onClick={() => setViewMode('board')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${viewMode === 'board' ? 'bg-white text-primary-navy shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/30'}`}
+          >
+            <KanbanSquare size={14} /> {t('admin.orders.view_board') || 'Pano'}
+          </button>
+        </div>
       </header>
 
-      <AdminToolbar
+      {viewMode === 'list' && <AdminToolbar
         storageKey="toolbar:orders"
         search={{ value: query, onChange: setQuery, placeholder: t('admin.search.orders'), focusShortcut: '/' }}
         select={{ value: status, onChange: setStatus, title: t('admin.orders.filters.status'), options: STATUSES.map(s => ({ value: s.value, label: s.label })) }}
@@ -519,23 +542,8 @@ const AdminOrdersPage: React.FC = () => {
             <button onClick={fetchOrders} disabled={loading} className={`${adminButtonSecondaryClass}`}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
           </div>
         )}
-      />
+      />}
 
-      {/* View Mode Tabs */}
-      <div className="flex items-center gap-1 bg-slate-100/50 p-1 rounded-lg w-max mb-4 border border-slate-200/60">
-        <button
-          onClick={() => setViewMode('list')}
-          className={`px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'list' ? 'bg-white text-primary-navy shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/30'}`}
-        >
-          <LayoutList size={16} /> Tablo Görünümü
-        </button>
-        <button
-          onClick={() => setViewMode('board')}
-          className={`px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all ${viewMode === 'board' ? 'bg-white text-primary-navy shadow-sm ring-1 ring-slate-200/50' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/30'}`}
-        >
-          <KanbanSquare size={16} /> Pano (Kanban)
-        </button>
-      </div>
 
       {viewMode === 'board' ? (
         <AdminOrdersBoard />
@@ -547,17 +555,17 @@ const AdminOrdersPage: React.FC = () => {
             <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.ceil(total / PAGE_SIZE)} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
           </div>
 
-          <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
+          <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
             <div className="overflow-x-auto w-full">
-              <table className="min-w-full text-sm max-md:text-xs">
+              <table className="min-w-[900px] w-full text-sm">
                 <thead>
                   <tr>
-                    <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
-                    {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
-                    {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
-                    {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad} max-lg:hidden`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
-                    {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
-                    {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
+                    <th className={`${adminTableHeadCellClass} ${headPad} w-10`}></th>
+                    {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
+                    {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
+                    {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
+                    {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
+                    {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
                     <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
                   </tr>
                 </thead>
@@ -570,11 +578,11 @@ const AdminOrdersPage: React.FC = () => {
                     sorted.map((r) => (
                       <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} /></td>
-                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs max-sm:hidden">{r.id}</td>)}
-                        {visibleCols.status && (<td className="px-4 py-3 max-md:hidden"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
-                        {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500 max-lg:hidden">{r.conversation_id || '-'}</td>)}
-                        {visibleCols.amount && (<td className="px-4 py-3 max-sm:hidden">{formatAmount(r.total_amount, lang)}</td>)}
-                        {visibleCols.created && (<td className="px-4 py-3 max-md:hidden">{safeDate(r.created_at, lang)}</td>)}
+                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs">{r.id}</td>)}
+                        {visibleCols.status && (<td className="px-4 py-3"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
+                        {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500">{r.conversation_id || '-'}</td>)}
+                        {visibleCols.amount && (<td className="px-4 py-3">{formatAmount(r.total_amount, lang)}</td>)}
+                        {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
                         <td className="px-4 py-3">
                           <div className="flex gap-2">
                             {hasWriteAccess && (
@@ -758,16 +766,16 @@ const AdminOrdersPage: React.FC = () => {
   )
 }
 
-function formatAmount(v?: number | null, lang: any = 'tr') {
+function formatAmount(v?: number | null, lang: string = 'tr') {
   if (typeof v === 'number') return formatCurrency(v, lang, { maximumFractionDigits: 0 })
   return '-'
 }
 
-function safeDate(iso: string, lang: any = 'tr') {
+function safeDate(iso: string, lang: string = 'tr') {
   try { return formatDateTime(iso, lang) } catch { return iso }
 }
 
-function prettyStatus(s: string, t: any) {
+function prettyStatus(s: string, t: (key: string) => string) {
   if (!s) return s
   const key = s.toLowerCase()
   switch (key) {

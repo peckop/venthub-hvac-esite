@@ -1,4 +1,5 @@
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass, adminTableActionClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -82,7 +83,8 @@ const AdminErrorsPage: React.FC = () => {
     }
   }, [fromDate, toDate, level, env, debouncedQ, page, t])
 
-  React.useEffect(() => { fetchErrors() }, [fetchErrors])
+  const pathname = usePathname()
+  React.useEffect(() => { fetchErrors() }, [fetchErrors, pathname])
 
   // Realtime auto-refresh with debounce
   const fetchRef = React.useRef(fetchErrors)
@@ -152,7 +154,7 @@ const AdminErrorsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[1000px] text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.date')}</th>

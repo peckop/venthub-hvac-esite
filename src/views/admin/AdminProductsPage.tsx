@@ -1,6 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
@@ -219,7 +219,8 @@ const AdminProductsPage: React.FC = () => {
     }
   }, [selectedCategoryFilter, featuredOnly, statusFilter, debouncedQ, sortKey, sortDir, page])
 
-  React.useEffect(() => { load() }, [load])
+  const pathname = usePathname()
+  React.useEffect(() => { load() }, [load, pathname])
 
   React.useEffect(() => {
     const t = setTimeout(() => {
@@ -505,7 +506,7 @@ const AdminProductsPage: React.FC = () => {
           </div>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="w-full max-md:text-xs">
+          <table className="w-full min-w-[1200px] max-md:text-xs">
             <thead className="bg-gray-50">
               <tr>
                 {/* Checkbox column */}
@@ -517,7 +518,7 @@ const AdminProductsPage: React.FC = () => {
                 {/* Expand column */}
                 <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
                 {visibleCols.image && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}>{t('admin.products.table.image')}</th>
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
                 )}
                 {visibleCols.name && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
@@ -525,22 +526,22 @@ const AdminProductsPage: React.FC = () => {
                   </th>
                 )}
                 {visibleCols.sku && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
                   </th>
                 )}
                 {visibleCols.category && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} max-lg:hidden`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
                   </th>
                 )}
                 {visibleCols.status && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
                   </th>
                 )}
                 {visibleCols.health && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} text-center max-xl:hidden`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>
                     Performans
                   </th>
                 )}
@@ -604,7 +605,7 @@ const AdminProductsPage: React.FC = () => {
                         </button>
                       </td>
                       {visibleCols.image && (
-                        <td className={`${adminTableCellClass} ${cellPad} max-sm:hidden`}>
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
                           {covers[r.id] ? (
                             <img
                               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
@@ -618,15 +619,15 @@ const AdminProductsPage: React.FC = () => {
                       )}
                       {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
                       {visibleCols.sku && (
-                        <td className={`${adminTableCellClass} ${cellPad} max-md:hidden`}>
+                        <td className={`${adminTableCellClass} ${cellPad}`}>
                           {r.sku}
                           {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
                         </td>
                       )}
-                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad} max-lg:hidden`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
-                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad} max-md:hidden`}>{statusBadge(r.status)}</td>}
+                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
+                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
                       {visibleCols.health && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-center max-xl:hidden`}>
+                        <td className={`${adminTableCellClass} ${cellPad} text-center`}>
                           <ProductHealthBadge
                             stockQty={r.stock_qty || 0}
                             threshold={r.low_stock_threshold || 10}

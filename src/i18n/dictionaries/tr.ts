@@ -525,6 +525,8 @@ export const tr = {
       }
     },
     orders: {
+      view_list: 'Tablo Görünümü',
+      view_board: 'Pano (Kanban)',
       statusLabels: {
         all: 'Tümü',
         pending: 'Bekliyor',
