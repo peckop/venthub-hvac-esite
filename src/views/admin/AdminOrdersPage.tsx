@@ -502,7 +502,7 @@ const AdminOrdersPage: React.FC = () => {
         onClear={() => { setPresetPendingShipments(false); setStatus(''); setDateRange(undefined); setQuery(''); setPage(1) }}
         recordCount={total}
         rightExtra={(
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0 justify-start md:justify-end">
             <DateRangePicker value={dateRange} onChange={(d) => setDateRange(d)} />
             <ExportMenu items={[{ key: 'csv', label: t('admin.orders.export.csvLabel'), onSelect: exportCsv }]} />
             <ColumnsMenu
@@ -553,11 +553,11 @@ const AdminOrdersPage: React.FC = () => {
                 <thead>
                   <tr>
                     <th className={`${adminTableHeadCellClass} ${headPad}`}></th>
-                    {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
-                    {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
-                    {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
-                    {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
-                    {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
+                    {visibleCols.id && (<th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}><button onClick={() => toggleSort('id')}>{t('admin.orders.table.orderId')} {sortIndicator('id')}</button></th>)}
+                    {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}><button onClick={() => toggleSort('status')}>{t('admin.orders.table.status')} {sortIndicator('status')}</button></th>)}
+                    {visibleCols.conversation && (<th className={`${adminTableHeadCellClass} ${headPad} max-lg:hidden`}><button onClick={() => toggleSort('conversation')}>{t('admin.orders.table.conversationId')} {sortIndicator('conversation')}</button></th>)}
+                    {visibleCols.amount && (<th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}><button onClick={() => toggleSort('amount')}>{t('admin.orders.table.amount')} {sortIndicator('amount')}</button></th>)}
+                    {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}><button onClick={() => toggleSort('created')}>{t('admin.orders.table.created')} {sortIndicator('created')}</button></th>)}
                     <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.orders.table.actions')}</th>
                   </tr>
                 </thead>
@@ -570,11 +570,11 @@ const AdminOrdersPage: React.FC = () => {
                     sorted.map((r) => (
                       <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} /></td>
-                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs">{r.id}</td>)}
-                        {visibleCols.status && (<td className="px-4 py-3"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
-                        {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500">{r.conversation_id || '-'}</td>)}
-                        {visibleCols.amount && (<td className="px-4 py-3">{formatAmount(r.total_amount, lang)}</td>)}
-                        {visibleCols.created && (<td className="px-4 py-3">{safeDate(r.created_at, lang)}</td>)}
+                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs max-sm:hidden">{r.id}</td>)}
+                        {visibleCols.status && (<td className="px-4 py-3 max-md:hidden"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
+                        {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500 max-lg:hidden">{r.conversation_id || '-'}</td>)}
+                        {visibleCols.amount && (<td className="px-4 py-3 max-sm:hidden">{formatAmount(r.total_amount, lang)}</td>)}
+                        {visibleCols.created && (<td className="px-4 py-3 max-md:hidden">{safeDate(r.created_at, lang)}</td>)}
                         <td className="px-4 py-3">
                           <div className="flex gap-2">
                             {hasWriteAccess && (

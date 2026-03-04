@@ -14,17 +14,17 @@ export const ForgotPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!email) {
-toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
+      toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
       return
     }
 
     setLoading(true)
-    
+
     try {
       const { error } = await resetPassword(email)
-      
+
       if (error) {
         if (error.message?.includes('User not found')) {
           toast.error(t('auth.userNotFound') || 'User not found')
@@ -52,24 +52,23 @@ toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
               <CheckCircle size={32} />
             </div>
             <h1 className="text-2xl font-bold text-industrial-gray mb-4">
-              E-posta Gönderildi!
+              {t('auth.emailSentTitle')}
             </h1>
             <p className="text-steel-gray mb-6 leading-relaxed">
-              <strong>{email}</strong> adresine şifre sıfırlama linki gönderildi. 
-              Lütfen e-postanızı kontrol edin ve linke tıklayarak yeni şifrenizi belirleyin.
+              {t('auth.emailSentDesc', { email })}
             </p>
             <div className="space-y-3">
               <Link
                 href="/auth/login"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
-                Giriş Sayfasına Dön
+                {t('auth.backToLogin')}
               </Link>
               <button
                 onClick={() => setEmailSent(false)}
                 className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
-                Başka E-posta Dene
+                {t('auth.tryAnotherEmail')}
               </button>
             </div>
           </div>
@@ -82,7 +81,7 @@ toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-repeat" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}} />
+        <div className="absolute inset-0 bg-repeat" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
       </div>
 
       <div className="relative max-w-md mx-auto px-4 py-8">
@@ -142,7 +141,7 @@ toast.error(t('auth.email') + ' ' + t('auth.required') || 'Required')
                   {t('auth.submitting') || 'Gönderiliyor...'}
                 </div>
               ) : (
-t('auth.sendResetLink') || 'Şifre Sıfırlama Linki Gönder'
+                t('auth.sendResetLink') || 'Şifre Sıfırlama Linki Gönder'
               )}
             </button>
           </form>

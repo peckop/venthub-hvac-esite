@@ -7,9 +7,11 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
+import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
-import { ChevronDown, ChevronRight, Pencil, Plus } from 'lucide-react'
+import { ChevronDown, ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
 
 interface ProductRow {
@@ -379,8 +381,6 @@ const AdminProductsPage: React.FC = () => {
     return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
   }
 
-  const [importPreview, setImportPreview] = React.useState<{ header: string[]; rows: Record<string, string>[]; total: number } | null>(null)
-  const [importRows, setImportRows] = React.useState<Record<string, string>[] | null>(null)
 
   const ColumnsMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ColumnsMenu')), [])
   const ExportMenu = React.useMemo(() => React.lazy(() => import('../../components/admin/ExportMenu')), [])
@@ -447,20 +447,7 @@ const AdminProductsPage: React.FC = () => {
         rightExtra={(
           <div className="flex items-center gap-2">
             {hasWriteAccess && (
-              <>
-                <input id="prod-import-input" type="file" accept=".csv,text/csv" className="hidden" onChange={async (e) => {
-                  const f = e.target.files?.[0]
-                  if (!f) return
-                  const text = await f.text()
-                  const lines = text.replace(/^\ufeff/, '').split(/\r?\n/).filter(l => l.trim().length > 0)
-                  const split = (s: string) => s.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').replace(/""/g, '"'))
-                  const header = split(lines[0]).map(h => h.trim().toLowerCase())
-                  const rows = lines.slice(1).map(l => { const cells = split(l); const obj: Record<string, string> = {}; header.forEach((h, i) => obj[h] = cells[i] || ''); return obj })
-                  setImportRows(rows)
-                  setImportPreview({ header, rows: rows.slice(0, 10), total: rows.length })
-                }} />
-                <button onClick={() => document.getElementById('prod-import-input')?.click()} className={`${adminButtonSecondaryClass}`}>{t('admin.products.import.button')}</button>
-              </>
+              <ProductCsvImport categories={cats} onSuccess={load} />
             )}
             <React.Suspense fallback={<button className={`${adminButtonSecondaryClass} opacity-70`} disabled>Görünüm…</button>}>
               <ColumnsMenu
@@ -505,79 +492,6 @@ const AdminProductsPage: React.FC = () => {
         )}
       />
 
-      {importPreview && (
-        <div className={`${adminCardClass} p-4`}>
-          <div className="mb-2 text-sm text-slate-500">{t('admin.products.import.previewTitle', { total: importPreview.total }) ?? `CSV Önizleme (ilk 10 satır) — Toplam: ${importPreview.total}`}</div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead className="bg-gray-50">
-                <tr>
-                  {importPreview.header.map(h => (<th key={h} className="p-2 border-b text-left">{h}</th>))}
-                </tr>
-              </thead>
-              <tbody>
-                {importPreview.rows.map((r, idx) => (
-                  <tr key={idx} className="border-b">
-                    {importPreview.header.map(h => (<td key={h} className="p-2">{r[h]}</td>))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            <button className={`${adminButtonSecondaryClass} h-10 text-xs`} onClick={() => { setImportPreview(null); setImportRows(null); }}>{t('admin.products.import.close')}</button>
-            <button className={`${adminButtonSecondaryClass} h-10 text-xs`} onClick={() => {
-              const h = (importPreview?.header || [])
-              const required = ['name', 'sku']
-              const hasRequired = required.every(k => h.includes(k))
-              const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
-              alert(t('admin.products.import.dryRunResult', { status: t(`admin.products.import.${hasRequired ? 'statusComplete' : 'statusMissing'}`), ok: okCount, total: importPreview?.total || 0 }))
-            }}>{t('admin.products.import.dryRun')}</button>
-            <button className={`${adminButtonPrimaryClass} h-10 text-xs`} onClick={async () => {
-              if (!importRows || !importPreview) return alert(t('admin.products.import.needCsv'))
-              const h = importPreview.header
-              if (!h.includes('sku') || !h.includes('name')) { alert(t('admin.products.import.minColumns')); return }
-              const mapCategorySlugToId = (slug: string) => {
-                const s = (slug || '').toLowerCase().trim()
-                const found = cats.find(c => c.name.toLowerCase() === s)
-                return found?.id || null
-              }
-              const payloads: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
-              for (const r of importRows) {
-                if (!r['sku'] || !r['name']) continue
-                const p: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
-                  sku: r['sku'].trim(),
-                  name: r['name'].trim(),
-                }
-                if (r['model_code']) p.model_code = r['model_code'].trim()
-                else if (r['model']) p.model_code = r['model'].trim()
-                if (r['brand']) p.brand = r['brand'].trim()
-                if (r['status']) p.status = r['status'].trim()
-                if (r['price']) p.price = Number(r['price'])
-                if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
-                if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
-                if (r['category_id']) p.category_id = r['category_id'] || null
-                else if (r['category_slug'] || r['category']) p.category_id = mapCategorySlugToId(r['category_slug'] || r['category'])
-                payloads.push(p)
-              }
-              if (payloads.length === 0) { alert(t('admin.products.import.noneFound')); return }
-              try {
-                // chunked upsert by sku
-                let ok = 0, fail = 0
-                for (let i = 0; i < payloads.length; i += 100) {
-                  const chunk = payloads.slice(i, i + 100)
-                  const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
-                  if (error) { console.warn('import upsert error', error); fail += chunk.length } else ok += chunk.length
-                }
-                alert(t('admin.products.import.done', { ok, fail }))
-                await load()
-              } catch (e) {
-                alert(t('admin.products.import.error', { msg: ((e as Error).message || String(e)) }))
-              }
-            }}>{t('admin.products.import.writeButton')}</button>
-          </div>
-        </div>
-      )}
 
       {/* Table */}
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -603,7 +517,7 @@ const AdminProductsPage: React.FC = () => {
                 {/* Expand column */}
                 <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
                 {visibleCols.image && (
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
+                  <th className={`${adminTableHeadCellClass} ${headPad} max-sm:hidden`}>{t('admin.products.table.image')}</th>
                 )}
                 {visibleCols.name && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
@@ -611,22 +525,22 @@ const AdminProductsPage: React.FC = () => {
                   </th>
                 )}
                 {visibleCols.sku && (
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
                   </th>
                 )}
                 {visibleCols.category && (
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} max-lg:hidden`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
                   </th>
                 )}
                 {visibleCols.status && (
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} max-md:hidden`}>
                     <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
                   </th>
                 )}
                 {visibleCols.health && (
-                  <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>
+                  <th className={`${adminTableHeadCellClass} ${headPad} text-center max-xl:hidden`}>
                     Performans
                   </th>
                 )}
@@ -645,9 +559,34 @@ const AdminProductsPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={10}>{t('admin.ui.loading')}</td></tr>
+                [...Array(5)].map((_, i) => (
+                  <tr key={`skel-${i}`} className="border-b border-slate-100">
+                    <td colSpan={10} className="p-4">
+                      <div className="flex gap-4">
+                        <div className="h-4 w-4 bg-slate-200 animate-pulse rounded"></div>
+                        <div className="h-10 w-10 bg-slate-200 animate-pulse rounded"></div>
+                        <div className="space-y-2 flex-1 relative">
+                          <div className="h-4 w-1/3 bg-slate-200 animate-pulse rounded"></div>
+                          <div className="h-3 w-1/4 bg-slate-100 animate-pulse rounded"></div>
+                        </div>
+                        <div className="h-6 w-20 bg-slate-200 animate-pulse rounded-full"></div>
+                        <div className="h-4 w-16 bg-slate-200 animate-pulse rounded"></div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               ) : filtered.length === 0 ? (
-                <tr><td className="p-4" colSpan={10}>{t('admin.ui.noRecords')}</td></tr>
+                <tr>
+                  <td colSpan={10} className="p-0">
+                    <div className="border-b-0">
+                      <AdminEmptyState
+                        icon={SearchX}
+                        title={t('admin.ui.noRecords') || 'Kayıt bulunamadı'}
+                        description="Arama kriterlerinize uyan ürün bulunamadı. Lütfen filtreleri değiştirin veya yeni ürün ekleyin."
+                      />
+                    </div>
+                  </td>
+                </tr>
               ) : (
                 sorted.map(r => (
                   <React.Fragment key={r.id}>
@@ -665,7 +604,7 @@ const AdminProductsPage: React.FC = () => {
                         </button>
                       </td>
                       {visibleCols.image && (
-                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <td className={`${adminTableCellClass} ${cellPad} max-sm:hidden`}>
                           {covers[r.id] ? (
                             <img
                               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
@@ -679,15 +618,15 @@ const AdminProductsPage: React.FC = () => {
                       )}
                       {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
                       {visibleCols.sku && (
-                        <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <td className={`${adminTableCellClass} ${cellPad} max-md:hidden`}>
                           {r.sku}
                           {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
                         </td>
                       )}
-                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
-                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
+                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad} max-lg:hidden`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
+                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad} max-md:hidden`}>{statusBadge(r.status)}</td>}
                       {visibleCols.health && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-center`}>
+                        <td className={`${adminTableCellClass} ${cellPad} text-center max-xl:hidden`}>
                           <ProductHealthBadge
                             stockQty={r.stock_qty || 0}
                             threshold={r.low_stock_threshold || 10}
@@ -698,7 +637,7 @@ const AdminProductsPage: React.FC = () => {
                       )}
                       {/* Inline-edit Price */}
                       {visibleCols.price && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                        <td className={`${adminTableCellClass} ${cellPad} text-right whitespace-nowrap`}>
                           {hasWriteAccess ? (
                             inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
                               <div className="relative inline-block animate-in fade-in zoom-in duration-200">

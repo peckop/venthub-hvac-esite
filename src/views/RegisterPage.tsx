@@ -32,32 +32,32 @@ export const RegisterPage: React.FC = () => {
       toast.error(t('auth.errors.nameRequired') || t('auth.name'))
       return false
     }
-    
+
     if (!formData.email || !formData.email.includes('@')) {
       toast.error(t('auth.emailInvalid') || t('auth.validEmailPassRequired'))
       return false
     }
-    
+
     if (formData.password.length < 8) {
       toast.error(t('auth.passwordMin'))
       return false
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error(t('auth.passwordsDontMatch'))
       return false
     }
-    
+
     return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     setLoading(true)
-    
+
     try {
       // HIBP sızıntı kontrolü (k-Anonymity). Ağ hatasında geçer, sızıntıda engeller.
       const pwned = await hibpPwnedCount(formData.password)
@@ -67,7 +67,7 @@ export const RegisterPage: React.FC = () => {
         return
       }
       const { error } = await signUp(formData.email, formData.password, formData.name)
-      
+
       if (error) {
         if (error.message?.includes('already registered')) {
           toast.error(t('auth.emailAlready') || 'Already registered')
@@ -97,24 +97,23 @@ export const RegisterPage: React.FC = () => {
               <CheckCircle size={32} />
             </div>
             <h1 className="text-2xl font-bold text-industrial-gray mb-4">
-              Kayıt Tamamlandı!
+              {t('auth.registrationCompleteTitle')}
             </h1>
             <p className="text-steel-gray mb-6 leading-relaxed">
-              E-posta adresinize doğrulama linki gönderildi. 
-              Lütfen e-postanızı kontrol ederek hesabınızı doğrulayın.
+              {t('auth.registrationCompleteDesc')}
             </p>
             <div className="space-y-3">
               <Link
                 href="/auth/login"
                 className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
-                Giriş Sayfasına Dön
+                {t('auth.backToLogin')}
               </Link>
               <Link
                 href="/"
                 className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block"
               >
-                Ana Sayfaya Dön
+                {t('auth.backHome')}
               </Link>
             </div>
           </div>
@@ -127,7 +126,7 @@ export const RegisterPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-air-blue via-clean-white to-light-gray">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-repeat" style={{backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}} />
+        <div className="absolute inset-0 bg-repeat" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='https://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
       </div>
 
       <div className="relative max-w-md mx-auto px-4 py-8">
@@ -259,7 +258,7 @@ export const RegisterPage: React.FC = () => {
                   {t('auth.registering')}
                 </div>
               ) : (
-t('auth.register')
+                t('auth.register')
               )}
             </button>
           </form>
