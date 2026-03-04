@@ -5,7 +5,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 
 interface AuditRow {
   id: string
@@ -85,7 +85,8 @@ const AdminAuditLogPage: React.FC = () => {
     }
   }, [fromDate, toDate, action, debouncedQ, page, batch])
 
-  React.useEffect(() => { fetchLogs() }, [fetchLogs])
+  const pathname = usePathname()
+  React.useEffect(() => { fetchLogs() }, [fetchLogs, pathname])
 
   const searchParams = useSearchParams()
   React.useEffect(() => {
@@ -147,7 +148,7 @@ const AdminAuditLogPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[800px] text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.date') || 'Tarih'}</th>

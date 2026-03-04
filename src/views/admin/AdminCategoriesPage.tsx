@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
@@ -89,7 +90,8 @@ const AdminCategoriesPage: React.FC = () => {
     }
   }, [])
 
-  React.useEffect(() => { load() }, [load])
+  const pathname = usePathname()
+  React.useEffect(() => { load() }, [load, pathname])
 
   const filtered = React.useMemo(() => {
     const term = q.trim().toLowerCase()
@@ -182,7 +184,7 @@ const AdminCategoriesPage: React.FC = () => {
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
         <div className="overflow-x-auto w-full">
-          <table className="w-full max-md:text-xs">
+          <table className="w-full min-w-[800px] max-md:text-xs">
             <thead className="bg-gray-50">
               <tr>
                 {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}

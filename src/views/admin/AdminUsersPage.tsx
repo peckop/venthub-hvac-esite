@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search, Package, Tag, Eye } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
@@ -38,6 +38,7 @@ export default function AdminUsersPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const { t: _t, lang } = useI18n()
+  const pathname = usePathname()
 
   const [isAdmin, setIsAdmin] = useState(false)
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([])
@@ -93,7 +94,7 @@ export default function AdminUsersPage() {
     }
 
     loadAdminUsers()
-  }, [isAdmin, user, _t])
+  }, [isAdmin, user, _t, pathname])
 
   // Tüm kullanıcıları yükle
   useEffect(() => {
@@ -121,7 +122,7 @@ export default function AdminUsersPage() {
     }
 
     loadAllUsers()
-  }, [isAdmin, user, activeTab, _t])
+  }, [isAdmin, user, activeTab, _t, pathname])
 
   const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') => {
     if (!hasWriteAccess) {
@@ -319,7 +320,7 @@ export default function AdminUsersPage() {
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full min-w-[900px] text-left">
               <thead className="bg-slate-50/50 border-b border-slate-200">
                 <tr>
                   {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user') || 'Kullanıcı'}</th>)}

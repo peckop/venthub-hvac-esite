@@ -1,40 +1,27 @@
 import React from 'react'
-import InventoryCsvImport from '../../components/admin/InventoryCsvImport'
-import InventoryDetailDrawer from '../../components/admin/InventoryDetailDrawer'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
-import { SearchX } from 'lucide-react'
+import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import ColumnsMenu from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
 import { useI18n } from '../../i18n/I18nProvider'
-
 import toast from 'react-hot-toast'
 import { useRole } from '../../hooks/useRole'
 
-type Row = {
-  product_id: string;
-  name: string;
-  physical_stock: number;
-  reserved_stock: number;
-  available_stock: number;
-  warehouse_location?: string | null;
-  supplier_name?: string | null;
-  daily_velocity?: number;
-  days_until_empty?: number;
-  abc_class?: 'A' | 'B' | 'C' | null;
-}
-
-type SortKey = 'name' | 'physical' | 'reserved' | 'available' | 'threshold' | 'status' | 'location' | 'supplier' | 'days_empty' | 'abc'
-
-type Category = { id: string; name: string }
-
-type ReservedRow = { order_id: string; created_at: string; status: string; payment_status: string | null; quantity: number }
-
-enum LoadState { Idle, Loading, Error }
+import InventoryCsvImport from '../../components/admin/InventoryCsvImport'
+import InventoryDetailDrawer from '../../components/admin/InventoryDetailDrawer'
+import InventoryTable from '../../components/admin/InventoryTable'
+import {
+  InventoryRow as Row,
+  SortKey,
+  Category,
+  ReservedRow,
+  LoadState,
+  Density,
+  VisibleCols
+} from '../../types/inventory'
 
 const AdminInventoryPage: React.FC = () => {
   const { t } = useI18n()
@@ -83,6 +70,40 @@ const AdminInventoryPage: React.FC = () => {
   const [productCategoryMap, setProductCategoryMap] = React.useState<Record<string, string | null>>({})
   // Durum filtresi (çoklu seçim)
   const [statusFilter, setStatusFilter] = React.useState<{ out: boolean; critical: boolean; reserved: boolean; ok: boolean }>({ out: false, critical: false, reserved: false, ok: false })
+
+  // Görünür kolonlar ve yoğunluk
+  const STORAGE_KEY = 'toolbar:inventory'
+  const [visibleCols, setVisibleCols] = React.useState<VisibleCols>({
+    name: true, physical: true, reserved: true, available: true, threshold: true, status: true, location: true, supplier: false, abc: true, days: true
+  })
+  const [density, setDensity] = React.useState<Density>('comfortable')
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}: cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}: density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}: cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}: density`, density) } catch { }
+  }, [density])
+
+  // ESC ile çekmeceyi kapat
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   // Çekmece içi hızlı hareket durumu
   const [moveQty, setMoveQty] = React.useState<number>(1)
@@ -200,7 +221,8 @@ const AdminInventoryPage: React.FC = () => {
     setLoading(LoadState.Idle)
   }, [])
 
-  React.useEffect(() => { load() }, [load])
+  const pathname = usePathname()
+  React.useEffect(() => { load() }, [load, pathname])
 
   // Realtime: inventory_settings değiştiğinde efektif eşik değerini güncelle
   React.useEffect(() => {
@@ -234,7 +256,7 @@ const AdminInventoryPage: React.FC = () => {
 
 
   // Yerel efektif eşik hesaplayıcı (sıralama/filtre için)
-  const computeEffectiveThresholdLocal = React.useCallback((productId: string): number | null => {
+  const effectiveThreshold = React.useCallback((productId: string): number | null => {
     const hasOverride = !!overrideMap[productId]
     const ovVal = thresholdMap[productId]
     const defVal = defaultThreshold ?? null
@@ -245,21 +267,21 @@ const AdminInventoryPage: React.FC = () => {
 
   const statusKey = React.useCallback((r: Row): 'out' | 'critical' | 'reserved' | 'ok' => {
     const net = r.available_stock
-    const th = computeEffectiveThresholdLocal(r.product_id)
+    const th = effectiveThreshold(r.product_id)
     if (net <= 0) return 'out'
     if (th != null && net <= th) return 'critical'
     if (r.reserved_stock > 0) return 'reserved'
     return 'ok'
-  }, [computeEffectiveThresholdLocal])
+  }, [effectiveThreshold])
 
   const statusRank = React.useCallback((r: Row) => {
     const net = r.available_stock
-    const th = computeEffectiveThresholdLocal(r.product_id)
+    const th = effectiveThreshold(r.product_id)
     if (net <= 0) return 0 // Tükendi
     if (th != null && net <= th) return 1 // Kritik
     if (r.reserved_stock > 0) return 2 // Rezervli
     return 3 // Uygun
-  }, [computeEffectiveThresholdLocal])
+  }, [effectiveThreshold])
 
   const filteredRows = React.useMemo(() => {
     const t = q.trim().toLowerCase()
@@ -294,8 +316,8 @@ const AdminInventoryPage: React.FC = () => {
         case 'available':
           return dir * (a.available_stock - b.available_stock)
         case 'threshold': {
-          const ea = computeEffectiveThresholdLocal(a.product_id) ?? -Infinity
-          const eb = computeEffectiveThresholdLocal(b.product_id) ?? -Infinity
+          const ea = effectiveThreshold(a.product_id) ?? -Infinity
+          const eb = effectiveThreshold(b.product_id) ?? -Infinity
           return dir * (Number(ea) - Number(eb))
         }
         case 'status':
@@ -309,7 +331,7 @@ const AdminInventoryPage: React.FC = () => {
       }
     })
     return arr
-  }, [filteredRows, sortKey, sortDir, computeEffectiveThresholdLocal, statusRank])
+  }, [filteredRows, sortKey, sortDir, effectiveThreshold, statusRank])
 
   const getCategoryName = React.useCallback((cid: string | null | undefined): string => {
     if (!cid) return 'Kategorisiz'
@@ -345,9 +367,22 @@ const AdminInventoryPage: React.FC = () => {
     }
   }
 
-  function sortIndicator(key: SortKey) {
-    if (sortKey !== key) return ''
-    return sortDir === 'asc' ? '▲' : '▼'
+  const updateLocation = async (productId: string, val: string) => {
+    const r = rows.find(x => x.product_id === productId)
+    if (!r || r.warehouse_location === val) return
+    const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', productId)
+    if (error) throw error
+    setRows(prev => prev.map(row => row.product_id === productId ? { ...row, warehouse_location: val || null } : row))
+    toast.success('Raf konumu güncellendi')
+  }
+
+  const updateSupplier = async (productId: string, val: string) => {
+    const r = rows.find(x => x.product_id === productId)
+    if (!r || r.supplier_name === val) return
+    const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', productId)
+    if (error) throw error
+    setRows(prev => prev.map(row => row.product_id === productId ? { ...row, supplier_name: val || null } : row))
+    toast.success('Tedarikçi güncellendi')
   }
 
   const loadReserved = React.useCallback(async (productId: string) => {
@@ -364,18 +399,6 @@ const AdminInventoryPage: React.FC = () => {
     }
   }, [])
 
-
-  const effectiveThreshold = React.useCallback((productId: string): number | null => {
-    const hasOverride = !!overrideMap[productId]
-    const ovVal = thresholdMap[productId]
-    const defVal = defaultThreshold ?? null
-    // Eğer override yoksa ya da override null ise -> default
-    if (!hasOverride || ovVal == null) return defVal
-    // Override var ama değer default ile aynıysa -> default’u kullan
-    if (defVal != null && Number(ovVal) === Number(defVal)) return defVal
-    // Gerçek bir override ise ürün değerini kullan
-    return Number(ovVal)
-  }, [thresholdMap, overrideMap, defaultThreshold])
 
   async function saveThreshold(productId: string) {
     try {
@@ -442,45 +465,6 @@ const AdminInventoryPage: React.FC = () => {
     }
   }
 
-  // Görünür kolonlar ve yoğunluk
-  const STORAGE_KEY = 'toolbar:inventory'
-  const [visibleCols, setVisibleCols] = React.useState<{ name: boolean; physical: boolean; reserved: boolean; available: boolean; threshold: boolean; status: boolean; location: boolean; supplier: boolean; abc: boolean; days: boolean }>({ name: true, physical: true, reserved: true, available: true, threshold: true, status: true, location: true, supplier: false, abc: true, days: true })
-  const [density, setDensity] = React.useState<Density>('comfortable')
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const c = localStorage.getItem(`${STORAGE_KEY}: cols`);
-      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
-      const d = localStorage.getItem(`${STORAGE_KEY}: density`);
-      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
-    } catch { }
-  }, [])
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}: cols`, JSON.stringify(visibleCols)) } catch { }
-  }, [visibleCols])
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}: density`, density) } catch { }
-  }, [density])
-  const headPad = density === 'compact' ? 'px-2 py-2' : ''
-  const cellPad = density === 'compact' ? 'px-2 py-2' : ''
-
-  // ESC ile çekmeceyi kapat
-  React.useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
-  function statusBadge(r: Row) {
-    const net = r.available_stock
-    const th = effectiveThreshold(r.product_id)
-    if (net <= 0) return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">Tükendi</span>
-    if (th != null && net <= th) return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">Kritik</span>
-    if (r.reserved_stock > 0) return <span className="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">Rezervli</span>
-    return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">Uygun</span>
-  }
 
   return (
     <div className="space-y-6">
@@ -562,306 +546,39 @@ const AdminInventoryPage: React.FC = () => {
         )}
       />
 
-      <div className={adminCardClass + " overflow-hidden"}>
-        <table className="w-full">
-          <thead className="bg-slate-50">
-            <tr>
-              {visibleCols.name && (
-                <th className={adminTableHeadCellClass + " " + headPad}>
-                  <button onClick={() => toggleSort('name')} className="hover:underline flex items-center gap-1 uppercase tracking-wider">
-                    Ürün {sortIndicator('name')}
-                  </button>
-                </th>
-              )}
-              {visibleCols.physical && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider max-sm:hidden"}>
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => toggleSort('physical')} className="hover:underline flex items-center gap-1">
-                      Fiziksel {sortIndicator('physical')}
-                    </button>
-                    <InfoTooltip text="Depodaki gerçekte sayılan mevcut ürün adedi." />
-                  </div>
-                </th>
-              )}
-              {visibleCols.reserved && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider max-sm:hidden"}>
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => toggleSort('reserved')} className="hover:underline flex items-center gap-1">
-                      Rezerve {sortIndicator('reserved')}
-                    </button>
-                    <InfoTooltip text="Henüz kargolanmamış ama parası ödenmiş (siparişi verilmiş) ürün miktarı." />
-                  </div>
-                </th>
-              )}
-              {visibleCols.available && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider"}>
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => toggleSort('available')} className="hover:underline flex items-center gap-1 text-primary-navy">
-                      Müsait {sortIndicator('available')}
-                    </button>
-                    <InfoTooltip text="Müşterilere satılabilecek durumdaki net stok adedi. (Fiziksel - Rezerve)" />
-                  </div>
-                </th>
-              )}
-              {visibleCols.threshold && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider max-md:hidden"}>
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => toggleSort('threshold')} className="hover:underline flex items-center gap-1">
-                      Eşik {sortIndicator('threshold')}
-                    </button>
-                    <InfoTooltip text="Müsait stok bu rakamın altına indiğinde sistem 'Kritik Stok' uyarısı verir." />
-                  </div>
-                </th>
-              )}
-              {visibleCols.location && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase tracking-wider max-lg:hidden"}>
-                  <button onClick={() => toggleSort('location')} className="hover:underline flex items-center gap-1">
-                    Raf {sortIndicator('location')}
-                  </button>
-                </th>
-              )}
-              {visibleCols.supplier && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-left uppercase tracking-wider max-xl:hidden"}>
-                  <button onClick={() => toggleSort('supplier')} className="hover:underline flex items-center gap-1">
-                    Tedarikçi {sortIndicator('supplier')}
-                  </button>
-                </th>
-              )}
-              {visibleCols.abc && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider max-lg:hidden"}>
-                  <div className="flex items-center justify-center gap-1">
-                    <button onClick={() => toggleSort('abc')} className="hover:underline flex items-center gap-1">
-                      Sınıf {sortIndicator('abc')}
-                    </button>
-                    <InfoTooltip text="Satış hacmine göre ürünün önem derecesi: A (En Popüler), B (Orta), C (Az Satan)." />
-                  </div>
-                </th>
-              )}
-              {visibleCols.days && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-right uppercase tracking-wider max-xl:hidden"}>
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => toggleSort('days_empty')} className="hover:underline flex items-center gap-1">
-                      Tükenme Hızı {sortIndicator('days_empty')}
-                    </button>
-                    <InfoTooltip text="Son 30 günlük satış ivmesine göre eldeki müsait stoğun kaç gün içinde biteceği tahmini." />
-                  </div>
-                </th>
-              )}
-              {visibleCols.status && (
-                <th className={adminTableHeadCellClass + " " + headPad + " text-center uppercase tracking-wider"}>Durum</th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {loading === LoadState.Loading && filteredRows.length === 0 ? (
-              [...Array(5)].map((_, i) => (
-                <tr key={`skel-${i}`} className="border-b border-slate-100">
-                  <td colSpan={10} className="p-4">
-                    <div className="flex gap-4 items-center">
-                      <div className="h-4 w-1/4 bg-slate-200 animate-pulse rounded"></div>
-                      <div className="h-4 w-16 bg-slate-100 animate-pulse rounded"></div>
-                      <div className="h-4 w-16 bg-slate-100 animate-pulse rounded"></div>
-                      <div className="h-4 w-20 bg-slate-200 animate-pulse rounded-full"></div>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : filteredRows.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="p-0 border-b-0">
-                  <AdminEmptyState
-                    icon={SearchX}
-                    title="Kayıt bulunamadı"
-                    description="Arama kriterlerinize veya kategori filtrenize uyan envanter kaydı bulunamadı."
-                  />
-                </td>
-              </tr>
-            ) : groupByCategory ? (
-              groupedRows.map(g => (
-                <React.Fragment key={g.cid ?? 'null'}>
-                  <tr className="bg-slate-50/80">
-                    <th colSpan={5} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-6 py-3'} text-slate-500 font-bold uppercase text-[10px] tracking-wider border-y border-slate-200`}>
-                      {g.name || 'Kategorisiz'}
-                    </th>
-                  </tr>
-                  {g.items.map(r => (
-                    <tr
-                      key={r.product_id}
-                      className={`group hover:bg-slate-50/50 cursor-pointer transition-colors ${r.available_stock <= 0 ? 'bg-rose-50/20' : r.available_stock <= (thresholdMap[r.product_id] ?? defaultThreshold ?? 10) ? 'bg-amber-50/20' : ''}`}
-                      onClick={() => { setSelected(r); setSelectedThreshold(thresholdMap[r.product_id] ?? ''); setSelectedStock(r.physical_stock); loadMovements(r.product_id); loadReserved(r.product_id); }}
-                    >
-                      {visibleCols.name && (
-                        <td className={adminTableCellClass + " " + cellPad}>
-                          <div className="flex flex-col">
-                            <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
-                            <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
-                          </div>
-                        </td>
-                      )}
-                      {visibleCols.physical && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono max-sm:hidden"}>{r.physical_stock}</td>}
-                      {visibleCols.reserved && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400 max-sm:hidden"}>{r.reserved_stock}</td>}
-                      {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
-                      {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono max-md:hidden"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
-                      {visibleCols.location && (
-                        <td className={adminTableCellClass + " " + cellPad + " max-lg:hidden"}>
-                          {hasWriteAccess ? (
-                            <EditableCell
-                              value={r.warehouse_location || ''}
-                              placeholder="-"
-                              inputWidth="w-20"
-                              onSave={async (val) => {
-                                if (r.warehouse_location === val) return
-                                const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
-                                if (error) throw error
-                                setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
-                                toast.success('Raf konumu güncellendi')
-                              }}
-                            />
-                          ) : (
-                            <span className="w-20 inline-block">{r.warehouse_location || '-'}</span>
-                          )}
-                        </td>
-                      )}
-                      {visibleCols.supplier && (
-                        <td className={adminTableCellClass + " " + cellPad + " max-xl:hidden"}>
-                          {hasWriteAccess ? (
-                            <EditableCell
-                              value={r.supplier_name || ''}
-                              placeholder="-"
-                              inputWidth="w-24"
-                              className="max-w-[120px] truncate block"
-                              onSave={async (val) => {
-                                if (r.supplier_name === val) return
-                                const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
-                                if (error) throw error
-                                setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
-                                toast.success('Tedarikçi güncellendi')
-                              }}
-                            />
-                          ) : (
-                            <span className="max-w-[120px] truncate block">{r.supplier_name || '-'}</span>
-                          )}
-                        </td>
-                      )}
-                      {visibleCols.abc && (
-                        <td className={adminTableCellClass + " " + cellPad + " text-center max-lg:hidden"}>
-                          {r.abc_class === 'A' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs" title="Sermayenin büyük kısmı ve yüksek hız">A</span> :
-                            r.abc_class === 'B' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-xs">B</span> :
-                              r.abc_class === 'C' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs" title="Düşük hareket/sermaye">C</span> : '-'}
-                        </td>
-                      )}
-                      {visibleCols.days && (
-                        <td className={adminTableCellClass + " " + cellPad + " text-right font-mono max-xl:hidden"}>
-                          {r.days_until_empty === 9999 ? (
-                            <span className="text-slate-400 text-xs">Hareketsiz</span>
-                          ) : (
-                            <span className={`text-xs ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-600 font-bold flex justify-end items-center gap-1 animate-pulse' : 'text-slate-600'}`}>
-                              {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
-                              ≈ {r.days_until_empty} gün
-                            </span>
-                          )}
-                        </td>
-                      )}
-                      {visibleCols.status && <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>}
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))
-            ) : (
-              sortedRows.map(r => (
-                <tr
-                  key={r.product_id}
-                  className={`group hover:bg-slate-50/50 cursor-pointer transition-colors ${r.available_stock <= 0 ? 'bg-rose-50/20' : r.available_stock <= (thresholdMap[r.product_id] ?? defaultThreshold ?? 10) ? 'bg-amber-50/20' : ''}`}
-                  onClick={() => { setSelected(r); setSelectedThreshold(thresholdMap[r.product_id] ?? ''); setSelectedStock(r.physical_stock); loadMovements(r.product_id); loadReserved(r.product_id); }}
-                >
-                  {visibleCols.name && (
-                    <td className={adminTableCellClass + " " + cellPad}>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-slate-900 group-hover:text-primary-navy transition-colors">{r.name}</span>
-                        <span className="text-[11px] font-mono text-slate-400 uppercase">{r.product_id.slice(0, 8)}</span>
-                      </div>
-                    </td>
-                  )}
-                  {visibleCols.physical && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{r.physical_stock}</td>}
-                  {visibleCols.reserved && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono text-slate-400"}>{r.reserved_stock}</td>}
-                  {visibleCols.available && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono font-bold text-slate-900"}>{r.available_stock}</td>}
-                  {visibleCols.threshold && <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>{thresholdMap[r.product_id] ?? defaultThreshold ?? 10}</td>}
-                  {visibleCols.location && (
-                    <td className={adminTableCellClass + " " + cellPad}>
-                      {hasWriteAccess ? (
-                        <EditableCell
-                          value={r.warehouse_location || ''}
-                          placeholder="-"
-                          inputWidth="w-20"
-                          onSave={async (val) => {
-                            if (r.warehouse_location === val) return
-                            const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', r.product_id)
-                            if (error) throw error
-                            setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, warehouse_location: val || null } : row))
-                            toast.success('Raf konumu güncellendi')
-                          }}
-                        />
-                      ) : (
-                        <span className="w-20 inline-block">{r.warehouse_location || '-'}</span>
-                      )}
-                    </td>
-                  )}
-                  {visibleCols.supplier && (
-                    <td className={adminTableCellClass + " " + cellPad}>
-                      {hasWriteAccess ? (
-                        <EditableCell
-                          value={r.supplier_name || ''}
-                          placeholder="-"
-                          inputWidth="w-24"
-                          className="max-w-[120px] truncate block"
-                          onSave={async (val) => {
-                            if (r.supplier_name === val) return
-                            const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', r.product_id)
-                            if (error) throw error
-                            setRows(prev => prev.map(row => row.product_id === r.product_id ? { ...row, supplier_name: val || null } : row))
-                            toast.success('Tedarikçi güncellendi')
-                          }}
-                        />
-                      ) : (
-                        <span className="max-w-[120px] truncate block">{r.supplier_name || '-'}</span>
-                      )}
-                    </td>
-                  )}
-                  {visibleCols.abc && (
-                    <td className={adminTableCellClass + " " + cellPad + " text-center"}>
-                      {r.abc_class === 'A' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs" title="Sermayenin büyük kısmı ve yüksek hız">A</span> :
-                        r.abc_class === 'B' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-xs">B</span> :
-                          r.abc_class === 'C' ? <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-700 font-bold text-xs" title="Düşük hareket/sermaye">C</span> : '-'}
-                    </td>
-                  )}
-                  {visibleCols.days && (
-                    <td className={adminTableCellClass + " " + cellPad + " text-right font-mono"}>
-                      {r.days_until_empty === 9999 ? (
-                        <span className="text-slate-400 text-xs">Hareketsiz</span>
-                      ) : (
-                        <span className={`text-xs ${r.days_until_empty && r.days_until_empty <= 7 ? 'text-rose-600 font-bold flex justify-end items-center gap-1 animate-pulse' : 'text-slate-600'}`}>
-                          {r.days_until_empty && r.days_until_empty <= 7 && '🔥 '}
-                          ≈ {r.days_until_empty} gün
-                        </span>
-                      )}
-                    </td>
-                  )}
-                  {visibleCols.status && <td className={adminTableCellClass + " " + cellPad + " text-center"}>{statusBadge(r)}</td>}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-        {
-          loading === LoadState.Loading && (
-            <div className="p-4 text-sm text-slate-500">Yükleniyor…</div>
-          )
-        }
-        {
-          loading === LoadState.Error && (
-            <div className="p-4 text-sm text-red-600">{error}</div>
-          )
-        }
+      <div className={adminCardClass}>
+        <InventoryTable
+          rows={sortedRows}
+          loading={loading}
+          error={error}
+          selected={selected}
+          visibleCols={visibleCols as VisibleCols}
+          density={density}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          groupByCategory={groupByCategory}
+          groupedRows={groupedRows}
+          onSort={toggleSort}
+          onSelect={(r) => {
+            setSelected(r);
+            setSelectedThreshold(thresholdMap[r.product_id] ?? '');
+            setSelectedStock(r.physical_stock);
+            loadMovements(r.product_id);
+            loadReserved(r.product_id);
+          }}
+          onUpdateLocation={updateLocation}
+          onUpdateSupplier={updateSupplier}
+          hasWriteAccess={hasWriteAccess}
+          thresholdMap={thresholdMap}
+          defaultThreshold={defaultThreshold}
+          effectiveThreshold={effectiveThreshold}
+        />
+        {loading === LoadState.Loading && rows.length > 0 && (
+          <div className="p-4 text-xs text-slate-500 bg-slate-50/50 flex items-center justify-center gap-2 border-t border-slate-100">
+            <span className="w-2 h-2 bg-primary-navy rounded-full animate-bounce"></span>
+            Veriler Tazeleniyor...
+          </div>
+        )}
       </div>
 
       {/* Sağ detay çekmecesi */}

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { useI18n } from '../../i18n/I18nProvider'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw, PackageX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
@@ -100,8 +100,12 @@ export default function AdminReturnsPage() {
 
       if (error) throw error
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapped = (data || []).map((item: any) => ({
+      interface ReturnRow {
+        id: string; order_id: string; user_id: string; reason: string; description: string | null;
+        status: string; created_at: string; updated_at: string;
+        venthub_orders: { order_number: string; customer_name: string; customer_email: string; total_amount: number } | null;
+      }
+      const mapped = (data as unknown as ReturnRow[] || []).map((item) => ({
         id: item.id,
         order_id: item.order_id,
         user_id: item.user_id,
@@ -125,9 +129,10 @@ export default function AdminReturnsPage() {
     }
   }, [user, _t])
 
+  const pathname = usePathname()
   useEffect(() => {
     loadReturns()
-  }, [loadReturns])
+  }, [loadReturns, pathname])
 
   // Filtreleme
   useEffect(() => {
@@ -464,7 +469,7 @@ export default function AdminReturnsPage() {
       ) : (
         <div className={`${adminCardClass} overflow-hidden`}>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead className="bg-gray-50">
                 <tr>
                   {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
@@ -8,6 +9,7 @@ import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays } from 'date-fns'
 
 export default function AdminInventoryReportPage() {
+    const pathname = usePathname()
     const [loading, setLoading] = React.useState(true)
     const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
         from: subDays(startOfDay(new Date()), 30),
@@ -78,7 +80,7 @@ export default function AdminInventoryReportPage() {
             }
         }
         void loadData()
-    }, [dateRange])
+    }, [dateRange, pathname])
 
     if (loading) return <div className="p-8 text-slate-500 animate-pulse">Raporlar hesaplanıyor...</div>
 

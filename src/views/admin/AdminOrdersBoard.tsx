@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { supabase } from '../../lib/supabase'
 import { updateOrderStatus } from '../../lib/orderStatusService'
@@ -285,6 +286,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
 // --- Ana Board Bileşeni ---
 export default function AdminOrdersBoard() {
+    const pathname = usePathname()
     const { lang } = useI18n()
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('orders')
@@ -314,7 +316,7 @@ export default function AdminOrdersBoard() {
 
     useEffect(() => {
         fetchOrders()
-    }, [fetchOrders])
+    }, [fetchOrders, pathname])
 
     // Yatay scroll butonları
     const scrollBoard = (direction: 'left' | 'right') => {
@@ -399,114 +401,143 @@ export default function AdminOrdersBoard() {
     }
 
     return (
-        <div className="space-y-4 flex flex-col" style={{ height: 'calc(100vh - 120px)' }}>
-            {/* Header + Yatay Scroll Butonları */}
-            <header className="flex items-center justify-between shrink-0">
-                <div>
-                    <h1 className={adminSectionTitleClass}>Sipariş Panosu</h1>
-                    <p className="text-sm text-slate-500 mt-1">Siparişleri sürükleyerek durumlarını güncelleyin. Karta tıklayarak detay görün.</p>
-                </div>
+        <div className="flex-1 flex flex-col min-h-0">
+            {/* Board Sub-Toolbar (Scroll & Refresh) */}
+            <div className="flex items-center justify-between mb-4 shrink-0">
+                <div className="flex-1" />
                 <div className="flex items-center gap-2">
+                    <div className="hidden md:flex items-center gap-2">
+                        <button
+                            onClick={() => scrollBoard('left')}
+                            className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                            title="Sola kaydır"
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+                        <button
+                            onClick={() => scrollBoard('right')}
+                            className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                            title="Sağa kaydır"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
                     <button
-                        onClick={() => scrollBoard('left')}
-                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
-                        title="Sola kaydır"
+                        onClick={fetchOrders}
+                        disabled={loading}
+                        className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
                     >
-                        <ChevronLeft size={18} />
-                    </button>
-                    <button
-                        onClick={() => scrollBoard('right')}
-                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
-                        title="Sağa kaydır"
-                    >
-                        <ChevronRight size={18} />
-                    </button>
-                    <button onClick={fetchOrders} className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
-                        Yenile
+                        {loading ? '...' : 'Yenile'}
                     </button>
                 </div>
-            </header>
+            </div>
+
+            {/* Mobile Tabs Switcher */}
+            <div className="flex md:hidden overflow-x-auto gap-2 pb-2 mb-1 no-scrollbar -mx-1 px-1 shrink-0 snap-x">
+                {COLUMNS.map(col => {
+                    const Icon = col.icon
+                    const isActive = expandedCol === col.id
+                    const count = getOrdersByCol(col.id).length
+                    return (
+                        <button
+                            key={col.id}
+                            onClick={() => setExpandedCol(col.id)}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border snap-start
+                                ${isActive
+                                    ? `${col.bgClass} ${col.colorClass} border-current ring-2 ring-inset ring-current/10 shadow-sm z-10 scale-105 mx-1`
+                                    : 'bg-white text-slate-400 border-slate-200/60 hover:border-slate-300 shadow-sm'}`}
+                        >
+                            <Icon size={14} />
+                            {col.title}
+                            <span className={`px-1.5 py-0.5 rounded-full text-[10px] ml-1 ${isActive ? 'bg-white/40' : 'bg-slate-100 shadow-inner'}`}>
+                                {count}
+                            </span>
+                        </button>
+                    )
+                })}
+            </div>
 
             {/* Board — tek scroll katmanı, nested scroll yok */}
             <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     ref={scrollRef}
-                    className="flex flex-col md:flex-row gap-4 flex-1 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-2 snap-x scroll-smooth"
-                    style={{ scrollbarGutter: 'stable' }}
+                    className="flex flex-col md:flex-row gap-4 flex-1 min-h-0 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-2 scroll-smooth"
                 >
-                    {COLUMNS.map(col => {
-                        const colOrders = getOrdersByCol(col.id)
-                        const Icon = col.icon
-                        const isExpanded = expandedCol === col.id
+                    <div className="contents md:flex md:gap-4 md:min-w-max">
+                        {COLUMNS.map(col => {
+                            const colOrders = getOrdersByCol(col.id)
+                            const Icon = col.icon
+                            const isExpanded = expandedCol === col.id
 
-                        return (
-                            <div key={col.id} className={`flex flex-col w-full md:w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center ${!isExpanded ? 'h-auto md:h-full' : ''}`} style={{ maxHeight: '100%' }}>
-                                {/* Sütun Başlık */}
-                                <div
-                                    className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset ${isExpanded ? 'rounded-t-2xl' : 'rounded-2xl md:rounded-t-2xl'} cursor-pointer md:cursor-default`}
-                                    onClick={() => setExpandedCol(isExpanded ? null : col.id)}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Icon className={`w-4 h-4 ${col.colorClass}`} />
-                                        <h2 className={`font-bold text-sm ${col.colorClass}`}>{col.title}</h2>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
-                                            {colOrders.length}
-                                        </span>
-                                        <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-400 ${isExpanded ? 'rotate-180' : ''}`} />
-                                    </div>
-                                </div>
-
-                                {/* Droppable — overflow-y-auto SADECE burada (tek scroll parent) */}
-                                <Droppable droppableId={col.id}>
-                                    {(provided, snapshot) => (
-                                        <div
-                                            ref={provided.innerRef}
-                                            {...provided.droppableProps}
-                                            className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
-                                            style={{ overflowY: 'auto', minHeight: 60 }}
-                                        >
-                                            {colOrders.map((order, index) => (
-                                                <Draggable key={order.id} draggableId={order.id} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <div
-                                                            ref={provided.innerRef}
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                            onClick={() => setSelectedOrder(order)}
-                                                            className={`bg-white p-3 rounded-xl shadow-sm border border-slate-200/50 flex flex-col gap-2 transition-shadow cursor-pointer ${snapshot.isDragging ? 'shadow-lg ring-2 ring-primary-navy/20 cursor-grabbing' : 'hover:shadow-md hover:border-primary-navy/20'}`}
-                                                            style={{ ...provided.draggableProps.style }}
-                                                        >
-                                                            <div className="flex items-start justify-between gap-2">
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 mb-0.5">
-                                                                        <GripVertical className="w-3 h-3 opacity-50" />
-                                                                        #{order.order_number || order.id.substring(0, 8)}
-                                                                    </div>
-                                                                    <h4 className="font-semibold text-slate-800 text-xs truncate">{order.customer_name || 'İsimsiz Müşteri'}</h4>
-                                                                </div>
-                                                                <div className="font-bold text-slate-700 text-xs shrink-0">
-                                                                    {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center justify-between border-t border-slate-50 pt-2">
-                                                                <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
-                                                                    {formatDateTime(order.created_at, lang).split(' ')[0]}
-                                                                </span>
-                                                                <span className="text-[9px] text-primary-navy/50 font-medium">detay →</span>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            ))}
-                                            {provided.placeholder}
+                            return (
+                                <div key={col.id} className={`flex flex-col w-full md:w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center ${!isExpanded ? 'h-auto md:h-full' : ''}`} style={{ maxHeight: '100%' }}>
+                                    {/* Sütun Başlık */}
+                                    <div
+                                        className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset ${isExpanded ? 'rounded-t-2xl' : 'rounded-2xl md:rounded-t-2xl'} cursor-pointer md:cursor-default`}
+                                        onClick={() => setExpandedCol(isExpanded ? null : col.id)}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Icon className={`w-4 h-4 ${col.colorClass}`} />
+                                            <h2 className={`font-bold text-sm ${col.colorClass}`}>{col.title}</h2>
                                         </div>
-                                    )}
-                                </Droppable>
-                            </div>
-                        )
-                    })}
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
+                                                {colOrders.length}
+                                            </span>
+                                            <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-400 ${isExpanded ? 'rotate-180' : ''}`} />
+                                        </div>
+                                    </div>
+
+                                    {/* Droppable — overflow-y-auto SADECE burada (tek scroll parent) */}
+                                    <Droppable droppableId={col.id}>
+                                        {(provided, snapshot) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.droppableProps}
+                                                className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
+                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 120 : 60 }}
+                                            >
+                                                {colOrders.map((order, index) => (
+                                                    <Draggable key={order.id} draggableId={order.id} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                onClick={() => setSelectedOrder(order)}
+                                                                className={`bg-white p-3 rounded-xl shadow-sm border border-slate-200/50 flex flex-col gap-2 transition-shadow cursor-pointer ${snapshot.isDragging ? 'shadow-lg ring-2 ring-primary-navy/20 cursor-grabbing' : 'hover:shadow-md hover:border-primary-navy/20'}`}
+                                                                style={{ ...provided.draggableProps.style }}
+                                                            >
+                                                                <div className="flex items-start justify-between gap-2">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 mb-0.5">
+                                                                            <GripVertical className="w-3 h-3 opacity-50" />
+                                                                            #{order.order_number || order.id.substring(0, 8)}
+                                                                        </div>
+                                                                        <h4 className="font-semibold text-slate-800 text-xs truncate">{order.customer_name || 'İsimsiz Müşteri'}</h4>
+                                                                    </div>
+                                                                    <div className="font-bold text-slate-700 text-xs shrink-0">
+                                                                        {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center justify-between border-t border-slate-50 pt-2">
+                                                                    <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                                                                        {formatDateTime(order.created_at, lang).split(' ')[0]}
+                                                                    </span>
+                                                                    <span className="text-[9px] text-primary-navy/50 font-medium">detay →</span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))}
+                                                {provided.placeholder}
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
             </DragDropContext>
 

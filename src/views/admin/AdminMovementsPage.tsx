@@ -1,5 +1,5 @@
 import React from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -126,7 +126,8 @@ const AdminMovementsPage: React.FC = () => {
     }
   }, [batchFilter, dateRange, t])
 
-  React.useEffect(() => { load(page) }, [load, page])
+  const pathname = usePathname()
+  React.useEffect(() => { load(page) }, [load, page, pathname])
 
   // URL'den batch filtresi
   const searchParams = useSearchParams()
@@ -338,7 +339,7 @@ const AdminMovementsPage: React.FC = () => {
 
       <div className={`${adminCardClass} overflow-hidden`}>
         <div className="overflow-x-auto w-full">
-          <table className="w-full max-md:text-xs">
+          <table className="w-full min-w-[700px] max-md:text-xs">
             <thead className="bg-gray-50">
               <tr>
                 {visibleCols.date && (
