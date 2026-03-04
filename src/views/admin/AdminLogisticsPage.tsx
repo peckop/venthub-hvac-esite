@@ -30,6 +30,9 @@ export default function AdminLogisticsPage() {
     const fetchPendingOrders = useCallback(async () => {
         setLoading(true)
         try {
+            // Proaktif oturum kontrolü
+            await supabase.auth.getSession()
+
             const { data, error } = await supabase
                 .from('view_admin_orders')
                 .select('id, order_number, customer_name, created_at, carrier, tracking_number')

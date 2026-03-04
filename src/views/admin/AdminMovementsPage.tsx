@@ -73,6 +73,9 @@ const AdminMovementsPage: React.FC = () => {
   const load = React.useCallback(async (pageNum: number) => {
     try {
       setLoading(LoadState.Loading)
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       // Pagination
       const from = (pageNum - 1) * PAGE_SIZE
       const to = from + PAGE_SIZE - 1

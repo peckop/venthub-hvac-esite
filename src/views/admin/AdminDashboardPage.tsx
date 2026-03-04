@@ -63,6 +63,8 @@ const AdminDashboardPage: React.FC = () => {
     try {
       setLoading(true)
       setError(null)
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
 
       // Orders count and sales total within range
       const ordersQuery = supabase

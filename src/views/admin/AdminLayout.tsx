@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
@@ -81,6 +81,24 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     guard()
     return () => { active = false }
   }, [user, loading, router])
+
+  // Proaktif Token Yenileme: Sekme aktif olduğunda Supabase oturumunu kontrol et
+  useEffect(() => {
+    const refreshOnVisibility = async () => {
+      if (document.visibilityState === 'visible') {
+        try {
+          const { supabase } = await import('../../lib/supabase')
+          // getSession() çağrısı, eğer token süresi dolmuşsa otomatik olarak yenileme tetikler.
+          await supabase.auth.getSession()
+        } catch (error) {
+          console.error('Proactive token refresh failed:', error)
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', refreshOnVisibility)
+    return () => document.removeEventListener('visibilitychange', refreshOnVisibility)
+  }, [])
 
   if (loading || roleLoading) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Yükleniyor...</div>

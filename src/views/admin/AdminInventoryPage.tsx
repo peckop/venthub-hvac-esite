@@ -171,6 +171,9 @@ const AdminInventoryPage: React.FC = () => {
   const load = React.useCallback(async () => {
     try {
       setLoading(LoadState.Loading)
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       const [invRes, velRes, settingsRes, catRes] = await Promise.all([
         supabase.from('inventory_summary').select('*'),
         supabase.from('inventory_velocity').select('product_id, daily_velocity, days_until_empty, abc_class'),

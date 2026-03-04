@@ -132,6 +132,9 @@ const AdminProductsPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       // Build products query with server-side filters and pagination
       let query = supabase
         .from('products')
