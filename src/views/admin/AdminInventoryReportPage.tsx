@@ -23,6 +23,8 @@ export default function AdminInventoryReportPage() {
         async function loadData() {
             try {
                 setLoading(true)
+                // Proaktif oturum kontrolü
+                await supabase.auth.getSession()
 
                 let query = supabase
                     .from('inventory_movements')

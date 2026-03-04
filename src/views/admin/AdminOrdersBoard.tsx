@@ -139,6 +139,8 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
         async function load() {
             setLoading(true)
             try {
+                // Proaktif oturum kontrolü
+                await supabase.auth.getSession()
                 const [notesRes, logsRes, orderRes] = await Promise.all([
                     supabase.from('order_notes').select('id,note,created_at').eq('order_id', order.id).order('created_at', { ascending: false }).limit(5),
                     supabase.from('shipping_email_events').select('subject,created_at').eq('order_id', order.id).order('created_at', { ascending: false }).limit(3),
@@ -299,6 +301,9 @@ export default function AdminOrdersBoard() {
     const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
+            // Proaktif oturum kontrolü
+            await supabase.auth.getSession()
+
             const { data, error } = await supabase
                 .from('view_admin_orders')
                 .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status')

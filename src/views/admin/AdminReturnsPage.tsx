@@ -87,6 +87,8 @@ export default function AdminReturnsPage() {
 
     try {
       setIsLoading(true)
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
 
       const { data, error } = await supabase
         .from('venthub_returns')

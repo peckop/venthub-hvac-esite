@@ -47,6 +47,9 @@ const AdminAuditLogPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
+      // Proaktif oturum kontrolü
+      await supabase.auth.getSession()
+
       let query = supabase
         .from('admin_audit_log')
         .select('id, at, actor, table_name, row_pk, action, comment, before, after', { count: 'exact' })

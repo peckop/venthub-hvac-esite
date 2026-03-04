@@ -103,6 +103,8 @@ export default function AdminUsersPage() {
 
       try {
         setIsLoading(true)
+        // Proaktif oturum kontrolü
+        await supabase.auth.getSession()
 
         // user_profiles tablosundan tüm kullanıcıları getir
         const { data: profiles, error: profileError } = await supabase

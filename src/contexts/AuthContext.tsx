@@ -286,6 +286,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  async function refreshSession() {
+    try {
+      const { supabase } = await import('../lib/supabase')
+      const { data: { session: newSession }, error } = await supabase.auth.refreshSession()
+      if (error) {
+        console.error('Refresh session error:', error)
+        return null
+      }
+      if (newSession) {
+        setSession(newSession)
+        setUser(newSession.user)
+      }
+      return newSession
+    } catch (error) {
+      console.error('Refresh session catch error:', error)
+      return null
+    }
+  }
+
   const value = {
     user,
     session,
@@ -294,7 +313,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn,
     signUp,
     signOut,
-    resetPassword
+    resetPassword,
+    refreshSession
   } as const;
 
   return (
