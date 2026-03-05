@@ -1,6 +1,7 @@
 import React from 'react'
 import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useI18n } from '../../i18n/I18nProvider'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -13,6 +14,7 @@ import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircl
 import { DateRange } from 'react-day-picker'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { startOfDay, endOfDay, differenceInDays, subDays } from 'date-fns'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 
 const AdminDashboardPage: React.FC = () => {
   const { t, lang } = useI18n()
@@ -64,7 +66,7 @@ const AdminDashboardPage: React.FC = () => {
       setLoading(true)
       setError(null)
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       // Orders count and sales total within range
       const ordersQuery = supabase
@@ -411,10 +413,12 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {carrierDist.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                <PackageSearch size={32} className="mb-2 opacity-50" />
-                <span className="text-sm">Kayıt Bulunamadı</span>
-              </div>
+              <AdminEmptyState
+                icon={PackageSearch}
+                title="Kayıt Bulunamadı"
+                description="Seçili aralıkta kargo verisi bulunmuyor."
+                compact
+              />
             ) : (
               <div className="space-y-4">
                 {(() => {
@@ -441,10 +445,12 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {returnsByStatus.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                <Undo2 size={32} className="mb-2 opacity-50" />
-                <span className="text-sm">Kayıt Bulunamadı</span>
-              </div>
+              <AdminEmptyState
+                icon={Undo2}
+                title="Kayıt Bulunamadı"
+                description="Seçili aralıkta iade verisi bulunmuyor."
+                compact
+              />
             ) : (
               <div className="space-y-4">
                 {(() => {
@@ -475,10 +481,12 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {shipAges.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                <PackageSearch size={32} className="mb-2 opacity-50" />
-                <span className="text-sm">Kutu Boş</span>
-              </div>
+              <AdminEmptyState
+                icon={PackageSearch}
+                title="Kayıt Bulunamadı"
+                description="Bekleyen kargo kaydı bulunmuyor."
+                compact
+              />
             ) : (
               <div className="space-y-4">
                 {(() => {
@@ -505,10 +513,12 @@ const AdminDashboardPage: React.FC = () => {
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {returnsWeekly.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                <Undo2 size={32} className="mb-2 opacity-50" />
-                <span className="text-sm">Veri Yok</span>
-              </div>
+              <AdminEmptyState
+                icon={Undo2}
+                title="Grafik Verisi Yok"
+                description="Haftalık trend için yeterli veri bulunmuyor."
+                compact
+              />
             ) : (
               <div className="space-y-4">
                 {(() => {

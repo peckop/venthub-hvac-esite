@@ -1,5 +1,6 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
@@ -12,6 +13,7 @@ import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
 import { ChevronDown, ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
 
 interface ProductRow {
@@ -133,7 +135,7 @@ const AdminProductsPage: React.FC = () => {
     setError(null)
     try {
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       // Build products query with server-side filters and pagination
       let query = supabase
@@ -563,22 +565,11 @@ const AdminProductsPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={`skel-${i}`} className="border-b border-slate-100">
-                    <td colSpan={10} className="p-4">
-                      <div className="flex gap-4">
-                        <div className="h-4 w-4 bg-slate-200 animate-pulse rounded"></div>
-                        <div className="h-10 w-10 bg-slate-200 animate-pulse rounded"></div>
-                        <div className="space-y-2 flex-1 relative">
-                          <div className="h-4 w-1/3 bg-slate-200 animate-pulse rounded"></div>
-                          <div className="h-3 w-1/4 bg-slate-100 animate-pulse rounded"></div>
-                        </div>
-                        <div className="h-6 w-20 bg-slate-200 animate-pulse rounded-full"></div>
-                        <div className="h-4 w-16 bg-slate-200 animate-pulse rounded"></div>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                <tr>
+                  <td colSpan={10} className="p-0">
+                    <AdminSkeleton variant="table" count={10} rows={5} />
+                  </td>
+                </tr>
               ) : filtered.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="p-0">

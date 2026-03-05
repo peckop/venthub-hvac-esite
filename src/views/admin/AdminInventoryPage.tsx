@@ -1,6 +1,7 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu from '../../components/admin/ColumnsMenu'
@@ -172,7 +173,7 @@ const AdminInventoryPage: React.FC = () => {
     try {
       setLoading(LoadState.Loading)
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       const [invRes, velRes, settingsRes, catRes] = await Promise.all([
         supabase.from('inventory_summary').select('*'),

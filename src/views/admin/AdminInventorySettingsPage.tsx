@@ -2,6 +2,7 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
 
@@ -104,24 +105,29 @@ const AdminInventorySettingsPage: React.FC = () => {
       )}
 
       <div className={`${adminCardClass} p-4 space-y-4`}>
-        <div>
-          <label className="block text-sm font-bold text-slate-500 uppercase tracking-tight mb-2">Varsayılan Düşük Stok Eşiği</label>
-          <div className="flex items-center gap-3">
-            <input type="number" className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
-            <button className={adminButtonPrimaryClass} disabled={saving || !hasWriteAccess} onClick={save}>Uygula</button>
-          </div>
-          <label className="mt-4 flex items-center gap-3 text-sm font-medium text-slate-600 cursor-pointer group">
-            <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
-            <span className="group-hover:text-slate-900 transition-colors">Tüm ürünlere uygula (override’ları temizle)</span>
-          </label>
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mt-3">
-            <p className="text-xs text-slate-500 leading-relaxed">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir). Bu işlem geri alınamaz.</p>
-          </div>
-        </div>
+        {loading === LoadState.Loading ? (
+          <AdminSkeleton variant="form" fields={4} />
+        ) : (
+          <>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 uppercase tracking-tight mb-2">Varsayılan Düşük Stok Eşiği</label>
+              <div className="flex items-center gap-3">
+                <input type="number" className="w-32 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" value={defaultThreshold} onChange={(e) => setDefaultThreshold(e.target.value === '' ? '' : Number(e.target.value))} placeholder="örn. 8" />
+                <button className={adminButtonPrimaryClass} disabled={saving || !hasWriteAccess} onClick={save}>Uygula</button>
+              </div>
+              <label className="mt-4 flex items-center gap-3 text-sm font-medium text-slate-600 cursor-pointer group">
+                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy" checked={resetAll} onChange={(e) => setResetAll(e.target.checked)} />
+                <span className="group-hover:text-slate-900 transition-colors">Tüm ürünlere uygula (override’ları temizle)</span>
+              </label>
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mt-3">
+                <p className="text-xs text-slate-500 leading-relaxed">Bu seçenek işaretliyken tüm ürünler varsayılan eşiği kullanacak şekilde ayarlanır (ürün bazlı override temizlenir). Bu işlem geri alınamaz.</p>
+              </div>
+            </div>
 
-        {loading === LoadState.Loading && <div className="text-sm text-slate-500">Yükleniyor…</div>}
-        {loading === LoadState.Error && <div className="text-sm text-red-600">{error}</div>}
-        {!!success && <div className="text-sm text-green-700">{success}</div>}
+            {loading === LoadState.Error && <div className="text-sm text-red-600">{error}</div>}
+            {!!success && <div className="text-sm text-green-700">{success}</div>}
+          </>
+        )}
       </div>
 
       <div className={`${adminCardClass} p-6 space-y-6`}>

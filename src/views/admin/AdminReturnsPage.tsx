@@ -13,6 +13,9 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { formatDateTime, formatDate, formatTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useRole } from '../../hooks/useRole'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import { Undo2 } from 'lucide-react'
 
 interface ReturnWithOrder {
   id: string
@@ -455,19 +458,14 @@ export default function AdminReturnsPage() {
       />
 
       {/* İçerik */}
-      {isLoading ? (
-        <div className={`${adminCardClass} min-h-[20vh] flex items-center justify-center`}>
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
-        </div>
+      {isLoading && returns.length === 0 ? (
+        <AdminSkeleton variant="table" rows={6} count={7} />
       ) : filteredReturns.length === 0 ? (
-        <div className={`${adminCardClass} text-center py-12`}>
-          <PackageX size={48} className="mx-auto text-slate-300 mb-3" strokeWidth={1.5} />
-          <div className="text-slate-500 text-sm">
-            {searchQuery || !Object.values(statusFilter).every(Boolean)
-              ? _t('admin.returns.empty.filtered')
-              : _t('admin.returns.empty.none')}
-          </div>
-        </div>
+        <AdminEmptyState
+          icon={Undo2}
+          title={searchQuery || !Object.values(statusFilter).every(Boolean) ? _t('admin.returns.empty.filtered')! : _t('admin.returns.empty.none')!}
+          description="Şu anda aktif bir iade veya değişim talebi bulunmuyor."
+        />
       ) : (
         <div className={`${adminCardClass} overflow-hidden`}>
           <div className="overflow-x-auto">
