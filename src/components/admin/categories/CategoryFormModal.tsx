@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
-import { supabase } from '../../../lib/supabase'
+import { supabase, Category } from '../../../lib/supabase'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
@@ -13,13 +13,13 @@ import { compressImage } from '../../../utils/imageUtils'
 // --- Zod Schema ---
 const categorySchema = z.object({
     name: z.string().min(1, 'Kategori adı zorunludur'),
-    slug: z.string().optional(),
+    slug: z.string().min(1, 'Slug zorunludur'),
     parent_id: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
     seo_title: z.string().optional().nullable(),
     seo_desc: z.string().optional().nullable(),
-    is_featured: z.boolean().default(false),
-    sort_order: z.number().int().default(0),
+    is_featured: z.boolean().optional().default(false),
+    sort_order: z.number().int().optional().default(0),
     image_url: z.string().optional().nullable(),
 })
 
@@ -41,7 +41,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
 
     // Image state
     const [image, setImage] = useState<{ url: string; file?: File; isNew?: boolean } | null>(null)
-    const [initialData, setInitialData] = useState<CategoryFormValues | null>(null)
+    const [initialData, setInitialData] = useState<Category | null>(null)
 
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CategoryFormValues>({
         resolver: zodResolver(categorySchema),
@@ -65,8 +65,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 description: data.description,
                 seo_title: data.seo_title,
                 seo_desc: data.seo_desc,
-                is_featured: data.is_featured,
-                sort_order: data.sort_order,
+                is_featured: data.is_featured ?? false,
+                sort_order: data.sort_order ?? 0,
                 image_url: data.image_url
             })
 
