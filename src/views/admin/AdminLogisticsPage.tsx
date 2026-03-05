@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useI18n } from '../../i18n/I18nProvider'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
 import { Truck, CheckCircle2 } from 'lucide-react'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
 
 // Sadece kargo ataması bekleyen siparişler (confirmed)
@@ -31,7 +34,7 @@ export default function AdminLogisticsPage() {
         setLoading(true)
         try {
             // Proaktif oturum kontrolü
-            await supabase.auth.getSession()
+            await ensureSessionFresh()
 
             const { data, error } = await supabase
                 .from('view_admin_orders')
@@ -163,13 +166,21 @@ export default function AdminLogisticsPage() {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
                 {loading && rows.length === 0 ? (
-                    <div className="p-12 text-center text-slate-400 animate-pulse">Siparişler taranıyor...</div>
+                    <table className="w-full min-w-[1000px]">
+                        <tbody>
+                            <tr>
+                                <td colSpan={7} className="p-0">
+                                    <AdminSkeleton variant="table" count={7} rows={5} />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 ) : rows.length === 0 ? (
-                    <div className="p-12 text-center flex flex-col items-center">
-                        <CheckCircle2 className="w-12 h-12 text-emerald-400 mb-3" />
-                        <h3 className="text-lg font-bold text-slate-700">Bekleyen Kargo Yok</h3>
-                        <p className="text-sm text-slate-500 mt-1">Tüm siparişlerin kargo işlemi tamamlanmış görünüyor.</p>
-                    </div>
+                    <AdminEmptyState
+                        icon={CheckCircle2}
+                        title="Bekleyen Kargo Yok"
+                        description="Tüm siparişlerin kargo işlemi tamamlanmış görünüyor."
+                    />
                 ) : (
                     <div className="overflow-x-auto w-full" ref={el => { if (el) el.scrollLeft = 0 }}>
                         <table className="min-w-[1000px] text-sm max-md:text-xs">

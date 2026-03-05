@@ -5,6 +5,9 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import { Bug } from 'lucide-react'
 
 interface ErrorRow {
   id: string
@@ -166,9 +169,21 @@ const AdminErrorsPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={5}>{t('admin.ui.loading')}</td></tr>
+                <tr>
+                  <td colSpan={5} className="p-0">
+                    <AdminSkeleton variant="table" count={5} rows={5} />
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={5}>{t('admin.ui.noRecords')}</td></tr>
+                <tr>
+                  <td colSpan={5} className="p-4">
+                    <AdminEmptyState
+                      icon={Bug}
+                      title="Hata Bulunamadı"
+                      description="Seçilen tarih aralığı ve filtrelere uygun kaydedilmiş bir hata görünmüyor."
+                    />
+                  </td>
+                </tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useRouter, usePathname } from 'next/navigation'
-import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search, Package, Tag, Eye } from 'lucide-react'
+import { Crown, Shield, ShieldCheck, Users, AlertCircle, Building2, Search, Package, Tag, Eye, SearchX } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import { useRole } from '../../hooks/useRole'
@@ -104,7 +107,7 @@ export default function AdminUsersPage() {
       try {
         setIsLoading(true)
         // Proaktif oturum kontrolü
-        await supabase.auth.getSession()
+        await ensureSessionFresh()
 
         // user_profiles tablosundan tüm kullanıcıları getir
         const { data: profiles, error: profileError } = await supabase
@@ -312,12 +315,37 @@ export default function AdminUsersPage() {
         )}
       />
 
-      {isLoading ? (
-        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm min-h-[300px] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy" />
-            <span className="text-sm font-medium text-slate-400">Veriler yükleniyor...</span>
+      {isLoading && (activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-200">
+                <tr>
+                  {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user') || 'Kullanıcı'}</th>)}
+                  {visibleCols.company && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.company') || 'Şirket & B2B'}</th>)}
+                  {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.role') || 'Rol'}</th>)}
+                  {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.created') || 'Kayıt'}</th>)}
+                  {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>{_t('admin.users.table.actions') || 'Aksiyonlar'}</th>}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colSpan={5} className="p-0">
+                    <AdminSkeleton variant="table" count={5} rows={8} />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+        </div>
+      ) : (activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden p-6">
+          <AdminEmptyState
+            icon={SearchX}
+            title="Sonuç bulunamadı"
+            description={searchQuery ? `"${searchQuery}" araması için hiçbir kullanıcı eşleşmedi.` : "Bu listede henüz herhangi bir kayıt bulunmuyor."}
+            action={searchQuery ? { label: 'Aramayı sıfırla', onClick: () => setSearchQuery('') } : undefined}
+          />
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
@@ -459,27 +487,6 @@ export default function AdminUsersPage() {
             </table>
           </div>
 
-          {(activeTab === 'admins' ? filteredAdminUsers.length === 0 : filteredAllUsers.length === 0) && (
-            <div className="text-center py-20 px-4">
-              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 shadow-sm">
-                <Search className="text-slate-300" size={24} />
-              </div>
-              <h3 className="text-slate-900 font-bold text-lg">Sonuç bulunamadı</h3>
-              <p className="text-slate-500 max-w-xs mx-auto mt-1">
-                {searchQuery
-                  ? `"${searchQuery}" araması için hiçbir kullanıcı eşleşmedi.`
-                  : "Bu listede henüz herhangi bir kayıt bulunmuyor."}
-              </p>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className={`${adminButtonSecondaryClass} mt-4 shadow-sm`}
-                >
-                  Aramayı sıfırla
-                </button>
-              )}
-            </div>
-          )}
         </div>
       )}
 

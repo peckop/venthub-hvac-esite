@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
 import { checkAdminAccessAsync } from '../../config/admin'
@@ -87,9 +86,9 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     const refreshOnVisibility = async () => {
       if (document.visibilityState === 'visible') {
         try {
-          const { supabase } = await import('../../lib/supabase')
-          // getSession() çağrısı, eğer token süresi dolmuşsa otomatik olarak yenileme tetikler.
-          await supabase.auth.getSession()
+          const { ensureSessionFresh } = await import('../../lib/ensureSessionFresh')
+          // Akıllı oturum kontrolü
+          await ensureSessionFresh()
         } catch (error) {
           console.error('Proactive token refresh failed:', error)
         }
@@ -228,15 +227,21 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
                       {visibleItems.map((item) => {
                         const Icon = item.icon
                         return (
-                          <Link
+                          <a
                             key={item.href}
                             href={item.href}
                             className={adminNavClass(pathname === item.href)}
-                            onClick={() => setSidebarOpen(false)}
+                            onClick={() => {
+                              // Router Cache Bypass (TAM SAYFA YENILEME - HARD NAVIGATION):
+                              // 'output: export' statik modunda SPA Component unmount sorununu aşmak için
+                              // e.preventDefault() KULLANMIYORUZ. Tıpkı F5 yapılmış gibi sayfa yeniden yüklenecek ve 
+                              // en güncel veri Supabase'den çekilecektir. Sadece mobilde sidebar'ı kapatıyoruz.
+                              setSidebarOpen(false)
+                            }}
                           >
                             <Icon size={18} className="shrink-0" />
                             <span className="truncate">{item.label}</span>
-                          </Link>
+                          </a>
                         )
                       })}
                     </div>

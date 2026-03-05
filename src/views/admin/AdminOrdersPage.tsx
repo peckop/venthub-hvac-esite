@@ -7,15 +7,18 @@ import {
   adminTableActionPrimaryClass, adminTableActionWarningClass, adminTableActionNeutralClass
 } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { logAdminAction } from '../../lib/audit'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
-import { X, Truck, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare } from 'lucide-react'
+import { X, Truck, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare, ShoppingCart } from 'lucide-react'
 import AdminOrdersBoard from './AdminOrdersBoard'
 import { updateOrderStatus } from '../../lib/orderStatusService'
 import DateRangePicker from '../../components/admin/DateRangePicker'
@@ -169,7 +172,7 @@ const AdminOrdersPage: React.FC = () => {
     setError(null)
     try {
       // Proaktif oturum kontrolü: Token süresi dolmuşsa yenilemeyi deni
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       let qb = supabase
         .from('view_admin_orders')
@@ -575,9 +578,21 @@ const AdminOrdersPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {loading && rows.length === 0 ? (
-                    <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.loading')}</td></tr>
+                    <tr>
+                      <td colSpan={colCount} className="p-0">
+                        <AdminSkeleton variant="table" rows={10} count={colCount} />
+                      </td>
+                    </tr>
                   ) : sorted.length === 0 ? (
-                    <tr><td className="px-4 py-6" colSpan={colCount}>{t('admin.orders.states.noRecords')}</td></tr>
+                    <tr>
+                      <td colSpan={colCount} className="p-4">
+                        <AdminEmptyState
+                          icon={ShoppingCart}
+                          title={t('admin.orders.states.noRecords') || "Sipariş bulunamadı"}
+                          description="Arama kriterlerinize veya uyguladığınız filtrelere uygun bir sipariş kaydı mevcut değil."
+                        />
+                      </td>
+                    </tr>
                   ) : (
                     sorted.map((r) => (
                       <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">

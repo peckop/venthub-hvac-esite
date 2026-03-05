@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { updateOrderStatus } from '../../lib/orderStatusService'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
@@ -140,7 +141,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
             setLoading(true)
             try {
                 // Proaktif oturum kontrolü
-                await supabase.auth.getSession()
+                await ensureSessionFresh()
                 const [notesRes, logsRes, orderRes] = await Promise.all([
                     supabase.from('order_notes').select('id,note,created_at').eq('order_id', order.id).order('created_at', { ascending: false }).limit(5),
                     supabase.from('shipping_email_events').select('subject,created_at').eq('order_id', order.id).order('created_at', { ascending: false }).limit(3),
@@ -302,7 +303,7 @@ export default function AdminOrdersBoard() {
         setLoading(true)
         try {
             // Proaktif oturum kontrolü
-            await supabase.auth.getSession()
+            await ensureSessionFresh()
 
             const { data, error } = await supabase
                 .from('view_admin_orders')

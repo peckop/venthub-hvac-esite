@@ -1,11 +1,14 @@
 import React, { lazy, Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
-import { Plus } from 'lucide-react'
+import { Menu, X, Save, Edit3, Image as ImageIcon, Trash2, Tags, Plus } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
 import toast from 'react-hot-toast'
@@ -77,7 +80,7 @@ const AdminCategoriesPage: React.FC = () => {
       setLoading(true)
       setError(null)
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       const { data, error } = await supabase
         .from('categories')
@@ -208,9 +211,21 @@ const AdminCategoriesPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={7}>Yükleniyor…</td></tr>
+                <tr>
+                  <td colSpan={7} className="p-0">
+                    <AdminSkeleton variant="table" rows={6} count={7} />
+                  </td>
+                </tr>
               ) : filtered.length === 0 ? (
-                <tr><td className="p-4" colSpan={7}>Kayıt yok</td></tr>
+                <tr>
+                  <td colSpan={7} className="p-4">
+                    <AdminEmptyState
+                      icon={Tags}
+                      title="Kategori bulunamadı"
+                      description="Arama kriterlerinize uygun bir kategori bulunamadı veya henüz hiç kategori eklenmemiş."
+                    />
+                  </td>
+                </tr>
               ) : (
                 filtered.map(r => (
                   <tr key={r.id} className="border-b border-slate-200/60 hover:bg-gray-50/50 transition-colors">
