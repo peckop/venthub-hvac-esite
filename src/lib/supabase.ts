@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import type { Database } from '../types/database.types'
 
 // Define SUPABASE config from process.env for Next.js
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -14,7 +15,7 @@ if (missingEnv) {
 }
 
 // Create client with real or dummy values to prevent instant crash
-export const supabase = createClient(
+export const supabase = createClient<Database>(
   SUPABASE_URL || 'https://placeholder.supabase.co',
   SUPABASE_ANON_KEY || 'placeholder-key',
   {
@@ -33,13 +34,15 @@ export interface Category {
   slug: string
   parent_id: string | null
   level: number
-  description: string
+  description: string | null
   image_url?: string | null
   seo_title?: string | null
   seo_desc?: string | null
-  sort_order?: number
-  is_featured?: boolean
-  is_active?: boolean // Kategori aktif mi?
+  sort_order?: number | null
+  is_featured?: boolean | null
+  is_active?: boolean | null // Kategori aktif mi?
+  created_at?: string
+  updated_at?: string
   metadata?: {
     display_mode?: 'showcase' | 'series' | 'list'
     showcase_images?: { desktop: string; mobile: string }[]
@@ -56,18 +59,18 @@ export interface Product {
   id: string
   name: string
   brand: string
-  price: string
+  price: number
   sku: string
   model_code?: string | null
-  category_id: string
-  subcategory_id: string
-  status: 'active' | 'inactive' | 'out_of_stock'
+  category_id: string | null
+  subcategory_id: string | null
+  status: string
   is_featured: boolean
-  description?: string
-  technical_specs?: Record<string, string | number | boolean | null>
-  image_url?: string
+  description?: string | null
+  technical_specs?: Record<string, any> | null
+  image_url?: string | null
   image_alt?: string | null
-  slug?: string // URL-friendly ID for linking/SEO
+  slug?: string | null // URL-friendly ID for linking/SEO
   // Stok alanları (opsiyonel; migration sonrası gelir)
   stock_qty?: number | null
   low_stock_threshold?: number | null
@@ -75,6 +78,9 @@ export interface Product {
   airflow_capacity?: number | null
   noise_level?: number | null
   pressure_rating?: number | null
+  created_at?: string
+  updated_at?: string
+  warehouse_location?: string | null
 }
 
 export interface CartItem {
