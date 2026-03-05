@@ -1,8 +1,12 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import { Ticket } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
@@ -74,7 +78,7 @@ const AdminCouponsPage: React.FC = () => {
     setLoading(true)
     try {
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       const { data, error } = await supabase
         .from('coupons')
@@ -244,8 +248,22 @@ const AdminCouponsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered().length === 0 ? (
-                <tr><td className="px-4 py-6">Kayıt yok</td></tr>
+              {loading && rows.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-0">
+                    <AdminSkeleton variant="table" count={9} rows={5} />
+                  </td>
+                </tr>
+              ) : filtered().length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-4">
+                    <AdminEmptyState
+                      icon={Ticket}
+                      title="Kupon bulunamadı"
+                      description="Arama kriterlerinize uygun bir kupon bulunamadı veya henüz hiç kupon oluşturulmamış."
+                    />
+                  </td>
+                </tr>
               ) : (
                 filtered().map(r => (
                   <tr key={r.id} className="border-t border-gray-100">

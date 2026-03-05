@@ -1,7 +1,9 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
 import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp } from 'lucide-react'
 import DateRangePicker from '../../components/admin/DateRangePicker'
@@ -24,7 +26,7 @@ export default function AdminInventoryReportPage() {
             try {
                 setLoading(true)
                 // Proaktif oturum kontrolü
-                await supabase.auth.getSession()
+                await ensureSessionFresh()
 
                 let query = supabase
                     .from('inventory_movements')
@@ -84,7 +86,22 @@ export default function AdminInventoryReportPage() {
         void loadData()
     }, [dateRange, pathname])
 
-    if (loading) return <div className="p-8 text-slate-500 animate-pulse">Raporlar hesaplanıyor...</div>
+    if (loading) return (
+        <div className="space-y-6 max-w-[1400px]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div className="h-8 w-64 bg-slate-200 animate-pulse rounded mb-2"></div>
+                    <div className="h-4 w-96 bg-slate-100 animate-pulse rounded"></div>
+                </div>
+                <div className="h-10 w-48 bg-slate-200 animate-pulse rounded-lg"></div>
+            </div>
+            <AdminSkeleton variant="cards" count={3} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+                <div className="h-80 bg-slate-100 animate-pulse rounded-2xl border border-slate-200/60 w-full" />
+            </div>
+        </div>
+    )
 
     return (
         <div className="space-y-6 max-w-[1400px]">

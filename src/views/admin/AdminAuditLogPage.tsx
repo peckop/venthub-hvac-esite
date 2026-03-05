@@ -1,11 +1,15 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass, adminTableActionClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import { ClipboardList } from 'lucide-react'
 
 interface AuditRow {
   id: string
@@ -48,7 +52,7 @@ const AdminAuditLogPage: React.FC = () => {
     setError(null)
     try {
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       let query = supabase
         .from('admin_audit_log')
@@ -164,9 +168,21 @@ const AdminAuditLogPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={6}>{t('admin.ui.loading')}</td></tr>
+                <tr>
+                  <td colSpan={6} className="p-0">
+                    <AdminSkeleton variant="table" count={6} rows={5} />
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={6}>{t('admin.ui.noRecords')}</td></tr>
+                <tr>
+                  <td colSpan={6} className="p-4">
+                    <AdminEmptyState
+                      icon={ClipboardList}
+                      title="Kayıt Bulunamadı"
+                      description="Girilen filtrelere veya arama kriterlerine uygun denetim logu bulunamadı."
+                    />
+                  </td>
+                </tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>

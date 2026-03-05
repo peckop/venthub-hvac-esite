@@ -6,6 +6,9 @@ import AdminToolbar from '../../components/admin/AdminToolbar'
 import { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
+import { RefreshCcw, MailX } from 'lucide-react'
 
 interface ReturnEventRow {
   id: number | string
@@ -151,11 +154,25 @@ const AdminWebhookEventsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredReturns.length === 0 ? (
-                  <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
+                {loading && returnsRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-0">
+                      <AdminSkeleton variant="table" count={5} rows={5} />
+                    </td>
+                  </tr>
+                ) : filteredReturns.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-4">
+                      <AdminEmptyState
+                        icon={RefreshCcw}
+                        title="İade Etkinliği Bulunamadı"
+                        description="Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor."
+                      />
+                    </td>
+                  </tr>
                 ) : (
-                  filteredReturns.map((r) => (
-                    <tr key={String(r.id)} className="border-t border-gray-100">
+                  filteredReturns.map((r, idx) => (
+                    <tr key={String(r.id || idx)} className="border-t border-gray-100">
                       {colsRet.event && (<td className="px-3 py-2 font-mono text-xs">{r.event_id}</td>)}
                       {colsRet.order && (<td className="px-3 py-2 font-mono text-xs">{r.order_id || '-'}</td>)}
                       {colsRet.carrier && (<td className="px-3 py-2">{r.carrier || '-'}</td>)}
@@ -182,8 +199,22 @@ const AdminWebhookEventsPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredEmails.length === 0 ? (
-                  <tr><td className="px-4 py-6">{t('admin.ui.noRecords')}</td></tr>
+                {loading && emailsRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-0">
+                      <AdminSkeleton variant="table" count={5} rows={5} />
+                    </td>
+                  </tr>
+                ) : filteredEmails.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-4">
+                      <AdminEmptyState
+                        icon={MailX}
+                        title="E-Posta Etkinliği Bulunamadı"
+                        description="Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor."
+                      />
+                    </td>
+                  </tr>
                 ) : (
                   filteredEmails.map((e, idx) => (
                     <tr key={idx} className="border-t border-gray-100">

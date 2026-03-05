@@ -1,13 +1,16 @@
 import React from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ExportMenu from '../../components/admin/ExportMenu'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, PackageMinus } from 'lucide-react'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
@@ -74,7 +77,7 @@ const AdminMovementsPage: React.FC = () => {
     try {
       setLoading(LoadState.Loading)
       // Proaktif oturum kontrolü
-      await supabase.auth.getSession()
+      await ensureSessionFresh()
 
       // Pagination
       const from = (pageNum - 1) * PAGE_SIZE
@@ -373,46 +376,64 @@ const AdminMovementsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {sorted.map(m => (
-                <tr key={m.id} className="border-b">
-                  {visibleCols.date && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>{formatDateTime(m.created_at, lang)}</td>
-                  )}
-                  {visibleCols.product && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>
-                      <div className="flex flex-col">
-                        <span>{productMap[m.product_id]?.name || m.product_id}</span>
-                        {productMap[m.product_id]?.sku && (
-                          <span className="text-xs text-slate-500">{productMap[m.product_id]?.sku}</span>
-                        )}
-                      </div>
-                    </td>
-                  )}
-                  {visibleCols.delta && (
-                    <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
-                      <span className={`inline-flex items-center gap-0.5 text-xs font-semibold font-mono px-2 py-0.5 rounded-full ${m.delta > 0 ? 'bg-emerald-50 text-emerald-700' : m.delta < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
-                        {m.delta > 0 ? <ArrowUpRight size={12} /> : m.delta < 0 ? <ArrowDownRight size={12} /> : null}
-                        {m.delta > 0 ? `+${m.delta}` : m.delta}
-                      </span>
-                    </td>
-                  )}
-                  {visibleCols.reason && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
-                  )}
-                  {visibleCols.ref && (
-                    <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
-                  )}
+              {loading === LoadState.Loading && sorted.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-0">
+                    <AdminSkeleton variant="table" count={5} rows={8} />
+                  </td>
                 </tr>
-              ))}
+              ) : loading === LoadState.Error ? (
+                <tr>
+                  <td colSpan={5} className="p-4 text-center text-red-600">
+                    Hata: {error}
+                  </td>
+                </tr>
+              ) : sorted.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-4">
+                    <AdminEmptyState
+                      icon={PackageMinus}
+                      title="Hareket Bulunamadı"
+                      description="Seçilen filtrelere veya arama kriterlerine uygun envanter hareketi bulunmuyor."
+                    />
+                  </td>
+                </tr>
+              ) : (
+                sorted.map(m => (
+                  <tr key={m.id} className="border-b">
+                    {visibleCols.date && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>{formatDateTime(m.created_at, lang)}</td>
+                    )}
+                    {visibleCols.product && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className="flex flex-col">
+                          <span>{productMap[m.product_id]?.name || m.product_id}</span>
+                          {productMap[m.product_id]?.sku && (
+                            <span className="text-xs text-slate-500">{productMap[m.product_id]?.sku}</span>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {visibleCols.delta && (
+                      <td className={`${density === 'compact' ? 'px-2 py-2' : 'p-3'} text-right`}>
+                        <span className={`inline-flex items-center gap-0.5 text-xs font-semibold font-mono px-2 py-0.5 rounded-full ${m.delta > 0 ? 'bg-emerald-50 text-emerald-700' : m.delta < 0 ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
+                          {m.delta > 0 ? <ArrowUpRight size={12} /> : m.delta < 0 ? <ArrowDownRight size={12} /> : null}
+                          {m.delta > 0 ? `+${m.delta}` : m.delta}
+                        </span>
+                      </td>
+                    )}
+                    {visibleCols.reason && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>{reasonLabel(m.reason, t)}</td>
+                    )}
+                    {visibleCols.ref && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>{m.order_id ? m.order_id.slice(-8).toUpperCase() : '-'}</td>
+                    )}
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
-        {loading === LoadState.Loading && (
-          <div className="p-4 text-sm text-slate-500">{t('admin.ui.loadingShort')}</div>
-        )}
-        {loading === LoadState.Error && (
-          <div className="p-4 text-sm text-red-600">{error}</div>
-        )}
       </div>
 
       <div className="flex items-center justify-between mt-4 px-2">
@@ -420,7 +441,7 @@ const AdminMovementsPage: React.FC = () => {
         <span className="text-sm font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200/50">{t('admin.movements.pageLabel', { page: String(page) })}</span>
         <button className={adminButtonSecondaryClass} disabled={!hasMore} onClick={() => setPage(p => p + 1)}>{t('admin.ui.next')}</button>
       </div>
-    </div>
+    </div >
   )
 }
 

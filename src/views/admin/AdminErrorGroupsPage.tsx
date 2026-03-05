@@ -7,6 +7,9 @@ import ExportMenu from '../../components/admin/ExportMenu'
 import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import { ShieldAlert } from 'lucide-react'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
 interface ErrorGroup {
   id: string
@@ -480,9 +483,21 @@ const AdminErrorGroupsPage: React.FC = () => {
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={8}>{t('admin.ui.loading')}</td></tr>
+                <tr>
+                  <td colSpan={8} className="p-0">
+                    <AdminSkeleton variant="table" count={8} rows={5} />
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
-                <tr><td className="p-4" colSpan={8}>{t('admin.ui.noRecords')}</td></tr>
+                <tr>
+                  <td colSpan={8} className="p-0">
+                    <AdminEmptyState
+                      icon={ShieldAlert}
+                      title="Hata Grubu Bulunamadı"
+                      description="Seçilen filtrelere uygun kaydedilmiş bir hata grubu görünmüyor."
+                    />
+                  </td>
+                </tr>
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>

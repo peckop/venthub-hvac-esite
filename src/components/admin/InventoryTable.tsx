@@ -3,6 +3,7 @@ import { adminTableHeadCellClass, adminTableCellClass } from '../../utils/adminU
 import EditableCell from './EditableCell'
 import InfoTooltip from './InfoTooltip'
 import AdminEmptyState from './AdminEmptyState'
+import AdminSkeleton from './AdminSkeleton'
 import { SearchX } from 'lucide-react'
 import { InventoryRow, SortKey, LoadState, Density, VisibleCols } from '../../types/inventory'
 
@@ -115,8 +116,8 @@ export default function InventoryTable({
                 <td className={adminTableCellClass + " " + cellPad + " text-center"}>
                     {r.abc_class ? (
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full font-black text-[10px] border shadow-sm ${r.abc_class === 'A' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                r.abc_class === 'B' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                    'bg-slate-50 text-slate-700 border-slate-200'
+                            r.abc_class === 'B' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                'bg-slate-50 text-slate-700 border-slate-200'
                             }`}>
                             {r.abc_class}
                         </span>
@@ -216,11 +217,11 @@ export default function InventoryTable({
                 </thead>
                 <tbody className="bg-white">
                     {loading === LoadState.Loading && rows.length === 0 ? (
-                        [...Array(10)].map((_, i) => (
-                            <tr key={`skel-${i}`} className="border-b border-slate-50 animate-pulse">
-                                <td colSpan={10} className="p-4"><div className="h-4 bg-slate-100 rounded w-full"></div></td>
-                            </tr>
-                        ))
+                        <tr>
+                            <td colSpan={10} className="p-0">
+                                <AdminSkeleton variant="table" count={10} rows={10} />
+                            </td>
+                        </tr>
                     ) : error ? (
                         <tr><td colSpan={10} className="p-12 text-center text-rose-500 font-bold">{error}</td></tr>
                     ) : rows.length === 0 ? (
