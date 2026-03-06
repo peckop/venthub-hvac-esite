@@ -92,7 +92,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                     {t('cartToast.whatNext')}
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => { setShowChoiceModal(false); onClose() }}
                   className="ml-auto text-steel-gray hover:text-industrial-gray"
                 >
@@ -109,7 +109,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                       {product.name}
                     </p>
                     <p className="text-sm text-steel-gray">
-                      {product.brand} • {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                      {product.brand} • {formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
                     </p>
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                   <ShoppingBag size={20} />
                   <span>{t('cartToast.continue')}</span>
                 </button>
-                
+
                 <Link href="/cart" onClick={handleGoToCart}>
                   <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors">
                     <ArrowRight size={20} />
