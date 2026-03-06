@@ -7,8 +7,6 @@ import type { Category } from '../../lib/supabase'
 
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
-// ... existing imports ...
-
 interface CategoryCard3DProps {
     category: Category
     subCategoryCount: number
@@ -27,10 +25,13 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
     return (
         <div
             onClick={onClick}
-            className="group relative bg-gradient-to-br from-primary-navy to-secondary-blue rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
+            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
         >
-            {/* 3D Canvas Area */}
-            <div className="h-40 relative">
+            {/* Background Layer - Absolute */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-navy to-secondary-blue rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors -z-10 pointer-events-none" />
+
+            {/* 3D Canvas Area - Extended height and negative margin for Pop-out effect */}
+            <div className="h-56 relative -mt-12 z-10 pointer-events-none">
                 <Canvas
                     camera={{ position: [0, 0, 2.2], fov: 45 }}
                     style={{ background: 'transparent' }}
@@ -52,13 +53,10 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                         <Environment preset="city" />
                     </Suspense>
                 </Canvas>
-
-                {/* Gradient overlay for text readability */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-primary-navy/90 to-transparent pointer-events-none" />
             </div>
 
             {/* Text Content */}
-            <div className="px-4 pb-4 -mt-4 relative z-10">
+            <div className="px-4 pb-4 relative z-20">
                 <h3 className="text-lg font-bold text-white mb-1 group-hover:text-secondary-blue transition-colors">
                     {getCategoryDisplayName(category)}
                 </h3>
@@ -72,9 +70,6 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     />
                 </div>
             </div>
-
-            {/* Hover glow effect */}
-            <div className="absolute inset-0 rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors pointer-events-none" />
         </div>
     )
 }
