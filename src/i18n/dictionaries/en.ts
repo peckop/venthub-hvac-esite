@@ -42,6 +42,12 @@ export const en = {
     backToTop: "Back to top",
     gotoCategory: "Go to category",
     cancel: "Cancel",
+    close: "Close",
+    viewFullscreen: "View fullscreen",
+    view3D: "View 3D",
+    prev: "Previous",
+    next: "Next",
+    remove: "Remove",
   },
   search: {
     recentSearches: "Recent Searches",
