@@ -8,6 +8,7 @@ import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTable
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import { ShieldAlert } from 'lucide-react'
+import { useDragScroll } from '../../hooks/useDragScroll'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
@@ -46,6 +47,7 @@ const PAGE_SIZE = 50
 const AdminErrorGroupsPage: React.FC = () => {
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
   const hasWriteAccess = canWrite('error_groups')
   // Columns & density (like Inventory)
   const STORAGE_KEY = 'toolbar:errorgroups'
@@ -290,61 +292,6 @@ const AdminErrorGroupsPage: React.FC = () => {
     }
   }, [fromDate, toDate, level, status, debouncedQ, sortBy, sortDir])
 
-  // Top and bottom synchronized horizontal scroll
-  const topScrollRef = React.useRef<HTMLDivElement | null>(null)
-  const tableWrapRef = React.useRef<HTMLDivElement | null>(null)
-  const [topScrollWidth, setTopScrollWidth] = React.useState(0)
-  const refreshTopWidth = React.useCallback(() => { setTopScrollWidth(tableWrapRef.current?.scrollWidth || 0) }, [])
-  React.useEffect(() => { refreshTopWidth(); const onResize = () => refreshTopWidth(); window.addEventListener('resize', onResize); return () => window.removeEventListener('resize', onResize) }, [rows, refreshTopWidth])
-
-  // Smooth, bi-directional sync with rAF + programmatic update guard
-  const rafIdRef = React.useRef<number | null>(null)
-  const latestLeftRef = React.useRef(0)
-  const programmaticTargetRef = React.useRef<null | 'top' | 'bottom'>(null)
-  const pendingSourceRef = React.useRef<null | 'top' | 'bottom'>(null)
-
-  const flushSync = React.useCallback(() => {
-    if (rafIdRef.current != null) return
-    rafIdRef.current = requestAnimationFrame(() => {
-      const source = pendingSourceRef.current
-      rafIdRef.current = null
-      pendingSourceRef.current = null
-      if (!source) return
-      if (!topScrollRef.current || !tableWrapRef.current) return
-      const srcEl = source === 'top' ? topScrollRef.current : tableWrapRef.current
-      const dstEl = source === 'top' ? tableWrapRef.current : topScrollRef.current
-      const srcMax = Math.max(0, srcEl.scrollWidth - srcEl.clientWidth)
-      const dstMax = Math.max(0, dstEl.scrollWidth - dstEl.clientWidth)
-      const ratio = srcMax > 0 ? (latestLeftRef.current / srcMax) : 0
-      const mappedLeft = Math.max(0, Math.min(dstMax, ratio * dstMax))
-      programmaticTargetRef.current = source === 'top' ? 'bottom' : 'top'
-      dstEl.scrollLeft = mappedLeft
-    })
-  }, [])
-
-  const onTopScroll = React.useCallback(() => {
-    if (!topScrollRef.current || !tableWrapRef.current) return
-    if (programmaticTargetRef.current === 'top') {
-      // consume one programmatic event
-      programmaticTargetRef.current = null
-      return
-    }
-    latestLeftRef.current = topScrollRef.current.scrollLeft
-    pendingSourceRef.current = 'top'
-    flushSync()
-  }, [flushSync])
-
-  const onBottomScroll = React.useCallback(() => {
-    if (!topScrollRef.current || !tableWrapRef.current) return
-    if (programmaticTargetRef.current === 'bottom') {
-      programmaticTargetRef.current = null
-      return
-    }
-    latestLeftRef.current = tableWrapRef.current.scrollLeft
-    pendingSourceRef.current = 'bottom'
-    flushSync()
-  }, [flushSync])
-
   const toggleSelect = (id: string, on: boolean) => {
     setSelectedIds(prev => on ? Array.from(new Set([...prev, id])) : prev.filter(x => x !== id))
   }
@@ -446,13 +393,8 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
 
-        {/* Top horizontal scrollbar */}
-        <div ref={topScrollRef} onScroll={onTopScroll} className="overflow-x-auto h-4 bg-gray-100 border-b border-slate-200/70 select-none" role="presentation" aria-hidden style={{ willChange: 'scroll-position' }}>
-          <div style={{ width: topScrollWidth || '100%' }} className="h-4" />
-        </div>
-
         {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
-        <div ref={tableWrapRef} onScroll={onBottomScroll} className="overflow-x-auto overscroll-x-contain" style={{ willChange: 'scroll-position' }}>
+        <div ref={dragScrollRef} className="overflow-x-auto overscroll-x-contain" style={{ willChange: 'scroll-position' }}>
           <table className="w-full text-sm min-w-[980px]">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
