@@ -1,0 +1,108 @@
+﻿
+> react_repo@0.0.0 build
+> next build
+
+  Ôû▓ Next.js 14.2.35
+  - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/449) ...
+   Generating static pages (112/449) 
+   Generating static pages (224/449) 
+   Generating static pages (336/449) 
+ Ô£ô Generating static pages (449/449)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                           Size     First Load JS
+Ôöî Ôùï /                                                 1.32 kB        90.5 kB
+Ôö£ Ôùï /_not-found                                       881 B          90.1 kB
+Ôö£ Ôùï /about                                            5.05 kB         135 kB
+Ôö£ Ôùï /account                                          6.85 kB         180 kB
+Ôö£ Ôùï /account/addresses                                1.32 kB        90.5 kB
+Ôö£ Ôùï /account/invoices                                 1.32 kB        90.5 kB
+Ôö£ Ôùï /account/orders                                   1.32 kB        90.5 kB
+Ôö£ Ôùï /account/orders/detail                            7.13 kB         323 kB
+Ôö£ Ôùï /account/profile                                  6.29 kB         141 kB
+Ôö£ Ôùï /account/returns                                  5.64 kB         175 kB
+Ôö£ Ôùï /account/security                                 8.59 kB         174 kB
+Ôö£ Ôùï /account/shipments                                5.16 kB         175 kB
+Ôö£ Ôùï /admin                                            16.8 kB         335 kB
+Ôö£ Ôùï /admin/categories                                 7.22 kB         220 kB
+Ôö£ Ôùï /admin/coupons                                    4.22 kB         181 kB
+Ôö£ Ôùï /admin/error-groups                               9.27 kB         204 kB
+Ôö£ Ôùï /admin/errors                                     2.95 kB         175 kB
+Ôö£ Ôùï /admin/inventory                                  1.35 kB        90.5 kB
+Ôö£ Ôùï /admin/inventory/report                           6.47 kB         312 kB
+Ôö£ Ôùï /admin/inventory/settings                         8.04 kB         137 kB
+Ôö£ Ôùï /admin/logistics                                  9.29 kB         144 kB
+Ôö£ Ôùï /admin/logs                                       3.49 kB         175 kB
+Ôö£ Ôùï /admin/movements                                  1.35 kB        90.5 kB
+Ôö£ Ôùï /admin/orders                                     45.3 kB         268 kB
+Ôö£ Ôùï /admin/products                                   13.4 kB         221 kB
+Ôö£ Ôùï /admin/returns                                    7.45 kB         211 kB
+Ôö£ Ôùï /admin/users                                      9.48 kB         210 kB
+Ôö£ Ôùï /admin/webhook-events                             2.51 kB         174 kB
+Ôö£ Ôùï /auth/callback                                    5.99 kB         140 kB
+Ôö£ Ôùï /auth/forgot-password                             2.63 kB         137 kB
+Ôö£ Ôùï /auth/login                                       1.32 kB        90.5 kB
+Ôö£ Ôùï /auth/register                                    1.32 kB        90.5 kB
+Ôö£ Ôùï /brands                                           1.32 kB        90.5 kB
+Ôö£ ÔùÅ /brands/[slug]                                    9.36 kB         181 kB
+Ôö£   Ôö£ /brands/avens
+Ôö£   Ôö£ /brands/vortice
+Ôö£   Ôö£ /brands/nicotra-gebhardt
+Ôö£   Ôöö [+3 more paths]
+Ôö£ Ôùï /cart                                             1.32 kB        90.5 kB
+Ôö£ ÔùÅ /category/[categorySlug]                          161 B           212 kB
+Ôö£   Ôö£ /category/hiz-anahtari
+Ôö£   Ôö£ /category/fanlar
+Ôö£   Ôö£ /category/hava-perdeleri
+Ôö£   Ôöö [+26 more paths]
+Ôö£ ÔùÅ /category/[categorySlug]/[subCategorySlug]        161 B           212 kB
+Ôö£   Ôö£ /category/hiz-kontrolu-cihazlari/hiz-anahtari
+Ôö£   Ôö£ /category/fanlar/endustriyel-fanlar
+Ôö£   Ôö£ /category/fanlar/nicotra-gebhardt-fanlar
+Ôö£   Ôöö [+18 more paths]
+Ôö£ Ôùï /checkout                                         1.32 kB        90.5 kB
+Ôö£ Ôùï /contact                                          5.96 kB         129 kB
+Ôö£ Ôùï /destek/hesaplayicilar/hava-perdesi               4.18 kB         141 kB
+Ôö£ Ôùï /destek/hesaplayicilar/hrv                        2.99 kB         140 kB
+Ôö£ Ôùï /destek/hesaplayicilar/jet-fan                    3.53 kB         140 kB
+Ôö£ Ôùï /destek/hesaplayicilar/kanal                      3.01 kB         140 kB
+Ôö£ ÔùÅ /destek/konular/[slug]                            1.85 kB         131 kB
+Ôö£   Ôö£ /destek/konular/hava-perdesi
+Ôö£   Ôö£ /destek/konular/jet-fan
+Ôö£   Ôöö /destek/konular/hrv
+Ôö£ Ôùï /destek/merkez                                    1.24 kB         131 kB
+Ôö£ Ôùï /legal/cerez-politikasi                           1.56 kB        90.8 kB
+Ôö£ Ôùï /legal/gizlilik-politikasi                        1.85 kB          91 kB
+Ôö£ Ôùï /legal/kullanim-kosullari                         1.65 kB        90.8 kB
+Ôö£ Ôùï /legal/kvkk                                       2.69 kB        91.9 kB
+Ôö£ Ôùï /legal/mesafeli-satis-sozlesmesi                  2.61 kB        91.8 kB
+Ôö£ Ôùï /legal/on-bilgilendirme-formu                     1.73 kB        90.9 kB
+Ôö£ Ôùï /payment-success                                  4.23 kB         182 kB
+Ôö£ Ôùï /products                                         62.2 kB         489 kB
+Ôö£ ÔùÅ /products/[id]                                    35.4 kB         646 kB
+Ôö£   Ôö£ /products/d4d70df3-8c20-45bf-b19e-4f615788ad4c
+Ôö£   Ôö£ /products/3bf760dd-4e63-42f3-bc6f-8bdee7c70757
+Ôö£   Ôö£ /products/a86d9b18-a0f2-4273-a57d-ab0dcdc58682
+Ôö£   Ôöö [+331 more paths]
+Ôö£ Ôùï /support                                          2.71 kB         134 kB
+Ôö£ Ôùï /support/garanti-servis                           1.16 kB         122 kB
+Ôö£ Ôùï /support/iade-degisim                             1.15 kB         122 kB
+Ôö£ Ôùï /support/sss                                      1.89 kB         125 kB
+Ôöö Ôùï /support/teslimat-kargo                           1.16 kB         122 kB
++ First Load JS shared by all                         89.2 kB
+  Ôö£ chunks/3395-8b4c579a4b3d8472.js                   32 kB
+  Ôö£ chunks/4994161d-2801e414283f7bea.js               53.6 kB
+  Ôöö other shared chunks (total)                       3.55 kB
+
+
+Ôùï  (Static)  prerendered as static content
+ÔùÅ  (SSG)     prerendered as static HTML (uses getStaticProps)
+

@@ -302,13 +302,13 @@ const ProductsPage: React.FC = () => {
             results = allProds
               .filter(p => {
                 // Category filter
-                if (categoryIdsToFilter.length > 0 && !categoryIdsToFilter.includes(p.category_id)) return false
+                if (categoryIdsToFilter.length > 0 && !categoryIdsToFilter.includes(p.category_id || '')) return false
                 // Brand filter
                 if (filters.brand && p.brand !== filters.brand) return false
                 // Price filters
-                const price = parseFloat(p.price || '0')
-                if (filters.price_min && price < parseFloat(String(filters.price_min))) return false
-                if (filters.price_max && price > parseFloat(String(filters.price_max))) return false
+                const price = typeof p.price === 'number' ? p.price : Number(p.price || 0)
+                if (filters.price_min && price < Number(filters.price_min)) return false
+                if (filters.price_max && price > Number(filters.price_max)) return false
                 return true
               })
               .map(p => ({
@@ -316,7 +316,7 @@ const ProductsPage: React.FC = () => {
                 name: p.name,
                 sku: p.sku,
                 brand: p.brand,
-                price: p.price,
+                price: typeof p.price === 'number' ? p.price : Number(p.price || 0),
                 rank: null,
                 is_fuzzy_match: false,
                 status: p.status,

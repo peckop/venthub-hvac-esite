@@ -61,13 +61,14 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             return found?.id || null
         }
 
-        const payloads: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null }[] = []
+        const payloads: any[] = []
 
         for (const r of importRows) {
             if (!r['sku'] || !r['name']) continue
-            const p: { sku: string; name: string; model_code?: string | null; brand?: string; status?: string; price?: number; stock_qty?: number; low_stock_threshold?: number | null; category_id?: string | null } = {
+            const p: any = {
                 sku: r['sku'].trim(),
                 name: r['name'].trim(),
+                brand: r['brand']?.trim() || 'Generic' // Default for required field
             }
             if (r['model_code']) p.model_code = r['model_code'].trim()
             else if (r['model']) p.model_code = r['model'].trim()
@@ -92,7 +93,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             let ok = 0, fail = 0
             for (let i = 0; i < payloads.length; i += 100) {
                 const chunk = payloads.slice(i, i + 100)
-                const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
+                const { error } = await supabase.from('products').upsert(chunk as any, { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
                     fail += chunk.length

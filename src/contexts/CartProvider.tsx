@@ -382,7 +382,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const getCartTotal = () => {
     return items.reduce((total, item) => {
-      const unit = typeof item.unitPrice === 'number' ? item.unitPrice : parseFloat(item.product.price)
+      const unit = typeof item.unitPrice === 'number' ? item.unitPrice : Number(item.product.price || 0)
       return total + unit * item.quantity
     }, 0)
   }
@@ -411,7 +411,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     for (const it of items) {
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) continue
-      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price || 0)
       if (!nearlyEqual(currUnit, nextUnit)) changedIds.add(it.product.id)
     }
 
@@ -419,7 +419,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(curr => curr.map(it => {
       const nextUnit = pmap.get(it.product.id)
       if (nextUnit == null) return it
-      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price)
+      const currUnit = typeof it.unitPrice === 'number' ? it.unitPrice : Number(it.product.price || 0)
       if (nearlyEqual(currUnit, nextUnit)) return it
       return { ...it, unitPrice: nextUnit }
     }))

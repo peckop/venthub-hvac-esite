@@ -68,7 +68,7 @@ export const CheckoutPage: React.FC = () => {
   // Price hash helpers to prevent repeated confirmation loops
   const to2 = (n: number) => Number(Number(n).toFixed(2))
   const priceHashLocal = () => {
-    const norm = items.map(i => ({ id: i.id, qty: i.quantity, unit: to2(Number((typeof i.unitPrice === 'number' ? i.unitPrice : parseFloat(i.product.price)))) }))
+    const norm = items.map(i => ({ id: i.id, qty: i.quantity, unit: to2(Number((typeof i.unitPrice === 'number' ? i.unitPrice : Number(i.product.price)))) }))
       .sort((a, b) => a.id.localeCompare(b.id))
     return JSON.stringify(norm)
   }
@@ -349,7 +349,7 @@ export const CheckoutPage: React.FC = () => {
       const { buildPaymentRequest } = await import('./checkout/buildPaymentRequest')
       const requestData = buildPaymentRequest({
         amount: authoritativeTotal,
-        items,
+        items: items as any,
         customer: { name: customerInfo.name, email: customerInfo.email, phone: customerInfo.phone },
         shipping: shippingAddress,
         billing: billingAddress,

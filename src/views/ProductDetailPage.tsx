@@ -663,7 +663,7 @@ export const ProductDetailPage: React.FC = () => {
                 <span className="text-lg text-industrial-gray font-normal">Fiyat Teklifi Alın</span>
               ) : (
                 <>
-                  {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                  {formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                   <span className="text-sm text-steel-gray font-normal ml-2">
                     {t('pdp.vatIncluded')}
                   </span>
