@@ -17,6 +17,8 @@ export const en = {
     searchHeaderPlaceholder: "Search product, brand or model...",
     search: "Search",
     quickSearch: "Quick search...",
+    allCategories: "All Categories",
+    priceRange: "Price Range",
 
     // Existing
     discover: "Discover",
@@ -36,6 +38,7 @@ export const en = {
     searchPlaceholderLong: "Product name, brand, model...",
     selectByNeed: "Choose by need",
     seeAllProducts: "See all products",
+    back: "Back",
     backToTop: "Back to top",
     gotoCategory: "Go to category",
     cancel: "Cancel",
@@ -233,8 +236,6 @@ export const en = {
     breadcrumbDiscover: "Discover",
     heroTitle: "Discover HVAC products: engineering-led selection, fast quotes",
     heroSubtitle: "Find the right product quickly with application-guided areas, popular categories and featured products.",
-    applicationTitle: "Solutions by Application",
-    popularCategories: "Popular Categories",
     itemsListed: "items listed",
     resultsFound: "results found",
     heroValue1: "Certified, reliable products",
@@ -242,11 +243,18 @@ export const en = {
     heroValue3: "Fast quote / guidance",
     helpCtaTitle: "Not sure? Let's choose the right product by application.",
     helpCtaSubtitle: "Share your project details; our engineering team will respond quickly.",
+    applicationTitle: "Solutions by Application",
+    popularCategories: "Popular Categories",
     discoverVisual: 'Discover visual area',
     searchResultsTitle: 'Search Results',
     searchSeoTitle: 'Search: {{q}}',
     searchSeoDesc: 'Search results for "{{q}}"',
-    discoverSeoDesc: 'Discover products, featured items and popular categories on VentHub.'
+    discoverSeoDesc: 'Discover products, featured items and popular categories on VentHub.',
+    // Hub Section
+    hubBadge: "Turkey's HVAC Expert",
+    hubTitle: "Professional HVAC Solutions",
+    hubSubtitle: "Air curtain, industrial fan and heat recovery systems. Let's find the right product for your needs together.",
+    searchPlaceholder: "Search product or model..."
   },
   applications: {
     parking: {
@@ -371,6 +379,8 @@ export const en = {
       audit: 'Audit Logs',
       errors: 'Error Logs',
       errorGroups: 'Error Groups',
+      products: 'Products',
+      categories: 'Categories',
       coupons: 'Coupons'
     },
     products: {
@@ -848,6 +858,7 @@ export const en = {
     addToCart: 'Add to Cart',
     askStock: 'Ask about stock',
     techQuote: 'Request Technical Offer',
+    askPriceButton: 'Request Quote',
     freeShipping: 'Free Shipping',
     warranty2y: '2-Year Warranty',
     support247: '24/7 Support',
