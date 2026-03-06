@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
-import type { Product, Category } from '../lib/supabase'
+import type { Category } from '../lib/supabase'
 import { checkAdminAccess, getUserRole } from '../config/admin'
 import { useI18n } from '../i18n/I18nProvider'
 import { trackEvent } from '../utils/analytics'
@@ -21,15 +21,12 @@ interface StickyHeaderProps {
   isScrolled: boolean
 }
 
-const BrandIconLazy = React.lazy(() => import('./HVACIcons').then(m => ({ default: m.BrandIcon })))
+
 
 export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const { t, lang } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [stickySearchQuery, setStickySearchQuery] = useState('')
-  const [stickySearchResults, setStickySearchResults] = useState<Product[]>([])
-  const [isStickySearchOpen, setIsStickySearchOpen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
@@ -52,7 +49,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
   const [userRole, setUserRole] = useState<string>('user')
   const router = useRouter()
   const userMenuRef = useRef<HTMLDivElement>(null)
-  const stickySearchRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
 
 
@@ -61,9 +57,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     function handleClickOutside(event: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
-      }
-      if (stickySearchRef.current && !stickySearchRef.current.contains(event.target as Node)) {
-        setIsStickySearchOpen(false)
       }
       if (categoriesRef.current && !categoriesRef.current.contains(event.target as Node)) {
         setIsCategoriesOpen(false)
@@ -137,6 +130,23 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isScrolled])
 
+  // Global search shortcut listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // ignore if typing in an input
+      if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        return
+      }
+
+      if (e.key === '/' || (e.key === 'k' && (e.metaKey || e.ctrlKey))) {
+        e.preventDefault()
+        setIsSearchOverlayOpen(true)
+      }
+    }
+    document.addEventListener('keydown', handleGlobalKeyDown)
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown)
+  }, [])
+
   // Defer categories fetch until dropdown first open (reduce initial header churn)
   const ensureCategories = useCallback(async () => {
     if (categoriesLoaded) return
@@ -166,50 +176,6 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       setShowSyncPulse(false)
     }
   }, [syncing])
-
-  // Handle sticky search - optimized debounce
-  useEffect(() => {
-    if (stickySearchQuery.trim().length === 0) {
-      // Avoid unnecessary re-renders when already empty/closed
-      setStickySearchResults(prev => (prev.length ? [] : prev))
-      setIsStickySearchOpen(prev => (prev ? false : prev))
-      return
-    }
-
-    if (stickySearchQuery.trim().length < 3) {
-      return // Don't search for less than 3 characters
-    }
-
-    const delayedSearch = setTimeout(async () => {
-      try {
-        const { ftsSearchProducts } = await import('../lib/supabase')
-        const ftsResults = await ftsSearchProducts(stickySearchQuery.trim(), 5)
-        // Map FTS results to Product-like shape for rendering
-        const mapped = ftsResults.map(r => ({
-          id: r.id,
-          name: r.name,
-          brand: r.brand || '',
-          sku: r.sku,
-          price: '', // fiyat gizleme stratejisi
-          slug: '',
-          status: 'active' as const,
-          description: '',
-          model_code: '',
-          category_id: '',
-          stock_qty: 0,
-          is_featured: false,
-        }))
-        setStickySearchResults(mapped as unknown as Product[])
-        setIsStickySearchOpen(true)
-      } catch (error) {
-        console.error('Sticky search error:', error)
-        setStickySearchResults(prev => (prev.length ? [] : prev))
-        setIsStickySearchOpen(prev => (prev ? false : prev))
-      }
-    }, 400) // Slightly longer delay to reduce API calls
-
-    return () => clearTimeout(delayedSearch)
-  }, [stickySearchQuery])
 
 
   const handleSignOut = useCallback(async () => {
@@ -567,60 +533,19 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                   </Link>
                 </nav>
 
-                {/* Sticky Search Bar */}
-                <div className="flex-1 max-w-sm mx-2 relative" ref={stickySearchRef}>
-                  <form onSubmit={(e) => {
-                    e.preventDefault()
-                    if (stickySearchQuery.trim()) {
-                      router.push(`/products?q=${encodeURIComponent(stickySearchQuery.trim())}`)
-                      setStickySearchQuery('')
-                      setIsStickySearchOpen(false)
-                    }
-                  }}>
-                    <div className="relative group">
-                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-steel-gray group-focus-within:text-primary-navy transition-colors">
-                        <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-                      </svg>
-                      <input
-                        type="text"
-                        placeholder={t('common.quickSearch')}
-                        value={stickySearchQuery}
-                        onChange={(e) => setStickySearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-3 h-10 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy focus:bg-white transition-all duration-200"
-                      />
-                      {/* Quick search hint */}
-                      <kbd className="hidden lg:block absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-steel-gray/50 font-mono">/</kbd>
-                    </div>
-                  </form>
-
-                  {/* Sticky Search Results */}
-                  {isStickySearchOpen && stickySearchResults.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl z-50 max-h-64 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-                      {stickySearchResults.map((product) => (
-                        <button
-                          key={product.id}
-                          onClick={() => {
-                            router.push(`/products/${product.id}`)
-                            setStickySearchQuery('')
-                            setIsStickySearchOpen(false)
-                          }}
-                          className="w-full flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 text-left transition-all duration-200"
-                        >
-                          <React.Suspense fallback={<div className="w-5 h-5 rounded bg-gray-100" aria-hidden="true" />}>
-                            <BrandIconLazy brand={product.brand} />
-                          </React.Suspense>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-industrial-gray truncate">{product.name}</div>
-                            <div className="text-xs text-steel-gray">{product.brand}</div>
-                          </div>
-                          <div className="text-xs font-medium text-primary-ocean opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
-                            Detay
-                            <svg className="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                {/* Search Trigger Button */}
+                <div className="flex-1 max-w-sm mx-2 flex justify-end lg:justify-start">
+                  <button
+                    onClick={() => setIsSearchOverlayOpen(true)}
+                    className="flex lg:w-full items-center pl-3 lg:pr-3 h-10 lg:bg-slate-50 lg:border border-slate-200 rounded-lg text-sm text-slate-400 focus:outline-none hover:ring-2 hover:ring-primary-navy/20 hover:border-primary-navy hover:bg-white transition-all duration-200 group"
+                    aria-label={t('common.search')}
+                  >
+                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy transition-colors">
+                      <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <span className="hidden lg:block ml-2 text-left flex-1">{t('common.quickSearch')}</span>
+                    <kbd className="hidden lg:block text-xs text-steel-gray/50 font-mono ml-2 border border-slate-200 rounded px-1.5 shadow-sm bg-white">/</kbd>
+                  </button>
                 </div>
 
                 {/* Smart Actions & Right Icons */}
