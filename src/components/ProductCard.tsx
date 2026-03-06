@@ -35,7 +35,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
   const router = useRouter()
   const isList = layout === 'list'
   const { addToCart } = useCart()
-  const price = parseFloat(product.price as any)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
