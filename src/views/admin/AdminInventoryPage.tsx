@@ -6,7 +6,6 @@ import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from 
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-import InfoTooltip from '../../components/admin/InfoTooltip'
 import { useI18n } from '../../i18n/I18nProvider'
 import toast from 'react-hot-toast'
 import { useRole } from '../../hooks/useRole'

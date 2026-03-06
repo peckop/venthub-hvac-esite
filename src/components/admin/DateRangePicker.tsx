@@ -15,7 +15,7 @@ interface DateRangePickerProps {
 }
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, placeholder, className = '' }) => {
-    const { t, lang } = useI18n()
+    const { lang } = useI18n()
     const locale = lang === 'en' ? enUS : tr
 
     const [isOpen, setIsOpen] = useState(false)
@@ -34,7 +34,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
         if (value?.from !== selectedRange?.from || value?.to !== selectedRange?.to) {
             setSelectedRange(value)
         }
-    }, [value])
+    }, [value, selectedRange?.from, selectedRange?.to])
 
     const presets = [
         {

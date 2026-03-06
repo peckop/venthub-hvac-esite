@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { useI18n } from '../../i18n/I18nProvider'
 import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
 import { Truck, CheckCircle2 } from 'lucide-react'
@@ -124,7 +123,7 @@ export default function AdminLogisticsPage() {
             } else {
                 toast.success(`${targets.length} sipariş başarıyla Kargoda durumuna alındı!`)
             }
-        } catch (err: any) {
+        } catch {
             toast.error('Toplu güncelleme sırasında kritik bir hata oluştu.')
         } finally {
             setSaving(false)
@@ -194,7 +193,7 @@ export default function AdminLogisticsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {rows.map((row, i) => (
+                                {rows.map((row) => (
                                     <tr key={row.id} className={row.saved ? 'bg-emerald-50/30' : 'hover:bg-slate-50/50'}>
                                         <td className="px-4 py-3 font-mono text-xs text-slate-600">#{row.order_number}</td>
                                         <td className="px-4 py-3 font-semibold text-slate-800">{row.customer_name}</td>

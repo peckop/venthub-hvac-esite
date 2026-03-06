@@ -42,38 +42,7 @@ interface OrderItem {
   product_image_url?: string
 }
 
-// Minimal Supabase row types used for mapping
-interface VenthubOrderItemRow {
-  id: string
-  product_id?: string | null
-  product_name: string
-  quantity: number
-  price_at_time: number | string
-  product_image_url?: string | null
-}
-
-interface VenthubOrderRow {
-  id: string
-  total_amount: number | string
-  status: string
-  payment_status?: string | null
-  created_at: string
-  customer_name?: string | null
-  customer_email?: string | null
-  shipping_address: unknown
-  order_number?: string | null
-  payment_data?: unknown
-  conversation_id?: string | null
-  carrier?: string | null
-  tracking_number?: string | null
-  tracking_url?: string | null
-  shipped_at?: string | null
-  delivered_at?: string | null
-  venthub_order_items?: VenthubOrderItemRow[]
-}
-
 type StatusFilter = 'all' | 'pending' | 'paid' | 'shipped' | 'delivered' | 'failed'
-
 export const OrdersPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()

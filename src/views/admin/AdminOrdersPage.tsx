@@ -18,9 +18,8 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
-import { X, Truck, Filter, Download, MoreVertical, Eye, AlertCircle, Trash2, Pencil, LayoutList, KanbanSquare, ShoppingCart } from 'lucide-react'
+import { X, Truck, LayoutList, KanbanSquare, ShoppingCart } from 'lucide-react'
 import AdminOrdersBoard from './AdminOrdersBoard'
-import { updateOrderStatus } from '../../lib/orderStatusService'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
@@ -43,7 +42,7 @@ type SortKey = 'id' | 'status' | 'conversation' | 'amount' | 'created'
 
 const AdminOrdersPage: React.FC = () => {
   const { t, lang } = useI18n()
-  const { canWrite, isReadOnly } = useRole()
+  const { canWrite } = useRole()
   const hasWriteAccess = canWrite('orders')
 
   const STATUSES: { value: string; label: string }[] = React.useMemo(() => ([
@@ -59,7 +58,6 @@ const AdminOrdersPage: React.FC = () => {
   const [viewMode, setViewMode] = React.useState<'list' | 'board'>('list')
   const [rows, setRows] = React.useState<AdminOrderRow[]>([])
   const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
   const [sortKey, setSortKey] = React.useState<SortKey>('created')
   const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('desc')
 
@@ -77,7 +75,6 @@ const AdminOrdersPage: React.FC = () => {
   const [carrier, setCarrier] = React.useState('')
   const [tracking, setTracking] = React.useState('')
   const [sendEmail, setSendEmail] = React.useState(true)
-  const [saving, setSaving] = React.useState(false)
   const [bulkMode, setBulkMode] = React.useState(false)
   const [selectedIds, setSelectedIds] = React.useState<string[]>([])
   const [advBulk, setAdvBulk] = React.useState(false)
@@ -85,13 +82,11 @@ const AdminOrdersPage: React.FC = () => {
 
   const [logsOpen, setLogsOpen] = React.useState(false)
   const [logsLoading, setLogsLoading] = React.useState(false)
-  const [logsOrderId, setLogsOrderId] = React.useState<string>('')
   interface EmailLog { subject: string; email_to: string; provider_message_id: string | null; created_at: string; carrier: string | null; tracking_number: string | null }
   const [emailLogs, setEmailLogs] = React.useState<EmailLog[]>([])
 
   interface OrderNote { id: string; note: string; created_at: string; user_id: string | null }
   const [notesOpen, setNotesOpen] = React.useState(false)
-  const [notesLoading, setNotesLoading] = React.useState(false)
   const [notesOrderId, setNotesOrderId] = React.useState<string>('')
   const [noteInput, setNoteInput] = React.useState('')
   const [notes, setNotes] = React.useState<OrderNote[]>([])
@@ -143,33 +138,8 @@ const AdminOrdersPage: React.FC = () => {
     }
   }, [searchParams])
 
-  const changeTargetStatus = React.useCallback(async (id: string, newStats: string) => {
-    if (!hasWriteAccess) {
-      toast.error('Bu işlem için yetkiniz bulunmuyor.')
-      return
-    }
-    const o = rows.find(x => x.id === id)
-    setError(null)
-    try {
-      // Merkezi servis: hem sipariş statüsünü günceller hem returns'e yansıtır hem audit log yazar
-      const res = await updateOrderStatus({
-        orderId: id,
-        newStatus: newStats,
-        oldStatus: o?.status,
-        reason: 'Sipariş Tablo Üzerinden Güncellendi',
-        auditComment: `table status update to ${newStats}`,
-      })
-      if (!res.ok) throw new Error(res.error)
-      setRows(prev => prev.map(r => r.id === id ? { ...r, status: newStats } : r))
-      toast.success(t('admin.orders.toasts.statusUpdateSuccess'))
-    } catch (e) {
-      toast.error(t('admin.orders.toasts.statusUpdateFailed'))
-    }
-  }, [hasWriteAccess, rows, t])
-
   const fetchOrders = React.useCallback(async () => {
     setLoading(true)
-    setError(null)
     try {
       // Proaktif oturum kontrolü: Token süresi dolmuşsa yenilemeyi deni
       await ensureSessionFresh()
@@ -201,8 +171,8 @@ const AdminOrdersPage: React.FC = () => {
 
       setRows(Array.isArray(data) ? (data as AdminOrderRow[]) : [])
       setTotal(count || 0)
-    } catch (e) {
-      setError((e as Error).message || t('admin.orders.toasts.loadError'))
+    } catch {
+      toast.error(t('admin.orders.toasts.loadError'))
     } finally {
       setLoading(false)
     }
@@ -243,7 +213,6 @@ const AdminOrdersPage: React.FC = () => {
   }, [shipOpen, bulkMode, selectedIds])
 
   async function openLogsModal(id: string) {
-    setLogsOrderId(id)
     setLogsOpen(true)
     setLogsLoading(true)
     try {
@@ -255,7 +224,7 @@ const AdminOrdersPage: React.FC = () => {
         .limit(20)
       if (error) throw error
       setEmailLogs(Array.isArray(data) ? (data as EmailLog[]) : [])
-    } catch (e) {
+    } catch {
       toast.error(t('admin.orders.toasts.emailLogsFailed'))
       setEmailLogs([])
     } finally {
@@ -267,7 +236,6 @@ const AdminOrdersPage: React.FC = () => {
   async function openNotesModal(id: string) {
     setNotesOrderId(id)
     setNotesOpen(true)
-    setNotesLoading(true)
     try {
       const { data, error } = await supabase
         .from('order_notes')
@@ -277,11 +245,9 @@ const AdminOrdersPage: React.FC = () => {
         .limit(50)
       if (error) throw error
       setNotes(Array.isArray(data) ? (data as OrderNote[]) : [])
-    } catch (e) {
+    } catch {
       toast.error(t('admin.orders.toasts.notesFailed'))
       setNotes([])
-    } finally {
-      setNotesLoading(false)
     }
   }
   const closeNotesModal = () => setNotesOpen(false)
@@ -289,7 +255,6 @@ const AdminOrdersPage: React.FC = () => {
   async function addNote() {
     if (!notesOrderId || !noteInput.trim()) return
     try {
-      setNotesLoading(true)
       const { data, error } = await supabase
         .from('order_notes')
         .insert({ order_id: notesOrderId, note: noteInput.trim() })
@@ -298,17 +263,14 @@ const AdminOrdersPage: React.FC = () => {
       if (error) throw error
       setNotes(prev => [data as OrderNote, ...prev])
       setNoteInput('')
-    } catch (e) {
+    } catch {
       toast.error(t('admin.orders.toasts.noteAddFailed'))
-    } finally {
-      setNotesLoading(false)
     }
   }
 
   async function deleteNote(noteId: string) {
     if (!noteId) return
     try {
-      setNotesLoading(true)
       const { error } = await supabase
         .from('order_notes')
         .delete()
@@ -316,35 +278,8 @@ const AdminOrdersPage: React.FC = () => {
       if (error) throw error
       setNotes(prev => prev.filter(n => n.id !== noteId))
       toast.success(t('admin.orders.toasts.noteDeleteSuccess'))
-    } catch (e) {
+    } catch {
       toast.error(t('admin.orders.toasts.noteDeleteFailed'))
-    } finally {
-      setNotesLoading(false)
-    }
-  }
-
-  async function cancelShipping(id: string) {
-    if (!id) return
-    const ok = window.confirm(t('admin.orders.toasts.shippingCancelConfirm'))
-    if (!ok) return
-    try {
-      setSaving(true)
-      const curRow = rows.find(r => r.id === id)
-      // Merkezi servis: hem sipariş statüsünü günceller hem returns'e yansıtır hem audit log yazar
-      const res = await updateOrderStatus({
-        orderId: id,
-        newStatus: 'cancelled',
-        oldStatus: curRow?.status,
-        reason: 'Sipariş Tablo Üzerinden İptal Edildi',
-        auditComment: 'table cancel shipping',
-      })
-      if (!res.ok) throw new Error(res.error)
-      setRows(prev => prev.map(r => r.id === id ? { ...r, status: 'cancelled' } : r))
-      toast.success(t('admin.orders.toasts.shippingCancelSuccess'))
-    } catch (e) {
-      toast.error(t('admin.orders.toasts.shippingCancelFailed'))
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -357,7 +292,6 @@ const AdminOrdersPage: React.FC = () => {
         alert(t('admin.orders.toasts.missingFields'))
         return
       }
-      setSaving(true)
       try {
         const turl = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
         const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', {
@@ -381,17 +315,14 @@ const AdminOrdersPage: React.FC = () => {
         setRows(prev => prev.map(r => r.id === shipId ? { ...r, status: isShipped ? r.status : 'shipped' } : r))
         setShipOpen(false)
         toast.success(isShipped ? t('admin.orders.toasts.shippingUpdateSuccess') : t('admin.orders.toasts.shippingCreateSuccess'))
-      } catch (e) {
+      } catch {
         toast.error(t('admin.orders.toasts.shippingUpdateFailed'))
-      } finally {
-        setSaving(false)
       }
       return
     }
 
     const targets = rows.filter(r => selectedIds.includes(r.id) && r.status !== 'shipped').map(r => r.id)
     if (targets.length === 0) { setShipOpen(false); return }
-    setSaving(true)
     try {
       if (!advBulk) {
         const turl = carrier && tracking ? generateTrackingUrl(carrier, tracking) : null
@@ -415,7 +346,6 @@ const AdminOrdersPage: React.FC = () => {
         })
         if (invalid.length > 0) {
           alert(t('admin.orders.toasts.missingAdvancedFields', { count: String(invalid.length) }))
-          setSaving(false)
           return
         }
         const results = await Promise.all(targets.map(async (id) => {
@@ -433,10 +363,8 @@ const AdminOrdersPage: React.FC = () => {
         setSelectedIds([])
         setBulkMode(false)
       }
-    } catch (e) {
+    } catch {
       toast.error(t('admin.orders.bulk.shippingFailed'))
-    } finally {
-      setSaving(false)
     }
   }
 
@@ -470,7 +398,6 @@ const AdminOrdersPage: React.FC = () => {
     const targets = rows.filter(r => selectedIds.includes(r.id) && r.status === 'shipped').map(r => r.id)
     if (targets.length === 0) return
     if (!window.confirm(t('admin.orders.bulk.confirmCancelShipping', { count: String(targets.length) }))) return
-    setSaving(true)
     try {
       const results = await Promise.all(targets.map(async (id) => {
         const { error: fnErr } = await supabase.functions.invoke('admin-update-shipping', { body: { order_id: id, cancel: true, send_email: false } })
@@ -479,8 +406,8 @@ const AdminOrdersPage: React.FC = () => {
       const failed = results.filter(r => !r.ok).map(r => r.id)
       setRows(prev => prev.map(r => targets.includes(r.id) ? { ...r, status: failed.includes(r.id) ? r.status : 'confirmed' } : r))
       setSelectedIds([])
-    } finally {
-      setSaving(false)
+    } catch {
+      // no-op
     }
   }
 

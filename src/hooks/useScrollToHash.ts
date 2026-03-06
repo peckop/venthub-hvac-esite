@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
 
 /**
  * Custom hook to automatically scroll to element based on URL hash
