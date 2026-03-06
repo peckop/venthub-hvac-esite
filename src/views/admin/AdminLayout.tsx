@@ -146,7 +146,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       items: [
         { href: '/admin/users', label: t('admin.menu.users') || 'Kullanıcılar', icon: Users },
         { href: '/admin/webhook-events', label: t('admin.menu.webhookEvents') || 'Webhook Olayları', icon: Webhook },
-        { href: '/admin/logs', label: t('admin.menu.logs') || 'Kayıtlar', icon: FileText },
+        { href: '/admin/audit-logs', label: t('admin.menu.logs') || 'Kayıtlar', icon: FileText },
         { href: '/admin/errors', label: t('admin.menu.errors') || 'Hatalar', icon: AlertCircle },
         { href: '/admin/error-groups', label: t('admin.menu.errorGroups') || 'Hata Grupları', icon: FolderX },
       ]
