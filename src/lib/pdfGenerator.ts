@@ -242,14 +242,15 @@ export async function generateProductDatasheet(
     }
 
     // Sayfa numaraları ve footer'ları ekle
-    const totalPages = (doc as any).internal.getNumberOfPages();
+    const docAny = doc as unknown as { internal: { getNumberOfPages: () => number } };
+    const totalPages = docAny.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         drawFooter(i, totalPages);
     }
 
     // PDF Kaydet
-    const cleanName = product.name.replace(/[^a-zA-Z0-9-_\.]/g, '_').substring(0, 30);
+    const cleanName = product.name.replace(/[^a-zA-Z0-9-_.]/g, '_').substring(0, 30);
     doc.save(`${product.brand}_${cleanName}_Datasheet.pdf`);
 }
 
