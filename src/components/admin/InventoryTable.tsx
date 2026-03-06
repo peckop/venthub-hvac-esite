@@ -6,6 +6,7 @@ import AdminEmptyState from './AdminEmptyState'
 import AdminSkeleton from './AdminSkeleton'
 import { SearchX } from 'lucide-react'
 import { InventoryRow, SortKey, LoadState, Density, VisibleCols } from '../../types/inventory'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface InventoryTableProps {
     rows: InventoryRow[]
@@ -48,6 +49,7 @@ export default function InventoryTable({
     defaultThreshold,
     effectiveThreshold
 }: InventoryTableProps) {
+    const dragScrollRef = useDragScroll<HTMLDivElement>()
     const headPad = density === 'compact' ? 'px-2 py-2' : ''
     const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
@@ -141,7 +143,7 @@ export default function InventoryTable({
     )
 
     return (
-        <div className="overflow-x-auto">
+        <div ref={dragScrollRef} className="overflow-x-auto">
             <table className="w-full min-w-[1000px] border-separate border-spacing-0">
                 <thead className="bg-slate-50/80 sticky top-0 z-10 backdrop-blur-sm">
                     <tr>
