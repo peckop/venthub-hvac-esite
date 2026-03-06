@@ -42,6 +42,12 @@ export const tr = {
     backToTop: "Başa dön",
     gotoCategory: "Kategoriye git",
     cancel: "İptal",
+    close: "Kapat",
+    viewFullscreen: "Tam ekran görüntüle",
+    view3D: "3D görüntüle",
+    prev: "Önceki",
+    next: "Sonraki",
+    remove: "Kaldır",
   },
   search: {
     recentSearches: "Son Aramalar",

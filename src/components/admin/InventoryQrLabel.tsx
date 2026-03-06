@@ -1,26 +1,26 @@
 import toast from 'react-hot-toast'
 
 interface QrLabelProps {
-    product_id: string
-    name: string
-    warehouse_location?: string | null
-    physical_stock: number
+  product_id: string
+  name: string
+  warehouse_location?: string | null
+  physical_stock: number
 }
 
 export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) => void) => {
-    try {
-        setPrintingQr(true)
-        const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.product_id)}`
+  try {
+    setPrintingQr(true)
+    const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.product_id)}`
 
-        const iframe = document.createElement('iframe')
-        iframe.style.display = 'none'
-        document.body.appendChild(iframe)
+    const iframe = document.createElement('iframe')
+    iframe.style.display = 'none'
+    document.body.appendChild(iframe)
 
-        const safeName = (r.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        const safeSku = r.product_id.slice(0, 8).toUpperCase().replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        const safeLoc = (r.warehouse_location || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const safeName = (r.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const safeSku = r.product_id.slice(0, 8).toUpperCase().replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const safeLoc = (r.warehouse_location || '-').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-        const htmlContent = `
+    const htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -134,7 +134,7 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
         <div class="card-wrapper">
           <div class="card">
             <div class="qr-wrapper">
-              <img src="${url}" class="qr" onload="window.print();" />
+              <img src="${url}" class="qr" onload="window.print();" alt="QR Code" />
             </div>
             <div class="title">${safeName}</div>
             <div class="separator"></div>
@@ -157,22 +157,22 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
       </html>
     `
 
-        const doc = iframe.contentWindow?.document
-        if (doc) {
-            doc.open()
-            doc.write(htmlContent)
-            doc.close()
-        }
-
-        setTimeout(() => {
-            if (iframe.parentNode) {
-                iframe.parentNode.removeChild(iframe)
-            }
-        }, 5000)
-
-    } catch {
-        toast.error('Etiket oluşturulamadı')
-    } finally {
-        setPrintingQr(false)
+    const doc = iframe.contentWindow?.document
+    if (doc) {
+      doc.open()
+      doc.write(htmlContent)
+      doc.close()
     }
+
+    setTimeout(() => {
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe)
+      }
+    }, 5000)
+
+  } catch {
+    toast.error('Etiket oluşturulamadı')
+  } finally {
+    setPrintingQr(false)
+  }
 }
