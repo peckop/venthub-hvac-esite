@@ -218,7 +218,7 @@ export default function OrderDetailPage() {
         let prod: Product | undefined
         if (it.product_id) prod = productMap[it.product_id]
         if (!prod) prod = productMap[it.product_name]
-        if (prod) { addToCart({ ...prod, price: String(prod.price) }, it.quantity); added += it.quantity }
+        if (prod) { addToCart(prod, it.quantity); added += it.quantity }
       }
       if (added > 0) { toast.success(t('orders.reorderedToast', { count: added })); router.push('/cart') } else { toast.error(t('orders.reorderNotFound')) }
     } catch (e) { console.error(e); toast.error(t('orders.reorderError')) }

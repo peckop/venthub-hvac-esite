@@ -184,7 +184,7 @@ const AdminInventoryPage: React.FC = () => {
       if (invRes.error) throw invRes.error
 
       const vMap = new Map((velRes.data || []).map((v: { product_id: string; daily_velocity: number | null; days_until_empty: number | null; abc_class: 'A' | 'B' | 'C' | null }) => [v.product_id, v]))
-      const invRows = (invRes.data || []).map((r: Row) => ({
+      const invRows = (invRes.data || []).map((r: any) => ({
         ...r,
         daily_velocity: vMap.get(r.product_id)?.daily_velocity,
         days_until_empty: vMap.get(r.product_id)?.days_until_empty,
