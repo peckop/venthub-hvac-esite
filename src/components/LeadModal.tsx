@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useI18n } from '../i18n/I18nProvider'
 import { Building2, X, CheckCircle2, ChevronRight, Mail, Phone, MapPin, Briefcase } from 'lucide-react'
 
 interface LeadModalProps {
@@ -20,7 +19,6 @@ const applicationAreas = [
 ]
 
 const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, productId: _productId }) => {
-  const { } = useI18n()
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
   const [email, setEmail] = useState('')
