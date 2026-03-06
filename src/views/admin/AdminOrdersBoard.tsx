@@ -7,7 +7,6 @@ import { updateOrderStatus } from '../../lib/orderStatusService'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
-import { adminSectionTitleClass } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
@@ -99,7 +98,6 @@ function OrderStepper({ status }: { status: string }) {
             {steps.map((step, idx) => {
                 const isPast = idx < currentIndex
                 const isCurrent = idx === currentIndex
-                const isFuture = idx > currentIndex
 
                 return (
                     <div key={step.key} className="flex flex-col items-center gap-1.5 z-10 w-1/5">
