@@ -112,8 +112,8 @@ export const OrdersPage: React.FC = () => {
         return
       }
 
-      const formattedOrders: Order[] = (ordersData || []).map((order: VenthubOrderRow) => {
-        const items: OrderItem[] = (order.venthub_order_items || []).map((it: VenthubOrderItemRow) => ({
+      const formattedOrders: Order[] = (ordersData || []).map((order: any) => {
+        const items: OrderItem[] = (order.venthub_order_items || []).map((it: any) => ({
           id: it.id,
           product_id: it.product_id ?? undefined,
           product_name: it.product_name,
