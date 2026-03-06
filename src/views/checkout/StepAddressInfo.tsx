@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react'
-import { MapPin, Lock } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { UserAddress, InvoiceProfile } from '../../lib/supabase'
+import { UserAddress } from '../../lib/supabase'
 
 interface Address {
     fullAddress: string
