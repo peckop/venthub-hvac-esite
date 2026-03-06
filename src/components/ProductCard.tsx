@@ -35,7 +35,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
   const router = useRouter()
   const isList = layout === 'list'
   const { addToCart } = useCart()
-  const price = parseFloat(product.price)
+  const price = parseFloat(product.price as any)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -153,7 +153,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
                   </svg>
                 </span>
               ) : (
-                formatCurrency(price, lang, { maximumFractionDigits: 0 })
+                (() => {
+                  const label = formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 });
+                  return label;
+                })()
               )}
             </div>
             {(() => {

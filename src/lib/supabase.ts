@@ -328,6 +328,8 @@ export interface UserAddress {
   is_default_billing: boolean
   created_at: string
   updated_at: string
+  // DB fields not in CreateAddressInput
+  street_address?: string | null // DB column for full_address
 }
 
 export interface CreateAddressInput {
@@ -362,9 +364,17 @@ export async function createAddress(payload: CreateAddressInput) {
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
+  const dbPayload = {
+    user_id: user.id,
+    street_address: payload.full_address,
+    address_line: payload.full_address, // Map both
+    address_type: payload.is_default_shipping ? 'shipping' : 'billing', // Mandatory in DB
+    ...payload
+  } as any
+
   const { data, error } = await supabase
     .from('user_addresses')
-    .insert({ user_id: user.id, street_address: payload.full_address, ...payload })
+    .insert(dbPayload)
     .select('*')
     .single()
 
@@ -373,7 +383,7 @@ export async function createAddress(payload: CreateAddressInput) {
   if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id)
   if (payload.is_default_billing) await setDefaultAddress('billing', data.id)
 
-  return data as UserAddress
+  return (data as unknown) as UserAddress
 }
 
 export async function updateAddress(id: string, payload: UpdateAddressInput) {
@@ -441,16 +451,19 @@ export type InvoiceProfileType = 'individual' | 'corporate'
 export interface InvoiceProfile {
   id: string
   user_id: string
-  type: InvoiceProfileType
+  type: string // Maps to profile_type in DB
   title?: string | null
-  tckn?: string | null
   company_name?: string | null
-  vkn?: string | null
+  tax_number?: string | null // Maps to tckn/vkn
   tax_office?: string | null
-  e_invoice?: boolean | null
   is_default: boolean
   created_at: string
   updated_at: string
+  // DB fields not in CreateInvoiceProfileInput
+  profile_type?: string | null // DB column for type
+  tckn?: string | null // DB column for tax_number (individual)
+  vkn?: string | null // DB column for tax_number (corporate)
+  e_invoice?: boolean | null
 }
 
 export interface CreateInvoiceProfileInput {
@@ -481,7 +494,7 @@ export async function listInvoiceProfiles() {
     }
     throw error
   }
-  return data as InvoiceProfile[]
+  return (data as unknown) as InvoiceProfile[]
 }
 
 export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
@@ -490,29 +503,65 @@ export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
+  const dbPayload: Record<string, unknown> = {
+    user_id: user.id,
+    profile_type: payload.type, // Map 'type' to 'profile_type'
+    title: payload.title,
+    company_name: payload.company_name,
+    tax_office: payload.tax_office,
+    e_invoice: payload.e_invoice,
+    is_default: payload.is_default,
+  };
+
+  if (payload.type === 'individual') {
+    dbPayload.tckn = payload.tckn;
+  } else if (payload.type === 'corporate') {
+    dbPayload.vkn = payload.vkn;
+  }
+
   const { data, error } = await supabase
-    .from('invoice_profiles')
-    .insert({ user_id: user.id, ...payload })
+    .from('user_invoice_profiles')
+    .insert(dbPayload as any)
     .select('*')
     .single()
   if (error) throw error
-  return (data as any) as InvoiceProfile
+  return (data as unknown) as InvoiceProfile
 }
 
 export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
+  const dbPayload: Record<string, unknown> = {};
+  if (payload.type !== undefined) dbPayload.profile_type = payload.type;
+  if (payload.title !== undefined) dbPayload.title = payload.title;
+  if (payload.company_name !== undefined) dbPayload.company_name = payload.company_name;
+  if (payload.tax_office !== undefined) dbPayload.tax_office = payload.tax_office;
+  if (payload.e_invoice !== undefined) dbPayload.e_invoice = payload.e_invoice;
+  if (payload.is_default !== undefined) dbPayload.is_default = payload.is_default;
+
+  if (payload.type === 'individual') {
+    dbPayload.tckn = payload.tckn;
+    dbPayload.vkn = null; // Clear VKN if changing to individual
+  } else if (payload.type === 'corporate') {
+    dbPayload.vkn = payload.vkn;
+    dbPayload.tckn = null; // Clear TCKN if changing to corporate
+  } else {
+    // If type is not specified in update, handle tckn/vkn directly if present
+    if (payload.tckn !== undefined) dbPayload.tckn = payload.tckn;
+    if (payload.vkn !== undefined) dbPayload.vkn = payload.vkn;
+  }
+
   const { data, error } = await supabase
-    .from('invoice_profiles')
-    .update(payload)
+    .from('user_invoice_profiles')
+    .update(dbPayload as any)
     .eq('id', id)
     .select('*')
     .single()
   if (error) throw error
-  return (data as any) as InvoiceProfile
+  return (data as unknown) as InvoiceProfile
 }
 
 export async function deleteInvoiceProfile(id: string) {
   const { error } = await supabase
-    .from('invoice_profiles')
+    .from('user_invoice_profiles')
     .delete()
     .eq('id', id)
   if (error) throw error
@@ -520,6 +569,19 @@ export async function deleteInvoiceProfile(id: string) {
 }
 
 export async function setDefaultInvoiceProfile(id: string) {
+  const { data: authData, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
+  // Clear other defaults for this user
+  const clear = await supabase
+    .from('user_invoice_profiles')
+    .update({ is_default: false })
+    .eq('user_id', user.id)
+    .eq('is_default', true)
+  if (clear.error) throw clear.error
+
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .update({ is_default: true })
@@ -531,9 +593,15 @@ export async function setDefaultInvoiceProfile(id: string) {
 }
 
 export async function fetchDefaultInvoiceProfile() {
+  const { data: authData, error: userError } = await supabase.auth.getUser()
+  if (userError) throw userError
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
+    .eq('user_id', user.id) // Filter by user_id
     .eq('is_default', true)
     .order('updated_at', { ascending: false })
     .limit(1)
@@ -544,7 +612,7 @@ export async function fetchDefaultInvoiceProfile() {
     }
     throw error
   }
-  const row = Array.isArray(data) && data.length > 0 ? (data[0] as InvoiceProfile) : null
+  const row = Array.isArray(data) && data.length > 0 ? ((data[0] as unknown) as InvoiceProfile) : null
   return row
 }
 
