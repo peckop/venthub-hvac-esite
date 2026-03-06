@@ -3,14 +3,12 @@ import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
-import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
 
 enum LoadState { Idle, Loading, Error }
 
 const AdminInventorySettingsPage: React.FC = () => {
   const pathname = usePathname()
-  const { user } = useAuth()
   const [defaultThreshold, setDefaultThreshold] = React.useState<number | ''>('')
   const [resetAll, setResetAll] = React.useState<boolean>(false)
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)

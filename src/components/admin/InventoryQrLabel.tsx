@@ -170,7 +170,7 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
             }
         }, 5000)
 
-    } catch (e) {
+    } catch {
         toast.error('Etiket oluşturulamadı')
     } finally {
         setPrintingQr(false)

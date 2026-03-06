@@ -1,7 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/navigation'
 import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
-import { formatCurrency } from '../i18n/format'
 
 interface SearchOverlayProps {
   open: boolean

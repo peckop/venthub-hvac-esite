@@ -26,7 +26,6 @@ interface CategoryPreviewPanelProps {
  */
 const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, isOpen, onClose }) => {
   const router = useRouter()
-    const navigate = useRouter()
 
     const handleNavigate = () => {
         if (category) {
