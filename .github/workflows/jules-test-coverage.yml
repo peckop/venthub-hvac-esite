@@ -1,0 +1,27 @@
+name: Jules - Test Coverage
+
+on:
+  schedule:
+    - cron: '0 3 * * 3' # Every Wednesday at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          prompt: |
+            You are a QA automation agent.
+            Identify 3 React components or hooks in `src/` that lack unit tests.
+            Write Vitest tests for them.
+            Ensure tests pass with `pnpm test -- --run`.
+            Create a PR with your new tests.
