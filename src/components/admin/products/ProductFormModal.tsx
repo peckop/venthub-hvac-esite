@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Upload, Trash2, Plus, Save, Loader2 } from 'lucide-react'
-import { supabase, Product } from '../../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 
@@ -52,7 +52,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
     // Technical Specs State (Key-Value pairs for UI)
     const [specs, setSpecs] = useState<{ key: string; value: string }[]>([])
-    const [initialData, setInitialData] = useState<Product | null>(null)
+    const [initialData, setInitialData] = useState<ProductFormValues | null>(null)
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
@@ -69,7 +69,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             // Fetch product
             const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(product as any)
+            setInitialData(product)
 
             // Fetch images
             const { data: imgs, error: imgError } = await supabase
@@ -87,17 +87,17 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                 brand: product.brand || '',
                 model_code: product.model_code || '',
                 category_id: product.category_id || '',
-                status: (product.status as any) || 'active',
-                price: product.price ?? 0,
+                status: product.status || 'active',
+                price: product.price,
                 purchase_price: product.purchase_price,
                 stock_qty: product.stock_qty,
                 low_stock_threshold: product.low_stock_threshold,
                 description: product.description,
-                slug: product.slug || undefined,
-                meta_title: product.meta_title || '',
-                meta_description: product.meta_description || '',
-                is_featured: product.is_featured ?? false,
-                technical_specs: (product.technical_specs as any) || {}
+                slug: product.slug,
+                meta_title: product.meta_title,
+                meta_description: product.meta_description,
+                is_featured: product.is_featured,
+                technical_specs: product.technical_specs || {}
             })
 
             // Set Images
@@ -179,7 +179,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
             // 2. Insert/Update Product
             if (currentProductId) {
-                const { error } = await supabase.from('products').update(data as any).eq('id', currentProductId)
+                const { error } = await supabase.from('products').update(data).eq('id', currentProductId)
                 if (error) throw error
 
                 // Audit Log
@@ -188,13 +188,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     table_name: 'products',
                     row_pk: currentProductId,
                     action: 'UPDATE',
-                    before: initialData as any,
-                    after: data as any,
+                    before: initialData,
+                    after: data,
                     comment: 'Updated via Modal'
                 })
 
             } else {
-                const { data: newProd, error } = await supabase.from('products').insert(data as any).select('id').single()
+                const { data: newProd, error } = await supabase.from('products').insert(data).select('id').single()
                 if (error) throw error
                 currentProductId = newProd.id
 
@@ -205,7 +205,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     row_pk: currentProductId,
                     action: 'INSERT',
                     before: null,
-                    after: data as any,
+                    after: data,
                     comment: 'Created via Modal'
                 })
             }

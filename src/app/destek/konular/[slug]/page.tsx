@@ -1,14 +1,27 @@
 import PageComponent from '../../../../views/knowledge/TopicPage'
-import { tr } from '../../../../i18n/dictionaries/tr'
+import { supabase } from '../../../../lib/supabase'
 
 export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const topics = Object.keys(tr.knowledge.topics)
+  try {
+    const { data: topics } = await supabase
+      .from('venthub_support_topics')
+      .select('slug')
 
-  return topics.map((slug) => ({
-    slug,
-  }))
+    const slugs = (topics || []).map((t) => ({
+      slug: t.slug,
+    }))
+
+    // Build anında boş dönmesi durumunda en azından bir rota sağla (Next.js kısıtlaması için)
+    if (slugs.length === 0) {
+      return [{ slug: 'genel-bakis' }]
+    }
+    return slugs
+  } catch (e) {
+    console.error('generateStaticParams error:', e)
+    return [{ slug: 'genel-bakis' }]
+  }
 }
 
 export default function Page() {

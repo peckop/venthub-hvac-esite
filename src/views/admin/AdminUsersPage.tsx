@@ -18,9 +18,11 @@ import { useRole } from '../../hooks/useRole'
 interface AdminUser {
   id: string
   email: string
-  full_name?: string | null
-  phone?: string | null
+  full_name?: string
+  phone?: string
   role: string
+  company_name?: string
+  vkn?: string
   created_at: string
   updated_at: string
 }
@@ -28,7 +30,9 @@ interface AdminUser {
 interface AllUser {
   id: string
   email: string
-  full_name?: string | null
+  full_name?: string
+  company_name?: string
+  vkn?: string
   created_at: string
   role?: string
 }
@@ -73,11 +77,13 @@ export default function AdminUsersPage() {
         // Admin user profillerini manuel join ile genişlet (şirket adı vb. için)
         const { data: profiles } = await supabase
           .from('user_profiles')
-          .select('id, full_name')
+          .select('id, full_name, company_name, vkn')
           .in('id', data.map(u => u.id))
 
         const enrichedAdmins = data.map(u => ({
           ...u,
+          company_name: profiles?.find(p => p.id === u.id)?.company_name,
+          vkn: profiles?.find(p => p.id === u.id)?.vkn,
           full_name: profiles?.find(p => p.id === u.id)?.full_name || u.full_name
         }))
 
@@ -106,7 +112,7 @@ export default function AdminUsersPage() {
         // user_profiles tablosundan tüm kullanıcıları getir
         const { data: profiles, error: profileError } = await supabase
           .from('user_profiles')
-          .select('id, role, created_at, full_name')
+          .select('id, role, created_at, full_name, company_name, vkn, email')
 
         if (profileError) throw profileError
 
@@ -171,12 +177,16 @@ export default function AdminUsersPage() {
 
   const filteredAdminUsers = adminUsers.filter(user =>
     user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.vkn?.includes(searchQuery)
   )
 
   const filteredAllUsers = allUsers.filter(user =>
     user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.vkn?.includes(searchQuery)
   )
 
   const getRoleIcon = (roleCode: string) => {
@@ -201,7 +211,7 @@ export default function AdminUsersPage() {
 
   // Görünür kolonlar ve yoğunluk
   const STORAGE_KEY = 'toolbar:users'
-  const [visibleCols, setVisibleCols] = useState<{ user: boolean; role: boolean; created: boolean; actions: boolean }>({ user: true, role: true, created: true, actions: true })
+  const [visibleCols, setVisibleCols] = useState<{ user: boolean; company: boolean; role: boolean; created: boolean; actions: boolean }>({ user: true, company: true, role: true, created: true, actions: true })
   const [density, setDensity] = useState<Density>('comfortable')
 
   useEffect(() => {
@@ -294,6 +304,7 @@ export default function AdminUsersPage() {
           <ColumnsMenu
             columns={[
               { key: 'user', label: _t('admin.users.table.user') || 'Kullanıcı', checked: visibleCols.user, onChange: (v) => setVisibleCols(s => ({ ...s, user: v })) },
+              { key: 'company', label: _t('admin.users.table.company') || 'Şirket/B2B', checked: visibleCols.company, onChange: (v) => setVisibleCols(s => ({ ...s, company: v })) },
               { key: 'role', label: _t('admin.users.table.role') || 'Rol', checked: visibleCols.role, onChange: (v) => setVisibleCols(s => ({ ...s, role: v })) },
               { key: 'created', label: _t('admin.users.table.created') || 'Kayıt', checked: visibleCols.created, onChange: (v) => setVisibleCols(s => ({ ...s, created: v })) },
               { key: 'actions', label: _t('admin.users.table.actions') || 'Aksiyonlar', checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }
@@ -311,6 +322,7 @@ export default function AdminUsersPage() {
               <thead className="bg-slate-50/50 border-b border-slate-200">
                 <tr>
                   {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user') || 'Kullanıcı'}</th>)}
+                  {visibleCols.company && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.company') || 'Şirket & B2B'}</th>)}
                   {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.role') || 'Rol'}</th>)}
                   {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.created') || 'Kayıt'}</th>)}
                   {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>{_t('admin.users.table.actions') || 'Aksiyonlar'}</th>}
@@ -342,6 +354,7 @@ export default function AdminUsersPage() {
               <thead className="bg-slate-50/50 border-b border-slate-200">
                 <tr>
                   {visibleCols.user && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.user') || 'Kullanıcı'}</th>)}
+                  {visibleCols.company && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.company') || 'Şirket & B2B'}</th>)}
                   {visibleCols.role && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.role') || 'Rol'}</th>)}
                   {visibleCols.created && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.users.table.created') || 'Kayıt'}</th>)}
                   {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>{_t('admin.users.table.actions') || 'Aksiyonlar'}</th>}
@@ -353,7 +366,7 @@ export default function AdminUsersPage() {
                     {visibleCols.user && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center gap-3">
-                          <UserAvatar name={userItem.full_name || undefined} email={userItem.email} />
+                          <UserAvatar name={userItem.full_name} email={userItem.email} />
                           <div className="flex flex-col min-w-0">
                             <span className="font-bold text-slate-900 truncate">{userItem.email || "—"}</span>
                             {userItem.full_name && (
@@ -364,7 +377,23 @@ export default function AdminUsersPage() {
                       </td>
                     )}
 
-
+                    {visibleCols.company && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        {userItem.company_name ? (
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-1.5 text-slate-700 font-semibold">
+                              <Building2 size={14} className="text-slate-400" />
+                              <span className="truncate max-w-[180px]">{userItem.company_name}</span>
+                            </div>
+                            {userItem.vkn && (
+                              <span className="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded w-fit mt-1 uppercase">VKN: {userItem.vkn}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-300 italic text-xs">—</span>
+                        )}
+                      </td>
+                    )}
 
                     {visibleCols.role && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>

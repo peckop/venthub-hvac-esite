@@ -22,7 +22,7 @@ export async function generateStaticParams() {
     const paths = allCategories
       .filter(c => c.parent_id && categoryMap.has(c.parent_id))
       .map((c) => ({
-        categorySlug: categoryMap.get(c.parent_id!) || 'generic',
+        categorySlug: categoryMap.get(c.parent_id),
         subCategorySlug: c.slug,
       }))
 
