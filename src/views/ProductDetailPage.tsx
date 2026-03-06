@@ -907,7 +907,7 @@ export const ProductDetailPage: React.FC = () => {
             <div className="hidden lg:flex items-center space-x-4 pl-4 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex flex-col items-end">
                 <span className="text-sm font-semibold text-industrial-gray line-clamp-1 max-w-[200px]">{product.name}</span>
-                <span className="text-xs text-primary-navy font-bold">{formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}</span>
+                <span className="text-xs text-primary-navy font-bold">{formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}</span>
               </div>
               <button
                 onClick={handleAddToCart}
@@ -957,7 +957,7 @@ export const ProductDetailPage: React.FC = () => {
             offers: {
               '@type': 'Offer',
               priceCurrency: 'TRY',
-              price: parseFloat(product.price || '0') || 0,
+              price: product.price || 0,
               availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
               url: canonicalUrl,
             },
@@ -1050,7 +1050,7 @@ export const ProductDetailPage: React.FC = () => {
                           <div className="flex justify-between py-2">
                             <span className="text-steel-gray">{t('pdp.labels.price')}</span>
                             <span className="font-bold text-primary-navy">
-                              {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                              {formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                             </span>
                           </div>
                         </div>
@@ -1075,7 +1075,7 @@ export const ProductDetailPage: React.FC = () => {
                                 {t('pdp.variantDetails')}
                               </p>
                               <div className="text-primary-navy font-semibold">
-                                {formatCurrency((parseFloat(product.price) + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}
+                                {formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}
                               </div>
                             </div>
                           ))}

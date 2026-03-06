@@ -125,7 +125,7 @@ export default function AccountReturnsPage() {
       }
       const payload = {
         order_id: form.order_id,
-        user_id: user?.id,
+        user_id: user?.id || '',
         reason: form.reason,
         description: form.description || null
       }
@@ -232,8 +232,8 @@ export default function AccountReturnsPage() {
                 key={opt.value}
                 onClick={() => setStatusFilter(opt.value)}
                 className={`h-8 px-3.5 rounded-lg text-xs font-bold transition-all border ${statusFilter === opt.value
-                    ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
+                  ? 'bg-primary-navy text-white border-primary-navy shadow-sm shadow-primary-navy/20'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-primary-navy hover:text-primary-navy'
                   }`}
               >
                 {opt.label}

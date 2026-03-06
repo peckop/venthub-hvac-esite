@@ -214,9 +214,9 @@ export const CategoryPage: React.FC = () => {
     .sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
-          return parseFloat(a.price) - parseFloat(b.price)
+          return Number(a.price) - Number(b.price)
         case 'price-high':
-          return parseFloat(b.price) - parseFloat(a.price)
+          return Number(b.price) - Number(a.price)
         case 'name':
         default:
           return a.name.localeCompare(b.name)
@@ -314,8 +314,8 @@ export const CategoryPage: React.FC = () => {
       <>
         <Seo
           title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-          description={category.seo_desc || category.description}
-          canonical={canonicalUrl}
+          description={category.seo_desc || category.description || undefined}
+          canonical={(canonicalUrl || undefined) as string | undefined}
           image={categoryImageUrl || undefined}
         />
         <CategoryShowcase category={enrichedCategory} subCategories={subCategories} parentCategory={parentCategory} />
@@ -329,8 +329,8 @@ export const CategoryPage: React.FC = () => {
       <>
         <Seo
           title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-          description={category.seo_desc || category.description}
-          canonical={canonicalUrl}
+          description={category.seo_desc || category.description || undefined}
+          canonical={(canonicalUrl || undefined) as string | undefined}
           image={categoryImageUrl || undefined}
         />
         <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} parentCategory={parentCategory} />
@@ -342,8 +342,8 @@ export const CategoryPage: React.FC = () => {
     <div className="min-h-screen bg-light-gray">
       <Seo
         title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-        description={category.seo_desc || category.description}
-        canonical={canonicalUrl}
+        description={category.seo_desc || category.description || undefined}
+        canonical={(canonicalUrl || undefined) as string | undefined}
         noindex={false}
         image={categoryImageUrl || undefined} // Use category image for OG image if allowed by Seo component types
       />

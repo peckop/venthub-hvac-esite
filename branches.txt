@@ -1,12 +1,12 @@
-﻿origin/jules-4879508831171477288-ff5982a1 | 13 minutes ago | fix: remove output export and vercel.json for standard nextjs deployment on vercel
-origin/wip-jules-2026-03-05T09-22-01-068Z | 20 hours ago | fix(db): drop supabase auto-merged policies to resolve duplicate permissive performance warnings
-origin/wip-jules-2026-03-05T09-16-18-076Z | 24 hours ago | WIP: Auto-save for Jules Handover [2026-03-05T09:16:18.076Z]
-origin/wip-jules-2026-03-05T09-07-33-139Z | 24 hours ago | WIP: Auto-save for Jules Handover [2026-03-05T09:07:33.139Z]
-origin | 26 hours ago | feat(admin): standardize loading and empty states across all admin pages
-origin/master | 26 hours ago | feat(admin): standardize loading and empty states across all admin pages
-origin/backup-before-reset-a725973 | 5 months ago | fix(hero-bg): arka plan─▒ her cihazda daima render et; mobilde g├Âr├╝nmeme sorununu gider
-origin/feat/search-ui | 6 months ago | chore(lint): remove unnecessary escapes in CSV parsing and quoting
-origin/feat/dashboard-analytics | 6 months ago | feat(admin): Dashboard geni┼şletme ÔÇö bekleyen kargo ya┼ş k─▒r─▒l─▒m─▒ + iadeler haftal─▒k trend
-origin/feat/fts-search | 6 months ago | feat(search): FTS (Turkish) + pg_trgm indexler ve fts_search_products RPC\n\n- pg_trgm eklentisi\n- name/model_code/sku/brand ├╝zerinde GIN trgm\n- birle┼şik Turkish tsvector GIN\n- fts_search_products RPC (SECURITY INVOKER)
-origin/feat/hero-css-bg-lcp | 6 months ago | chore: satisfy eslint (no-console/no-unused-vars) in generate-meta.mjs
-origin/chore/homepage-cleanup-brandflow-docs | 6 months ago | chore(homepage): remove BrandFlow; integrate brand flow into BrandsShowcase (single-line gapless full-bleed); reorder sections; move Trust to Products Discover; i18n TR placeholders; hook LeadModal on Products; footer selection contrast; update docs
+﻿  backup-before-reset-a725973
+  chore/homepage-cleanup-brandflow-docs
+  feat/advanced-fts-search
+  feat/dashboard-analytics
+  feat/fts-search
+  feat/hero-css-bg-lcp
+  feat/search-ui
+* master
+  revert-scrollbars
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/feat/advanced-fts-search
+  remotes/origin/master
