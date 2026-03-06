@@ -20,6 +20,7 @@ jobs:
         uses: google-labs-code/jules-action@v1.0.0
         with:
           jules_api_key: ${{ secrets.JULES_API_KEY }}
+          starting_branch: master
           prompt: |
             You are an i18n synchronization agent.
             Read `src/i18n/dictionaries/tr.ts` as the source of truth.
