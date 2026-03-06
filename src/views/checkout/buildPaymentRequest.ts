@@ -1,7 +1,7 @@
 export interface CartItemInput {
   id: string
   quantity: number
-  product: { id: string; name: string; price: string; image_url?: string | null }
+  product: { id: string; name: string; price: number; image_url?: string | null }
 }
 
 export interface CustomerInput { name: string; email: string; phone: string }
@@ -31,7 +31,7 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
   const cartItems = items.map(it => ({
     product_id: it.product.id,
     quantity: it.quantity,
-    price: parseFloat(it.product.price),
+    price: Number(it.product.price || 0),
     product_name: it.product.name,
     product_image_url: it.product.image_url || null,
   }))

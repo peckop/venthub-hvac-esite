@@ -43,16 +43,7 @@ export interface Category {
   is_active?: boolean | null // Kategori aktif mi?
   created_at?: string
   updated_at?: string
-  metadata?: {
-    display_mode?: 'showcase' | 'series' | 'list'
-    showcase_images?: { desktop: string; mobile: string }[]
-    features?: { icon: string; title: string; description: string }[]
-    technical_summary?: string
-    hero_title?: string
-    hero_description?: string
-    hide_price?: boolean
-    model_type?: string
-  } | null
+  metadata?: any | null
 }
 
 export interface Product {
@@ -67,7 +58,7 @@ export interface Product {
   status: string
   is_featured: boolean
   description?: string | null
-  technical_specs?: Record<string, any> | null
+  technical_specs?: any | null
   image_url?: string | null
   image_alt?: string | null
   slug?: string | null // URL-friendly ID for linking/SEO
@@ -248,12 +239,12 @@ export interface FtsProductResult {
   name: string
   sku: string
   brand: string | null
-  price: string
+  price: number
   rank: number | null
   is_fuzzy_match?: boolean
   // Extended fields for compatibility
-  status?: 'active' | 'inactive' | 'out_of_stock'
-  image_url?: string
+  status?: string
+  image_url?: string | null
   image_alt?: string | null
   is_featured?: boolean
   stock_qty?: number | null
@@ -589,7 +580,8 @@ export async function setDefaultInvoiceProfile(id: string) {
     .select('*')
     .single()
   if (error) throw error
-  return data as InvoiceProfile
+  const mapped = { ...data, type: (data as any).profile_type || (data as any).type }
+  return (mapped as unknown) as InvoiceProfile
 }
 
 export async function fetchDefaultInvoiceProfile() {
@@ -800,7 +792,7 @@ export async function getEffectiveUnitPrice(product: Product): Promise<number> {
 export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
   // Fallback: product.price numeric
   const fallback = (() => {
-    const v = parseFloat(product.price || '0')
+    const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
     return Number.isFinite(v) ? v : 0
   })()
 
@@ -878,9 +870,9 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
         .eq('is_active', true)
 
       if (pq.price_list_id === null) {
-        query = query.is('price_list_id', null as unknown as undefined)
+        query = query.is('price_list_id', null as any)
       } else {
-        query = query.eq('price_list_id', pq.price_list_id)
+        query = query.eq('price_list_id', pq.price_list_id as any)
       }
 
       const { data: rows, error: prErr } = await query

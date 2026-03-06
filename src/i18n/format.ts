@@ -1,4 +1,4 @@
-export function formatCurrency(value: string | number, lang: 'tr' | 'en', options: Intl.NumberFormatOptions = {}) {
+export function formatCurrency(value: string | number, lang: string, options: Intl.NumberFormatOptions = {}) {
   try {
     const v = typeof value === 'string' ? Number(value) : value
     if (isNaN(v)) return '0 ₺'

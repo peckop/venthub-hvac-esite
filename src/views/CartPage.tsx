@@ -83,11 +83,11 @@ export const CartPage: React.FC = () => {
                     </p>
                     <div className="flex items-center space-x-4">
                       <span className="text-lg font-bold text-primary-navy">
-                        {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)), lang, { maximumFractionDigits: 0 })}
+                        {formatCurrency(Number(item.unitPrice ?? item.product.price), lang, { maximumFractionDigits: 0 })}
                       </span>
                       {item.quantity > 1 && (
                         <span className="text-sm text-steel-gray">
-                          {t('cart.itemTotal')}: {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity, lang, { maximumFractionDigits: 0 })}
+                          {t('cart.itemTotal')}: {formatCurrency(Number(item.unitPrice ?? item.product.price) * item.quantity, lang, { maximumFractionDigits: 0 })}
                         </span>
                       )}
                     </div>
