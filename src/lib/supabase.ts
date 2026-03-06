@@ -491,28 +491,28 @@ export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
   if (!user) throw new Error('Not authenticated')
 
   const { data, error } = await supabase
-    .from('user_invoice_profiles')
+    .from('invoice_profiles')
     .insert({ user_id: user.id, ...payload })
     .select('*')
     .single()
   if (error) throw error
-  return data as InvoiceProfile
+  return (data as any) as InvoiceProfile
 }
 
 export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
   const { data, error } = await supabase
-    .from('user_invoice_profiles')
+    .from('invoice_profiles')
     .update(payload)
     .eq('id', id)
     .select('*')
     .single()
   if (error) throw error
-  return data as InvoiceProfile
+  return (data as any) as InvoiceProfile
 }
 
 export async function deleteInvoiceProfile(id: string) {
   const { error } = await supabase
-    .from('user_invoice_profiles')
+    .from('invoice_profiles')
     .delete()
     .eq('id', id)
   if (error) throw error

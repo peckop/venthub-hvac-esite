@@ -151,9 +151,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-industrial-gray">{label}</div>
-          {s.type === 'product' && (s.metadata as { price?: string | number }).price && (
-            <div className="text-xs text-primary-ocean font-medium mt-0.5">
-              {formatCurrency(Number((s.metadata as { price?: string | number }).price), 'tr')}
+          {s.type === 'product' && (s.metadata as any)?.sku && (
+            <div className="text-xs text-steel-gray mt-0.5">
+              {(s.metadata as any).brand && <span className="font-semibold">{(s.metadata as any).brand}</span>}
+              {(s.metadata as any).brand && (s.metadata as any).sku && <span> • </span>}
+              {(s.metadata as any).sku}
             </div>
           )}
         </div>
@@ -275,10 +277,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
                     <span>{r.sku}</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm font-bold text-industrial-gray">
-                    {r.price != null ? formatCurrency(Number(r.price) || 0, 'tr') : ''}
-                  </div>
+                <div className="text-xs font-medium text-primary-ocean opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
+                  Detay
+                  <svg className="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </div>
               </button>
             </li>
