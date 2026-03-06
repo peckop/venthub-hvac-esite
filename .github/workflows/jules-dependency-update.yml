@@ -1,0 +1,27 @@
+name: Jules - Dependency Update
+
+on:
+  schedule:
+    - cron: '0 3 * * 5' # Every Friday at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  deps-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          prompt: |
+            You are a dependency management agent.
+            Run `pnpm outdated`.
+            Update non-breaking dependencies (minor and patch versions only).
+            Run `pnpm install`, `pnpm run build:ci`, and `pnpm test -- --run` to verify the system works.
+            If everything is green, commit changes and open a PR outlining what was updated.
