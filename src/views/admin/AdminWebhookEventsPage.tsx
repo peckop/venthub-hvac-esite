@@ -8,7 +8,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { Webhook, RefreshCcw, MailX } from 'lucide-react'
+import { RefreshCcw, MailX } from 'lucide-react'
 import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface ReturnEventRow {

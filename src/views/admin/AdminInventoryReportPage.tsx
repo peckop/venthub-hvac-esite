@@ -6,16 +6,14 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
-import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, SearchX, Download, Calendar, ListFilter, History, PlusCircle, MinusCircle } from 'lucide-react'
+import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
+import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, Download, PlusCircle, MinusCircle } from 'lucide-react'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
 import { useDragScroll } from '../../hooks/useDragScroll'
-import { useI18n } from '../../i18n/I18nProvider'
 
 export default function AdminInventoryReportPage() {
-    const { lang } = useI18n()
     const pathname = usePathname()
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()

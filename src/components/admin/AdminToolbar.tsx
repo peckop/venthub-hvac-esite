@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { adminCardClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminButtonSecondaryClass } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
 import { SlidersHorizontal, ChevronDown } from 'lucide-react'
