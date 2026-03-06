@@ -456,32 +456,17 @@ const AdminProductsPage: React.FC = () => {
         )}
       </div>
 
-      {/* SIMPLE DIRECT SEARCH INPUT - NO ADMIN TOOLBAR COMPLEXITY */}
-      <div className={adminCardClass + " p-4"}>
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <input
-              type="text"
-              className="w-full border border-slate-200 rounded-lg px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
-              placeholder={t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara'}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-            />
-          </div>
-          {q && (
-            <button
-              onClick={() => setQ('')}
-              className={`${adminButtonSecondaryClass} h-11 !px-4 shadow-sm`}
-            >
-              Temizle
-            </button>
-          )}
-        </div>
-      </div>
+
 
       <AdminToolbar
         storageKey="toolbar:products"
         sticky
+        search={{
+          value: q,
+          onChange: setQ,
+          placeholder: t('admin.search.products') ?? 'ürün adı/SKU/marka/slug ara',
+          focusShortcut: '/'
+        }}
         select={selectConfig}
         chips={[
           { key: 'active', label: t('admin.products.statusLabels.active'), active: statusFilter.active, onToggle: () => setStatusFilter(s => ({ ...s, active: !s.active })) },
