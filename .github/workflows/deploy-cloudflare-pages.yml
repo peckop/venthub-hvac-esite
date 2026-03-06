@@ -1,0 +1,117 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required Cloudflare secrets
+        run: |
+          if [ -z "${{ secrets.CF_API_TOKEN }}" ] || [ -z "${{ secrets.CF_ACCOUNT_ID }}" ] || [ -z "${{ secrets.CF_PAGES_PROJECT_NAME }}" ]; then
+            echo "::error::Missing Cloudflare secrets. Please set CF_API_TOKEN, CF_ACCOUNT_ID, CF_PAGES_PROJECT_NAME."
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate _headers (no restrictive security headers)
+        run: |
+          HEADERS_FILE="public/_headers"
+          if grep -q "Content-Security-Policy" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains CSP which can block the site. Remove it!"
+            exit 1
+          fi
+          if grep -q "frame-ancestors" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains frame-ancestors which can block the site. Remove it!"
+            exit 1
+          fi
+          if grep -q "X-Frame-Options: DENY" "$HEADERS_FILE" 2>/dev/null; then
+            echo "::error::_headers contains X-Frame-Options: DENY which can block the site. Use SAMEORIGIN or remove it!"
+            exit 1
+          fi
+          echo "✅ _headers file is safe for deployment"
+
+      - name: Build
+        env:
+          NODE_ENV: "production"
+          VITE_COMMIT_SHA: "${{ github.sha }}"
+          VITE_BRANCH: "${{ github.ref_name }}"
+        run: |
+          rm -rf out
+          pnpm run build
+
+      - name: Ensure Cloudflare Pages project exists (idempotent)
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          set -e
+          # Try to create project; ignore error if it already exists
+          RESP=$(curl -s -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"name\":\"$CF_PAGES_PROJECT_NAME\",\"production_branch\":\"master\"}" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects" || true)
+          echo "Create project response: $RESP"
+
+      - name: Ensure production branch is set to master
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          set -e
+          echo "Setting production_branch=master for $CF_PAGES_PROJECT_NAME"
+          PATCH_RESP=$(curl -s -X PATCH \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"production_branch":"master"}' \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$CF_PAGES_PROJECT_NAME")
+          echo "Patch response: $PATCH_RESP"
+
+      - name: Show project info
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_PAGES_PROJECT_NAME: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/$CF_PAGES_PROJECT_NAME" | jq '{name: .result.name, production_branch: .result.production_branch}'
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: ${{ secrets.CF_PAGES_PROJECT_NAME }}
+          directory: out
+          branch: master
