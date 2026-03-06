@@ -46,6 +46,7 @@ export type AdminToolbarProps = {
   sticky?: boolean // if true, wraps in a sticky card like inventory page
   storageKey?: string // kalıcılık için benzersiz anahtar (ör. 'toolbar:orders')
   persist?: { search?: boolean; select?: boolean; chips?: boolean; toggles?: boolean }
+  className?: string
 }
 
 const defaultChipOn = 'bg-slate-100 text-primary-navy border-slate-200 font-bold shadow-sm'
@@ -62,10 +63,12 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   sticky,
   storageKey,
   persist,
+  className
 }) => {
   const { t } = useI18n()
   const hydratedRef = React.useRef(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Mobil filtre badge sayısı
   const activeFilterCount = [
@@ -74,7 +77,18 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     ...(chips || []).map(ch => ch.active ? 1 : 0 as number),
   ].reduce((a, b) => a + b, 0)
 
-  // NOTE: Removed inputRef and focus shortcut handler - they were causing cursor position issues
+  // shortcut: '/' to focus search
+  React.useEffect(() => {
+    if (!search) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [search])
 
   // Kalıcılık: yükleme
   React.useEffect(() => {
@@ -156,15 +170,16 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   const hasFilters = !!(select || (toggles && toggles.length > 0) || (chips && chips.length > 0) || rightExtra || onClear)
 
   return (
-    <div className={`${adminCardClass} p-4 ${sticky ? 'sticky top-4 z-10' : ''}`}>
-      <div className="rounded-xl bg-white border border-slate-100 p-2 md:p-3 shadow-sm">
+    <div className={`${sticky ? 'sticky top-4 z-40 mx-2 mb-6' : 'mb-6'} ${className || ''}`}>
+      <div className={`rounded-2xl border border-slate-200/60 shadow-xl ${sticky ? 'bg-white/80 backdrop-blur-xl' : 'bg-white'} p-3 md:p-4 transition-all duration-300`}>
         <div className="flex flex-col gap-3">
           {/* Mobil: Arama + Filtre Butonu (Yan yana) */}
           <div className="flex md:hidden items-center gap-2 w-full">
             {search && (
               <div className="flex-1 min-w-0 relative">
                 <input
-                  className="w-full border border-slate-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400 shadow-inner"
+                  ref={inputRef}
+                  className="w-full border border-slate-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy bg-slate-50/50 font-medium text-slate-900 transition-all placeholder:text-slate-400 shadow-inner"
                   placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                   value={search.value}
                   onChange={(e) => search.onChange(e.target.value)}
@@ -190,11 +205,15 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
           {search && (
             <div className="hidden md:block flex-1 min-w-0">
               <input
-                className="w-full border border-slate-200 rounded-lg px-4 h-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy bg-slate-50 font-medium text-slate-900 transition-all placeholder:text-slate-400"
+                ref={inputRef}
+                className="w-full border border-slate-200 rounded-xl px-5 h-12 text-sm focus:outline-none focus:ring-4 focus:ring-primary-navy/5 focus:border-primary-navy bg-slate-50/50 font-medium text-slate-900 transition-all placeholder:text-slate-400 group-hover:bg-white"
                 placeholder={search.placeholder || t('admin.toolbar.searchPlaceholder')}
                 value={search.value}
                 onChange={(e) => search.onChange(e.target.value)}
               />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-1.5 px-2 py-1 rounded bg-slate-200/50 border border-slate-300/50 text-[10px] font-black text-slate-500 uppercase tracking-tighter pointer-events-none">
+                <span className="text-[12px]">/</span> Focus
+              </div>
             </div>
           )}
 

@@ -16,6 +16,7 @@ import { useRole } from '../../hooks/useRole'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { Undo2 } from 'lucide-react'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface ReturnWithOrder {
   id: string
@@ -41,6 +42,7 @@ export default function AdminReturnsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const { t: _t, lang } = useI18n()
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   const [returns, setReturns] = useState<ReturnWithOrder[]>([])
   const [filteredReturns, setFilteredReturns] = useState<ReturnWithOrder[]>([])
@@ -468,7 +470,7 @@ export default function AdminReturnsPage() {
         />
       ) : (
         <div className={`${adminCardClass} overflow-hidden`}>
-          <div className="overflow-x-auto">
+          <div ref={dragScrollRef} className="overflow-x-auto">
             <table className="w-full min-w-[800px] text-sm">
               <thead className="bg-gray-50">
                 <tr>

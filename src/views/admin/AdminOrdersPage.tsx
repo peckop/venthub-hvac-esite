@@ -25,6 +25,7 @@ import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
 import { useRole } from '../../hooks/useRole'
 import { Lang } from '../../i18n/I18nContext'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface AdminOrderRow {
   id: string
@@ -44,6 +45,7 @@ const AdminOrdersPage: React.FC = () => {
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('orders')
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   const STATUSES: { value: string; label: string }[] = React.useMemo(() => ([
     { value: '', label: t('admin.orders.statusLabels.all') },
@@ -490,7 +492,7 @@ const AdminOrdersPage: React.FC = () => {
           </div>
 
           <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60">
-            <div className="overflow-x-auto w-full">
+            <div ref={dragScrollRef} className="overflow-x-auto w-full">
               <table className="min-w-[900px] w-full text-sm">
                 <thead>
                   <tr>

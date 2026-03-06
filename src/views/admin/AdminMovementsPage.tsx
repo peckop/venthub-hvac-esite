@@ -14,6 +14,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay } from 'date-fns'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 type Movement = {
   id: string
@@ -54,6 +55,7 @@ type SortKey = 'date' | 'product' | 'delta' | 'reason' | 'ref'
 
 const AdminMovementsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
   const router = useRouter()
   const [rows, setRows] = React.useState<Movement[]>([])
   const [loading, setLoading] = React.useState<LoadState>(LoadState.Idle)
@@ -344,7 +346,7 @@ const AdminMovementsPage: React.FC = () => {
       />
 
       <div className={`${adminCardClass} overflow-hidden`}>
-        <div className="overflow-x-auto w-full">
+        <div ref={dragScrollRef} className="overflow-x-auto w-full">
           <table className="w-full min-w-[700px] max-md:text-xs">
             <thead className="bg-gray-50">
               <tr>

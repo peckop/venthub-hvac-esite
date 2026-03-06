@@ -5,6 +5,7 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
+import { useDragScroll } from '../../hooks/useDragScroll'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { Bug } from 'lucide-react'
@@ -25,6 +26,7 @@ const PAGE_SIZE = 50
 
 const AdminErrorsPage: React.FC = () => {
   const { t, lang } = useI18n()
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
   // Default date range: last 7 days (including today)
   const fmt = (d: Date) => {
     const y = d.getFullYear()
@@ -156,8 +158,8 @@ const AdminErrorsPage: React.FC = () => {
         {error && (
           <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
         )}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[1000px] text-sm">
+        <div ref={dragScrollRef} className="overflow-x-auto">
+          <table className="min-w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.date')}</th>

@@ -8,6 +8,7 @@ import { Truck, CheckCircle2 } from 'lucide-react'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 // Sadece kargo ataması bekleyen siparişler (confirmed)
 interface LogisticsRow {
@@ -23,6 +24,7 @@ interface LogisticsRow {
 export default function AdminLogisticsPage() {
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('logistics')
+    const dragScrollRef = useDragScroll<HTMLDivElement>()
 
     const [rows, setRows] = useState<LogisticsRow[]>([])
     const [loading, setLoading] = useState(true)
@@ -181,7 +183,7 @@ export default function AdminLogisticsPage() {
                         description="Tüm siparişlerin kargo işlemi tamamlanmış görünüyor."
                     />
                 ) : (
-                    <div className="overflow-x-auto w-full" ref={el => { if (el) el.scrollLeft = 0 }}>
+                    <div className="overflow-x-auto w-full" ref={dragScrollRef}>
                         <table className="min-w-[1000px] text-sm max-md:text-xs">
                             <thead className="bg-slate-50">
                                 <tr>

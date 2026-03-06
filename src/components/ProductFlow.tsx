@@ -89,7 +89,7 @@ const ProductFlow: React.FC = () => {
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
             {(urls.length ? urls.slice(0, 18) : new Array(12).fill(0)).map((src, i) => (
               urls.length ? (
-                <img key={i} src={src as string} alt="product" loading="lazy" decoding="async" className="rounded-xl object-cover h-24 w-[160px] sm:w-[180px] md:w-[200px] bg-gray-100 border border-light-gray" />
+                <img key={i} src={src as string} alt="" loading="lazy" decoding="async" className="rounded-xl object-cover h-24 w-[160px] sm:w-[180px] md:w-[200px] bg-gray-100 border border-light-gray" />
               ) : (
                 <div key={i} className="rounded-xl h-24 w-full bg-gradient-to-br from-gray-200 to-gray-100 border border-light-gray animate-pulse" />
               )

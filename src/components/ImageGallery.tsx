@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronLeft, ChevronRight, X, Box, Maximize2 } from 'lucide-react'
 import { Product3DViewer } from './products/3d/Product3DViewer'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface ImageGalleryProps {
     images: { path: string; alt?: string | null }[]
@@ -11,6 +12,7 @@ interface ImageGalleryProps {
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, modelType }) => {
+    const { t } = useI18n()
     const [activeIdx, setActiveIdx] = useState(0)
     const [isLightboxOpen, setIsLightboxOpen] = useState(false) // Only for Images
     const [is3DMode, setIs3DMode] = useState(false) // Toggle between Image and 3D in the square container
@@ -152,7 +154,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
                             className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200/80 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-xl transition-all"
-                            title="Tam Ekran Görüntüle"
+                            title={t('common.viewFullscreen')}
+                            aria-label={t('common.viewFullscreen')}
                         >
                             <Maximize2 size={20} strokeWidth={1.8} />
                         </button>
@@ -164,6 +167,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
                         className="absolute top-2 right-2 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200/80 flex flex-col items-center gap-0.5 transition-all hover:shadow-xl group min-w-[50px]"
+                        aria-label={t('common.view3D')}
                     >
                         <div className="bg-blue-50 p-1 rounded-md text-blue-600 group-hover:bg-blue-100 transition-colors">
                             <Box size={18} strokeWidth={2} />
@@ -180,12 +184,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         <button
                             onClick={prevImage}
                             className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-30 pointer-events-auto"
+                            aria-label={t('common.prev')}
                         >
                             <ChevronLeft size={24} />
                         </button>
                         <button
                             onClick={nextImage}
                             className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-30 pointer-events-auto"
+                            aria-label={t('common.next')}
                         >
                             <ChevronRight size={24} />
                         </button>
@@ -227,6 +233,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                     <button
                         onClick={() => setIsLightboxOpen(false)}
                         className="absolute top-6 right-6 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all cursor-pointer z-50 shadow-lg"
+                        aria-label={t('common.close')}
                     >
                         <X size={28} strokeWidth={2.5} />
                     </button>
@@ -243,10 +250,10 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                     {images.length > 1 && (
                         <>
-                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all">
+                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all" aria-label={t('common.prev')}>
                                 <ChevronLeft size={32} />
                             </button>
-                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all">
+                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all" aria-label={t('common.next')}>
                                 <ChevronRight size={32} />
                             </button>
 
