@@ -14,6 +14,7 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDate } from '../../i18n/datetime'
 import { useRole } from '../../hooks/useRole'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface AdminUser {
   id: string
@@ -49,6 +50,7 @@ export default function AdminUsersPage() {
 
   const { role, canWrite } = useRole()
   const hasWriteAccess = canWrite('users')
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   // Use the global role state instead of local checks
   useEffect(() => {
@@ -306,7 +308,7 @@ export default function AdminUsersPage() {
 
       {isLoading && (activeTab === 'admins' ? filteredAdminUsers : filteredAllUsers).length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div ref={dragScrollRef} className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left">
               <thead className="bg-slate-50/50 border-b border-slate-200">
                 <tr>
@@ -337,7 +339,7 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div ref={dragScrollRef} className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left">
               <thead className="bg-slate-50/50 border-b border-slate-200">
                 <tr>

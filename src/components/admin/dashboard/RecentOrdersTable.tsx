@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { formatCurrency } from '../../../i18n/format'
 import { formatDateTime } from '../../../i18n/datetime'
 import { useI18n } from '../../../i18n/I18nProvider'
+import { useDragScroll } from '../../../hooks/useDragScroll'
 
 interface OrderData {
     id: string
@@ -21,6 +22,7 @@ interface RecentOrdersTableProps {
 
 const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) => {
     const { lang } = useI18n()
+    const dragScrollRef = useDragScroll<HTMLDivElement>()
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -50,7 +52,7 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
                     Tümünü Gör
                 </Link>
             </div>
-            <div className="overflow-x-auto">
+            <div ref={dragScrollRef} className="overflow-x-auto">
                 <table className="w-full text-sm text-left whitespace-nowrap">
                     <thead className="bg-gray-50/50 text-industrial-gray uppercase text-xs">
                         <tr>

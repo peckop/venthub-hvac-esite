@@ -8,7 +8,8 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { RefreshCcw, MailX } from 'lucide-react'
+import { Webhook, RefreshCcw, MailX } from 'lucide-react'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface ReturnEventRow {
   id: number | string
@@ -36,6 +37,9 @@ interface EmailEventRow {
 }
 
 const AdminWebhookEventsPage: React.FC = () => {
+  const { lang, t } = useI18n()
+  const dragScrollRef1 = useDragScroll<HTMLDivElement>()
+  const dragScrollRef2 = useDragScroll<HTMLDivElement>()
   const [tab, setTab] = React.useState<'returns' | 'shipping'>('returns')
   const [q, setQ] = React.useState('')
   const [density, setDensity] = React.useState<Density>('comfortable')
@@ -43,7 +47,6 @@ const AdminWebhookEventsPage: React.FC = () => {
 
   const [returnsRows, setReturnsRows] = React.useState<ReturnEventRow[]>([])
   const [emailsRows, setEmailsRows] = React.useState<EmailEventRow[]>([])
-  const { t, lang } = useI18n()
 
   const STORAGE_KEY = 'toolbar:webhook-events'
   const [colsRet, setColsRet] = React.useState({ event: true, order: true, carrier: true, status: true, received: true })
@@ -142,8 +145,8 @@ const AdminWebhookEventsPage: React.FC = () => {
       {tab === 'returns' ? (
         <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
           <div className="p-2 text-xs text-slate-500">{t('admin.webhooks.tip.rowAction')}</div>
-          <div className="overflow-x-auto w-full">
-            <table className="min-w-[800px] text-sm max-md:text-xs">
+          <div ref={dragScrollRef1} className="overflow-x-auto w-full">
+            <table className="w-full text-left max-md:text-xs">
               <thead>
                 <tr>
                   {colsRet.event && (<th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
@@ -186,8 +189,8 @@ const AdminWebhookEventsPage: React.FC = () => {
           </div>
         </section>
       ) : (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-          <div className="overflow-x-auto w-full">
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+          <div ref={dragScrollRef2} className="overflow-x-auto w-full">
             <table className="min-w-[800px] text-sm max-md:text-xs">
               <thead>
                 <tr>

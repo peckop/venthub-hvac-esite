@@ -15,6 +15,7 @@ import { ChevronDown, ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 interface ProductRow {
   id: string
@@ -37,6 +38,7 @@ const AdminProductsPage: React.FC = () => {
   const { t, lang } = useI18n()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('products')
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   const searchParams = useSearchParams()
   const [rows, setRows] = React.useState<ProductRow[]>([])
@@ -536,7 +538,7 @@ const AdminProductsPage: React.FC = () => {
             <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
           </div>
         </div>
-        <div className="overflow-x-auto w-full">
+        <div ref={dragScrollRef} className="overflow-x-auto w-full">
           <table className="w-full min-w-[1200px] max-md:text-xs">
             <thead className="bg-gray-50">
               <tr>

@@ -13,6 +13,7 @@ import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
 import toast from 'react-hot-toast'
 import { useRole } from '../../hooks/useRole'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 // Lazy load menus
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))
@@ -40,6 +41,7 @@ const AdminCategoriesPage: React.FC = () => {
 
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('categories')
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -191,8 +193,8 @@ const AdminCategoriesPage: React.FC = () => {
 
       <div className={`${adminCardClass} overflow-hidden`}>
         {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
-        <div className="overflow-x-auto w-full">
-          <table className="w-full min-w-[800px] max-md:text-xs">
+        <div ref={dragScrollRef} className="overflow-x-auto w-full">
+          <table className="w-full text-left max-md:text-xs min-w-[800px]">
             <thead className="bg-gray-50">
               <tr>
                 {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}

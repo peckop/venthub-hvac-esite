@@ -12,6 +12,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import { useRole } from '../../hooks/useRole'
+import { useDragScroll } from '../../hooks/useDragScroll'
 
 // Uygulama içi kullanım için UI modeli
 interface CouponRow {
@@ -66,6 +67,7 @@ const AdminCouponsPage: React.FC = () => {
   const { lang, t } = useI18n()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('coupons')
+  const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   const [rows, setRows] = React.useState<CouponRow[]>([])
   const [loading, setLoading] = React.useState(false)
@@ -232,7 +234,7 @@ const AdminCouponsPage: React.FC = () => {
       )}
 
       <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-        <div className="overflow-x-auto w-full">
+        <div ref={dragScrollRef} className="overflow-x-auto w-full">
           <table className="min-w-[1000px] text-sm max-md:text-xs">
             <thead>
               <tr>

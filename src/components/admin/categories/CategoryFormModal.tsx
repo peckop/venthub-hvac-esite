@@ -204,7 +204,10 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                         <Dialog.Title className="text-xl font-bold text-primary-navy">
                             {categoryId ? 'Kategoriyi Düzenle' : 'Yeni Kategori'}
                         </Dialog.Title>
-                        <Dialog.Close className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
+                        <Dialog.Close
+                            className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all"
+                            aria-label={_t('common.close')}
+                        >
                             <X size={20} />
                         </Dialog.Close>
                     </div>
@@ -265,7 +268,12 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         {image && (
                                             <div className="relative border rounded-lg overflow-hidden w-full h-64 bg-gray-50 flex items-center justify-center">
                                                 <img src={image.url} alt="Kategori" className="max-w-full max-h-full object-contain" />
-                                                <button type="button" onClick={removeImage} className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600">
+                                                <button
+                                                    type="button"
+                                                    onClick={removeImage}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                                                    aria-label={_t('common.remove')}
+                                                >
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
