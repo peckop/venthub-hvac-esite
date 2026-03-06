@@ -182,9 +182,24 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
 
     const delayedSearch = setTimeout(async () => {
       try {
-        const { searchProducts } = await import('../lib/supabase')
-        const results = await searchProducts(stickySearchQuery.trim())
-        setStickySearchResults(results.slice(0, 5)) // Max 5 results in sticky
+        const { ftsSearchProducts } = await import('../lib/supabase')
+        const ftsResults = await ftsSearchProducts(stickySearchQuery.trim(), 5)
+        // Map FTS results to Product-like shape for rendering
+        const mapped = ftsResults.map(r => ({
+          id: r.id,
+          name: r.name,
+          brand: r.brand || '',
+          sku: r.sku,
+          price: '', // fiyat gizleme stratejisi
+          slug: '',
+          status: 'active' as const,
+          description: '',
+          model_code: '',
+          category_id: '',
+          stock_qty: 0,
+          is_featured: false,
+        }))
+        setStickySearchResults(mapped as unknown as Product[])
         setIsStickySearchOpen(true)
       } catch (error) {
         console.error('Sticky search error:', error)
@@ -598,8 +613,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                             <div className="text-sm font-medium text-industrial-gray truncate">{product.name}</div>
                             <div className="text-xs text-steel-gray">{product.brand}</div>
                           </div>
-                          <div className="text-sm font-bold text-primary-navy">
-                            {formatCurrency(parseFloat(product.price), lang, { maximumFractionDigits: 0 })}
+                          <div className="text-xs font-medium text-primary-ocean opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
+                            Detay
+                            <svg className="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                           </div>
                         </button>
                       ))}
@@ -682,7 +698,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
                     </div>
                     {getCartTotal && getCartTotal() > 0 && (
                       <span className="hidden xl:block text-sm font-bold text-success-green">
-                        {formatCurrency(getCartTotal(), lang, { maximumFractionDigits: 0 })}
+                        {formatCurrency(String(getCartTotal()), lang, { maximumFractionDigits: 0 })}
                       </span>
                     )}
                   </Link>
