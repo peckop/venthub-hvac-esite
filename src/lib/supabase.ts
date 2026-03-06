@@ -261,10 +261,41 @@ export interface FtsProductResult {
 }
 
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
-  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as unknown }
-  const { data, error } = await supabase.rpc('fts_search_products', payload)
+  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as Record<string, unknown> }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('fts_search_products', payload)
   if (error) throw error
   return (data || []) as FtsProductResult[]
+}
+
+// Admin panel FTS search — returns ALL statuses, supports pagination
+export interface AdminSearchResult {
+  id: string
+  name: string
+  sku: string
+  model_code: string | null
+  brand: string | null
+  status: string | null
+  category_id: string | null
+  price: number | null
+  purchase_price: number | null
+  stock_qty: number | null
+  low_stock_threshold: number | null
+  is_featured: boolean | null
+  slug: string | null
+  rank: number
+  total_count: number
+}
+
+export async function adminSearchProducts(
+  q: string, limit = 50, offset = 0, categoryId?: string
+): Promise<AdminSearchResult[]> {
+  const payload: Record<string, unknown> = { p_q: q, p_limit: limit, p_offset: offset }
+  if (categoryId) payload.p_category_id = categoryId
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('admin_search_products', payload)
+  if (error) throw error
+  return (data || []) as AdminSearchResult[]
 }
 
 export interface SearchSuggestion {
@@ -275,7 +306,8 @@ export interface SearchSuggestion {
 }
 
 export async function getSearchSuggestions(q: string, limit = 5) {
-  const { data, error } = await supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.rpc as any)('get_search_suggestions', { p_q: q, p_limit: limit })
   if (error) throw error
   return (data || []) as SearchSuggestion[]
 }

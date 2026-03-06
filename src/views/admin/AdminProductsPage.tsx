@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../../lib/supabase'
+import { supabase, adminSearchProducts } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -137,45 +137,86 @@ const AdminProductsPage: React.FC = () => {
       // Proaktif oturum kontrolü
       await ensureSessionFresh()
 
-      // Build products query with server-side filters and pagination
-      let query = supabase
-        .from('products')
-        .select('id,name,sku,model_code,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
-
-      // Filters
-      if (selectedCategoryFilter) query = query.eq('category_id', selectedCategoryFilter)
-      if (featuredOnly) query = query.eq('is_featured', true)
-      const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
-      if (anyStatus) {
-        const statuses: string[] = []
-        if (statusFilter.active) statuses.push('active')
-        if (statusFilter.inactive) statuses.push('inactive')
-        if (statusFilter.out_of_stock) statuses.push('out_of_stock')
-        if (statuses.length === 1) query = query.eq('status', statuses[0])
-        else if (statuses.length > 1) query = query.in('status', statuses)
-      }
       const term = debouncedQ.trim()
+      let list: ProductRow[] = []
+      let totalCount = 0
+
       if (term) {
-        // Sanitize term to prevent PostgREST delimiter issues in .or()
-        const safeTerm = term.replace(/[(),]/g, ' ')
-        const like = `%${safeTerm}%`
-        query = query.or(`name.ilike.${like},sku.ilike.${like},model_code.ilike.${like},brand.ilike.${like},slug.ilike.${like}`)
+        // ── FTS RPC ile akıllı arama ──
+        const offset = (page - 1) * PAGE_SIZE
+        const results = await adminSearchProducts(
+          term,
+          PAGE_SIZE,
+          offset,
+          selectedCategoryFilter || undefined
+        )
+
+        // RPC sonuçlarını client-side status/featured filtrelerine uygula
+        let filtered = results as ProductRow & { rank: number; total_count: number }[] extends never ? typeof results : typeof results
+        const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
+        if (anyStatus) {
+          const statuses: string[] = []
+          if (statusFilter.active) statuses.push('active')
+          if (statusFilter.inactive) statuses.push('inactive')
+          if (statusFilter.out_of_stock) statuses.push('out_of_stock')
+          filtered = filtered.filter(r => statuses.includes(r.status || ''))
+        }
+        if (featuredOnly) {
+          filtered = filtered.filter(r => r.is_featured)
+        }
+
+        list = filtered.map(r => ({
+          id: r.id,
+          name: r.name,
+          sku: r.sku,
+          model_code: r.model_code,
+          brand: r.brand,
+          status: r.status,
+          category_id: r.category_id,
+          price: r.price != null ? Number(r.price) : null,
+          purchase_price: r.purchase_price != null ? Number(r.purchase_price) : null,
+          stock_qty: r.stock_qty != null ? Number(r.stock_qty) : null,
+          low_stock_threshold: r.low_stock_threshold != null ? Number(r.low_stock_threshold) : null,
+          is_featured: r.is_featured,
+        }))
+        // total_count: RPC window function üzerinden gelir
+        totalCount = results.length > 0 ? Number((results[0] as { total_count?: number }).total_count || results.length) : 0
+      } else {
+        // ── Normal Supabase query (arama terimi yokken) ──
+        let query = supabase
+          .from('products')
+          .select('id,name,sku,model_code,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug', { count: 'exact' })
+
+        // Filters
+        if (selectedCategoryFilter) query = query.eq('category_id', selectedCategoryFilter)
+        if (featuredOnly) query = query.eq('is_featured', true)
+        const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
+        if (anyStatus) {
+          const statuses: string[] = []
+          if (statusFilter.active) statuses.push('active')
+          if (statusFilter.inactive) statuses.push('inactive')
+          if (statusFilter.out_of_stock) statuses.push('out_of_stock')
+          if (statuses.length === 1) query = query.eq('status', statuses[0])
+          else if (statuses.length > 1) query = query.in('status', statuses)
+        }
+
+        // Sorting
+        const sortableMap: Record<SortKey, string | null> = { name: 'name', sku: 'sku', category: null, status: 'status', price: 'price', stock: 'stock_qty' }
+        const col = sortableMap[sortKey]
+        if (col) query = query.order(col, { ascending: sortDir === 'asc' })
+        else query = query.order('name', { ascending: true })
+
+        // Pagination
+        const from = (page - 1) * PAGE_SIZE
+        const to = from + PAGE_SIZE - 1
+        const { data, error, count } = await query.range(from, to)
+        if (error) throw error
+        list = (data || []) as ProductRow[]
+        totalCount = typeof count === 'number' ? count : 0
       }
 
-      // Sorting (only supported keys)
-      const sortableMap: Record<SortKey, string | null> = { name: 'name', sku: 'sku', category: null, status: 'status', price: 'price', stock: 'stock_qty' }
-      const col = sortableMap[sortKey]
-      if (col) query = query.order(col, { ascending: sortDir === 'asc' })
-      else query = query.order('name', { ascending: true })
-
-      // Pagination
-      const from = (page - 1) * PAGE_SIZE
-      const to = from + PAGE_SIZE - 1
-      const { data, error, count } = await query.range(from, to)
-      if (error) throw error
-      const list = (data || []) as ProductRow[]
       setRows(list)
-      setTotal(typeof count === 'number' ? count : 0)
+      setTotal(totalCount)
 
       // Categories + settings
       const [c, s] = await Promise.all([
