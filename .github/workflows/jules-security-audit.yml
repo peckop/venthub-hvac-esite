@@ -1,0 +1,28 @@
+name: Jules - Security Audit
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Every day at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          prompt: |
+            You are a security auditor.
+            Run `pnpm audit`.
+            Attempt to fix any High or Critical vulnerabilities by doing minor or patch updates.
+            Do not perform major version bumps if it breaks the codebase.
+            Verify build with `pnpm run build:ci` and testing with `pnpm test -- --run`.
+            If you made fixes, create a PR.

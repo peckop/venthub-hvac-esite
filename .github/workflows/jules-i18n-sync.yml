@@ -1,0 +1,30 @@
+name: Jules - i18n Sync
+
+on:
+  push:
+    paths:
+      - 'src/i18n/dictionaries/tr.ts'
+  workflow_dispatch:
+
+jobs:
+  i18n-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          prompt: |
+            You are an i18n synchronization agent.
+            Read `src/i18n/dictionaries/tr.ts` as the source of truth.
+            Read `src/i18n/dictionaries/en.ts`.
+            Identify any keys present in the Turkish dictionary but missing in the English one.
+            Translate the missing keys appropriately to English and add them to `en.ts` maintaining the exact key hierarchy.
+            Validate syntax by ensuring the build passes.
+            Open a PR with the translation updates.
