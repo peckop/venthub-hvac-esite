@@ -7,7 +7,7 @@ import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
-import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, SearchX, Download, Calendar, ListFilter, History } from 'lucide-react'
+import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, SearchX, Download, Calendar, ListFilter, History, PlusCircle, MinusCircle } from 'lucide-react'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
@@ -17,7 +17,9 @@ import { useI18n } from '../../i18n/I18nProvider'
 export default function AdminInventoryReportPage() {
     const { lang } = useI18n()
     const pathname = usePathname()
-    const dragScrollRef = useDragScroll<HTMLDivElement>()
+    const dragScrollRefIn = useDragScroll<HTMLDivElement>()
+    const dragScrollRefOut = useDragScroll<HTMLDivElement>()
+
     const [loading, setLoading] = React.useState(true)
     const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
         from: subDays(startOfDay(new Date()), 30),
@@ -141,6 +143,14 @@ export default function AdminInventoryReportPage() {
         URL.revokeObjectURL(url)
     }
 
+    const filteredMovements = React.useMemo(() => {
+        const term = searchQuery.toLowerCase().trim()
+        return term ? movementsData.filter(m => (m.products?.name || '').toLowerCase().includes(term) || m.product_id.toLowerCase().includes(term)) : movementsData
+    }, [movementsData, searchQuery])
+
+    const inboundMovements = filteredMovements.filter(m => m.delta > 0).slice(0, 50)
+    const outboundMovements = filteredMovements.filter(m => m.delta < 0).slice(0, 50)
+
     if (loading) return (
         <div className="space-y-6 max-w-[1400px]">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -192,16 +202,9 @@ export default function AdminInventoryReportPage() {
                         description="Seçilen tarih aralığında herhangi bir stok hareketi kaydedilmemiş. Farklı bir tarih aralığı seçmeyi deneyin."
                     />
                 </div>
-            ) : stats.totalIn === 0 && stats.totalOut === 0 && searchQuery ? (
-                <div className="py-24 bg-white rounded-3xl shadow-sm border border-slate-200/60">
-                    <AdminEmptyState
-                        icon={SearchX}
-                        title="Eşleşen Veri Yok"
-                        description={`"${searchQuery}" araması için bu tarih aralığında herhangi bir stok hareketi bulunamadı.`}
-                    />
-                </div>
             ) : (
                 <>
+                    {/* Üst Kartlar */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
                             <div className="flex items-center gap-2 text-slate-500 mb-2">
@@ -209,9 +212,6 @@ export default function AdminInventoryReportPage() {
                                 <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Giriş</h3>
                             </div>
                             <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
-                            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <ArrowDownRight size={80} />
-                            </div>
                         </div>
 
                         <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
@@ -220,9 +220,6 @@ export default function AdminInventoryReportPage() {
                                 <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Çıkış</h3>
                             </div>
                             <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
-                            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <ArrowUpRight size={80} />
-                            </div>
                         </div>
 
                         <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
@@ -233,161 +230,120 @@ export default function AdminInventoryReportPage() {
                             <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
                                 {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
                             </div>
-                            <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <Activity size={80} />
-                            </div>
                         </div>
                     </div>
 
-                    <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100`}>
-                        <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-primary-navy" /> Günlük Stok Akış Trendi
-                        </h2>
-                        <div className="h-80 w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={trendData}>
-                                    <defs>
-                                        <linearGradient id="colorIn" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
-                                            <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="colorOut" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.1} />
-                                            <stop offset="95%" stopColor="#F43F5E" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                                    <RechartsTooltip
-                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
-                                    />
-                                    <Area type="monotone" dataKey="incoming" name="Giriş" stroke="#10B981" fillOpacity={1} fill="url(#colorIn)" strokeWidth={3} />
-                                    <Area type="monotone" dataKey="outgoing" name="Çıkış" stroke="#F43F5E" fillOpacity={1} fill="url(#colorOut)" strokeWidth={3} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200">
+                    {/* Ana Grafikler Grid (2 Pencereli Görünüm) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100">
                         <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
                             <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-primary-navy" /> En Çok Hareket Gören Ürünler
+                                <TrendingUp className="w-5 h-5 text-primary-navy" /> Stok Akış Trendi
                             </h2>
-                            <div className="h-80">
-                                {topProducts.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={topProducts} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                                            <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                                            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                                            <RechartsTooltip
-                                                cursor={{ fill: '#f8fafc' }}
-                                                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                            />
-                                            <Bar dataKey="amount" fill="#0f172a" radius={[6, 6, 0, 0]} barSize={40} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                                        <PackageMinus size={40} className="opacity-20" />
-                                        <span className="text-sm">Yeterli veri yok</span>
-                                    </div>
-                                )}
+                            <div className="h-72 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={trendData}>
+                                        <defs>
+                                            <linearGradient id="colorIn" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
+                                                <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                            </linearGradient>
+                                            <linearGradient id="colorOut" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#F43F5E" stopOpacity={0.1} />
+                                                <stop offset="95%" stopColor="#F43F5E" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                                        <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                                        <Area type="monotone" dataKey="incoming" name="Giriş" stroke="#10B981" fillOpacity={1} fill="url(#colorIn)" strokeWidth={2} />
+                                        <Area type="monotone" dataKey="outgoing" name="Çıkış" stroke="#F43F5E" fillOpacity={1} fill="url(#colorOut)" strokeWidth={2} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
 
                         <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
                             <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-primary-navy" /> İşlem Türü Analizi
+                                <Activity className="w-5 h-5 text-primary-navy" /> İşlem Türü & En Çok Hareket
                             </h2>
-                            <div className="h-80 flex items-center justify-center">
-                                {reasonData.length > 0 ? (
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={reasonData}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={70}
-                                                outerRadius={110}
-                                                paddingAngle={8}
-                                                dataKey="value"
-                                                cornerRadius={4}
-                                            >
-                                                {reasonData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
-                                                ))}
-                                            </Pie>
-                                            <RechartsTooltip
-                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                                itemStyle={{ color: '#1e293b', fontWeight: 'bold' }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                                        <Activity size={40} className="opacity-20" />
-                                        <span className="text-sm">Analiz için yeterli veri yok</span>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-4">
-                                {reasonData.map((d, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-xs font-bold text-slate-600 tracking-tight">
-                                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }}></span>
-                                        {d.name} <span className="text-slate-400 font-medium">({d.value})</span>
-                                    </div>
-                                ))}
+                            <div className="h-72 flex items-center justify-center relative">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie data={reasonData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={5} dataKey="value" cornerRadius={4}>
+                                            {reasonData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                                        </Pie>
+                                        <RechartsTooltip />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                    <span className="text-xs text-slate-400 font-bold uppercase tracking-tight">Toplam</span>
+                                    <span className="text-xl font-black text-slate-800">{movementsData.length}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl mt-8 animate-in fade-in slide-in-from-bottom-8 duration-800 delay-300`}>
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <History className="w-5 h-5 text-primary-navy" /> Hareket Detay Tablosu
-                            </h2>
-                            <div className="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                                {movementsData.length} kayıt listeleniyor
+                    {/* Detay Tabloları (2 Pencereli Görünüm: Girişler vs Çıkışlar) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-800 delay-300">
+                        {/* Giriş Hareketleri Penceresi */}
+                        <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100`}>
+                            <div className="p-4 bg-emerald-50/50 border-b border-emerald-100 flex items-center justify-between">
+                                <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-2">
+                                    <PlusCircle className="w-4 h-4" /> Son Stok Girişleri (Pencere 1)
+                                </h2>
+                                <span className="text-[10px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-full border border-emerald-200 uppercase">Incoming</span>
                             </div>
-                        </div>
-                        <div ref={dragScrollRef} className="overflow-x-auto overscroll-x-contain">
-                            <table className="w-full text-sm">
-                                <thead className="bg-slate-50/50">
-                                    <tr>
-                                        <th className={adminTableHeadCellClass}>Tarih/Saat</th>
-                                        <th className={adminTableHeadCellClass}>Ürün</th>
-                                        <th className={adminTableHeadCellClass}>Miktar</th>
-                                        <th className={adminTableHeadCellClass}>İşlem</th>
-                                        <th className={adminTableHeadCellClass}>Ürün ID</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {(searchQuery ? movementsData.filter(m => (m.products?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || m.product_id.toLowerCase().includes(searchQuery.toLowerCase())) : movementsData).slice(0, 100).map((m) => (
-                                        <tr key={m.id} className="hover:bg-slate-50 transition-colors">
-                                            <td className={adminTableCellClass}>{format(new Date(m.created_at), 'dd.MM.yyyy HH:mm')}</td>
-                                            <td className={`${adminTableCellClass} font-medium text-slate-700`}>{(m.products as any)?.name || '-'}</td>
-                                            <td className={`${adminTableCellClass}`}>
-                                                <span className={`inline-flex items-center font-bold ${m.delta > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                    {m.delta > 0 ? '+' : ''}{m.delta}
-                                                </span>
-                                            </td>
-                                            <td className={adminTableCellClass}>
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200">
-                                                    {m.reason}
-                                                </span>
-                                            </td>
-                                            <td className={adminTableCellClass + " font-mono text-[10px] text-slate-400"}>{m.product_id}</td>
+                            <div ref={dragScrollRefIn} className="overflow-x-auto max-h-[400px]">
+                                <table className="w-full text-xs">
+                                    <thead className="bg-slate-50 sticky top-0 z-10">
+                                        <tr>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Tarih</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Ürün</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Miktar</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        {movementsData.length > 100 && (
-                            <div className="p-4 bg-slate-50 text-center text-xs text-slate-400 font-medium italic border-t border-slate-100">
-                                Performans için son 100 kayıt gösteriliyor. Tümünü görmek için CSV indirin.
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {inboundMovements.map((m) => (
+                                            <tr key={m.id} className="hover:bg-emerald-50/30 transition-colors">
+                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
+                                                <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
-                        )}
+                        </div>
+
+                        {/* Çıkış Hareketleri Penceresi */}
+                        <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100`}>
+                            <div className="p-4 bg-rose-50/50 border-b border-rose-100 flex items-center justify-between">
+                                <h2 className="text-sm font-bold text-rose-800 flex items-center gap-2">
+                                    <MinusCircle className="w-4 h-4" /> Son Stok Çıkışları (Pencere 2)
+                                </h2>
+                                <span className="text-[10px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded-full border border-rose-200 uppercase">Outgoing</span>
+                            </div>
+                            <div ref={dragScrollRefOut} className="overflow-x-auto max-h-[400px]">
+                                <table className="w-full text-xs">
+                                    <thead className="bg-slate-50 sticky top-0 z-10">
+                                        <tr>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Tarih</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Ürün</th>
+                                            <th className={adminTableHeadCellClass + " py-2"}>Miktar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {outboundMovements.map((m) => (
+                                            <tr key={m.id} className="hover:bg-rose-50/30 transition-colors">
+                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
+                                                <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </>
             )}
