@@ -526,7 +526,12 @@ const AdminOrdersPage: React.FC = () => {
                     sorted.map((r) => (
                       <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-3"><input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => setSelectedIds(prev => e.target.checked ? [...prev, r.id] : prev.filter(x => x !== r.id))} /></td>
-                        {visibleCols.id && (<td className="px-4 py-3 font-mono text-xs">{r.id}</td>)}
+                        {visibleCols.id && (
+                          <td className="px-4 py-3 font-mono text-xs">
+                            <div className="font-bold text-slate-800">{r.order_number || r.id.slice(0, 8).toUpperCase()}</div>
+                            {r.order_number && <div className="text-[10px] text-slate-400 mt-0.5" title={r.id}>{r.id.slice(0, 8)}...</div>}
+                          </td>
+                        )}
                         {visibleCols.status && (<td className="px-4 py-3"><span className={badgeClass(r.status)}>{prettyStatus(r.status, t)}</span></td>)}
                         {visibleCols.conversation && (<td className="px-4 py-3 text-xs text-slate-500">{r.conversation_id || '-'}</td>)}
                         {visibleCols.amount && (<td className="px-4 py-3">{formatAmount(r.total_amount, lang)}</td>)}
