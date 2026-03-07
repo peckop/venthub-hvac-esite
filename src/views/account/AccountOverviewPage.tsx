@@ -47,7 +47,7 @@ export default function AccountOverviewPage() {
 
         // 2. Tüm Siparişler (İstatistik ve Son Siparişler için daha geniş data çekiyoruz)
         // Fallback chain (in case shipped_at column does not exist yet)
-        let orderData: any[] = []
+        let orderData: Record<string, unknown>[] = []
         try {
           const { data, error } = await supabase
             .from('venthub_orders')
@@ -56,8 +56,8 @@ export default function AccountOverviewPage() {
             .order('created_at', { ascending: false })
             .limit(50)
 
-          if (error && (error as any).code === 'PGRST100') throw error // Fallback tetiklensin
-          if (data) orderData = data
+          if (error && (error as unknown as Record<string, unknown>).code === 'PGRST100') throw error // Fallback tetiklensin
+          if (data) orderData = data as Record<string, unknown>[]
         } catch {
           const fallback = await supabase
             .from('venthub_orders')
@@ -65,10 +65,10 @@ export default function AccountOverviewPage() {
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
             .limit(50)
-          if (fallback.data) orderData = fallback.data
+          if (fallback.data) orderData = fallback.data as Record<string, unknown>[]
         }
 
-        if (mounted) setOrders(orderData as ShipmentRecord[])
+        if (mounted) setOrders(orderData as unknown as ShipmentRecord[])
 
       } catch (e) {
         console.error('Overview load error', e)
