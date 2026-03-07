@@ -347,7 +347,7 @@ export const CheckoutPage: React.FC = () => {
       const { buildPaymentRequest } = await import('./checkout/buildPaymentRequest')
       const requestData = buildPaymentRequest({
         amount: authoritativeTotal,
-        items: items as any,
+        items: items as unknown as import('./checkout/buildPaymentRequest').CartItemInput[],
         customer: { name: customerInfo.name, email: customerInfo.email, phone: customerInfo.phone },
         shipping: shippingAddress,
         billing: billingAddress,
@@ -901,7 +901,7 @@ export const CheckoutPage: React.FC = () => {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <OrderSummarySidebar
-              items={items}
+              items={items as unknown as import('./checkout/OrderSummarySidebar').OrderSummarySidebarProps['items']}
               totalAmount={totalAmount}
               vatAmount={vatAmount}
               finalAmount={finalAmount}

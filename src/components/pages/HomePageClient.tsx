@@ -51,7 +51,10 @@ export default function HomePageClient() {
             {/* Bento Grid */}
             <div id="categories" className="cv-600 scroll-mt-20">
                 <LazyInView
-                    loader={async () => ((await import('../BentoGrid')) as any).default}
+                    loader={async () => {
+                        const m = await import('../BentoGrid')
+                        return { default: m.default as unknown as React.ComponentType<Record<string, unknown>> }
+                    }}
                     placeholder={<div className="min-h-[200px]" aria-hidden="true" />}
                     rootMargin="0px 0px"
                     once

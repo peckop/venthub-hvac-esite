@@ -111,7 +111,7 @@ const ContactPage: React.FC = () => {
 
     try {
       const { supabase } = await import('../lib/supabase')
-      const { error } = await supabase.from('contact_messages').insert(payload as any)
+      const { error } = await supabase.from('contact_messages').insert(payload as import('../types/database.types').Database['public']['Tables']['contact_messages']['Insert'])
       if (error) throw error
       setFormSubmitted(true)
       window.scrollTo({ top: formRef.current?.offsetTop || 0, behavior: 'smooth' })
