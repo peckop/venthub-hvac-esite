@@ -6,16 +6,14 @@ import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminT
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
-import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
-import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, SearchX, Download, Calendar, ListFilter, History, PlusCircle, MinusCircle } from 'lucide-react'
+import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts'
+import { Activity, ArrowDownRight, ArrowUpRight, TrendingUp, PackageMinus, Download, PlusCircle, MinusCircle } from 'lucide-react'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
 import { useDragScroll } from '../../hooks/useDragScroll'
-import { useI18n } from '../../i18n/I18nProvider'
 
 export default function AdminInventoryReportPage() {
-    const { lang } = useI18n()
     const pathname = usePathname()
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()
@@ -29,7 +27,6 @@ export default function AdminInventoryReportPage() {
     const [movementsData, setMovementsData] = React.useState<any[]>([])
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
-    const [topProducts, setTopProducts] = React.useState<{ name: string, amount: number }[]>([])
     const [trendData, setTrendData] = React.useState<any[]>([])
 
     const loadData = React.useCallback(async () => {
@@ -111,12 +108,6 @@ export default function AdminInventoryReportPage() {
             { name: 'Manuel / Düzeltme', value: reasonMap.manual_in + reasonMap.manual_out + reasonMap.adjustment, color: '#8B5CF6' },
         ].filter(d => d.value > 0)
         setReasonData(rData)
-
-        const sortedProds = Object.values(productSales).sort((a, b) => b.out - a.out).slice(0, 8).map(p => ({
-            name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
-            amount: p.out
-        }))
-        setTopProducts(sortedProds)
 
         setTrendData(Object.values(trendMap))
     }, [movementsData, searchQuery, dateRange])
