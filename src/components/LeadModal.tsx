@@ -314,7 +314,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, produ
   )
 }
 
-export default LeadModal
+export default React.memo(LeadModal)
 
 
 
