@@ -46,17 +46,17 @@ export default function AdminLogisticsPage() {
 
             if (error) throw error
 
-            setRows((data as any[]).map(r => ({
-                id: r.id,
-                order_number: r.order_number || r.id.substring(0, 8),
-                customer_name: r.customer_name || 'İsimsiz',
-                created_at: r.created_at,
-                carrier: r.carrier || 'Yurtiçi',
-                tracking_number: r.tracking_number || '',
+            setRows((data as Record<string, unknown>[]).map(r => ({
+                id: r.id as string,
+                order_number: (r.order_number as string) || (r.id as string).substring(0, 8),
+                customer_name: (r.customer_name as string) || 'İsimsiz',
+                created_at: r.created_at as string,
+                carrier: (r.carrier as string) || 'Yurtiçi',
+                tracking_number: (r.tracking_number as string) || '',
                 saved: false
             })))
-        } catch (err: any) {
-            toast.error('Bekleyen siparişler yüklenemedi: ' + err.message)
+        } catch (err: unknown) {
+            toast.error('Bekleyen siparişler yüklenemedi: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'))
         } finally {
             setLoading(false)
         }
