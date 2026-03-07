@@ -12,10 +12,8 @@ import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
 import { useDragScroll } from '../../hooks/useDragScroll'
-import { useI18n } from '../../i18n/I18nProvider'
 
 export default function AdminInventoryReportPage() {
-    const { } = useI18n()
     const pathname = usePathname()
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()
@@ -26,11 +24,11 @@ export default function AdminInventoryReportPage() {
         to: endOfDay(new Date())
     })
     const [searchQuery, setSearchQuery] = React.useState('')
-    const [movementsData, setMovementsData] = React.useState<any[]>([])
+    const [movementsData, setMovementsData] = React.useState<Record<string, unknown>[]>([])
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
     const [topProducts, setTopProducts] = React.useState<{ name: string, amount: number }[]>([])
-    const [trendData, setTrendData] = React.useState<any[]>([])
+    const [trendData, setTrendData] = React.useState<Record<string, unknown>[]>([])
 
     const loadData = React.useCallback(async () => {
         try {
@@ -68,7 +66,7 @@ export default function AdminInventoryReportPage() {
         const trendMap: Record<string, { date: string, incoming: number, outgoing: number }> = {}
 
         const term = searchQuery.toLowerCase().trim()
-        const filtered = term ? movementsData.filter(m => (m.products?.name || '').toLowerCase().includes(term) || m.product_id.toLowerCase().includes(term)) : movementsData
+        const filtered = term ? movementsData.filter(m => (((m.products as Record<string, unknown>)?.name as string) || '').toLowerCase().includes(term) || (m.product_id as string).toLowerCase().includes(term)) : movementsData
 
         // Initialize trend map for the selected interval
         if (dateRange?.from && dateRange?.to) {
@@ -80,23 +78,23 @@ export default function AdminInventoryReportPage() {
         }
 
         filtered.forEach(m => {
-            const dateKey = format(new Date(m.created_at), 'yyyy-MM-dd')
-            const deltaAbs = Math.abs(m.delta)
+            const dateKey = format(new Date(m.created_at as string), 'yyyy-MM-dd')
+            const deltaAbs = Math.abs(m.delta as number)
 
-            if (m.delta > 0) {
-                tIn += m.delta
-                if (trendMap[dateKey]) trendMap[dateKey].incoming += m.delta
+            if ((m.delta as number) > 0) {
+                tIn += m.delta as number
+                if (trendMap[dateKey]) trendMap[dateKey].incoming += m.delta as number
             } else {
                 tOut += deltaAbs
                 if (trendMap[dateKey]) trendMap[dateKey].outgoing += deltaAbs
             }
 
-            if (reasonMap[m.reason] !== undefined) {
-                reasonMap[m.reason] += deltaAbs
+            if (reasonMap[m.reason as string] !== undefined) {
+                reasonMap[m.reason as string] += deltaAbs
             }
 
-            if (m.delta < 0 && (m.reason === 'sale' || m.reason === 'manual_out')) {
-                const pname = (m.products as any)?.name || m.product_id
+            if ((m.delta as number) < 0 && (m.reason === 'sale' || m.reason === 'manual_out')) {
+                const pname = (m.products as Record<string, unknown>)?.name as string || (m.product_id as string)
                 if (!productSales[pname]) productSales[pname] = { name: pname, out: 0 }
                 productSales[pname].out += deltaAbs
             }
@@ -126,8 +124,8 @@ export default function AdminInventoryReportPage() {
         const header = ['ID', 'Tarih', 'Ürün', 'Miktar', 'Sebep', 'Ürün ID']
         const csvRows = movementsData.map(m => [
             m.id,
-            format(new Date(m.created_at), 'yyyy-MM-dd HH:mm'),
-            (m.products as any)?.name || m.product_id,
+            format(new Date(m.created_at as string), 'yyyy-MM-dd HH:mm'),
+            (m.products as Record<string, unknown>)?.name || m.product_id,
             m.delta,
             m.reason,
             m.product_id
@@ -145,11 +143,11 @@ export default function AdminInventoryReportPage() {
 
     const filteredMovements = React.useMemo(() => {
         const term = searchQuery.toLowerCase().trim()
-        return term ? movementsData.filter(m => (m.products?.name || '').toLowerCase().includes(term) || m.product_id.toLowerCase().includes(term)) : movementsData
+        return term ? movementsData.filter(m => (((m.products as Record<string, unknown>)?.name as string) || '').toLowerCase().includes(term) || (m.product_id as string).toLowerCase().includes(term)) : movementsData
     }, [movementsData, searchQuery])
 
-    const inboundMovements = filteredMovements.filter(m => m.delta > 0).slice(0, 50)
-    const outboundMovements = filteredMovements.filter(m => m.delta < 0).slice(0, 50)
+    const inboundMovements = filteredMovements.filter(m => (m.delta as number) > 0).slice(0, 50)
+    const outboundMovements = filteredMovements.filter(m => (m.delta as number) < 0).slice(0, 50)
 
     if (loading) return (
         <div className="space-y-6 max-w-[1400px]">
@@ -335,10 +333,10 @@ export default function AdminInventoryReportPage() {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {inboundMovements.map((m) => (
-                                            <tr key={m.id} className="hover:bg-emerald-50/30 transition-colors">
-                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
-                                                <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta}</td>
+                                            <tr key={m.id as string} className="hover:bg-emerald-50/30 transition-colors">
+                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta as number}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -371,10 +369,10 @@ export default function AdminInventoryReportPage() {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {outboundMovements.map((m) => (
-                                            <tr key={m.id} className="hover:bg-rose-50/30 transition-colors">
-                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
-                                                <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta}</td>
+                                            <tr key={m.id as string} className="hover:bg-rose-50/30 transition-colors">
+                                                <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at as string), 'dd.MM HH:mm')}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as Record<string, unknown>)?.name as string || m.product_id as string}</td>
+                                                <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta as number}</td>
                                             </tr>
                                         ))}
                                     </tbody>
