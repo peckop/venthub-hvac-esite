@@ -133,7 +133,7 @@ const AdminDashboardPage: React.FC = () => {
       // ... Stok verilerini ayrı bir state veya call ile çeksek daha güvenli? (Fazla ürün yoksa sorun olmaz)
       const productsRes = await supabase.from('products').select('stock_qty, price, low_stock_threshold')
       if (!productsRes.error && productsRes.data) {
-        const prods = productsRes.data as any[]
+        const prods = productsRes.data as Array<{ stock_qty: number | null, price: number | null, low_stock_threshold: number | null }>
 
         // Bağlı Sermaye
         const capital = prods.reduce((acc, p) => acc + ((p.stock_qty || 0) > 0 ? (p.stock_qty * (p.price || 0)) : 0), 0)
@@ -200,7 +200,7 @@ const AdminDashboardPage: React.FC = () => {
       })
 
       const daily = Array.from(dataMap.values()).sort((a, b) => a.date.localeCompare(b.date))
-      setDailyCounts(daily as any)
+      setDailyCounts(daily)
 
       // Calculate Heatmap Data
       const heatmapMap = new Map<string, number>()

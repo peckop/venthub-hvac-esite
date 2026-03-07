@@ -12,10 +12,9 @@ import DateRangePicker from '../../components/admin/DateRangePicker'
 import { DateRange } from 'react-day-picker'
 import { endOfDay, startOfDay, subDays, format, eachDayOfInterval } from 'date-fns'
 import { useDragScroll } from '../../hooks/useDragScroll'
-import { useI18n } from '../../i18n/I18nProvider'
 
 export default function AdminInventoryReportPage() {
-    const { } = useI18n()
+
     const pathname = usePathname()
     const dragScrollRefIn = useDragScroll<HTMLDivElement>()
     const dragScrollRefOut = useDragScroll<HTMLDivElement>()
@@ -26,11 +25,11 @@ export default function AdminInventoryReportPage() {
         to: endOfDay(new Date())
     })
     const [searchQuery, setSearchQuery] = React.useState('')
-    const [movementsData, setMovementsData] = React.useState<any[]>([])
+    const [movementsData, setMovementsData] = React.useState<Array<{ id: string, delta: number, reason: string, created_at: string, product_id: string, products: { name: string } | null }>>([])
     const [stats, setStats] = React.useState({ totalIn: 0, totalOut: 0, net: 0 })
     const [reasonData, setReasonData] = React.useState<{ name: string, value: number, color: string }[]>([])
     const [topProducts, setTopProducts] = React.useState<{ name: string, amount: number }[]>([])
-    const [trendData, setTrendData] = React.useState<any[]>([])
+    const [trendData, setTrendData] = React.useState<Array<{ date: string, incoming: number, outgoing: number }>>([])
 
     const loadData = React.useCallback(async () => {
         try {
@@ -96,7 +95,7 @@ export default function AdminInventoryReportPage() {
             }
 
             if (m.delta < 0 && (m.reason === 'sale' || m.reason === 'manual_out')) {
-                const pname = (m.products as any)?.name || m.product_id
+                const pname = m.products?.name || m.product_id
                 if (!productSales[pname]) productSales[pname] = { name: pname, out: 0 }
                 productSales[pname].out += deltaAbs
             }
@@ -127,7 +126,7 @@ export default function AdminInventoryReportPage() {
         const csvRows = movementsData.map(m => [
             m.id,
             format(new Date(m.created_at), 'yyyy-MM-dd HH:mm'),
-            (m.products as any)?.name || m.product_id,
+            m.products?.name || m.product_id,
             m.delta,
             m.reason,
             m.product_id
@@ -337,7 +336,7 @@ export default function AdminInventoryReportPage() {
                                         {inboundMovements.map((m) => (
                                             <tr key={m.id} className="hover:bg-emerald-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{m.products?.name || m.product_id}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-emerald-600"}>+{m.delta}</td>
                                             </tr>
                                         ))}
@@ -373,7 +372,7 @@ export default function AdminInventoryReportPage() {
                                         {outboundMovements.map((m) => (
                                             <tr key={m.id} className="hover:bg-rose-50/30 transition-colors">
                                                 <td className={adminTableCellClass + " py-2"}>{format(new Date(m.created_at), 'dd.MM HH:mm')}</td>
-                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{(m.products as any)?.name || m.product_id}</td>
+                                                <td className={adminTableCellClass + " py-2 font-medium truncate max-w-[150px]"}>{m.products?.name || m.product_id}</td>
                                                 <td className={adminTableCellClass + " py-2 font-bold text-rose-600"}>{m.delta}</td>
                                             </tr>
                                         ))}
