@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import dynamic from 'next/dynamic'
 
 const PageComponent = dynamic(() => import('../views/HomePage'), {
@@ -12,8 +13,25 @@ const PageComponent = dynamic(() => import('../views/HomePage'), {
 })
 
 export default function RootPage() {
-    return <PageComponent />
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "VentHub",
+        "url": "https://venthub.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://venthub.com/products?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <PageComponent />
+        </>
+    )
 }
-
-
-
