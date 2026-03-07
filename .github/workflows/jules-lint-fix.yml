@@ -21,9 +21,26 @@ jobs:
           jules_api_key: ${{ secrets.JULES_API_KEY }}
           starting_branch: master
           prompt: |
-            You are a code maintenance agent.
-            Run `pnpm run lint` and `pnpm exec tsc -b tsconfig.build.json`.
-            Identify static analysis and type errors.
-            Fix them carefully without altering business logic.
-            Re-run the checks to verify.
+            TARGET SCOPE (Dalga 1): SADECE `src/views/admin/` dizinindeki dosyalar.
+            GÖREV: Lint & TypeScript Cleanup
+
+            You are an expert code quality agent.
+            Your task is to fix existing ESLint warnings and TypeScript `any` types ONLY across the `src/views/admin/` folder.
+
+            1. Run `pnpm run lint` and `pnpm exec tsc -b tsconfig.build.json`.
+            2. Analyze the errors specifically inside `src/views/admin/`.
+            3. Fix the errors target by target ONLY in `src/views/admin/`.
+
+            ⚠️ STRICT BOUNDARIES (Sınır Kuralları):
+            0. ZORUNLU MASTER SYNC: İşe başlamadan ÖNCE `git fetch origin master` ve `git checkout -b <gorev-dali> origin/master` ile HER ZAMAN TAZELENMİŞ MASTER'dan başla!
+            1. DOKUNULACAK ALANLAR (Dalga Kapsamı - Scope): SADECE sana promptta belirtilen klasör/hedef (`src/views/admin/`) üzerinde çalışacaksın. Bunun dışındaki hiçbir klasöre/dosyaya DOKUNAMAZSIN.
+            2. DOKUNULMASI KESİNLİKLE YASAK OLANLAR (No-go zones):
+               - src/types/database.types.ts
+               - src/lib/supabase.ts
+               - supabase/ klasörü (migrations, functions)
+               - tsconfig*.json
+               - package.json
+            3. UYGULAMA MANTIĞI: İş mantığını (business logic), conditional (if/else) ve state'leri ASLA değiştirme. Projedeki *.tsx, *.ts dosyalarını TAMAMEN SİLME. 
+            4. CI/CD ONAYLARI: Mümkünse commit'ten önce `pnpm run lint` komutlarının temiz olduğundan emin ol.
+            5. PR Boyut Limiti (max 100 satır diff) kurallarına harfiyen uy.
             If successful, commit the changes and create a PR.
