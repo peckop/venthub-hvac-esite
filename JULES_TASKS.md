@@ -11,20 +11,22 @@ All tasks below include the following strict boundaries section. Do NOT remove i
 
 ```text
 ⚠️ STRICT BOUNDARIES (Sınır Kuralları):
-1. DOKUNULACAK ALANLAR (Scope): Sadece sana belirtilen hedefler.
+0. ZORUNLU MASTER SYNC: İşe başlamadan ÖNCE `git fetch origin master` ve `git checkout -b <gorev-dali> origin/master` ile HER ZAMAN TAZELENMİŞ MASTER'dan başla! Eski veya varsayılan yerel daldan asla işleme girme.
+1. DOKUNULACAK ALANLAR (Dalga Kapsamı - Scope): SADECE sana promptta belirtilen klasör/hedef (Örn: `Dalga 1`) üzerinde çalışacaksın. Bunun dışındaki hiçbir klasöre/dosyaya DOKUNAMAZSIN.
 2. DOKUNULMASI KESİNLİKLE YASAK OLANLAR (No-go zones):
    - src/types/database.types.ts
    - src/lib/supabase.ts
    - supabase/ klasörü (migrations, functions)
    - tsconfig*.json
    - package.json (Dependency güncelleme taskı hariç!)
-3. UYGULAMA MANTIĞI: İş mantığını (business logic) ASLA değiştirme. Sadece kodu iyileştir/temizle.
+   - .github/ (workflows)
+3. UYGULAMA MANTIĞI: İş mantığını (business logic), conditional (if/else) ve state'leri ASLA değiştirme. Projedeki *.tsx, *.ts dosyalarını TAMAMEN SİLME. 
 4. CI/CD ONAYLARI: PR açmadan önce yerelde şu 4 komutu sırayla çalıştır ve HEPSİNİN HATASIZ GEÇTİĞİNDEN emin ol:
    - pnpm run lint
    - pnpm exec tsc -b tsconfig.build.json
    - pnpm test -- --run
    - pnpm run build:ci
-5. ANAYASA: Kök dizindeki `AGENTS.md` dosyasını oku ve oradaki tüm kurallara uy.
+5. ANAYASA: Kök dizindeki `AGENTS.md` dosyasını EN BAŞTAN oku, Master Sync ve PR Boyut Limiti (max 100 satır diff) gibi tüm kurallara harfiyen uy.
 ```
 
 ---
