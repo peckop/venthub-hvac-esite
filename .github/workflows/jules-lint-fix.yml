@@ -13,6 +13,10 @@ on:
         description: 'Target Scope (e.g., src/components/admin/)'
         required: true
         default: 'src/components/admin/'
+      additionalInstruction:
+        description: 'Mission context/guidelines'
+        required: false
+        default: ''
 
 jobs:
   lint-fix:
@@ -31,6 +35,7 @@ jobs:
           starting_branch: master
           prompt: |
             TARGET SCOPE (${{ github.event.inputs.wave || 'Dalga 2' }}): SADECE `${{ github.event.inputs.scope || 'src/components/admin/' }}` dizinindeki dosyalar.
+            EXTRA INFO: `${{ github.event.inputs.additionalInstruction || '' }}`
             GÖREV: Lint & TypeScript Cleanup
 
             You are an expert code quality agent.
