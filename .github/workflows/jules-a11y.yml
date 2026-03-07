@@ -1,0 +1,32 @@
+name: Jules - A11y
+on:
+  workflow_dispatch:
+
+jobs:
+  a11y-fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-action@v1.0.0
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          starting_branch: master
+          prompt: |
+            You are an accessibility UI/UX expert agent.
+            Your task is to improve WCAG 2.1 AA compliance in UI components.
+            
+            1. Scan `src/components/` for common a11y issues: Missing `alt` attributes on `<img>`, missing `aria-label` on icon-only buttons (`<button><Icon/></button>`), and bad heading hierarchy.
+            2. Fix these issues by providing context-aware screen reader tags. Use `useI18n` if string literals are added.
+            3. Open a PR with the accessibility improvements.
+            
+            ⚠️ STRICT BOUNDARIES:
+            - DO NOT TOUCH: src/types/database.types.ts, src/lib/supabase.ts, supabase/, package.json.
+            - DO NOT break standard UI visual designs (no color changes without user consent).
+            - MUST PASS BEFORE PR: pnpm run lint, pnpm exec tsc -b tsconfig.build.json, pnpm test -- --run, pnpm run build:ci.
+            - READ: AGENTS.md.
