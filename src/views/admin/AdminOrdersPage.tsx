@@ -723,7 +723,7 @@ function safeDate(iso: string, lang: Lang = 'tr') {
   try { return formatDateTime(iso, lang) } catch { return iso }
 }
 
-function prettyStatus(s: string, t: (key: string, params?: Record<string, any>) => string) {
+function prettyStatus(s: string, t: (key: string, params?: Record<string, unknown>) => string) {
   if (!s) return s
   const key = s.toLowerCase()
   switch (key) {

@@ -52,7 +52,7 @@ const AdminInventorySettingsPage: React.FC = () => {
       setError('')
       const value = (defaultThreshold === '' ? null : Number(defaultThreshold))
       // Global eşik ve toplu uygulama için yeni RPC
-      const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value as any, p_reset_overrides: resetAll })
+      const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value as number | null, p_reset_overrides: resetAll })
       if (error) throw error
       setSuccess(resetAll ? 'Kaydedildi ve tüm ürünlere uygulandı' : 'Kaydedildi')
       await load() // kaydettikten sonra güncel değeri yeniden yükle
@@ -76,8 +76,8 @@ const AdminInventorySettingsPage: React.FC = () => {
           alert_webhook_url: alertWebhook || null,
           reservation_timeout_hours: resTimeout || 24,
           updated_at: new Date().toISOString()
-        } as any)
-        .eq('id', 1 as any)
+        } as { alert_email: string | null; alert_webhook_url: string | null; reservation_timeout_hours: number; updated_at: string })
+        .eq('id', 1 as unknown as boolean)
       if (error) throw error
       setSuccess('Genel ayarlar kaydedildi')
       await load()

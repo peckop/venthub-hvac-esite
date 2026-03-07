@@ -46,7 +46,7 @@ export default function AdminLogisticsPage() {
 
             if (error) throw error
 
-            setRows((data as any[]).map(r => ({
+            setRows((data as Array<{ id: string, order_number: string | null, customer_name: string | null, created_at: string, carrier: string | null, tracking_number: string | null }>).map(r => ({
                 id: r.id,
                 order_number: r.order_number || r.id.substring(0, 8),
                 customer_name: r.customer_name || 'İsimsiz',
@@ -55,8 +55,8 @@ export default function AdminLogisticsPage() {
                 tracking_number: r.tracking_number || '',
                 saved: false
             })))
-        } catch (err: any) {
-            toast.error('Bekleyen siparişler yüklenemedi: ' + err.message)
+        } catch (err: unknown) {
+            toast.error('Bekleyen siparişler yüklenemedi: ' + (err instanceof Error ? err.message : String(err)))
         } finally {
             setLoading(false)
         }
