@@ -1,0 +1,34 @@
+name: Jules - Performance
+
+on:
+  workflow_dispatch:
+
+jobs:
+  performance-fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Invoke Jules Agent
+        uses: google-labs-code/jules-action@v1.0.0
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          starting_branch: master
+          prompt: |
+            You are a React Performance optimization agent.
+            Your task is to resolve unnecessary re-renders in the application.
+            
+            1. Scan `src/components/` for expensive pure functional UI components that lack `React.memo()`.
+            2. Inspect complex calculation hooks or event handlers without `useMemo` or `useCallback`.
+            3. Apply performance primitives cautiously.
+            4. Open a PR specifying which components were optimized.
+            
+            ⚠️ STRICT BOUNDARIES:
+            - DO NOT TOUCH: src/types/database.types.ts, src/lib/supabase.ts, supabase/, package.json.
+            - DO NOT OVER-MEMOIZE. Only apply memoization to heavy components or items rendered inside large lists.
+            - MUST PASS BEFORE PR: pnpm run lint, pnpm exec tsc -b tsconfig.build.json, pnpm test -- --run, pnpm run build:ci.
+            - READ: AGENTS.md.
