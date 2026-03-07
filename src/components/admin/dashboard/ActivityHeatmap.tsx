@@ -45,7 +45,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
 
     // Fill in empty spots with 0 to make the tooltip cleaner if needed, or just let them be empty
     // Tooltip content
-    const CustomTooltip = ({ active, payload }: any) => {
+    const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: HeatmapData & { dayName: string } }[] }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload
             return (

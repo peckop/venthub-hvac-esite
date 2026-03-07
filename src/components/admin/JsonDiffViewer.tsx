@@ -6,12 +6,12 @@ interface JsonDiffViewerProps {
 }
 
 const JsonDiffViewer: React.FC<JsonDiffViewerProps> = ({ before, after }) => {
-    const bObj = (typeof before === 'object' && before !== null) ? before as Record<string, any> : {}
-    const aObj = (typeof after === 'object' && after !== null) ? after as Record<string, any> : {}
+    const bObj = (typeof before === 'object' && before !== null) ? before as Record<string, unknown> : {}
+    const aObj = (typeof after === 'object' && after !== null) ? after as Record<string, unknown> : {}
 
     const allKeys = Array.from(new Set([...Object.keys(bObj), ...Object.keys(aObj)])).sort()
 
-    const safeStringify = (val: any) => {
+    const safeStringify = (val: unknown) => {
         if (val === undefined || val === null) return 'null'
         if (typeof val === 'string') return `"${val}"`
         if (typeof val === 'object') return JSON.stringify(val)
