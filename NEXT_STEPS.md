@@ -63,9 +63,15 @@
    - [ ] Env toggle: sandbox ↔ live (script URLs, API endpoints)
    - [ ] Live callback domain whitelist (iyzico panel)
 
-2) **Sipariş/İdari işlevler**
+2) **JULES Paralel Çalışma — Batch 2 (Devam Ediyor)**
+   - [x] Task 6: Dead Code & TS Cleanup (PR #44 ile tamamlandı)
+   - [ ] **Task 5: Accessibility (A11y)** → JULES'a verilecek sıradaki iş.
+   - [ ] **Task 7: Performance Optimization** → A11y sonrası verilecek son periyodik temizlik.
+
+3) **Sipariş/İdari işlevler**
    - [ ] Orders detayında fatura bilgileri + yasal onayları görünür kıl
    - [ ] (Opsiyonel) Admin için basit görüntüleme sayfası
+
 
 3) **İçerik/Legal**
    - [ ] Çerez Politikası metni (src/config/legal.ts) şirket bilgileri ile güncelle
