@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '0 3,9,12,15,21 * * *' # TR Saatiyle: 06:00, 12:00, 15:00, 18:00, 00:00
   workflow_dispatch:
+    inputs:
+      wave:
+        description: 'Target Wave (e.g., Dalga 2)'
+        required: true
+        default: 'Dalga 2'
+      scope:
+        description: 'Target Scope (e.g., src/components/admin/)'
+        required: true
+        default: 'src/components/admin/'
 
 jobs:
   lint-fix:
@@ -21,26 +30,26 @@ jobs:
           jules_api_key: ${{ secrets.JULES_API_KEY }}
           starting_branch: master
           prompt: |
-            TARGET SCOPE (Dalga 1): SADECE `src/views/admin/` dizinindeki dosyalar.
+            TARGET SCOPE (${{ github.event.inputs.wave || 'Dalga 2' }}): SADECE `${{ github.event.inputs.scope || 'src/components/admin/' }}` dizinindeki dosyalar.
             GÖREV: Lint & TypeScript Cleanup
 
             You are an expert code quality agent.
-            Your task is to fix existing ESLint warnings and TypeScript `any` types ONLY across the `src/views/admin/` folder.
+            Your task is to fix existing ESLint warnings and TypeScript `any` types ONLY across the `${{ github.event.inputs.scope || 'src/components/admin/' }}` folder.
 
             1. Run `pnpm run lint` and `pnpm exec tsc -b tsconfig.build.json`.
-            2. Analyze the errors specifically inside `src/views/admin/`.
-            3. Fix the errors target by target ONLY in `src/views/admin/`.
+            2. Analyze the errors specifically inside `${{ github.event.inputs.scope || 'src/components/admin/' }}`.
+            3. Fix the errors target by target ONLY in `${{ github.event.inputs.scope || 'src/components/admin/' }}`.
 
             ⚠️ STRICT BOUNDARIES (Sınır Kuralları):
             0. ZORUNLU MASTER SYNC: İşe başlamadan ÖNCE `git fetch origin master` ve `git checkout -b <gorev-dali> origin/master` ile HER ZAMAN TAZELENMİŞ MASTER'dan başla!
-            1. DOKUNULACAK ALANLAR (Dalga Kapsamı - Scope): SADECE sana promptta belirtilen klasör/hedef (`src/views/admin/`) üzerinde çalışacaksın. Bunun dışındaki hiçbir klasöre/dosyaya DOKUNAMAZSIN.
+            1. DOKUNULACAK ALANLAR (Dalga Kapsamı - Scope): SADECE sana promptta belirtilen klasör/hedef (`${{ github.event.inputs.scope || 'src/components/admin/' }}`) üzerinde çalışacaksın. Bunun dışındaki hiçbir klasöre/dosyaya DOKUNAMAZSIN.
             2. DOKUNULMASI KESİNLİKLE YASAK OLANLAR (No-go zones):
                - src/types/database.types.ts
                - src/lib/supabase.ts
-               - supabase/ klasörü (migrations, functions)
+               - supabase/
                - tsconfig*.json
                - package.json
-            3. UYGULAMA MANTIĞI: İş mantığını (business logic), conditional (if/else) ve state'leri ASLA değiştirme. Projedeki *.tsx, *.ts dosyalarını TAMAMEN SİLME. 
+            3. UYGULAMA MANTIĞI: İş mantığını, state yönetimini ve conditional blokları ASLA değiştirme. Dosya silme.
             4. CI/CD ONAYLARI: Mümkünse commit'ten önce `pnpm run lint` komutlarının temiz olduğundan emin ol.
-            5. PR Boyut Limiti (max 100 satır diff) kurallarına harfiyen uy.
+            5. ANAYASA: Kök dizindeki `AGENTS.md` dosyasını oku, PR Boyut Limiti (max 100 satır diff) kuralına uy.
             If successful, commit the changes and create a PR.
