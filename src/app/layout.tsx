@@ -5,7 +5,6 @@ import { Providers, ClientLayout } from '../components/layout/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
     title: "VentHub - Endüstriyel Havalandırma",
     description: "Türkiye'nin En Büyük B2B HVAC ve Endüstriyel Fan Platformu",

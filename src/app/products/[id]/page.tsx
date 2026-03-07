@@ -2,7 +2,6 @@ import PageComponent from '../../../views/ProductDetailPage'
 import { supabase } from '../../../lib/supabase'
 
 
-// eslint-disable-next-line react-refresh/only-export-components
 export async function generateStaticParams() {
   try {
     const { data: products } = await supabase
