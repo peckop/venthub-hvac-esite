@@ -30,7 +30,7 @@ interface ProductCardProps {
   hidePrice?: boolean
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false, hidePrice = false }) => {
+export const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({ product, onQuickView, highlightFeatured = false, showCompare = false, compareSelected = false, onToggleCompare, layout = 'grid', relatedTopicSlug, priority = false, hidePrice = false }) {
   const { t, lang } = useI18n()
   const router = useRouter()
   const isList = layout === 'list'
@@ -298,7 +298,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView, 
       </div>
     </Link>
   )
-}
+})
 
 export default ProductCard
 
