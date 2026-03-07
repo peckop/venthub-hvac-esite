@@ -23,7 +23,7 @@ interface StickyHeaderProps {
 
 
 
-export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
+export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHeader({ isScrolled }) {
   const { t, lang } = useI18n()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
@@ -677,7 +677,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = ({ isScrolled }) => {
       )}
     </>
   )
-}
+})
 
 export default StickyHeader
 
