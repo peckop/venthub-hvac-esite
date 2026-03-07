@@ -185,51 +185,43 @@ export default function AdminInventoryReportPage() {
                 rightExtra={<DateRangePicker value={dateRange} onChange={setDateRange} />}
             />
 
-            {movementsData.length === 0 ? (
-                <div className="py-24 bg-white rounded-3xl shadow-sm border border-slate-200/60">
-                    <AdminEmptyState
-                        icon={PackageMinus}
-                        title="Tarih Aralığında Veri Yok"
-                        description="Seçilen tarih aralığında herhangi bir stok hareketi kaydedilmemiş. Farklı bir tarih aralığı seçmeyi deneyin."
-                    />
-                </div>
-            ) : (
-                <>
-                    {/* Üst Kartlar */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                            <div className="flex items-center gap-2 text-slate-500 mb-2">
-                                <ArrowDownRight className="w-5 h-5 text-emerald-500" />
-                                <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Giriş</h3>
-                            </div>
-                            <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
+            <>
+                {/* Üst Kartlar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-emerald-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-slate-500 mb-2">
+                            <ArrowDownRight className="w-5 h-5 text-emerald-500" />
+                            <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Giriş</h3>
                         </div>
-
-                        <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                            <div className="flex items-center gap-2 text-slate-500 mb-2">
-                                <ArrowUpRight className="w-5 h-5 text-rose-500" />
-                                <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Çıkış</h3>
-                            </div>
-                            <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
-                        </div>
-
-                        <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
-                            <div className="flex items-center gap-2 text-slate-500 mb-2">
-                                <Activity className="w-5 h-5 text-indigo-500" />
-                                <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Net Değişim</h3>
-                            </div>
-                            <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
-                                {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
-                            </div>
-                        </div>
+                        <div className="text-3xl font-black text-slate-800">{stats.totalIn} <span className="text-xs font-medium text-slate-400">adet</span></div>
                     </div>
 
-                    {/* Ana Grafikler Grid (2 Pencereli Görünüm) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100">
-                        <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
-                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-primary-navy" /> Stok Akış Trendi
-                            </h2>
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-rose-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-slate-500 mb-2">
+                            <ArrowUpRight className="w-5 h-5 text-rose-500" />
+                            <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Toplam Çıkış</h3>
+                        </div>
+                        <div className="text-3xl font-black text-slate-800">{stats.totalOut} <span className="text-xs font-medium text-slate-400">adet</span></div>
+                    </div>
+
+                    <div className={`${adminCardClass} p-6 border-l-4 border-l-indigo-500 !rounded-2xl shadow-md relative overflow-hidden group`}>
+                        <div className="flex items-center gap-2 text-slate-500 mb-2">
+                            <Activity className="w-5 h-5 text-indigo-500" />
+                            <h3 className="font-bold uppercase tracking-widest text-[10px] text-slate-400">Net Değişim</h3>
+                        </div>
+                        <div className={`text-3xl font-black ${stats.net > 0 ? 'text-emerald-600' : stats.net < 0 ? 'text-rose-600' : 'text-slate-800'}`}>
+                            {stats.net > 0 ? '+' : ''}{stats.net} <span className="text-xs font-medium text-slate-400">adet</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Ana Grafikler Grid (2 Pencereli Görünüm) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-5 duration-600 delay-100">
+                    <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
+                        <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <TrendingUp className="w-5 h-5 text-primary-navy" /> Stok Akış Trendi
+                        </h2>
+                        {movementsData.length > 0 ? (
                             <div className="h-72 w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={trendData}>
@@ -251,12 +243,18 @@ export default function AdminInventoryReportPage() {
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="h-72 flex items-center justify-center">
+                                <AdminEmptyState icon={PackageMinus} title="Trend Verisi Yok" description="Seçilen aralıkta veri bulunmuyor." />
+                            </div>
+                        )}
+                    </div>
 
-                        <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
-                            <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-primary-navy" /> İşlem Türü & En Çok Hareket
-                            </h2>
+                    <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100`}>
+                        <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <Activity className="w-5 h-5 text-primary-navy" /> İşlem Türü Analizi
+                        </h2>
+                        {reasonData.length > 0 ? (
                             <div className="h-72 flex items-center justify-center relative">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -271,20 +269,53 @@ export default function AdminInventoryReportPage() {
                                     <span className="text-xl font-black text-slate-800">{movementsData.length}</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Detay Tabloları (2 Pencereli Görünüm: Girişler vs Çıkışlar) */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-800 delay-300">
-                        {/* Giriş Hareketleri Penceresi */}
-                        <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100`}>
-                            <div className="p-4 bg-emerald-50/50 border-b border-emerald-100 flex items-center justify-between">
-                                <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-2">
-                                    <PlusCircle className="w-4 h-4" /> Son Stok Girişleri (Pencere 1)
-                                </h2>
-                                <span className="text-[10px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-full border border-emerald-200 uppercase">Incoming</span>
+                        ) : (
+                            <div className="h-72 flex items-center justify-center">
+                                <AdminEmptyState icon={Activity} title="Analiz Verisi Yok" description="İşlem kaydı bulunamadı." />
                             </div>
-                            <div ref={dragScrollRefIn} className="overflow-x-auto max-h-[400px]">
+                        )}
+                    </div>
+                </div>
+
+                {/* Orta Bölüm: En Çok Hareket Görenler (Geniş Grafik) */}
+                <div className={`${adminCardClass} p-6 !rounded-3xl shadow-lg border-slate-100 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-200`}>
+                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-primary-navy" /> En Çok Hareket Gören Ürünler
+                    </h2>
+                    <div className="h-80">
+                        {topProducts.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={topProducts} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                                    <RechartsTooltip
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Bar dataKey="amount" fill="#0f172a" radius={[6, 6, 0, 0]} barSize={40} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center text-slate-400 gap-2">
+                                <PackageMinus size={40} className="opacity-20" />
+                                <span className="text-sm">Yeterli veri yok</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Detay Tabloları (2 Pencereli Görünüm: Girişler vs Çıkışlar) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-8 duration-800 delay-300">
+                    {/* Giriş Hareketleri Penceresi */}
+                    <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-emerald-100`}>
+                        <div className="p-4 bg-emerald-50/50 border-b border-emerald-100 flex items-center justify-between">
+                            <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-2">
+                                <PlusCircle className="w-4 h-4" /> Son Stok Girişleri (Pencere 1)
+                            </h2>
+                            <span className="text-[10px] font-bold text-emerald-600 bg-white px-2 py-0.5 rounded-full border border-emerald-200 uppercase">Incoming</span>
+                        </div>
+                        <div ref={dragScrollRefIn} className="overflow-x-auto max-h-[400px]">
+                            {inboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
                                         <tr>
@@ -303,18 +334,24 @@ export default function AdminInventoryReportPage() {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
+                            ) : (
+                                <div className="p-12">
+                                    <AdminEmptyState icon={PackageMinus} title="Giriş Yok" description="Henüz bir giriş hareketi kaydedilmemiş." />
+                                </div>
+                            )}
                         </div>
+                    </div>
 
-                        {/* Çıkış Hareketleri Penceresi */}
-                        <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100`}>
-                            <div className="p-4 bg-rose-50/50 border-b border-rose-100 flex items-center justify-between">
-                                <h2 className="text-sm font-bold text-rose-800 flex items-center gap-2">
-                                    <MinusCircle className="w-4 h-4" /> Son Stok Çıkışları (Pencere 2)
-                                </h2>
-                                <span className="text-[10px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded-full border border-rose-200 uppercase">Outgoing</span>
-                            </div>
-                            <div ref={dragScrollRefOut} className="overflow-x-auto max-h-[400px]">
+                    {/* Çıkış Hareketleri Penceresi */}
+                    <div className={`${adminCardClass} overflow-hidden !rounded-3xl shadow-xl border-rose-100`}>
+                        <div className="p-4 bg-rose-50/50 border-b border-rose-100 flex items-center justify-between">
+                            <h2 className="text-sm font-bold text-rose-800 flex items-center gap-2">
+                                <MinusCircle className="w-4 h-4" /> Son Stok Çıkışları (Pencere 2)
+                            </h2>
+                            <span className="text-[10px] font-bold text-rose-600 bg-white px-2 py-0.5 rounded-full border border-rose-200 uppercase">Outgoing</span>
+                        </div>
+                        <div ref={dragScrollRefOut} className="overflow-x-auto max-h-[400px]">
+                            {outboundMovements.length > 0 ? (
                                 <table className="w-full text-xs">
                                     <thead className="bg-slate-50 sticky top-0 z-10">
                                         <tr>
@@ -333,11 +370,15 @@ export default function AdminInventoryReportPage() {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
+                            ) : (
+                                <div className="p-12">
+                                    <AdminEmptyState icon={PackageMinus} title="Çıkış Yok" description="Henüz bir çıkış hareketi kaydedilmemiş." />
+                                </div>
+                            )}
                         </div>
                     </div>
-                </>
-            )}
+                </div>
+            </>
         </div>
     )
 }
