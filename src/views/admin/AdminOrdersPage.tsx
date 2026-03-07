@@ -107,6 +107,7 @@ const AdminOrdersPage: React.FC = () => {
   const searchParams = useSearchParams()
   const [presetPendingShipments, setPresetPendingShipments] = React.useState(false)
   const deepLinkAppliedRef = React.useRef(false)
+  const lastFetchId = React.useRef(0)
 
   React.useEffect(() => {
     if (deepLinkAppliedRef.current) return
@@ -147,9 +148,9 @@ const AdminOrdersPage: React.FC = () => {
   }, [searchParams])
 
   const fetchOrders = React.useCallback(async () => {
+    const fetchId = ++lastFetchId.current
     setLoading(true)
     try {
-      // Proaktif oturum kontrolü: Token süresi dolmuşsa yenilemeyi deni
       await ensureSessionFresh()
 
       let qb = supabase
@@ -163,26 +164,34 @@ const AdminOrdersPage: React.FC = () => {
         qb = qb.eq('status', status)
       }
 
-      if (dateRange?.from) qb = qb.gte('created_at', dateRange.from.toISOString())
-      if (dateRange?.to) qb = qb.lte('created_at', endOfDay(dateRange.to).toISOString())
-
-      if (debouncedQuery) {
-        const q = debouncedQuery.trim()
+      const q = debouncedQuery.trim()
+      if (q) {
         qb = qb.ilike('search_text', `%${q}%`)
       }
+
+      if (dateRange?.from) qb = qb.gte('created_at', dateRange.from.toISOString())
+      if (dateRange?.to) qb = qb.lte('created_at', endOfDay(dateRange.to).toISOString())
 
       const offset = (page - 1) * PAGE_SIZE
       qb = qb.range(offset, offset + PAGE_SIZE - 1)
 
       const { data, count, error: fetchErr } = await qb
+
+      // Yarış durumu kontrolü: Başka bir istek başladıysa bu sonucu yoksay
+      if (fetchId !== lastFetchId.current) return
+
       if (fetchErr) throw fetchErr
 
       setRows(Array.isArray(data) ? (data as AdminOrderRow[]) : [])
       setTotal(count || 0)
     } catch {
-      toast.error(t('admin.orders.toasts.loadError'))
+      if (fetchId === lastFetchId.current) {
+        toast.error(t('admin.orders.toasts.loadError'))
+      }
     } finally {
-      setLoading(false)
+      if (fetchId === lastFetchId.current) {
+        setLoading(false)
+      }
     }
   }, [status, dateRange, page, debouncedQuery, presetPendingShipments, t])
 
