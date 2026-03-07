@@ -45,3 +45,10 @@ Before suggesting or opening a Pull Request, you MUST ensure that the following 
 4. `pnpm run build:ci` (Production build)
 
 If any of these fail, you MUST fix the errors before finalizing your task.
+
+## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli
+🚨 **JULES (AI Agent) için Kesin Kurallar:**
+1. **ZORUNLU MASTER SYNC:** Herhangi bir koda dokunmadan veya yeni bir PR açmadan ÖNCE, ortamı mutlaka `master` dalının **en güncel** haliyle eşitlemelisin. (`git fetch origin master` ve `git checkout -b <görev-dali> origin/master`). Eski bir daldan veya senkronize olmayan yerel bir kopyadan ASLA işleme başlama.
+2. **Dalga (Wave) Kapsamı:** Sana verilen bir görevde hedef dizin (örn. `Dalga 1: src/views/admin/`) belirtilecek. Belirtilen bu dizin DIŞINDAKİ hiçbir dosyaya müdahale EDEMEZSİN.
+3. **PR Boyut Limiti:** Tek bir PR devasa olmamalı. Çoklu dosyalarda çalışıyorsan ve diff çok büyüyorsa (100+ satır), görevi parçalara ayırarak sıralı PR'lar aç.
+4. **Dosya Silme Yasağı:** Projeden ASLA `.ts`, `.tsx`, `.css` vb. dosyaları tamamen SİLME (özel olarak emredilmedikçe). Sadece dosya içi temizlik/düzenleme yapabilirsin.
