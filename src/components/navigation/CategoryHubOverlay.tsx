@@ -210,14 +210,24 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                     ) : (
                         /* Ana Kategoriler Grid */
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {mainCategories.map((category) => (
-                                <CategoryCard3D
-                                    key={category.id}
-                                    category={category}
-                                    subCategoryCount={getSubCategoryCount(category.id)}
-                                    onClick={() => handleCategoryClick(category)}
-                                />
-                            ))}
+                            {mainCategories.length > 0 ? (
+                                mainCategories.map((category) => (
+                                    <CategoryCard3D
+                                        key={category.id}
+                                        category={category}
+                                        subCategoryCount={getSubCategoryCount(category.id)}
+                                        onClick={() => handleCategoryClick(category)}
+                                    />
+                                ))
+                            ) : (
+                                /* Skeleton-like loading state */
+                                Array.from({ length: 8 }).map((_, i) => (
+                                    <div key={i} className="h-48 bg-white/5 rounded-2xl animate-pulse flex flex-col justify-end p-4">
+                                        <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
+                                        <div className="h-3 w-1/4 bg-white/5 rounded" />
+                                    </div>
+                                ))
+                            )}
                         </div>
                     )}
                 </div>

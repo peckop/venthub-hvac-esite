@@ -165,11 +165,13 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     }
   }, [categoriesLoaded])
 
-  // Open Category Hub with categories loaded
-  const openCategoryHub = useCallback(async () => {
-    await ensureCategories()
+  // Open Category Hub immediately and trigger data fetch in background
+  const openCategoryHub = useCallback(() => {
     setIsCategoryHubOpen(true)
-  }, [ensureCategories])
+    if (!categoriesLoaded) {
+      ensureCategories()
+    }
+  }, [ensureCategories, categoriesLoaded])
 
   // Delay showing syncing pulse to avoid early flicker
   useEffect(() => {
@@ -226,8 +228,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
         {t('common.skipToContent')}
       </a>
 
-      {/* Main Header */}
-      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm relative z-30 transition-all duration-300">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm relative z-40 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -237,8 +238,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             <nav className="hidden xl:flex items-center space-x-1">
               <button
                 onClick={() => { trackEvent('nav_click', { target: 'categories' }); openCategoryHub() }}
-                disabled={isCategoriesLoading}
-                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center disabled:opacity-75 disabled:cursor-wait"
+                onMouseEnter={() => ensureCategories()}
+                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center active:scale-95"
               >
                 {isCategoriesLoading ? (
                   <svg className="animate-spin h-4 w-4 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -496,9 +497,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                   {/* Categories Dropdown */}
                   <div className="relative" ref={categoriesRef}>
                     <button
-                      onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
-                      disabled={isCategoriesLoading}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap disabled:opacity-75 disabled:cursor-wait"
+                      onClick={() => { openCategoryHub(); setIsCategoriesOpen(!isCategoriesOpen) }}
+                      onMouseEnter={() => ensureCategories()}
+                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap active:scale-95"
                     >
                       {isCategoriesLoading ? (
                         <svg className="animate-spin h-3.5 w-3.5 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
