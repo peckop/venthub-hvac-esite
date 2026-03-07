@@ -167,15 +167,9 @@ export default function AdminLogisticsPage() {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
                 {loading && rows.length === 0 ? (
-                    <table className="w-full min-w-[1000px]">
-                        <tbody>
-                            <tr>
-                                <td colSpan={7} className="p-0">
-                                    <AdminSkeleton variant="table" count={7} rows={5} />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div className="p-0">
+                        <AdminSkeleton variant="table" count={7} rows={5} />
+                    </div>
                 ) : rows.length === 0 ? (
                     <AdminEmptyState
                         icon={CheckCircle2}
