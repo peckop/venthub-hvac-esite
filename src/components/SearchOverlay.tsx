@@ -30,7 +30,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
-  const [popularCategories, setPopularCategories] = React.useState<any[]>([])
+  const [popularCategories, setPopularCategories] = React.useState<Record<string, unknown>[]>([])
 
   const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -187,9 +187,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     const isActive = idx === activeIndex
 
     const icon = s.type === 'product' ? (
-      (s.metadata as any)?.image_url ? (
+      (s.metadata as Record<string, string>)?.image_url ? (
         <div className="w-8 h-8 relative rounded-md overflow-hidden bg-white border border-gray-100 flex-shrink-0">
-          <Image src={(s.metadata as any).image_url} alt={s.label} fill className="object-cover" />
+          <Image src={(s.metadata as Record<string, string>).image_url} alt={s.label} fill className="object-cover" />
         </div>
       ) : (
         <svg className="w-5 h-5 text-steel-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
@@ -218,11 +218,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         </div>
         <div className="flex-1">
           <div className="text-sm font-medium text-industrial-gray">{highlightMatch(label, debounced)}</div>
-          {s.type === 'product' && (s.metadata as any)?.sku && (
+          {s.type === 'product' && (s.metadata as Record<string, string>)?.sku && (
             <div className="text-xs text-steel-gray mt-0.5">
-              {(s.metadata as any).brand && <span className="font-semibold">{highlightMatch((s.metadata as any).brand, debounced)}</span>}
-              {(s.metadata as any).brand && (s.metadata as any).sku && <span> • </span>}
-              {highlightMatch((s.metadata as any).sku, debounced)}
+              {(s.metadata as Record<string, string>).brand && <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>}
+              {(s.metadata as Record<string, string>).brand && (s.metadata as Record<string, string>).sku && <span> • </span>}
+              {highlightMatch((s.metadata as Record<string, string>).sku, debounced)}
             </div>
           )}
         </div>
@@ -271,12 +271,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         <div className="px-4 flex flex-wrap gap-2">
           {popularCategories.length > 0 ? popularCategories.map(cat => (
             <button
-              key={cat.id}
-              onClick={() => { router.push(`/category/${cat.slug}`); handleClose(); }}
+              key={String(cat.id)}
+              onClick={() => { router.push(`/category/${String(cat.slug)}`); handleClose(); }}
               className="px-3 py-1.5 bg-gray-50 text-sm text-industrial-gray rounded-full border border-gray-200 hover:border-primary-ocean hover:text-primary-ocean transition-all flex items-center gap-1.5"
             >
-              {getCategoryIcon(cat.slug, { size: 14 })}
-              {cat.name}
+              {getCategoryIcon(String(cat.slug), { size: 14 })}
+              {String(cat.name)}
             </button>
           )) : (
             ['Fanlar', 'Hava Perdeleri', 'Isı Geri Kazanım'].map(cat => (

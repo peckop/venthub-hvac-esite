@@ -55,7 +55,7 @@ export default function AccountShipmentsPage() {
             .select('id, created_at, total_amount, status, order_number')
             .eq('user_id', user?.id || '')
             .order('created_at', { ascending: false })
-          data = fallback.data as any
+          data = fallback.data as unknown[] as typeof data
           error = fallback.error
         }
         if (error) throw error
