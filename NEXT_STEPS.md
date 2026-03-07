@@ -65,8 +65,8 @@
 
 2) **JULES Paralel Çalışma — Batch 2 (Devam Ediyor)**
    - [x] Task 6: Dead Code & TS Cleanup (PR #44 ile tamamlandı)
-   - [ ] **Task 5: Accessibility (A11y)** → JULES'a verilecek sıradaki iş.
-   - [ ] **Task 7: Performance Optimization** → A11y sonrası verilecek son periyodik temizlik.
+   - [x] **Task 5: Accessibility (A11y)** → JULES tarafından denetlendi (sıfır hata), PR #45 ile kapatıldı.
+   - [ ] **Task 7: Performance Optimization** → JULES'a verilecek sıradaki ve son periyodik temizlik işi.
 
 3) **Sipariş/İdari işlevler**
    - [ ] Orders detayında fatura bilgileri + yasal onayları görünür kıl
