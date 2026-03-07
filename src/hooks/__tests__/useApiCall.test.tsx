@@ -29,7 +29,7 @@ describe('useApiCall hook', () => {
         const mockData = { id: 1, name: 'test' }
         const mockApiFunc = vi.fn().mockResolvedValue(mockData)
 
-        let promise: Promise<any>;
+        let promise: Promise<{ id: number, name: string } | null>;
         act(() => {
             promise = result.current.execute(mockApiFunc)
         })
