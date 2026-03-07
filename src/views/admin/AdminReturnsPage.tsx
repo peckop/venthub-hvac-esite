@@ -494,7 +494,7 @@ export default function AdminReturnsPage() {
                         <td className={`${adminTableCellClass} ${cellPad}`}>
                           <div className="flex flex-col">
                             <button
-                              onClick={() => router.push(`/account/orders/${returnItem.order_id}`)}
+                              onClick={() => router.push(`/admin/orders?q=${returnItem.order_number || returnItem.order_id}`)}
                               className="text-primary-navy hover:underline font-medium text-left"
                             >
                               {orderNo}
