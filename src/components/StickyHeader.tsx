@@ -31,6 +31,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const [categories, setCategories] = useState<Category[]>([])
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
   const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
   const [allCategories, setAllCategories] = useState<Category[]>([])
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
@@ -150,6 +151,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   // Defer categories fetch until dropdown first open (reduce initial header churn)
   const ensureCategories = useCallback(async () => {
     if (categoriesLoaded) return
+    setIsCategoriesLoading(true)
     try {
       const { getCategories } = await import('../lib/supabase')
       const data = await getCategories()
@@ -158,6 +160,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       setCategoriesLoaded(true)
     } catch (error) {
       console.error('Error fetching categories:', error)
+    } finally {
+      setIsCategoriesLoading(false)
     }
   }, [categoriesLoaded])
 
@@ -233,11 +237,19 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             <nav className="hidden xl:flex items-center space-x-1">
               <button
                 onClick={() => { trackEvent('nav_click', { target: 'categories' }); openCategoryHub() }}
-                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center"
+                disabled={isCategoriesLoading}
+                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center disabled:opacity-75 disabled:cursor-wait"
               >
-                <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-180 transition-transform duration-300">
-                  <rect x="3" y="3" width="6" height="6" rx="1" /><rect x="15" y="3" width="6" height="6" rx="1" /><rect x="3" y="15" width="6" height="6" rx="1" /><rect x="15" y="15" width="6" height="6" rx="1" />
-                </svg>
+                {isCategoriesLoading ? (
+                  <svg className="animate-spin h-4 w-4 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-180 transition-transform duration-300">
+                    <rect x="3" y="3" width="6" height="6" rx="1" /><rect x="15" y="3" width="6" height="6" rx="1" /><rect x="3" y="15" width="6" height="6" rx="1" /><rect x="15" y="15" width="6" height="6" rx="1" />
+                  </svg>
+                )}
                 <span className="font-medium whitespace-nowrap">{t('common.categories')}</span>
               </button>
               <Link
@@ -485,11 +497,19 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                   <div className="relative" ref={categoriesRef}>
                     <button
                       onClick={async () => { await ensureCategories(); setIsCategoriesOpen(!isCategoriesOpen) }}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap"
+                      disabled={isCategoriesLoading}
+                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap disabled:opacity-75 disabled:cursor-wait"
                     >
-                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="6" height="6" /><rect x="15" y="3" width="6" height="6" /><rect x="3" y="15" width="6" height="6" /><rect x="15" y="15" width="6" height="6" />
-                      </svg>
+                      {isCategoriesLoading ? (
+                        <svg className="animate-spin h-3.5 w-3.5 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="6" height="6" /><rect x="15" y="3" width="6" height="6" /><rect x="3" y="15" width="6" height="6" /><rect x="15" y="15" width="6" height="6" />
+                        </svg>
+                      )}
                       <span>{t('common.categories')}</span>
                       <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`}>
                         <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
