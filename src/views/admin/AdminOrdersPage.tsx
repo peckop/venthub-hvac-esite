@@ -72,6 +72,12 @@ const AdminOrdersPage: React.FC = () => {
   const [query, setQuery] = React.useState('')
   const [debouncedQuery, setDebouncedQuery] = React.useState('')
 
+  const [hasDeepLink] = React.useState(() => {
+    if (typeof window === 'undefined') return false
+    const qs = new URLSearchParams(window.location.search)
+    return !!(qs.get('q') || qs.get('preset'))
+  })
+
   const [shipOpen, setShipOpen] = React.useState(false)
   const [shipId, setShipId] = React.useState<string>('')
   const [carrier, setCarrier] = React.useState('')
@@ -455,6 +461,7 @@ const AdminOrdersPage: React.FC = () => {
 
       {viewMode === 'list' && <AdminToolbar
         storageKey="toolbar:orders"
+        persist={{ select: !hasDeepLink, toggles: !hasDeepLink, chips: !hasDeepLink }}
         search={{ value: query, onChange: setQuery, placeholder: t('admin.search.orders'), focusShortcut: '/' }}
         select={{ value: status, onChange: setStatus, title: t('admin.orders.filters.status'), options: STATUSES.map(s => ({ value: s.value, label: s.label })) }}
         toggles={[{ key: 'pendingShipments', label: t('admin.orders.filters.pendingShipments'), checked: presetPendingShipments, onChange: (v) => { setPresetPendingShipments(v); if (v) setStatus('') } }]}
