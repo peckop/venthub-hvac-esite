@@ -20,6 +20,17 @@ export default function RootLayout({
             <body className={inter.className}>
                 <Providers>
                     <ClientLayout>
+                        <script
+                          type="application/ld+json"
+                          dangerouslySetInnerHTML={{
+                            __html: JSON.stringify({
+                              "@context": "https://schema.org",
+                              "@type": "WebSite",
+                              "name": "VentHub",
+                              "url": "https://venthub.com"
+                            })
+                          }}
+                        />
                         {children}
                     </ClientLayout>
                 </Providers>
@@ -27,6 +38,3 @@ export default function RootLayout({
         </html>
     )
 }
-
-
-
