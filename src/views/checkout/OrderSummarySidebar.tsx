@@ -5,8 +5,8 @@ import { Lock } from 'lucide-react'
 import { formatCurrency } from '../../i18n/format'
 import { Lang } from '../../i18n/I18nContext'
 
-interface OrderSummarySidebarProps {
-    items: any[]
+export interface OrderSummarySidebarProps {
+    items: { id: string; product: { name: string; image_url?: string | null; price: number | string }; quantity: number; price: number; unitPrice?: number | string }[]
     totalAmount: number
     vatAmount: number
     finalAmount: number
@@ -15,7 +15,7 @@ interface OrderSummarySidebarProps {
     setCouponCode: (v: string) => void
     onApplyCoupon: () => void
     onRemoveCoupon: () => void
-    t: (key: string, params?: Record<string, any>) => string
+    t: (key: string, params?: Record<string, unknown>) => string
     lang: Lang
 }
 
@@ -50,11 +50,11 @@ const OrderSummarySidebar: React.FC<OrderSummarySidebarProps> = ({
                                 {item.product.name}
                             </p>
                             <p className="text-xs text-steel-gray">
-                                {item.quantity} {t('orders.qtyCol')} x {formatCurrency(Number(item.unitPrice ?? parseFloat(item.product.price)), lang, { maximumFractionDigits: 0 })}
+                                {item.quantity} {t('orders.qtyCol')} x {formatCurrency(Number(item.unitPrice ?? parseFloat(String(item.product.price))), lang, { maximumFractionDigits: 0 })}
                             </p>
                         </div>
                         <div className="text-sm font-medium text-industrial-gray">
-                            {formatCurrency((Number(item.unitPrice ?? parseFloat(item.product.price)) * item.quantity), lang, { maximumFractionDigits: 0 })}
+                            {formatCurrency((Number(item.unitPrice ?? parseFloat(String(item.product.price))) * item.quantity), lang, { maximumFractionDigits: 0 })}
                         </div>
                     </div>
                 ))}

@@ -97,7 +97,7 @@ const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
         <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5} floatingRange={[-0.1, 0.1]}>
             <group>
                 {/* Main Card with Image */}
-                {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image
                     ref={meshRef}
                     url={image}
