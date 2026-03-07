@@ -56,7 +56,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         try {
             const { data, error } = await supabase.from('categories').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(data as any)
+            setInitialData(data as unknown as Category)
 
             reset({
                 name: data.name,
@@ -139,7 +139,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
-            const payload = { ...data, image_url: imgPath } as any
+            const payload = { ...data, image_url: imgPath } as unknown as Category
             if (payload.parent_id === '') payload.parent_id = null
 
             let currentId = categoryId
