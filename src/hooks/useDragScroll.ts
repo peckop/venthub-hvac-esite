@@ -1,12 +1,17 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useCallback } from 'react'
 
 export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
-    const ref = useRef<T>(null)
+    const cleanupRef = useRef<(() => void) | null>(null)
 
-    useEffect(() => {
-        const el = ref.current
-        if (!el) return
+    const callbackRef = useCallback((node: T | null) => {
+        if (cleanupRef.current) {
+            cleanupRef.current()
+            cleanupRef.current = null
+        }
 
+        if (!node) return
+
+        const el = node
         let isDown = false
         let startX: number
         let scrollLeft: number
@@ -15,14 +20,10 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
         const DRAG_THRESHOLD = 5
         let startClientX: number
 
-        // Set initial cursor
         el.style.cursor = 'grab'
-        // Ensure the element can handle mouse events over children
-        // and doesn't interfere with momentum scrolling on mobile
         el.style.touchAction = 'pan-x'
 
         const handleMouseDown = (e: MouseEvent) => {
-            // Only left click
             if (e.button !== 0) return
 
             isDown = true
@@ -33,7 +34,7 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
 
             el.style.cursor = 'grabbing'
             el.style.userSelect = 'none'
-            el.style.scrollBehavior = 'auto' // Prevent conflict with smooth scroll
+            el.style.scrollBehavior = 'auto'
         }
 
         const handleMouseLeave = () => {
@@ -76,12 +77,12 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
         }
 
         el.addEventListener('mousedown', handleMouseDown)
-        window.addEventListener('mouseup', handleMouseUp) // Use window to catch up even if mouse is outside
+        window.addEventListener('mouseup', handleMouseUp)
         el.addEventListener('mouseleave', handleMouseLeave)
         el.addEventListener('mousemove', handleMouseMove)
         el.addEventListener('click', handleClick, { capture: true })
 
-        return () => {
+        cleanupRef.current = () => {
             el.removeEventListener('mousedown', handleMouseDown)
             window.removeEventListener('mouseup', handleMouseUp)
             el.removeEventListener('mouseleave', handleMouseLeave)
@@ -90,5 +91,5 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
         }
     }, [])
 
-    return ref
+    return callbackRef
 }
