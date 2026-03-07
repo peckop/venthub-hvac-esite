@@ -58,20 +58,22 @@ const AdminRealtimeNotifications: React.FC = () => {
                 }
 
                 if (sData) {
-                    sData.forEach((s: any) => {
-                        const pName = s.products?.name || 'Bilinmeyen Ürün'
-                        const pSku = s.products?.sku || ''
-                        const movementType = s.delta > 0 ? 'Giriş' : 'Çıkış'
-                        const absQty = Math.abs(s.delta || 0)
+                    sData.forEach((s: Record<string, unknown>) => {
+                        const products = s.products as Record<string, unknown> | null
+                        const pName = products?.name || 'Bilinmeyen Ürün'
+                        const pSku = products?.sku || ''
+                        const delta = Number(s.delta || 0)
+                        const movementType = delta > 0 ? 'Giriş' : 'Çıkış'
+                        const absQty = Math.abs(delta)
 
                         combined.push({
-                            id: `stock_${s.id}`,
+                            id: `stock_${String(s.id)}`,
                             type: 'stock',
                             title: 'Stok Hareketi',
-                            message: `${pName} için ${movementType}: ${absQty} Adet`,
-                            timestamp: s.created_at,
+                            message: `${String(pName)} için ${movementType}: ${absQty} Adet`,
+                            timestamp: s.created_at as string,
                             isRead: true,
-                            link: pSku ? `/admin/products?q=${pSku}` : `/admin/products`
+                            link: pSku ? `/admin/products?q=${String(pSku)}` : `/admin/products`
                         })
                     })
                 }
@@ -103,17 +105,21 @@ const AdminRealtimeNotifications: React.FC = () => {
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'venthub_orders' },
                 (payload) => {
-                    const newOrder = payload.new as any
-                    const amt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(newOrder.total_amount)
+                    const newOrder = payload.new as Record<string, unknown>
+                    const totalAmt = Number(newOrder.total_amount || 0)
+                    const amt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalAmt)
+
+                    const orderId = String(newOrder.id || '')
+                    const orderNumber = newOrder.order_number ? String(newOrder.order_number) : orderId.slice(0, 8)
 
                     const notif: AppNotification = {
-                        id: `order_rt_${newOrder.id}`,
+                        id: `order_rt_${orderId}`,
                         type: 'order',
                         title: '🚀 Yeni Sipariş Alındı!',
-                        message: `Sipariş No: #${newOrder.order_number || newOrder.id.slice(0, 8)} - Tutar: ${amt}`,
-                        timestamp: newOrder.created_at || new Date().toISOString(),
+                        message: `Sipariş No: #${orderNumber} - Tutar: ${amt}`,
+                        timestamp: (newOrder.created_at as string) || new Date().toISOString(),
                         isRead: false,
-                        link: `/admin/orders?q=${newOrder.order_number || newOrder.id}`
+                        link: `/admin/orders?q=${orderNumber}`
                     }
 
                     // Add to dropdown
@@ -151,16 +157,17 @@ const AdminRealtimeNotifications: React.FC = () => {
                 'postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'inventory_movements' },
                 (payload) => {
-                    const m = payload.new as any
-                    const movementType = (m.delta || 0) > 0 ? 'Giriş' : 'Çıkış'
-                    const absQty = Math.abs(m.delta || 0)
+                    const m = payload.new as Record<string, unknown>
+                    const delta = Number(m.delta || 0)
+                    const movementType = delta > 0 ? 'Giriş' : 'Çıkış'
+                    const absQty = Math.abs(delta)
 
                     const notif: AppNotification = {
-                        id: `stock_rt_${m.id}`,
+                        id: `stock_rt_${String(m.id)}`,
                         type: 'stock',
                         title: '📦 Stok Güncellendi',
-                        message: `${movementType}: ${absQty} Adet (${m.reason || 'Sistem'})`,
-                        timestamp: m.created_at || new Date().toISOString(),
+                        message: `${movementType}: ${absQty} Adet (${String(m.reason || 'Sistem')})`,
+                        timestamp: (m.created_at as string) || new Date().toISOString(),
                         isRead: false,
                         link: `/admin/products` // Default products page for RT stock, ideally we'd fetch SKU here but payload doesn't have it
                     }

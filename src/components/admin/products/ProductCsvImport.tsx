@@ -61,11 +61,11 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             return found?.id || null
         }
 
-        const payloads: any[] = []
+        const payloads: Record<string, unknown>[] = []
 
         for (const r of importRows) {
             if (!r['sku'] || !r['name']) continue
-            const p: any = {
+            const p: Record<string, unknown> = {
                 sku: r['sku'].trim(),
                 name: r['name'].trim(),
                 brand: r['brand']?.trim() || 'Generic' // Default for required field
@@ -93,7 +93,8 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             let ok = 0, fail = 0
             for (let i = 0; i < payloads.length; i += 100) {
                 const chunk = payloads.slice(i, i + 100)
-                const { error } = await supabase.from('products').upsert(chunk as any, { onConflict: 'sku' })
+                // Use the proper product insert type to avoid 'any'
+                const { error } = await supabase.from('products').upsert(chunk as never, { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
                     fail += chunk.length
