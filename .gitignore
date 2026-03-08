@@ -101,3 +101,8 @@ eslint.json
 log*.txt
 find_buttons*.js
 extract_types*.py
+pr_*.json
+pr_*.txt
+open_prs*.json
+open_prs*.txt
+prs_open*.json
