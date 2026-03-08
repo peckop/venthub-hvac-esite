@@ -10,9 +10,22 @@ interface HeroCarouselProps {
     categories: Category[]
 }
 
+interface CategoryFeature {
+    icon: string;
+    title: string;
+    description?: string;
+}
+
+interface CategoryMetadata {
+    hero_title?: string;
+    hero_description?: string;
+    technical_summary?: string;
+    features?: CategoryFeature[];
+    [key: string]: unknown;
+}
+
 // Fallback data for when DB metadata is missing
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FALLBACK_METADATA: Record<string, any> = {
+const FALLBACK_METADATA: Record<string, CategoryMetadata> = {
     'fanlar': {
         hero_title: 'Endüstriyel Havalandırma Çözümleri',
         hero_description: 'Yüksek performanslı, enerji verimli ve uzun ömürlü fan teknolojileri.',
@@ -35,8 +48,7 @@ const FALLBACK_METADATA: Record<string, any> = {
 }
 
 // Icon mapper
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const IconMap: Record<string, any> = {
+const IconMap: Record<string, React.ElementType> = {
     wind: Wind,
     shield: Shield,
     activity: Activity,
@@ -149,8 +161,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Features Grid */}
                                 {meta.features && (
                                     <div className="flex gap-8 mb-10">
-                                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                        {meta.features.map((f: any, i: number) => {
+                                        {meta.features.map((f: CategoryFeature, i: number) => {
                                             const Icon = IconMap[f.icon] || Activity
                                             return (
                                                 <div key={i} className="flex items-center gap-3">
