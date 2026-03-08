@@ -13,16 +13,16 @@ verify_jwt = false
 verify_jwt = false
 
 [functions."admin-update-order"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."admin-order-inspect"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."admin-orders-latest"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."admin-iyzico-reconcile"]
-verify_jwt = false
+verify_jwt = true
 
 [functions."shipping-webhook"]
 verify_jwt = false

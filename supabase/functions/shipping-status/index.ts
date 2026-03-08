@@ -1,7 +1,3 @@
-// Supabase Edge Function: shipping-status
-// Returns shipping status for a given order_id or tracking_number
-// Env required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (read-only is okay but service role simplifies policies in sandbox)
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
@@ -31,18 +27,50 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ error: 'Function misconfigured: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 })
     }
 
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return jsonResponse({ error: 'unauthenticated' }, { status: 401 })
+    }
+
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || SERVICE_KEY
+    const supabaseUser = createClient(SUPABASE_URL, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    })
+
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    if (userErr || !userRes?.user) {
+      return jsonResponse({ error: 'unauthorized' }, { status: 401 })
+    }
+    const uid = userRes.user.id
+
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    let query = supabase.from('venthub_orders').select('id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at').limit(1)
+    const { data: profile, error: profErr } = await supabase
+      .from('user_profiles')
+      .select('role')
+      .eq('id', uid)
+      .maybeSingle();
+
+    // deno-lint-ignore no-explicit-any
+    const role = (profile as any)?.role || 'user';
+    const isAdmin = ['admin', 'superadmin'].includes(role);
+
+    let query = supabase.from('venthub_orders').select('id, user_id, status, carrier, tracking_number, tracking_url, shipped_at, delivered_at').limit(1)
     if (orderId) query = query.eq('id', orderId)
     if (tracking) query = query.eq('tracking_number', tracking)
 
     const { data, error } = await query.single()
     if (error) return jsonResponse({ error: error.message || 'Not found' }, { status: 404 })
 
-    return jsonResponse({ ok: true, shipping: data })
+    if (data.user_id !== uid && !isAdmin) {
+      return jsonResponse({ error: 'forbidden' }, { status: 403 })
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { user_id, ...shippingData } = data;
+
+    return jsonResponse({ ok: true, shipping: shippingData })
   } catch (e) {
     return jsonResponse({ error: (e as Error).message || 'Unexpected error' }, { status: 500 })
   }
 })
-

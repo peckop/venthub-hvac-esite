@@ -1,3 +1,5 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+
 Deno.serve(async (req) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -12,6 +14,39 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     if (!supabaseUrl || !serviceRoleKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    }
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || serviceRoleKey;
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser();
+    if (userErr || !userRes?.user) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    const userId = userRes.user.id;
+
+    const { data: profile, error: profErr } = await supabaseAdmin
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profErr) {
+      return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    // deno-lint-ignore no-explicit-any
+    const role = (profile as any)?.role || 'user';
+    if (!['admin', 'superadmin'].includes(role)) {
+      return new Response(JSON.stringify({ error: 'forbidden', details: 'admin_only' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     let id: string | null = null
@@ -33,7 +68,7 @@ Deno.serve(async (req) => {
     }
 
     const rpcUrl = `${supabaseUrl}/rest/v1/rpc/fn_admin_get_orders`
-    const body = { p_id: id, p_conv: conv, p_status: null, p_limit: 1 }
+    const bodyReq = { p_id: id, p_conv: conv, p_status: null, p_limit: 1 }
     const resp = await fetch(rpcUrl, {
       method: 'POST',
       headers: {
@@ -41,7 +76,7 @@ Deno.serve(async (req) => {
         apikey: serviceRoleKey,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(bodyReq)
     })
 
     if (!resp.ok) {

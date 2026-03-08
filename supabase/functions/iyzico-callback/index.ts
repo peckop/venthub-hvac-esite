@@ -61,7 +61,30 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       if (!orderId) orderId = url.searchParams.get('orderId') || undefined;
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
-      successUrl = url.searchParams.get('successUrl');
+
+      let rawSuccessUrl = url.searchParams.get('successUrl');
+      if (rawSuccessUrl) {
+        try {
+          const parsedSuccessUrl = new URL(rawSuccessUrl);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+            console.warn('Blocked open redirect attempt to:', rawSuccessUrl);
+            successUrl = null;
+          } else {
+            successUrl = rawSuccessUrl;
+          }
+        } catch {
+          successUrl = rawSuccessUrl; // It might be a relative path like /payment-success
+        }
+      }
+
     } catch {}
 
     // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
@@ -428,9 +451,27 @@ Deno.serve(async (req) => {
     // Her durumda frontende yönlendiren HTML dön (IyziCo bazı durumlarda 302'yi takip etmiyor olabilir)
     try {
       const url = new URL(req.url);
-      const successUrl = url.searchParams.get('successUrl');
-      let finalSuccess = successUrl;
+
+      const rawSuccessUrl = url.searchParams.get('successUrl');
+      let finalSuccess = rawSuccessUrl;
+      if (finalSuccess) {
+        try {
+          const parsedSuccessUrl = new URL(finalSuccess);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+            finalSuccess = null;
+          }
+        } catch {}
+      }
       if (!finalSuccess) {
+
         const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
         if (base) {
           try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
@@ -462,8 +503,27 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       const orderId = url.searchParams.get('orderId') || undefined;
       const conversationId = url.searchParams.get('conversationId') || undefined;
-      let finalSuccess = url.searchParams.get('successUrl');
+
+      const rawSuccessUrl = url.searchParams.get('successUrl');
+      let finalSuccess = rawSuccessUrl;
+      if (finalSuccess) {
+        try {
+          const parsedSuccessUrl = new URL(finalSuccess);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+            finalSuccess = null;
+          }
+        } catch {}
+      }
       if (!finalSuccess) {
+
         const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
         if (base) {
           try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
