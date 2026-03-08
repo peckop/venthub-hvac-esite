@@ -8,6 +8,4 @@ tmp-*/
 *.log
 *.txt
 .git/
-avens-integration/node_modules/
-avens-integration/dist/
 brain/

@@ -100,7 +100,6 @@ export default defineConfig(({ mode }) => {
       watch: {
         ignored: [
           '**/hood-visualization*.html',
-          '**/avens-integration/**',
           '**/supabase/functions/**',
         ],
       },

@@ -48,7 +48,6 @@ Bu belge, proje geçmişindeki tüm planları, yol haritalarını ve kod durumun
 ### A. Entegrasyonlar
 | Görev | Durum | Öncelik |
 |-------|-------|---------|
-| Avens Data Import (~160 → 500+ ürün) | Kısmen yapıldı | YÜKSEK |
 | Hesaplayıcı motorları (HRV, Fan formülleri) | İskelet var | ORTA |
 
 ### B. Ana Sayfa Geliştirmeleri (Arşivden taşınan)
@@ -94,7 +93,6 @@ Bu belge, proje geçmişindeki tüm planları, yol haritalarını ve kod durumun
 ## 📋 ÖNERİLER
 
 1. **SmartRouting Entegrasyonu:** Kod hazır, sadece HomePage'e eklenmeli. ~30 dk iş.
-2. **Avens Import:** Öncelikli. Ürün sayısı yetersiz.
-3. **Kullanılmayan Bileşenler:** `VisualShowcase.tsx` gibi dosyalar ya entegre edilmeli ya temizlenmeli.
-4. **Düzenli Doküman Güncellemesi:** Her sprint sonunda bu dosya güncellensin.
+2. **Kullanılmayan Bileşenler:** `VisualShowcase.tsx` gibi dosyalar ya entegre edilmeli ya temizlenmeli.
+3. **Düzenli Doküman Güncellemesi:** Her sprint sonunda bu dosya güncellensin.
 
