@@ -87,3 +87,17 @@ out.txt
 # Out of scope integrations
 avens-integration/
 
+
+# AI & Build Reports
+*.log
+tmp_*.*
+*_errors.txt
+*_errors_*.txt
+*-log.txt
+*-log-utf8.txt
+.reports/
+src_lint*.txt
+eslint.json
+log*.txt
+find_buttons*.js
+extract_types*.py
