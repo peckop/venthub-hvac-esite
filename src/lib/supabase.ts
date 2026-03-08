@@ -129,17 +129,123 @@ export const HVAC_BRANDS: HVACBrand[] = [
   }
 ]
 
-// API functions
-export async function getCategories() {
+const CATEGORY_FETCH_TIMEOUT_MS = 10000
+
+let categoriesCache: Category[] | null = null
+let categoriesInFlight: Promise<Category[]> | null = null
+
+async function ensureSupabaseSessionFresh() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.expires_at) return
+
+    const nowSec = Math.floor(Date.now() / 1000)
+    if (session.expires_at - nowSec < 60) {
+      await supabase.auth.refreshSession()
+    }
+  } catch (error) {
+    console.warn('[supabase] session refresh skipped:', error)
+  }
+}
+
+export class CategoryFetchTimeoutError extends Error {
+  constructor(message = 'Timed out while loading categories') {
+    super(message)
+    this.name = 'CategoryFetchTimeoutError'
+  }
+}
+
+function isCategoryFetchRetryable(error: unknown) {
+  if (!(error instanceof Error)) return false
+
+  const normalized = error.message.toLowerCase()
+  return (
+    error instanceof CategoryFetchTimeoutError ||
+    normalized.includes('jwt') ||
+    normalized.includes('session') ||
+    normalized.includes('token') ||
+    normalized.includes('network') ||
+    normalized.includes('fetch')
+  )
+}
+
+async function withTimeout<T>(factory: (signal: AbortSignal) => Promise<T>, timeoutMs: number) {
+  const controller = new AbortController()
+  const timeoutId = globalThis.setTimeout(() => controller.abort(), timeoutMs)
+
+  try {
+    return await factory(controller.signal)
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new CategoryFetchTimeoutError()
+    }
+
+    throw error
+  } finally {
+    globalThis.clearTimeout(timeoutId)
+  }
+}
+
+async function fetchCategoriesFromSupabase(signal: AbortSignal) {
+  await ensureSupabaseSessionFresh()
+
   const { data, error } = await supabase
     .from('categories')
     .select('*')
-    .eq('is_active', true) // Sadece aktif kategorileri getir
+    .eq('is_active', true)
     .order('level', { ascending: true })
     .order('name', { ascending: true })
+    .abortSignal(signal)
 
   if (error) throw error
   return data as Category[]
+}
+
+// API functions
+export async function getCategories(options?: { forceRefresh?: boolean }) {
+  if (categoriesCache && !options?.forceRefresh) {
+    return categoriesCache
+  }
+
+  if (categoriesInFlight) {
+    return categoriesInFlight
+  }
+
+  const request = (async () => {
+    let lastError: unknown = null
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        const data = await withTimeout(
+          (signal) => fetchCategoriesFromSupabase(signal),
+          CATEGORY_FETCH_TIMEOUT_MS
+        )
+        categoriesCache = data
+        return data
+      } catch (error) {
+        lastError = error
+
+        if (attempt === 0 && isCategoryFetchRetryable(error)) {
+          await ensureSupabaseSessionFresh()
+          continue
+        }
+
+        break
+      }
+    }
+
+    if (categoriesCache) {
+      return categoriesCache
+    }
+
+    throw lastError
+  })()
+
+  categoriesInFlight = request.finally(() => {
+    categoriesInFlight = null
+  })
+
+  return categoriesInFlight
 }
 
 export async function getProducts(limit?: number) {

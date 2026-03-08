@@ -101,6 +101,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch { }
     }
 
+    const refreshOnResume = async () => {
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return
+
+      try {
+        const { supabase } = await import('../lib/supabase')
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        if (!currentSession?.expires_at) return
+
+        const nowSec = Math.floor(Date.now() / 1000)
+        if (currentSession.expires_at - nowSec < 60) {
+          await supabase.auth.refreshSession()
+        }
+      } catch (error) {
+        console.warn('Auth resume refresh skipped:', error)
+      }
+    }
+
     if (needImmediate) {
       start()
     } else {
@@ -116,11 +133,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
 
+    document.addEventListener('visibilitychange', refreshOnResume)
+    window.addEventListener('focus', refreshOnResume)
+
     return () => {
       isMounted = false
       if (unsubscribe) unsubscribe()
       try {
         cleanup()
+        document.removeEventListener('visibilitychange', refreshOnResume)
+        window.removeEventListener('focus', refreshOnResume)
       } catch { }
     }
   }, [])

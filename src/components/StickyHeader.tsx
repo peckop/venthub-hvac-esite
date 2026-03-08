@@ -32,6 +32,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
+  const [categoriesError, setCategoriesError] = useState<string | null>(null)
   const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
   const [allCategories, setAllCategories] = useState<Category[]>([])
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
@@ -51,6 +52,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const router = useRouter()
   const userMenuRef = useRef<HTMLDivElement>(null)
   const categoriesRef = useRef<HTMLDivElement>(null)
+  const categoriesRequestRef = useRef<Promise<Category[] | null> | null>(null)
 
 
   // Close dropdowns when clicking outside
@@ -149,29 +151,69 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   }, [])
 
   // Defer categories fetch until dropdown first open (reduce initial header churn)
-  const ensureCategories = useCallback(async () => {
-    if (categoriesLoaded) return
+  const ensureCategories = useCallback(async (options?: { force?: boolean }) => {
+    const force = options?.force ?? false
+
+    if (categoriesLoaded && !force) return allCategories
+    if (categoriesRequestRef.current) return categoriesRequestRef.current
+
     setIsCategoriesLoading(true)
+    setCategoriesError(null)
+
+    const request = (async () => {
+      try {
+        const { getCategories } = await import('../lib/supabase')
+        const data = await getCategories({ forceRefresh: force })
+        setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
+        setAllCategories(data) // Store all categories for CategoryHub
+        setCategoriesLoaded(true)
+        return data
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+        setCategoriesError(t('categoryHub.loadFailed'))
+        return null
+      } finally {
+        setIsCategoriesLoading(false)
+        categoriesRequestRef.current = null
+      }
+    })()
+
+    categoriesRequestRef.current = request
+
     try {
-      const { getCategories } = await import('../lib/supabase')
-      const data = await getCategories()
-      setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
-      setAllCategories(data) // Store all categories for CategoryHub
-      setCategoriesLoaded(true)
-    } catch (error) {
-      console.error('Error fetching categories:', error)
+      return await request
     } finally {
-      setIsCategoriesLoading(false)
+      if (categoriesRequestRef.current === request) {
+        categoriesRequestRef.current = null
+      }
     }
-  }, [categoriesLoaded])
+  }, [allCategories, categoriesLoaded, t])
 
   // Open Category Hub immediately and trigger data fetch in background
   const openCategoryHub = useCallback(() => {
     setIsCategoryHubOpen(true)
-    if (!categoriesLoaded) {
-      ensureCategories()
+    if (!categoriesLoaded || categoriesError) {
+      void ensureCategories({ force: Boolean(categoriesError) })
     }
-  }, [ensureCategories, categoriesLoaded])
+  }, [categoriesError, ensureCategories, categoriesLoaded])
+
+  useEffect(() => {
+    const retryVisibleCategoryLoad = () => {
+      if (document.visibilityState !== 'visible') return
+      if (!isCategoryHubOpen) return
+      if (categoriesLoaded && !categoriesError) return
+
+      void ensureCategories({ force: Boolean(categoriesError) })
+    }
+
+    document.addEventListener('visibilitychange', retryVisibleCategoryLoad)
+    window.addEventListener('focus', retryVisibleCategoryLoad)
+
+    return () => {
+      document.removeEventListener('visibilitychange', retryVisibleCategoryLoad)
+      window.removeEventListener('focus', retryVisibleCategoryLoad)
+    }
+  }, [categoriesError, categoriesLoaded, ensureCategories, isCategoryHubOpen])
 
   // Delay showing syncing pulse to avoid early flicker
   useEffect(() => {
@@ -520,10 +562,22 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                     {isCategoriesOpen && (
                       <div className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         <div className="p-2 max-h-96 overflow-y-auto">
-                          {categoriesLoaded && categories.length === 0 && (
+                          {categoriesError && (
+                            <div className="space-y-2 px-3 py-2 text-sm text-steel-gray">
+                              <div>{categoriesError}</div>
+                              <button
+                                type="button"
+                                onClick={() => void ensureCategories({ force: true })}
+                                className="font-medium text-primary-navy hover:text-secondary-blue transition-colors"
+                              >
+                                {t('common.retry')}
+                              </button>
+                            </div>
+                          )}
+                          {!categoriesError && categoriesLoaded && categories.length === 0 && (
                             <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
                           )}
-                          {!categoriesLoaded && (
+                          {!categoriesError && !categoriesLoaded && (
                             <div className="px-3 py-2 text-sm text-steel-gray">{t('common.loading')}</div>
                           )}
                           {categories.map((cat) => (
@@ -689,6 +743,10 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             isOpen={isCategoryHubOpen}
             onClose={() => setIsCategoryHubOpen(false)}
             categories={allCategories}
+            isLoading={isCategoriesLoading}
+            loadError={categoriesError}
+            hasLoadedOnce={categoriesLoaded}
+            onRetry={() => void ensureCategories({ force: true })}
             onCategorySelect={(category) => {
               setIsCategoryHubOpen(false)
               router.push(`/category/${category.slug}`)

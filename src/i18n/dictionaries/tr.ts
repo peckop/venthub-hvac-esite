@@ -48,6 +48,9 @@ export const tr = {
     prev: "Önceki",
     next: "Sonraki",
     remove: "Kaldır",
+    loading: 'Yükleniyor...',
+    noData: 'Gösterilecek veri bulunamadı',
+    retry: 'Tekrar Dene',
   },
   search: {
     recentSearches: "Son Aramalar",
@@ -293,6 +296,16 @@ export const tr = {
     pickCategory: 'Premium HVAC çözümleri için kategori seçiminizi yapın',
     subcategories: 'alt kategori',
     more: 'daha fazla',
+  },
+  categoryHub: {
+    mainCategories: 'Ana Kategoriler',
+    seriesCount: '{{count}} seri',
+    loadFailed: 'Kategoriler şu anda yüklenemedi. Lütfen tekrar deneyin.',
+    viewAllInCategory: '{{category}} ürünlerini gör',
+    noSubcategories: 'Bu kategori altında henüz gösterilecek seri bulunmuyor.',
+    empty: 'Gösterilecek kategori bulunamadı.',
+    subcategoryHint: 'Bir alt kategori seçerek ürünleri görüntüleyin',
+    categoryHint: 'Bir kategori seçerek alt serileri görüntüleyin'
   },
   header: {
     syncing: 'Senkronize ediliyor',

@@ -48,6 +48,9 @@ export const en = {
     prev: "Previous",
     next: "Next",
     remove: "Remove",
+    loading: 'Loading...',
+    noData: 'No data to display',
+    retry: 'Try Again',
   },
   search: {
     recentSearches: "Recent Searches",
@@ -293,6 +296,16 @@ export const en = {
     pickCategory: 'Choose a category for premium HVAC solutions',
     subcategories: 'subcategories',
     more: 'more',
+  },
+  categoryHub: {
+    mainCategories: 'Main Categories',
+    seriesCount: '{{count}} series',
+    loadFailed: 'Categories could not be loaded right now. Please try again.',
+    viewAllInCategory: 'View all {{category}} products',
+    noSubcategories: 'There are no series to show under this category yet.',
+    empty: 'No categories available to display.',
+    subcategoryHint: 'Select a subcategory to view products',
+    categoryHint: 'Select a category to view its series'
   },
   header: {
     syncing: 'Syncing',
