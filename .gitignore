@@ -84,4 +84,6 @@ lint_results.txt
 src_lint_utf8.txt
 build_error.txt
 out.txt
-lint.txt
+# Out of scope integrations
+avens-integration/
+
