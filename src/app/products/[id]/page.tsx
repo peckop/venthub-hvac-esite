@@ -48,7 +48,8 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 export default async function Page({ params }: { params: { id: string } }) {
   // Fetch product data for detailed JSON-LD
-  let productData = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let productData: any = null;
   try {
     const { data } = await supabase
       .from('products')
