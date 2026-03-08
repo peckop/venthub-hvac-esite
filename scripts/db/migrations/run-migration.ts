@@ -11,7 +11,7 @@ async function runMigration() {
     console.log('🚀 Migration başlatılıyor...')
 
     // Migration dosyasını oku
-    const migrationPath = path.join(__dirname, '../supabase/migrations/20260209_add_model_type_mapping.sql')
+    const migrationPath = path.join(__dirname, '../../../supabase/migrations/20260209_add_model_type_mapping.sql')
     const migrationSQL = fs.readFileSync(migrationPath, 'utf-8')
 
     // SQL'i satırlara böl ve temizle
