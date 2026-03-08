@@ -11,12 +11,32 @@ const nextConfig = {
             },
         ],
     },
-    // Vercel build'ini engelleyen eski tip hatalarını görmezden gel
     typescript: {
-        ignoreBuildErrors: true,
+        ignoreBuildErrors: false,
     },
     eslint: {
-        ignoreDuringBuilds: true,
+        ignoreDuringBuilds: false,
+    },
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Content-Security-Policy',
+                        value: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: wss: data: blob:;"
+                    },
+                    {
+                        key: 'Strict-Transport-Security',
+                        value: 'max-age=63072000; includeSubDomains; preload'
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'SAMEORIGIN'
+                    }
+                ],
+            },
+        ];
     },
 };
 export default nextConfig;

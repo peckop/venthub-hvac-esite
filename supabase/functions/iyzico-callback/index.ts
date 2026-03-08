@@ -61,7 +61,38 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       if (!orderId) orderId = url.searchParams.get('orderId') || undefined;
       if (!conversationId) conversationId = url.searchParams.get('conversationId') || undefined;
-      successUrl = url.searchParams.get('successUrl');
+
+      let rawSuccessUrl = url.searchParams.get('successUrl');
+      if (rawSuccessUrl) {
+        try {
+          const parsedSuccessUrl = new URL(rawSuccessUrl);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
+            console.warn('Blocked open redirect attempt to:', rawSuccessUrl);
+            successUrl = null;
+          } else {
+            successUrl = rawSuccessUrl;
+          }
+        } catch {
+          // Prevent protocol-relative bypasses (e.g. //attacker.com)
+          if (rawSuccessUrl.startsWith('//') || rawSuccessUrl.startsWith('\\')) {
+            console.warn('Blocked protocol-relative open redirect attempt to:', rawSuccessUrl);
+            successUrl = null;
+          } else if (rawSuccessUrl.startsWith('/')) {
+            successUrl = rawSuccessUrl; // It might be a safe absolute path like /payment-success
+          } else {
+            successUrl = null; // Deny arbitrary unparseable strings
+          }
+        }
+      }
+
     } catch {}
 
     // Eğer successUrl yoksa, ortamdan türet (PUBLIC_SITE_URL/FRONTEND_URL/SITE_URL)
@@ -87,7 +118,11 @@ Deno.serve(async (req) => {
           const arr = await got.json().catch(()=>[])
           const row = Array.isArray(arr) ? arr[0] : null
           if (row?.payment_token) token = row.payment_token
-        } catch {}
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
       }
       if (!token) {
         // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'e yönlendir (pending)
@@ -102,8 +137,12 @@ Deno.serve(async (req) => {
             const t = target.toString();
             const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
             return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
-          } catch {}
+          } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
         }
+      }
         // Son çare
         return new Response(JSON.stringify({ status: 'pending' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
@@ -428,9 +467,31 @@ Deno.serve(async (req) => {
     // Her durumda frontende yönlendiren HTML dön (IyziCo bazı durumlarda 302'yi takip etmiyor olabilir)
     try {
       const url = new URL(req.url);
-      const successUrl = url.searchParams.get('successUrl');
-      let finalSuccess = successUrl;
+
+      const rawSuccessUrl = url.searchParams.get('successUrl');
+      let finalSuccess = rawSuccessUrl;
+      if (finalSuccess) {
+        try {
+          const parsedSuccessUrl = new URL(finalSuccess);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
+            finalSuccess = null;
+          }
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
+      }
       if (!finalSuccess) {
+
         const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
         if (base) {
           try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }
@@ -462,8 +523,31 @@ Deno.serve(async (req) => {
       const url = new URL(req.url);
       const orderId = url.searchParams.get('orderId') || undefined;
       const conversationId = url.searchParams.get('conversationId') || undefined;
-      let finalSuccess = url.searchParams.get('successUrl');
+
+      const rawSuccessUrl = url.searchParams.get('successUrl');
+      let finalSuccess = rawSuccessUrl;
+      if (finalSuccess) {
+        try {
+          const parsedSuccessUrl = new URL(finalSuccess);
+          const allowedBases = [
+            Deno.env.get('PUBLIC_SITE_URL'),
+            Deno.env.get('FRONTEND_URL'),
+            Deno.env.get('SITE_URL')
+          ].filter(Boolean).map(url => {
+            try { return new URL(url).host; } catch { return null; }
+          }).filter(Boolean);
+
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
+            finalSuccess = null;
+          }
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
+      }
       if (!finalSuccess) {
+
         const base = (Deno.env.get('PUBLIC_SITE_URL') || Deno.env.get('FRONTEND_URL') || Deno.env.get('SITE_URL') || '').trim();
         if (base) {
           try { finalSuccess = new URL(base).origin + '/payment-success'; } catch { finalSuccess = base.replace(/\/$/, '') + '/payment-success'; }

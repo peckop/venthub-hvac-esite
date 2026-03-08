@@ -1,3 +1,5 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin') || ''
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
@@ -5,7 +7,7 @@ Deno.serve(async (req) => {
   const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = {
     "Access-Control-Allow-Origin": okOrigin ? (origin || '*') : 'null',
-    "Access-Control-Allow-Headers": "content-type, x-admin-key",
+    "Access-Control-Allow-Headers": "authorization, content-type, x-admin-key",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "86400"
   };
@@ -31,21 +33,48 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const adminKey = Deno.env.get('ADMIN_KEY');
-    const provided = req.headers.get('x-admin-key') || '';
-    if (!adminKey || provided !== adminKey) {
-      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
-    }
-
-    const body = await req.json().catch(() => ({}));
-    const { id, conversation_id, status, display_code } = body || {};
-    const newStatus = (status || 'paid').toString();
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!supabaseUrl || !serviceRoleKey) {
       return new Response(JSON.stringify({ error: 'config_error' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || serviceRoleKey;
+    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser();
+    if (userErr || !userRes?.user) {
+      return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+
+    const userId = userRes.user.id;
+
+    const { data: profile, error: profErr } = await supabaseAdmin
+      .from('user_profiles')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (profErr) {
+      return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+
+    // deno-lint-ignore no-explicit-any
+    const role = (profile as any)?.role || 'user';
+    if (!['admin', 'superadmin'].includes(role)) {
+      return new Response(JSON.stringify({ error: 'forbidden', details: 'admin_only' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const { id, conversation_id, status, display_code } = body || {};
+    const newStatus = (status || 'paid').toString();
 
     async function patch(filter: string) {
       return await fetch(`${supabaseUrl}/rest/v1/venthub_orders?${filter}`, {
@@ -94,7 +123,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok, response: text }), { status: ok ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+    const msg = e instanceof Error ? e.message : String(e ?? '');
+    return new Response(JSON.stringify({ error: msg || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   }
 });
-
