@@ -1,7 +1,18 @@
 import Iyzipay from "npm:iyzipay";
 /* eslint-disable no-console */
 
-Deno.serve(async (req) => {
+/**
+ * @file Supabase Edge Function - Iyzico Payment
+ * IDE help: Declare Deno for environments without Deno extension
+ */
+declare const Deno: {
+    serve: (handler: (req: Request) => Promise<Response> | Response) => void;
+    env: {
+        get: (key: string) => string | undefined;
+    };
+};
+
+Deno.serve(async (req: Request) => {
     const origin = req.headers.get('origin') || '';
     const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
     const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin));
@@ -38,9 +49,10 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: 'payload_too_large' }), { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
     }
 
+    let debugEnabled = false;
     try {
         const url = new URL(req.url);
-        const debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
+        debugEnabled = ((Deno.env.get('IYZICO_DEBUG') || '').toLowerCase() === 'true')
             || (url.searchParams.get('debug') === '1')
             || ((req.headers.get('x-debug') || '') === '1');
 
@@ -124,8 +136,8 @@ Deno.serve(async (req) => {
         let authoritativeTotalNum: number = typeof amount === 'number' ? Number(amount) : 0
         try {
             const vHeaders = {
-                'Authorization': `Bearer ${serviceRoleKey}`,
-                'apikey': serviceRoleKey,
+                'Authorization': `Bearer ${serviceRoleKey as string}`,
+                'apikey': serviceRoleKey as string,
                 'Content-Type': 'application/json'
             } as Record<string, string>;
             const vResp = await fetch(`${supabaseUrl}/functions/v1/order-validate`, {
@@ -239,8 +251,8 @@ Deno.serve(async (req) => {
         let orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${serviceRoleKey}`,
-                'apikey': serviceRoleKey,
+                'Authorization': `Bearer ${serviceRoleKey as string}`,
+                'apikey': serviceRoleKey as string,
                 'Content-Type': 'application/json',
                 'Prefer': 'return=representation'
             },
@@ -334,10 +346,10 @@ Deno.serve(async (req) => {
             const unitPrice = Number(raw.unit_price)
             const qty = Math.max(1, Number(raw.quantity ?? 1))
             const safeUnit = Number.isFinite(unitPrice) ? unitPrice : 0
-            const p = productId ? (prodMap.get(productId) || {}) : {}
+            const p = productId ? (prodMap.get(productId) as any || {}) : {};
             const fid = String(productId || '')
-            const fallbackName = (p?.name) || nameMap.get(fid) || 'Ürün'
-            const fallbackImage = (p?.image_url) || imageMap.get(fid) || null
+            const fallbackName = (p.name) || nameMap.get(fid) || 'Ürün';
+            const fallbackImage = (p.image_url) || imageMap.get(fid) || null;
             return {
                 order_id: dbOrderId,
                 product_id: productId,
