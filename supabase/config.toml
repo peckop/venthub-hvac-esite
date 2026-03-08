@@ -24,6 +24,12 @@ verify_jwt = true
 [functions."admin-iyzico-reconcile"]
 verify_jwt = true
 
+[functions."admin-update-shipping"]
+verify_jwt = true
+
+[functions."admin-create-coupon"]
+verify_jwt = true
+
 [functions."shipping-webhook"]
 verify_jwt = false
 

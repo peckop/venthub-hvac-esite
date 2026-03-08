@@ -74,14 +74,22 @@ Deno.serve(async (req) => {
             try { return new URL(url).host; } catch { return null; }
           }).filter(Boolean);
 
-          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
             console.warn('Blocked open redirect attempt to:', rawSuccessUrl);
             successUrl = null;
           } else {
             successUrl = rawSuccessUrl;
           }
         } catch {
-          successUrl = rawSuccessUrl; // It might be a relative path like /payment-success
+          // Prevent protocol-relative bypasses (e.g. //attacker.com)
+          if (rawSuccessUrl.startsWith('//') || rawSuccessUrl.startsWith('\\')) {
+            console.warn('Blocked protocol-relative open redirect attempt to:', rawSuccessUrl);
+            successUrl = null;
+          } else if (rawSuccessUrl.startsWith('/')) {
+            successUrl = rawSuccessUrl; // It might be a safe absolute path like /payment-success
+          } else {
+            successUrl = null; // Deny arbitrary unparseable strings
+          }
         }
       }
 
@@ -110,7 +118,11 @@ Deno.serve(async (req) => {
           const arr = await got.json().catch(()=>[])
           const row = Array.isArray(arr) ? arr[0] : null
           if (row?.payment_token) token = row.payment_token
-        } catch {}
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
       }
       if (!token) {
         // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'e yönlendir (pending)
@@ -125,8 +137,12 @@ Deno.serve(async (req) => {
             const t = target.toString();
             const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
             return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
-          } catch {}
+          } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
         }
+      }
         // Son çare
         return new Response(JSON.stringify({ status: 'pending' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
@@ -465,10 +481,14 @@ Deno.serve(async (req) => {
             try { return new URL(url).host; } catch { return null; }
           }).filter(Boolean);
 
-          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
             finalSuccess = null;
           }
-        } catch {}
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
       }
       if (!finalSuccess) {
 
@@ -517,10 +537,14 @@ Deno.serve(async (req) => {
             try { return new URL(url).host; } catch { return null; }
           }).filter(Boolean);
 
-          if (allowedBases.length > 0 && !allowedBases.includes(parsedSuccessUrl.host)) {
+          if (allowedBases.length === 0 || !allowedBases.includes(parsedSuccessUrl.host)) {
             finalSuccess = null;
           }
-        } catch {}
+        } catch {
+          if (finalSuccess.startsWith('//') || finalSuccess.startsWith('\\') || !finalSuccess.startsWith('/')) {
+            finalSuccess = null;
+          }
+        }
       }
       if (!finalSuccess) {
 
