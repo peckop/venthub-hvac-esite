@@ -1,5 +1,5 @@
 // Quick test to fetch categories from database and find correct slugs
-import { getCategories } from './src/lib/supabase'
+import { getCategories } from '../../../src/lib/supabase'
 
 async function testCategories() {
     try {

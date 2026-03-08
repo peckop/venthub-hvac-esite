@@ -11,8 +11,9 @@ if (!$SERVICE_ROLE_KEY) {
     exit 1
 }
 
-# Read the SQL file
-$sqlContent = Get-Content -Path "fix-stock-reduction.sql" -Raw
+# Read the SQL file relative to this script
+$sqlPath = Join-Path $PSScriptRoot "fix-stock-reduction.sql"
+$sqlContent = Get-Content -Path $sqlPath -Raw
 
 Write-Host "🔄 Executing stock reduction fix via Supabase REST API..."
 
