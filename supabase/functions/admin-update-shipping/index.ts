@@ -1,28 +1,75 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
-serve(async (req) => {
-  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
+Deno.serve(async (req) => {
   const origin = req.headers.get('origin') || ''
   const allowed = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const okOrigin = allowed.length === 0 || (origin && allowed.includes(origin))
+  const requestId = (typeof crypto?.randomUUID === 'function') ? crypto.randomUUID() : String(Date.now())
   const cors = {
-    'Access-Control-Allow-Origin': okOrigin ? (origin || '*') : 'null',
-    'Vary': 'Origin',
-    'Access-Control-Allow-Headers': req.headers.get('access-control-request-headers') ?? 'authorization, x-client-info, apikey, content-type, x-idempotency-key',
-    'Access-Control-Allow-Methods': req.headers.get('access-control-request-method') ?? 'POST, OPTIONS',
-    'Access-Control-Max-Age': '86400',
+    "Access-Control-Allow-Origin": okOrigin ? (origin || '*') : 'null',
+    "Access-Control-Allow-Headers": "authorization, content-type, x-admin-key",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400"
+  };
+
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 200, headers: cors });
+  }
+  if (!okOrigin && req.method !== 'OPTIONS') {
+    return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
+  }
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } });
   }
 
-  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: cors })
-  if (!okOrigin) return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+  // Basic config
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+  if (!supabaseUrl || !serviceKey) {
+    return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
+  }
 
-  // Content-Type & size
+  // Auth and Role Checks
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } })
+  }
+
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || serviceKey;
+  const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: authHeader } }
+  });
+  const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+
+  const { data: userRes, error: userErr } = await supabaseUser.auth.getUser();
+  if (userErr || !userRes?.user) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+
+  const userId = userRes.user.id;
+
+  const { data: profile, error: profErr } = await supabaseAdmin
+    .from('user_profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (profErr) {
+    return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+
+  // deno-lint-ignore no-explicit-any
+  const role = (profile as any)?.role || 'user';
+  if (!['admin', 'superadmin'].includes(role)) {
+    return new Response(JSON.stringify({ error: 'forbidden', details: 'admin_only' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
+
+  // Body constraints
   const ct = (req.headers.get('content-type') || '').toLowerCase()
   if (!ct.includes('application/json')) {
     return new Response(JSON.stringify({ error: 'unsupported_media_type' }), { status: 415, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
-  const max = parseInt(Deno.env.get('MAX_BODY_KB') || '200', 10) * 1024
+  const max = parseInt(Deno.env.get('MAX_BODY_KB') || '100', 10) * 1024
   const cl = parseInt(req.headers.get('content-length') || '0', 10) || 0
   if (cl > max) {
     return new Response(JSON.stringify({ error: 'payload_too_large' }), { status: 413, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
@@ -53,23 +100,16 @@ serve(async (req) => {
     })()
 
     // Body + query fallback
-    let order_id = pick(['order_id','orderId']) || qs.get('order_id') || qs.get('orderId')
-    let carrier = pick(['carrier']) || qs.get('carrier')
-    let tracking_number = pick(['tracking_number','trackingNumber']) || qs.get('tracking_number') || qs.get('trackingNumber')
-    let tracking_url = pick(['tracking_url','trackingUrl']) || qs.get('tracking_url') || qs.get('trackingUrl')
+    const order_id = pick(['order_id','orderId']) || qs.get('order_id') || qs.get('orderId')
+    const carrier = pick(['carrier']) || qs.get('carrier')
+    const tracking_number = pick(['tracking_number','trackingNumber']) || qs.get('tracking_number') || qs.get('trackingNumber')
+    const tracking_url = pick(['tracking_url','trackingUrl']) || qs.get('tracking_url') || qs.get('trackingUrl')
     const send_email = ((): boolean => {
       const v = (parsed['send_email'] ?? parsed['sendEmail'] ?? qs.get('send_email') ?? qs.get('sendEmail'))
       if (typeof v === 'boolean') return v
       if (typeof v === 'string') return v.toLowerCase() === 'true'
       return true
     })()
-
-    // Basic config
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-    if (!supabaseUrl || !serviceKey) {
-      return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
-    }
 
     // Read current order status to allow implicit cancel (if already shipped and no carrier/tracking provided)
     let isCurrentlyShipped = false
@@ -128,8 +168,8 @@ serve(async (req) => {
     } catch {}
 
     // Idempotency key (optional but recommended)
-    async function computeIdemKey(action: 'ship' | 'cancel', orderId: string, carrier?: string|null, tn?: string|null) {
-      const raw = [action, orderId || '', carrier || '', tn || ''].join('|')
+    async function computeIdemKey(action: 'ship' | 'cancel', orderId: string, carrierParam?: string|null, tn?: string|null) {
+      const raw = [action, orderId || '', carrierParam || '', tn || ''].join('|')
       const bytes = new TextEncoder().encode(raw)
       const hash = await crypto.subtle.digest('SHA-256', bytes)
       return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('')
@@ -187,6 +227,7 @@ serve(async (req) => {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
           })
           if (usrResp.ok) {
+            // deno-lint-ignore no-explicit-any
             const u = await usrResp.json().catch(()=>null) as any
             customer_email = (u && u.email) || null
             const metaName = u && u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)
@@ -197,7 +238,7 @@ serve(async (req) => {
     } catch {}
 
     // optional email with result flags
-    let emailResult = { sent: false, disabled: false }
+    const emailResult = { sent: false, disabled: false }
     if (send_email) {
       try {
         const resp = await fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
@@ -205,13 +246,14 @@ serve(async (req) => {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
           body: JSON.stringify({ order_id, carrier, tracking_number, tracking_url, customer_email, customer_name })
         })
+        // deno-lint-ignore no-explicit-any
         let j: any = null
         try { j = await resp.json() } catch {}
         if (resp.ok) {
           if (j && j.disabled) emailResult.disabled = true; else emailResult.sent = true
           // Log shipping email event (best-effort)
           try {
-            const body = JSON.stringify({
+            const bodyReq = JSON.stringify({
               order_id,
               email_to: customer_email || '',
               subject: (j && j.subject) || 'Kargo bildirimi',
@@ -223,7 +265,7 @@ serve(async (req) => {
             await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
-              body
+              body: bodyReq
             })
           } catch {}
         }
