@@ -308,6 +308,10 @@ export const tr = {
     categoryHint: 'Bir kategori seçerek alt serileri görüntüleyin'
   },
   header: {
+    brandName: 'VentHub',
+    brandTagline: 'HVAC Premium Selection',
+    commandSearch: 'Ürün, seri veya marka ara',
+    commandSearchCompact: 'Hızlı ara',
     syncing: 'Senkronize ediliyor',
     roleLabel: 'Yetki',
     account: 'Hesabım',

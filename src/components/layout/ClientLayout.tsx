@@ -13,6 +13,7 @@ import PaymentWatcher from '../PaymentWatcher'
 import BackToTopButton from '../BackToTopButton'
 import LoadingSpinner from '../LoadingSpinner'
 import Footer from '../Footer'
+import { NAVIGATION_MAIN_OFFSET_CLASS } from '../../utils/navigationConfig'
 
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
 const AddToCartToast = lazy(() => import('../AddToCartToast'))
@@ -158,7 +159,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <ScrollToTop />
             <StickyHeader isScrolled={isScrolled} />
 
-            <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
+            <main id="main-content" className={isScrolled ? NAVIGATION_MAIN_OFFSET_CLASS : ''}>
                 <BackToTopButton />
                 {(() => {
                     try { return typeof window !== 'undefined' && localStorage.getItem('vh_pending_order') ? <PaymentWatcher /> : null } catch { return null }

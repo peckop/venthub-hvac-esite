@@ -308,6 +308,10 @@ export const en = {
     categoryHint: 'Select a category to view its series'
   },
   header: {
+    brandName: 'VentHub',
+    brandTagline: 'HVAC Premium Selection',
+    commandSearch: 'Search product, series or brand',
+    commandSearchCompact: 'Quick search',
     syncing: 'Syncing',
     roleLabel: 'Role',
     account: 'My Account',
