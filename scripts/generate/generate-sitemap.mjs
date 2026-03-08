@@ -81,8 +81,8 @@ async function main() {
     const data = await fetchData()
     const urls = buildUrls(data)
     const xml = toSitemapXml(urls)
-    const outPath = resolve(__dirname, '../public/sitemap.xml')
-    mkdirSync(resolve(__dirname, '../public'), { recursive: true })
+    const outPath = resolve(__dirname, '../../public/sitemap.xml')
+    mkdirSync(resolve(__dirname, '../../public'), { recursive: true })
     writeFileSync(outPath, xml, 'utf8')
     console.warn(`[sitemap] Yazıldı: ${outPath} (${urls.length} URL)`) 
   } catch (e) {
@@ -93,7 +93,7 @@ async function main() {
       { loc: `${BASE_URL}/`, changefreq: 'daily', priority: '1.0', lastmod: now },
       { loc: `${BASE_URL}/products`, changefreq: 'daily', priority: '0.9', lastmod: now },
     ])
-    const outPath = resolve(__dirname, '../public/sitemap.xml')
+    const outPath = resolve(__dirname, '../../public/sitemap.xml')
     writeFileSync(outPath, fallback, 'utf8')
     console.warn('[sitemap] Fallback sitemap yazıldı')
   }
