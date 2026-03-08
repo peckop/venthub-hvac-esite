@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename)
 
 // Load .env manually
 try {
-    const envPath = path.resolve(__dirname, '../.env')
+    const envPath = path.resolve(__dirname, '../../../.env')
     const envFile = fs.readFileSync(envPath, 'utf8')
     envFile.split('\n').forEach(line => {
         const [key, ...values] = line.split('=')
