@@ -8,6 +8,7 @@ import { BottomCTA } from './sections'
 import { Breadcrumb } from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import CategorySpotlightScene from '../navigation/CategorySpotlightScene'
 
 interface CategoryShowcaseProps {
     category: Category
@@ -38,7 +39,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
             {/* Hero Section */}
             <div className="relative h-[600px] w-full overflow-hidden bg-primary-navy">
-                {heroImage && (
+                {heroImage ? (
                     <div className="absolute inset-0">
                         <img
                             src={heroImage}
@@ -46,6 +47,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             className="w-full h-full object-cover opacity-75"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/40 to-transparent" />
+                    </div>
+                ) : (
+                    <div className="absolute inset-0 bg-slate-950">
+                        <div className="absolute inset-0 opacity-40">
+                            <CategorySpotlightScene categorySlug={category.slug} />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-primary-navy via-primary-navy/20 to-transparent" />
                     </div>
                 )}
 

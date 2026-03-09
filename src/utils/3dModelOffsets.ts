@@ -245,7 +245,7 @@ export function getModelPlacement(
         config = MODEL_CONFIGS['AxialFanModel'];
     }
     // Aksiyal (Genel)
-    else if (s.includes('aksiyal') || s.includes('axial')) {
+    else if (s.includes('aksiyal') || s.includes('axial') || s === 'fanlar') {
         config = MODEL_CONFIGS['AxialFanModel'];
     }
     // Plug Fan

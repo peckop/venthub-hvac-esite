@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import CategorySpotlightScene from '../navigation/CategorySpotlightScene'
 import { Category, Product } from '../../lib/supabase'
 import {
     ChevronDown,
@@ -209,6 +210,12 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             {/* Technical Summary / Badge */}
+                            {!heroImage && (
+                                <div className="absolute inset-x-0 -top-10 h-72 lg:hidden opacity-60 pointer-events-none">
+                                    <CategorySpotlightScene categorySlug={category.slug} />
+                                </div>
+                            )}
+
                             {category.metadata?.technical_summary && (
                                 <div className="flex items-center space-x-2 text-secondary-blue mb-4">
                                     <Activity size={20} />
@@ -277,9 +284,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                     className="w-full h-full object-contain drop-shadow-2xl filter contrast-125 select-none"
                                 />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <div className="p-12 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                                        <Wind size={120} className="text-white/20" />
+                                <div className="w-full h-full relative">
+                                    <div className="absolute inset-0 opacity-40">
+                                        <CategorySpotlightScene categorySlug={category.slug} />
+                                    </div>
+                                    <div className="w-full h-full flex items-center justify-center relative z-10">
+                                        <div className="p-12 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                                            <Wind size={120} className="text-white/20" />
+                                        </div>
                                     </div>
                                 </div>
                             )}

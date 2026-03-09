@@ -21,16 +21,16 @@ export function AxialFanModel() {
 
     // Custom Glossy Black Material (Painted Metal)
     const glossyBlack = new THREE.MeshStandardMaterial({
-        color: '#111111',
-        roughness: 0.3,
-        metalness: 0.5,
+        color: '#2a2a2a', // Lightened from #111111 for visibility
+        roughness: 0.15,
+        metalness: 0.7,
         side: THREE.DoubleSide
     })
 
     const bladeBlack = new THREE.MeshStandardMaterial({
-        color: '#0f172a', // Slightly bluish black for blades
+        color: '#1e293b', // Lightened from #0f172a
         roughness: 0.2,
-        metalness: 0.2,
+        metalness: 0.4,
         side: THREE.DoubleSide
     })
 

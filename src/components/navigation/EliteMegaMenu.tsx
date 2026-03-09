@@ -573,9 +573,9 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
 
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
             <div className="mb-4 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(59,130,246,0.12),rgba(255,255,255,0.03))]">
-              <div className="relative h-36 border-b border-white/10 bg-slate-950/70">
+              <div className="relative h-44 border-b border-white/10 bg-slate-950/70">
                 <CategorySpotlightScene categorySlug={selectedCategory.slug} />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/10 to-slate-950/80" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/5 to-slate-950/50" />
               </div>
 
               <div className="p-4">

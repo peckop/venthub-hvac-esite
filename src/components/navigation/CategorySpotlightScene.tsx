@@ -17,9 +17,10 @@ const CategorySpotlightScene: React.FC<CategorySpotlightSceneProps> = ({ categor
   return (
     <div className="absolute inset-0 pointer-events-none">
       <Canvas camera={{ position: [0, 0.15, 2.3], fov: 40 }} dpr={[1, 1.5]}>
-        <ambientLight intensity={1.8} />
-        <directionalLight position={[4, 6, 5]} intensity={2.2} color="#ffffff" />
-        <pointLight position={[-5, -2, 3]} intensity={1.4} color="#8ec5ff" />
+        <ambientLight intensity={2.2} />
+        <directionalLight position={[4, 6, 5]} intensity={2.8} color="#ffffff" />
+        <pointLight position={[-5, -2, 3]} intensity={1.8} color="#8ec5ff" />
+        <spotLight position={[0, 5, 0]} intensity={1.5} angle={0.5} penumbra={1} />
 
         <Suspense fallback={null}>
           <Float
