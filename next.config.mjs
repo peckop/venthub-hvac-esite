@@ -38,5 +38,14 @@ const nextConfig = {
             },
         ];
     },
+    async redirects() {
+        return [
+            {
+                source: '/destek',
+                destination: '/support',
+                permanent: true,
+            },
+        ];
+    },
 };
 export default nextConfig;
