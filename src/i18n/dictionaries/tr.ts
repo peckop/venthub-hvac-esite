@@ -135,9 +135,94 @@ export const tr = {
       }
     }
   },
-  home: {
+home: {
+    guidedDiscovery: {
+      title: "Ürünleri Keşfedin",
+      subtitle: "Projeniz için doğru premium seriyi bulmak üzere ana kategorilerden ilerleyin.",
+      viewSeries: "Seriyi İncele",
+      categories: {
+        fans: { title: "Endüstriyel Fanlar", desc: "Ağır hizmet ve yüksek verimli fan çözümleri" },
+        airCurtains: { title: "Hava Perdeleri", desc: "Isı ve enerji kaybını önleyen giriş çözümleri" },
+        hrv: { title: "Isı Geri Kazanım", desc: "Taze hava ve enerji verimliliği sağlayan HRV cihazları" },
+        control: { title: "Hız Kontrol", desc: "Frekans invertörleri ve otomasyon panoları" }
+      }
+    },
+    applicationSolutions: {
+      title: "Uygulamaya Göre Çözümler",
+      subtitle: "Sektörünüze ve alanınıza özel havalandırma senaryoları",
+      viewAll: "Tümü",
+      discover: "İncele",
+      scenarios: {
+        parking: { title: "Otopark Havalandırma", subtitle: "CO kontrolü ve jet fan senaryoları" },
+        kitchen: { title: "Endüstriyel Mutfak", subtitle: "Davlumbaz, filtre ve egzoz çözümleri" },
+        entrance: { title: "Mağaza Girişleri", subtitle: "Hava perdesi ve iklim kontrolü" },
+        smoke: { title: "Duman Tahliye", subtitle: "Acil durum ve yangın güvenlik sistemleri" },
+        commercial: { title: "Ticari Alanlar", subtitle: "Ofis ve AVM'ler için konfor odaklı HRV sistemleri" }
+      }
+    },
+
+    featuredCommerce: {
+      title: "Öne Çıkan Çözümler",
+      subtitle: "Projeleriniz için en çok tercih edilen profesyonel ekipmanlar.",
+      viewAll: "Tüm Ürünleri Gör",
+      tabs: {
+        popular: "Popüler Ürünler",
+        professional: "Profesyonel Seri",
+        newlyAdded: "Yeni Eklenenler"
+      },
+      unavailable: "Ürünler şu anda listelenemiyor."
+    },
+    trustProof: {
+      title: "Endüstriyel HVAC Çözümlerinde Güvenilir İş Ortağınız",
+      subtitle: "Yılların deneyimi, yetkili mühendislik desteği ve Avrupa standartlarında ürün kalitesi ile projenizi güvence altına alın.",
+      proofs: {
+        brands: { title: "Premium Markalar", desc: "Sadece Avrupa standartlarına uygun, onaylı global markalar." },
+        engineering: { title: "Mühendislik Desteği", desc: "Debi ve basınç kaybı hesaplamalarında ücretsiz profesyonel danışmanlık." },
+        delivery: { title: "Türkiye Geneli Teslimat", desc: "Tüm şehirlere sigortalı, hızlı ve güvenli lojistik ağı." },
+        support: { title: "Satış Sonrası Güvence", desc: "Yetkili servis ağı, 2 yıl garanti ve yedek parça teminatı." }
+      },
+      distributorNetwork: "Yetkili Dağıtıcı Ağı"
+    },
+    strategicBrands: {
+      title: "Çalıştığımız Premium Markalar",
+      subtitle: "Performans, enerji verimliliği ve dayanıklılık konusunda kendini kanıtlamış dünya markalarını sizin için seçiyoruz."
+    },
+
+    knowledgeBlock: {
+      title: "Teknik Rehberlik ve Bilgi Merkezi",
+      subtitle: "Doğru ürünü seçmenize yardımcı olacak mühendislik araçları ve dokümanlar.",
+      cards: {
+        guide: { title: "Ürün Seçim Rehberi", desc: "Uygulamanıza en uygun cihazı adım adım bulmanıza yardımcı olur." },
+        calculators: { title: "Hesaplayıcılar", desc: "Debi, statik basınç ve güç ihtiyaçlarınızı hızlıca analiz edin." },
+        support: { title: "Destek Merkezi", desc: "Kurulum, bakım ve devreye alma dokümanlarına erişin." }
+      },
+      explore: "İncele"
+    },
+    finalCta: {
+      title: "Doğru HVAC çözümünü birlikte belirleyelim",
+      subtitle: "Alanında uzman mühendis kadromuz, projenizin tüm süreçlerinde yanınızda.",
+      contactExpert: "Uzmanla Görüş",
+      requestQuote: "Teklif Talep Et",
+      exploreProducts: "Ürünleri Keşfet"
+    },
+
     seoTitle: "VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma",
     seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
+    hero: {
+      title: "Endüstriyel ve ticari HVAC çözümlerini doğru ürün, doğru kategori ve uzman destekle bulun.",
+      subtitle: "Fanlar, hava perdeleri, hız kontrol cihazları, ısı geri kazanım ve proje odaklı havalandırma çözümleri. Ürün keşfi, teknik yönlendirme ve hızlı teklif tek platformda.",
+      primaryCta: "Ürünleri Keşfet",
+      secondaryCta: "Hızlı Teklif Al",
+      trustStrips: ["Yetkili markalar", "Teknik danışmanlık", "Türkiye geneli teslimat", "Proje desteği"],
+      quickChips: ["Fanlar", "Hava Perdeleri", "Isı Geri Kazanım", "Hız Kontrol", "Teklif Al"],
+      quickAccessLabel: "Hızlı Erişim"
+    },
+    quickEntry: {
+      category: "Kategoriye Göre Ara",
+      application: "Uygulamaya Göre Bul",
+      support: "Teknik Destek Al",
+      quote: "Hızlı Teklif İste"
+    },
     features: {
       euQuality: "Avrupa kalite standartları",
       fastDelivery: "Hızlı teslimat",
