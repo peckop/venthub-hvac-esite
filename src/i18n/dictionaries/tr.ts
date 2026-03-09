@@ -308,7 +308,13 @@ export const tr = {
     seriesShowcaseTitle: 'Seri vitrini',
     mobileNavigatorTitle: 'Mobil gezinme',
     mobileNavigatorDescription: 'Global geçişler ve kategori keşfi tek premium sheet içinde sunulur.',
-    mobileCategoryPrompt: 'Bir kategori seçin, ardından serilerini mobil akış içinde açın.'
+    mobileCategoryPrompt: 'Bir kategori seçin, ardından serilerini mobil akış içinde açın.',
+    sectionOverview: 'Genel Bakış',
+    sectionCompany: 'Kurumsal',
+    sectionHint: 'Bölüm değiştirerek paneli güncelleyin',
+    companyPanelDescription: 'Kurumsal sayfalar, iletişim ve destek geçişleri bu bölümde toplanır.',
+    aboutDescription: 'VentHub yaklaşımını, marka konumunu ve operasyon modelini inceleyin.',
+    contactDescription: 'Satış, proje ve destek ekiplerine hızlıca ulaşın.'
   },
   categoryHub: {
     mainCategories: 'Ana Kategoriler',

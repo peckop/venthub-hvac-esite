@@ -308,7 +308,13 @@ export const en = {
     seriesShowcaseTitle: 'Series showcase',
     mobileNavigatorTitle: 'Mobile navigation',
     mobileNavigatorDescription: 'Global routes and category discovery live in one premium mobile sheet.',
-    mobileCategoryPrompt: 'Choose a category, then open its series inside the mobile flow.'
+    mobileCategoryPrompt: 'Choose a category, then open its series inside the mobile flow.',
+    sectionOverview: 'Overview',
+    sectionCompany: 'Company',
+    sectionHint: 'Switch sections to refresh the panel',
+    companyPanelDescription: 'Corporate pages, contact and support transitions are grouped here.',
+    aboutDescription: 'Review the VentHub approach, brand position and operating model.',
+    contactDescription: 'Reach sales, project and support teams quickly.'
   },
   categoryHub: {
     mainCategories: 'Main Categories',
