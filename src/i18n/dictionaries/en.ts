@@ -297,6 +297,18 @@ export const en = {
     pickCategory: 'Choose a category for premium HVAC solutions',
     subcategories: 'subcategories',
     more: 'more',
+    globalNavigatorTitle: 'Global navigation scene',
+    globalNavigatorDescription: 'Manage every primary route outside category discovery from one premium panel.',
+    curatedCategories: 'Curated Categories',
+    productsDescription: 'Open product families, filtering entry points and the main product discovery flow.',
+    brandsDescription: 'Browse represented premium brands and brand-led discovery paths.',
+    knowledgeHubDescription: 'Access selection guides, technical content and the knowledge hub flow.',
+    supportDescription: 'Reach support center, assistance flows and operational guidance.',
+    exploreSection: 'Open Section',
+    seriesShowcaseTitle: 'Series showcase',
+    mobileNavigatorTitle: 'Mobile navigation',
+    mobileNavigatorDescription: 'Global routes and category discovery live in one premium mobile sheet.',
+    mobileCategoryPrompt: 'Choose a category, then open its series inside the mobile flow.'
   },
   categoryHub: {
     mainCategories: 'Main Categories',

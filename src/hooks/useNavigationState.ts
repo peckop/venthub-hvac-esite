@@ -2,40 +2,60 @@ import { useCallback, useMemo, useState } from 'react'
 
 import type { NavigationMode } from '../utils/navigationConfig'
 
+type NavigationSurface = 'none' | 'menu' | 'categoryHub' | 'search'
+
 interface UseNavigationStateOptions {
   isScrolled: boolean
 }
 
 export function useNavigationState({ isScrolled }: UseNavigationStateOptions) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [activeSurface, setActiveSurface] = useState<NavigationSurface>('none')
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-  const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
-  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
 
   const mode = useMemo<NavigationMode>(() => (isScrolled ? 'compact' : 'expanded'), [isScrolled])
 
-  const openMenu = useCallback(() => setIsMenuOpen(true), [])
-  const closeMenu = useCallback(() => setIsMenuOpen(false), [])
+  const openMenu = useCallback(() => {
+    setIsUserMenuOpen(false)
+    setActiveSurface('menu')
+  }, [])
+
+  const closeMenu = useCallback(() => {
+    setActiveSurface((current) => (current === 'menu' ? 'none' : current))
+  }, [])
 
   const toggleUserMenu = useCallback(() => {
+    setActiveSurface('none')
     setIsUserMenuOpen((current) => !current)
   }, [])
 
   const closeUserMenu = useCallback(() => setIsUserMenuOpen(false), [])
 
-  const openCategoryHub = useCallback(() => setIsCategoryHubOpen(true), [])
-  const closeCategoryHub = useCallback(() => setIsCategoryHubOpen(false), [])
+  const openCategoryHub = useCallback(() => {
+    setIsUserMenuOpen(false)
+    setActiveSurface('categoryHub')
+  }, [])
 
-  const openSearchOverlay = useCallback(() => setIsSearchOverlayOpen(true), [])
-  const closeSearchOverlay = useCallback(() => setIsSearchOverlayOpen(false), [])
+  const closeCategoryHub = useCallback(() => {
+    setActiveSurface((current) => (current === 'categoryHub' ? 'none' : current))
+  }, [])
+
+  const openSearchOverlay = useCallback(() => {
+    setIsUserMenuOpen(false)
+    setActiveSurface('search')
+  }, [])
+
+  const closeSearchOverlay = useCallback(() => {
+    setActiveSurface((current) => (current === 'search' ? 'none' : current))
+  }, [])
 
   return {
     mode,
     isCompact: mode === 'compact',
-    isMenuOpen,
+    activeSurface,
+    isMenuOpen: activeSurface === 'menu',
     isUserMenuOpen,
-    isCategoryHubOpen,
-    isSearchOverlayOpen,
+    isCategoryHubOpen: activeSurface === 'categoryHub',
+    isSearchOverlayOpen: activeSurface === 'search',
     openMenu,
     closeMenu,
     toggleUserMenu,

@@ -1,256 +1,456 @@
-import React, { useEffect, useState } from 'react'
-import * as NavigationMenu from '@radix-ui/react-navigation-menu'
+'use client'
+
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ChevronDown, ExternalLink } from 'lucide-react'
-import type { Category } from '../../lib/supabase'
+import { ArrowLeft, ChevronRight, Compass, ExternalLink, Grid3X3, Library, ShieldCheck, Sparkles } from 'lucide-react'
+
 import { useI18n } from '../../i18n/I18nProvider'
-import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import type { Category } from '../../lib/supabase'
 import { trackEvent } from '../../utils/analytics'
-import MegaMenu3DBackground from './MegaMenu3DBackground'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import CategorySpotlightScene from './CategorySpotlightScene'
+import NavSceneShell from './NavSceneShell'
 
 interface EliteMegaMenuProps {
-    categories: Category[]
-    onNavigate?: () => void
+  isOpen: boolean
+  onClose: () => void
+  categories: Category[]
 }
 
-export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
-    const { t } = useI18n()
-    const mainCategories = categories.filter(cat => cat.level === 0)
-    const subCategories = categories.filter(cat => cat.level === 1)
-
-    const getSubCategories = (parentId: string) => {
-        return subCategories.filter(sub => sub.parent_id === parentId)
-    }
-
-    const handleLinkClick = (level: number, slug: string, parent?: string) => {
-        trackEvent('category_click', { level, slug, parent, source: 'elite_megamenu' })
-        onNavigate?.()
-    }
-
-    return (
-        <NavigationMenu.Root className="relative z-50 flex w-full justify-center">
-            <NavigationMenu.List className="center shadow-blackA7 m-0 flex list-none rounded-[6px] bg-white bg-opacity-95 backdrop-blur-sm p-1 shadow-[0_2px_10px] shadow-black/5">
-                {mainCategories.map((category) => {
-                    const subs = getSubCategories(category.id)
-
-                    if (subs.length === 0) {
-                        return (
-                            <NavigationMenu.Item key={category.id}>
-                                <Link
-                                    href={`/category/${category.slug}`}
-                                    onClick={() => handleLinkClick(0, category.slug)}
-                                    className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
-                                >
-                                    <span className="text-primary-navy">
-                                        {getCategoryIcon(category.slug, { size: 18 })}
-                                    </span>
-                                    <span>{getCategoryDisplayName(category)}</span>
-                                </Link>
-                            </NavigationMenu.Item>
-                        )
-                    }
-
-                    return (
-                        <NavigationMenu.Item key={category.id}>
-                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-primary-navy">
-                                        {getCategoryIcon(category.slug, { size: 18 })}
-                                    </span>
-                                    <span>{getCategoryDisplayName(category)}</span>
-                                </div>
-                                <ChevronDown
-                                    className="relative top-[1px] ml-1 h-3 w-3 transition-transform duration-[250ms] ease-in group-data-[state=open]:-rotate-180"
-                                    aria-hidden
-                                />
-                            </NavigationMenu.Trigger>
-
-                            <NavigationMenu.Content className="absolute top-0 left-0 w-full sm:w-auto data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight">
-                                <div className="m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
-                                    {/* Category Header */}
-                                    <div className="row-span-3">
-                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7 relative overflow-hidden">
-                                            <MegaMenu3DBackground categorySlug={category.slug} />
-                                            <div className="relative z-10">
-                                                <div className="text-white mb-4">
-                                                    {getCategoryIcon(category.slug, { size: 48 })}
-                                                </div>
-                                                <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
-                                                    {getCategoryDisplayName(category)}
-                                                </div>
-                                                <p className="text-[14px] leading-[1.3] text-white/90">
-                                                    {category.description || t('categoryHub.emptyDescription')}
-                                                </p>
-                                                <Link
-                                                    href={`/category/${category.slug}`}
-                                                    onClick={() => handleLinkClick(0, category.slug)}
-                                                    className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
-                                                >
-                                                    {t('common.viewAll')} <ExternalLink size={14} />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Subcategories Grid */}
-                                    <div className="col-span-1">
-                                        <ul className="grid grid-cols-2 gap-2">
-                                            {subs.filter(sub => sub.slug !== category.slug).map((sub) => (
-                                                <li key={sub.id}>
-                                                    <Link
-                                                        href={`/category/${category.slug}/${sub.slug}`}
-                                                        onClick={() => handleLinkClick(1, sub.slug, category.slug)}
-                                                        className="block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
-                                                    >
-                                                        <div className="mb-1 font-medium text-slate-900">{getCategoryDisplayName(sub)}</div>
-                                                        <p className="text-[13px] leading-[1.4] text-slate-500 line-clamp-2">
-                                                            {sub.description || t('categoryHub.windowFallback')}
-                                                        </p>
-                                                    </Link>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </NavigationMenu.Content>
-                        </NavigationMenu.Item>
-                    )
-                })}
-
-                {/* Quick Links */}
-                <NavigationMenu.Item>
-                    <Link
-                        href="/products"
-                        onClick={() => handleLinkClick(0, 'products')}
-                        className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-bold leading-none text-secondary-blue outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
-                    >
-                        {t('common.products')}
-                    </Link>
-                </NavigationMenu.Item>
-
-                <NavigationMenu.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
-                    <div className="relative top-[70%] h-[10px] w-[10px] rotate-[45deg] rounded-tl-[2px] bg-white" />
-                </NavigationMenu.Indicator>
-            </NavigationMenu.List>
-
-            <div className="absolute left-0 top-full flex w-full justify-center perspective-[2000px]">
-                <NavigationMenu.Viewport className="data-[state=open]:animate-scaleIn data-[state=closed]:animate-scaleOut relative mt-[10px] h-[var(--radix-navigation-menu-viewport-height)] w-[var(--radix-navigation-menu-viewport-width)] origin-[top_center] overflow-hidden rounded-[10px] bg-white transition-[width,_height] duration-300 shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)]" />
-            </div>
-        </NavigationMenu.Root>
-    )
-}
-
-// Mobile version - Full screen overlay
 interface MobileMegaMenuProps {
-    isOpen: boolean
-    onClose: () => void
-    categories: Category[]
+  isOpen: boolean
+  onClose: () => void
+  categories: Category[]
+}
+
+interface GlobalDestination {
+  id: string
+  title: string
+  description: string
+  href: string
+  icon: React.ReactNode
+}
+
+function buildChildrenMap(categories: Category[]) {
+  return categories.reduce<Record<string, Category[]>>((acc, category) => {
+    if (!category.parent_id) return acc
+
+    acc[category.parent_id] = acc[category.parent_id] ? [...acc[category.parent_id], category] : [category]
+    return acc
+  }, {})
+}
+
+export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ isOpen, onClose, categories }) => {
+  const { t } = useI18n()
+  const [focusedCategoryId, setFocusedCategoryId] = useState<string | null>(null)
+
+  const mainCategories = useMemo(() => categories.filter((category) => category.level === 0), [categories])
+  const childrenMap = useMemo(() => buildChildrenMap(categories), [categories])
+
+  const featuredCategory = useMemo(() => {
+    const targetId = focusedCategoryId || mainCategories[0]?.id
+    return mainCategories.find((category) => category.id === targetId) || mainCategories[0] || null
+  }, [focusedCategoryId, mainCategories])
+
+  const featuredSeries = useMemo(() => {
+    if (!featuredCategory) return []
+    return (childrenMap[featuredCategory.id] || []).filter((category) => category.slug !== featuredCategory.slug)
+  }, [childrenMap, featuredCategory])
+
+  const destinations: GlobalDestination[] = useMemo(
+    () => [
+      {
+        id: 'products',
+        title: t('common.products'),
+        description: t('megamenu.productsDescription'),
+        href: '/products',
+        icon: <Compass className="h-5 w-5" />,
+      },
+      {
+        id: 'brands',
+        title: t('common.brands'),
+        description: t('megamenu.brandsDescription'),
+        href: '/brands',
+        icon: <Sparkles className="h-5 w-5" />,
+      },
+      {
+        id: 'knowledgeHub',
+        title: t('common.knowledgeHub'),
+        description: t('megamenu.knowledgeHubDescription'),
+        href: '/destek/merkez',
+        icon: <Library className="h-5 w-5" />,
+      },
+      {
+        id: 'support',
+        title: t('common.supportCenter'),
+        description: t('megamenu.supportDescription'),
+        href: '/destek',
+        icon: <ShieldCheck className="h-5 w-5" />,
+      },
+    ],
+    [t]
+  )
+
+  const handleNavigate = (target: string) => {
+    trackEvent('nav_click', { target, source: 'mega_menu_scene' })
+    onClose()
+  }
+
+  return (
+    <NavSceneShell
+      isOpen={isOpen}
+      onClose={onClose}
+      closeLabel={t('common.close')}
+      eyebrow={t('megamenu.navigation')}
+      title={t('megamenu.globalNavigatorTitle')}
+      description={t('megamenu.globalNavigatorDescription')}
+      panelClassName="top-4 bottom-4"
+      bodyClassName="grid min-h-0 lg:grid-cols-[minmax(360px,0.95fr)_minmax(520px,1.2fr)]"
+    >
+      <div className="relative min-h-[320px] overflow-hidden border-b border-white/10 lg:border-b-0 lg:border-r">
+        {featuredCategory && (
+          <>
+            <CategorySpotlightScene categorySlug={featuredCategory.slug} />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/15 to-slate-950" />
+          </>
+        )}
+
+        <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
+          <div className="max-w-xl space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-secondary-blue/25 bg-secondary-blue/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue">
+              <Grid3X3 className="h-4 w-4" />
+              <span>{t('megamenu.curatedCategories')}</span>
+            </div>
+
+            {featuredCategory ? (
+              <>
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.08] text-secondary-blue shadow-[0_18px_38px_-24px_rgba(56,189,248,0.75)]">
+                  {getCategoryIcon(featuredCategory.slug, { size: 24 })}
+                </div>
+                <div>
+                  <h3 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.2rem]">
+                    {getCategoryDisplayName(featuredCategory)}
+                  </h3>
+                  <p className="mt-3 max-w-lg text-sm leading-6 text-white/68 sm:text-[15px]">
+                    {featuredCategory.description || t('categoryHub.emptyDescription')}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="rounded-[1.8rem] border border-dashed border-white/10 bg-white/5 p-6 text-sm text-white/60">
+                {t('categoryHub.empty')}
+              </div>
+            )}
+          </div>
+
+          {featuredCategory && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                  {t('categoryHub.curatedSeries')}
+                </div>
+                <div className="mt-2 text-2xl font-semibold text-white">{featuredSeries.length}</div>
+                <div className="mt-1 text-sm text-white/55">{t('categoryHub.seriesPanelTitle', { category: getCategoryDisplayName(featuredCategory) })}</div>
+              </div>
+
+              <Link
+                href={`/category/${featuredCategory.slug}`}
+                onClick={() => handleNavigate(`category:${featuredCategory.slug}`)}
+                className="rounded-[1.6rem] border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.1]"
+              >
+                <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                  {t('categoryHub.quickOpen')}
+                </div>
+                <div className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-secondary-blue">
+                  <span>{t('categoryHub.viewCategory')}</span>
+                  <ChevronRight className="h-4 w-4" />
+                </div>
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid min-h-0 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <div className="border-b border-white/10 p-5 lg:min-h-0 lg:border-b-0 lg:border-r lg:p-6">
+          <div className="mb-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+              {t('common.categories')}
+            </div>
+            <p className="mt-1 text-sm text-white/55">{t('megamenu.pickCategory')}</p>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            {mainCategories.map((category) => {
+              const isActive = featuredCategory?.id === category.id
+              const seriesCount = (childrenMap[category.id] || []).filter((item) => item.slug !== category.slug).length
+
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  onMouseEnter={() => setFocusedCategoryId(category.id)}
+                  onFocus={() => setFocusedCategoryId(category.id)}
+                  onClick={() => handleNavigate(`category:${category.slug}`)}
+                  className={`group rounded-[1.35rem] border px-3 py-3 text-left transition-all duration-300 ${isActive ? 'border-secondary-blue/40 bg-secondary-blue/15 shadow-[0_18px_40px_-28px_rgba(56,189,248,0.8)]' : 'border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.08]'}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl border ${isActive ? 'border-secondary-blue/30 bg-secondary-blue/15 text-secondary-blue' : 'border-white/10 bg-white/5 text-white/65'}`}>
+                      {getCategoryIcon(category.slug, { size: 20 })}
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                      {t('categoryHub.seriesCount', { count: seriesCount })}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 text-sm font-semibold text-white">{getCategoryDisplayName(category)}</div>
+                  <div className="mt-1 text-xs text-white/55">{category.description || t('categoryHub.windowFallback')}</div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="flex min-h-0 flex-col p-5 lg:p-6">
+          <div className="grid gap-3 md:grid-cols-2">
+            {destinations.map((destination) => (
+              <Link
+                key={destination.id}
+                href={destination.href}
+                onClick={() => handleNavigate(destination.id)}
+                className="group rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-secondary-blue/30 hover:bg-[linear-gradient(180deg,rgba(59,130,246,0.18),rgba(255,255,255,0.06))] hover:shadow-[0_24px_60px_-34px_rgba(59,130,246,0.7)]"
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue transition-colors group-hover:border-secondary-blue/30 group-hover:bg-secondary-blue/10">
+                  {destination.icon}
+                </div>
+                <div className="mt-4 text-base font-semibold text-white">{destination.title}</div>
+                <p className="mt-2 text-sm leading-6 text-white/58">{destination.description}</p>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-secondary-blue transition-transform group-hover:translate-x-1">
+                  <span>{t('megamenu.exploreSection')}</span>
+                  <ExternalLink className="h-4 w-4" />
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-5 min-h-0 flex-1 overflow-y-auto rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-4 sm:p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                  {t('megamenu.seriesShowcaseTitle')}
+                </div>
+                <p className="mt-1 text-sm text-white/55">{featuredCategory ? t('categoryHub.seriesPanelTitle', { category: getCategoryDisplayName(featuredCategory) }) : t('categoryHub.empty')}</p>
+              </div>
+            </div>
+
+            {featuredSeries.length > 0 && featuredCategory ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {featuredSeries.map((series) => (
+                  <Link
+                    key={series.id}
+                    href={`/category/${featuredCategory.slug}/${series.slug}`}
+                    onClick={() => handleNavigate(`series:${series.slug}`)}
+                    className="group rounded-[1.35rem] border border-white/10 bg-white/[0.05] p-4 transition-all duration-300 hover:border-secondary-blue/30 hover:bg-white/[0.08]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue">
+                        {getCategoryIcon(series.slug, { size: 18 })}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-white/35 transition-transform group-hover:translate-x-1 group-hover:text-secondary-blue" />
+                    </div>
+                    <div className="mt-4 text-sm font-semibold text-white">{getCategoryDisplayName(series)}</div>
+                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-white/55">{series.description || t('categoryHub.windowFallback')}</p>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="flex min-h-[180px] items-center justify-center rounded-[1.5rem] border border-dashed border-white/10 bg-white/[0.03] text-sm text-white/55">
+                {t('categoryHub.noSubcategories')}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </NavSceneShell>
+  )
 }
 
 export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose, categories }) => {
-    const { t } = useI18n()
-    const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
-    const mainCategories = categories.filter(cat => cat.level === 0)
-    const subCategories = categories.filter(cat => cat.level === 1)
+  const { t } = useI18n()
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
 
-    const getSubCategories = (parentId: string) => {
-        return subCategories.filter(sub => sub.parent_id === parentId)
-    }
+  const mainCategories = useMemo(() => categories.filter((category) => category.level === 0), [categories])
+  const childrenMap = useMemo(() => buildChildrenMap(categories), [categories])
 
-    // Close on escape
-    useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose()
-        }
-        if (isOpen) {
-            document.addEventListener('keydown', handleEscape)
-            document.body.style.overflow = 'hidden'
-        }
-        return () => {
-            document.removeEventListener('keydown', handleEscape)
-            document.body.style.overflow = ''
-        }
-    }, [isOpen, onClose])
+  const selectedCategory = useMemo(() => {
+    if (!selectedCategoryId) return null
+    return mainCategories.find((category) => category.id === selectedCategoryId) || null
+  }, [mainCategories, selectedCategoryId])
 
-    if (!isOpen) return null
+  const selectedSeries = useMemo(() => {
+    if (!selectedCategory) return []
+    return (childrenMap[selectedCategory.id] || []).filter((category) => category.slug !== selectedCategory.slug)
+  }, [childrenMap, selectedCategory])
 
-    return (
-        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-            <div
-                className="absolute top-0 left-0 w-[85%] max-w-[360px] h-full bg-white shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col"
-                onClick={(e) => e.stopPropagation()}
+  const destinations: GlobalDestination[] = useMemo(
+    () => [
+      {
+        id: 'products',
+        title: t('common.products'),
+        description: t('megamenu.productsDescription'),
+        href: '/products',
+        icon: <Compass className="h-5 w-5" />,
+      },
+      {
+        id: 'brands',
+        title: t('common.brands'),
+        description: t('megamenu.brandsDescription'),
+        href: '/brands',
+        icon: <Sparkles className="h-5 w-5" />,
+      },
+      {
+        id: 'knowledgeHub',
+        title: t('common.knowledgeHub'),
+        description: t('megamenu.knowledgeHubDescription'),
+        href: '/destek/merkez',
+        icon: <Library className="h-5 w-5" />,
+      },
+    ],
+    [t]
+  )
+
+  return (
+    <NavSceneShell
+      isOpen={isOpen}
+      onClose={() => {
+        setSelectedCategoryId(null)
+        onClose()
+      }}
+      closeLabel={t('common.close')}
+      eyebrow={t('megamenu.navigation')}
+      title={selectedCategory ? getCategoryDisplayName(selectedCategory) : t('megamenu.mobileNavigatorTitle')}
+      description={selectedCategory ? t('categoryHub.subcategoryHint') : t('megamenu.mobileNavigatorDescription')}
+      panelClassName="inset-x-0 bottom-0 top-auto md:inset-x-5 md:top-5 md:bottom-5"
+      bodyClassName="flex flex-col"
+    >
+      {selectedCategory ? (
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="border-b border-white/10 px-5 py-4">
+            <button
+              type="button"
+              onClick={() => setSelectedCategoryId(null)}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
             >
-                {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
-                    <h2 className="text-lg font-bold text-slate-800">{t('common.categories')}</h2>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-500 hover:text-slate-800 transition-colors">
-                        ✕
-                    </button>
-                </div>
+              <ArrowLeft className="h-4 w-4" />
+              <span>{t('categoryHub.backToRail')}</span>
+            </button>
+          </div>
 
-                {/* Categories */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                    {mainCategories.map((category) => {
-                        const subs = getSubCategories(category.id)
-                        const isExpanded = expandedCategory === category.id
-
-                        return (
-                            <div key={category.id} className="border border-slate-100 rounded-lg overflow-hidden">
-                                <button
-                                    className={`w-full flex items-center gap-3 p-3 text-left transition-colors ${isExpanded ? 'bg-slate-50' : 'bg-white hover:bg-slate-50'}`}
-                                    onClick={() => setExpandedCategory(isExpanded ? null : category.id)}
-                                >
-                                    <span className="w-9 h-9 flex items-center justify-center bg-white border border-slate-200 rounded-md text-primary-navy shadow-sm">
-                                        {getCategoryIcon(category.slug, { size: 20 })}
-                                    </span>
-                                    <span className="flex-1 font-semibold text-slate-700">{getCategoryDisplayName(category)}</span>
-                                    {subs.length > 0 && (
-                                        <ChevronDown
-                                            className={`text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                                            size={18}
-                                        />
-                                    )}
-                                </button>
-
-                                {subs.length > 0 && isExpanded && (
-                                    <div className="bg-slate-50 border-t border-slate-100 p-2 pl-4 space-y-1">
-                                        {subs.filter(sub => sub.slug !== category.slug).map((sub) => (
-                                            <Link
-                                                key={sub.id}
-                                                href={`/category/${category.slug}/${sub.slug}`}
-                                                onClick={onClose}
-                                                className="block p-2 text-sm font-medium text-slate-600 hover:text-primary-navy hover:bg-white rounded-md transition-all"
-                                            >
-                                                {getCategoryDisplayName(sub)}
-                                            </Link>
-                                        ))}
-                                        <Link
-                                            href={`/category/${category.slug}`}
-                                            onClick={onClose}
-                                            className="block p-2 text-sm font-bold text-secondary-blue hover:text-primary-navy hover:bg-white rounded-md transition-all mt-2"
-                                        >
-                                            {t('common.viewAll')} →
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    })}
-                </div>
-
-                {/* Footer Links */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50">
-                    <Link href="/products" onClick={onClose} className="block w-full py-3 px-4 bg-primary-navy text-white text-center font-bold rounded-lg shadow-lg shadow-primary-navy/20 active:scale-95 transition-all">
-                        {t('common.products')}
-                    </Link>
-                </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+            <div className="mb-4 rounded-[1.6rem] border border-white/10 bg-[linear-gradient(180deg,rgba(59,130,246,0.14),rgba(255,255,255,0.04))] p-5">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue">
+                {getCategoryIcon(selectedCategory.slug, { size: 20 })}
+              </div>
+              <h3 className="mt-4 text-xl font-semibold text-white">{getCategoryDisplayName(selectedCategory)}</h3>
+              <p className="mt-2 text-sm leading-6 text-white/60">{selectedCategory.description || t('categoryHub.emptyDescription')}</p>
             </div>
+
+            {selectedSeries.length > 0 ? (
+              <div className="space-y-3">
+                {selectedSeries.map((series) => (
+                  <Link
+                    key={series.id}
+                    href={`/category/${selectedCategory.slug}/${series.slug}`}
+                    onClick={onClose}
+                    className="group block rounded-[1.45rem] border border-white/10 bg-white/[0.05] p-4 transition-all duration-300 hover:border-secondary-blue/30 hover:bg-white/[0.08]"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue">
+                        {getCategoryIcon(series.slug, { size: 18 })}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="truncate text-sm font-semibold text-white">{getCategoryDisplayName(series)}</div>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-white/35 transition-transform group-hover:translate-x-1 group-hover:text-secondary-blue" />
+                        </div>
+                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/55">{series.description || t('categoryHub.windowFallback')}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+
+                <Link
+                  href={`/category/${selectedCategory.slug}`}
+                  onClick={onClose}
+                  className="flex items-center justify-center gap-2 rounded-[1.45rem] border border-dashed border-secondary-blue/35 bg-secondary-blue/10 px-4 py-4 text-sm font-semibold text-secondary-blue transition-colors hover:bg-secondary-blue/16 hover:text-white"
+                >
+                  <span>{t('categoryHub.viewAllInCategory', { category: getCategoryDisplayName(selectedCategory) })}</span>
+                  <ExternalLink className="h-4 w-4" />
+                </Link>
+              </div>
+            ) : (
+              <div className="rounded-[1.45rem] border border-white/10 bg-white/[0.05] p-5 text-center text-sm text-white/60">
+                {t('categoryHub.noSubcategories')}
+              </div>
+            )}
+          </div>
         </div>
-    )
+      ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+          <div className="grid gap-3">
+            {destinations.map((destination) => (
+              <Link
+                key={destination.id}
+                href={destination.href}
+                onClick={onClose}
+                className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-5 transition-all duration-300 hover:border-secondary-blue/30 hover:bg-[linear-gradient(180deg,rgba(59,130,246,0.18),rgba(255,255,255,0.06))]"
+              >
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue">
+                  {destination.icon}
+                </div>
+                <div className="mt-4 text-base font-semibold text-white">{destination.title}</div>
+                <p className="mt-2 text-sm leading-6 text-white/58">{destination.description}</p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-5 rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-4">
+            <div className="mb-4">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/45">
+                {t('common.categories')}
+              </div>
+              <p className="mt-1 text-sm text-white/55">{t('megamenu.mobileCategoryPrompt')}</p>
+            </div>
+
+            <div className="space-y-3">
+              {mainCategories.map((category) => {
+                const seriesCount = (childrenMap[category.id] || []).filter((item) => item.slug !== category.slug).length
+
+                return (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => setSelectedCategoryId(category.id)}
+                    className="group flex w-full items-center gap-3 rounded-[1.35rem] border border-white/10 bg-white/[0.05] p-4 text-left transition-all duration-300 hover:border-secondary-blue/30 hover:bg-white/[0.08]"
+                  >
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/40 text-secondary-blue">
+                      {getCategoryIcon(category.slug, { size: 20 })}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold text-white">{getCategoryDisplayName(category)}</span>
+                      <span className="mt-1 block text-xs text-white/50">{t('categoryHub.seriesCount', { count: seriesCount })}</span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-white/35 transition-transform group-hover:translate-x-1 group-hover:text-secondary-blue" />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </NavSceneShell>
+  )
 }
 
 export default EliteMegaMenu
-
-
-

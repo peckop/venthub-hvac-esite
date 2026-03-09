@@ -297,6 +297,18 @@ export const tr = {
     pickCategory: 'Premium HVAC çözümleri için kategori seçiminizi yapın',
     subcategories: 'alt kategori',
     more: 'daha fazla',
+    globalNavigatorTitle: 'Global gezinme sahnesi',
+    globalNavigatorDescription: 'Kategori keşfi dışında kalan tüm ana geçişleri tek premium panelden yönetin.',
+    curatedCategories: 'Küratör Seçimi',
+    productsDescription: 'Tüm ürün ailelerini, filtreleri ve ürün keşif akışını açın.',
+    brandsDescription: 'Temsil ettiğimiz premium markaları ve marka bazlı keşif akışlarını inceleyin.',
+    knowledgeHubDescription: 'Seçim rehberleri, teknik içerikler ve bilgi merkezi akışına geçin.',
+    supportDescription: 'Destek merkezi, yardım akışları ve operasyonel yönlendirmelere ulaşın.',
+    exploreSection: 'Bölümü Aç',
+    seriesShowcaseTitle: 'Seri vitrini',
+    mobileNavigatorTitle: 'Mobil gezinme',
+    mobileNavigatorDescription: 'Global geçişler ve kategori keşfi tek premium sheet içinde sunulur.',
+    mobileCategoryPrompt: 'Bir kategori seçin, ardından serilerini mobil akış içinde açın.'
   },
   categoryHub: {
     mainCategories: 'Ana Kategoriler',
