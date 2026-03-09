@@ -51,6 +51,7 @@ export const tr = {
     loading: 'Yükleniyor...',
     noData: 'Gösterilecek veri bulunamadı',
     retry: 'Tekrar Dene',
+    viewDetails: 'Detayları Gör',
   },
   search: {
     recentSearches: "Son Aramalar",
@@ -305,7 +306,18 @@ export const tr = {
     noSubcategories: 'Bu kategori altında henüz gösterilecek seri bulunmuyor.',
     empty: 'Gösterilecek kategori bulunamadı.',
     subcategoryHint: 'Bir alt kategori seçerek ürünleri görüntüleyin',
-    categoryHint: 'Bir kategori seçerek alt serileri görüntüleyin'
+    categoryHint: 'Bir kategori seçerek alt serileri görüntüleyin',
+    navigatorEyebrow: '3D Kategori Gezgini',
+    previewLabel: 'Spotlight',
+    backToRail: 'Kategori rayına dön',
+    hoverHint: 'Bir ana kategoriye gelerek ya da seçerek serilerini inceleyin',
+    emptyDescription: 'Projeleriniz için seçilmiş premium HVAC cozumleri.',
+    curatedSeries: 'Kurgulanan Seri',
+    quickOpen: 'Hızlı Geçiş',
+    exploreSeries: 'Serileri Aç',
+    viewCategory: 'Kategori sayfasına git',
+    seriesPanelTitle: '{{category}} serileri',
+    windowFallback: 'Bu serideki ürünleri ve teknik varyasyonlari inceleyin.'
   },
   header: {
     brandName: 'VentHub',

@@ -64,18 +64,21 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   if (loadError) {
     return (
       <div
-        className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm animate-in fade-in duration-300"
+        className="fixed inset-0 z-50 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_35%),rgba(2,6,23,0.58)] backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       >
         <div
-          className="absolute top-0 left-0 w-full bg-white/95 backdrop-blur-md shadow-2xl animate-in slide-in-from-top-4 duration-300"
+          className="absolute top-0 left-0 w-full border-b border-white/10 bg-slate-950/88 backdrop-blur-xl shadow-2xl animate-in slide-in-from-top-4 duration-300"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between p-4 border-b border-gray-100 max-w-7xl mx-auto">
-            <h2 className="text-lg font-bold text-industrial-gray">{t('megamenu.productCategories')}</h2>
+          <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/10 p-4">
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue">{t('categoryHub.navigatorEyebrow')}</div>
+              <h2 className="mt-1 text-lg font-bold text-white">{t('megamenu.productCategories')}</h2>
+            </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-slate-400 group"
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white group"
               aria-label={t('common.close')}
             >
               <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-90 transition-transform duration-300">
@@ -86,7 +89,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
 
           <div className="max-w-7xl mx-auto p-4">
             <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
-              <p className="text-sm text-steel-gray">{loadError}</p>
+              <p className="text-sm text-white/70">{loadError}</p>
               <button
                 type="button"
                 onClick={() => void fetchCategories(true)}
@@ -115,19 +118,22 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   // Desktop: Full-screen overlay with Radix NavigationMenu
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_35%),rgba(2,6,23,0.58)] backdrop-blur-md animate-in fade-in duration-300"
       onClick={onClose}
     >
       <div
-        className="absolute top-0 left-0 w-full bg-white/95 backdrop-blur-md shadow-2xl animate-in slide-in-from-top-4 duration-300"
+        className="absolute top-0 left-0 w-full border-b border-white/10 bg-slate-950/88 backdrop-blur-xl shadow-2xl animate-in slide-in-from-top-4 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100 max-w-7xl mx-auto">
-          <h2 className="text-lg font-bold text-industrial-gray">{t('megamenu.productCategories')}</h2>
+        <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/10 p-4">
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue">{t('categoryHub.navigatorEyebrow')}</div>
+            <h2 className="mt-1 text-lg font-bold text-white">{t('megamenu.productCategories')}</h2>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-slate-400 group"
+            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white group"
             aria-label={t('common.close')}
           >
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-90 transition-transform duration-300">

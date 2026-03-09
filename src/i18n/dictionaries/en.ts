@@ -51,6 +51,7 @@ export const en = {
     loading: 'Loading...',
     noData: 'No data to display',
     retry: 'Try Again',
+    viewDetails: 'View Details',
   },
   search: {
     recentSearches: "Recent Searches",
@@ -305,7 +306,18 @@ export const en = {
     noSubcategories: 'There are no series to show under this category yet.',
     empty: 'No categories available to display.',
     subcategoryHint: 'Select a subcategory to view products',
-    categoryHint: 'Select a category to view its series'
+    categoryHint: 'Select a category to view its series',
+    navigatorEyebrow: '3D Category Navigator',
+    previewLabel: 'Spotlight',
+    backToRail: 'Back to category rail',
+    hoverHint: 'Hover or select a main category to inspect its series',
+    emptyDescription: 'Premium HVAC solutions curated for demanding projects.',
+    curatedSeries: 'Curated Series',
+    quickOpen: 'Quick Open',
+    exploreSeries: 'Explore Series',
+    viewCategory: 'Go to category page',
+    seriesPanelTitle: '{{category}} series',
+    windowFallback: 'Review products and technical variants inside this series.'
   },
   header: {
     brandName: 'VentHub',

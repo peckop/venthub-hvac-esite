@@ -3,6 +3,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu'
 import Link from 'next/link'
 import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { Category } from '../../lib/supabase'
+import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
 import MegaMenu3DBackground from './MegaMenu3DBackground'
@@ -14,6 +15,7 @@ interface EliteMegaMenuProps {
 }
 
 export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
+    const { t } = useI18n()
     const mainCategories = categories.filter(cat => cat.level === 0)
     const subCategories = categories.filter(cat => cat.level === 1)
 
@@ -78,14 +80,14 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                     {getCategoryDisplayName(category)}
                                                 </div>
                                                 <p className="text-[14px] leading-[1.3] text-white/90">
-                                                    {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
+                                                    {category.description || t('categoryHub.emptyDescription')}
                                                 </p>
                                                 <Link
                                                     href={`/category/${category.slug}`}
                                                     onClick={() => handleLinkClick(0, category.slug)}
                                                     className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
                                                 >
-                                                    Tümünü Gör <ExternalLink size={14} />
+                                                    {t('common.viewAll')} <ExternalLink size={14} />
                                                 </Link>
                                             </div>
                                         </div>
@@ -103,7 +105,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                     >
                                                         <div className="mb-1 font-medium text-slate-900">{getCategoryDisplayName(sub)}</div>
                                                         <p className="text-[13px] leading-[1.4] text-slate-500 line-clamp-2">
-                                                            {sub.description || 'Ürünleri incele →'}
+                                                            {sub.description || t('categoryHub.windowFallback')}
                                                         </p>
                                                     </Link>
                                                 </li>
@@ -123,7 +125,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                         onClick={() => handleLinkClick(0, 'products')}
                         className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-bold leading-none text-secondary-blue outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
                     >
-                        Tüm Ürünler
+                        {t('common.products')}
                     </Link>
                 </NavigationMenu.Item>
 
@@ -147,6 +149,7 @@ interface MobileMegaMenuProps {
 }
 
 export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose, categories }) => {
+    const { t } = useI18n()
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
     const mainCategories = categories.filter(cat => cat.level === 0)
     const subCategories = categories.filter(cat => cat.level === 1)
@@ -180,7 +183,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50">
-                    <h2 className="text-lg font-bold text-slate-800">Kategoriler</h2>
+                    <h2 className="text-lg font-bold text-slate-800">{t('common.categories')}</h2>
                     <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-500 hover:text-slate-800 transition-colors">
                         ✕
                     </button>
@@ -227,7 +230,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                                             onClick={onClose}
                                             className="block p-2 text-sm font-bold text-secondary-blue hover:text-primary-navy hover:bg-white rounded-md transition-all mt-2"
                                         >
-                                            Tümünü Gör →
+                                            {t('common.viewAll')} →
                                         </Link>
                                     </div>
                                 )}
@@ -239,7 +242,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                 {/* Footer Links */}
                 <div className="p-4 border-t border-slate-100 bg-slate-50">
                     <Link href="/products" onClick={onClose} className="block w-full py-3 px-4 bg-primary-navy text-white text-center font-bold rounded-lg shadow-lg shadow-primary-navy/20 active:scale-95 transition-all">
-                        Tüm Ürünler
+                        {t('common.products')}
                     </Link>
                 </div>
             </div>
