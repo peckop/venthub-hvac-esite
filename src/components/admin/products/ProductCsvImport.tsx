@@ -2,6 +2,9 @@ import React from 'react'
 import { supabase } from '../../../lib/supabase'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 import { useI18n } from '../../../i18n/I18nProvider'
+import type { Database } from '../../../types/database.types'
+
+type ProductInsert = Database['public']['Tables']['products']['Insert']
 
 interface CategoryOpt {
     id: string
@@ -61,11 +64,11 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             return found?.id || null
         }
 
-        const payloads: Record<string, unknown>[] = []
+        const payloads: ProductInsert[] = []
 
         for (const r of importRows) {
             if (!r['sku'] || !r['name']) continue
-            const p: Record<string, unknown> = {
+            const p: Partial<ProductInsert> & { sku: string; name: string; brand: string } = {
                 sku: r['sku'].trim(),
                 name: r['name'].trim(),
                 brand: r['brand']?.trim() || 'Generic' // Default for required field
@@ -79,7 +82,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
             if (r['category_id']) p.category_id = r['category_id'] || null
             else if (r['category_slug'] || r['category']) p.category_id = mapCategorySlugToId(r['category_slug'] || r['category'])
-            payloads.push(p)
+            payloads.push(p as ProductInsert)
         }
 
         if (payloads.length === 0) {
@@ -94,7 +97,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             for (let i = 0; i < payloads.length; i += 100) {
                 const chunk = payloads.slice(i, i + 100)
                 // Use the proper product insert type to avoid 'any'
-                const { error } = await supabase.from('products').upsert(chunk as never, { onConflict: 'sku' })
+                const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
                     fail += chunk.length
