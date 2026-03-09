@@ -314,7 +314,12 @@ export const tr = {
     sectionHint: 'Bölüm değiştirerek paneli güncelleyin',
     companyPanelDescription: 'Kurumsal sayfalar, iletişim ve destek geçişleri bu bölümde toplanır.',
     aboutDescription: 'VentHub yaklaşımını, marka konumunu ve operasyon modelini inceleyin.',
-    contactDescription: 'Satış, proje ve destek ekiplerine hızlıca ulaşın.'
+    contactDescription: 'Satış, proje ve destek ekiplerine hızlıca ulaşın.',
+    mobileCategoryLead: 'Kategori mobilde yeniden birinci seviyede. Kompakt liste üzerinden serilere hızlıca inebilirsiniz.',
+    mobileExploreLead: 'Ürün, marka ve bilgi merkezi geçişleri uygulama benzeri hızlı satırlar olarak sunulur.',
+    mobileCompanyLead: 'Kurumsal ve destek akışları tek bir mobil bölümde toplanır.',
+    needDifferentRoute: 'Kategori dışında bir yere mi gitmek istiyorsunuz?',
+    needDifferentRouteHint: 'Ürünler, markalar ve bilgi merkezi için Genel Bakış sekmesine geçin.'
   },
   categoryHub: {
     mainCategories: 'Ana Kategoriler',

@@ -314,7 +314,12 @@ export const en = {
     sectionHint: 'Switch sections to refresh the panel',
     companyPanelDescription: 'Corporate pages, contact and support transitions are grouped here.',
     aboutDescription: 'Review the VentHub approach, brand position and operating model.',
-    contactDescription: 'Reach sales, project and support teams quickly.'
+    contactDescription: 'Reach sales, project and support teams quickly.',
+    mobileCategoryLead: 'Categories return to the first level on mobile. Dive into series through a compact list.',
+    mobileExploreLead: 'Products, brands and knowledge hub routes are presented as fast app-like rows.',
+    mobileCompanyLead: 'Corporate and support flows are gathered inside one mobile section.',
+    needDifferentRoute: 'Need somewhere other than categories?',
+    needDifferentRouteHint: 'Switch to Overview for products, brands and knowledge hub routes.'
   },
   categoryHub: {
     mainCategories: 'Main Categories',
