@@ -41,8 +41,8 @@ const NavShell: React.FC<NavShellProps> = ({
           showProgress && 'pt-1'
         )}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className={cn('flex items-center justify-between gap-3', NAVIGATION_HEIGHT_CLASSES[mode])}>
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className={cn('flex items-center justify-between gap-1.5 sm:gap-3', NAVIGATION_HEIGHT_CLASSES[mode])}>
             {children}
           </div>
         </div>

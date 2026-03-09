@@ -17,8 +17,8 @@ const NavBrand: React.FC<NavBrandProps> = ({ mode, brandName, tagline }) => {
     <Link
       href="/"
       className={cn(
-        'group flex shrink-0 items-center gap-3',
-        isCompact ? 'min-w-[172px] pr-3' : 'min-w-[244px] pr-5 xl:pr-6'
+        'group flex shrink-0 items-center gap-2 sm:gap-3',
+        isCompact ? 'min-w-[140px] sm:min-w-[172px] pr-2 sm:pr-3' : 'min-w-[200px] sm:min-w-[244px] pr-4 sm:pr-5 xl:pr-6'
       )}
     >
       <div
