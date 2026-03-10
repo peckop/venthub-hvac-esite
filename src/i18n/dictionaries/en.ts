@@ -136,8 +136,10 @@ export const en = {
     seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
-      title: 'Make the right HVAC decision faster, with more control and with a more premium flow.',
-      subtitle: 'VentHub brings category discovery, application-led routing, a 3D product language and expert support into one homepage flow. Users are not only shown products; they are guided toward the right solution.',
+      title: 'Enter the right HVAC path from the first screen.',
+      titleLineOne: 'Enter the right HVAC',
+      titleLineTwo: 'path from the first screen.',
+      subtitle: '3D discovery, category flow and quote routing come together in one focused layer.',
       primaryCta: 'Explore Products',
       secondaryCta: 'Get a Fast Quote',
       quickAccessLabel: 'Quick Access',
@@ -151,8 +153,8 @@ export const en = {
       },
       metrics: {
         coreCategories: 'core categories for a faster start',
-        productSeries: 'series and sub-family routes',
-        entryPaths: 'primary decision paths with guided routing'
+        productSeries: '{{count}} series and sub-family routes',
+        entryPaths: 'guided decision flow'
       },
       trustStrip: {
         authorizedBrands: 'Authorized premium brands',
@@ -166,6 +168,12 @@ export const en = {
         heatRecovery: 'Heat Recovery',
         speedControl: 'Speed Control',
         quote: 'Request Quote'
+      },
+      categorySummaries: {
+        fans: 'Compare ATEX, industrial and commercial fan families faster.',
+        airCurtains: 'Move toward the right air curtain family for entrance comfort and energy-loss control.',
+        heatRecovery: 'Evaluate fresh-air and efficiency balance through a heat recovery route.',
+        speedControl: 'Select fan control, drive and speed management in the right equipment layer.'
       }
     },
     quickEntry: {
@@ -193,11 +201,13 @@ export const en = {
     },
     guidedDiscovery: {
       eyebrow: 'Primary Discovery Layer',
-      title: 'Move through core categories with more control and clarity.',
-      subtitle: 'We combine product family, technical need and series logic inside one focused panel so users can approach the right category immediately.',
+      title: 'See the core category structure at a glance and choose the right entry point.',
+      subtitle: 'This section does not repeat the 3D hero. It presents the main product families in a simpler way and moves users toward category, series and product detail with more control.',
       seriesCount: '{{count}} series',
       categoryFallback: 'Premium HVAC solutions designed to accelerate category selection.',
-      panelEyebrow: 'Selected Category',
+      panelEyebrow: 'Decision Flow',
+      panelTitle: 'Move from category selection to product decision faster.',
+      panelBody: 'We create a clearer navigation structure that guides users first to the right family, then to the relevant series, and finally to product detail.',
       panelFallback: 'Review product families, sub-series and the next discovery step for this category in one place.',
       primaryCta: 'Open Category',
       secondaryCta: 'View Scenarios',
@@ -205,6 +215,20 @@ export const en = {
       seriesTitle: '{{category}} series',
       seriesFallback: 'Review this product family and its key variations.',
       footerNote: 'Category discovery starts here and makes the series logic easier to understand before entering product detail.',
+      steps: {
+        select: {
+          title: 'Choose the right core category',
+          description: 'Start from the main families such as fans, air curtains, heat recovery, or speed control.'
+        },
+        compare: {
+          title: 'Narrow the series logic quickly',
+          description: 'Move into the right branch by application, capacity, or technical need through the sub-series structure.'
+        },
+        convert: {
+          title: 'Move to product and quote with control',
+          description: 'Once the category and series are clear, product evaluation and quoting move forward with less friction.'
+        }
+      },
       loading: 'Preparing categories...'
     },
     applicationSolutions: {
@@ -497,7 +521,11 @@ export const en = {
     quickOrder: 'Quick Order',
     recentlyViewed: 'Recently Viewed',
     favorites: 'Favorites',
-    cart: 'Cart'
+    cart: 'Cart',
+    brandName: 'VentHub',
+    brandTagline: 'HVAC Premium',
+    commandSearch: 'Quick search... (/)',
+    commandSearchCompact: 'Search...'
   },
   roles: {
     superadmin: 'Super Admin',
