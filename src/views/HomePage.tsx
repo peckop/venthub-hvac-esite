@@ -66,8 +66,8 @@ export const HomePage: React.FC = () => {
         }}
       />
 
-      <GuidedCategoryDiscovery />
       <ApplicationSolutions />
+      <GuidedCategoryDiscovery />
       <TrustProofSection />
       <FeaturedCommercialBlocks />
       <StrategicBrands />
