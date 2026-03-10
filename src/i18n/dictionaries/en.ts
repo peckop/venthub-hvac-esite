@@ -135,9 +135,91 @@ export const en = {
       }
     }
   },
-  home: {
+home: {
     seoTitle: "VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling",
-    seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
+    seoDesc: "Discover premium ventilation products with VentHub. Engineering-supported solutions for parking jet fans, air curtains, heat recovery units, and more.",
+    hero: {
+      title: "Find industrial and commercial HVAC solutions with the right product, right category, and expert support.",
+      subtitle: "Fans, air curtains, speed controllers, heat recovery, and project-oriented ventilation solutions. Product discovery, technical guidance, and fast quoting on a single platform.",
+      primaryCta: "Explore Products",
+      secondaryCta: "Get a Fast Quote",
+      trustStrips: ["Authorized brands", "Technical consulting", "Nationwide delivery", "Project support"],
+      quickChips: ["Fans", "Air Curtains", "Heat Recovery", "Speed Control", "Get Quote"],
+      quickAccessLabel: "Quick Access"
+    },
+    quickEntry: {
+      category: "Search by Category",
+      application: "Find by Application",
+      support: "Get Technical Support",
+      quote: "Request a Fast Quote"
+    },
+    guidedDiscovery: {
+      title: "Discover Products",
+      subtitle: "Proceed through main categories to find the right premium series for your project.",
+      viewSeries: "View Series",
+      categories: {
+        fans: { title: "Industrial Fans", desc: "Heavy-duty and high-efficiency fan solutions" },
+        airCurtains: { title: "Air Curtains", desc: "Entrance solutions preventing heat and energy loss" },
+        hrv: { title: "Heat Recovery", desc: "HRV units providing fresh air and energy efficiency" },
+        control: { title: "Speed Control", desc: "Frequency inverters and automation panels" }
+      }
+    },
+    applicationSolutions: {
+      title: "Solutions by Application",
+      subtitle: "Ventilation scenarios specific to your sector and space",
+      viewAll: "View All",
+      discover: "Discover",
+      scenarios: {
+        parking: { title: "Parking Ventilation", subtitle: "CO control and jet fan scenarios" },
+        kitchen: { title: "Industrial Kitchen", subtitle: "Hood, filter, and exhaust solutions" },
+        entrance: { title: "Store Entrances", subtitle: "Air curtain and climate control" },
+        smoke: { title: "Smoke Extraction", subtitle: "Emergency and fire safety systems" },
+        commercial: { title: "Commercial Spaces", subtitle: "Comfort-focused HRV systems for offices and malls" }
+      }
+    },
+    featuredCommerce: {
+      title: "Featured Solutions",
+      subtitle: "The most preferred professional equipment for your projects.",
+      viewAll: "View All Products",
+      unavailable: "Products cannot be listed right now.",
+      tabs: {
+        popular: "Popular Products",
+        professional: "Professional Series",
+        newlyAdded: "Newly Added"
+      }
+    },
+    trustProof: {
+      title: "Your Reliable Partner in Industrial HVAC Solutions",
+      subtitle: "Secure your project with years of experience, authorized engineering support, and European standard product quality.",
+      distributorNetwork: "Authorized Distributor Network",
+      proofs: {
+        brands: { title: "Premium Brands", desc: "Only certified global brands complying with European standards." },
+        engineering: { title: "Engineering Support", desc: "Free professional consulting in flow and pressure loss calculations." },
+        delivery: { title: "Nationwide Delivery", desc: "Insured, fast, and secure logistics network to all cities." },
+        support: { title: "After-Sales Guarantee", desc: "Authorized service network, 2-year warranty, and spare parts assurance." }
+      }
+    },
+    strategicBrands: {
+      title: "Premium Brands We Work With",
+      subtitle: "We select world brands that have proven themselves in performance, energy efficiency, and durability for you."
+    },
+    knowledgeBlock: {
+      title: "Technical Guidance and Knowledge Hub",
+      subtitle: "Engineering tools and documents to help you choose the right product.",
+      explore: "Explore",
+      cards: {
+        guide: { title: "Product Selection Guide", desc: "Helps you find the most suitable device for your application step-by-step." },
+        calculators: { title: "Calculators", desc: "Quickly analyze your flow, static pressure, and power needs." },
+        support: { title: "Support Center", desc: "Access installation, maintenance, and commissioning documents." }
+      }
+    },
+    finalCta: {
+      title: "Let's determine the right HVAC solution together",
+      subtitle: "Our expert engineering staff is with you throughout all processes of your project.",
+      contactExpert: "Talk to an Expert",
+      requestQuote: "Request a Quote",
+      exploreProducts: "Explore Products"
+    },
     features: {
       euQuality: "European quality standards",
       fastDelivery: "Fast delivery",
