@@ -172,7 +172,6 @@ const formatSpecValue = (key: string, value: unknown): string => {
   if (lowerKey.endsWith('_hz')) return `${stringValue} Hz`;
   if (lowerKey.endsWith('_c')) return `${stringValue} °C`;
   if (lowerKey.endsWith('_ms')) return `${stringValue} m / s`;
-  // if (lowerKey.endsWith('_ls')) return `${ stringValue } l / s`; // Filtered out
   if (lowerKey.endsWith('_a')) return `${stringValue} A`;
   if (lowerKey.endsWith('_m3h')) return `${stringValue} m³/h`;
   if (lowerKey.endsWith('_w')) return `${stringValue} W`;
