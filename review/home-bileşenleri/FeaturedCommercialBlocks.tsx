@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useI18n } from '../../i18n/I18nProvider'
-import { getProducts, Product } from '../../lib/supabase'
+import { useI18n } from '../../src/i18n/I18nProvider'
+import { getProducts, Product } from '../../src/lib/supabase'
 
 // Using real data via supabase. If API fails, fall back to safe curated blocks.
 export const FeaturedCommercialBlocks: React.FC = () => {

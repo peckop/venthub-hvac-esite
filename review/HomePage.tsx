@@ -1,7 +1,7 @@
 import React, { useState, Suspense, useEffect } from 'react'
 
-import { useI18n } from '../i18n/I18nProvider'
-import Seo from '../components/Seo'
+import { useI18n } from '../src/i18n/I18nProvider'
+import Seo from '../src/components/Seo'
 
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 

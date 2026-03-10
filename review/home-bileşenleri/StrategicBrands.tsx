@@ -1,9 +1,9 @@
 'use client'
 
 import React, { Suspense } from 'react'
-import { useI18n } from '../../i18n/I18nProvider'
+import { useI18n } from '../../src/i18n/I18nProvider'
 
-const BrandsShowcase = React.lazy(() => import('../BrandsShowcase'))
+const BrandsShowcase = React.lazy(() => import('../../src/components/BrandsShowcase'))
 
 export const StrategicBrands: React.FC = () => {
   const { t } = useI18n()
