@@ -125,7 +125,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 try {
                     const compressedBlob = await compressImage(image.file)
                     const ext = 'webp'
-                    const filename = `cat_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+                    const filename = `cat_${crypto.randomUUID()}.${ext}`
                     const path = `${filename}`
 
                     const { error: upErr } = await supabase.storage.from('category-images').upload(path, compressedBlob, { contentType: 'image/webp' })

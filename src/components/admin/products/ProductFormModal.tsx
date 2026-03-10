@@ -257,7 +257,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     // Compress
                     const compressedBlob = await compressImage(img.file)
                     const ext = 'webp'
-                    const filename = `prod_${pid}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+                    const filename = `prod_${pid}_${crypto.randomUUID()}.${ext}`
                     const path = `product/${pid}/${filename}`
 
                     // Upload
