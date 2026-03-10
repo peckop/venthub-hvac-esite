@@ -134,6 +134,195 @@ export const tr = {
   home: {
     seoTitle: "VentHub - Premium HVAC Çözümleri | Fan, Hız Kontrol, Isıtma & Soğutma",
     seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
+    hero: {
+      eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
+      title: 'Endüstriyel ve ticari HVAC çözümlerini doğru ürün, doğru kategori ve uzman destekle bulun.',
+      subtitle: 'Fanlar, hava perdeleri, hız kontrol cihazları, ısı geri kazanım ve proje odaklı havalandırma çözümleri. Ürün keşfi, teknik yönlendirme ve hızlı teklif tek platformda.',
+      primaryCta: 'Ürünleri Keşfet',
+      secondaryCta: 'Hızlı Teklif Al',
+      quickAccessLabel: 'Hızlı Erişim',
+      visualAlt: 'VentHub endüstriyel HVAC çözüm görseli',
+      visualEyebrow: 'Kontrollü Keşif',
+      visualTitle: 'Mühendislikten satışa uzanan daha net bir seçim akışı.',
+      visualSubtitle: 'Kategori, uygulama ve teknik destek yollarını tek bir premium ana sayfa deneyiminde birleştiriyoruz.',
+      visualPoints: {
+        selection: 'Kategori ve uygulama bazlı hızlı yönlendirme',
+        routing: 'Teklif ve uzman desteğine kısa yol erişimi'
+      },
+      trustStrip: {
+        authorizedBrands: 'Yetkili premium markalar',
+        engineeringSupport: 'Mühendislik yönlendirmesi',
+        nationwideDelivery: 'Türkiye geneli sevkiyat',
+        projectGuidance: 'Proje odaklı seçim desteği'
+      },
+      quickChips: {
+        fans: 'Fanlar',
+        airCurtains: 'Hava Perdeleri',
+        heatRecovery: 'Isı Geri Kazanım',
+        speedControl: 'Hız Kontrol',
+        quote: 'Teklif İste'
+      }
+    },
+    quickEntry: {
+      eyebrow: 'Başlangıç Katmanı',
+      title: 'Neye ihtiyacınız olduğunu hızlıca seçin.',
+      subtitle: 'Kategoriden başlayın, uygulama ile daraltın veya doğrudan teknik destek ve teklif akışına geçin.',
+      items: {
+        category: {
+          title: 'Kategoriye Göre Ara',
+          description: 'Ana ürün ailelerinden başlayarak doğru kategoriye ilerleyin.'
+        },
+        application: {
+          title: 'Uygulamaya Göre Bul',
+          description: 'Otopark, mutfak, giriş ve konfor senaryolarına göre çözüm seçin.'
+        },
+        support: {
+          title: 'Teknik Destek Al',
+          description: 'Sık sorulanlar, destek akışları ve bilgi merkezine hızlıca ulaşın.'
+        },
+        quote: {
+          title: 'Hızlı Teklif İste',
+          description: 'İhtiyacınızı kısaca paylaşın, doğru çözüm için uzman yönlendirmesi alın.'
+        }
+      }
+    },
+    guidedDiscovery: {
+      eyebrow: 'Ana Keşif Katmanı',
+      title: 'Ana kategoriler üzerinden kontrollü ve daha net ilerleyin.',
+      subtitle: 'Ürün ailesi, teknik ihtiyaç ve seri mantığını tek bir odak panelinde birleştiriyoruz. Böylece kullanıcı ilk bakışta doğru kategoriye yaklaşabiliyor.',
+      seriesCount: '{{count}} seri',
+      categoryFallback: 'Bu kategori için seçimi hızlandıran premium HVAC çözümleri.',
+      panelEyebrow: 'Seçili Kategori',
+      panelFallback: 'Kategoriye ait ürün ailelerini, alt serileri ve sonraki keşif adımlarını net biçimde görüntüleyin.',
+      primaryCta: 'Kategoriye Git',
+      secondaryCta: 'Senaryolara Bak',
+      seriesEyebrow: 'Seri Kısa Yolları',
+      seriesTitle: '{{category}} serileri',
+      seriesFallback: 'Bu seri için ürün ailesini ve varyasyonlarını inceleyin.',
+      footerNote: 'Kategori keşfi burada başlar; ürün detayına gitmeden önce seri mantığını kavramanızı kolaylaştırır.',
+      loading: 'Kategoriler hazırlanıyor...'
+    },
+    applicationSolutions: {
+      eyebrow: 'Senaryo Odaklı Çözümler',
+      title: 'Üründen değil, kullanım senaryosundan da başlayabilirsiniz.',
+      subtitle: 'Otoparktan giriş konforuna, mutfaktan ticari alan konforuna kadar farklı HVAC ihtiyaçlarını çözüm mantığıyla sunuyoruz.',
+      viewAll: 'Tümünü Gör',
+      items: {
+        parking: {
+          eyebrow: 'Otopark Senaryosu',
+          title: 'Otopark havalandırması ve jet fan akışı',
+          description: 'CO kontrolü, hava sirkulasyonu ve yüksek debi gereksinimi olan otopark projeleri için doğru fan ailesine hızlı geçiş sağlayın.',
+          point1: 'Jet fan ve duman egzoz geçişleri',
+          point2: 'Yüksek debi ve güvenli yönlendirme'
+        },
+        kitchen: {
+          eyebrow: 'Mutfak Senaryosu',
+          title: 'Endüstriyel mutfak egzozu ve kanal akışı',
+          description: 'Yağ buharı, koku yönetimi ve kanal tipi fan ihtiyacında daha doğru ürün ailesine senaryo odaklı ilerleyin.',
+          point1: 'Kanal tipi fan odaklı başlangıç',
+          point2: 'Davlumbaz ve egzoz uyum mantığı'
+        },
+        entrance: {
+          eyebrow: 'Giriş Konforu',
+          title: 'Mağaza girişi ve hava perdesi çözümleri',
+          description: 'Kapı açıklıklarında konforu artırmak ve enerji kaybını azaltmak için hava perdesi keşfini daha anlaşılır hale getirin.',
+          point1: 'Giriş konforu odaklı seçim',
+          point2: 'Enerji kaybını azaltan yapı'
+        },
+        comfort: {
+          eyebrow: 'Ticari Alan Konforu',
+          title: 'Isı geri kazanım ve verimli ticari iklimlendirme',
+          description: 'Ticari alanlarda iç hava kalitesi ve enerji verimliliği ihtiyacını ısı geri kazanım ekseninde değerlendirin.',
+          point1: 'Verimlilik odaklı ürün ailesi',
+          point2: 'Konfor ve taze hava dengesine geçiş'
+        }
+      }
+    },
+    featuredCommercial: {
+      eyebrow: 'Ticari Ürün Vitrini',
+      title: 'Ticaret katmanını gerçek ürün verisiyle öne çıkarın.',
+      subtitle: 'Öne çıkan ürünler ve güçlü ürün aileleri arasında hızlı geçiş yaparak kategori keşfinden satın alma niyetine daha kısa ilerleyin.',
+      cta: 'Tüm Ürünleri Gör',
+      panelEyebrow: 'Odak Paneli',
+      tabs: {
+        featured: 'Öne Çıkanlar',
+        airCurtains: 'Hava Perdeleri',
+        heatRecovery: 'Isı Geri Kazanım'
+      },
+      panelTitles: {
+        featured: 'Öne çıkan ürün seçkisi',
+        airCurtains: 'Hava perdesi odağı',
+        heatRecovery: 'Isı geri kazanım odağı'
+      },
+      panelDescriptions: {
+        featured: 'Gerçek veriden gelen öne çıkan ürünleri, daha kısa ürün değerlendirme akışına yardımcı olacak şekilde sunuyoruz.',
+        airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için hava perdesi ürünlerini bir arada görün.',
+        heatRecovery: 'Verimlilik odaklı ticari iklimlendirme için ısı geri kazanım ürün ailesine doğrudan yaklaşın.'
+      }
+    },
+    trustProof: {
+      eyebrow: 'Güven ve Kanıt',
+      title: 'Güven duygusunu süslü vaatlerle değil, net operasyonel gerçeklerle kuruyoruz.',
+      subtitle: 'VentHub ana sayfasındaki güven katmanı, doğrulanabilir iş yapış biçimini ve uzman destek yaklaşımını görünür kılmalıdır.',
+      items: {
+        brands: {
+          eyebrow: 'Marka Katmanı',
+          title: 'Premium marka seçkisi',
+          description: 'Temsil edilen markalar yalnızca vitrin değil; kategori ve çözüm kalitesinin ana taşıyıcılarıdır.'
+        },
+        guidance: {
+          eyebrow: 'Uzmanlık Katmanı',
+          title: 'Mühendislik odaklı yönlendirme',
+          description: 'Kullanıcıyı yalnızca ürün listesine değil, daha doğru seçim akışına taşımayı hedefliyoruz.'
+        },
+        delivery: {
+          eyebrow: 'Operasyon Katmanı',
+          title: 'Sevkiyat ve tedarik görünürlüğü',
+          description: 'Teslimat ve tedarik beklentileri daha net, daha öngörülebilir ve daha profesyonel hissettirilir.'
+        },
+        support: {
+          eyebrow: 'Süreklilik Katmanı',
+          title: 'Satış sonrası erişilebilir destek',
+          description: 'Destek, teklif ve bilgi merkezi akışları birbirinden kopuk değil; aynı güven mimarisinin parçalarıdır.'
+        }
+      }
+    },
+    strategicBrands: {
+      eyebrow: 'Stratejik Markalar',
+      title: 'Çalıştığımız markalar sadece logo değil, çözüm mimarisinin temelidir.',
+      subtitle: 'Marka alanını pasif logo vitrini olmaktan çıkarıp kalite, güven ve ürün yaklaşımının taşıyıcısı haline getiriyoruz.'
+    },
+    knowledge: {
+      eyebrow: 'Bilgi ve Destek Katmanı',
+      title: 'Teknik kararları destekleyen bilgi yollarını görünür kılın.',
+      subtitle: 'Rehberler, hesaplayıcılar ve destek merkezi sayesinde kullanıcı yalnızca ürüne değil, doğru karar ortamına da ulaşır.',
+      cta: 'İncele',
+      items: {
+        guides: {
+          eyebrow: 'Bilgi Merkezi',
+          title: 'Seçim rehberleri ve teknik içerikler',
+          description: 'Kategori bazlı rehberler ve konu sayfaları ile ürün seçimini daha bilinçli hale getirin.'
+        },
+        calculators: {
+          eyebrow: 'Hesaplayıcılar',
+          title: 'Hızlı hesaplama araçları',
+          description: 'HRV, hava perdesi ve kanal gibi araçlarla teknik ön değerlendirmeyi hızlandırın.'
+        },
+        support: {
+          eyebrow: 'Destek',
+          title: 'SSS ve operasyonel destek akışı',
+          description: 'Sık sorulan sorular ve destek yolları ile teklif ve satış sonrası süreçlere daha rahat geçin.'
+        }
+      }
+    },
+    finalCta: {
+      eyebrow: 'Son Adım',
+      title: 'Doğru HVAC çözümünü birlikte netleştirelim.',
+      subtitle: 'Kategori keşfinden teknik desteğe kadar kurduğumuz bu akışı şimdi uzman görüşü, teklif ve ürün keşfi ile tamamlayın.',
+      primaryCta: 'Teklif İste',
+      secondaryCta: 'Uzmanla Görüş',
+      tertiaryCta: 'Ürünleri Keşfet'
+    },
     features: {
       euQuality: "Avrupa kalite standartları",
       fastDelivery: "Hızlı teslimat",
