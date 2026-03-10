@@ -136,18 +136,23 @@ export const tr = {
     seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
-      title: 'Endüstriyel ve ticari HVAC çözümlerini doğru ürün, doğru kategori ve uzman destekle bulun.',
-      subtitle: 'Fanlar, hava perdeleri, hız kontrol cihazları, ısı geri kazanım ve proje odaklı havalandırma çözümleri. Ürün keşfi, teknik yönlendirme ve hızlı teklif tek platformda.',
+      title: 'Projeye uygun HVAC kararını daha hızlı, daha kontrollü ve daha premium biçimde verin.',
+      subtitle: 'VentHub; kategori keşfi, uygulama bazlı yönlendirme, 3D ürün dili ve uzman desteğini tek ana sayfa akışında birleştirir. Böylece kullanıcı yalnızca ürün görmez, doğru çözüme yönlendirilir.',
       primaryCta: 'Ürünleri Keşfet',
       secondaryCta: 'Hızlı Teklif Al',
       quickAccessLabel: 'Hızlı Erişim',
       visualAlt: 'VentHub endüstriyel HVAC çözüm görseli',
       visualEyebrow: 'Kontrollü Keşif',
-      visualTitle: 'Mühendislikten satışa uzanan daha net bir seçim akışı.',
-      visualSubtitle: 'Kategori, uygulama ve teknik destek yollarını tek bir premium ana sayfa deneyiminde birleştiriyoruz.',
+      visualTitle: '3D keşif ile kategori kararını ilk ekranda başlatın.',
+      visualSubtitle: 'Ana sayfa artık yalnızca vitrin değil; kategori, senaryo ve uzman desteği arasında gerçek bir karar merkezi gibi davranır.',
       visualPoints: {
         selection: 'Kategori ve uygulama bazlı hızlı yönlendirme',
         routing: 'Teklif ve uzman desteğine kısa yol erişimi'
+      },
+      metrics: {
+        coreCategories: 'çekirdek kategori üzerinden hızlı başlangıç',
+        productSeries: 'seri ve alt aileye kontrollü geçiş',
+        entryPaths: 'ana karar yolu ile akıllı yönlendirme'
       },
       trustStrip: {
         authorizedBrands: 'Yetkili premium markalar',
@@ -165,8 +170,8 @@ export const tr = {
     },
     quickEntry: {
       eyebrow: 'Başlangıç Katmanı',
-      title: 'Neye ihtiyacınız olduğunu hızlıca seçin.',
-      subtitle: 'Kategoriden başlayın, uygulama ile daraltın veya doğrudan teknik destek ve teklif akışına geçin.',
+      title: 'İlk adımı kafa karışıklığı olmadan seçin.',
+      subtitle: 'Kategori, uygulama veya destek yolundan başlayarak aynı premium karar akışına girin.',
       items: {
         category: {
           title: 'Kategoriye Göre Ara',

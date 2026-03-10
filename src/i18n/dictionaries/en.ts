@@ -136,18 +136,23 @@ export const en = {
     seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
     hero: {
       eyebrow: 'Engineering-Guided HVAC Commerce',
-      title: 'Find industrial and commercial HVAC solutions with the right product, the right category and expert support.',
-      subtitle: 'Fans, air curtains, speed controllers, heat recovery units and project-led ventilation solutions. Product discovery, technical guidance and fast quoting in one platform.',
+      title: 'Make the right HVAC decision faster, with more control and with a more premium flow.',
+      subtitle: 'VentHub brings category discovery, application-led routing, a 3D product language and expert support into one homepage flow. Users are not only shown products; they are guided toward the right solution.',
       primaryCta: 'Explore Products',
       secondaryCta: 'Get a Fast Quote',
       quickAccessLabel: 'Quick Access',
       visualAlt: 'VentHub industrial HVAC solution visual',
       visualEyebrow: 'Controlled Discovery',
-      visualTitle: 'A clearer selection flow from engineering to commerce.',
-      visualSubtitle: 'We unify category, application and technical support paths in one premium homepage experience.',
+      visualTitle: 'Start the category decision from the first screen with 3D discovery.',
+      visualSubtitle: 'The homepage no longer behaves like a simple showcase; it acts like a real decision hub across category, scenario and expert support.',
       visualPoints: {
         selection: 'Fast routing by category and application',
         routing: 'Short access to quote and expert support'
+      },
+      metrics: {
+        coreCategories: 'core categories for a faster start',
+        productSeries: 'series and sub-family routes',
+        entryPaths: 'primary decision paths with guided routing'
       },
       trustStrip: {
         authorizedBrands: 'Authorized premium brands',
@@ -165,8 +170,8 @@ export const en = {
     },
     quickEntry: {
       eyebrow: 'Starting Layer',
-      title: 'Choose your path quickly.',
-      subtitle: 'Start from category, narrow by application, or move directly into technical support and quotation flows.',
+      title: 'Choose the first step without friction.',
+      subtitle: 'Start from category, application or support and enter the same premium decision flow.',
       items: {
         category: {
           title: 'Search by Category',
