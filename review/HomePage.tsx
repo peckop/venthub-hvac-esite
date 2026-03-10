@@ -3,20 +3,20 @@ import React, { useState, Suspense, useEffect } from 'react'
 import { useI18n } from '../src/i18n/I18nProvider'
 import Seo from '../src/components/Seo'
 
-const LeadModal = React.lazy(() => import('../components/LeadModal'))
+const LeadModal = React.lazy(() => import('../src/components/LeadModal'))
 
 const hero1200 = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
 // Elite Homepage Architecture Components
-const EliteHero = React.lazy(() => import('../components/home/EliteHero').then(m => ({ default: m.EliteHero })))
-const QuickEntryRail = React.lazy(() => import('../components/home/QuickEntryRail').then(m => ({ default: m.QuickEntryRail })))
-const GuidedCategoryDiscovery = React.lazy(() => import('../components/home/GuidedCategoryDiscovery').then(m => ({ default: m.GuidedCategoryDiscovery })))
-const ApplicationSolutions = React.lazy(() => import('../components/home/ApplicationSolutions').then(m => ({ default: m.ApplicationSolutions })))
-const FeaturedCommercialBlocks = React.lazy(() => import('../components/home/FeaturedCommercialBlocks').then(m => ({ default: m.FeaturedCommercialBlocks })))
-const TrustProofSection = React.lazy(() => import('../components/home/TrustProofSection').then(m => ({ default: m.TrustProofSection })))
-const StrategicBrands = React.lazy(() => import('../components/home/StrategicBrands').then(m => ({ default: m.StrategicBrands })))
-const KnowledgeBlock = React.lazy(() => import('../components/home/KnowledgeBlock').then(m => ({ default: m.KnowledgeBlock })))
-const FinalCTA = React.lazy(() => import('../components/home/FinalCTA').then(m => ({ default: m.FinalCTA })))
+const EliteHero = React.lazy(() => import('./home-bileþenleri/EliteHero').then(m => ({ default: m.EliteHero })))
+const QuickEntryRail = React.lazy(() => import('./home-bileþenleri/QuickEntryRail').then(m => ({ default: m.QuickEntryRail })))
+const GuidedCategoryDiscovery = React.lazy(() => import('./home-bileþenleri/GuidedCategoryDiscovery').then(m => ({ default: m.GuidedCategoryDiscovery })))
+const ApplicationSolutions = React.lazy(() => import('./home-bileþenleri/ApplicationSolutions').then(m => ({ default: m.ApplicationSolutions })))
+const FeaturedCommercialBlocks = React.lazy(() => import('./home-bileþenleri/FeaturedCommercialBlocks').then(m => ({ default: m.FeaturedCommercialBlocks })))
+const TrustProofSection = React.lazy(() => import('./home-bileþenleri/TrustProofSection').then(m => ({ default: m.TrustProofSection })))
+const StrategicBrands = React.lazy(() => import('./home-bileþenleri/StrategicBrands').then(m => ({ default: m.StrategicBrands })))
+const KnowledgeBlock = React.lazy(() => import('./home-bileþenleri/KnowledgeBlock').then(m => ({ default: m.KnowledgeBlock })))
+const FinalCTA = React.lazy(() => import('./home-bileþenleri/FinalCTA').then(m => ({ default: m.FinalCTA })))
 
 export const HomePage: React.FC = () => {
   const [leadOpen, setLeadOpen] = useState(false)
