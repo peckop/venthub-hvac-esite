@@ -77,7 +77,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100 max-w-7xl mx-auto">
-          <h2 className="text-lg font-bold text-industrial-gray">Ürün Kategorileri</h2>
+          <h2 className="text-lg font-bold text-industrial-gray">Menü</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors text-slate-400 group"

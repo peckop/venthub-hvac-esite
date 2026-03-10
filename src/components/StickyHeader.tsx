@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCart } from '../hooks/useCartHook'
 import { useAuth } from '../hooks/useAuth'
-import type { Category } from '../lib/supabase'
+// import type { Category } from '../lib/supabase'
 import { checkAdminAccess, getUserRole } from '../config/admin'
 import { useI18n } from '../i18n/I18nProvider'
-import { trackEvent } from '../utils/analytics'
-import { prefetchProductsPage } from '../utils/prefetch'
-import { getCategoryIcon } from '../utils/getCategoryIcon'
+// import { trackEvent } from '../utils/analytics'
+// import { prefetchProductsPage } from '../utils/prefetch'
+// import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { formatCurrency } from '../i18n/format'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+// import { getCategoryDisplayName } from '../utils/categoryHelpers'
 const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
 const MegaMenu = React.lazy(() => import('./MegaMenu'))
 const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
@@ -28,12 +28,12 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
-  const [categoriesLoaded, setCategoriesLoaded] = useState(false)
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
-  const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
-  const [allCategories, setAllCategories] = useState<Category[]>([])
+  // const [categories, setCategories] = useState<Category[]>([])
+  // const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
+  // const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+  // const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
+  // const [isCategoryHubOpen, setIsCategoryHubOpen] = useState(false)
+  // const [allCategories, setAllCategories] = useState<Category[]>([])
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false)
   const { getCartCount, syncing, getCartTotal } = useCart()
   const [showSyncPulse, setShowSyncPulse] = useState(false)
@@ -50,7 +50,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const [userRole, setUserRole] = useState<string>('user')
   const router = useRouter()
   const userMenuRef = useRef<HTMLDivElement>(null)
-  const categoriesRef = useRef<HTMLDivElement>(null)
+  // const categoriesRef = useRef<HTMLDivElement>(null)
 
 
   // Close dropdowns when clicking outside
@@ -59,9 +59,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false)
       }
-      if (categoriesRef.current && !categoriesRef.current.contains(event.target as Node)) {
-        setIsCategoriesOpen(false)
-      }
+      // unused categoriesRef handle
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -149,29 +147,10 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   }, [])
 
   // Defer categories fetch until dropdown first open (reduce initial header churn)
-  const ensureCategories = useCallback(async () => {
-    if (categoriesLoaded) return
-    setIsCategoriesLoading(true)
-    try {
-      const { getCategories } = await import('../lib/supabase')
-      const data = await getCategories()
-      setCategories(data.filter(cat => cat.level === 0).slice(0, 6)) // Top 6 main categories
-      setAllCategories(data) // Store all categories for CategoryHub
-      setCategoriesLoaded(true)
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    } finally {
-      setIsCategoriesLoading(false)
-    }
-  }, [categoriesLoaded])
+  // unused ensureCategories
 
   // Open Category Hub immediately and trigger data fetch in background
-  const openCategoryHub = useCallback(() => {
-    setIsCategoryHubOpen(true)
-    if (!categoriesLoaded) {
-      ensureCategories()
-    }
-  }, [ensureCategories, categoriesLoaded])
+  // const openCategoryHub = useCallback(() => {}, [ensureCategories, categoriesLoaded])
 
   // Delay showing syncing pulse to avoid early flicker
   useEffect(() => {
@@ -235,60 +214,16 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             {MainLogo}
 
             {/* Desktop Navigation - Reordered per requirements */}
-            <nav className="hidden xl:flex items-center space-x-1">
+            <nav className="hidden xl:flex items-center space-x-2">
               <button
-                onClick={() => { trackEvent('nav_click', { target: 'categories' }); openCategoryHub() }}
-                onMouseEnter={() => ensureCategories()}
-                className="nav-link group flex items-center space-x-2 px-4 py-3 text-steel-gray hover:text-primary-navy transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 min-w-[110px] justify-center active:scale-95"
+                onClick={() => setIsMenuOpen(true)}
+                className="nav-link group flex items-center space-x-2 px-4 py-2 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 justify-center active:scale-95 border border-slate-200 hover:border-primary-navy/30 shadow-sm"
               >
-                {isCategoriesLoading ? (
-                  <svg className="animate-spin h-4 w-4 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:rotate-180 transition-transform duration-300">
-                    <rect x="3" y="3" width="6" height="6" rx="1" /><rect x="15" y="3" width="6" height="6" rx="1" /><rect x="3" y="15" width="6" height="6" rx="1" /><rect x="15" y="15" width="6" height="6" rx="1" />
-                  </svg>
-                )}
-                <span className="font-medium whitespace-nowrap">{t('common.categories')}</span>
+                <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform duration-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <span className="font-bold whitespace-nowrap text-[15px]">{t('header.menu') || 'Menü'}</span>
               </button>
-              <Link
-                href="/products"
-                onMouseEnter={() => prefetchProductsPage()}
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative min-w-[88px] text-center whitespace-nowrap"
-              >
-                {t('common.products')}
-                <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
-              </Link>
-              <Link
-                href="/destek/merkez"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
-              >
-                {t('common.knowledgeHub')}
-                <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
-              </Link>
-              <Link
-                href="/brands"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group min-w-[84px] text-center whitespace-nowrap"
-              >
-                {t('common.brands')}
-                <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
-              </Link>
-              <Link
-                href="/about"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
-              >
-                {t('common.about')}
-                <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
-              </Link>
-              <Link
-                href="/contact"
-                className="nav-link px-4 py-3 text-steel-gray hover:text-primary-navy font-medium transition-all duration-300 rounded-lg hover:bg-gradient-to-r hover:from-air-blue/30 hover:to-light-gray/30 relative group whitespace-nowrap"
-              >
-                {t('common.contact')}
-                <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-navy to-secondary-blue transition-all duration-300 group-hover:w-full group-hover:left-0 rounded-full"></div>
-              </Link>
             </nav>
 
             {/* Search trigger (header input kaldırıldı) */}
@@ -328,7 +263,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
               </Link>
 
               {/* Enhanced User Menu */}
-              <div className="relative" ref={userMenuRef}>
+              <div className="relative group" ref={userMenuRef}>
                 {user ? (
                   <>
                     <button
@@ -486,72 +421,16 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                 {StickyLogo}
 
                 {/* Quick Navigation */}
-                <nav className="hidden lg:flex items-center space-x-1 mx-4">
-                  <Link
-                    href="/products"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] text-center whitespace-nowrap"
+                <nav className="hidden lg:flex items-center space-x-2 mx-4">
+                  <button
+                    onClick={() => setIsMenuOpen(true)}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-semibold text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[88px] justify-center whitespace-nowrap active:scale-95 border border-slate-200"
                   >
-                    {t('common.products')}
-                  </Link>
-
-                  {/* Categories Dropdown */}
-                  <div className="relative" ref={categoriesRef}>
-                    <button
-                      onClick={() => { openCategoryHub(); setIsCategoriesOpen(!isCategoriesOpen) }}
-                      onMouseEnter={() => ensureCategories()}
-                      className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[110px] justify-center whitespace-nowrap active:scale-95"
-                    >
-                      {isCategoriesLoading ? (
-                        <svg className="animate-spin h-3.5 w-3.5 text-primary-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      ) : (
-                        <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <rect x="3" y="3" width="6" height="6" /><rect x="15" y="3" width="6" height="6" /><rect x="3" y="15" width="6" height="6" /><rect x="15" y="15" width="6" height="6" />
-                        </svg>
-                      )}
-                      <span>{t('common.categories')}</span>
-                      <svg width={14} height={14} fill="none" stroke="currentColor" viewBox="0 0 24 24" className={`transition-transform duration-200 ${isCategoriesOpen ? 'rotate-180' : ''}`}>
-                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="6,9 12,15 18,9" />
-                      </svg>
-                    </button>
-
-                    {isCategoriesOpen && (
-                      <div className="absolute top-full left-0 mt-2 w-64 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                        <div className="p-2 max-h-96 overflow-y-auto">
-                          {categoriesLoaded && categories.length === 0 && (
-                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.noData')}</div>
-                          )}
-                          {!categoriesLoaded && (
-                            <div className="px-3 py-2 text-sm text-steel-gray">{t('common.loading')}</div>
-                          )}
-                          {categories.map((cat) => (
-                            <Link
-                              key={cat.id}
-                              href={`/category/${cat.slug}`}
-                              onClick={() => setIsCategoriesOpen(false)}
-                              className="flex items-center space-x-3 px-3 py-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200"
-                            >
-                              <div className="text-primary-navy">
-                                {getCategoryIcon(cat.slug, { size: 18 })}
-                              </div>
-                              <span className="text-sm font-medium text-industrial-gray hover:text-primary-navy">
-                                {getCategoryDisplayName(cat)}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <Link
-                    href="/brands"
-                    className="px-3 py-2 text-sm font-medium text-steel-gray hover:text-primary-navy hover:bg-air-blue/20 rounded-lg transition-all duration-200 min-w-[84px] text-center whitespace-nowrap"
-                  >
-                    {t('common.brands')}
-                  </Link>
+                    <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <span>{t('header.menu') || 'Menü'}</span>
+                  </button>
                 </nav>
 
                 {/* Search Trigger Button */}
@@ -612,16 +491,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                     </svg>
                   </button>
 
-                  {/* Menu Button */}
-                  <button
-                    onClick={() => setIsMenuOpen(true)}
-                    aria-label={t('header.menu')}
-                    className="p-2 hover:bg-air-blue/20 rounded-lg transition-all duration-200 group"
-                  >
-                    <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="text-steel-gray group-hover:text-primary-navy group-hover:rotate-180 transition-all duration-300">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                  </button>
+
 
                   {/* Cart with Total */}
                   <Link
@@ -683,19 +553,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       )}
 
       {/* Category Hub Overlay - 3D Grid */}
-      {isCategoryHubOpen && (
-        <React.Suspense fallback={null}>
-          <CategoryHubOverlay
-            isOpen={isCategoryHubOpen}
-            onClose={() => setIsCategoryHubOpen(false)}
-            categories={allCategories}
-            onCategorySelect={(category) => {
-              setIsCategoryHubOpen(false)
-              router.push(`/category/${category.slug}`)
-            }}
-          />
-        </React.Suspense>
-      )}
+
     </>
   )
 })
