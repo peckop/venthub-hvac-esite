@@ -16,9 +16,6 @@ const TiltCard = dynamic(() => import('../TiltCard'), { ssr: false })
 import { trackEvent } from '../../utils/analytics'
 const LeadModal = dynamic(() => import('../LeadModal'), { ssr: false })
 
-// TODO: Remove Vite-specific image imports and use Next.js next/image later
-// import hero1200 from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg?w=1200&format=jpg&quality=88'
-
 import LazyBrandsShowcase from '../LazyBrandsShowcase'
 const SmartRouting = dynamic(() => import('../SmartRouting'), { ssr: false })
 const WhyVentHubEnhanced = dynamic(() => import('../WhyVentHubEnhanced'), { ssr: false })
