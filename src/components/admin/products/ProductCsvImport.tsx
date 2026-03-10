@@ -2,6 +2,9 @@ import React from 'react'
 import { supabase } from '../../../lib/supabase'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminCardClass } from '../../../utils/adminUi'
 import { useI18n } from '../../../i18n/I18nProvider'
+import type { Database } from '../../../types/database.types'
+
+type ProductInsert = Database['public']['Tables']['products']['Insert']
 
 interface CategoryOpt {
     id: string
@@ -94,7 +97,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             for (let i = 0; i < payloads.length; i += 100) {
                 const chunk = payloads.slice(i, i + 100)
                 // Use the proper product insert type to avoid 'any'
-                const { error } = await supabase.from('products').upsert(chunk as never, { onConflict: 'sku' })
+                const { error } = await supabase.from('products').upsert(chunk as ProductInsert[], { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
                     fail += chunk.length
