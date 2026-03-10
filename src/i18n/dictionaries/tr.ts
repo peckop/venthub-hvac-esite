@@ -136,8 +136,10 @@ export const tr = {
     seoDesc: "VentHub ile premium havalandırma ürünlerini keşfedin. Otopark jet fanları, hava perdeleri, ısı geri kazanım cihazları ve daha fazlası için mühendislik destekli çözümler.",
     hero: {
       eyebrow: 'Mühendislik Odaklı HVAC Ticareti',
-      title: 'Projeye uygun HVAC kararını daha hızlı, daha kontrollü ve daha premium biçimde verin.',
-      subtitle: 'VentHub; kategori keşfi, uygulama bazlı yönlendirme, 3D ürün dili ve uzman desteğini tek ana sayfa akışında birleştirir. Böylece kullanıcı yalnızca ürün görmez, doğru çözüme yönlendirilir.',
+      title: 'Doğru HVAC seçimine ilk ekranda girin.',
+      titleLineOne: 'Doğru HVAC',
+      titleLineTwo: 'seçimine ilk ekranda girin.',
+      subtitle: '3D keşif, kategori akışı ve teklif yönlendirmesi tek odakta birleşir.',
       primaryCta: 'Ürünleri Keşfet',
       secondaryCta: 'Hızlı Teklif Al',
       quickAccessLabel: 'Hızlı Erişim',
@@ -151,8 +153,8 @@ export const tr = {
       },
       metrics: {
         coreCategories: 'çekirdek kategori üzerinden hızlı başlangıç',
-        productSeries: 'seri ve alt aileye kontrollü geçiş',
-        entryPaths: 'ana karar yolu ile akıllı yönlendirme'
+        productSeries: '{{count}} seri ve alt aileye geçiş',
+        entryPaths: 'akıllı yönlendirme akışı'
       },
       trustStrip: {
         authorizedBrands: 'Yetkili premium markalar',
@@ -166,6 +168,12 @@ export const tr = {
         heatRecovery: 'Isı Geri Kazanım',
         speedControl: 'Hız Kontrol',
         quote: 'Teklif İste'
+      },
+      categorySummaries: {
+        fans: 'ATEX, endüstriyel ve ticari fan ailelerini daha hızlı karşılaştırın.',
+        airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için doğru hava perdesi ailesine yaklaşın.',
+        heatRecovery: 'Taze hava ve verimlilik dengesini ısı geri kazanım ekseninde değerlendirin.',
+        speedControl: 'Fan kontrol, sürücü ve hız yönetimini doğru ekipman katmanında seçin.'
       }
     },
     quickEntry: {
@@ -193,11 +201,13 @@ export const tr = {
     },
     guidedDiscovery: {
       eyebrow: 'Ana Keşif Katmanı',
-      title: 'Ana kategoriler üzerinden kontrollü ve daha net ilerleyin.',
-      subtitle: 'Ürün ailesi, teknik ihtiyaç ve seri mantığını tek bir odak panelinde birleştiriyoruz. Böylece kullanıcı ilk bakışta doğru kategoriye yaklaşabiliyor.',
+      title: 'Ana kategori yapısını tek bakışta görün ve doğru giriş noktasını seçin.',
+      subtitle: 'Bu alan, 3D hero deneyimini tekrar etmez; ana ürün ailelerini sade biçimde gösterir ve kullanıcıyı kategori, seri ve ürün detayına daha kontrollü taşır.',
       seriesCount: '{{count}} seri',
       categoryFallback: 'Bu kategori için seçimi hızlandıran premium HVAC çözümleri.',
-      panelEyebrow: 'Seçili Kategori',
+      panelEyebrow: 'Karar Akışı',
+      panelTitle: 'Kategori seçiminden ürün kararına daha kısa ilerleyin.',
+      panelBody: 'Kullanıcıyı önce doğru aileye, ardından ilgili seriye ve son olarak ürün detayına taşıyan daha net bir navigasyon yapısı kuruyoruz.',
       panelFallback: 'Kategoriye ait ürün ailelerini, alt serileri ve sonraki keşif adımlarını net biçimde görüntüleyin.',
       primaryCta: 'Kategoriye Git',
       secondaryCta: 'Senaryolara Bak',
@@ -205,6 +215,20 @@ export const tr = {
       seriesTitle: '{{category}} serileri',
       seriesFallback: 'Bu seri için ürün ailesini ve varyasyonlarını inceleyin.',
       footerNote: 'Kategori keşfi burada başlar; ürün detayına gitmeden önce seri mantığını kavramanızı kolaylaştırır.',
+      steps: {
+        select: {
+          title: 'Doğru ana kategoriyi seçin',
+          description: 'Fan, hava perdesi, ısı geri kazanım veya hız kontrolü gibi çekirdek ailelerden başlayın.'
+        },
+        compare: {
+          title: 'Seri mantığını hızla daraltın',
+          description: 'Alt seri yapısı ile uygulama, kapasite veya teknik ihtiyaca göre doğru kola geçin.'
+        },
+        convert: {
+          title: 'Ürüne ve teklife kontrollü geçin',
+          description: 'Kategori ve seri netleşince ürün değerlendirmesi ve teklif akışı daha az sürtünmeyle ilerler.'
+        }
+      },
       loading: 'Kategoriler hazırlanıyor...'
     },
     applicationSolutions: {
@@ -497,7 +521,11 @@ export const tr = {
     quickOrder: 'Hızlı Sipariş',
     recentlyViewed: 'Son Görüntülenen',
     favorites: 'Favoriler',
-    cart: 'Sepet'
+    cart: 'Sepet',
+    brandName: 'VentHub',
+    brandTagline: 'HVAC Premium',
+    commandSearch: 'Hızlı arama... (/)',
+    commandSearchCompact: 'Ara...'
   },
   roles: {
     superadmin: 'Süper Admin',
