@@ -134,6 +134,195 @@ export const en = {
   home: {
     seoTitle: "VentHub - Premium HVAC Solutions | Fans, Speed Control, Heating & Cooling",
     seoDesc: "Discover premium ventilation products with VentHub. Engineering-led solutions for parking jet fans, air curtains, heat recovery units, and more.",
+    hero: {
+      eyebrow: 'Engineering-Guided HVAC Commerce',
+      title: 'Find industrial and commercial HVAC solutions with the right product, the right category and expert support.',
+      subtitle: 'Fans, air curtains, speed controllers, heat recovery units and project-led ventilation solutions. Product discovery, technical guidance and fast quoting in one platform.',
+      primaryCta: 'Explore Products',
+      secondaryCta: 'Get a Fast Quote',
+      quickAccessLabel: 'Quick Access',
+      visualAlt: 'VentHub industrial HVAC solution visual',
+      visualEyebrow: 'Controlled Discovery',
+      visualTitle: 'A clearer selection flow from engineering to commerce.',
+      visualSubtitle: 'We unify category, application and technical support paths in one premium homepage experience.',
+      visualPoints: {
+        selection: 'Fast routing by category and application',
+        routing: 'Short access to quote and expert support'
+      },
+      trustStrip: {
+        authorizedBrands: 'Authorized premium brands',
+        engineeringSupport: 'Engineering guidance',
+        nationwideDelivery: 'Nationwide delivery',
+        projectGuidance: 'Project-led selection support'
+      },
+      quickChips: {
+        fans: 'Fans',
+        airCurtains: 'Air Curtains',
+        heatRecovery: 'Heat Recovery',
+        speedControl: 'Speed Control',
+        quote: 'Request Quote'
+      }
+    },
+    quickEntry: {
+      eyebrow: 'Starting Layer',
+      title: 'Choose your path quickly.',
+      subtitle: 'Start from category, narrow by application, or move directly into technical support and quotation flows.',
+      items: {
+        category: {
+          title: 'Search by Category',
+          description: 'Move into the right product family through the core category structure.'
+        },
+        application: {
+          title: 'Find by Application',
+          description: 'Select solutions by parking, kitchen, entrance and comfort scenarios.'
+        },
+        support: {
+          title: 'Get Technical Support',
+          description: 'Reach FAQs, support flows and the knowledge hub quickly.'
+        },
+        quote: {
+          title: 'Request a Fast Quote',
+          description: 'Share your need briefly and get expert guidance toward the right solution.'
+        }
+      }
+    },
+    guidedDiscovery: {
+      eyebrow: 'Primary Discovery Layer',
+      title: 'Move through core categories with more control and clarity.',
+      subtitle: 'We combine product family, technical need and series logic inside one focused panel so users can approach the right category immediately.',
+      seriesCount: '{{count}} series',
+      categoryFallback: 'Premium HVAC solutions designed to accelerate category selection.',
+      panelEyebrow: 'Selected Category',
+      panelFallback: 'Review product families, sub-series and the next discovery step for this category in one place.',
+      primaryCta: 'Open Category',
+      secondaryCta: 'View Scenarios',
+      seriesEyebrow: 'Series Shortcuts',
+      seriesTitle: '{{category}} series',
+      seriesFallback: 'Review this product family and its key variations.',
+      footerNote: 'Category discovery starts here and makes the series logic easier to understand before entering product detail.',
+      loading: 'Preparing categories...'
+    },
+    applicationSolutions: {
+      eyebrow: 'Scenario-Led Solutions',
+      title: 'You can also start from the use case, not only from the product.',
+      subtitle: 'From parking to entrance comfort, from kitchen extraction to commercial comfort, we present HVAC needs through a solution logic.',
+      viewAll: 'View All',
+      items: {
+        parking: {
+          eyebrow: 'Parking Scenario',
+          title: 'Parking ventilation and jet fan flow',
+          description: 'Move quickly into the right fan family for parking projects that require CO control, air circulation and high airflow.',
+          point1: 'Jet fan and smoke exhaust entry points',
+          point2: 'High airflow and safe routing'
+        },
+        kitchen: {
+          eyebrow: 'Kitchen Scenario',
+          title: 'Industrial kitchen exhaust and duct flow',
+          description: 'Advance toward the right product family with a scenario-led path when grease vapor, odor control and duct fan needs matter.',
+          point1: 'Duct fan-led starting point',
+          point2: 'Hood and exhaust alignment logic'
+        },
+        entrance: {
+          eyebrow: 'Entrance Comfort',
+          title: 'Store entrance and air curtain solutions',
+          description: 'Make air curtain discovery clearer for entrance comfort and reduced energy loss at openings.',
+          point1: 'Entrance comfort-led selection',
+          point2: 'Structure that reduces energy loss'
+        },
+        comfort: {
+          eyebrow: 'Commercial Comfort',
+          title: 'Heat recovery and efficient commercial climate control',
+          description: 'Evaluate indoor air quality and energy efficiency needs in commercial spaces through a heat recovery-led route.',
+          point1: 'Efficiency-led product family',
+          point2: 'Transition to comfort and fresh air balance'
+        }
+      }
+    },
+    featuredCommercial: {
+      eyebrow: 'Commercial Product Showcase',
+      title: 'Bring the commerce layer forward with real product data.',
+      subtitle: 'Move faster from category discovery to buying intent by switching between featured products and strong product families.',
+      cta: 'View All Products',
+      panelEyebrow: 'Focus Panel',
+      tabs: {
+        featured: 'Featured',
+        airCurtains: 'Air Curtains',
+        heatRecovery: 'Heat Recovery'
+      },
+      panelTitles: {
+        featured: 'Featured product selection',
+        airCurtains: 'Air curtain focus',
+        heatRecovery: 'Heat recovery focus'
+      },
+      panelDescriptions: {
+        featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
+        airCurtains: 'See air curtain products together for entrance comfort and energy-loss control.',
+        heatRecovery: 'Approach the heat recovery product family directly for efficiency-led commercial climate control.'
+      }
+    },
+    trustProof: {
+      eyebrow: 'Trust and Proof',
+      title: 'We build trust with clear operational realities, not decorative promises.',
+      subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
+      items: {
+        brands: {
+          eyebrow: 'Brand Layer',
+          title: 'Premium brand selection',
+          description: 'Represented brands are not only visual assets; they carry solution quality and category credibility.'
+        },
+        guidance: {
+          eyebrow: 'Expert Layer',
+          title: 'Engineering-guided direction',
+          description: 'We aim to move users not only into product lists, but into a more accurate selection flow.'
+        },
+        delivery: {
+          eyebrow: 'Operations Layer',
+          title: 'Delivery and supply visibility',
+          description: 'Delivery and supply expectations are made clearer, more predictable and more professional.'
+        },
+        support: {
+          eyebrow: 'Continuity Layer',
+          title: 'Accessible after-sales support',
+          description: 'Support, quoting and knowledge-center flows are not disconnected; they are parts of the same trust architecture.'
+        }
+      }
+    },
+    strategicBrands: {
+      eyebrow: 'Strategic Brands',
+      title: 'The brands we work with are not only logos, but the base of the solution architecture.',
+      subtitle: 'We turn the brand area from passive logo wallpaper into a carrier of quality, trust and product positioning.'
+    },
+    knowledge: {
+      eyebrow: 'Knowledge and Support Layer',
+      title: 'Make technical decision paths visible and reachable.',
+      subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
+      cta: 'Explore',
+      items: {
+        guides: {
+          eyebrow: 'Knowledge Hub',
+          title: 'Selection guides and technical content',
+          description: 'Use category-based guides and topic pages to make product selection more informed.'
+        },
+        calculators: {
+          eyebrow: 'Calculators',
+          title: 'Fast calculation tools',
+          description: 'Speed up technical pre-evaluation with HRV, air-curtain and duct tools.'
+        },
+        support: {
+          eyebrow: 'Support',
+          title: 'FAQ and operational support flow',
+          description: 'Move more comfortably into quote and after-sales processes through FAQs and support paths.'
+        }
+      }
+    },
+    finalCta: {
+      eyebrow: 'Final Step',
+      title: 'Let’s clarify the right HVAC solution together.',
+      subtitle: 'Complete the flow we built from category discovery to technical support with expert guidance, quotation and product exploration.',
+      primaryCta: 'Request Quote',
+      secondaryCta: 'Talk to an Expert',
+      tertiaryCta: 'Explore Products'
+    },
     features: {
       euQuality: "European quality standards",
       fastDelivery: "Fast delivery",
