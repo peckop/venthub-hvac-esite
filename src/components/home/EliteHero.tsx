@@ -1,229 +1,145 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 
 import { useI18n } from '../../i18n/I18nProvider'
-import { getCategories, type Category } from '../../lib/supabase'
-import { getCategoryDescription, getCategoryDisplayName } from '../../utils/categoryHelpers'
-import CategorySpotlightScene from '../navigation/CategorySpotlightScene'
 
 interface EliteHeroProps {
   onQuoteClick: () => void
 }
 
-const preferredCategorySlugs = ['fanlar', 'hava-perdeleri', 'isi-geri-kazanim-cihazlari', 'hiz-kontrolu-cihazlari'] as const
-const categorySummaryKeyMap = {
-  fanlar: 'fans',
-  'hava-perdeleri': 'airCurtains',
-  'isi-geri-kazanim-cihazlari': 'heatRecovery',
-  'hiz-kontrolu-cihazlari': 'speedControl',
-} as const
+const quickChipConfig = [
+  { id: 'fans', href: '/products?category=fanlar', isQuote: false },
+  { id: 'airCurtains', href: '/products?category=hava-perdeleri', isQuote: false },
+  { id: 'heatRecovery', href: '/products?category=isi-geri-kazanim-cihazlari', isQuote: false },
+  { id: 'speedControl', href: '/products?category=hiz-kontrolu-cihazlari', isQuote: false },
+  { id: 'quote', href: '', isQuote: true },
+] as const
+
+const trustStripConfig = ['authorizedBrands', 'engineeringSupport', 'nationwideDelivery', 'projectGuidance'] as const
 
 export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
-
-  useEffect(() => {
-    let active = true
-
-    const load = async () => {
-      try {
-        const data = await getCategories()
-        if (!active) return
-
-        setCategories(data)
-        const rootCategories = data.filter((category) => category.level === 0)
-        const firstPreferred = preferredCategorySlugs.find((slug) => rootCategories.some((category) => category.slug === slug))
-        setSelectedSlug(firstPreferred || rootCategories[0]?.slug || null)
-      } catch (error) {
-        console.error('Failed to load homepage hero categories:', error)
-      }
-    }
-
-    void load()
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  const mainCategories = useMemo(() => {
-    const rootCategories = categories.filter((category) => category.level === 0)
-
-    return preferredCategorySlugs
-      .map((slug) => rootCategories.find((category) => category.slug === slug))
-      .filter((category): category is Category => Boolean(category))
-  }, [categories])
-
-  const selectedCategory = useMemo(
-    () => mainCategories.find((category) => category.slug === selectedSlug) || mainCategories[0] || null,
-    [mainCategories, selectedSlug]
-  )
-
-  const selectedSeries = useMemo(() => {
-    if (!selectedCategory) return []
-    return categories.filter((category) => category.parent_id === selectedCategory.id)
-  }, [categories, selectedCategory])
-
-  const seriesCount = selectedSeries.length
-  const selectedSummary = selectedCategory
-    ? t(`home.hero.categorySummaries.${categorySummaryKeyMap[selectedCategory.slug as keyof typeof categorySummaryKeyMap]}`)
-    : t('home.guidedDiscovery.panelFallback')
 
   return (
-    <section className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#020617_0%,#04122a_50%,#0b1730_100%)] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(56,189,248,0.18),transparent_28%),radial-gradient(circle_at_82%_14%,rgba(37,99,235,0.18),transparent_24%),radial-gradient(circle_at_72%_82%,rgba(14,116,144,0.12),transparent_30%)]" />
+    <section className="relative overflow-hidden border-b border-slate-200/80 bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_42%,#f7fbff_100%)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(37,99,235,0.12),transparent_26%)]" />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-6 xl:min-h-[calc(100vh-96px)] xl:py-8">
-        <div className="grid gap-5 xl:min-h-[calc(100vh-160px)] xl:grid-cols-[minmax(460px,0.72fr)_minmax(0,1.28fr)] xl:items-center">
-          <div className="max-w-[30rem] xl:pr-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-secondary-blue/30 bg-secondary-blue/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue backdrop-blur-sm">
-              <span className="h-2 w-2 rounded-full bg-secondary-blue" />
-              <span>{t('home.hero.eyebrow')}</span>
-            </div>
-
-            <h1 className="mt-4 text-[2.45rem] font-semibold leading-[0.92] tracking-[-0.055em] text-white sm:text-[2.9rem] lg:text-[3.1rem] xl:text-[3.35rem]">
-              <span className="block">{t('home.hero.titleLineOne')}</span>
-              <span className="block">{t('home.hero.titleLineTwo')}</span>
-            </h1>
-
-            <p className="mt-3 max-w-sm text-[15px] leading-6 text-slate-300 sm:text-base sm:leading-7">
-              {t('home.hero.subtitle')}
-            </p>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link
-                href="/products"
-                className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-[0_20px_50px_-28px_rgba(255,255,255,0.24)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary-blue hover:text-white"
-              >
-                {t('home.hero.primaryCta')}
-              </Link>
-              <button
-                type="button"
-                onClick={onQuoteClick}
-                className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-secondary-blue/40 hover:bg-white/[0.1]"
-              >
-                {t('home.hero.secondaryCta')}
-              </button>
-            </div>
-
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-slate-300 xl:mt-4">
-              <Link href="#categories" className="transition-colors hover:text-white">
-                {t('home.quickEntry.items.category.title')}
-              </Link>
-              <Link href="#applications" className="transition-colors hover:text-white">
-                {t('home.quickEntry.items.application.title')}
-              </Link>
-              <Link href="/support" className="transition-colors hover:text-white">
-                {t('home.quickEntry.items.support.title')}
-              </Link>
-            </div>
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-center lg:gap-12 lg:px-8 lg:py-16">
+        <div className="max-w-2xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary-navy/10 bg-white/85 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary-navy shadow-sm backdrop-blur-sm">
+            <span className="h-2 w-2 rounded-full bg-secondary-blue" />
+            <span>{t('home.hero.eyebrow')}</span>
           </div>
 
-          <div className="relative">
-            <div className="rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-3 shadow-[0_36px_120px_-56px_rgba(2,6,23,1)] backdrop-blur-sm sm:p-4">
-              <div className="grid grid-cols-2 gap-2 pb-3 lg:grid-cols-4">
-                {mainCategories.map((category) => {
-                  const isActive = selectedCategory?.id === category.id
+          <h1 className="mt-5 text-[2rem] font-semibold leading-[1.04] tracking-[-0.04em] text-slate-950 sm:text-[2.8rem] lg:text-[3.7rem]">
+            {t('home.hero.title')}
+          </h1>
 
+          <p className="mt-5 max-w-xl text-base leading-7 text-steel-gray sm:text-lg sm:leading-8">
+            {t('home.hero.subtitle')}
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center rounded-2xl bg-primary-navy px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(15,23,42,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-secondary-blue"
+            >
+              {t('home.hero.primaryCta')}
+            </Link>
+
+            <button
+              type="button"
+              onClick={onQuoteClick}
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-300 bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-navy/25 hover:text-primary-navy"
+            >
+              {t('home.hero.secondaryCta')}
+            </button>
+          </div>
+
+          <div className="mt-7 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+            {trustStripConfig.map((itemKey) => (
+              <div
+                key={itemKey}
+                className="rounded-2xl border border-white/75 bg-white/92 px-3 py-3 text-sm font-medium text-slate-700 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.38)] backdrop-blur-sm"
+              >
+                {t(`home.hero.trustStrip.${itemKey}`)}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-7 lg:hidden">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-steel-gray">
+              {t('home.hero.quickAccessLabel')}
+            </div>
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {quickChipConfig.map((chip) => {
+                const label = t(`home.hero.quickChips.${chip.id}`)
+
+                if (chip.isQuote) {
                   return (
                     <button
-                      key={category.id}
+                      key={chip.id}
                       type="button"
-                      onClick={() => setSelectedSlug(category.slug)}
-                      className={`min-h-[46px] rounded-[1rem] border px-3 py-2 text-sm font-medium transition-all duration-300 ${isActive ? 'border-secondary-blue/45 bg-secondary-blue/16 text-white shadow-[0_18px_40px_-28px_rgba(56,189,248,0.85)]' : 'border-white/10 bg-white/[0.04] text-slate-300 hover:border-white/20 hover:bg-white/[0.08] hover:text-white'}`}
+                      onClick={onQuoteClick}
+                      className="shrink-0 rounded-full border border-primary-navy/15 bg-white px-4 py-2.5 text-sm font-semibold text-primary-navy shadow-sm transition-colors hover:border-primary-navy/25 hover:bg-primary-navy hover:text-white"
                     >
-                      {getCategoryDisplayName(category)}
+                      {label}
                     </button>
                   )
-                })}
-              </div>
+                }
 
-              <div className="relative overflow-hidden rounded-[1.7rem] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.08),transparent_30%),linear-gradient(180deg,#081121_0%,#050b16_100%)] lg:h-[480px] xl:h-[500px]">
-                {selectedCategory ? (
-                  <>
-                    <div className="grid lg:h-full lg:grid-cols-[minmax(0,1.34fr)_280px] xl:grid-cols-[minmax(0,1.34fr)_300px]">
-                      <div className="relative min-h-[320px] overflow-hidden border-b border-white/10 sm:min-h-[360px] lg:h-full lg:min-h-0 lg:border-b-0 lg:border-r">
-                        <div className="absolute left-1/2 top-1/2 z-0 h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary-blue/20 blur-3xl sm:h-[380px] sm:w-[380px]" />
-                        <CategorySpotlightScene categorySlug={selectedCategory.slug} />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.04)_50%,rgba(2,6,23,0.22)_100%)]" />
+                return (
+                  <Link
+                    key={chip.id}
+                    href={chip.href}
+                    className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:text-primary-navy"
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </div>
 
-                        <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-slate-950/55 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue backdrop-blur-md sm:left-5 sm:top-5">
-                          {t('home.hero.visualEyebrow')}
-                        </div>
+        <div className="relative">
+          <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-secondary-blue/15 blur-3xl" />
+          <div className="absolute -bottom-10 left-8 h-24 w-24 rounded-full bg-primary-navy/10 blur-3xl" />
 
-                        <div className="absolute inset-x-0 bottom-0 px-4 pb-4 sm:px-5 sm:pb-5 lg:px-6 lg:pb-6">
-                          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/58 px-4 py-2.5 text-sm font-medium text-slate-200 backdrop-blur-md">
-                            <span className="h-2 w-2 rounded-full bg-secondary-blue" />
-                            <span>{t('home.hero.metrics.productSeries', { count: seriesCount })}</span>
-                          </div>
-                        </div>
-                      </div>
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/70 bg-slate-950 shadow-[0_36px_80px_-36px_rgba(15,23,42,0.65)]">
+            <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(2,6,23,0.12),rgba(2,6,23,0.48))]" />
+            <Image
+              src="/images/industrial_HVAC_air_handling_unit_warehouse.jpg"
+              alt={t('home.hero.visualAlt')}
+              width={960}
+              height={1100}
+              priority
+              className="h-[380px] w-full object-cover object-center sm:h-[460px] lg:h-[560px]"
+            />
 
-                      <div className="flex flex-col bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] p-4 sm:p-5 lg:h-full xl:p-6">
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue">
-                          {t('home.guidedDiscovery.panelEyebrow')}
-                        </div>
-                        <h2 className="mt-2 text-[1.7rem] font-semibold leading-none tracking-[-0.04em] text-white sm:text-[1.9rem] xl:text-[2rem]">
-                          {getCategoryDisplayName(selectedCategory)}
-                        </h2>
-                        <p className="mt-3 min-h-[56px] text-sm leading-6 text-slate-300 sm:min-h-[72px] sm:text-[15px]">
-                          {selectedSummary || getCategoryDescription(selectedCategory) || t('home.guidedDiscovery.panelFallback')}
-                        </p>
+            <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-6">
+              <div className="max-w-md rounded-[1.6rem] border border-white/10 bg-slate-950/70 p-4 text-white backdrop-blur-md">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-blue">
+                  {t('home.hero.visualEyebrow')}
+                </div>
+                <div className="mt-2 text-xl font-semibold leading-tight sm:text-2xl">
+                  {t('home.hero.visualTitle')}
+                </div>
+                <p className="mt-2 text-sm leading-6 text-white/72 sm:text-[15px]">
+                  {t('home.hero.visualSubtitle')}
+                </p>
 
-                        <div className="mt-4 grid gap-3">
-                          <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.05] px-4 py-3.5">
-                            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-blue">
-                              {t('home.guidedDiscovery.seriesEyebrow')}
-                            </div>
-                            <div className="mt-1.5 text-sm font-semibold text-white">{t('home.hero.metrics.productSeries', { count: seriesCount })}</div>
-                          </div>
-
-                          <div className="grid h-[142px] gap-2 overflow-hidden xl:h-[150px]">
-                            {selectedSeries.slice(0, 3).map((series) => (
-                              <Link
-                                key={series.id}
-                                href={`/category/${selectedCategory.slug}/${series.slug}`}
-                                className="group rounded-[1.1rem] border border-white/10 bg-white/[0.04] px-4 py-3 transition-all duration-300 hover:border-secondary-blue/30 hover:bg-white/[0.08]"
-                              >
-                                <div className="flex items-center justify-between gap-3">
-                                  <span className="min-w-0 truncate text-sm font-semibold text-white">{getCategoryDisplayName(series)}</span>
-                                  <span className="text-sm font-semibold text-secondary-blue transition-transform group-hover:translate-x-1">→</span>
-                                </div>
-                              </Link>
-                            ))}
-                            {selectedSeries.length === 0 && (
-                              <div className="rounded-[1.15rem] border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-300">
-                                {t('home.guidedDiscovery.loading')}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="mt-auto flex flex-col gap-2.5 pt-4">
-                          <Link
-                            href={`/category/${selectedCategory.slug}`}
-                            className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-secondary-blue hover:text-white"
-                          >
-                            {t('home.guidedDiscovery.primaryCta')}
-                          </Link>
-                          <Link
-                            href="#applications"
-                            className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/[0.08]"
-                          >
-                            {t('home.guidedDiscovery.secondaryCta')}
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex h-full min-h-[460px] items-center justify-center px-6 text-center text-sm text-white/60">
-                    {t('home.guidedDiscovery.loading')}
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-medium text-white/80">
+                    {t('home.hero.visualPoints.selection')}
                   </div>
-                )}
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm font-medium text-white/80">
+                    {t('home.hero.visualPoints.routing')}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
