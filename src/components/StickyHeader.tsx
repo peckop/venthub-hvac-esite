@@ -419,6 +419,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
         progress={scrollProgress}
         isScrollingDown={isScrollingDown}
         isAtTop={isAtTop}
+        isAnyOverlayOpen={isMenuOpen || isCategoryHubOpen || isSearchOverlayOpen}
         topTierChildren={
           <NavSecondaryRail items={secondaryItems} />
         }
