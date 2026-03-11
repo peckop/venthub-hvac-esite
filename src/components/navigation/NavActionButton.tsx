@@ -2,12 +2,10 @@ import React from 'react'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
-import type { NavigationMode } from '@/utils/navigationConfig'
 
 type NavActionTone = 'default' | 'accent' | 'success' | 'warning'
 
 interface NavActionButtonProps {
-    mode: NavigationMode
     icon: React.ReactNode
     label?: React.ReactNode
     href?: string
@@ -19,8 +17,6 @@ interface NavActionButtonProps {
     className?: string
     iconClassName?: string
     labelClassName?: string
-    compactLabelClassName?: string
-    hideLabelInCompact?: boolean
 }
 
 const toneClasses: Record<NavActionTone, string> = {
@@ -31,7 +27,6 @@ const toneClasses: Record<NavActionTone, string> = {
 }
 
 const NavActionButton: React.FC<NavActionButtonProps> = ({
-    mode,
     icon,
     label,
     href,
@@ -43,8 +38,6 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
     className,
     iconClassName,
     labelClassName,
-    compactLabelClassName,
-    hideLabelInCompact = false,
 }) => {
     const content = (
         <>
@@ -52,11 +45,11 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
                 {icon}
                 {badge}
             </span>
-            {label && (!hideLabelInCompact || mode !== 'compact') && (
+            {label && (
                 <span
                     className={cn(
-                        'min-w-0 truncate text-sm font-medium',
-                        mode === 'compact' ? compactLabelClassName : labelClassName
+                        'min-w-0 truncate text-[13px] font-semibold transition-all',
+                        labelClassName
                     )}
                 >
                     {label}
@@ -67,7 +60,7 @@ const NavActionButton: React.FC<NavActionButtonProps> = ({
 
     const classes = cn(
         'group relative inline-flex items-center gap-2 rounded-2xl border border-transparent transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy/20 focus-visible:ring-offset-2',
-        mode === 'compact' ? 'px-3 py-2.5' : 'px-3.5 py-3',
+        'px-3 py-2.5', // Using compact sizing as default for the Action Bar
         toneClasses[tone],
         className
     )
