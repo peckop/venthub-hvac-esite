@@ -5,7 +5,17 @@ import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
+import { 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminCardClass, 
+  adminTableHeadCellClass, 
+  adminTableCellClass, 
+  adminTableContainerClass,
+  adminButtonPrimaryClass, 
+  adminTableActionClass, 
+  adminTableActionDangerClass 
+} from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
 import { Tags, Plus } from 'lucide-react'
@@ -135,11 +145,14 @@ const AdminCategoriesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.categories') ?? 'Kategoriler'}</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+        <div>
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.categories') ?? 'Kategoriler'}</h1>
+          <p className={adminSubtitleClass}>Ürün hiyerarşisini ve kategori ağacını buradan yönetebilirsiniz.</p>
+        </div>
         {hasWriteAccess && (
-          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
-            <Plus size={18} />
+          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2 group`}>
+            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
             <span>Yeni Kategori</span>
           </button>
         )}
@@ -191,27 +204,29 @@ const AdminCategoriesPage: React.FC = () => {
         )}
       />
 
-      <div className={`${adminCardClass} overflow-hidden`}>
-        {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
-        <div ref={dragScrollRef} className="overflow-x-auto w-full">
-          <table className="w-full text-left max-md:text-xs min-w-[800px]">
-            <thead className="bg-gray-50">
-              <tr>
+      <div className={adminTableContainerClass}>
+        {error && <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" />{error}</div>}
+        <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
+          <table className="w-full text-left min-w-[800px]">
+            <thead>
+              <tr className="glass-strong">
                 {visibleCols.image && <th className={`${adminTableHeadCellClass} ${headPad}`}>Görsel</th>}
                 {visibleCols.name && <th className={`${adminTableHeadCellClass} ${headPad}`}>Ad</th>}
                 {visibleCols.sortOrder && (
                   <th className={`${adminTableHeadCellClass} ${headPad} w-24 text-center`}>
-                    Sıra
-                    <InfoTooltip text="Kategorilerin sitedeki listelenme sırasını belirler. 1 değeri en üstte görünür." />
+                    <div className="flex items-center justify-center gap-2">
+                       Sıra
+                       <InfoTooltip text="Kategorilerin sitedeki listelenme sırasını belirler. 1 değeri en üstte görünür." />
+                    </div>
                   </th>
                 )}
                 {visibleCols.slug && <th className={`${adminTableHeadCellClass} ${headPad}`}>Slug</th>}
                 {visibleCols.parent && <th className={`${adminTableHeadCellClass} ${headPad}`}>Üst</th>}
                 {visibleCols.description && <th className={`${adminTableHeadCellClass} ${headPad}`}>Açıklama</th>}
-                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>İşlem</th>}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>İşlem</th>}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {loading && rows.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-0">
@@ -220,7 +235,7 @@ const AdminCategoriesPage: React.FC = () => {
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-4">
+                  <td colSpan={7} className="p-0">
                     <AdminEmptyState
                       icon={Tags}
                       title="Kategori bulunamadı"
@@ -230,33 +245,33 @@ const AdminCategoriesPage: React.FC = () => {
                 </tr>
               ) : (
                 filtered.map(r => (
-                  <tr key={r.id} className="border-b border-slate-200/60 hover:bg-gray-50/50 transition-colors">
+                  <tr key={r.id} className="group hover:bg-white/[0.02] transition-colors duration-300">
                     {visibleCols.image && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        {r.image_url ? (
-                          <img
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
-                            alt=""
-                            className="w-10 h-10 object-cover rounded border border-gray-200"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-gray-300">
-                            -
-                          </div>
-                        )}
+                        <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
+                          {r.image_url ? (
+                            <img
+                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
+                              alt=""
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-700 uppercase">NO IMG</div>
+                          )}
+                        </div>
                       </td>
                     )}
                     {visibleCols.name && (
-                      <td className={`${adminTableCellClass} ${cellPad} font-medium text-gray-900`}>
-                        <div className="flex items-center">
-                          {r.parent_id && <span className="text-slate-300 mr-2">└─</span>}
-                          <div className={r.parent_id ? 'pl-1' : ''}>
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <div className="flex items-center gap-2">
+                          {r.parent_id && <div className="w-4 h-px bg-slate-700 mt-1" />}
+                          <div className="flex flex-col">
                             {hasWriteAccess ? (
                               <EditableCell
                                 value={r.name}
-                                placeholder="Kategori Adı"
+                                placeholder="KATEGORİ ADI"
                                 inputWidth="w-full"
-                                className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}
+                                className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-[11px]' : 'text-white text-xs'}`}
                                 onSave={async (val) => {
                                   if (!val || r.name === val) return
                                   const { error } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
@@ -266,43 +281,65 @@ const AdminCategoriesPage: React.FC = () => {
                                 }}
                               />
                             ) : (
-                              <span className={r.parent_id ? 'text-slate-600 font-normal' : 'font-medium'}>{r.name}</span>
+                              <span className={`uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-[11px]' : 'text-white text-xs'}`}>{r.name}</span>
+                            )}
+                            {r.is_featured && (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <span className="w-1 h-1 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                                <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest">Öne Çıkan</span>
+                              </div>
                             )}
                           </div>
-                          {r.is_featured && <span className="ml-2 inline-block px-1.5 py-0.5 text-[10px] bg-yellow-100 text-yellow-800 rounded-full">Vitrin</span>}
                         </div>
                       </td>
                     )}
                     {visibleCols.sortOrder && (
                       <td className={`${adminTableCellClass} ${cellPad} text-center`}>
                         {hasWriteAccess ? (
-                          <EditableCell
-                            value={r.sort_order?.toString() || '0'}
-                            placeholder="0"
-                            type="number"
-                            inputWidth="w-16"
-                            onSave={async (val) => {
-                              const num = parseInt(val || '0', 10)
-                              if (isNaN(num)) return
-                              if (r.sort_order === num) return
-                              const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
-                              if (error) throw error
-                              setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
-                              toast.success('Sıra güncellendi')
-                              load()
-                            }}
-                          />
+                          <div className="inline-block glass bg-white/5 rounded-xl border border-white/5 group-hover:border-cyan-400/30 transition-all p-1">
+                             <EditableCell
+                                value={r.sort_order?.toString() || '0'}
+                                placeholder="0"
+                                type="number"
+                                inputWidth="w-12"
+                                 className="text-center text-cyan-400 font-black text-[11px] tracking-widest uppercase"
+                                onSave={async (val) => {
+                                  const num = parseInt(val || '0', 10)
+                                  if (isNaN(num)) return
+                                  if (r.sort_order === num) return
+                                  const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
+                                  if (error) throw error
+                                  setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
+                                  toast.success('Sıra güncellendi')
+                                  load()
+                                }}
+                              />
+                          </div>
                         ) : (
-                          <span>{r.sort_order || 0}</span>
+                           <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">{r.sort_order || 0}</span>
                         )}
                       </td>
                     )}
-                    {visibleCols.slug && <td className={`${adminTableCellClass} ${cellPad} text-gray-500`}>{r.slug}</td>}
-                    {visibleCols.parent && <td className={`${adminTableCellClass} ${cellPad}`}>{rows.find(x => x.id === r.parent_id)?.name || <span className="text-gray-400">-</span>}</td>}
-                    {visibleCols.description && <td className={`${adminTableCellClass} ${cellPad} text-gray-500 truncate max-w-[200px]`}>{r.description}</td>}
+                    {visibleCols.slug && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                         <code className="text-[9px] font-black text-slate-500 bg-white/5 px-2 py-0.5 rounded-lg border border-white/5 group-hover:text-cyan-400/60 transition-colors uppercase tracking-[0.15em] font-mono">{r.slug}</code>
+                      </td>
+                    )}
+                    {visibleCols.parent && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.15em]">
+                          {rows.find(x => x.id === r.parent_id)?.name || '-'}
+                        </span>
+                      </td>
+                    )}
+                    {visibleCols.description && (
+                      <td className={`${adminTableCellClass} ${cellPad}`}>
+                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] italic">{r.description || '-'}</p>
+                      </td>
+                    )}
                     {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <button
                             className={adminTableActionClass}
                             onClick={() => handleEdit(r)}
@@ -333,6 +370,7 @@ const AdminCategoriesPage: React.FC = () => {
         categories={rows}
       />
     </div>
+
   )
 }
 

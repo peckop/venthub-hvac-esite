@@ -1,4 +1,3 @@
-import React from 'react'
 import {
     ScatterChart,
     Scatter,
@@ -9,6 +8,8 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts'
+import { Activity } from 'lucide-react'
+import AdminEmptyState from '../AdminEmptyState'
 
 interface HeatmapData {
     day: number // 0: Sun, 1: Mon, ..., 6: Sat
@@ -49,10 +50,10 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
         if (active && payload && payload.length) {
             const data = payload[0].payload
             return (
-                <div className="bg-white/95 backdrop-blur shadow-xl border border-slate-200 p-3 rounded-xl z-50">
-                    <p className="text-sm font-bold text-slate-800 mb-1">{data.dayName}, {String(data.hour).padStart(2, '0')}:00</p>
-                    <p className="text-xs text-slate-500">
-                        Sipariş: <span className="font-semibold text-primary-navy">{data.count}</span>
+                <div className="glass-strong border border-white/5 py-3 px-5 rounded-2xl z-50 shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in zoom-in-95 duration-200">
+                    <p className="text-[13px] font-black text-white mb-2 uppercase tracking-wider">{data.dayName}, {String(data.hour).padStart(2, '0')}:00</p>
+                    <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
+                        Sipariş: <span className="text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">{data.count}</span>
                     </p>
                 </div>
             )
@@ -66,29 +67,42 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
     const zRange = [20, 400]
 
     return (
-        <div className="flex flex-col h-full w-full">
-            {title && <h3 className="text-sm font-bold text-slate-700 mb-6">{title}</h3>}
+        <div className="flex flex-col h-full w-full group/heatmap">
+            {title && (
+                <div className="mb-10">
+                    <h3 className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover/heatmap:text-cyan-400 transition-colors uppercase">{title}</h3>
+                    <div className="h-0.5 w-12 bg-cyan-500/30 mt-2 rounded-full group-hover/heatmap:w-20 transition-all duration-700" />
+                </div>
+            )}
 
             {chartData.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
-                    <p className="text-sm">Bu aralıkta henüz aktivite yok.</p>
+                <div className="flex-1 flex flex-col items-center justify-center">
+                    <AdminEmptyState 
+                        icon={Activity} 
+                        title="Aktivite Bulunamadı" 
+                        description="Seçili aralıkta henüz aktivite kaydı bulunmuyor." 
+                        compact 
+                    />
                 </div>
             ) : (
-                <div className="w-full flex-1 min-h-[300px] -ml-6">
+                <div className="w-full flex-1 min-h-[300px] -ml-6 relative">
+                    {/* Background decorative glow */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-cyan-500/5 blur-[80px] rounded-full pointer-events-none" />
+                    
                     <ResponsiveContainer width="100%" height="100%">
-                        <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 20 }}>
+                        <ScatterChart margin={{ top: 10, right: 30, bottom: 20, left: 30 }}>
                             <XAxis
                                 type="number"
                                 dataKey="hour"
                                 name="Saat"
                                 domain={[0, 23]}
                                 tickCount={24}
-                                tick={{ fontSize: 11, fill: '#94A3B8' }}
+                                tick={{ fontSize: 9, fill: '#64748B', fontWeight: 900 }}
                                 axisLine={false}
                                 tickLine={false}
-                                tickFormatter={(val) => String(val).padStart(2, '0') + ':00'}
+                                tickFormatter={(val) => String(val).padStart(2, '0')}
                                 interval="preserveStartEnd"
-                                minTickGap={20}
+                                minTickGap={15}
                             />
                             <YAxis
                                 type="number"
@@ -96,10 +110,10 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                                 name="Gün"
                                 domain={[0, 6]}
                                 tickCount={7}
-                                tick={{ fontSize: 12, fill: '#64748B', fontWeight: 500 }}
+                                tick={{ fontSize: 10, fill: '#64748B', fontWeight: 900 }}
                                 axisLine={false}
                                 tickLine={false}
-                                tickFormatter={(val) => dayNames[val]}
+                                tickFormatter={(val) => dayNames[val].toUpperCase()}
                                 reversed // Monday at the top
                             />
                             <ZAxis
@@ -110,20 +124,23 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
                             />
                             <Tooltip
                                 content={<CustomTooltip />}
-                                cursor={{ strokeDasharray: '3 3', stroke: '#E2E8F0', strokeWidth: 1 }}
+                                cursor={{ strokeDasharray: '4 4', stroke: '#22d3ee', strokeWidth: 1.5, opacity: 0.3 }}
+                                isAnimationActive={false}
                             />
-                            <Scatter data={chartData} fill="#1E3A8A">
+                            <Scatter data={chartData} fill="#22d3ee">
                                 {chartData.map((entry, index) => {
-                                    // Color intensity based on count relative to max
                                     const intensity = entry.count / maxCount
-                                    // Use primary-navy (1E3A8A) with varying opacity, or a color scale
-                                    const opacity = Math.max(0.3, intensity)
+                                    const opacity = Math.max(0.15, intensity)
                                     return (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill="#1E3A8A"
+                                            fill="#22d3ee"
                                             fillOpacity={opacity}
-                                            className="transition-all duration-300 hover:fill-blue-500"
+                                            stroke="#22d3ee"
+                                            strokeWidth={intensity > 0.7 ? 2 : 0}
+                                            strokeOpacity={intensity}
+                                            className="transition-all duration-700 hover:fill-white cursor-pointer origin-center"
+                                            style={{ filter: intensity > 0.5 ? `drop-shadow(0 0 ${8 * intensity}px rgba(34,211,238,${0.5 * intensity}))` : 'none' }}
                                         />
                                     )
                                 })}
@@ -134,14 +151,13 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ data, title }) => {
             )}
 
             {chartData.length > 0 && (
-                <div className="mt-4 flex items-center justify-end gap-2 text-[10px] text-slate-400 font-medium px-4">
-                    <span>Az Yoğun</span>
-                    <div className="flex gap-1">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] opacity-30"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] opacity-60"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#1E3A8A] opacity-100"></div>
+                <div className="mt-8 flex items-center justify-end gap-4 px-6 relative z-10">
+                    <span className="text-[9px] text-slate-600 font-black uppercase tracking-[0.2em] italic">Yoğunluk Skalası</span>
+                    <div className="flex items-center gap-2 p-1.5 glass rounded-full border border-white/5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-20 border border-white/10"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-50 border border-white/10"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 opacity-100 shadow-[0_0_15px_rgba(34,211,238,0.7)] border border-cyan-400/20"></div>
                     </div>
-                    <span>Çok Yoğun</span>
                 </div>
             )}
         </div>
