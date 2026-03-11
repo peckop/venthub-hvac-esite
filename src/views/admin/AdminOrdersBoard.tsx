@@ -1,3 +1,4 @@
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
@@ -8,7 +9,6 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import toast from 'react-hot-toast'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
 import { useRole } from '../../hooks/useRole'
 
