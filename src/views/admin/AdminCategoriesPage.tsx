@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { lazy, Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
