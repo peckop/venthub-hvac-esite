@@ -4,19 +4,17 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { updateOrderStatus } from '../../lib/orderStatusService'
+import toast from 'react-hot-toast'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
 import {
     adminButtonPrimaryClass,
-    adminButtonSecondaryClass,
-    adminInputClass,
-    adminSelectClass,
-    adminCardPaddedClass,
-    adminSubtitleClass
+    adminInputClass
 } from '../../utils/adminUi'
 import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
 import { useRole } from '../../hooks/useRole'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 
 // --- Types ---
 interface AdminOrderRow {
@@ -133,7 +131,6 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
     const [loading, setLoading] = useState(true)
     const [noteInput, setNoteInput] = useState('')
     const [saving, setSaving] = useState(false)
-
     useEffect(() => {
         let mounted = true
         async function load() {
@@ -300,13 +297,12 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 // --- Ana Board Bileşeni ---
 export default function AdminOrdersBoard() {
     const pathname = usePathname()
-    const { lang, t } = useI18n()
+    const { lang } = useI18n()
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('orders')
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
-    const [expandedCol, setExpandedCol] = useState<ColumnId | null>('col_new')
     const scrollRef = useRef<HTMLDivElement>(null)
 
     const fetchOrders = useCallback(async () => {
@@ -327,7 +323,6 @@ export default function AdminOrdersBoard() {
             setLoading(false)
         }
     }, [])
-
     useEffect(() => {
         fetchOrders()
     }, [fetchOrders, pathname])

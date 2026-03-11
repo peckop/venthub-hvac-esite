@@ -1,8 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import toast from 'react-hot-toast'
-import { adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
-import { FileUp, X, CheckCircle2, AlertCircle, Search, Info } from 'lucide-react'
+import { FileUp, X, CheckCircle2, Search, Info } from 'lucide-react'
 
 interface CsvPreviewRow {
     sku: string
@@ -111,9 +110,9 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                 preview.push({
                     sku: row.sku,
                     name: product.name,
-                    current: product.stock,
+                    current: product.stock || 0,
                     new: row.newQty,
-                    delta: row.newQty - product.stock,
+                    delta: row.newQty - (product.stock || 0),
                     status
                 })
             }
@@ -388,6 +387,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                                 <div className="flex items-center gap-2">
                                     <div className="w-3 h-3 border-2 border-[#0A0F1E]/20 border-t-[#0A0F1E] rounded-full animate-spin" />
                                     {Math.round(csvProgress * 100)}%
+                                Montaj yapılıyor.
                                 </div>
                             ) : (dryRun ? 'Sadece Test Et' : 'Verileri İçe Aktar')}
                         </button>

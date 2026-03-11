@@ -12,17 +12,10 @@ import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTabl
 import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
 import { 
   TrendingUp, 
-  ArrowDownRight, 
   ChevronRight, 
   PackageSearch,
-  Users,
   AlertCircle,
-  Clock,
-  BarChart3,
   PieChart,
-  ShoppingCart,
-  Boxes,
-  Truck,
   ShoppingBag,
   HandCoins,
   PackagePlus,
