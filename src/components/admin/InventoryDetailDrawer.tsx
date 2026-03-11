@@ -1,10 +1,10 @@
-import React from 'react'
-import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminSettingsInputClass } from '../../utils/adminUi'
+import React, { useEffect } from 'react'
+import { adminButtonPrimaryClass } from '../../utils/adminUi'
 import { printQrLabel } from './InventoryQrLabel'
 import { InventoryRow, ReservedRow } from '../../types/inventory'
 import InventoryStockAdjust from './InventoryStockAdjust'
 import InventoryReservedTable from './InventoryReservedTable'
-import InventoryMovementHistory from './InventoryMovementHistory'
+import InventoryMovementHistory, { Movement } from './InventoryMovementHistory'
 
 interface InventoryDetailDrawerProps {
     selected: InventoryRow | null
@@ -23,7 +23,7 @@ interface InventoryDetailDrawerProps {
     moving: boolean
     adjustStock: (id: string, delta: number, reason: string) => void
     reservedOrders: ReservedRow[]
-    movements: { id: string; delta: number; reason: string; created_at: string }[]
+    movements: Movement[] // Use the defined Movement type
     undoLastMovement: () => void
     undoing: boolean
     t: (key: string) => string
@@ -38,7 +38,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
     } = props
 
     // ESC ile çekmeceyi kapat
-    React.useEffect(() => {
+    useEffect(() => {
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
         window.addEventListener('keydown', onKey)
         return () => window.removeEventListener('keydown', onKey)
@@ -190,8 +190,6 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                         </div>
                         <InventoryMovementHistory
                             movements={movements}
-                            onUndo={undoLastMovement}
-                            undoing={undoing}
                         />
                     </div>
                 </div>

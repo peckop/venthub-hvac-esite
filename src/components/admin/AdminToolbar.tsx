@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
-import { adminButtonSecondaryClass, adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
+import React, { useState, useRef, useEffect } from 'react'
+import { adminSelectClass, adminSelectStyle, adminButtonPrimaryClass, adminSettingsInputClass } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
-import { SlidersHorizontal, ChevronDown, Search } from 'lucide-react'
+import { SlidersHorizontal, Search } from 'lucide-react'
 
 export type AdminToolbarChip = {
   key: string
@@ -66,9 +66,9 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   className
 }) => {
   const { t } = useI18n()
-  const hydratedRef = React.useRef(false)
+  const hydratedRef = useRef(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const inputRef = React.useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Mobil filtre badge sayısı
   const activeFilterCount = [
@@ -78,7 +78,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   ].reduce((a, b) => a + b, 0)
 
   // shortcut: '/' to focus search
-  React.useEffect(() => {
+  useEffect(() => {
     if (!search) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
@@ -91,7 +91,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   }, [search])
 
   // Kalıcılık: yükleme
-  React.useEffect(() => {
+  useEffect(() => {
     if (!storageKey) return
     try {
       const enable = {
@@ -135,7 +135,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   }, [storageKey])
 
   // Kalıcılık: kaydetme
-  React.useEffect(() => {
+  useEffect(() => {
     if (!storageKey || !hydratedRef.current) return
     try {
       const enable = {
