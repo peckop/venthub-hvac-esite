@@ -1,0 +1,5 @@
+🚨 Severity: MEDIUM
+💡 Vulnerability: Eksik Güvenlik Başlıkları (Missing Security Headers). Next.js uygulamasında varsayılan olarak HTTP Security Headers (X-Frame-Options, HSTS vb.) bulunmuyordu. Bu durum, siteyi clickjacking, MIME koklama ve güvenli olmayan HTTP bağlantılarına maruz bırakabilir.
+🎯 Impact: Saldırganlar iframe içine siteyi gömerek (clickjacking) veya veri tipi koklayarak kullanıcıları kandırabilir veya veri çalabilir.
+🔧 Fix: `next.config.mjs` dosyasına `async headers()` eklendi. Defense-in-Depth amacıyla `X-DNS-Prefetch-Control`, `Strict-Transport-Security`, `X-Frame-Options`, `X-Content-Type-Options` ve `Referrer-Policy` başlıkları eklendi.
+✅ Verification: `pnpm build` komutu kullanılarak test edildi ve header yapısının doğruluğu onaylandı.
