@@ -53,6 +53,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
             })
         } else {
             setIsAnimating(false)
+
             setSelectedCategory(null) // Reset selection on close
             const timer = setTimeout(() => setIsVisible(false), 300)
             return () => clearTimeout(timer)
@@ -114,128 +115,96 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
     return (
         <div
-            className={`fixed inset-0 z-[100] transition-all duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'
-                }`}
+            className={`fixed inset-0 z-[100] transition-opacity duration-500 ${isAnimating ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         >
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px]"
                 onClick={onClose}
             />
 
-            {/* Modal Content */}
+            {/* Dropdown Panel expanding downwards */}
             <div
-                className={`fixed left-0 w-full h-[calc(100vh-104px)] overflow-y-auto bg-white/95 backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border-t border-slate-100 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] z-[90] ${isAnimating ? 'top-[104px] translate-y-0 opacity-100' : 'top-[90px] -translate-y-4 opacity-0 pointer-events-none'}`}
+                className={`absolute left-0 w-full top-[104px] bg-white/95 backdrop-blur-xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] border-t border-slate-100 overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] z-[90] ${isAnimating ? 'max-h-[calc(100vh-104px)] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
             >
-                {/* Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-100">
-                    <div className="flex items-center gap-3">
-                        {selectedCategory ? (
-                            <>
-                                <button
-                                    onClick={() => setSelectedCategory(null)}
-                                    className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group mr-4"
-                                >
-                                    <div className="p-1.5 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
-                                        <ArrowLeft className="w-4 h-4" />
+                <div className="overflow-y-auto max-h-[calc(100vh-104px)] w-full">
+                    {/* Header */}
+                    <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                            {selectedCategory ? (
+                                <>
+                                    <button
+                                        onClick={() => setSelectedCategory(null)}
+                                        className="flex items-center gap-2 text-slate-500 hover:text-primary-navy transition-colors group mr-4"
+                                    >
+                                        <div className="p-1.5 rounded-full bg-slate-50 group-hover:bg-slate-100 transition-colors">
+                                            <ArrowLeft className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-sm font-bold">Ana Kategoriler</span>
+                                    </button>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                                                {getCategoryDisplayName(selectedCategory)}
+                                            </h2>
+                                            <span className="text-sm font-medium text-slate-400">
+                                                ({subCategories.length} seri)
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span className="text-sm font-medium">Ana Kategoriler</span>
-                                    <ChevronRight className="w-4 h-4 text-white/30" />
-                                </button>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="text-xl font-bold text-white">
-                                            {getCategoryDisplayName(selectedCategory)}
-                                        </h2>
-                                        <span className="text-sm text-white/50">
-                                            ({subCategories.length} seri)
-                                        </span>
-                                    </div>
-                                    {selectedCategory.description && (
-                                        <p className="text-sm text-gray-400 mt-0.5 line-clamp-1 max-w-xl">
-                                            {selectedCategory.description}
-                                        </p>
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <Grid3X3 className="w-6 h-6 text-secondary-blue" />
-                                <h2 className="text-xl font-bold text-white">
-                                    Kategoriler
-                                </h2>
-                            </>
-                        )}
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
-                        aria-label="Kapat"
-                    >
-                        <X className="w-6 h-6 text-white/70 hover:text-white" />
-                    </button>
-                </div>
-
-                {/* Content: Ana Kategoriler veya Alt Kategoriler */}
-                <div className="p-6">
-                    {selectedCategory ? (
-                        /* Alt Kategoriler Grid - ARTIK 3D KARTLAR */
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {subCategories.filter(subCat => subCat.slug !== selectedCategory.slug).map((subCat) => (
-                                <CategoryCard3D
-                                    key={subCat.id}
-                                    category={subCat}
-                                    subCategoryCount={0} // Alt kategorinin altı yok
-                                    onClick={() => handleSubCategoryClick(subCat)}
-                                />
-                            ))}
-
-                            {/* Tüm Ürünleri Gör butonu - Grid içinde şık durması için kart boyutunda */}
-                            <Link
-                                href={`/category/${selectedCategory.slug}`}
-                                onClick={() => onClose()}
-                                className="group relative flex flex-col items-center justify-center p-6 bg-secondary-blue/10 hover:bg-secondary-blue/20 border-2 border-dashed border-secondary-blue/30 hover:border-secondary-blue rounded-2xl transition-all duration-300 h-40"
-                            >
-                                <div className="p-3 rounded-full bg-secondary-blue/20 group-hover:bg-secondary-blue/30 mb-3 transition-colors">
-                                    <ChevronRight className="w-8 h-8 text-secondary-blue" />
-                                </div>
-                                <span className="font-semibold text-secondary-blue text-center group-hover:text-white transition-colors">
-                                    Tüm {getCategoryDisplayName(selectedCategory)} <br /> Ürünlerini Gör
-                                </span>
-                            </Link>
-                        </div>
-                    ) : (
-                        /* Ana Kategoriler Grid */
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {mainCategories.length > 0 ? (
-                                mainCategories.map((category) => (
-                                    <CategoryCard3D
-                                        key={category.id}
-                                        category={category}
-                                        subCategoryCount={getSubCategoryCount(category.id)}
-                                        onClick={() => handleCategoryClick(category)}
-                                    />
-                                ))
+                                </>
                             ) : (
-                                /* Skeleton-like loading state */
-                                Array.from({ length: 8 }).map((_, i) => (
-                                    <div key={i} className="h-48 bg-white/5 rounded-2xl animate-pulse flex flex-col justify-end p-4">
-                                        <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
-                                        <div className="h-3 w-1/4 bg-white/5 rounded" />
-                                    </div>
-                                ))
+                                <>
+                                    <Grid3X3 className="w-6 h-6 text-primary-navy" />
+                                    <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                                        Kategoriler
+                                    </h2>
+                                </>
                             )}
                         </div>
-                    )}
-                </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-800"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
 
-                {/* Footer hint */}
-                <div className="px-6 pb-6 text-center">
-                    <p className="text-sm text-white/50">
-                        {selectedCategory
-                            ? 'Bir alt kategori seçerek ürünleri görüntüleyin'
-                            : 'Bir kategori seçerek alt serileri görüntüleyin'}
-                    </p>
+                    {/* Content */}
+                    <div className="p-8 max-w-[1400px] mx-auto min-h-[400px]">
+                        {!selectedCategory ? (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                                {mainCategories.map((category) => {
+                                    const subCount = getSubCategoryCount(category.id)
+                                    return (
+                                        <CategoryCard3D
+                                            key={category.id}
+                                            category={category}
+                                            subCategoryCount={subCount}
+                                            onClick={() => handleCategoryClick(category)}
+                                        />
+                                    )
+                                })}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {subCategories.map((subCategory) => (
+                                    <div
+                                        key={subCategory.id}
+                                        onClick={() => handleSubCategoryClick(subCategory)}
+                                        className="group flex flex-col items-center justify-center p-8 rounded-2xl bg-white hover:bg-slate-50 border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-lg hover:shadow-primary-navy/5 transition-all cursor-pointer"
+                                    >
+                                        <div className="text-lg font-bold text-slate-800 text-center mb-2">
+                                            {getCategoryDisplayName(subCategory)}
+                                        </div>
+                                        <div className="text-sm text-slate-500 font-medium text-center flex items-center gap-1 group-hover:text-secondary-blue transition-colors">
+                                            İncele <ChevronRight size={14} className="text-secondary-blue" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
@@ -243,7 +212,3 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 }
 
 export default CategoryHubOverlay
-
-
-
-

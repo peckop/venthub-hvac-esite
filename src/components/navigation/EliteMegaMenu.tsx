@@ -116,16 +116,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                     )
                 })}
 
-                {/* Quick Links */}
-                <NavigationMenu.Item>
-                    <Link
-                        href="/products"
-                        onClick={() => handleLinkClick(0, 'products')}
-                        className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-bold leading-none text-secondary-blue outline-none hover:bg-slate-50 focus:shadow-[0_0_0_2px] focus:shadow-slate-300"
-                    >
-                        Tüm Ürünler
-                    </Link>
-                </NavigationMenu.Item>
+
 
                 <NavigationMenu.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
                     <div className="relative top-[70%] h-[10px] w-[10px] rotate-[45deg] rounded-tl-[2px] bg-white" />
@@ -236,12 +227,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                     })}
                 </div>
 
-                {/* Footer Links */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50">
-                    <Link href="/products" onClick={onClose} className="block w-full py-3 px-4 bg-primary-navy text-white text-center font-bold rounded-lg shadow-lg shadow-primary-navy/20 active:scale-95 transition-all">
-                        Tüm Ürünler
-                    </Link>
-                </div>
+
             </div>
         </div>
     )
