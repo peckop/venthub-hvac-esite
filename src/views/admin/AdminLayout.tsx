@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
 import { checkAdminAccessAsync } from '../../config/admin'
-import { adminNavClass } from '../../utils/adminUi'
 import AccessDenied from '../../components/admin/AccessDenied'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -24,7 +24,9 @@ import {
   PieChart,
   Truck,
   Menu,
-  X
+  X,
+  ExternalLink,
+  Search as SearchIcon
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
@@ -39,7 +41,6 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
-  const isSettingsPage = pathname === '/admin/settings'
   const minSwipeDistance = 50
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -60,18 +61,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     }
   }
 
-  React.useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [sidebarOpen])
-
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true
     async function guard() {
       if (loading) return
@@ -82,13 +72,12 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     return () => { active = false }
   }, [user, loading, router])
 
-  // Proaktif Token Yenileme: Sekme aktif olduğunda Supabase oturumunu kontrol et
+  // Proaktif Token Yenileme
   useEffect(() => {
     const refreshOnVisibility = async () => {
       if (document.visibilityState === 'visible') {
         try {
           const { ensureSessionFresh } = await import('../../lib/ensureSessionFresh')
-          // Akıllı oturum kontrolü
           await ensureSessionFresh()
         } catch (error) {
           console.error('Proactive token refresh failed:', error)
@@ -100,9 +89,10 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
     return () => document.removeEventListener('visibilitychange', refreshOnVisibility)
   }, [])
 
-  if (loading || roleLoading) {
+  // Initial Auth Loading Spinner (Sadece ilk girişte)
+  if (loading && !user) {
     return (
-      <div className="min-h-screen bg-[#0A0F1E] flex flex-col items-center justify-center space-y-6">
+      <div className="h-screen bg-[#0A0F1E] flex flex-col items-center justify-center space-y-6">
         <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin shadow-[0_0_15px_rgba(34,211,238,0.2)]"></div>
         <div className="text-slate-400 text-xs font-black uppercase tracking-[0.3em] animate-pulse">
           Sistem Hazırlanıyor...
@@ -112,11 +102,10 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   }
 
   // URL Doğrudan erişim koruması
-  if (!canAccess(pathname ?? '')) {
+  if (!loading && !roleLoading && !canAccess(pathname ?? '')) {
     return <AccessDenied />
   }
 
-  // Grouped navigation items
   const navGroups = [
     {
       label: t('admin.menu.groupMain') || 'Ana Menü',
@@ -163,39 +152,66 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   ]
 
   return (
-    <div className="min-h-screen font-sans transition-colors duration-500 bg-[#0A0F1E] text-slate-200 overflow-x-hidden">
+    <div className="h-screen flex flex-col font-sans transition-colors duration-500 bg-[#0A0F1E] text-slate-200 overflow-hidden selection:bg-cyan-500 selection:text-white">
       {/* Background Decor */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary-navy/20 blur-[120px] rounded-full opacity-50" />
         <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-secondary-blue/10 blur-[100px] rounded-full opacity-30" />
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center relative z-20">
-        <div className="flex items-center gap-3">
+      {/* Modern Global Header */}
+      <header className="h-16 flex-none border-b border-white/5 bg-[#0A0F1E]/60 backdrop-blur-xl relative z-40 px-4 md:px-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <button
             type="button"
-            className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white focus:outline-none"
+            className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white focus:outline-none glass rounded-xl"
             onClick={() => setSidebarOpen(true)}
           >
-            <Menu size={24} />
+            <Menu size={20} />
           </button>
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 text-white">
-              <div className="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center cyan-glow">
-                <Webhook size={18} className="text-cyan-400" />
-              </div>
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">Premium</span>
-              <span className="text-slate-200">Yönetim</span>
-            </h1>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 ml-11">VentHub B2B Energy Systems</p>
+          <Link href="/admin" className="flex items-center gap-3 group transition-all">
+            <div className="w-9 h-9 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center cyan-glow group-hover:scale-105 transition-transform">
+              <Webhook size={20} className="text-cyan-400" />
+            </div>
+            <div className="flex flex-col">
+              <h1 className="text-lg font-bold tracking-tight text-white leading-none">
+                <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">Vent</span>Hub
+              </h1>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Yönetim Paneli</span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* External Site Link - Standard Requirement */}
+          <Link 
+            href="/" 
+            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white glass border-white/5 hover:border-white/10 rounded-xl transition-all"
+          >
+            <ExternalLink size={14} />
+            <span>Mağazaya Git</span>
+          </Link>
+
+          <div className="w-px h-6 bg-white/5 mx-2 hidden md:block" />
+
+          <AdminRealtimeNotifications />
+          
+          <div className="hidden sm:flex items-center gap-3 pl-2 border-l border-white/5 ml-2">
+            <div className="flex flex-col items-end">
+                <span className="text-xs font-bold text-white leading-none">{user?.user_metadata?.first_name || 'Admin'}</span>
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">{user?.user_metadata?.role || 'Süper Admin'}</span>
+            </div>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-white/10 flex items-center justify-center shrink-0">
+               <span className="text-xs font-bold text-cyan-400">
+                  {(user?.user_metadata?.first_name?.[0] || user?.email?.[0] || 'A').toUpperCase()}
+               </span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <AdminRealtimeNotifications />
-        </div>
-      </div>
+      </header>
 
-      <div className="max-w-[1600px] mx-auto px-4 py-4 grid grid-cols-12 gap-6 relative z-10">
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Mobile Overlay */}
         {sidebarOpen && (
           <div
@@ -204,22 +220,22 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           />
         )}
 
+        {/* Persistent Sidebar */}
         <aside
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           className={`
           fixed inset-y-0 left-0 z-50 w-[280px] bg-[#0A0F1E] border-r border-white/5 shadow-2xl transform transition-transform duration-300 ease-in-out
-          md:relative md:inset-auto md:w-auto md:bg-transparent md:border-r-0 md:shadow-none md:transform-none
-          col-span-12 md:col-span-3 lg:col-span-2
+          md:relative md:inset-auto md:w-64 md:bg-[#0A0F1E]/30 md:backdrop-blur-sm md:transform-none
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
-          <div className="h-full overflow-y-auto p-4 md:p-0 md:h-auto md:overflow-visible">
+          <div className="h-full flex flex-col">
             {/* Mobile Header in Drawer */}
-            <div className="flex items-center justify-between mb-6 md:hidden px-2 pb-4 border-b border-white/5">
+            <div className="flex items-center justify-between p-6 md:hidden border-b border-white/5">
               <div className="flex flex-col">
-                <span className="font-bold text-lg text-white truncate max-w-[180px]">
-                  {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Kullanıcı'}
+                <span className="font-bold text-lg text-white">
+                  {user?.user_metadata?.first_name || 'Admin'}
                 </span>
                 <span className="text-[10px] font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 px-2 py-0.5 rounded-full inline-block mt-1 w-max uppercase tracking-wider">
                   {user?.user_metadata?.role || 'Admin'}
@@ -227,74 +243,100 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
               </div>
               <button
                 type="button"
-                className="p-2 -mr-2 text-slate-400 hover:text-white focus:outline-none glass rounded-full transition-colors"
+                className="p-2 -mr-2 text-slate-400 hover:text-white focus:outline-none glass rounded-xl"
                 onClick={() => setSidebarOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <nav className="glass rounded-2xl p-4 sticky top-6 space-y-6">
+            <nav className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-8 py-8">
               {navGroups.map((group, gi) => {
                 const visibleItems = group.items.filter(item => canAccess(item.href))
                 if (visibleItems.length === 0) return null
 
                 return (
-                  <div key={gi}>
-                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3 px-3">{group.label}</h3>
+                  <div key={gi} className="animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${gi * 100}ms` }}>
+                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-4 px-3 opacity-60 font-sans">{group.label}</h3>
                     <div className="space-y-1">
                       {visibleItems.map((item) => {
                         const Icon = item.icon
                         const isActive = pathname === item.href
                         return (
-                          <a
+                          <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-xl group ${
+                            className={`flex items-center gap-3 px-3 py-2.5 text-sm font-bold transition-all duration-300 rounded-xl group relative overflow-hidden ${
                               isActive 
                                 ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20 cyan-glow' 
-                                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                                : 'text-slate-400 hover:bg-white/[0.03] hover:text-slate-200 border border-transparent'
                             }`}
-                            onClick={() => {
-                              setSidebarOpen(false)
-                            }}
+                            onClick={() => setSidebarOpen(false)}
                           >
-                            <Icon size={18} className={`shrink-0 ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                            <Icon size={18} className={`shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
                             <span className="truncate">{item.label}</span>
-                            {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />}
-                          </a>
+                            {isActive && (
+                                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse" />
+                            )}
+                          </Link>
                         )
                       })}
                     </div>
                   </div>
                 )
               })}
-              
-              {/* User profile footer - Desktop only */}
-              <div className="hidden md:block pt-4 mt-4 border-t border-white/5">
-                <div className="flex items-center gap-3 px-2">
-                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-white/10 flex items-center justify-center shrink-0">
-                    <span className="text-[10px] font-bold text-cyan-400">
-                      {(user?.user_metadata?.first_name?.[0] || user?.email?.[0] || 'A').toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-slate-200 truncate">{user?.user_metadata?.first_name || 'Admin'}</p>
-                    <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider">{user?.user_metadata?.role || 'Super Admin'}</p>
-                  </div>
-                </div>
-              </div>
             </nav>
+
+            <div className="p-4 border-t border-white/5 md:hidden">
+                 <Link 
+                    href="/" 
+                    className="flex items-center justify-center gap-3 w-full py-3 text-xs font-bold text-white bg-cyan-500/20 border border-cyan-500/30 rounded-xl"
+                    onClick={() => setSidebarOpen(false)}
+                >
+                    <ExternalLink size={16} />
+                    <span>Siteye Dön</span>
+                </Link>
+            </div>
           </div>
         </aside>
 
-        <section className="col-span-12 md:col-span-9 lg:col-span-10">
-          <div key={pathname} className="min-h-[calc(100vh-10rem)] transition-all duration-500">
-            {children}
-          </div>
-        </section>
+        {/* Independent Scroll Content Area */}
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col">
+            <div className="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {children}
+            </div>
+            
+            {/* Footer - Optional standard */}
+            <footer className="w-full max-w-[1600px] mx-auto px-8 py-6 text-slate-600 text-[10px] font-black uppercase tracking-[0.2em] flex justify-between items-center opacity-50">
+                <span>© 2026 VentHub HVAC Systems</span>
+                <div className="flex gap-4">
+                    <span className="text-cyan-400/40">v2.4.0 Platinum Edition</span>
+                </div>
+            </footer>
+        </main>
       </div>
+      
       <CommandPalette />
+      
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .cyan-glow {
+          box-shadow: 0 0 15px rgba(34, 211, 238, 0.1);
+        }
+      `}</style>
     </div>
   )
 }

@@ -157,7 +157,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   const hasFilters = !!(select || (toggles && toggles.length > 0) || (chips && chips.length > 0) || rightExtra || onClear)
 
   return (
-    <div className={`${sticky ? 'sticky top-[72px] z-30 mx-0 mb-8' : 'mb-8'} ${className || ''} animate-in fade-in slide-in-from-top-4 duration-500`}>
+    <div className={`${sticky ? 'sticky top-0 z-30 mx-0 mb-8' : 'mb-8'} ${className || ''} animate-in fade-in slide-in-from-top-4 duration-500`}>
       <div className={`rounded-[1.5rem] border border-white/5 shadow-2xl ${sticky ? 'glass-strong backdrop-blur-2xl' : 'glass'} p-2.5 md:p-3 transition-all duration-300`}>
         <div className="flex flex-col md:flex-row md:items-center gap-3">
           {/* Mobil: Arama + Filtre Butonu (Yan yana) */}

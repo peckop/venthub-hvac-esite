@@ -34,6 +34,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
+    const isAdmin = pathname?.startsWith('/admin')
     const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' })
 
     const [enableToaster, setEnableToaster] = React.useState(false)
@@ -154,24 +155,24 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     }, [pathname])
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className={`min-h-screen bg-white ${isAdmin ? 'overflow-hidden' : ''}`}>
             <ScrollToTop />
-            <StickyHeader isScrolled={isScrolled} />
+            {!isAdmin && <StickyHeader isScrolled={isScrolled} />}
 
-            <main id="main-content" className={isScrolled ? 'pt-16' : ''}>
-                <BackToTopButton />
+            <main id="main-content" className={!isAdmin && isScrolled ? 'pt-16' : ''}>
+                {!isAdmin && <BackToTopButton />}
                 {(() => {
                     try { return typeof window !== 'undefined' && localStorage.getItem('vh_pending_order') ? <PaymentWatcher /> : null } catch { return null }
                 })()}
-                <LanguageSwitcher />
+                {!isAdmin && <LanguageSwitcher />}
                 <Suspense fallback={<LoadingSpinner />}>
                     {children}
                 </Suspense>
             </main>
 
-            <Footer />
+            {!isAdmin && <Footer />}
 
-            {enableWhatsApp && (
+            {enableWhatsApp && !isAdmin && (
                 <Suspense fallback={null}>
                     <WhatsAppFloat />
                 </Suspense>
