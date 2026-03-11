@@ -1,5 +1,6 @@
 import PageComponent from '../../../views/ProductDetailPage'
-import { supabase } from '../../../lib/supabase'
+import { getProductById, supabase } from '../../../lib/supabase'
+import type { Product } from '../../../lib/supabase'
 
 export async function generateStaticParams() {
   try {
@@ -48,18 +49,10 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 export default async function Page({ params }: { params: { id: string } }) {
   // Fetch product data for detailed JSON-LD
-  let productData = null;
-  try {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('id', params.id)
-      .single()
-
-    productData = data;
-  } catch (e) {
+  const productData: Product | null = await getProductById(params.id).catch((e) => {
     console.error('fetch error for JSON-LD:', e)
-  }
+    return null
+  })
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -77,7 +70,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     }),
     "offers": {
       "@type": "Offer",
-      "availability": productData?.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "availability": (productData?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "price": productData?.price || "0.00",
       "priceCurrency": "TRY",
       "url": `https://venthub.com/products/${params.id}`

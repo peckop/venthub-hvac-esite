@@ -61,7 +61,7 @@ interface Order {
 
 export default function OrderDetailPage() {
   const searchParams = useSearchParams()
-  const id = searchParams.get('id') as string
+  const id = searchParams?.get('id') ?? ''
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const { t, lang } = useI18n()
