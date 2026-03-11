@@ -437,7 +437,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
               onItemHover={handleNavItemHover}
             />
 
-            <div className="flex-1 max-w-lg hidden sm:flex justify-center md:px-2">
+            <div className="flex-1 max-w-xl hidden sm:flex justify-center md:px-4">
               <NavSearchTrigger
                 label={t('header.commandSearchCompact')}
                 shortcutLabel="/"
