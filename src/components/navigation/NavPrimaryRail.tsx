@@ -76,4 +76,4 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = ({
     )
 }
 
-export default NavPrimaryRail
+export default React.memo(NavPrimaryRail)
