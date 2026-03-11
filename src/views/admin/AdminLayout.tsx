@@ -39,6 +39,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
 
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const isSettingsPage = pathname === '/admin/settings'
   const minSwipeDistance = 50
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -100,7 +101,14 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   }, [])
 
   if (loading || roleLoading) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-500">Yükleniyor...</div>
+    return (
+      <div className="min-h-screen bg-[#0A0F1E] flex flex-col items-center justify-center space-y-6">
+        <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin shadow-[0_0_15px_rgba(34,211,238,0.2)]"></div>
+        <div className="text-slate-400 text-xs font-black uppercase tracking-[0.3em] animate-pulse">
+          Sistem Hazırlanıyor...
+        </div>
+      </div>
+    )
   }
 
   // URL Doğrudan erişim koruması
@@ -147,6 +155,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
         { href: '/admin/users', label: t('admin.menu.users') || 'Kullanıcılar', icon: Users },
         { href: '/admin/webhook-events', label: t('admin.menu.webhookEvents') || 'Webhook Olayları', icon: Webhook },
         { href: '/admin/audit-logs', label: t('admin.menu.logs') || 'Kayıtlar', icon: FileText },
+        { href: '/admin/settings', label: t('admin.menu.settings') || 'Ayarlar', icon: Settings },
         { href: '/admin/errors', label: t('admin.menu.errors') || 'Hatalar', icon: AlertCircle },
         { href: '/admin/error-groups', label: t('admin.menu.errorGroups') || 'Hata Grupları', icon: FolderX },
       ]
@@ -154,33 +163,43 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-12">
-      <div className="max-w-[1400px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center relative z-20">
+    <div className="min-h-screen font-sans transition-colors duration-500 bg-[#0A0F1E] text-slate-200 overflow-x-hidden">
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary-navy/20 blur-[120px] rounded-full opacity-50" />
+        <div className="absolute top-[20%] -right-[10%] w-[30%] h-[50%] bg-secondary-blue/10 blur-[100px] rounded-full opacity-30" />
+      </div>
+
+      <div className="max-w-[1600px] mx-auto px-4 pt-6 pb-2 flex justify-between items-center relative z-20">
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 focus:outline-none"
+            className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white focus:outline-none"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu size={24} />
           </button>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <span className="bg-gradient-to-r from-primary-navy to-secondary-blue text-transparent bg-clip-text">Premium</span>
-              Yönetim
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2 text-white">
+              <div className="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center cyan-glow">
+                <Webhook size={18} className="text-cyan-400" />
+              </div>
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">Premium</span>
+              <span className="text-slate-200">Yönetim</span>
             </h1>
-            <p className="text-xs text-slate-500 font-medium hidden sm:block">VentHub B2B Platform</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5 ml-11">VentHub B2B Energy Systems</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <AdminRealtimeNotifications />
         </div>
       </div>
-      <div className="max-w-[1400px] mx-auto px-4 py-4 grid grid-cols-12 gap-8">
+
+      <div className="max-w-[1600px] mx-auto px-4 py-4 grid grid-cols-12 gap-6 relative z-10">
         {/* Mobile Overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 md:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -190,57 +209,59 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           className={`
-          fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 shadow-2xl transform transition-transform duration-300 ease-in-out
-          md:relative md:inset-auto md:w-auto md:bg-transparent md:shadow-none md:transform-none
+          fixed inset-y-0 left-0 z-50 w-[280px] bg-[#0A0F1E] border-r border-white/5 shadow-2xl transform transition-transform duration-300 ease-in-out
+          md:relative md:inset-auto md:w-auto md:bg-transparent md:border-r-0 md:shadow-none md:transform-none
           col-span-12 md:col-span-3 lg:col-span-2
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}>
           <div className="h-full overflow-y-auto p-4 md:p-0 md:h-auto md:overflow-visible">
             {/* Mobile Header in Drawer */}
-            <div className="flex items-center justify-between mb-6 md:hidden px-2 pb-4 border-b border-slate-200">
+            <div className="flex items-center justify-between mb-6 md:hidden px-2 pb-4 border-b border-white/5">
               <div className="flex flex-col">
-                <span className="font-bold text-lg text-slate-900 truncate max-w-[180px]">
+                <span className="font-bold text-lg text-white truncate max-w-[180px]">
                   {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Kullanıcı'}
                 </span>
-                <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full inline-block mt-1 w-max">
-                  {user?.user_metadata?.role || 'Üye'}
+                <span className="text-[10px] font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 px-2 py-0.5 rounded-full inline-block mt-1 w-max uppercase tracking-wider">
+                  {user?.user_metadata?.role || 'Admin'}
                 </span>
               </div>
               <button
                 type="button"
-                className="p-2 -mr-2 text-slate-500 hover:text-slate-900 focus:outline-none bg-slate-200/50 hover:bg-slate-200 rounded-full transition-colors"
+                className="p-2 -mr-2 text-slate-400 hover:text-white focus:outline-none glass rounded-full transition-colors"
                 onClick={() => setSidebarOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
 
-            <nav className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-5 sticky top-24 space-y-5">
+            <nav className="glass rounded-2xl p-4 sticky top-6 space-y-6">
               {navGroups.map((group, gi) => {
                 const visibleItems = group.items.filter(item => canAccess(item.href))
                 if (visibleItems.length === 0) return null
 
                 return (
                   <div key={gi}>
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">{group.label}</h3>
-                    <div className="space-y-0.5">
+                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3 px-3">{group.label}</h3>
+                    <div className="space-y-1">
                       {visibleItems.map((item) => {
                         const Icon = item.icon
+                        const isActive = pathname === item.href
                         return (
                           <a
                             key={item.href}
                             href={item.href}
-                            className={adminNavClass(pathname === item.href)}
+                            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-xl group ${
+                              isActive 
+                                ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20 cyan-glow' 
+                                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                            }`}
                             onClick={() => {
-                              // Router Cache Bypass (TAM SAYFA YENILEME - HARD NAVIGATION):
-                              // 'output: export' statik modunda SPA Component unmount sorununu aşmak için
-                              // e.preventDefault() KULLANMIYORUZ. Tıpkı F5 yapılmış gibi sayfa yeniden yüklenecek ve 
-                              // en güncel veri Supabase'den çekilecektir. Sadece mobilde sidebar'ı kapatıyoruz.
                               setSidebarOpen(false)
                             }}
                           >
-                            <Icon size={18} className="shrink-0" />
+                            <Icon size={18} className={`shrink-0 ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
                             <span className="truncate">{item.label}</span>
+                            {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />}
                           </a>
                         )
                       })}
@@ -248,11 +269,27 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
                   </div>
                 )
               })}
+              
+              {/* User profile footer - Desktop only */}
+              <div className="hidden md:block pt-4 mt-4 border-t border-white/5">
+                <div className="flex items-center gap-3 px-2">
+                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-white/10 flex items-center justify-center shrink-0">
+                    <span className="text-[10px] font-bold text-cyan-400">
+                      {(user?.user_metadata?.first_name?.[0] || user?.email?.[0] || 'A').toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-slate-200 truncate">{user?.user_metadata?.first_name || 'Admin'}</p>
+                    <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider">{user?.user_metadata?.role || 'Super Admin'}</p>
+                  </div>
+                </div>
+              </div>
             </nav>
           </div>
         </aside>
+
         <section className="col-span-12 md:col-span-9 lg:col-span-10">
-          <div key={pathname} className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 lg:p-8 min-h-[calc(100vh-8rem)] flex flex-col">
+          <div key={pathname} className="min-h-[calc(100vh-10rem)] transition-all duration-500">
             {children}
           </div>
         </section>

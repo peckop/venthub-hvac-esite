@@ -6,7 +6,15 @@ import { useRouter, usePathname } from 'next/navigation'
 import { ChevronRight, Package, Clock, CheckCircle, XCircle, Truck, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { syncOrderFromReturn } from '../../lib/orderStatusService'
-import { adminSectionTitleClass, adminTableHeadCellClass, adminTableCellClass, adminCardClass, adminTableActionPrimaryClass } from '../../utils/adminUi'
+import { 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminTableHeadCellClass, 
+  adminTableCellClass, 
+  adminCardClass, 
+  adminTableActionPrimaryClass,
+  adminButtonSecondaryClass 
+} from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -310,14 +318,14 @@ export default function AdminReturnsPage() {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'requested': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200'
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200'
-      case 'in_transit': return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'received': return 'bg-purple-100 text-purple-800 border-purple-200'
-      case 'refunded': return 'bg-green-200 text-green-900 border-green-300'
-      case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-200'
-      default: return 'bg-gray-100 text-gray-600 border-gray-200'
+      case 'requested': return 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+      case 'approved': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+      case 'rejected': return 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+      case 'in_transit': return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20'
+      case 'received': return 'bg-violet-500/10 text-violet-500 border-violet-500/20'
+      case 'refunded': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+      case 'cancelled': return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
     }
   }
 
@@ -342,7 +350,7 @@ export default function AdminReturnsPage() {
     cancelled: []
   }
 
-  // Görünür kolonlar ve yoğunluk (erken - hooks unconditional)
+  // Görünür kolonlar ve yoğunluk
   const STORAGE_KEY = 'toolbar:returns'
   const [visibleCols, setVisibleCols] = useState<{ order: boolean; customer: boolean; reason: boolean; status: boolean; date: boolean }>({ order: true, customer: true, reason: true, status: true, date: true })
   const [density, setDensity] = useState<Density>('comfortable')
@@ -351,8 +359,6 @@ export default function AdminReturnsPage() {
   useEffect(() => { try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { } }, [density])
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
-
-  // Sayfa izli kisiden de erisilebilmesi icin access-denied kontrolu artik AdminLayout'tan yapilmaktadir
 
   function exportCsv() {
     const header = [
@@ -411,20 +417,21 @@ export default function AdminReturnsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h2>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={loadReturns}
-            disabled={isLoading}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
-          >
-            {isLoading ? 'İadeler Yükleniyor...' : 'Yenile'}
-          </button>
-          <div className="text-sm text-slate-500">{_t('admin.returns.total', { count: returns.length })}</div>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h1>
+          <p className={adminSubtitleClass}>{_t('admin.returns.total', { count: returns.length })} iade talebi yönetiliyor.</p>
         </div>
-      </div>
+        <button
+          onClick={loadReturns}
+          disabled={isLoading}
+          className={adminButtonSecondaryClass}
+        >
+          <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
+          {isLoading ? 'Güncelleniyor...' : _t('admin.ui.refresh')}
+        </button>
+      </header>
 
       {/* Filtreler */}
       <AdminToolbar
@@ -463,44 +470,51 @@ export default function AdminReturnsPage() {
       {isLoading && returns.length === 0 ? (
         <AdminSkeleton variant="table" rows={6} count={7} />
       ) : filteredReturns.length === 0 ? (
-        <AdminEmptyState
-          icon={Undo2}
-          title={searchQuery || !Object.values(statusFilter).every(Boolean) ? _t('admin.returns.empty.filtered')! : _t('admin.returns.empty.none')!}
-          description="Şu anda aktif bir iade veya değişim talebi bulunmuyor."
-        />
+        <div className={`${adminCardClass} py-20 bg-[#0A0F1E]/20`}>
+          <AdminEmptyState
+            icon={Undo2}
+            title={searchQuery || !Object.values(statusFilter).every(Boolean) ? _t('admin.returns.empty.filtered')! : _t('admin.returns.empty.none')!}
+            description="Şu anda aktif bir iade veya değişim talebi bulunmuyor."
+          />
+        </div>
       ) : (
-        <div className={`${adminCardClass} overflow-hidden`}>
-          <div ref={dragScrollRef} className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-sm">
-              <thead className="bg-gray-50">
+        <div className={`${adminCardClass} overflow-hidden group`}>
+          <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar">
+            <table className="w-full min-w-[800px] text-sm border-collapse">
+              <thead className="glass-strong">
                 <tr>
-                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
-                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
-                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
-                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
-                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:underline" onClick={() => toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
-                  <th className={`${adminTableHeadCellClass} ${headPad}`}>{_t('admin.returns.table.actions')}</th>
+                  {visibleCols.order && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('order')}>{_t('admin.returns.table.order')} {sortIndicator('order')}</button></th>)}
+                  {visibleCols.customer && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('customer')}>{_t('admin.returns.table.customer')} {sortIndicator('customer')}</button></th>)}
+                  {visibleCols.reason && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('reason')}>{_t('admin.returns.table.reason')} {sortIndicator('reason')}</button></th>)}
+                  {visibleCols.status && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('status')}>{_t('admin.returns.table.status')} {sortIndicator('status')}</button></th>)}
+                  {visibleCols.date && (<th className={`${adminTableHeadCellClass} ${headPad}`}><button type="button" className="hover:text-cyan-400 transition-colors uppercase tracking-[0.2em]" onClick={() => toggleSort('date')}>{_t('admin.returns.table.date')} {sortIndicator('date')}</button></th>)}
+                  <th className={adminTableHeadCellClass}>{_t('admin.returns.table.actions')}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {sortedReturns.map((returnItem, index) => {
                   const orderNo = returnItem.order_number ?
                     `#${returnItem.order_number.split('-')[1]}` :
                     `#${returnItem.order_id.slice(-8).toUpperCase()}`
 
                   return (
-                    <tr key={returnItem.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                    <tr 
+                      key={returnItem.id} 
+                      className="group/row border-b border-white/5 hover:bg-white/[0.02] transition-colors duration-300"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
                       {visibleCols.order && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className="flex flex-col">
+                          <div className="flex flex-col gap-0.5">
                             <button
                               onClick={() => router.push(`/admin/orders?q=${returnItem.order_number || returnItem.order_id}`)}
-                              className="text-primary-navy hover:underline font-medium text-left"
+                              className="text-cyan-400 hover:text-cyan-300 font-black text-left transition-colors uppercase tracking-wider"
                             >
                               {orderNo}
                             </button>
                             {returnItem.total_amount && (
-                              <span className="text-xs text-slate-500">
+                              <span className="text-[10px] font-black text-white/50 uppercase tracking-widest flex items-center gap-1">
+                                <div className="w-1 h-[1px] bg-white/10"></div>
                                 {formatCurrency(Number(returnItem.total_amount), lang)}
                               </span>
                             )}
@@ -509,18 +523,18 @@ export default function AdminReturnsPage() {
                       )}
                       {visibleCols.customer && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className="flex flex-col">
-                            <span className="font-medium text-slate-700">{returnItem.customer_name}</span>
-                            <span className="text-xs text-slate-500">{returnItem.customer_email}</span>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-black text-white uppercase tracking-tight">{returnItem.customer_name}</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{returnItem.customer_email}</span>
                           </div>
                         </td>
                       )}
                       {visibleCols.reason && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className="max-w-xs">
-                            <div className="font-medium text-slate-700">{returnItem.reason}</div>
+                          <div className="max-w-xs space-y-1">
+                            <div className="font-black text-[11px] text-slate-200 uppercase tracking-wider">{returnItem.reason}</div>
                             {returnItem.description && (
-                              <div className="text-xs text-slate-500 mt-1 truncate" title={returnItem.description}>
+                              <div className="text-[10px] font-bold text-slate-500 leading-relaxed truncate uppercase tracking-widest" title={returnItem.description}>
                                 {returnItem.description}
                               </div>
                             )}
@@ -529,7 +543,7 @@ export default function AdminReturnsPage() {
                       )}
                       {visibleCols.status && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-md border text-xs font-medium ${getStatusColor(returnItem.status)}`}>
+                          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${getStatusColor(returnItem.status)}`}>
                             {getStatusIcon(returnItem.status)}
                             {getStatusLabel(returnItem.status)}
                           </div>
@@ -537,29 +551,32 @@ export default function AdminReturnsPage() {
                       )}
                       {visibleCols.date && (
                         <td className={`${adminTableCellClass} ${cellPad}`}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{formatDate(returnItem.created_at, lang)}</span>
-                            <span className="text-xs text-slate-500">{formatTime(returnItem.created_at, lang)}</span>
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-black text-white tracking-widest text-[10px] uppercase">{formatDate(returnItem.created_at, lang)}</span>
+                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                              <div className="inline-block w-1.5 h-[1px] bg-white/10 mr-1 align-middle"></div>
+                              {formatTime(returnItem.created_at, lang)}
+                            </span>
                           </div>
                         </td>
                       )}
-                      <td className={`px-4 ${density === 'compact' ? 'py-2' : 'py-3'}`}>
+                      <td className={`px-6 ${density === 'compact' ? 'py-2' : 'py-5'} align-middle border-b border-white/5`}>
                         {hasWriteAccess ? (
-                          <div className="flex gap-1">
+                          <div className="flex gap-1.5">
                             {nextStatuses[returnItem.status]?.map(status => (
                               <button
                                 key={status}
                                 onClick={() => handleStatusUpdate(returnItem.id, status)}
                                 disabled={updatingStatus === returnItem.id}
-                                className={`${adminTableActionPrimaryClass} disabled:opacity-50 gap-1`}
+                                className={`${adminTableActionPrimaryClass} !px-3 !h-7 disabled:opacity-50 gap-1 sm:opacity-0 sm:group-hover/row:opacity-100 transition-all duration-300 transform sm:translate-x-1 sm:group-hover/row:translate-x-0`}
                                 title={_t('admin.returns.actions.markAs', { status: getStatusLabel(status) }) as string}
                               >
                                 {updatingStatus === returnItem.id ? (
-                                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                                  <div className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                   <>
-                                    {getStatusLabel(status)}
-                                    <ChevronRight size={12} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{getStatusLabel(status)}</span>
+                                    <ChevronRight size={10} strokeWidth={3} />
                                   </>
                                 )}
                               </button>
@@ -580,6 +597,7 @@ export default function AdminReturnsPage() {
     </div>
   )
 }
+
 
 
 

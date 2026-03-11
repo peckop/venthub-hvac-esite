@@ -14,33 +14,28 @@ interface InventoryReservedTableProps {
 }
 
 export default function InventoryReservedTable({ reservedOrders }: InventoryReservedTableProps) {
+    if (reservedOrders.length === 0) return null;
+
     return (
-        <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-tight">Rezerve Eden Siparişler</h3>
-            {reservedOrders.length === 0 ? (
-                <div className="text-sm text-slate-500">Bekleyen sipariş yok.</div>
-            ) : (
-                <div className="border border-slate-100 rounded-lg overflow-hidden">
-                    <table className="w-full text-xs">
-                        <thead className="bg-slate-50 border-b border-slate-100">
-                            <tr>
-                                <th className="text-left p-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sipariş</th>
-                                <th className="text-left p-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tarih</th>
-                                <th className="text-right p-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Adet</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-50">
-                            {reservedOrders.map(ro => (
-                                <tr key={ro.order_id} className="hover:bg-slate-50 animate-in fade-in duration-300">
-                                    <td className="p-2 text-primary-navy font-bold uppercase font-mono tracking-tighter">{ro.order_id.slice(-8)}</td>
-                                    <td className="p-2 text-slate-500">{formatDateTime(ro.created_at, 'tr')}</td>
-                                    <td className="p-2 text-right font-medium text-slate-700">{ro.quantity}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-        </section>
+        <div className="overflow-hidden">
+            <table className="w-full text-xs border-separate border-spacing-0">
+                <thead>
+                    <tr className="bg-white/[0.02]">
+                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Sipariş</th>
+                        <th className="text-left px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Tarih</th>
+                        <th className="text-right px-4 py-3 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] border-b border-white/5">Adet</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-transparent">
+                    {reservedOrders.map(ro => (
+                        <tr key={ro.order_id} className="hover:bg-white/[0.02] transition-colors group">
+                            <td className="px-4 py-3 text-cyan-400 font-black uppercase font-mono tracking-tighter border-b border-white/5 group-last:border-0">{ro.order_id.slice(-8)}</td>
+                            <td className="px-4 py-3 text-slate-500 font-bold border-b border-white/5 group-last:border-0">{formatDateTime(ro.created_at, 'tr')}</td>
+                            <td className="px-4 py-3 text-right font-black text-slate-300 border-b border-white/5 group-last:border-0">{ro.quantity}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     )
 }

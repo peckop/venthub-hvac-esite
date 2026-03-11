@@ -10,7 +10,27 @@ import SalesChart from '../../components/admin/dashboard/SalesChart'
 import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
 import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
-import { ShoppingBag, TrendingUp, HandCoins, PackagePlus, Calculator, AlertCircle, ChevronRight, PackageSearch, Undo2, BellRing, Database } from 'lucide-react'
+import { 
+  TrendingUp, 
+  ArrowDownRight, 
+  ChevronRight, 
+  PackageSearch,
+  Users,
+  AlertCircle,
+  Clock,
+  BarChart3,
+  PieChart,
+  ShoppingCart,
+  Boxes,
+  Truck,
+  ShoppingBag,
+  HandCoins,
+  PackagePlus,
+  Calculator,
+  Undo2,
+  BellRing,
+  Database
+} from 'lucide-react'
 import { DateRange } from 'react-day-picker'
 import DateRangePicker from '../../components/admin/DateRangePicker'
 import { startOfDay, endOfDay, differenceInDays, subDays } from 'date-fns'
@@ -65,10 +85,8 @@ const AdminDashboardPage: React.FC = () => {
     try {
       setLoading(true)
       setError(null)
-      // Proaktif oturum kontrolü
       await ensureSessionFresh()
 
-      // Orders count and sales total within range
       const ordersQuery = supabase
         .from('venthub_orders')
         .select('id, total_amount, created_at, status, order_number', { count: 'exact' })
@@ -76,7 +94,6 @@ const AdminDashboardPage: React.FC = () => {
         .order('created_at', { ascending: false })
         .limit(1000)
 
-      // Previous period query for trends
       const prevOrdersQuery = supabase
         .from('venthub_orders')
         .select('id, total_amount', { count: 'exact' })
@@ -86,18 +103,15 @@ const AdminDashboardPage: React.FC = () => {
       const [ordersRes, prevOrdersRes, returnsRes, shipRes, shipListRes, returnsListRes, shipAgeRes, returnsWeeklyRes] = await Promise.all([
         ordersQuery,
         prevOrdersQuery,
-        // Pending returns (not time-bound): requested/approved/in_transit/received
         supabase
           .from('venthub_returns')
           .select('id', { count: 'exact', head: true })
           .in('status', ['requested', 'approved', 'in_transit', 'received']),
-        // Pending shipments: not shipped yet and status confirmed/processing
         supabase
           .from('venthub_orders')
           .select('id', { count: 'exact', head: true })
           .is('shipped_at', null)
           .in('status', ['confirmed', 'processing']),
-        // Lists for breakdowns
         supabase
           .from('venthub_orders')
           .select('carrier, shipping_carrier')
@@ -109,45 +123,35 @@ const AdminDashboardPage: React.FC = () => {
           .select('status')
           .in('status', ['requested', 'approved', 'in_transit', 'received'])
           .limit(1000),
-        // For age buckets
         supabase
           .from('venthub_orders')
           .select('created_at')
           .is('shipped_at', null)
           .in('status', ['confirmed', 'processing'])
           .limit(2000),
-        // For weekly returns trend
         supabase
           .from('venthub_returns')
           .select('requested_at')
           .in('status', ['requested', 'approved', 'in_transit', 'received'])
           .gte('requested_at', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString())
           .limit(5000),
-        // Envanter özetleri: Bağlı Sermaye, ABC, Alarmlar
         supabase
           .from('products')
           .select('stock_qty, price, low_stock_threshold')
           .gt('stock_qty', 0)
       ])
 
-      // ... Stok verilerini ayrı bir state veya call ile çeksek daha güvenli? (Fazla ürün yoksa sorun olmaz)
       const productsRes = await supabase.from('products').select('stock_qty, price, low_stock_threshold')
       if (!productsRes.error && productsRes.data) {
         const prods = productsRes.data as { stock_qty: number | null, price: number | null, low_stock_threshold: number | null }[]
-
-        // Bağlı Sermaye
         const capital = prods.reduce((acc, p) => {
           const stockQty = p.stock_qty ?? 0
           const price = p.price ?? 0
           return acc + (stockQty > 0 ? stockQty * price : 0)
         }, 0)
         setTiedCapital(capital)
-
-        // Alarm sayısı (stoku eşik altında olanlar)
         const alarms = prods.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length
         setAlarmCount(alarms)
-
-        // ABC (Geri bildirime göre daha sonra eklenecek veya view üzerinden çekilecek)
         setAbcDist([
           { name: 'A', value: 0, color: '#10b981' },
           { name: 'B', value: 0, color: '#3b82f6' },
@@ -162,13 +166,11 @@ const AdminDashboardPage: React.FC = () => {
       setOrdersCount(typeof ordersRes.count === 'number' ? ordersRes.count : list.length)
       setSalesTotal(sum)
 
-      // Previous period calculation
       const prevList = (prevOrdersRes.data || []) as Array<{ total_amount?: number | string | null }>
       const prevSum = prevList.reduce((acc, it) => acc + Number(it.total_amount || 0), 0)
       setPrevOrdersCount(typeof prevOrdersRes.count === 'number' ? prevOrdersRes.count : prevList.length)
       setPrevSalesTotal(prevSum)
 
-      // build daily counts (last N days depending on range)
       const r_start = dateRange?.from ? startOfDay(dateRange.from) : startOfDay(new Date())
       const r_end = dateRange?.to ? endOfDay(dateRange.to) : endOfDay(new Date())
       const days = Math.max(1, differenceInDays(r_end, r_start) + 1)
@@ -182,7 +184,6 @@ const AdminDashboardPage: React.FC = () => {
         dataMap.set(key, { date: key, orders: 0, returns: 0 })
       }
 
-      // Fill orders
       list.forEach(o => {
         const key = new Date(o.created_at).toISOString().slice(0, 10)
         if (dataMap.has(key)) {
@@ -191,8 +192,6 @@ const AdminDashboardPage: React.FC = () => {
         }
       })
 
-      // Fill returns (if available in historical data)
-      // Since returnsWeeklyRes fetches last 60 days, we can use it to fill the daily map
       const rlist_all = (returnsWeeklyRes.data || []) as Array<{ requested_at: string | null }>
       rlist_all.forEach(r => {
         if (!r.requested_at) return
@@ -206,12 +205,11 @@ const AdminDashboardPage: React.FC = () => {
       const daily = Array.from(dataMap.values()).sort((a, b) => a.date.localeCompare(b.date))
       setDailyCounts(daily as unknown as { date: string; orders: number; revenue: number; returns: number }[])
 
-      // Calculate Heatmap Data
       const heatmapMap = new Map<string, number>()
       list.forEach(o => {
         const d = new Date(o.created_at)
-        const day = d.getDay() // 0-6 (Sun-Sat)
-        const hour = d.getHours() // 0-23
+        const day = d.getDay()
+        const hour = d.getHours()
         const key = `${day}-${hour}`
         heatmapMap.set(key, (heatmapMap.get(key) || 0) + 1)
       })
@@ -221,20 +219,11 @@ const AdminDashboardPage: React.FC = () => {
       })
       setActivityData(heatData)
 
-      // recent orders (top 10)
       setRecentOrders(list.slice(0, 10).map(o => ({ id: o.id, created_at: o.created_at, total_amount: Number(o.total_amount || 0), status: o.status || 'pending', order_number: o.order_number || null })))
-
-      if (returnsRes.error) throw returnsRes.error
-      if (shipRes.error) throw shipRes.error
-      if (shipListRes.error) throw shipListRes.error
-      if (returnsListRes.error) throw returnsListRes.error
-      if (shipAgeRes.error) throw shipAgeRes.error
-      if (returnsWeeklyRes.error) throw returnsWeeklyRes.error
 
       setPendingReturns(returnsRes.count ?? 0)
       setPendingShipments(shipRes.count ?? 0)
 
-      // Build carrier distribution
       const shipList = (shipListRes.data || []) as Array<{ carrier: string | null; shipping_carrier: string | null }>
       const dist = new Map<string, number>()
       shipList.forEach(s => {
@@ -243,7 +232,6 @@ const AdminDashboardPage: React.FC = () => {
       })
       setCarrierDist(Array.from(dist.entries()).map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count))
 
-      // Build returns status breakdown
       const rlist = (returnsListRes.data || []) as Array<{ status: string | null }>
       const byStatus = new Map<string, number>()
       rlist.forEach(r => {
@@ -252,7 +240,6 @@ const AdminDashboardPage: React.FC = () => {
       })
       setReturnsByStatus(Array.from(byStatus.entries()).map(([status, count]) => ({ status, count })).sort((a, b) => b.count - a.count))
 
-      // Build shipments age buckets (0–1g, 2–3g, 4g+)
       const ageList = (shipAgeRes.data || []) as Array<{ created_at: string }>
       const now = Date.now()
       const ages = { '0–1g': 0, '2–3g': 0, '4g+': 0 }
@@ -265,7 +252,6 @@ const AdminDashboardPage: React.FC = () => {
       })
       setShipAges(Object.entries(ages).map(([bucket, count]) => ({ bucket, count })))
 
-      // Weekly returns trend (by requested_at, last ~8 weeks)
       const rw = (returnsWeeklyRes.data || []) as Array<{ requested_at: string | null }>
       const byWeek = new Map<string, number>()
       const weeks = 8
@@ -279,7 +265,7 @@ const AdminDashboardPage: React.FC = () => {
       rw.forEach(r => {
         if (!r.requested_at) return
         const d = new Date(r.requested_at)
-        d.setUTCDate(d.getUTCDate() - d.getUTCDay()) // hafta başına yuvarla (Pazar)
+        d.setUTCDate(d.getUTCDate() - d.getUTCDay())
         d.setUTCHours(0, 0, 0, 0)
         const key = d.toISOString().slice(0, 10)
         if (byWeek.has(key)) byWeek.set(key, (byWeek.get(key) || 0) + 1)
@@ -300,13 +286,21 @@ const AdminDashboardPage: React.FC = () => {
   React.useEffect(() => { loadKPIs() }, [loadKPIs, pathname])
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className={adminSectionTitleClass}>{t('admin.titles.dashboard')}</h1>
-          <p className={adminSubtitleClass}>{t('admin.dashboard.subtitle')}</p>
+    <div className="space-y-10 pb-20">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-white/5 relative">
+        {/* Decorative background glow */}
+        <div className="absolute -left-20 -top-20 w-64 h-64 bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none" />
+        
+        <div className="relative z-10">
+          <h1 className={adminSectionTitleClass}>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-400 to-blue-500">
+              {t('admin.titles.dashboard')}
+            </span>
+          </h1>
+          <p className={adminSubtitleClass}>Sistem genelindeki operasyonel verileri, satış trendlerini ve KPI'ları anlık olarak analiz edin.</p>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <div className="flex items-center gap-3 glass p-2 rounded-2xl border border-white/5 backdrop-blur-2xl self-start shadow-2xl relative z-10 transition-all hover:border-white/20">
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
       </header>
@@ -391,29 +385,30 @@ const AdminDashboardPage: React.FC = () => {
       </section>
 
       {/* Primary Chart Area */}
-      <section className="w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
-        <SalesChart
-          title="Sipariş Trendi"
-          data={dailyCounts}
-        />
-      </section>
-
-      {/* Heatmap Area */}
-      <section className="w-full bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
-        <ActivityHeatmap
-          title="Gelişmiş Sipariş Yoğunluk Haritası (Seçili Aralık)"
-          data={activityData}
-        />
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="xl:col-span-8 glass-strong border border-white/5 p-8 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] group rounded-[2.5rem]">
+          <SalesChart
+            title="Sipariş Trendi"
+            data={dailyCounts}
+          />
+        </div>
+        <div className="xl:col-span-4 glass-strong border border-white/5 p-8 overflow-hidden transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] group rounded-[2.5rem]">
+          <ActivityHeatmap
+            title="Sipariş Yoğunluğu"
+            data={activityData}
+          />
+        </div>
       </section>
 
       {/* Breakdown sections */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">Kargo Dağılımı</h3>
-            <Link href="/admin/orders?preset=pendingShipments" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
-              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="glass-strong border border-white/5 p-10 flex flex-col h-full group hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 rounded-[2.5rem]">
+          <div className="flex items-center justify-between mb-10 group/header">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover/header:text-cyan-400 transition-colors">Kargo Dağılımı</h3>
+              <div className="h-0.5 w-8 bg-cyan-500/30 rounded-full group-hover/header:w-16 transition-all duration-700" />
+            </div>
+            <TrendingUp className="w-5 h-5 text-slate-600 group-hover/header:text-cyan-400 transition-colors duration-500" />
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {carrierDist.length === 0 ? (
@@ -424,15 +419,15 @@ const AdminDashboardPage: React.FC = () => {
                 compact
               />
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {(() => {
                   const max = Math.max(1, ...carrierDist.map(x => x.count)); return carrierDist.map(({ key, count }) => (
-                    <div key={key} className="flex items-center gap-4 text-sm">
-                      <div className="w-32 font-medium text-slate-700 truncate" title={key}>{key}</div>
-                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                        <div className="bg-blue-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    <div key={key} className="flex items-center gap-6 text-sm">
+                      <div className="w-32 font-black text-slate-400 uppercase text-[10px] tracking-widest truncate" title={key}>{key}</div>
+                      <div className="flex-1 bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                        <div className="bg-gradient-to-r from-cyan-600 to-cyan-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(34,211,238,0.5)]" style={{ width: `${Math.round((count / max) * 100)}%` }} />
                       </div>
-                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
+                      <div className="w-10 font-black text-right text-white tracking-widest text-[12px]">{count}</div>
                     </div>
                   ))
                 })()}
@@ -440,12 +435,14 @@ const AdminDashboardPage: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">İade Durum Kırılımı</h3>
-            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
-              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
+
+        <div className="glass-strong border border-white/5 p-10 flex flex-col h-full group hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-500 rounded-[2.5rem]">
+          <div className="flex items-center justify-between mb-10 group/header">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover/header:text-rose-400 transition-colors">İade Durum Kırılımı</h3>
+              <div className="h-0.5 w-8 bg-rose-500/30 rounded-full group-hover/header:w-16 transition-all duration-700" />
+            </div>
+            <PieChart className="w-5 h-5 text-slate-600 group-hover/header:text-rose-400 transition-colors duration-500" />
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {returnsByStatus.length === 0 ? (
@@ -456,15 +453,15 @@ const AdminDashboardPage: React.FC = () => {
                 compact
               />
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {(() => {
                   const max = Math.max(1, ...returnsByStatus.map(x => x.count)); return returnsByStatus.map(({ status, count }) => (
-                    <div key={status} className="flex items-center gap-4 text-sm">
-                      <div className="w-32 font-medium text-slate-700 truncate" title={status}>{status}</div>
-                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                        <div className="bg-rose-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    <div key={status} className="flex items-center gap-6 text-sm">
+                      <div className="w-32 font-black text-slate-400 uppercase text-[10px] tracking-widest truncate" title={status}>{status}</div>
+                      <div className="flex-1 bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                        <div className="bg-gradient-to-r from-rose-600 to-rose-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(244,63,94,0.3)]" style={{ width: `${Math.round((count / max) * 100)}%` }} />
                       </div>
-                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
+                      <div className="w-10 font-black text-right text-white tracking-widest text-[12px]">{count}</div>
                     </div>
                   ))
                 })()}
@@ -475,13 +472,14 @@ const AdminDashboardPage: React.FC = () => {
       </section>
 
       {/* Age buckets + weekly returns trend */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">Bekleyen Kargo (Yaş)</h3>
-            <Link href="/admin/orders?preset=pendingShipments" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
-              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="glass-strong border border-white/5 p-10 flex flex-col h-full rounded-[2.5rem]">
+          <div className="flex items-center justify-between mb-10 group/header">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-[12px] font-black text-slate-500 uppercase tracking-[0.3em] group-hover/header:text-violet-400 transition-colors">Bekleyen Kargo (Yaş)</h3>
+              <div className="h-0.5 w-8 bg-violet-500/30 rounded-full group-hover/header:w-16 transition-all duration-700" />
+            </div>
+            <PackageSearch className="w-5 h-5 text-slate-600 group-hover/header:text-violet-400 transition-colors duration-500" />
           </div>
           <div className="flex-1 flex flex-col justify-center">
             {shipAges.length === 0 ? (
@@ -492,15 +490,15 @@ const AdminDashboardPage: React.FC = () => {
                 compact
               />
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {(() => {
                   const max = Math.max(1, ...shipAges.map(x => x.count)); return shipAges.map(({ bucket, count }) => (
-                    <div key={bucket} className="flex items-center gap-4 text-sm">
-                      <div className="w-20 font-medium text-slate-700 truncate" title={bucket}>{bucket}</div>
-                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                        <div className="bg-violet-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    <div key={bucket} className="flex items-center gap-6 text-sm">
+                      <div className="w-20 font-black text-slate-400 uppercase text-[10px] tracking-widest truncate" title={bucket}>{bucket}</div>
+                      <div className="flex-1 bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                        <div className="bg-gradient-to-r from-violet-600 to-violet-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(139,92,246,0.3)]" style={{ width: `${Math.round((count / max) * 100)}%` }} />
                       </div>
-                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
+                      <div className="w-10 font-black text-right text-white tracking-widest text-[12px]">{count}</div>
                     </div>
                   ))
                 })()}
@@ -508,11 +506,11 @@ const AdminDashboardPage: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest">İadeler - Haftalık Trend</h3>
-            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-sm font-medium text-primary-navy hover:text-primary-navy/80 flex items-center gap-1 group">
-              Tümü <ChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+        <div className="glass-strong border border-white/5 p-10 flex flex-col h-full rounded-[2.5rem]">
+          <div className="flex items-center justify-between mb-10">
+            <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">İadeler - Haftalık Trend</h3>
+            <Link href="/admin/returns?status=requested,approved,in_transit,received" className="text-[11px] font-black text-white uppercase tracking-widest px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all flex items-center gap-2 border border-white/5 group">
+              Tümü <ChevronRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
           <div className="flex-1 flex flex-col justify-center">
@@ -524,15 +522,15 @@ const AdminDashboardPage: React.FC = () => {
                 compact
               />
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {(() => {
                   const max = Math.max(1, ...returnsWeekly.map(x => x.count)); return returnsWeekly.map(({ week, count }) => (
-                    <div key={week} className="flex items-center gap-4 text-sm">
-                      <div className="w-24 font-medium text-slate-700 truncate" title={week}>{week}</div>
-                      <div className="flex-1 bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                        <div className="bg-emerald-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+                    <div key={week} className="flex items-center gap-6 text-sm">
+                      <div className="w-24 font-black text-slate-400 uppercase text-[10px] tracking-widest truncate" title={week}>{week}</div>
+                      <div className="flex-1 bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+                        <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: `${Math.round((count / max) * 100)}%` }} />
                       </div>
-                      <div className="w-8 font-semibold text-right text-slate-600">{count}</div>
+                      <div className="w-10 font-black text-right text-white tracking-widest text-[12px]">{count}</div>
                     </div>
                   ))
                 })()}
@@ -543,21 +541,18 @@ const AdminDashboardPage: React.FC = () => {
       </section>
 
       {/* ABC Sınıflandırması */}
-      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 overflow-hidden">
+      <section className="glass-strong border border-white/5 p-10 overflow-hidden rounded-[2.5rem]">
         <AbcPieChart data={abcDist} />
       </section>
 
-      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+      <section className="glass-strong border border-white/5 overflow-hidden rounded-[2.5rem] p-10">
         <RecentOrdersTable
           title={t('admin.dashboard.recent.title')}
           orders={recentOrders}
         />
       </section>
-    </div >
+    </div>
   )
 }
 
 export default AdminDashboardPage
-
-
-

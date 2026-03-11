@@ -6,6 +6,9 @@ import { formatCurrency } from '../../../i18n/format'
 import { formatDateTime } from '../../../i18n/datetime'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { useDragScroll } from '../../../hooks/useDragScroll'
+import { adminTableHeadCellClass, adminTableCellClass, adminTableContainerClass } from '../../../utils/adminUi'
+import { ExternalLink, ChevronRight, PackageSearch } from 'lucide-react'
+import AdminEmptyState from '../AdminEmptyState'
 
 interface OrderData {
     id: string
@@ -24,13 +27,13 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
     const { lang } = useI18n()
     const dragScrollRef = useDragScroll<HTMLDivElement>()
 
-    const getStatusColor = (status: string) => {
+    const getStatusStyles = (status: string) => {
         switch (status) {
-            case 'completed': return 'bg-emerald-100 text-emerald-800'
-            case 'pending': return 'bg-warning-orange/20 text-warning-orange'
-            case 'processing': return 'bg-blue-100 text-blue-800'
-            case 'cancelled': return 'bg-red-100 text-red-800'
-            default: return 'bg-gray-100 text-gray-800'
+            case 'completed': return 'bg-emerald-500/10 text-emerald-400 ring-emerald-500/30'
+            case 'pending': return 'bg-amber-500/10 text-amber-400 ring-amber-500/30'
+            case 'processing': return 'bg-cyan-500/10 text-cyan-400 ring-cyan-500/30'
+            case 'cancelled': return 'bg-rose-500/10 text-rose-400 ring-rose-500/30'
+            default: return 'bg-slate-500/10 text-slate-400 ring-slate-500/30'
         }
     }
 
@@ -45,56 +48,86 @@ const RecentOrdersTable: React.FC<RecentOrdersTableProps> = ({ orders, title }) 
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-hvac-md p-4 mt-6">
-            <div className="flex items-center justify-between mb-4 border-b pb-2">
-                <div className="text-sm font-semibold text-industrial-gray uppercase tracking-wide">{title}</div>
-                <Link href="/account/orders" className="text-sm text-primary-navy font-medium hover:underline">
-                    Tümünü Gör
+        <div className="flex flex-col h-full group/table">
+            <div className="flex items-center justify-between mb-10">
+                <div>
+                    <h3 className="text-xl font-black text-white tracking-tighter uppercase leading-none group-hover/table:text-cyan-400 transition-colors uppercase">{title}</h3>
+                    <div className="flex items-center gap-2 mt-3 italic opacity-60">
+                        <div className="h-0.5 w-8 bg-cyan-500 rounded-full" />
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] italic opacity-80">Son İşlemler</p>
+                    </div>
+                </div>
+                <Link href="/admin/orders" className="text-[11px] font-black text-white uppercase tracking-widest px-8 py-3 rounded-2xl glass-strong hover:bg-cyan-500 hover:text-[#0A0F1E] hover:scale-105 active:scale-95 border border-white/5 transition-all duration-300 flex items-center gap-3 group/btn shadow-2xl">
+                    Tümünü Gör <ChevronRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
                 </Link>
             </div>
-            <div ref={dragScrollRef} className="overflow-x-auto">
-                <table className="w-full text-sm text-left whitespace-nowrap">
-                    <thead className="bg-gray-50/50 text-industrial-gray uppercase text-xs">
-                        <tr>
-                            <th className="px-4 py-3 font-medium rounded-tl-md">Sipariş / Teklif No</th>
-                            <th className="px-4 py-3 font-medium">Tarih</th>
-                            <th className="px-4 py-3 font-medium text-right">Tutar</th>
-                            <th className="px-4 py-3 font-medium">Durum</th>
-                            <th className="px-4 py-3 font-medium rounded-tr-md"></th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {orders.length === 0 ? (
-                            <tr>
-                                <td className="px-4 py-6 text-center text-steel-gray" colSpan={5}>
-                                    Henüz kayıt bulunmuyor.
-                                </td>
+            
+            <div className={`${adminTableContainerClass} glass-strong border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl`}>
+                <div ref={dragScrollRef} className="overflow-x-auto custom-scrollbar relative">
+                    {/* Decorative glow inside table */}
+                    <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 blur-[100px] pointer-events-none" />
+                    
+                    <table className="w-full text-sm text-left whitespace-nowrap border-collapse">
+                        <thead>
+                            <tr className="bg-white/[0.02]">
+                                <th className={`${adminTableHeadCellClass} py-6 first:pl-8`}>Sipariş / Teklif No</th>
+                                <th className={adminTableHeadCellClass}>Tarih</th>
+                                <th className={`${adminTableHeadCellClass} text-right`}>Tutar</th>
+                                <th className={adminTableHeadCellClass}>Durum</th>
+                                <th className={`${adminTableHeadCellClass} last:pr-8`}></th>
                             </tr>
-                        ) : orders.map(r => (
-                            <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
-                                <td className="px-4 py-3 font-mono text-xs text-primary-navy font-medium">
-                                    #{(r.order_number || r.id).toString().slice(-8).toUpperCase()}
-                                </td>
-                                <td className="px-4 py-3 text-steel-gray">
-                                    {formatDateTime(r.created_at, lang)}
-                                </td>
-                                <td className="px-4 py-3 text-right font-medium text-steel-gray">
-                                    {formatCurrency(r.total_amount, lang)}
-                                </td>
-                                <td className="px-4 py-3">
-                                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(r.status)}`}>
-                                        {getStatusLabel(r.status)}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 text-right">
-                                    <Link href={`/account/orders/${r.id}`} className="text-primary-navy text-xs font-medium hover:underline bg-light-gray/50 px-3 py-1.5 rounded-md hover:bg-light-gray transition-colors">
-                                        Detay
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {orders.length === 0 ? (
+                                <tr>
+                                    <td className="px-5 py-24 text-center" colSpan={5}>
+                                        <AdminEmptyState 
+                                            icon={PackageSearch} 
+                                            title="Sipariş Bulunmuyor" 
+                                            description="Henüz herhangi bir sipariş veya teklif kaydı bulunmuyor." 
+                                            compact 
+                                        />
+                                    </td>
+                                </tr>
+                            ) : orders.map((r, index) => (
+                                <tr 
+                                    key={r.id} 
+                                    className="group/row hover:bg-white/[0.03] transition-all duration-500 animate-in fade-in slide-in-from-left-4 duration-500"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                >
+                                    <td className={`${adminTableCellClass} py-6 first:pl-8 font-black text-[12px] text-cyan-400/90 tracking-wider group-hover/row:text-white transition-colors`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-6 bg-cyan-500/0 group-hover/row:bg-cyan-500 transition-all rounded-full -ml-8 mr-6 duration-500" />
+                                            #{(r.order_number || r.id).toString().slice(-8).toUpperCase()}
+                                        </div>
+                                    </td>
+                                    <td className={adminTableCellClass}>
+                                        <span className="text-slate-400 font-black text-[11px] tracking-wider uppercase opacity-80 group-hover/row:opacity-100 transition-opacity">{formatDateTime(r.created_at, lang)}</span>
+                                    </td>
+                                    <td className={`${adminTableCellClass} text-right font-black text-white tracking-widest text-[14px]`}>
+                                        <span className="px-3 py-1 rounded-lg bg-white/5 group-hover/row:bg-white/10 transition-colors border border-white/5">
+                                            {formatCurrency(r.total_amount, lang)}
+                                        </span>
+                                    </td>
+                                    <td className={adminTableCellClass}>
+                                        <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-inset backdrop-blur-md transition-all duration-500 group-hover/row:scale-105 ${getStatusStyles(r.status)}`}>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-current mr-2 animate-pulse" />
+                                            {getStatusLabel(r.status)}
+                                        </span>
+                                    </td>
+                                    <td className={`${adminTableCellClass} text-right last:pr-8`}>
+                                        <Link 
+                                            href={`/admin/orders/${r.id}`} 
+                                            className="inline-flex items-center gap-3 text-white text-[10px] font-black uppercase tracking-[0.2em] bg-white/5 px-6 py-3 rounded-xl hover:bg-cyan-500 hover:text-[#0A0F1E] border border-white/5 transition-all duration-500 shadow-lg"
+                                        >
+                                            Detay <ExternalLink size={14} className="opacity-60 group-hover/link:opacity-100" />
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )
