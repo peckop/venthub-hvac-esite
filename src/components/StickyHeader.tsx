@@ -422,7 +422,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             void ensureCategories()
           }}
           onItemHover={handleNavItemHover}
-          moreLabel={t('common.more').includes('common') ? 'Daha Fazla' : t('common.more')}
+          moreLabel={t('common.more')}
         />
 
         {/* Compact Mod: Ortalanmış Arama Çubuğu */}
