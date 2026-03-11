@@ -25,4 +25,4 @@ const NavBrand: React.FC<NavBrandProps> = ({ brandName }) => {
     )
 }
 
-export default NavBrand
+export default React.memo(NavBrand)

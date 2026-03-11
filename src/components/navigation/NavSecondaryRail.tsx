@@ -86,4 +86,4 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = ({ items }) => {
     )
 }
 
-export default NavSecondaryRail
+export default React.memo(NavSecondaryRail)
