@@ -4,10 +4,20 @@ import { supabase } from '../../lib/supabase'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu, { Density } from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
-import { adminCardClass, adminSectionTitleClass, adminTableCellClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { 
+  adminCardClass, 
+  adminSectionTitleClass, 
+  adminTableCellClass, 
+  adminTableHeadCellClass, 
+  adminButtonPrimaryClass, 
+  adminButtonSecondaryClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminInputClass
+} from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
-import { ShieldAlert } from 'lucide-react'
+import { ShieldAlert, ChevronDown, ChevronUp } from 'lucide-react'
 import { useDragScroll } from '../../hooks/useDragScroll'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -330,21 +340,43 @@ const AdminErrorGroupsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer">
-              <option value="">{t('admin.errorGroups.filter.statusAll')}</option>
-              <option value="open">open</option>
-              <option value="resolved">resolved</option>
-              <option value="ignored">ignored</option>
+            <select 
+              value={status} 
+              onChange={(e) => setStatus(e.target.value)} 
+              className={adminSelectClass}
+              style={adminSelectStyle}
+            >
+              <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.statusAll')}</option>
+              <option value="open" className="bg-[#0A0F1E]">open</option>
+              <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
+              <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
             </select>
-            <select value={assigned} onChange={(e) => setAssigned(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer">
-              <option value="">{t('admin.errorGroups.filter.assignedAll')}</option>
-              <option value="__none__">{t('admin.errorGroups.filter.unassigned')}</option>
+            <select 
+              value={assigned} 
+              onChange={(e) => setAssigned(e.target.value)} 
+              className={adminSelectClass}
+              style={adminSelectStyle}
+            >
+              <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.assignedAll')}</option>
+              <option value="__none__" className="bg-[#0A0F1E]">{t('admin.errorGroups.filter.unassigned')}</option>
               {users.map(u => (
-                <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
+                <option key={u.id} value={u.id} className="bg-[#0A0F1E]">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
               ))}
             </select>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.endDate') as string} />
+            <input 
+              type="date" 
+              value={fromDate} 
+              onChange={(e) => setFromDate(e.target.value)} 
+              className={adminInputClass} 
+              title={t('admin.ui.startDate') as string} 
+            />
+            <input 
+              type="date" 
+              value={toDate} 
+              onChange={(e) => setToDate(e.target.value)} 
+              className={adminInputClass} 
+              title={t('admin.ui.endDate') as string} 
+            />
             <ExportMenu items={[{ key: 'csv', label: t('admin.errorGroups.export.csvLabel'), onSelect: () => exportGroupsCsv() }]} />
             <ColumnsMenu
               density={density}
@@ -365,10 +397,16 @@ const AdminErrorGroupsPage: React.FC = () => {
       />
 
       {/* Pagination */}
-      <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.prev')}</button>
-        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: pageCount })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= pageCount} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.next')}</button>
+      <div className="flex items-center justify-end gap-3 mb-2">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+          {t('admin.ui.prev')}
+        </button>
+        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+          {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
+        </span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+          {t('admin.ui.next')}
+        </button>
       </div>
 
       {/* Bulk action bar */}
@@ -377,10 +415,15 @@ const AdminErrorGroupsPage: React.FC = () => {
           <div className="text-sm text-slate-500">{t('admin.errorGroups.bulk.selected', { count: selectedIds.length })}</div>
           <div className="flex items-center gap-2">
             <label className="text-sm text-slate-500">{t('admin.errorGroups.bulk.statusTitle')}</label>
-            <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-white focus:ring-primary-navy/10">
-              <option value="open">open</option>
-              <option value="resolved">resolved</option>
-              <option value="ignored">ignored</option>
+            <select 
+              value={bulkStatus} 
+              onChange={(e) => setBulkStatus(e.target.value as 'open' | 'resolved' | 'ignored')} 
+              className={`${adminSelectClass} !h-10`}
+              style={adminSelectStyle}
+            >
+              <option value="open" className="bg-[#0A0F1E]">open</option>
+              <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
+              <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
             </select>
             <button onClick={bulkApplyStatus} disabled={savingBulk || !hasWriteAccess} className={adminButtonPrimaryClass}>{savingBulk ? t('admin.ui.loadingShort') : t('admin.ui.apply')}</button>
             <button onClick={() => setSelectedIds([])} className={adminButtonSecondaryClass}>{t('admin.ui.clear')}</button>
@@ -394,9 +437,9 @@ const AdminErrorGroupsPage: React.FC = () => {
         )}
 
         {/* Main table wrapper: only horizontal scroll; prevent scroll chaining on X axis */}
-        <div ref={dragScrollRef} className="overflow-x-auto overscroll-x-contain" style={{ willChange: 'scroll-position' }}>
-          <table className="w-full text-sm min-w-[980px]">
-            <thead className="bg-gray-50 sticky top-0 z-10">
+        <div ref={dragScrollRef} className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="glass-strong sticky top-0 z-10">
               <tr>
                 <th className={`${adminTableHeadCellClass} ${headPad} min-w-[40px]`}></th>
                 {visibleCols.lastSeen && (
@@ -443,25 +486,43 @@ const AdminErrorGroupsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-b border-slate-200/60 align-top">
+                    <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors group">
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <input type="checkbox" checked={selectedIds.includes(r.id)} onChange={(e) => toggleSelect(r.id, e.target.checked)} />
                       </td>
-                      {visibleCols.lastSeen && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{formatDateTime(r.last_seen, lang)}</td>}
-                      {visibleCols.level && <td className={`${adminTableCellClass} ${cellPad} whitespace-nowrap`}>{r.level || 'error'}</td>}
-                      {visibleCols.signature && <td className={`${adminTableCellClass} ${cellPad} max-w-[320px] truncate`} title={r.signature}>{r.signature}</td>}
+                      {visibleCols.lastSeen && <td className={`${adminTableCellClass} font-black text-white tracking-widest uppercase`}>{formatDateTime(r.last_seen, lang)}</td>}
+                      {visibleCols.level && <td className={`${adminTableCellClass}`}>
+                        <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
+                          r.level === 'error' ? 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20' : 
+                          r.level === 'warn' ? 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20' : 
+                          'bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20'
+                        }`}>
+                          {r.level || 'error'}
+                        </span>
+                      </td>}
+                      {visibleCols.signature && <td className={`${adminTableCellClass}`}>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-black text-slate-100 uppercase tracking-tight line-clamp-1">{r.signature}</span>
+                          <code className="text-[9px] font-black text-slate-500 uppercase tracking-widest opacity-60">ID: {r.id.slice(0, 8)}</code>
+                        </div>
+                      </td>}
                       {visibleCols.lastMsg && <td className={`${adminTableCellClass} ${cellPad} max-w-[420px] whitespace-normal break-words`} title={r.last_message || ''}>{r.last_message || '-'}</td>}
-                      {visibleCols.count && <td className={`${adminTableCellClass} ${cellPad}`}>{r.count}</td>}
+                      {visibleCols.count && <td className={`${adminTableCellClass} text-center`}>
+                        <span className="inline-flex items-center justify-center min-w-[28px] h-[28px] rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-black border border-cyan-500/20">
+                          {r.count}
+                        </span>
+                      </td>}
                       {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>
                         <select
                           disabled={!hasWriteAccess}
                           value={r.status}
                           onChange={(e) => updateStatus(r.id, e.target.value as 'open' | 'resolved' | 'ignored')}
-                          className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50"
+                          className={`${adminSelectClass} !py-1 !px-2 !text-[10px] !h-8`}
+                          style={adminSelectStyle}
                         >
-                          <option value="open">open</option>
-                          <option value="resolved">resolved</option>
-                          <option value="ignored">ignored</option>
+                          <option value="open" className="bg-[#0A0F1E]">open</option>
+                          <option value="resolved" className="bg-[#0A0F1E]">resolved</option>
+                          <option value="ignored" className="bg-[#0A0F1E]">ignored</option>
                         </select>
                       </td>}
                       {visibleCols.assigned && <td className={`${adminTableCellClass} ${cellPad}`}>
@@ -470,20 +531,36 @@ const AdminErrorGroupsPage: React.FC = () => {
                             disabled={!hasWriteAccess}
                             value={r.assigned_to || ''}
                             onChange={(e) => updateAssignedTo(r.id, e.target.value)}
-                            className="border border-slate-200 rounded-md px-2 py-1 text-xs bg-white disabled:opacity-50"
+                            className={`${adminSelectClass} !py-1 !px-2 !text-[10px] !h-8`}
+                            style={adminSelectStyle}
                           >
-                            <option value="">{t('admin.errorGroups.assigned.none')}</option>
+                            <option value="" className="bg-[#0A0F1E]">{t('admin.errorGroups.assigned.none')}</option>
                             {users.map(u => (
-                              <option key={u.id} value={u.id}>{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
+                              <option key={u.id} value={u.id} className="bg-[#0A0F1E]">{u.full_name ? `${u.full_name} <${u.email}>` : u.email}</option>
                             ))}
                           </select>
                         </div>
                       </td>}
-                      {visibleCols.actions && <td className={`${adminTableCellClass} ${cellPad}`}>
-                        <button className={adminButtonPrimaryClass + ' !px-2 !py-1 text-xs'} onClick={() => {
-                          setExpandedId(id => id === r.id ? null : r.id)
-                          if (expandedId !== r.id) loadLatestClientErrors(r.id)
-                        }}>{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
+                      {visibleCols.actions && <td className={`${adminTableCellClass}`}>
+                        <button
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                          onClick={() => {
+                            setExpandedId(id => id === r.id ? null : r.id)
+                            if (expandedId !== r.id) loadLatestClientErrors(r.id)
+                          }}
+                        >
+                          {expandedId === r.id ? (
+                            <>
+                              <ChevronUp size={12} />
+                              {t('admin.ui.hide')}
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown size={12} />
+                              {t('admin.ui.details')}
+                            </>
+                          )}
+                        </button>
                       </td>}
                     </tr>
                     {expandedId === r.id && (
@@ -509,7 +586,7 @@ const AdminErrorGroupsPage: React.FC = () => {
                                 disabled={!hasWriteAccess}
                                 defaultValue={rows.find(x => x.id === r.id)?.notes || ''}
                                 onBlur={(ev) => updateNotes(r.id, ev.target.value)}
-                                className="w-full border border-slate-200 rounded p-2 bg-white disabled:opacity-50"
+                                className={`${adminInputClass} w-full`}
                                 rows={7}
                                 placeholder={t('admin.errorGroups.details.notesPlaceholder') as string}
                               />

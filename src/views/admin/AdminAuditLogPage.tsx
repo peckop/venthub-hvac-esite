@@ -1,7 +1,16 @@
 import React from 'react'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass, adminTableActionClass } from '../../utils/adminUi'
+import { 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminCardClass, 
+  adminTableHeadCellClass, 
+  adminTableCellClass, 
+  adminButtonSecondaryClass, 
+  adminTableActionClass,
+  adminInputClass
+} from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
@@ -10,7 +19,7 @@ import JsonDiffViewer from '../../components/admin/JsonDiffViewer'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
-import { ClipboardList } from 'lucide-react'
+import { ClipboardList, Filter, Calendar, Terminal, ChevronLeft, ChevronRight, History } from 'lucide-react'
 
 interface AuditRow {
   id: string
@@ -53,7 +62,6 @@ const AdminAuditLogPage: React.FC = () => {
     setLoading(true)
     setError(null)
     try {
-      // Proaktif oturum kontrolü
       await ensureSessionFresh()
 
       let query = supabase
@@ -75,7 +83,6 @@ const AdminAuditLogPage: React.FC = () => {
         query = query.or(`table_name.ilike.${like},row_pk.ilike.${like},comment.ilike.${like}`)
       }
       if (batch) {
-        // Exact match on batch_id present in 'after' JSON or in comment
         query = query.or(`after->>batch_id.eq.${batch},comment.ilike.%${batch}%`)
       }
 
@@ -106,124 +113,196 @@ const AdminAuditLogPage: React.FC = () => {
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
 
   return (
-    <div className="space-y-4">
-      <h1 className={adminSectionTitleClass}>{t('admin.titles.audit')}</h1>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <header className="space-y-1">
+        <h1 className={adminSectionTitleClass}>{t('admin.titles.audit')}</h1>
+        <p className={adminSubtitleClass}>Sistem üzerindeki tüm değişiklikleri ve kullanıcı aktivitelerini inceleyin.</p>
+      </header>
 
       {batch && (
-        <div className="p-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800 flex items-center justify-between">
-          <span>Filtre: Batch <span className="font-mono">{batch}</span></span>
+        <div className="glass-strong border border-amber-500/20 bg-amber-500/5 p-4 rounded-2xl flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Filter size={18} className="text-amber-500" />
+            <span className="text-[11px] font-black uppercase tracking-widest text-amber-500">
+              Filtre: Batch <span className="font-mono text-xs">{batch}</span>
+            </span>
+          </div>
           <div className="flex items-center gap-2">
-            <a href={`/admin/movements?batch=${batch}`} className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] !border-amber-300 !text-amber-700 hover:!bg-amber-100`}>Hareketleri Gör</a>
+            <a href={`/admin/movements?batch=${batch}`} className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-[10px] uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all`}>
+              Hareketleri Gör
+            </a>
             <button
-              className={`${adminButtonSecondaryClass} !px-2 !py-1 text-[10px] !border-amber-300 !text-amber-700 hover:!bg-amber-100`}
-              onClick={() => { setBatch(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
-            >Temizle</button>
+              className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-[10px] uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all`}
+              onClick={() => { 
+                setBatch(''); 
+                const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); 
+                url.searchParams.delete('batch'); 
+                router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) 
+              }}
+            >
+              Temizle
+            </button>
           </div>
         </div>
       )}
 
-      <AdminToolbar
-        storageKey="toolbar:audit"
-        search={{ value: q, onChange: setQ, placeholder: 'Tablo adı, PK veya not ara', focusShortcut: '/' }}
-        select={{
-          value: action, onChange: setAction, title: 'Aksiyon', options: [
-            { value: '', label: 'Tümü' },
-            { value: 'INSERT', label: 'INSERT' },
-            { value: 'UPDATE', label: 'UPDATE' },
-            { value: 'DELETE', label: 'DELETE' },
-            { value: 'CUSTOM', label: 'CUSTOM' },
-          ]
-        }}
-        onClear={() => { setBatch(''); setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
-        recordCount={total}
-        rightExtra={(
-          <div className="flex items-center gap-3">
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 md:h-12 h-11 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 transition-all font-medium text-slate-600" title="Başlangıç" />
-            <span className="text-slate-400">—</span>
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 md:h-12 h-11 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 transition-all font-medium text-slate-600" title="Bitiş" />
+      <div className="glass-strong rounded-[2rem] border border-white/5 overflow-hidden">
+        <AdminToolbar
+          storageKey="toolbar:audit"
+          search={{ value: q, onChange: setQ, placeholder: 'Tablo adı, PK veya not ara', focusShortcut: '/' }}
+          select={{
+            value: action, onChange: setAction, title: 'Aksiyon', options: [
+              { value: '', label: 'Tümü' },
+              { value: 'INSERT', label: 'INSERT' },
+              { value: 'UPDATE', label: 'UPDATE' },
+              { value: 'DELETE', label: 'DELETE' },
+              { value: 'CUSTOM', label: 'CUSTOM' },
+            ]
+          }}
+          onClear={() => { setBatch(''); setQ(''); setAction(''); setFromDate(''); setToDate(''); setPage(1) }}
+          recordCount={total}
+          rightExtra={(
+            <div className="flex items-center gap-3 pr-2">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0A0F1E]/40 border border-white/10 group focus-within:border-cyan-400/50 transition-all">
+                <Calendar size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <input 
+                  type="date" 
+                  value={fromDate} 
+                  onChange={(e) => setFromDate(e.target.value)} 
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-600 w-24" 
+                  title="Başlangıç" 
+                />
+              </div>
+              <span className="text-white/20">—</span>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0A0F1E]/40 border border-white/10 group focus-within:border-cyan-400/50 transition-all">
+                <Calendar size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <input 
+                  type="date" 
+                  value={toDate} 
+                  onChange={(e) => setToDate(e.target.value)} 
+                  className="bg-transparent text-xs font-bold text-white focus:outline-none placeholder-slate-600 w-24" 
+                  title="Bitiş" 
+                />
+              </div>
+            </div>
+          )}
+        />
+
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-t border-white/5 bg-white/[0.02]">
+          <div className="flex items-center gap-2">
+            <History size={16} className="text-cyan-400" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Denetim Geçmişi</span>
           </div>
-        )}
-      />
+          
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setPage(p => Math.max(1, p - 1))} 
+              disabled={page <= 1} 
+              className={`${adminButtonSecondaryClass} !h-10 !w-10 !p-0 !rounded-xl disabled:opacity-30`}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <div className="px-5 h-10 flex items-center justify-center rounded-xl glass border border-white/5">
+              <span className="text-xs font-black text-white tracking-widest">
+                {page} <span className="opacity-30 mx-2">/</span> {Math.max(1, Math.ceil(total / PAGE_SIZE))}
+              </span>
+            </div>
+            <button 
+              onClick={() => setPage(p => p + 1)} 
+              disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} 
+              className={`${adminButtonSecondaryClass} !h-10 !w-10 !p-0 !rounded-xl disabled:opacity-30`}
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-end gap-3 px-1 py-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-40"}>{t('admin.ui.prev')}</button>
-        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " disabled:opacity-40"}>{t('admin.ui.next')}</button>
-      </div>
-
-      <div className={`${adminCardClass} overflow-hidden`}>
-        {error && (
-          <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>
-        )}
-        <div ref={dragScrollRef} className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.date') || 'Tarih'}</th>
-                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.action') || 'Aksiyon'}</th>
-                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.table') || 'Tablo'}</th>
-                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.pk') || 'PK'}</th>
-                <th className={`${adminTableHeadCellClass}`}>{t('admin.ui.note') || 'Not'}</th>
-                <th className={`${adminTableHeadCellClass}`}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && rows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-0">
-                    <AdminSkeleton variant="table" count={6} rows={5} />
-                  </td>
+        <div className="p-4 pt-0">
+          <div ref={dragScrollRef} className="overflow-x-auto rounded-2xl border border-white/5 bg-[#0A0F1E]/40">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="glass-strong">
+                  <th className={adminTableHeadCellClass}>{t('admin.ui.date') || 'Tarih'}</th>
+                  <th className={adminTableHeadCellClass}>{t('admin.ui.action') || 'Aksiyon'}</th>
+                  <th className={adminTableHeadCellClass}>{t('admin.ui.table') || 'Tablo'}</th>
+                  <th className={adminTableHeadCellClass}>{t('admin.ui.pk') || 'PK'}</th>
+                  <th className={adminTableHeadCellClass}>{t('admin.ui.note') || 'Not'}</th>
+                  <th className={adminTableHeadCellClass}></th>
                 </tr>
-              ) : rows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-4">
-                    <AdminEmptyState
-                      icon={ClipboardList}
-                      title="Kayıt Bulunamadı"
-                      description="Girilen filtrelere veya arama kriterlerine uygun denetim logu bulunamadı."
-                    />
-                  </td>
-                </tr>
-              ) : (
-                rows.map(r => (
-                  <React.Fragment key={r.id}>
-                    <tr className="border-b border-slate-200/60">
-                      <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
-                      <td className={`${adminTableCellClass}`}><span className="inline-block px-2 py-1 rounded border text-xs" title={r.action}>{r.action}</span></td>
-                      <td className={`${adminTableCellClass}`}>{r.table_name}</td>
-                      <td className={`${adminTableCellClass}`}>{r.row_pk || '-'}</td>
-                      <td className={`${adminTableCellClass}`}>{r.comment || '-'}</td>
-                      <td className={`${adminTableCellClass}`}>
-                        <button
-                          className={adminTableActionClass}
-                          onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
-                        > {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
-                      </td>
-                    </tr>
-                    {expandedId === r.id && (
-                      <tr className="bg-slate-50/50">
-                        <td colSpan={6} className="p-4 border-b border-slate-200 shadow-inner">
-                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">{r.action} İşlemi Detayları</div>
-                          <JsonDiffViewer before={r.before} after={r.after} />
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {loading && rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-0">
+                      <AdminSkeleton variant="table" count={6} rows={10} />
+                    </td>
+                  </tr>
+                ) : rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-12">
+                      <AdminEmptyState
+                        icon={ClipboardList}
+                        title="Kayıt Bulunamadı"
+                        description="Girilen filtrelere veya arama kriterlerine uygun denetim logu bulunamadı."
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map(r => (
+                    <React.Fragment key={r.id}>
+                      <tr className={`group transition-colors ${expandedId === r.id ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                        <td className={`${adminTableCellClass} whitespace-nowrap opacity-60`}>{formatDateTime(r.at, lang)}</td>
+                        <td className={adminTableCellClass}>
+                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all ${
+                            r.action === 'INSERT' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            r.action === 'UPDATE' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                            r.action === 'DELETE' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
+                            'bg-slate-500/10 text-slate-400 border-slate-500/20'
+                          }`}>
+                            {r.action}
+                          </span>
+                        </td>
+                        <td className={adminTableCellClass}>{r.table_name}</td>
+                        <td className={`${adminTableCellClass} font-mono text-[11px] text-slate-400`}>{r.row_pk || '-'}</td>
+                        <td className={`${adminTableCellClass} max-w-xs truncate`}>{r.comment || '-'}</td>
+                        <td className={adminTableCellClass}>
+                          <button
+                            className={`${adminTableActionClass} !bg-white/5 !border-white/10 hover:!bg-white/10 hover:!text-white`}
+                            onClick={() => setExpandedId(id => id === r.id ? null : r.id)}
+                          >
+                            {expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}
+                          </button>
                         </td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                ))
-              )}
-            </tbody>
-          </table>
+                      {expandedId === r.id && (
+                        <tr>
+                          <td colSpan={6} className="p-6 bg-black/40 shadow-inner">
+                            <div className="flex items-center gap-3 mb-4">
+                              <Terminal size={14} className="text-cyan-400" />
+                              <div className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.2em]">İşlem Detayları</div>
+                            </div>
+                            <div className="rounded-2xl border border-white/5 bg-[#0A0F1E]/60 p-1">
+                              <JsonDiffViewer before={r.before} after={r.after} />
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+      
+      {error && (
+        <div className="p-4 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-xs font-bold text-center uppercase tracking-widest">
+          {error}
+        </div>
+      )}
     </div>
   )
 }
 
 export default AdminAuditLogPage
-
-
-
-
-
-

@@ -1,5 +1,5 @@
 import React from 'react'
-import { adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminSettingsInputClass } from '../../utils/adminUi'
 import { printQrLabel } from './InventoryQrLabel'
 import { InventoryRow, ReservedRow } from '../../types/inventory'
 import InventoryStockAdjust from './InventoryStockAdjust'
@@ -48,105 +48,152 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={() => setSelected(null)} />
-            <aside className="fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white/95 backdrop-blur z-50 shadow-2xl border-l border-slate-200/80 flex flex-col animate-in slide-in-from-right duration-200">
-                <header className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-                    <h2 className="text-lg font-bold text-slate-800 truncate pr-4">{selected.name}</h2>
-                    <div className="flex items-center gap-2">
-                        <button disabled={printingQr} className={adminButtonPrimaryClass + " h-9 text-xs px-3 shadow-md shadow-primary-navy/10"} onClick={() => void printQrLabel(selected, setPrintingQr)}>
-                            {printingQr ? 'Hazırlanıyor...' : 'QR Etiket'}
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity" onClick={() => setSelected(null)} />
+            <aside className="fixed right-0 top-0 h-full w-full sm:w-[480px] glass-strong z-50 shadow-[-20px_0_50px_rgba(0,0,0,0.5)] border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300">
+                <header className="px-6 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                    <div className="flex flex-col truncate pr-4">
+                        <h2 className="text-xl font-black text-white truncate uppercase tracking-tight">{selected.name}</h2>
+                        <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-[0.2em] mt-1">{selected.product_id}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        <button 
+                            disabled={printingQr} 
+                            className="h-10 px-4 rounded-xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all disabled:opacity-50" 
+                            onClick={() => void printQrLabel(selected, setPrintingQr)}
+                        >
+                            {printingQr ? '...' : 'QR'}
                         </button>
-                        <button className={adminButtonSecondaryClass + " h-9"} onClick={() => setSelected(null)}>{t('admin.ui.close') || 'Kapat'}</button>
+                        <button 
+                            className="h-10 px-4 rounded-xl glass border border-white/10 text-slate-400 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest" 
+                            onClick={() => setSelected(null)}
+                        >
+                            {t('admin.ui.close') || 'Kapat'}
+                        </button>
                     </div>
                 </header>
-                <div className="p-4 space-y-6 overflow-auto">
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white border border-slate-200 rounded-lg p-3 relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-primary-navy"></div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 ml-1">Güncel Stok</div>
-                            <div className="text-2xl font-black text-slate-800 ml-1">{selectedStock ?? '-'}</div>
+                
+                <div className="flex-1 p-6 space-y-8 overflow-y-auto custom-scrollbar">
+                    {/* Özet Kartları */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="glass rounded-[1.5rem] border border-white/5 p-4 relative overflow-hidden group">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Güncel Stok</div>
+                            <div className="text-3xl font-black text-white">{selectedStock ?? '-'}</div>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-lg p-3 relative overflow-hidden group">
-                            <div className="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>
-                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 ml-1">Eşik (Alarm)</div>
-                            <div className="text-2xl font-black text-slate-800 ml-1">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
+                        <div className="glass rounded-[1.5rem] border border-white/5 p-4 relative overflow-hidden group">
+                            <div className="absolute top-0 left-0 w-1 h-full bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]"></div>
+                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Eşik (Alarm)</div>
+                            <div className="text-3xl font-black text-white">{(selectedThreshold === '' ? (defaultThreshold ?? '-') : selectedThreshold) as string | number}</div>
                         </div>
                     </div>
 
+                    {/* Zeki Öneri Bölümü */}
                     {selected.daily_velocity !== undefined && selected.daily_velocity > 0 && (
-                        <section className="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100/50 rounded-xl p-4 shadow-sm relative overflow-hidden">
-                            <div className="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl"></div>
-                            <h3 className="text-xs font-black text-indigo-900 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                        <section className="glass-strong rounded-[2rem] border border-cyan-400/20 p-6 relative overflow-hidden shadow-[0_0_30px_rgba(34,211,238,0.05)]">
+                            <div className="absolute -right-8 -top-8 w-32 h-32 bg-cyan-400/10 rounded-full blur-3xl"></div>
+                            <h3 className="text-[11px] font-black text-cyan-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                                <span className="relative flex h-2.5 w-2.5">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"></span>
                                 </span>
                                 Zeki Satın Alma Önerisi
                             </h3>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Satış Hızı (30 Gün)</div>
-                                    <div className="font-mono text-sm font-semibold text-slate-800">{selected.daily_velocity.toFixed(2)} / gün</div>
-                                    <div className="text-[10px] text-slate-400 mt-0.5">Tahmini {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
+                                    <div className="text-[9px] text-slate-500 uppercase tracking-[0.2em] mb-2 font-black">Satış Hızı (30 Gün)</div>
+                                    <div className="font-mono text-base font-bold text-white tracking-tight">{selected.daily_velocity.toFixed(2)} <span className="text-[10px] text-slate-500 uppercase">/ g</span></div>
+                                    <div className="text-[9px] text-slate-600 mt-1 uppercase font-black">~ {Math.ceil(selected.daily_velocity * 30)} adet/ay</div>
                                 </div>
                                 <div>
-                                    <div className="text-[10px] text-indigo-500 font-bold uppercase tracking-wider mb-1">Önerilen Sipariş</div>
-                                    <div className="font-mono text-2xl font-black text-indigo-600">
-                                        {Math.max(0, Math.ceil((selected.daily_velocity * 30)) - selected.available_stock)} <span className="text-sm font-semibold">adet</span>
+                                    <div className="text-[9px] text-cyan-400 font-black uppercase tracking-[0.2em] mb-2">Önerilen Sipariş</div>
+                                    <div className="font-mono text-3xl font-black text-white leading-none">
+                                        {Math.max(0, Math.ceil((selected.daily_velocity * 30)) - selected.available_stock)} <span className="text-xs font-bold text-slate-500 uppercase">ADET</span>
                                     </div>
-                                    <div className="text-[10px] text-slate-400 mt-0.5">30 günlük buffer için</div>
+                                    <div className="text-[9px] text-slate-600 mt-2 uppercase font-black tracking-tighter">30 günlük tampon için</div>
                                 </div>
                             </div>
 
                             {selected.abc_class === 'A' && (
-                                <div className="mt-3 text-[10px] bg-indigo-100/50 text-indigo-800 px-2 py-1.5 rounded-md border border-indigo-200/50 flex items-center gap-1.5">
-                                    <span className="font-bold">A Sınıfı:</span> Bu ürün kritik ciro kaynağıdır, stokta daima bulunmalıdır.
+                                <div className="mt-5 text-[10px] bg-cyan-400/10 text-cyan-300 px-3 py-2.5 rounded-xl border border-cyan-400/20 flex items-center gap-2 font-bold leading-relaxed">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+                                    <span className="opacity-80">A Sınıfı Ürün: Kritik ciro kaynağıdır, stokta daima bulunmalıdır.</span>
                                 </div>
                             )}
                         </section>
                     )}
 
+                    {/* Eşik Düzenleme */}
                     {hasWriteAccess && (
-                        <section className="space-y-2">
-                            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-tight">Eşik Düzenle</h3>
-                            <div className="flex items-center gap-2">
+                        <section className="space-y-4">
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Eşik Seviyesini Güncelle</h3>
+                            <div className="flex items-center gap-3">
                                 <input
                                     type="number"
                                     value={selectedThreshold}
                                     onChange={(e) => setSelectedThreshold(e.target.value === '' ? '' : Number(e.target.value))}
-                                    placeholder="Eşik"
-                                    className="w-28 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+                                    placeholder="Değer"
+                                    className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all font-bold"
                                 />
                                 <button
                                     disabled={saving}
                                     onClick={() => saveThreshold(selected.product_id)}
-                                    className={adminButtonPrimaryClass + " h-9 text-xs px-4"}>Uygula</button>
+                                    className="h-12 px-6 rounded-2xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all shadow-lg shadow-cyan-400/10 disabled:opacity-50"
+                                >
+                                    {saving ? '...' : 'Kaydet'}
+                                </button>
                                 <button
                                     disabled={saving}
                                     onClick={() => setSelectedThreshold('')}
-                                    className={adminButtonSecondaryClass + " h-9 text-xs px-4 text-warning-orange border-warning-orange/30 hover:bg-warning-orange/5"}>Varsayılan</button>
+                                    className="h-12 px-5 rounded-2xl glass border border-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:text-amber-400 hover:border-amber-400/30 transition-all"
+                                >
+                                    Sıfırla
+                                </button>
                             </div>
                         </section>
                     )}
 
+                    {/* Stok Hareketleri */}
                     {hasWriteAccess && (
-                        <InventoryStockAdjust
-                            productId={selected.product_id}
-                            onAdjust={adjustStock}
-                            moving={moving}
-                            moveQty={moveQty}
-                            setMoveQty={setMoveQty}
-                        />
+                        <div className="glass rounded-[2rem] border border-white/5 p-6 space-y-4">
+                            <InventoryStockAdjust
+                                productId={selected.product_id}
+                                onAdjust={adjustStock}
+                                moving={moving}
+                                moveQty={moveQty}
+                                setMoveQty={setMoveQty}
+                            />
+                        </div>
                     )}
 
-                    <InventoryReservedTable reservedOrders={reservedOrders} />
+                    {/* Rezerve Siparişler */}
+                    <div className="glass rounded-[2rem] border border-white/5 overflow-hidden">
+                        <div className="p-5 border-b border-white/5 bg-white/[0.02]">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rezerve Siparişler</h3>
+                        </div>
+                        <InventoryReservedTable reservedOrders={reservedOrders} />
+                    </div>
 
-                    <InventoryMovementHistory
-                        movements={movements}
-                        onUndo={undoLastMovement}
-                        undoing={undoing}
-                    />
+                    {/* Hareket Geçmişi */}
+                    <div className="glass rounded-[2rem] border border-white/5 overflow-hidden">
+                        <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Son Hareketler</h3>
+                            {movements.length > 0 && hasWriteAccess && (
+                                <button 
+                                    onClick={undoLastMovement}
+                                    disabled={undoing}
+                                    className="text-[9px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-400 transition-all disabled:opacity-50"
+                                >
+                                    {undoing ? 'Geri Alınıyor...' : 'Sonuncuyu Geri AL'}
+                                </button>
+                            )}
+                        </div>
+                        <InventoryMovementHistory
+                            movements={movements}
+                            onUndo={undoLastMovement}
+                            undoing={undoing}
+                        />
+                    </div>
                 </div>
             </aside>
         </>

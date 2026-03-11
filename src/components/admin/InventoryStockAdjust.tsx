@@ -1,5 +1,4 @@
 import React from 'react'
-import { adminButtonSecondaryClass } from '../../utils/adminUi'
 
 interface InventoryStockAdjustProps {
     productId: string
@@ -17,29 +16,29 @@ export default function InventoryStockAdjust({
     setMoveQty
 }: InventoryStockAdjustProps) {
     return (
-        <section className="space-y-2">
-            <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-tight">Hızlı Hareket</h3>
-            <div className="flex items-center gap-2">
+        <section className="space-y-4">
+            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Hızlı Stok Hareketi</h3>
+            <div className="flex items-center gap-3">
                 <input
                     type="number"
-                    className="w-24 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+                    className="w-24 bg-white/[0.03] border border-white/5 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/20 focus:border-cyan-400/40 transition-all font-bold"
                     value={moveQty}
                     min={1}
                     onChange={(e) => setMoveQty(Math.max(1, Number(e.target.value || 1)))}
                 />
                 <button
                     disabled={moving}
-                    className={adminButtonSecondaryClass + " h-9 text-xs px-4"}
+                    className="flex-1 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-50"
                     onClick={() => onAdjust(productId, Math.abs(moveQty), 'manual_in')}
                 >
-                    Giriş
+                    Stok Girişi
                 </button>
                 <button
                     disabled={moving}
-                    className={adminButtonSecondaryClass + " h-9 text-xs px-4"}
+                    className="flex-1 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all disabled:opacity-50"
                     onClick={() => onAdjust(productId, -Math.abs(moveQty), 'manual_out')}
                 >
-                    Çıkış
+                    Stok Çıkışı
                 </button>
             </div>
         </section>

@@ -2,7 +2,18 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminCardPaddedClass, adminSectionTitleClass, adminTableHeadCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass } from '../../utils/adminUi'
+import { 
+  adminCardPaddedClass, 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminTableHeadCellClass, 
+  adminTableCellClass,
+  adminTableContainerClass,
+  adminButtonPrimaryClass, 
+  adminButtonSecondaryClass,
+  adminInputClass,
+  adminSelectClass
+} from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
@@ -170,95 +181,151 @@ const AdminCouponsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
-      <header className="flex items-center justify-between">
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.coupons')}</h1>
-        <button onClick={fetchCoupons} disabled={loading} className={adminButtonSecondaryClass}>{loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}</button>
+    <div className="space-y-6 pb-20">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.coupons')}</h1>
+          <p className={adminSubtitleClass}>İndirim kuponlarını yönetin ve kullanım istatistiklerini takip edin.</p>
+        </div>
+        <button 
+          onClick={fetchCoupons} 
+          disabled={loading} 
+          className={`${adminButtonSecondaryClass} glass hover:bg-white/10`}
+        >
+          {loading ? t('admin.ui.loadingShort') : t('admin.ui.refresh')}
+        </button>
       </header>
 
       <AdminToolbar
         storageKey="toolbar:coupons"
-        search={{ value: q, onChange: setQ, placeholder: 'Kod veya tip ile ara', focusShortcut: '/' }}
+        search={{ value: q, onChange: setQ, placeholder: 'Kod veya tip ile ara...', focusShortcut: '/' }}
         rightExtra={null}
         recordCount={filtered().length}
       />
 
       {hasWriteAccess && (
-        <div className={adminCardPaddedClass + ' space-y-5'}>
+        <div className={`${adminCardPaddedClass} glass-strong border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500`}>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary-navy"></div>
-              Yeni Kupon
+            <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.6)]"></div>
+              Yeni Kupon Oluştur
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Kupon Kodu</label>
-              <input value={form.code || ''} onChange={e => setForm(f => ({ ...f, code: e.target.value }))} placeholder="Örn: VENT25" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all font-mono placeholder:text-slate-300" />
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Kupon Kodu</label>
+              <input 
+                value={form.code || ''} 
+                onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))} 
+                placeholder="Örn: VENT25" 
+                className={`${adminInputClass} font-mono`}
+              />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">İndirim Tipi</label>
-              <select value={form.type as string} onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all appearance-none cursor-pointer">
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">İndirim Tipi</label>
+              <select 
+                value={form.type as string} 
+                onChange={e => setForm(f => ({ ...f, type: e.target.value as 'percent' | 'fixed' }))} 
+                className={adminSelectClass}
+              >
                 <option value="percent">Yüzde (%)</option>
                 <option value="fixed">Sabit (₺)</option>
               </select>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Değer</label>
-              <input type="number" value={(form.value as number | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} placeholder="0" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Değer</label>
+              <input 
+                type="number" 
+                value={(form.value as number | undefined) ?? ''} 
+                onChange={e => setForm(f => ({ ...f, value: e.target.value ? Number(e.target.value) : undefined }))} 
+                placeholder="0" 
+                className={adminInputClass}
+              />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Başlangıç</label>
-              <input type="datetime-local" value={(form.starts_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Başlangıç</label>
+              <input 
+                type="datetime-local" 
+                value={(form.starts_at as string | undefined) ?? ''} 
+                onChange={e => setForm(f => ({ ...f, starts_at: e.target.value }))} 
+                className={adminInputClass}
+              />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Bitiş</label>
-              <input type="datetime-local" value={(form.ends_at as string | undefined) ?? ''} onChange={e => setForm(f => ({ ...f, ends_at: e.target.value }))} className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all" />
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Bitiş</label>
+              <input 
+                type="datetime-local" 
+                value={(form.ends_at as string | undefined) ?? ''} 
+                onChange={e => setForm(f => ({ ...f, ends_at: e.target.value }))} 
+                className={adminInputClass}
+              />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Durum</label>
-              <div className="flex items-center gap-3 px-4 h-[42px] bg-slate-50 border border-slate-200/60 rounded-xl">
-                <input type="checkbox" id="coupon-active" checked={!!form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy/5" />
-                <label htmlFor="coupon-active" className="text-sm font-medium text-slate-600 cursor-pointer">Aktif</label>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Durum</label>
+              <div className="flex items-center gap-3 px-4 h-[42px] glass-strong border-white/10 rounded-xl">
+                <input 
+                  type="checkbox" 
+                  id="coupon-active" 
+                  checked={!!form.active} 
+                  onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} 
+                  className="w-4 h-4 rounded border-white/10 bg-slate-800 text-cyan-500 focus:ring-cyan-500/20" 
+                />
+                <label htmlFor="coupon-active" className="text-sm font-medium text-slate-300 cursor-pointer">Aktif</label>
               </div>
             </div>
-            <div className="md:col-span-4 flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 uppercase ml-1">Kullanım Limiti (Opsiyonel)</label>
-              <input type="number" min={1} value={(form.usage_limit as number | null | undefined) ?? ''} onChange={e => setForm(f => { const raw = e.target.value ? Number(e.target.value) : null; const normalized = raw && raw > 0 ? raw : null; return { ...f, usage_limit: normalized } })} placeholder="Sınırsız için boş bırakın" className="bg-slate-50 border border-slate-200/60 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/5 focus:border-primary-navy transition-all placeholder:text-slate-300" />
+            <div className="md:col-span-4 flex flex-col gap-2">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Kullanım Limiti (Opsiyonel)</label>
+              <input 
+                type="number" 
+                min={1} 
+                value={(form.usage_limit as number | null | undefined) ?? ''} 
+                onChange={e => setForm(f => { 
+                  const raw = e.target.value ? Number(e.target.value) : null; 
+                  const normalized = raw && raw > 0 ? raw : null; 
+                  return { ...f, usage_limit: normalized } 
+                })} 
+                placeholder="Sınırsız kullanım için boş bırakın" 
+                className={adminInputClass}
+              />
             </div>
-            <div className="md:col-span-2 flex flex-col gap-1.5 justify-end">
-              <button onClick={saveCoupon} disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} className={`${adminButtonPrimaryClass} shadow-lg shadow-primary-navy/10 w-full`}>{saving ? 'Kaydediliyor…' : 'Kuponu Oluştur'}</button>
+            <div className="md:col-span-2 flex flex-col gap-2 justify-end">
+              <button 
+                onClick={saveCoupon} 
+                disabled={saving || !(String(form.code || '').trim().length >= 3 && (form.type === 'percent' || form.type === 'fixed') && Number(form.value) > 0)} 
+                className={`${adminButtonPrimaryClass} shadow-lg shadow-cyan-900/20 w-full h-[42px]`}
+              >
+                {saving ? 'Kaydediliyor...' : 'Kuponu Oluştur'}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      <section className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-auto">
-        <div ref={dragScrollRef} className="overflow-x-auto w-full">
-          <table className="min-w-[1000px] text-sm max-md:text-xs">
-            <thead>
+      <section className={adminTableContainerClass}>
+        <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
+          <table className="w-full text-sm">
+            <thead className="glass-strong">
               <tr>
-                <th className={`${adminTableHeadCellClass}`}>Kod</th>
-                <th className={`${adminTableHeadCellClass}`}>Tip</th>
-                <th className={`${adminTableHeadCellClass}`}>Değer</th>
-                <th className={`${adminTableHeadCellClass}`}>Aktif</th>
-                <th className={`${adminTableHeadCellClass}`}>Başlangıç</th>
-                <th className={`${adminTableHeadCellClass}`}>Bitiş</th>
-                <th className={`${adminTableHeadCellClass}`}>Kullanım</th>
-                <th className={`${adminTableHeadCellClass}`}>Oluşturulma</th>
-                <th className={`${adminTableHeadCellClass}`}>İşlemler</th>
+                <th className={adminTableHeadCellClass}>KOD</th>
+                <th className={adminTableHeadCellClass}>TİP</th>
+                <th className={adminTableHeadCellClass}>DEĞER</th>
+                <th className={adminTableHeadCellClass}>AKTİF</th>
+                <th className={adminTableHeadCellClass}>GEÇERLİLİK</th>
+                <th className={adminTableHeadCellClass}>KULLANIM</th>
+                <th className={adminTableHeadCellClass}>OLUŞTURULMA</th>
+                <th className={`${adminTableHeadCellClass} text-right`}>İŞLEMLER</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {loading && rows.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-0">
-                    <AdminSkeleton variant="table" count={9} rows={5} />
+                  <td colSpan={8} className="p-0">
+                    <AdminSkeleton variant="table" count={8} rows={5} />
                   </td>
                 </tr>
               ) : filtered().length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-4">
+                  <td colSpan={8} className="p-12">
                     <AdminEmptyState
                       icon={Ticket}
                       title="Kupon bulunamadı"
@@ -267,21 +334,73 @@ const AdminCouponsPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filtered().map(r => (
-                  <tr key={r.id} className="border-t border-gray-100">
-                    <td className="px-3 py-2 font-mono text-xs">{r.code}</td>
-                    <td className="px-3 py-2">{r.type}</td>
-                    <td className="px-3 py-2">{r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}</td>
-                    <td className="px-3 py-2">
-                      <label className="inline-flex items-center gap-2 text-xs">
-                        <input type="checkbox" checked={!!r.active} disabled={!hasWriteAccess} onChange={() => toggleActive(r.id, r.active)} /> {r.active ? 'Aktif' : 'Pasif'}
-                      </label>
+                filtered().map((r, idx) => (
+                  <tr 
+                    key={r.id} 
+                    className="group border-t border-white/5 hover:bg-white/[0.02] transition-colors"
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <td className={`${adminTableCellClass} font-mono text-[11px] font-black text-white`}>
+                      <span className="bg-cyan-500/10 px-3 py-1.5 rounded-lg border border-cyan-500/20 text-cyan-400 uppercase tracking-widest">
+                        {r.code}
+                      </span>
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : '-'}</td>
-                    <td className="px-3 py-2">{r.used_count || 0}{r.usage_limit ? ` / ${r.usage_limit}` : ''}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{formatDateTime(r.created_at, lang as 'tr' | 'en')}</td>
-                    <td className="px-3 py-2 text-xs text-slate-500">—</td>
+                    <td className={adminTableCellClass}>
+                      <span className={`uppercase tracking-widest font-black inline-flex items-center gap-1.5 text-[10px] ${r.type === 'percent' ? 'text-blue-400' : 'text-emerald-400'}`}>
+                        <div className={`w-1 h-1 rounded-full ${r.type === 'percent' ? 'bg-blue-500' : 'bg-emerald-500'}`}></div>
+                        {r.type === 'percent' ? 'Yüzde' : 'Sabit'}
+                      </span>
+                    </td>
+                    <td className={`${adminTableCellClass} font-black font-mono text-white tracking-widest`}>
+                      {r.type === 'percent' ? `%${r.value}` : `${formatCurrency(r.value, lang as 'tr' | 'en', { maximumFractionDigits: 0 })}`}
+                    </td>
+                    <td className={adminTableCellClass}>
+                      <button
+                        onClick={() => hasWriteAccess && toggleActive(r.id, r.active)}
+                        disabled={!hasWriteAccess}
+                        className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all border ${
+                          r.active 
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                            : 'bg-slate-500/10 text-slate-400 border-white/5 opacity-50'
+                        }`}
+                      >
+                        <div className={`w-1 h-1 rounded-full ${r.active ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-slate-500'}`}></div>
+                        {r.active ? 'Aktif' : 'Pasif'}
+                      </button>
+                    </td>
+                    <td className={adminTableCellClass}>
+                      <div className="flex flex-col gap-1 text-[10px] uppercase font-black tracking-widest">
+                        <span className="text-white/80">{r.starts_at ? formatDateTime(r.starts_at, lang as 'tr' | 'en') : '-'}</span>
+                        <span className="text-slate-500 flex items-center gap-1">
+                          <div className="w-1 h-[1px] bg-white/10"></div>
+                          {r.ends_at ? formatDateTime(r.ends_at, lang as 'tr' | 'en') : 'SÜRESİZ'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className={adminTableCellClass}>
+                      <div className="flex flex-col gap-1.5 w-24">
+                        <div className="flex justify-between text-[10px] font-bold font-mono text-slate-400">
+                          <span>{r.used_count || 0}</span>
+                          <span>{r.usage_limit || '∞'}</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-1000"
+                            style={{ 
+                              width: r.usage_limit ? `${Math.min((r.used_count || 0) / r.usage_limit * 100, 100)}%` : '0%' 
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className={`${adminTableCellClass} text-slate-500 text-[10px] font-black uppercase tracking-widest`}>
+                      {formatDateTime(r.created_at, lang as 'tr' | 'en')}
+                    </td>
+                    <td className={`${adminTableCellClass} text-right`}>
+                      <button className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-colors group">
+                        <Ticket className="w-4 h-4 opacity-40 group-hover:opacity-100" />
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
