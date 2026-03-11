@@ -48,6 +48,7 @@ export const en = {
     prev: "Previous",
     next: "Next",
     remove: "Remove",
+    more: "More",
   },
   search: {
     recentSearches: "Recent Searches",
