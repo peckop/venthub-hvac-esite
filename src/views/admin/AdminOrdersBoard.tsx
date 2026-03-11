@@ -303,6 +303,7 @@ export default function AdminOrdersBoard() {
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
+    const [expandedCol, setExpandedCol] = useState<ColumnId | null>('col_new')
     const scrollRef = useRef<HTMLDivElement>(null)
 
     const fetchOrders = useCallback(async () => {
