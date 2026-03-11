@@ -1,7 +1,17 @@
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonSecondaryClass, adminTableActionClass } from '../../utils/adminUi'
+import { 
+  adminSectionTitleClass, 
+  adminCardClass, 
+  adminTableHeadCellClass, 
+  adminTableCellClass, 
+  adminButtonSecondaryClass, 
+  adminTableActionClass,
+  adminSelectClass,
+  adminSelectStyle,
+  adminInputClass
+} from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatDateTime } from '../../i18n/datetime'
@@ -135,23 +145,47 @@ const AdminErrorsPage: React.FC = () => {
         recordCount={total}
         rightExtra={(
           <div className="flex items-center gap-2">
-            <select value={env} onChange={(e) => setEnv(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy font-medium text-slate-700 transition-all cursor-pointer" title={t('admin.errors.envTitle') as string}>
-              <option value="production">production</option>
-              <option value="preview">preview</option>
-              <option value="development">development</option>
-              <option value="">({t('admin.ui.all')})</option>
+            <select 
+              value={env} 
+              onChange={(e) => setEnv(e.target.value)} 
+              className={adminSelectClass}
+              style={adminSelectStyle}
+              title={t('admin.errors.envTitle') as string}
+            >
+              <option value="production" className="bg-[#0A0F1E]">production</option>
+              <option value="preview" className="bg-[#0A0F1E]">preview</option>
+              <option value="development" className="bg-[#0A0F1E]">development</option>
+              <option value="" className="bg-[#0A0F1E]">({t('admin.ui.all')})</option>
             </select>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.startDate') as string} />
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="border border-slate-200 rounded-lg px-3 h-10 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" title={t('admin.ui.endDate') as string} />
+            <input 
+              type="date" 
+              value={fromDate} 
+              onChange={(e) => setFromDate(e.target.value)} 
+              className={adminInputClass} 
+              title={t('admin.ui.startDate') as string} 
+            />
+            <input 
+              type="date" 
+              value={toDate} 
+              onChange={(e) => setToDate(e.target.value)} 
+              className={adminInputClass} 
+              title={t('admin.ui.endDate') as string} 
+            />
           </div>
         )}
       />
 
       {/* Pagination */}
-      <div className="flex items-center justify-end gap-2">
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.prev')}</button>
-        <span className="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={adminButtonSecondaryClass + " disabled:opacity-50"}>{t('admin.ui.next')}</button>
+      <div className="flex items-center justify-end gap-3 mb-2">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+          {t('admin.ui.prev')}
+        </button>
+        <span className="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] bg-white/5 px-4 py-2 rounded-xl border border-white/10 backdrop-blur-md">
+          {t('admin.ui.pageLabel', { page: String(page), pages: String(Math.max(1, Math.ceil(total / PAGE_SIZE))) })}
+        </span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+          {t('admin.ui.next')}
+        </button>
       </div>
 
       <div className={`${adminCardClass} overflow-hidden`}>
@@ -160,7 +194,7 @@ const AdminErrorsPage: React.FC = () => {
         )}
         <div ref={dragScrollRef} className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="bg-gray-50">
+            <thead className="glass-strong">
               <tr>
                 <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.date')}</th>
                 <th className={`${adminTableHeadCellClass}`}>{t('admin.errors.table.level')}</th>
@@ -189,7 +223,7 @@ const AdminErrorsPage: React.FC = () => {
               ) : (
                 rows.map(r => (
                   <React.Fragment key={r.id}>
-                    <tr className="border-b border-slate-200/60">
+                    <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors group">
                       <td className={`${adminTableCellClass}`}>{formatDateTime(r.at, lang)}</td>
                       <td className={`${adminTableCellClass}`}><span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${r.level === 'error' ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-600/20' : r.level === 'warn' ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20' : 'bg-sky-50 text-sky-700 ring-1 ring-sky-600/20'}`}>{r.level || 'error'}</span></td>
                       <td className={`${adminTableCellClass}`}>{r.message}</td>
@@ -201,20 +235,31 @@ const AdminErrorsPage: React.FC = () => {
                         >{expandedId === r.id ? t('admin.ui.hide') : t('admin.ui.details')}</button>
                       </td>
                     </tr>
-                    {expandedId === r.id && (
-                      <tr className="bg-gray-50">
-                        <td colSpan={5} className="p-3">
-                          <div className="grid md:grid-cols-2 gap-3 text-xs">
+                     {expandedId === r.id && (
+                      <tr className="bg-white/[0.03]">
+                        <td colSpan={5} className="p-6">
+                          <div className="grid md:grid-cols-2 gap-6 text-[11px]">
                             <div>
-                              <div className="font-medium text-slate-500 mb-1">{t('admin.errors.labels.stack')}</div>
-                              <pre className="bg-slate-950 text-amber-300 font-mono p-3 rounded-lg overflow-auto max-h-64 text-[11px] leading-relaxed">{String(r.stack || '').slice(0, 8000)}</pre>
+                              <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.labels.stack')}</div>
+                              <pre className="bg-[#0A0F1E]/80 text-amber-300/80 font-mono p-4 rounded-2xl border border-white/5 overflow-auto max-h-80 leading-relaxed custom-scrollbar">{String(r.stack || '').slice(0, 8000)}</pre>
                             </div>
-                            <div>
-                              <div className="font-medium text-slate-500 mb-1">{t('admin.errors.detailsTitle')}</div>
-                              <div className="space-y-1">
-                                <div><span className="text-slate-500">{t('admin.errors.labels.ua')}: </span>{r.user_agent || '-'}</div>
-                                <div><span className="text-slate-500">{t('admin.errors.labels.release')}: </span>{r.release || '-'}</div>
-                                <div><span className="text-slate-500">{t('admin.errors.labels.env')}: </span>{r.env || '-'}</div>
+                            <div className="space-y-6">
+                              <div>
+                                <div className="font-black text-slate-500 mb-3 uppercase tracking-widest">{t('admin.errors.detailsTitle')}</div>
+                                <div className="space-y-3 bg-[#0A0F1E]/40 p-4 rounded-2xl border border-white/5">
+                                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.ua')}</span>
+                                    <span className="text-slate-300 font-mono text-[10px] text-right ml-4">{r.user_agent || '-'}</span>
+                                  </div>
+                                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.release')}</span>
+                                    <span className="text-cyan-400 font-black tracking-widest">{r.release || '-'}</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-slate-500 uppercase font-bold tracking-tighter">{t('admin.errors.labels.env')}</span>
+                                    <span className="text-amber-400 font-black tracking-widest">{r.env || '-'}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>

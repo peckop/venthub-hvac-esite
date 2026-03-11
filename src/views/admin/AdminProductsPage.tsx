@@ -4,7 +4,18 @@ import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import type { Density } from '../../components/admin/ColumnsMenu'
-import { adminSectionTitleClass, adminCardClass, adminTableHeadCellClass, adminTableCellClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableActionClass, adminTableActionDangerClass } from '../../utils/adminUi'
+import { 
+  adminSectionTitleClass, 
+  adminSubtitleClass,
+  adminCardClass, 
+  adminTableHeadCellClass, 
+  adminTableCellClass, 
+  adminTableContainerClass,
+  adminButtonPrimaryClass, 
+  adminButtonSecondaryClass,
+  adminTableActionClass, 
+  adminTableActionDangerClass 
+} from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
@@ -424,10 +435,11 @@ const AdminProductsPage: React.FC = () => {
 
   const statusBadge = (s?: string | null) => {
     const v = (s || '').toLowerCase()
-    if (v === 'active') return <span className="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">{t('admin.products.statusLabels.active')}</span>
-    if (v === 'inactive') return <span className="px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">{t('admin.products.statusLabels.inactive')}</span>
-    if (v === 'out_of_stock') return <span className="px-2 py-0.5 text-xs rounded bg-orange-100 text-orange-700">{t('admin.products.statusLabels.out_of_stock')}</span>
-    return <span className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-600">-</span>
+    const baseClass = "px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border"
+    if (v === 'active') return <span className={`${baseClass} bg-emerald-500/10 text-emerald-400 border-emerald-500/20`}>{t('admin.products.statusLabels.active')}</span>
+    if (v === 'inactive') return <span className={`${baseClass} bg-slate-500/10 text-slate-400 border-white/5`}>{t('admin.products.statusLabels.inactive')}</span>
+    if (v === 'out_of_stock') return <span className={`${baseClass} bg-rose-500/10 text-rose-400 border-rose-500/20`}>{t('admin.products.statusLabels.out_of_stock')}</span>
+    return <span className={`${baseClass} bg-slate-500/10 text-slate-500 border-white/5`}>-</span>
   }
 
 
@@ -442,23 +454,23 @@ const AdminProductsPage: React.FC = () => {
   const selectConfig = React.useMemo(() => ({
     value: selectedCategoryFilter,
     onChange: handleCategoryChange,
-    title: t('admin.products.toolbar.categoryTitle') ?? 'Kategori',
-    options: [{ value: '', label: t('admin.products.toolbar.allCategories') ?? 'Tüm Kategoriler' }, ...cats.map(c => ({ value: c.id, label: c.name }))]
+    options: [{ value: '', label: t('admin.products.toolbar.allCategories') || 'TÜM KATEGORİLER' }, ...cats.map(c => ({ value: c.id, label: c.name.toUpperCase() }))]
   }), [selectedCategoryFilter, t, cats, handleCategoryChange])
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+        <div>
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.products') ?? 'Ürünler'}</h1>
+          <p className={adminSubtitleClass}>Tüm ürün kataloğunu yönetin, stok ve fiyat güncellemelerini anlık olarak takip edin.</p>
+        </div>
         {hasWriteAccess && (
-          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2`}>
-            <Plus size={18} />
+          <button onClick={handleCreate} className={`${adminButtonPrimaryClass} flex items-center gap-2 group`}>
+            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
             <span>{t('admin.products.edit.actions.new') ?? 'Yeni Ürün'}</span>
           </button>
         )}
       </div>
-
-
 
       <AdminToolbar
         storageKey="toolbar:products"
@@ -526,51 +538,80 @@ const AdminProductsPage: React.FC = () => {
         )}
       />
 
-
-      {/* Table */}
-      <div className={`${adminCardClass} overflow-hidden`}>
-        {error && <div className="p-3 text-red-600 text-sm border-b border-red-100">{error}</div>}
-        <div className="p-2 flex items-center justify-between text-sm text-slate-500">
-          <div>{t('admin.ui.total') ?? 'Toplam'}: {total}</div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.prev')}</button>
-            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/50">{t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}</span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} className={`${adminButtonSecondaryClass} disabled:opacity-50`}>{t('admin.ui.next')}</button>
+      <div className={adminTableContainerClass}>
+        {error && <div className="p-4 text-rose-400 text-xs font-bold bg-rose-500/10 border-b border-white/5 animate-pulse flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-rose-500" />{error}</div>}
+        
+        <div className="p-4 flex items-center justify-between border-b border-white/5 bg-white/[0.02]">
+          <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('admin.ui.total') ?? 'Toplam'}: <span className="text-cyan-400">{total}</span> Ürün</div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setPage(p => Math.max(1, p - 1))} 
+              disabled={page <= 1} 
+              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={16} className="rotate-180" />
+            </button>
+            <span className="text-[10px] font-black text-slate-400 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5 min-w-[100px] text-center uppercase tracking-tighter">
+              {t('admin.ui.pageLabel', { page, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) })}
+            </span>
+            <button 
+              onClick={() => setPage(p => p + 1)} 
+              disabled={page >= Math.max(1, Math.ceil(total / PAGE_SIZE))} 
+              className="w-8 h-8 flex items-center justify-center rounded-lg glass border border-white/5 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
-        <div ref={dragScrollRef} className="overflow-x-auto w-full">
-          <table className="w-full min-w-[1200px] max-md:text-xs">
-            <thead className="bg-gray-50">
-              <tr>
-                {/* Checkbox column */}
-                <th className={`${adminTableHeadCellClass} ${headPad} w-10`}>
+
+        <div ref={dragScrollRef} className="overflow-x-auto w-full custom-scrollbar">
+          <table className="w-full min-w-[1200px]">
+            <thead>
+              <tr className="glass-strong">
+                <th className={`${adminTableHeadCellClass} ${headPad} w-10 text-center py-4`}>
                   {hasWriteAccess && (
-                    <input type="checkbox" checked={rows.length > 0 && selectedIds.size === rows.length} onChange={toggleSelectAll} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
+                    <input 
+                      type="checkbox" 
+                      checked={rows.length > 0 && selectedIds.size === rows.length} 
+                      onChange={toggleSelectAll} 
+                      className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus:ring-cyan-400/30 focus:ring-offset-0 w-4 h-4" 
+                    />
                   )}
                 </th>
-                {/* Expand column */}
-                <th className={`${adminTableHeadCellClass} ${headPad} w-8`} />
+                <th className={`${adminTableHeadCellClass} ${headPad} w-8 py-4`} />
                 {visibleCols.image && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.image')}</th>
                 )}
                 {visibleCols.name && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('name')}>{t('admin.products.table.name')} {sortIndicator('name')}</button>
+                    <button type="button" className="flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('name')}>
+                      {t('admin.products.table.name')} 
+                      <span className="text-cyan-400/50">{sortIndicator('name')}</span>
+                    </button>
                   </th>
                 )}
                 {visibleCols.sku && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('sku')}>{t('admin.products.table.sku')} {sortIndicator('sku')}</button>
+                    <button type="button" className="flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('sku')}>
+                      {t('admin.products.table.sku')} 
+                      <span className="text-cyan-400/50">{sortIndicator('sku')}</span>
+                    </button>
                   </th>
                 )}
                 {visibleCols.category && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('category')}>{t('admin.products.table.category')} {sortIndicator('category')}</button>
+                    <button type="button" className="flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('category')}>
+                      {t('admin.products.table.category')} 
+                      <span className="text-cyan-400/50">{sortIndicator('category')}</span>
+                    </button>
                   </th>
                 )}
                 {visibleCols.status && (
                   <th className={`${adminTableHeadCellClass} ${headPad}`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('status')}>{t('admin.products.table.status')} {sortIndicator('status')}</button>
+                    <button type="button" className="flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('status')}>
+                      {t('admin.products.table.status')} 
+                      <span className="text-cyan-400/50">{sortIndicator('status')}</span>
+                    </button>
                   </th>
                 )}
                 {visibleCols.health && (
@@ -580,196 +621,238 @@ const AdminProductsPage: React.FC = () => {
                 )}
                 {visibleCols.price && (
                   <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('price')}>{t('admin.products.table.price')} {sortIndicator('price')}</button>
+                    <button type="button" className="inline-flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('price')}>
+                      {t('admin.products.table.price')} 
+                      <span className="text-cyan-400/50">{sortIndicator('price')}</span>
+                    </button>
                   </th>
                 )}
                 {visibleCols.stock && (
                   <th className={`${adminTableHeadCellClass} ${headPad} text-right`}>
-                    <button type="button" className="hover:underline" onClick={() => toggleSort('stock')}>{t('admin.products.table.stock')} {sortIndicator('stock')}</button>
+                    <button type="button" className="inline-flex items-center gap-2 hover:text-cyan-400 transition-colors uppercase tracking-widest" onClick={() => toggleSort('stock')}>
+                      {t('admin.products.table.stock')} 
+                      <span className="text-cyan-400/50">{sortIndicator('stock')}</span>
+                    </button>
                   </th>
                 )}
-                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad}`}>{t('admin.products.table.actions')}</th>}
+                {visibleCols.actions && <th className={`${adminTableHeadCellClass} ${headPad} text-center`}>{t('admin.products.table.actions')}</th>}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {loading && rows.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="p-0">
+                  <td colSpan={11} className="p-0">
                     <AdminSkeleton variant="table" count={10} rows={5} />
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="p-0">
-                    <div className="border-b-0">
-                      <AdminEmptyState
-                        icon={SearchX}
-                        title={t('admin.ui.noRecords') || 'Kayıt bulunamadı'}
-                        description="Arama kriterlerinize uyan ürün bulunamadı. Lütfen filtreleri değiştirin veya yeni ürün ekleyin."
-                      />
-                    </div>
+                  <td colSpan={11} className="p-0">
+                    <AdminEmptyState
+                      icon={SearchX}
+                      title={t('admin.ui.noRecords') || 'Kayıt bulunamadı'}
+                      description="Arama kriterlerinize uyan ürün bulunamadı. Lütfen filtreleri değiştirin veya yeni ürün ekleyin."
+                    />
                   </td>
                 </tr>
               ) : (
-                sorted.map(r => (
-                  <React.Fragment key={r.id}>
-                    <tr className={`border-b border-slate-200/60 transition-colors ${selectedIds.has(r.id) ? 'bg-blue-50/50' : 'hover:bg-gray-50/30'}`}>
-                      {/* Checkbox */}
-                      <td className={`${adminTableCellClass} ${cellPad} w-10`}>
-                        {hasWriteAccess && (
-                          <input type="checkbox" checked={selectedIds.has(r.id)} onChange={() => toggleSelect(r.id)} className="rounded border-gray-300 text-primary-navy focus:ring-primary-navy/30" />
-                        )}
-                      </td>
-                      {/* Expand */}
-                      <td className={`${adminTableCellClass} ${cellPad} w-8`}>
-                        <button onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} className="text-gray-400 hover:text-primary-navy transition-colors">
-                          {expandedIds.has(r.id) ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                        </button>
-                      </td>
-                      {visibleCols.image && (
-                        <td className={`${adminTableCellClass} ${cellPad}`}>
-                          {covers[r.id] ? (
-                            <img
-                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
-                              alt=""
-                              className="w-10 h-10 object-cover rounded border border-gray-200"
+                sorted.map(r => {
+                  const isExpanded = expandedIds.has(r.id);
+                  const isSelected = selectedIds.has(r.id);
+                  return (
+                    <React.Fragment key={r.id}>
+                      <tr className={`group transition-all duration-300 ${isSelected ? 'bg-cyan-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                        <td className={`${adminTableCellClass} ${cellPad} w-10 text-center`}>
+                          {hasWriteAccess && (
+                            <input 
+                              type="checkbox" 
+                              checked={isSelected} 
+                              onChange={() => toggleSelect(r.id)} 
+                              className="rounded-md border-white/10 bg-white/5 text-cyan-400 focus:ring-cyan-400/30 focus:ring-offset-0" 
                             />
-                          ) : (
-                            <div className="w-10 h-10 bg-gray-100 rounded" />
                           )}
                         </td>
-                      )}
-                      {visibleCols.name && <td className={`${adminTableCellClass} ${cellPad} font-medium`}>{r.name}</td>}
-                      {visibleCols.sku && (
-                        <td className={`${adminTableCellClass} ${cellPad}`}>
-                          {r.sku}
-                          {r.model_code && <div className="text-xs text-gray-500 mt-0.5">{r.model_code}</div>}
+                        <td className={`${adminTableCellClass} ${cellPad} w-8`}>
+                          <button 
+                            onClick={() => { toggleExpand(r.id); loadTechSpecs(r.id) }} 
+                            className={`w-6 h-6 flex items-center justify-center rounded-lg transition-all duration-300 ${isExpanded ? 'bg-cyan-400/10 text-cyan-400 rotate-90' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                          >
+                            <ChevronRight size={14} />
+                          </button>
                         </td>
-                      )}
-                      {visibleCols.category && <td className={`${adminTableCellClass} ${cellPad}`}>{cats.find(c => c.id === r.category_id)?.name || '-'}</td>}
-                      {visibleCols.status && <td className={`${adminTableCellClass} ${cellPad}`}>{statusBadge(r.status)}</td>}
-                      {visibleCols.health && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-center`}>
-                          <ProductHealthBadge
-                            stockQty={r.stock_qty || 0}
-                            threshold={r.low_stock_threshold || 10}
-                            status={r.status || 'inactive'}
-                            isFeatured={!!r.is_featured}
-                          />
-                        </td>
-                      )}
-                      {/* Inline-edit Price */}
-                      {visibleCols.price && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-right whitespace-nowrap`}>
-                          {hasWriteAccess ? (
-                            inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
-                              <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                                <input
-                                  type="number"
-                                  autoFocus
-                                  value={inlineEdit.value}
-                                  onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                                  onBlur={saveInlineEdit}
-                                  onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                  className="w-28 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
+                        {visibleCols.image && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
+                              {covers[r.id] ? (
+                                <img
+                                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
+                                  alt=""
+                                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
-                                className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-semibold text-slate-700 inline-flex items-center gap-2"
-                                title="Tıklayarak düzenle"
-                              >
-                                <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
-                                <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                                  <Pencil size={10} className="text-primary-navy" />
-                                </div>
-                              </button>
-                            )
-                          ) : (
-                            <span>{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
-                          )}
-                        </td>
-                      )}
-                      {/* Inline-edit Stock */}
-                      {visibleCols.stock && (
-                        <td className={`${adminTableCellClass} ${cellPad} text-right`}>
-                          {hasWriteAccess ? (
-                            inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
-                              <div className="relative inline-block animate-in fade-in zoom-in duration-200">
-                                <input
-                                  type="number"
-                                  autoFocus
-                                  value={inlineEdit.value}
-                                  onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
-                                  onBlur={saveInlineEdit}
-                                  onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
-                                  className="w-24 text-right border-2 border-primary-navy/40 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-primary-navy ring-4 ring-primary-navy/5 shadow-sm bg-white"
-                                />
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
-                                className="group relative bg-slate-50/50 hover:bg-primary-navy/5 px-3 py-1.5 rounded-lg border border-transparent hover:border-primary-navy/20 transition-all duration-200 text-sm font-bold text-slate-900 inline-flex items-center gap-2"
-                                title="Tıklayarak düzenle"
-                              >
-                                <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600' : ''}>
-                                  {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
-                                </span>
-                                <div className="p-1 rounded-md bg-white border border-slate-200 opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-sm">
-                                  <Pencil size={10} className="text-primary-navy" />
-                                </div>
-                              </button>
-                            )
-                          ) : (
-                            <span className={Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-600 font-bold' : 'font-bold'}>
-                              {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
-                            </span>
-                          )}
-                        </td>
-                      )}
-                      {visibleCols.actions && (
-                        <td className={`${adminTableCellClass} ${cellPad}`}>
-                          {hasWriteAccess ? (
-                            <div className="flex items-center gap-2 whitespace-nowrap">
-                              <button className={adminTableActionClass} onClick={() => handleEdit(r.id)}>{t('admin.ui.edit')}</button>
-                              <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete')}</button>
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-white/5 text-slate-700 uppercase font-black text-[10px]">No Img</div>
+                              )}
                             </div>
-                          ) : (
-                            <div className="text-xs text-slate-400">Yetki Yok</div>
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                    {/* Expanded Row - Tech Specs */}
-                    {expandedIds.has(r.id) && (
-                      <tr className="bg-gray-50/70">
-                        <td colSpan={10} className="px-6 py-3">
-                          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Teknik Özellikler (JSONB)</div>
-                          {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                              {Object.entries(techSpecs[r.id]).map(([key, val]) => (
-                                <div key={key} className="bg-white rounded-lg border border-gray-200 px-3 py-2">
-                                  <div className="text-[11px] text-gray-400 uppercase">{key}</div>
-                                  <div className="text-sm font-medium text-gray-800">{String(val)}</div>
-                                </div>
-                              ))}
+                          </td>
+                        )}
+                        {visibleCols.name && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sm font-bold text-slate-100 line-clamp-1 group-hover:text-cyan-400 transition-colors">{r.name}</span>
+                              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{r.brand || 'Markasız'}</span>
                             </div>
-                          ) : (
-                            <div className="text-sm text-slate-500">Teknik veri bulunamadı.</div>
-                          )}
-                        </td>
+                          </td>
+                        )}
+                        {visibleCols.sku && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <div className="flex flex-col gap-0.5">
+                              <code className="text-[11px] font-mono font-black text-cyan-400/70 bg-cyan-400/10 px-2 py-0.5 rounded-md w-max">{r.sku}</code>
+                              {r.model_code && <span className="text-[10px] text-slate-500 font-black uppercase tracking-tighter">{r.model_code}</span>}
+                            </div>
+                          </td>
+                        )}
+                        {visibleCols.category && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <span className="text-xs font-black text-slate-400 uppercase tracking-tighter">{cats.find(c => c.id === r.category_id)?.name || '-'}</span>
+                          </td>
+                        )}
+                        {visibleCols.status && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <div className="flex items-center">
+                              {statusBadge(r.status)}
+                            </div>
+                          </td>
+                        )}
+                        {visibleCols.health && (
+                          <td className={`${adminTableCellClass} ${cellPad} text-center`}>
+                            <div className="flex justify-center">
+                              <ProductHealthBadge
+                                stockQty={r.stock_qty || 0}
+                                threshold={r.low_stock_threshold || 10}
+                                status={r.status || 'inactive'}
+                                isFeatured={!!r.is_featured}
+                              />
+                            </div>
+                          </td>
+                        )}
+                        {visibleCols.price && (
+                          <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                            {hasWriteAccess ? (
+                              inlineEdit?.id === r.id && inlineEdit.field === 'price' ? (
+                                <div className="relative inline-block animate-in fade-in zoom-in duration-300">
+                                  <input
+                                    type="number"
+                                    autoFocus
+                                    value={inlineEdit.value}
+                                    onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                    onBlur={saveInlineEdit}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                    className="w-24 text-right bg-[#0A0F1E] border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                  />
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setInlineEdit({ id: r.id, field: 'price', value: String(r.price ?? '') })}
+                                  className="group/btn relative bg-white/[0.03] hover:bg-cyan-400/10 px-3 py-1.5 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-all duration-300 flex flex-col items-end gap-0.5 ml-auto"
+                                >
+                                  <span className="text-sm font-black text-slate-100 group-hover/btn:text-cyan-400 transition-colors">
+                                    {r.price != null ? formatCurrency(Number(r.price), lang) : '-'}
+                                  </span>
+                                  <Pencil size={8} className="text-slate-600 group-hover/btn:text-cyan-400 transition-colors" />
+                                </button>
+                              )
+                            ) : (
+                              <span className="text-sm font-black text-slate-100">{r.price != null ? formatCurrency(Number(r.price), lang) : '-'}</span>
+                            )}
+                          </td>
+                        )}
+                        {visibleCols.stock && (
+                          <td className={`${adminTableCellClass} ${cellPad} text-right`}>
+                            {hasWriteAccess ? (
+                              inlineEdit?.id === r.id && inlineEdit.field === 'stock_qty' ? (
+                                <div className="relative inline-block animate-in fade-in zoom-in duration-300">
+                                  <input
+                                    type="number"
+                                    autoFocus
+                                    value={inlineEdit.value}
+                                    onChange={(e) => setInlineEdit({ ...inlineEdit, value: e.target.value })}
+                                    onBlur={saveInlineEdit}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') saveInlineEdit(); if (e.key === 'Escape') setInlineEdit(null) }}
+                                    className="w-20 text-right bg-[#0A0F1E] border-2 border-cyan-400/50 rounded-xl px-2 py-1 text-sm text-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-400/10 font-black"
+                                  />
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setInlineEdit({ id: r.id, field: 'stock_qty', value: String(r.stock_qty ?? '') })}
+                                  className={`group/btn relative px-3 py-1.5 rounded-xl border transition-all duration-300 flex flex-col items-end gap-0.5 ml-auto ${
+                                    Number(r.stock_qty) < (r.low_stock_threshold || 10) 
+                                      ? 'bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20' 
+                                      : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.08] hover:border-white/10'
+                                  }`}
+                                >
+                                  <span className={`text-sm font-black ${Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-400' : 'text-slate-100'}`}>
+                                    {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                                  </span>
+                                  <Pencil size={8} className="text-slate-600 group-hover/btn:text-slate-400" />
+                                </button>
+                              )
+                            ) : (
+                              <span className={`text-sm font-black ${Number(r.stock_qty) < (r.low_stock_threshold || 10) ? 'text-rose-400' : 'text-slate-100'}`}>
+                                {(r.stock_qty != null ? Number(r.stock_qty) : null) ?? '-'}
+                              </span>
+                            )}
+                          </td>
+                        )}
+                        {visibleCols.actions && (
+                          <td className={`${adminTableCellClass} ${cellPad}`}>
+                            <div className="flex items-center justify-center gap-2">
+                              {hasWriteAccess ? (
+                                <>
+                                  <button onClick={() => handleEdit(r.id)} className={adminTableActionClass}>{t('admin.ui.edit')}</button>
+                                  <button onClick={() => remove(r.id)} className={adminTableActionDangerClass}>{t('admin.ui.delete')}</button>
+                                </>
+                              ) : (
+                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">Yetki Yok</span>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
-                    )}
-                  </React.Fragment>
-                ))
+                      {isExpanded && (
+                        <tr className="bg-white/[0.01]">
+                          <td colSpan={11} className="px-12 py-8 bg-gradient-to-r from-transparent via-cyan-400/[0.02] to-transparent">
+                            <div className="max-w-4xl mx-auto">
+                              <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-0.5 bg-cyan-400" />
+                                <h4 className="text-[11px] font-black text-cyan-400 uppercase tracking-[0.3em]">Teknik Ürün Parametreleri</h4>
+                              </div>
+                              {techSpecs[r.id] && Object.keys(techSpecs[r.id]).length > 0 ? (
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                  {Object.entries(techSpecs[r.id]).map(([key, val]) => (
+                                    <div key={key} className="glass p-4 rounded-2xl border border-white/5 hover:border-white/10 transition-all group/spec">
+                                      <div className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-1 group-hover/spec:text-cyan-400/70 transition-colors">{key}</div>
+                                      <div className="text-xs font-black text-slate-200 uppercase">{String(val)}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="glass p-8 rounded-2xl border border-white/5 text-center">
+                                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Bu ürün için tanımlanmış ek teknik özellik bulunmuyor.</p>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Bulk Action Toolbar */}
       {hasWriteAccess && (
         <BulkActionToolbar
           selectedCount={selectedIds.size}
@@ -789,6 +872,7 @@ const AdminProductsPage: React.FC = () => {
         categories={cats.map(c => ({ id: c.id, name: c.name }))}
       />
     </div>
+
   )
 }
 

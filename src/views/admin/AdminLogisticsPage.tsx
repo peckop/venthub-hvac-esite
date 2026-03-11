@@ -2,9 +2,20 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminSectionTitleClass, adminButtonPrimaryClass, adminButtonSecondaryClass, adminTableHeadCellClass } from '../../utils/adminUi'
+import { 
+    adminSectionTitleClass, 
+    adminSubtitleClass,
+    adminButtonPrimaryClass, 
+    adminButtonSecondaryClass, 
+    adminTableHeadCellClass, 
+    adminTableCellClass,
+    adminCardClass,
+    adminInputClass,
+    adminSelectClass,
+    adminSelectStyle
+} from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Truck, CheckCircle2 } from 'lucide-react'
+import { Truck, CheckCircle2, RefreshCw } from 'lucide-react'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
@@ -34,7 +45,6 @@ export default function AdminLogisticsPage() {
     const fetchPendingOrders = useCallback(async () => {
         setLoading(true)
         try {
-            // Proaktif oturum kontrolü
             await ensureSessionFresh()
 
             const { data, error } = await supabase
@@ -86,7 +96,6 @@ export default function AdminLogisticsPage() {
     }
 
     const handleBulkSubmit = async () => {
-        // Sadece takip numarası girilmiş ve henüz kaydedilmemiş olanları seç
         const targets = rows.filter(r => r.tracking_number.trim() !== '' && !r.saved)
         if (targets.length === 0) {
             toast.error('Kaydedilecek yeni kargo bilgisi bulunamadı.')
@@ -110,7 +119,6 @@ export default function AdminLogisticsPage() {
                 return { id: row.id, ok: !fnErr }
             }))
 
-            // Hata olanları say, başarılı olanların `saved` statüsünü true yap
             setRows(prev => prev.map(r => {
                 const res = results.find(x => x.id === r.id)
                 if (res) {
@@ -133,97 +141,126 @@ export default function AdminLogisticsPage() {
     }
 
     return (
-        <div className="space-y-6 max-w-[1400px]">
-            <header className="flex items-center justify-between">
-                <div>
+        <div className="space-y-8 max-w-[1400px] animate-in fade-in duration-700">
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div className="space-y-1">
                     <h1 className={adminSectionTitleClass}>Toplu Kargo Panosu</h1>
-                    <p className="text-sm text-slate-500 mt-1">Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.</p>
+                    <p className={adminSubtitleClass}>Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.</p>
                 </div>
-                <button onClick={fetchPendingOrders} className={adminButtonSecondaryClass}>
-                    {loading ? 'Yükleniyor...' : 'Yenile'}
+                <button 
+                    onClick={fetchPendingOrders} 
+                    disabled={loading}
+                    className={adminButtonSecondaryClass}
+                >
+                    <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                    {loading ? 'Güncelleniyor...' : 'Verileri Yenile'}
                 </button>
             </header>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex items-end gap-4">
-                <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-tight mb-1">Varsayılan Kargo Firması</label>
-                    <select
-                        value={globalCarrier}
-                        onChange={e => setGlobalCarrier(e.target.value)}
-                        className="w-48 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary-navy"
-                    >
-                        <option value="Yurtiçi">Yurtiçi Kargo</option>
-                        <option value="Aras">Aras Kargo</option>
-                        <option value="MNG">MNG Kargo</option>
-                        <option value="PTT">PTT Kargo</option>
-                    </select>
+            <div className={`${adminCardClass} p-8 flex flex-col md:flex-row md:items-end gap-6 relative overflow-hidden group`}>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
+                
+                <div className="flex-1 space-y-3 relative z-10">
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Varsayılan Kargo Firması</label>
+                    <div className="relative max-w-xs">
+                        <select
+                            value={globalCarrier}
+                            onChange={e => setGlobalCarrier(e.target.value)}
+                            className={adminSelectClass}
+                            style={adminSelectStyle}
+                        >
+                            <option value="Yurtiçi">Yurtiçi Kargo</option>
+                            <option value="Aras">Aras Kargo</option>
+                            <option value="MNG">MNG Kargo</option>
+                            <option value="PTT">PTT Kargo</option>
+                        </select>
+                    </div>
                 </div>
                 {hasWriteAccess && (
-                    <button onClick={applyGlobalCarrier} className="px-4 py-2 text-sm font-bold text-primary-navy bg-primary-navy/5 hover:bg-primary-navy/10 rounded-lg transition-colors">
-                        Tümüne Uygula
+                    <button 
+                        onClick={applyGlobalCarrier} 
+                        className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 relative z-10"
+                    >
+                        Tüm Satırlara Uygula
                     </button>
                 )}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+            <div className={`${adminCardClass} overflow-hidden`}>
                 {loading && rows.length === 0 ? (
                     <div className="p-0">
                         <AdminSkeleton variant="table" count={7} rows={5} />
                     </div>
                 ) : rows.length === 0 ? (
-                    <AdminEmptyState
-                        icon={CheckCircle2}
-                        title="Bekleyen Kargo Yok"
-                        description="Tüm siparişlerin kargo işlemi tamamlanmış görünüyor."
-                    />
+                    <div className="py-20 bg-[#0A0F1E]/20">
+                        <AdminEmptyState
+                            icon={CheckCircle2}
+                            title="Bekleyen Kargo Yok"
+                            description="Tüm siparişlerin kargo işlemi tamamlanmış görünüyor."
+                        />
+                    </div>
                 ) : (
-                    <div className="overflow-x-auto w-full" ref={dragScrollRef}>
-                        <table className="min-w-[1000px] text-sm max-md:text-xs">
-                            <thead className="bg-slate-50">
+                    <div className="overflow-x-auto w-full custom-scrollbar" ref={dragScrollRef}>
+                        <table className="w-full text-sm border-collapse">
+                            <thead className="glass-strong">
                                 <tr>
-                                    <th className={adminTableHeadCellClass}>Sipariş No</th>
-                                    <th className={adminTableHeadCellClass}>Müşteri</th>
-                                    <th className={adminTableHeadCellClass}>Kargo Firması</th>
-                                    <th className={adminTableHeadCellClass}>Takip Numarası</th>
-                                    <th className={adminTableHeadCellClass + " text-center"}>Durum</th>
+                                    <th className={adminTableHeadCellClass}>SİPARİŞ NO</th>
+                                    <th className={adminTableHeadCellClass}>MÜŞTERİ</th>
+                                    <th className={adminTableHeadCellClass}>KARGO FİRMASI</th>
+                                    <th className={adminTableHeadCellClass}>TAKİP NUMARASI</th>
+                                    <th className={`${adminTableHeadCellClass} text-center`}>DURUM</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {rows.map((row) => (
-                                    <tr key={row.id} className={row.saved ? 'bg-emerald-50/30' : 'hover:bg-slate-50/50'}>
-                                        <td className="px-4 py-3 font-mono text-xs text-slate-600">#{row.order_number}</td>
-                                        <td className="px-4 py-3 font-semibold text-slate-800">{row.customer_name}</td>
-                                        <td className="px-4 py-3">
-                                            <select
-                                                disabled={!hasWriteAccess || row.saved || saving}
-                                                value={row.carrier}
-                                                onChange={e => updateRow(row.id, 'carrier', e.target.value)}
-                                                className="w-32 bg-white border border-slate-200 rounded-md px-2 py-1.5 text-xs focus:outline-none focus:border-primary-navy disabled:opacity-60"
-                                            >
-                                                <option value="Yurtiçi">Yurtiçi</option>
-                                                <option value="Aras">Aras</option>
-                                                <option value="MNG">MNG</option>
-                                                <option value="PTT">PTT</option>
-                                            </select>
+                            <tbody className="divide-y divide-white/5">
+                                {rows.map((row, idx) => (
+                                    <tr 
+                                        key={row.id} 
+                                        className={`group border-b border-white/5 transition-all duration-300 ${
+                                            row.saved 
+                                                ? 'bg-emerald-500/[0.03] hover:bg-emerald-500/[0.06]' 
+                                                : 'hover:bg-white/[0.02]'
+                                        }`}
+                                        style={{ animationDelay: `${idx * 50}ms` }}
+                                    >
+                                        <td className={`${adminTableCellClass} font-mono text-[11px] font-black text-cyan-400`}>
+                                            <span className="bg-cyan-500/10 px-2 py-1 rounded-lg border border-cyan-500/20">
+                                                #{row.order_number}
+                                            </span>
                                         </td>
-                                        <td className="px-4 py-3">
+                                        <td className={`${adminTableCellClass} font-black text-white uppercase tracking-tight`}>{row.customer_name}</td>
+                                        <td className={adminTableCellClass}>
+                                            <div className="relative min-w-[140px]">
+                                                <select
+                                                    disabled={!hasWriteAccess || row.saved || saving}
+                                                    value={row.carrier}
+                                                    onChange={e => updateRow(row.id, 'carrier', e.target.value)}
+                                                    className={`${adminSelectClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 disabled:opacity-40`}
+                                                    style={adminSelectStyle}
+                                                >
+                                                    <option value="Yurtiçi">Yurtiçi</option>
+                                                    <option value="Aras">Aras</option>
+                                                    <option value="MNG">MNG</option>
+                                                    <option value="PTT">PTT</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td className={adminTableCellClass}>
                                             <input
                                                 type="text"
                                                 disabled={!hasWriteAccess || row.saved || saving}
                                                 value={row.tracking_number}
                                                 onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
-                                                placeholder="Barkod okutun veya girin..."
-                                                className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-primary-navy focus:ring-1 focus:ring-primary-navy/20 disabled:opacity-60"
-                                            // autoFocus kaldırıldı çünkü mobil scroll'u bozuyor. Bunun yerine kullanıcı gerekiyorsa tıklasın veya manual focus (preventScroll) yapalım.
+                                                placeholder="Takip no girin..."
+                                                className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 !font-mono focus:!bg-white/[0.03] disabled:opacity-40`}
                                             />
                                         </td>
-                                        <td className="px-4 py-3 text-center">
+                                        <td className={`${adminTableCellClass} text-center`}>
                                             {row.saved ? (
-                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">
-                                                    <CheckCircle2 size={12} /> EKLENDİ
+                                                <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full uppercase tracking-widest animate-in zoom-in duration-300">
+                                                    <CheckCircle2 size={10} /> Kaydedildi
                                                 </span>
                                             ) : (
-                                                <span className="text-[10px] font-medium text-slate-400">Bekliyor</span>
+                                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest opacity-40">Ready</span>
                                             )}
                                         </td>
                                     </tr>
@@ -234,18 +271,19 @@ export default function AdminLogisticsPage() {
                 )}
 
                 {rows.length > 0 && (
-                    <div className="p-4 bg-slate-50 border-t border-slate-200/60 flex items-center justify-between sticky bottom-0 z-10 backdrop-blur-sm bg-slate-50/90">
-                        <div className="text-sm font-medium text-slate-500">
-                            <span className="text-primary-navy font-bold">{rows.filter(r => r.tracking_number).length}</span> satır hazır.
+                    <div className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
+                        <div className="text-[13px] font-bold text-slate-400">
+                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} Sipariş Hazır
                         </div>
                         {hasWriteAccess && (
                             <button
                                 disabled={saving || rows.filter(r => r.tracking_number && !r.saved).length === 0}
                                 onClick={handleBulkSubmit}
-                                className={`${adminButtonPrimaryClass} px-8 py-2.5 shadow-lg flex items-center gap-2`}
+                                className={`${adminButtonPrimaryClass} w-full sm:w-auto px-10 relative overflow-hidden group/submit active:scale-[0.98]`}
                             >
-                                <Truck size={18} />
-                                {saving ? 'Gönderiliyor...' : 'Tüm Hazır Kargo Bilgilerini Kaydet'}
+                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/submit:translate-y-0 transition-transform duration-300" />
+                                <Truck size={18} className="relative z-10 group-hover/submit:animate-bounce" />
+                                <span className="relative z-10">{saving ? 'İşleniyor...' : 'Kargo Bilgilerini Sisteme İşle'}</span>
                             </button>
                         )}
                     </div>
@@ -254,3 +292,23 @@ export default function AdminLogisticsPage() {
         </div>
     )
 }
+
+function ChevronDown({ size = 24, ...props }: React.SVGProps<SVGSVGElement> & { size?: number }) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="m6 9 6 6 6-6" />
+        </svg>
+    )
+}
+

@@ -7,8 +7,14 @@ import { updateOrderStatus } from '../../lib/orderStatusService'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
-import toast from 'react-hot-toast'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
+import {
+    adminButtonPrimaryClass,
+    adminButtonSecondaryClass,
+    adminInputClass,
+    adminSelectClass,
+    adminCardPaddedClass,
+    adminSubtitleClass
+} from '../../utils/adminUi'
 import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
 import { useRole } from '../../hooks/useRole'
 
@@ -39,21 +45,16 @@ interface ColumnDef {
     targetStatus: string
 }
 
-// İptal ve İade ayrı sütunlar
+// Industrial Navy Colors
 const COLUMNS: ColumnDef[] = [
-    { id: 'col_new', title: 'Yeni / Bekliyor', statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-600', bgClass: 'bg-amber-50 ring-amber-100', targetStatus: 'pending' },
-    { id: 'col_prep', title: 'Hazırlanıyor', statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-indigo-600', bgClass: 'bg-indigo-50 ring-indigo-100', targetStatus: 'confirmed' },
-    { id: 'col_shipped', title: 'Kargoda', statuses: ['shipped'], icon: Truck, colorClass: 'text-sky-600', bgClass: 'bg-sky-50 ring-sky-100', targetStatus: 'shipped' },
-    { id: 'col_done', title: 'Teslim Edildi', statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-600', bgClass: 'bg-emerald-50 ring-emerald-100', targetStatus: 'delivered' },
-    { id: 'col_cancel', title: 'İptal', statuses: ['cancelled'], icon: XCircle, colorClass: 'text-rose-600', bgClass: 'bg-rose-50 ring-rose-100', targetStatus: 'cancelled' },
-    { id: 'col_refund', title: 'İade', statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-orange-600', bgClass: 'bg-orange-50 ring-orange-100', targetStatus: 'refunded' },
+    { id: 'col_new', title: 'Yeni / Bekliyor', statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-400', bgClass: 'bg-amber-500/10 ring-amber-500/20', targetStatus: 'pending' },
+    { id: 'col_prep', title: 'Hazırlanıyor', statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-cyan-400', bgClass: 'bg-cyan-500/10 ring-cyan-500/20', targetStatus: 'confirmed' },
+    { id: 'col_shipped', title: 'Kargoda', statuses: ['shipped'], icon: Truck, colorClass: 'text-blue-400', bgClass: 'bg-blue-500/10 ring-blue-500/20', targetStatus: 'shipped' },
+    { id: 'col_done', title: 'Teslim Edildi', statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-400', bgClass: 'bg-emerald-500/10 ring-emerald-500/20', targetStatus: 'delivered' },
+    { id: 'col_cancel', title: 'İptal', statuses: ['cancelled'], icon: XCircle, colorClass: 'text-rose-400', bgClass: 'bg-rose-500/10 ring-rose-500/20', targetStatus: 'cancelled' },
+    { id: 'col_refund', title: 'İade', statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-orange-400', bgClass: 'bg-orange-500/10 ring-orange-500/20', targetStatus: 'refunded' },
 ]
 
-/**
- * Sipariş satırının hangi sütuna ait olduğunu belirler.
- * payment_status "refunded" veya "partial_refunded" ise → İade sütunu
- * status "cancelled" ise → İptal sütunu
- */
 function getEffectiveStatus(order: AdminOrderRow): string {
     if (order.payment_status === 'refunded' || order.payment_status === 'partial_refunded') {
         return order.payment_status
@@ -76,7 +77,7 @@ function OrderStepper({ status }: { status: string }) {
         if (s === 'shipped') return 3
         if (s === 'confirmed' || s === 'processing') return 2
         if (s === 'paid') return 1
-        return 0 // pending
+        return 0 
     }
 
     const currentIndex = getStepIndex(status)
@@ -84,31 +85,31 @@ function OrderStepper({ status }: { status: string }) {
 
     if (isCancelled) {
         return (
-            <div className="bg-rose-50 border border-rose-100 p-3 rounded-lg flex items-center gap-2 text-rose-700 text-xs font-bold">
-                <XCircle size={16} /> Sipariş iptal veya iade edilmiş.
+            <div className="bg-rose-500/10 border border-rose-500/20 p-3 rounded-[1.25rem] flex items-center gap-2 text-rose-400 text-[11px] font-black uppercase tracking-wider backdrop-blur-md">
+                <XCircle size={14} /> Sipariş iptal veya iade edilmiş.
             </div>
         )
     }
 
     return (
-        <div className="flex items-center justify-between relative mt-2 mb-4">
-            <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 -z-10"></div>
-            <div className="absolute left-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-primary-navy -z-10 transition-all duration-500" style={{ width: `${(Math.min(currentIndex, 4) / 4) * 80}%` }}></div>
+        <div className="flex items-center justify-between relative mt-4 mb-6 px-2">
+            <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-white/5 -z-10 rounded-full"></div>
+            <div className="absolute left-[10%] top-1/2 -translate-y-1/2 h-0.5 bg-cyan-400 -z-10 transition-all duration-700 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.5)]" style={{ width: `${(Math.min(currentIndex, 4) / 4) * 80}%` }}></div>
 
             {steps.map((step, idx) => {
                 const isPast = idx < currentIndex
                 const isCurrent = idx === currentIndex
 
                 return (
-                    <div key={step.key} className="flex flex-col items-center gap-1.5 z-10 w-1/5">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ring-4 ring-white transition-all
-                            ${isPast ? 'bg-primary-navy text-white' :
-                                isCurrent ? 'bg-primary-navy text-white ring-primary-navy/20 scale-125' :
-                                    'bg-slate-200 text-slate-400'}`}
+                    <div key={step.key} className="flex flex-col items-center gap-2 z-10 w-1/5 relative">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black transition-all duration-500
+                            ${isPast ? 'bg-cyan-500 text-white shadow-[0_0_15px_rgba(34,211,238,0.3)]' :
+                                isCurrent ? 'bg-white text-slate-900 ring-4 ring-cyan-500/20 scale-125' :
+                                    'bg-white/5 text-slate-500 border border-white/10'}`}
                         >
                             {isPast ? <CheckCircle2 size={12} strokeWidth={3} /> : (idx + 1)}
                         </div>
-                        <span className={`text-[10px] font-bold text-center ${isCurrent ? 'text-primary-navy' : isPast ? 'text-slate-600' : 'text-slate-400'}`}>
+                        <span className={`text-[9px] font-black uppercase tracking-widest text-center transition-colors duration-500 ${isCurrent ? 'text-cyan-400' : isPast ? 'text-slate-300' : 'text-slate-500'}`}>
                             {step.label}
                         </span>
                     </div>
@@ -138,7 +139,6 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
         async function load() {
             setLoading(true)
             try {
-                // Proaktif oturum kontrolü
                 await ensureSessionFresh()
                 const [notesRes, logsRes, orderRes] = await Promise.all([
                     supabase.from('order_notes').select('id,note,created_at').eq('order_id', order.id).order('created_at', { ascending: false }).limit(5),
@@ -188,94 +188,106 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
     }
 
     return (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200" onClick={onClose}>
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-[#020617]/40 backdrop-blur-xl flex items-center justify-center z-[110] p-4 animate-in fade-in duration-300" onClick={onClose}>
+            <div className="glass-strong border border-white/10 rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-300" onClick={e => e.stopPropagation()}>
                 {/* Header */}
-                <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
                     <div>
-                        <div className="text-xs font-bold text-slate-400 mb-1">#{order.order_number || order.id.substring(0, 8)}</div>
-                        <h3 className="text-lg font-bold text-primary-navy">{order.customer_name || 'İsimsiz Müşteri'}</h3>
+                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">#{order.order_number || order.id.substring(0, 8)}</div>
+                        <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">{order.customer_name || 'İsimsiz Müşteri'}</h3>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all">
-                        <X size={18} />
+                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all ring-1 ring-white/10">
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="p-5 space-y-5 max-h-[60vh] overflow-y-auto">
+                <div className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     {loading ? (
-                        <AdminSkeleton variant="form" fields={3} />
+                        <div className="p-10 flex flex-col items-center gap-4">
+                            <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Yükleniyor...</span>
+                        </div>
                     ) : detail ? (
                         <>
-                            {/* Durum Takibi */}
                             <section>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Durum Takibi</h4>
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Sipariş Akışı</h4>
                                 <OrderStepper status={getEffectiveStatus(order)} />
                             </section>
 
-                            {/* Müşteri Bilgileri */}
-                            <section>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Müşteri</h4>
-                                <div className="text-sm text-slate-700 space-y-1">
-                                    {order.customer_email && <div className="flex items-center gap-2"><Mail size={12} className="text-slate-400" /> {order.customer_email}</div>}
-                                    {order.customer_phone && <div className="flex items-center gap-2"><ChevronRight size={12} className="text-slate-400" /> {order.customer_phone}</div>}
-                                    <div className="font-bold text-slate-800">{formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}</div>
+                            <section className="bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 space-y-4">
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Müşteri Detayları</h4>
+                                <div className="space-y-3">
+                                    {order.customer_email && <div className="flex items-center gap-3 text-xs text-slate-300"><Mail size={14} className="text-cyan-500" /> {order.customer_email}</div>}
+                                    {order.customer_phone && <div className="flex items-center gap-3 text-xs text-slate-300"><ChevronRight size={14} className="text-cyan-500" /> {order.customer_phone}</div>}
+                                    <div className="pt-2 flex items-baseline gap-2">
+                                        <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">TOPLAM:</span>
+                                        <span className="text-xl font-black text-white tracking-tight">{formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}</span>
+                                    </div>
                                 </div>
                             </section>
 
-                            {/* Kargo Bilgisi */}
                             {(detail.carrier || detail.tracking_number) && (
                                 <section>
-                                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Kargo Bilgileri</h4>
-                                    <div className="text-sm bg-sky-50 p-3 rounded-lg border border-sky-100 flex justify-between items-center">
-                                        <div>
-                                            <span className="font-bold text-sky-700">{detail.carrier || '-'}</span>
-                                            {detail.tracking_number && <span className="ml-2 font-mono text-xs text-sky-600">{detail.tracking_number}</span>}
+                                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Lojistik</h4>
+                                    <div className="bg-blue-500/10 border border-blue-500/20 p-5 rounded-[1.5rem] flex justify-between items-center backdrop-blur-md">
+                                        <div className="space-y-1">
+                                            <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.1em]">{detail.carrier || '-'}</div>
+                                            {detail.tracking_number && <div className="font-mono text-sm text-white font-black tracking-wider">{detail.tracking_number}</div>}
                                         </div>
-                                        <Truck className="text-sky-400 w-5 h-5" />
+                                        <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                                            <Truck size={24} />
+                                        </div>
                                     </div>
                                 </section>
                             )}
 
-                            {/* Notlar */}
-                            <section>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                    <MessageSquare size={12} /> Notlar ({detail.notes.length})
+                            <section className="space-y-4">
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1 flex items-center gap-2">
+                                    <MessageSquare size={14} className="text-indigo-400" /> Notlar ({detail.notes.length})
                                 </h4>
-                                <div className="space-y-2 mb-3">
+                                <div className="space-y-3">
                                     {detail.notes.map(n => (
-                                        <div key={n.id} className="text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                                            <div className="text-slate-700 font-medium">{n.note}</div>
-                                            <div className="text-[10px] text-slate-400 mt-1">{formatDateTime(n.created_at, lang)}</div>
+                                        <div key={n.id} className="p-4 bg-white/[0.03] rounded-2xl border border-white/5 group hover:border-white/10 transition-all">
+                                            <div className="text-xs text-slate-200 font-medium leading-relaxed">{n.note}</div>
+                                            <div className="text-[9px] text-slate-500 mt-2 font-black uppercase tracking-[0.2em]">{formatDateTime(n.created_at, lang)}</div>
                                         </div>
                                     ))}
-                                    {detail.notes.length === 0 && <div className="text-xs text-slate-400 italic">Henüz not yok</div>}
+                                    {detail.notes.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">GİRİLMİŞ NOT YOK</div>}
                                 </div>
-                                <div className="flex gap-2">
+                                 <div className="flex gap-3 mt-6">
                                     <input
                                         value={noteInput}
                                         onChange={e => setNoteInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && addNote()}
                                         placeholder="Hızlı not ekle..."
-                                        className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all"
+                                        className={adminInputClass}
                                     />
-                                    <button onClick={addNote} disabled={saving || !hasWriteAccess} className="px-3 py-2 bg-primary-navy text-white text-xs font-bold rounded-lg hover:bg-primary-navy/90 transition-colors disabled:opacity-50">
+                                    <button 
+                                        onClick={addNote} 
+                                        disabled={saving || !hasWriteAccess} 
+                                        className={`${adminButtonPrimaryClass} !px-5 !h-[42px]`}
+                                    >
                                         Ekle
                                     </button>
                                 </div>
                             </section>
 
-                            {/* E-posta Logları */}
-                            <section>
-                                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                    <Mail size={12} /> E-posta Logları ({detail.emailLogs.length})
+                            <section className="space-y-4">
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1 flex items-center gap-2">
+                                    <Mail size={14} className="text-amber-400" /> E-posta Arşivi ({detail.emailLogs.length})
                                 </h4>
-                                {detail.emailLogs.map((l, i) => (
-                                    <div key={i} className="text-xs bg-amber-50/50 p-2.5 rounded-lg border border-amber-100 mb-1.5">
-                                        <div className="text-slate-700 font-medium">{l.subject}</div>
-                                        <div className="text-[10px] text-slate-400 mt-1">{formatDateTime(l.created_at, lang)}</div>
-                                    </div>
-                                ))}
-                                {detail.emailLogs.length === 0 && <div className="text-xs text-slate-400 italic">E-posta kaydı yok</div>}
+                                <div className="space-y-2">
+                                    {detail.emailLogs.map((l, i) => (
+                                        <div key={i} className="p-4 bg-amber-400/5 rounded-2xl border border-amber-400/10 flex items-center justify-between group">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="text-[11px] text-amber-200 font-bold">{l.subject}</div>
+                                                <div className="text-[9px] text-amber-400/40 font-black uppercase tracking-widest">{formatDateTime(l.created_at, lang)}</div>
+                                            </div>
+                                            <CheckCircle2 size={14} className="text-amber-400/20" />
+                                        </div>
+                                    ))}
+                                    {detail.emailLogs.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">ARŞİV TEMİZ</div>}
+                                </div>
                             </section>
                         </>
                     ) : null}
@@ -288,7 +300,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 // --- Ana Board Bileşeni ---
 export default function AdminOrdersBoard() {
     const pathname = usePathname()
-    const { lang } = useI18n()
+    const { lang, t } = useI18n()
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('orders')
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
@@ -300,9 +312,7 @@ export default function AdminOrdersBoard() {
     const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
-            // Proaktif oturum kontrolü
             await ensureSessionFresh()
-
             const { data, error } = await supabase
                 .from('view_admin_orders')
                 .select('id,status,user_id,total_amount,created_at,order_number,customer_name,customer_email,customer_phone,payment_status')
@@ -322,24 +332,21 @@ export default function AdminOrdersBoard() {
         fetchOrders()
     }, [fetchOrders, pathname])
 
-    // Yatay scroll butonları
     const scrollBoard = (direction: 'left' | 'right') => {
         if (!scrollRef.current) return
-        const amount = 340 // bir sütun genişliği kadar
+        const amount = 340 
         scrollRef.current.scrollBy({
             left: direction === 'left' ? -amount : amount,
             behavior: 'smooth',
         })
     }
 
-    // Siparişleri sütunlara eşle (payment_status da dikkate alınır)
     const getOrdersByCol = (colId: ColumnId) => {
         const colDef = COLUMNS.find(c => c.id === colId)
         if (!colDef) return []
         return orders.filter(o => colDef.statuses.includes(getEffectiveStatus(o)))
     }
 
-    // Sürükle-bırak: Anında uygula, popup yok, sadece toast bildirimi
     const onDragEnd = async (result: DropResult) => {
         if (!hasWriteAccess) {
             toast.error('Durum değiştirmek için yetkiniz yok.')
@@ -362,17 +369,14 @@ export default function AdminOrdersBoard() {
 
         const oldStatus = targetOrder.status
 
-        // Optimistic UI: hemen görsel güncelleme
         setOrders(prev => prev.map(o => {
             if (o.id !== draggableId) return o
-            // İade sütununa taşınıyorsa payment_status da güncelle
             if (targetStatus === 'refunded') {
                 return { ...o, status: 'cancelled', payment_status: 'refunded' }
             }
             return { ...o, status: targetStatus, payment_status: targetStatus === 'cancelled' ? o.payment_status : null }
         }))
 
-        // Merkezi servis üzerinden güncelle
         const res = await updateOrderStatus({
             orderId: draggableId,
             newStatus: targetStatus,
@@ -389,7 +393,6 @@ export default function AdminOrdersBoard() {
         if (res.ok) {
             toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
         } else {
-            // Revert
             setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
             toast.error('Güncelleme başarısız: ' + (res.error || ''))
             fetchOrders()
@@ -406,38 +409,38 @@ export default function AdminOrdersBoard() {
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
-            {/* Board Sub-Toolbar (Scroll & Refresh) */}
-            <div className="flex items-center justify-between mb-4 shrink-0">
+            {/* Board Sub-Toolbar */}
+            <div className="flex items-center justify-between mb-6 shrink-0 h-10">
                 <div className="flex-1" />
                 <div className="flex items-center gap-2">
                     <div className="hidden md:flex items-center gap-2">
                         <button
                             onClick={() => scrollBoard('left')}
-                            className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                            className="w-10 h-10 flex items-center justify-center glass border border-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-sm"
                             title="Sola kaydır"
                         >
-                            <ChevronLeft size={16} />
+                            <ChevronLeft size={18} />
                         </button>
                         <button
                             onClick={() => scrollBoard('right')}
-                            className="p-2 bg-white border border-slate-200 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-primary-navy transition-colors shadow-sm"
+                            className="w-10 h-10 flex items-center justify-center glass border border-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-sm"
                             title="Sağa kaydır"
                         >
-                            <ChevronRight size={16} />
+                            <ChevronRight size={18} />
                         </button>
                     </div>
                     <button
                         onClick={fetchOrders}
                         disabled={loading}
-                        className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
+                        className="px-6 h-10 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30"
                     >
-                        {loading ? '...' : 'Yenile'}
+                        {loading ? '...' : 'Pano Yenile'}
                     </button>
                 </div>
             </div>
 
             {/* Mobile Tabs Switcher */}
-            <div className="flex md:hidden overflow-x-auto gap-2 pb-2 mb-1 no-scrollbar -mx-1 px-1 shrink-0 snap-x">
+            <div className="flex md:hidden overflow-x-auto gap-3 pb-4 mb-2 no-scrollbar -mx-1 px-1 shrink-0 snap-x">
                 {COLUMNS.map(col => {
                     const Icon = col.icon
                     const isActive = expandedCol === col.id
@@ -446,14 +449,14 @@ export default function AdminOrdersBoard() {
                         <button
                             key={col.id}
                             onClick={() => setExpandedCol(col.id)}
-                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border snap-start
+                            className={`flex items-center gap-3 px-5 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border snap-start
                                 ${isActive
-                                    ? `${col.bgClass} ${col.colorClass} border-current ring-2 ring-inset ring-current/10 shadow-sm z-10 scale-105 mx-1`
-                                    : 'bg-white text-slate-400 border-slate-200/60 hover:border-slate-300 shadow-sm'}`}
+                                    ? `bg-white text-slate-900 border-white shadow-[0_0_20px_rgba(255,255,255,0.2)] z-10 scale-105 mx-1`
+                                    : 'bg-white/5 text-slate-500 border-white/5 hover:border-white/10'}`}
                         >
-                            <Icon size={14} />
+                            <Icon size={16} />
                             {col.title}
-                            <span className={`px-1.5 py-0.5 rounded-full text-[10px] ml-1 ${isActive ? 'bg-white/40' : 'bg-slate-100 shadow-inner'}`}>
+                            <span className={`px-2 py-0.5 rounded-full text-[9px] ml-1 bg-white/10`}>
                                 {count}
                             </span>
                         </button>
@@ -461,45 +464,47 @@ export default function AdminOrdersBoard() {
                 })}
             </div>
 
-            {/* Board — tek scroll katmanı, nested scroll yok */}
+            {/* Board */}
             <DragDropContext onDragEnd={onDragEnd}>
                 <div
                     ref={scrollRef}
-                    className="flex flex-col md:flex-row gap-4 flex-1 min-h-0 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-2 scroll-smooth"
+                    className="flex flex-col md:flex-row gap-6 flex-1 min-h-0 overflow-y-auto md:overflow-x-auto md:overflow-y-hidden pb-4 scroll-smooth custom-scrollbar"
                 >
-                    <div className="contents md:flex md:gap-4 md:min-w-max">
+                    <div className="contents md:flex md:gap-6 md:min-w-max px-px">
                         {COLUMNS.map(col => {
                             const colOrders = getOrdersByCol(col.id)
                             const Icon = col.icon
                             const isExpanded = expandedCol === col.id
 
                             return (
-                                <div key={col.id} className={`flex flex-col w-full md:w-[280px] shrink-0 bg-slate-100/50 rounded-2xl border border-slate-200/60 snap-center ${!isExpanded ? 'h-auto md:h-full' : ''}`} style={{ maxHeight: '100%' }}>
+                                <div key={col.id} className={`flex flex-col w-full md:w-[320px] shrink-0 glass-strong border border-white/5 rounded-[2.5rem] overflow-hidden transition-all duration-300 ${!isExpanded ? 'h-auto md:h-full opacity-60 grayscale hover:opacity-100 hover:grayscale-0' : 'opacity-100 grayscale-0 shadow-2xl bg-white/[0.03]'}`} style={{ maxHeight: '100%' }}>
                                     {/* Sütun Başlık */}
                                     <div
-                                        className={`p-3 border-b border-slate-200/60 flex items-center justify-between ${col.bgClass} ring-1 ring-inset ${isExpanded ? 'rounded-t-2xl' : 'rounded-2xl md:rounded-t-2xl'} cursor-pointer md:cursor-default`}
+                                        className={`p-6 border-b border-white/5 flex items-center justify-between ${isExpanded ? `${col.bgClass} backdrop-blur-xl` : 'bg-transparent'} transition-colors cursor-pointer md:cursor-default`}
                                         onClick={() => setExpandedCol(isExpanded ? null : col.id)}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <Icon className={`w-4 h-4 ${col.colorClass}`} />
-                                            <h2 className={`font-bold text-sm ${col.colorClass}`}>{col.title}</h2>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-8 h-8 rounded-xl ${col.bgClass} flex items-center justify-center ${col.colorClass} border border-white/5`}>
+                                                <Icon size={18} />
+                                            </div>
+                                            <h2 className={`font-black text-xs uppercase tracking-widest ${isExpanded ? 'text-white' : 'text-slate-500'}`}>{col.title}</h2>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="bg-white px-2 py-0.5 rounded-full text-xs font-bold text-slate-600 shadow-sm ring-1 ring-slate-200/50">
+                                        <div className="flex items-center gap-3">
+                                            <span className="bg-white/10 px-3 py-1 rounded-full text-[10px] font-black text-white border border-white/10">
                                                 {colOrders.length}
                                             </span>
-                                            <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-400 ${isExpanded ? 'rotate-180' : ''}`} />
+                                            <ChevronDown className={`w-4 h-4 md:hidden transition-transform text-slate-500 ${isExpanded ? 'rotate-180' : ''}`} />
                                         </div>
                                     </div>
 
-                                    {/* Droppable — overflow-y-auto SADECE burada (tek scroll parent) */}
+                                    {/* Droppable */}
                                     <Droppable droppableId={col.id}>
                                         {(provided, snapshot) => (
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.droppableProps}
-                                                className={`flex-1 p-2 space-y-2 transition-colors ${snapshot.isDraggingOver ? 'bg-slate-200/50' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
-                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 120 : 60 }}
+                                                className={`flex-1 p-4 space-y-4 transition-all custom-scrollbar ${snapshot.isDraggingOver ? 'bg-cyan-500/5' : ''} ${isExpanded ? 'block' : 'hidden md:block'}`}
+                                                style={{ overflowY: 'auto', minHeight: isExpanded ? 150 : 80 }}
                                             >
                                                 {colOrders.map((order, index) => (
                                                     <Draggable key={order.id} draggableId={order.id} index={index}>
@@ -509,26 +514,37 @@ export default function AdminOrdersBoard() {
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
                                                                 onClick={() => setSelectedOrder(order)}
-                                                                className={`bg-white p-3 rounded-xl shadow-sm border border-slate-200/50 flex flex-col gap-2 transition-shadow cursor-pointer ${snapshot.isDragging ? 'shadow-lg ring-2 ring-primary-navy/20 cursor-grabbing' : 'hover:shadow-md hover:border-primary-navy/20'}`}
+                                                                className={`p-5 rounded-[1.75rem] border transition-all duration-300 cursor-pointer group relative overflow-hidden
+                                                                    ${snapshot.isDragging 
+                                                                        ? 'bg-cyan-400 text-[#0A0F1E] border-cyan-300 shadow-[0_20px_60px_rgba(34,211,238,0.4)] scale-105 z-50' 
+                                                                        : 'bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.06] shadow-sm'}`}
                                                                 style={{ ...provided.draggableProps.style }}
                                                             >
-                                                                <div className="flex items-start justify-between gap-2">
+                                                                {/* Accent Glow */}
+                                                                {shardColor(getEffectiveStatus(order), snapshot.isDragging)}
+
+                                                                <div className="flex items-start justify-between gap-3 relative z-10">
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 mb-0.5">
-                                                                            <GripVertical className="w-3 h-3 opacity-50" />
+                                                                        <div className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] mb-2 ${snapshot.isDragging ? 'text-[#0A0F1E]/60' : 'text-slate-500'}`}>
+                                                                            <GripVertical size={12} className="opacity-30" />
                                                                             #{order.order_number || order.id.substring(0, 8)}
                                                                         </div>
-                                                                        <h4 className="font-semibold text-slate-800 text-xs truncate">{order.customer_name || 'İsimsiz Müşteri'}</h4>
+                                                                        <h4 className={`font-black uppercase tracking-tight text-xs truncate ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-white'}`}>
+                                                                            {order.customer_name || 'İsimsiz Müşteri'}
+                                                                        </h4>
                                                                     </div>
-                                                                    <div className="font-bold text-slate-700 text-xs shrink-0">
+                                                                    <div className={`font-black text-xs tracking-tight shrink-0 ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-cyan-400'}`}>
                                                                         {formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}
                                                                     </div>
                                                                 </div>
-                                                                <div className="flex items-center justify-between border-t border-slate-50 pt-2">
-                                                                    <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+
+                                                                <div className={`flex items-center justify-between mt-4 pt-4 border-t ${snapshot.isDragging ? 'border-[#0A0F1E]/10' : 'border-white/5'} relative z-10`}>
+                                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${snapshot.isDragging ? 'text-[#0A0F1E]/40' : 'text-slate-500'}`}>
                                                                         {formatDateTime(order.created_at, lang).split(' ')[0]}
                                                                     </span>
-                                                                    <span className="text-[9px] text-primary-navy/50 font-medium">detay →</span>
+                                                                    <div className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.2em] ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-cyan-400 opacity-60 group-hover:opacity-100 transition-opacity'}`}>
+                                                                        DETAY <ChevronRight size={10} strokeWidth={3} />
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         )}
@@ -548,5 +564,21 @@ export default function AdminOrdersBoard() {
             {/* Mini Detay Paneli */}
             {selectedOrder && <MiniDetailPanel order={selectedOrder} onClose={() => setSelectedOrder(null)} hasWriteAccess={hasWriteAccess} />}
         </div>
+    )
+}
+
+function shardColor(status: string, isDragging: boolean) {
+    if (isDragging) return null
+    const base = status.toLowerCase()
+    let color = 'bg-slate-500/20'
+    if (base === 'pending') color = 'bg-amber-500/20'
+    else if (base === 'paid' || base === 'confirmed' || base === 'processing') color = 'bg-cyan-500/20'
+    else if (base === 'shipped') color = 'bg-blue-500/20'
+    else if (base === 'delivered' || base === 'completed') color = 'bg-emerald-500/20'
+    else if (base === 'cancelled') color = 'bg-rose-500/20'
+    else if (base === 'refunded' || base === 'partial_refunded') color = 'bg-orange-500/20'
+
+    return (
+        <div className={`absolute -right-4 -top-4 w-12 h-12 blur-2xl rounded-full ${color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
     )
 }

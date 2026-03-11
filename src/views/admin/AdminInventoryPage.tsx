@@ -2,13 +2,14 @@ import React from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
-import { adminSectionTitleClass, adminCardClass, adminButtonPrimaryClass } from '../../utils/adminUi'
+import { adminSectionTitleClass, adminCardClass } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import ColumnsMenu from '../../components/admin/ColumnsMenu'
 import ExportMenu from '../../components/admin/ExportMenu'
 import { useI18n } from '../../i18n/I18nProvider'
 import toast from 'react-hot-toast'
 import { useRole } from '../../hooks/useRole'
+import { FileUp, Settings2, Loader2 } from 'lucide-react'
 
 import InventoryCsvImport from '../../components/admin/InventoryCsvImport'
 import InventoryDetailDrawer from '../../components/admin/InventoryDetailDrawer'
@@ -470,31 +471,41 @@ const AdminInventoryPage: React.FC = () => {
 
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className={adminSectionTitleClass}>{t('admin.titles.inventory') ?? 'Stok Özeti'}</h1>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex flex-col gap-1">
+          <h1 className={adminSectionTitleClass}>{t('admin.titles.inventory') ?? 'Envanter Merkezi'}</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400">Gerçek Zamanlı Stok Takibi</p>
+        </div>
         {hasWriteAccess && (
-          <button onClick={() => window.location.href = '/admin/inventory/settings'} className={adminButtonPrimaryClass}>
-            Stok Ayarları
+          <button 
+            onClick={() => window.location.href = '/admin/inventory/settings'} 
+            className="group h-12 px-6 rounded-2xl glass border border-white/5 text-slate-400 hover:text-white transition-all flex items-center gap-3 hover:border-white/10"
+          >
+            <Settings2 size={16} className="text-slate-500 group-hover:text-cyan-400 transition-colors" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Global Ayarlar</span>
           </button>
         )}
       </div>
 
       <AdminToolbar
         storageKey="toolbar:inventory"
-        search={{ value: q, onChange: setQ, placeholder: 'ürün adı ile ara', focusShortcut: '/' }}
+        sticky
+        search={{ value: q, onChange: setQ, placeholder: 'Parça adı, kod veya SKU ara...', focusShortcut: '/' }}
         select={{
           value: selectedCategory,
           onChange: setSelectedCategory,
-          title: 'Kategori',
-          options: [{ value: '', label: 'Tüm Kategoriler' }, ...visibleCategories.map(c => ({ value: c.id, label: c.name }))]
+          options: [
+            { value: '', label: t('admin.inventory.allCategories') || 'TÜM KATEGORİLER' },
+            ...categories.map(c => ({ value: c.id, label: c.name.toUpperCase() }))
+          ]
         }}
         chips={[
-          { key: 'out', label: 'Stok Yok', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })) },
-          { key: 'critical', label: 'Kritik', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })) },
-          { key: 'reserved', label: 'Rezerve', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })) },
-          { key: 'ok', label: 'Normal', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })) },
-          { key: 'group', label: 'Grupla', active: groupByCategory, onToggle: () => setGroupByCategory(!groupByCategory) },
+          { key: 'out', label: t('admin.inventory.status.outOfStock') || 'Stok Yok', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })) },
+          { key: 'critical', label: t('admin.inventory.status.criticalLevel') || 'Kritik Seviye', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })) },
+          { key: 'reserved', label: t('admin.inventory.status.reserved') || 'Rezerve Edilmiş', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })) },
+          { key: 'ok', label: t('admin.inventory.status.normal') || 'Normal Durum', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })) },
+          { key: 'group', label: t('admin.inventory.groupByCategory') || 'Kategorize Et', active: groupByCategory, onToggle: () => setGroupByCategory(!groupByCategory) },
         ]}
         onClear={() => { setQ(''); setSelectedCategory(''); setStatusFilter({ out: false, critical: false, reserved: false, ok: false }) }}
         recordCount={filteredRows.length}
@@ -503,14 +514,15 @@ const AdminInventoryPage: React.FC = () => {
             {hasWriteAccess && (
               <button
                 onClick={() => setCsvImportOpen(true)}
-                className={`${adminButtonPrimaryClass} shadow-md shadow-primary-navy/10`}
+                className="h-12 px-6 rounded-2xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all flex items-center gap-2 shadow-[0_10px_30px_rgba(34,211,238,0.2)]"
               >
-                CSV İçe Aktar
+                <FileUp size={16} />
+                CSV Yükle
               </button>
             )}
             <ExportMenu items={[
               {
-                key: 'csv', label: 'CSV Aktar', onSelect: () => {
+                key: 'csv', label: 'Sayfa Verilerini İndir (.csv)', onSelect: () => {
                   const head = ['SKU', 'Ürün', 'Fiziksel', 'Rezerve', 'Müsait', 'Durum']
                   const lines = filteredRows.map(r => [r.product_id, `"${r.name.replace(/"/g, '""')}"`, r.physical_stock, r.reserved_stock, r.available_stock, (r.available_stock <= 0 ? 'YOK' : (r.available_stock <= (thresholdMap[r.product_id] ?? (defaultThreshold || 10)) ? 'KRİTİK' : 'OK'))])
                   const csv = '\ufeff' + [head.join(','), ...lines.map(l => l.join(','))].join('\n')
@@ -520,7 +532,7 @@ const AdminInventoryPage: React.FC = () => {
                 }
               },
               {
-                key: 'template', label: 'CSV Şablonu (sku,qty)', onSelect: () => {
+                key: 'template', label: 'Örnek CSV Şablonu (sku,qty)', onSelect: () => {
                   const header = ['sku', 'qty']
                   const csv = '\ufeff' + header.join(',') + '\n' + ['"PRD001"', '10'].join(',') + '\n'
                   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -531,16 +543,16 @@ const AdminInventoryPage: React.FC = () => {
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'name', label: 'Ürün', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
-                { key: 'physical', label: 'Fiziksel', checked: visibleCols.physical, onChange: (v) => setVisibleCols(s => ({ ...s, physical: v })) },
-                { key: 'reserved', label: 'Rezerve', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
-                { key: 'available', label: 'Satılabilir', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
-                { key: 'threshold', label: 'Eşik', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
-                { key: 'location', label: 'Raf', checked: visibleCols.location, onChange: (v) => setVisibleCols(s => ({ ...s, location: v })) },
+                { key: 'name', label: 'Ürün Bilgisi', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
+                { key: 'physical', label: 'Fiziksel Stok', checked: visibleCols.physical, onChange: (v) => setVisibleCols(s => ({ ...s, physical: v })) },
+                { key: 'reserved', label: 'Rezerve Stok', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
+                { key: 'available', label: 'Satılabilir Stok', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
+                { key: 'threshold', label: 'Uyarı Eşiği', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
+                { key: 'location', label: 'Raf Konumu', checked: visibleCols.location, onChange: (v) => setVisibleCols(s => ({ ...s, location: v })) },
                 { key: 'supplier', label: 'Tedarikçi', checked: visibleCols.supplier, onChange: (v) => setVisibleCols(s => ({ ...s, supplier: v })) },
-                { key: 'abc', label: 'ABC Sınıfı', checked: visibleCols.abc, onChange: (v) => setVisibleCols(s => ({ ...s, abc: v })) },
-                { key: 'days', label: 'Tükenme Hızı', checked: visibleCols.days, onChange: (v) => setVisibleCols(s => ({ ...s, days: v })) },
-                { key: 'status', label: 'Durum', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
+                { key: 'abc', label: 'ABC Analizi', checked: visibleCols.abc, onChange: (v) => setVisibleCols(s => ({ ...s, abc: v })) },
+                { key: 'days', label: 'Tükenme Tahmini', checked: visibleCols.days, onChange: (v) => setVisibleCols(s => ({ ...s, days: v })) },
+                { key: 'status', label: 'Durum İndikatörü', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -549,7 +561,7 @@ const AdminInventoryPage: React.FC = () => {
         )}
       />
 
-      <div className={adminCardClass}>
+      <div className={adminCardClass + " relative overflow-hidden group"}>
         <InventoryTable
           rows={sortedRows}
           loading={loading}
@@ -576,15 +588,15 @@ const AdminInventoryPage: React.FC = () => {
           defaultThreshold={defaultThreshold}
           effectiveThreshold={effectiveThreshold}
         />
+        
         {loading === LoadState.Loading && rows.length > 0 && (
-          <div className="p-4 text-xs text-slate-500 bg-slate-50/50 flex items-center justify-center gap-2 border-t border-slate-100">
-            <span className="w-2 h-2 bg-primary-navy rounded-full animate-bounce"></span>
-            Veriler Tazeleniyor...
+          <div className="absolute bottom-0 left-0 right-0 h-10 glass-strong backdrop-blur-xl flex items-center justify-center gap-3 border-t border-white/5 animate-in slide-in-from-bottom-full duration-300">
+            <Loader2 size={14} className="text-cyan-400 animate-spin" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">Veriler Arka Planda Güncelleniyor</span>
           </div>
         )}
       </div>
 
-      {/* Sağ detay çekmecesi */}
       <InventoryDetailDrawer
         selected={selected}
         setSelected={setSelected}
@@ -608,17 +620,13 @@ const AdminInventoryPage: React.FC = () => {
         t={t}
       />
 
-      {/* CSV Import Modal */}
       <InventoryCsvImport
         isOpen={csvImportOpen}
         onClose={() => setCsvImportOpen(false)}
         onSuccess={() => load()}
         effectiveThreshold={effectiveThreshold}
       />
-
     </div>
   )
 }
 export default AdminInventoryPage
-
-
