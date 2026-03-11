@@ -25,10 +25,10 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
     return (
         <div
             onClick={onClick}
-            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
+            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-slate-200/50"
         >
             {/* Background Layer - Absolute */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-navy to-secondary-blue rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors -z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-white shadow-sm border border-slate-100 rounded-2xl group-hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] group-hover:border-slate-200 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] -z-10 pointer-events-none" />
 
             {/* 3D Canvas Area - Extended height and negative margin for Pop-out effect */}
             <div className="h-56 relative -mt-12 z-10 pointer-events-none">

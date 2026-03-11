@@ -125,13 +125,10 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
             {/* Modal Content */}
             <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 w-[95vw] max-w-6xl max-h-[85vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-primary-navy to-slate-900 rounded-3xl shadow-2xl transition-all duration-300 ${isAnimating
-                    ? '-translate-y-1/2 scale-100'
-                    : '-translate-y-[40%] scale-95'
-                    }`}
+                className={`fixed left-0 w-full h-[calc(100vh-104px)] overflow-y-auto bg-white/95 backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border-t border-slate-100 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] z-[90] ${isAnimating ? 'top-[104px] translate-y-0 opacity-100' : 'top-[90px] -translate-y-4 opacity-0 pointer-events-none'}`}
             >
                 {/* Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-100">
                     <div className="flex items-center gap-3">
                         {selectedCategory ? (
                             <>
