@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatDateTime } from '../../i18n/datetime'
 
-interface Movement {
+export interface Movement {
     id: string;
     delta: number;
     reason: string;
@@ -10,14 +10,10 @@ interface Movement {
 
 interface InventoryMovementHistoryProps {
     movements: Movement[]
-    onUndo: () => void
-    undoing: boolean
 }
 
 export default function InventoryMovementHistory({
-    movements,
-    onUndo,
-    undoing
+    movements
 }: InventoryMovementHistoryProps) {
     if (movements.length === 0) return null;
 

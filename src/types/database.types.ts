@@ -1242,6 +1242,41 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_addresses: {
         Row: {
           address_line: string
@@ -1973,6 +2008,18 @@ export type Database = {
             }
             Returns: undefined
           }
+      admin_list_all_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          role: string
+          updated_at: string
+        }[]
+      }
       admin_list_users: {
         Args: never
         Returns: {
@@ -1983,6 +2030,31 @@ export type Database = {
           phone: string
           role: string
           updated_at: string
+        }[]
+      }
+      admin_search_products: {
+        Args: {
+          p_category_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_q: string
+        }
+        Returns: {
+          brand: string
+          category_id: string
+          id: string
+          is_featured: boolean
+          low_stock_threshold: number
+          model_code: string
+          name: string
+          price: number
+          purchase_price: number
+          rank: number
+          sku: string
+          slug: string
+          status: string
+          stock_qty: number
+          total_count: number
         }[]
       }
       bump_rate_limit: {
@@ -2104,6 +2176,15 @@ export type Database = {
           full_name: string
           id: string
           role: string
+        }[]
+      }
+      get_search_suggestions: {
+        Args: { p_limit?: number; p_q: string }
+        Returns: {
+          label: string
+          metadata: Json
+          type: string
+          url: string
         }[]
       }
       get_user_role: { Args: { user_id: string }; Returns: string }

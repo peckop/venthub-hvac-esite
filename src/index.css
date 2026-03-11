@@ -309,3 +309,103 @@ img {
   pointer-events: none;
   will-change: filter, background-image;
 }
+
+/* ── VentHub Industrial Navy Theme ─────────────────────────────────── */
+:root {
+  /* Base shell — Industrial Navy */
+  --navy-900:  #0A0F1E;
+  --navy-800:  #0D1426;
+  --navy-700:  #111830;
+  --navy-600:  #162040;
+  --navy-500:  #1E2D55;
+
+  /* Accent — Electric Cyan */
+  --cyan-400:  #22D3EE;
+  --cyan-500:  #06B6D4;
+  --cyan-glow: rgba(34, 211, 238, 0.15);
+
+  /* Accent warm — Amber for alerts/warnings */
+  --amber-400: #FBBF24;
+
+  /* Neutral text scale */
+  --text-primary:   rgba(255,255,255,0.92);
+  --text-secondary: rgba(255,255,255,0.55);
+  --text-muted:     rgba(255,255,255,0.30);
+
+  /* Glass surfaces */
+  --glass-bg:     rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.07);
+  --glass-hover:  rgba(255,255,255,0.07);
+}
+
+/* ── Glassmorphism utility classes ─────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-md {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.glass-strong {
+  background: rgba(13, 20, 38, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-active-premium {
+  background: rgba(34, 211, 238, 0.10);
+  color: #22D3EE !important;
+  border-left: 2px solid #22D3EE;
+}
+
+.nav-item-premium {
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.nav-item-premium:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.90);
+}
+
+.cyan-glow {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.15), 0 0 60px rgba(34, 211, 238, 0.05);
+}
+
+.input-glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.90);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-glass:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.08);
+}
+
+.tab-active-premium {
+  background: rgba(34, 211, 238, 0.10);
+  color: #22D3EE;
+  border-bottom: 2px solid #22D3EE;
+}
+
+.tab-inactive-premium {
+  color: rgba(255, 255, 255, 0.45);
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.tab-inactive-premium:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
