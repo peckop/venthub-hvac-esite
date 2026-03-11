@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { adminSelectClass, adminSelectStyle, adminButtonPrimaryClass, adminSettingsInputClass } from '../../utils/adminUi'
+import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
 import { SlidersHorizontal, Search } from 'lucide-react'
@@ -132,7 +132,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     } finally {
       hydratedRef.current = true
     }
-  }, [storageKey])
+  }, [storageKey, persist?.chips, persist?.search, persist?.select, persist?.toggles, select, chips, toggles])
 
   // Kalıcılık: kaydetme
   useEffect(() => {
