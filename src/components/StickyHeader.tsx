@@ -6,22 +6,24 @@ import { useRouter } from 'next/navigation'
 
 import { checkAdminAccess, getUserRole } from '../config/admin'
 import { useNavigationState } from '../hooks/useNavigationState'
+import { useHideOnScroll } from '../hooks/useHideOnScroll'
 import { useAuth } from '../hooks/useAuth'
 import { useCart } from '../hooks/useCartHook'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import type { Category } from '../lib/supabase'
-import { cn } from '../lib/utils'
+// import { cn } from '../lib/utils'
 import { trackEvent } from '../utils/analytics'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 
 // Helper function to handle variable sizing without creating separate JSX blocks
-const nodeSize = (isScrolled: boolean, compactSize: number, expandedSize: number) => isScrolled ? compactSize : expandedSize;
+
 
 import NavActionButton from './navigation/NavActionButton'
 import NavBrand from './navigation/NavBrand'
 import NavPrimaryRail from './navigation/NavPrimaryRail'
+import NavSecondaryRail from './navigation/NavSecondaryRail'
 import NavSearchTrigger from './navigation/NavSearchTrigger'
 import NavShell from './navigation/NavShell'
 import NavUtilityRail from './navigation/NavUtilityRail'
@@ -59,6 +61,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   } = useNavigationState({ isScrolled })
 
   const [scrollProgress, setScrollProgress] = useState(0)
+  const { isScrollingDown, isAtTop } = useHideOnScroll({ threshold: 60 })
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
   const [categoriesError, setCategoriesError] = useState<string | null>(null)
@@ -298,7 +301,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             {t('common.signUp')}
           </Link>
           <NavActionButton
-            mode={mode}
+
             href="/auth/login"
             ariaLabel={t('common.signIn')}
             icon={
@@ -408,205 +411,152 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       <div className="h-20" aria-hidden="true" />
 
       {/* Tekil (Single Source of Truth) Navigasyon Ağacı */}
-      <NavShell mode={mode} fixed={true} showProgress={isScrolled} progress={scrollProgress}>
-        <NavBrand mode={mode} brandName={t('header.brandName')} tagline={t('header.brandTagline')} />
 
-        <NavPrimaryRail
-          mode={mode}
-          items={primaryItems}
-          secondaryItems={secondaryItems}
-          isCategoriesLoading={isCategoriesLoading}
-          isCategoryHubOpen={isCategoryHubOpen}
-          onCategoryClick={handleOpenCategoryHub}
-          onCategoryHover={() => {
-            void ensureCategories()
-          }}
-          onItemHover={handleNavItemHover}
-          moreLabel={t('common.more')}
-        />
+      {/* Tekil (Single Source of Truth) Navigasyon Ağacı */}
+      <NavShell
+        fixed={true}
+        showProgress={isScrolled}
+        progress={scrollProgress}
+        isScrollingDown={isScrollingDown}
+        isAtTop={isAtTop}
+        topTierChildren={
+          <NavSecondaryRail items={secondaryItems} />
+        }
+        bottomTierChildren={
+          <>
+            <NavBrand brandName={t('header.brandName')} />
 
-        {/* Compact Mod: Ortalanmış Arama Çubuğu */}
-        <div
-          className={cn(
-            "hidden sm:flex justify-center px-0 md:px-2 transition-all duration-500 ease-in-out",
-            mode === 'compact' ? "flex-1 opacity-100 max-w-lg" : "flex-[0.0001] w-0 opacity-0 max-w-0 pointer-events-none"
-          )}
-        >
-          <NavSearchTrigger
-            mode={mode}
-            label={t('header.commandSearchCompact')}
-            shortcutLabel="/"
-            ariaLabel={t('common.search')}
-            onClick={openSearchOverlay}
-          />
-        </div>
-
-        <NavUtilityRail mode={mode}>
-          {/* Expanded Mod: Sağdaki Geniş Arama Çubuğu */}
-          <div className={cn(
-            "hidden sm:block transition-all duration-500 ease-in-out",
-            mode === 'compact' ? "w-0 opacity-0 overflow-hidden pointer-events-none" : "w-[240px] opacity-100"
-          )}>
-            <NavSearchTrigger
-              mode={mode}
-              label={t('header.commandSearch')}
-              shortcutLabel="/"
-              ariaLabel={t('common.search')}
-              onClick={openSearchOverlay}
-            />
-          </div>
-
-          {/* Sadece Compact Mod'da Gösterilen Aksiyon Butonları (Hızlı Sipariş, Son Görülmeler, Favoriler) */}
-          <div className={cn(
-            "hidden xl:flex items-center transition-all duration-500 ease-in-out",
-            mode === 'compact' ? "gap-1.5 opacity-100 w-auto" : "gap-0 w-0 opacity-0 overflow-hidden pointer-events-none"
-          )}>
-            <NavActionButton
-              mode={mode}
-              ariaLabel={t('header.quickOrder')}
-              title={t('header.quickOrder')}
-              onClick={() => router.push('/products?all=1&sort=bestsellers')}
-              tone="warning"
-              icon={
-                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
-                </svg>
-              }
-              label={t('header.quickOrder')}
-              hideLabelInCompact
+            <NavPrimaryRail
+              items={primaryItems}
+              isCategoriesLoading={isCategoriesLoading}
+              isCategoryHubOpen={isCategoryHubOpen}
+              onCategoryClick={handleOpenCategoryHub}
+              onCategoryHover={() => {
+                void ensureCategories()
+              }}
+              onItemHover={handleNavItemHover}
             />
 
-            {recentProducts.length > 0 && (
-              <NavActionButton
-                mode={mode}
-                ariaLabel={t('header.recentlyViewed')}
-                title={t('header.recentlyViewed')}
-                onClick={() => {
-                  if (recentProducts.length > 0) router.push(`/products/${recentProducts[0]}`)
-                }}
-                icon={
-                  <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" />
-                  </svg>
-                }
+            <div className="flex-1 max-w-lg hidden sm:flex justify-center md:px-2">
+              <NavSearchTrigger
+                label={t('header.commandSearchCompact')}
+                shortcutLabel="/"
+                ariaLabel={t('common.search')}
+                onClick={openSearchOverlay}
               />
-            )}
+            </div>
 
-            <NavActionButton
-              mode={mode}
-              ariaLabel={t('header.favorites')}
-              title={t('header.favorites')}
-              onClick={() => router.push('/account/favorites')}
-              icon={
-                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
-                </svg>
-              }
-            />
-          </div>
+            <NavUtilityRail>
+              <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">
+                <NavActionButton
+                  ariaLabel={t('header.quickOrder')}
+                  title={t('header.quickOrder')}
+                  onClick={() => router.push('/products?all=1&sort=bestsellers')}
+                  tone="warning"
+                  icon={
+                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" />
+                    </svg>
+                  }
+                  label={t('header.quickOrder')}
+                />
 
-          {/* Sepet (Cart) */}
-          <NavActionButton
-            mode={mode}
-            href="/cart"
-            ariaLabel={t('header.cart')}
-            tone="success"
-            icon={
-              <svg width={nodeSize(isScrolled, 18, 20)} height={nodeSize(isScrolled, 18, 20)} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
-                <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
-                <path strokeWidth={2} d="M5 6L4 2H2" />
-                <circle cx="16" cy="19" r="2" />
-                <circle cx="8" cy="19" r="2" />
-              </svg>
-            }
-            label={mode === 'compact' && cartTotal > 0 ? formatCurrency(String(cartTotal), lang, { maximumFractionDigits: 0 }) : undefined}
-            compactLabelClassName="hidden 2xl:block font-semibold text-success-green transition-all"
-            badge={
-              <>
-                {showSyncPulse && syncing && (
-                  <span
-                    title={t('header.syncing')}
-                    aria-label={t('header.syncing')}
-                    className="absolute -left-1 -top-1 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
+                {recentProducts.length > 0 && (
+                  <NavActionButton
+                    ariaLabel={t('header.recentlyViewed')}
+                    title={t('header.recentlyViewed')}
+                    onClick={() => {
+                      if (recentProducts.length > 0) router.push(`/products/${recentProducts[0]}`)
+                    }}
+                    icon={
+                      <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" />
+                      </svg>
+                    }
                   />
                 )}
-                {cartCount > 0 && (
-                  <span className={cn(
-                    "absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md transition-all duration-300",
-                    isScrolled ? "-right-1.5 -top-1.5 h-[18px] w-[18px] text-[10px]" : "-right-2 -top-2 h-5 w-5 text-[11px]"
-                  )}>
-                    {cartCount}
-                  </span>
-                )}
-              </>
-            }
-          />
 
-          {/* Expanded Mod: Gelişmiş Kullanıcı Menüsü */}
-          <div className={cn(
-            "hidden lg:block transition-all duration-500 ease-in-out",
-            mode === 'compact' ? "w-0 opacity-0 overflow-hidden pointer-events-none" : "w-auto opacity-100"
-          )}>
-            {renderUserMenu()}
-          </div>
+                <NavActionButton
+                  ariaLabel={t('header.favorites')}
+                  title={t('header.favorites')}
+                  onClick={() => router.push('/account/favorites')}
+                  icon={
+                    <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
+                    </svg>
+                  }
+                />
+              </div>
 
-          {/* Compact Mod: Basit Hesap İkonu */}
-          <div className={cn(
-            "hidden lg:flex items-center transition-all duration-500 ease-in-out",
-            mode === 'expanded' ? "w-0 opacity-0 overflow-hidden pointer-events-none" : "w-auto opacity-100 border-l border-slate-200/60 pl-2 ml-1"
-          )}>
-            {user ? (
+              {/* Sepet (Cart) */}
               <NavActionButton
-                mode={mode}
-                href="/account"
-                ariaLabel={t('header.account')}
+                href="/cart"
+                ariaLabel={t('header.cart')}
+                tone="success"
                 icon={
-                  <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
+                  <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
+                    <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
+                    <path strokeWidth={2} d="M5 6L4 2H2" />
+                    <circle cx="16" cy="19" r="2" />
+                    <circle cx="8" cy="19" r="2" />
                   </svg>
                 }
+                label={cartTotal > 0 ? formatCurrency(String(cartTotal), lang, { maximumFractionDigits: 0 }) : undefined}
+                labelClassName="hidden 2xl:block font-semibold text-success-green transition-all"
+                badge={
+                  <>
+                    {showSyncPulse && syncing && (
+                      <span
+                        title={t('header.syncing')}
+                        aria-label={t('header.syncing')}
+                        className="absolute -left-1 -top-1 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
+                      />
+                    )}
+                    {cartCount > 0 && (
+                      <span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md transition-all duration-300 -right-2 -top-2 h-5 w-5 text-[11px]">
+                        {cartCount}
+                      </span>
+                    )}
+                  </>
+                }
               />
-            ) : (
-              <Link
-                href="/auth/login"
-                className="rounded-xl bg-gradient-to-r from-primary-navy to-secondary-blue px-3.5 py-2 text-[13px] font-medium text-white shadow-[0_12px_24px_-12px_rgba(37,99,235,0.7)] transition-all duration-300 hover:-translate-y-0.5 whitespace-nowrap"
-              >
-                {t('common.signIn')}
-              </Link>
-            )}
-          </div>
 
-          {/* Mobil Cihazlar için Arama İkonu */}
-          <div className={cn("transition-all duration-300 overflow-hidden sm:hidden")}>
-            <NavActionButton
-              mode={mode}
-              ariaLabel={t('common.search')}
-              onClick={openSearchOverlay}
-              icon={
-                <svg width={nodeSize(isScrolled, 18, 20)} height={nodeSize(isScrolled, 18, 20)} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-              }
-            />
-          </div>
+              {/* Kullanıcı Menüsü / Login */}
+              <div className="hidden lg:block">
+                {renderUserMenu()}
+              </div>
 
-          {/* Hamburger Menü İkonu */}
-          <NavActionButton
-            mode={mode}
-            ariaLabel={t('header.menu')}
-            onClick={handleOpenMenu}
-            icon={
-              <svg width={nodeSize(isScrolled, 18, 20)} height={nodeSize(isScrolled, 18, 20)} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            }
-            tone={activeSurface === 'menu' ? 'accent' : 'default'}
-            className={mode === 'compact' ? "lg:hidden" : "xl:hidden"}
-          />
-        </NavUtilityRail>
-      </NavShell>
+              {/* Mobil Cihazlar için Arama İkonu */}
+              <div className="transition-all duration-300 overflow-hidden sm:hidden">
+                <NavActionButton
+                  ariaLabel={t('common.search')}
+                  onClick={openSearchOverlay}
+                  icon={
+                    <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.35-4.35" />
+                    </svg>
+                  }
+                />
+              </div>
+
+              {/* Hamburger Menü İkonu */}
+              <NavActionButton
+                ariaLabel={t('header.menu')}
+                onClick={handleOpenMenu}
+                icon={
+                  <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                }
+                tone={activeSurface === 'menu' ? 'accent' : 'default'}
+                className="lg:hidden"
+              />
+            </NavUtilityRail>
+          </>
+        }
+      />
 
       {isSearchOverlayOpen && (
         <React.Suspense fallback={null}>
