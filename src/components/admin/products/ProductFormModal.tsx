@@ -69,7 +69,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             // Fetch product
             const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(product as unknown as Product)
+            setInitialData(product as Product)
 
             // Fetch images
             const { data: imgs, error: imgError } = await supabase
@@ -97,7 +97,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                 meta_title: product.meta_title || '',
                 meta_description: product.meta_description || '',
                 is_featured: product.is_featured ?? false,
-                technical_specs: (product.technical_specs as Record<string, unknown>) || {}
+                technical_specs: (product.technical_specs as Record<string, string>) || {}
             })
 
             // Set Images
@@ -175,11 +175,16 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
             data.technical_specs = specsJson
 
+            // Clean payload
+            const cleanPayload = Object.fromEntries(
+                Object.entries(data).filter(([_, v]) => v !== undefined)
+            ) as import('../../../types/database.types').Database['public']['Tables']['products']['Insert']
+
             let currentProductId = productId
 
             // 2. Insert/Update Product
             if (currentProductId) {
-                const { error } = await supabase.from('products').update(data as unknown as Product).eq('id', currentProductId)
+                const { error } = await supabase.from('products').update(cleanPayload as import('../../../types/database.types').Database['public']['Tables']['products']['Update']).eq('id', currentProductId)
                 if (error) throw error
 
                 // Audit Log
@@ -188,13 +193,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     table_name: 'products',
                     row_pk: currentProductId,
                     action: 'UPDATE',
-                    before: initialData as unknown as Record<string, unknown>,
-                    after: data as unknown as Record<string, unknown>,
+                    before: initialData,
+                    after: cleanPayload,
                     comment: 'Updated via Modal'
                 })
 
             } else {
-                const { data: newProd, error } = await supabase.from('products').insert(data as unknown as Product).select('id').single()
+                const { data: newProd, error } = await supabase.from('products').insert(cleanPayload).select('id').single()
                 if (error) throw error
                 currentProductId = newProd.id
 
@@ -205,7 +210,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     row_pk: currentProductId,
                     action: 'INSERT',
                     before: null,
-                    after: data as unknown as Record<string, unknown>,
+                    after: cleanPayload,
                     comment: 'Created via Modal'
                 })
             }

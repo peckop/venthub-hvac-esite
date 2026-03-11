@@ -56,7 +56,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         try {
             const { data, error } = await supabase.from('categories').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(data as unknown as Category)
+            setInitialData(data)
 
             reset({
                 name: data.name,
@@ -139,13 +139,18 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
-            const payload = { ...data, image_url: imgPath } as unknown as Category
+            const payload = { ...data, image_url: imgPath }
             if (payload.parent_id === '') payload.parent_id = null
+
+            // Clean up optional fields that should not be undefined
+            const cleanPayload = Object.fromEntries(
+                Object.entries(payload).filter(([_, v]) => v !== undefined)
+            ) as import('../../../types/database.types').Database['public']['Tables']['categories']['Insert']
 
             let currentId = categoryId
 
             if (currentId) {
-                const { error } = await supabase.from('categories').update(payload).eq('id', currentId)
+                const { error } = await supabase.from('categories').update(cleanPayload as import('../../../types/database.types').Database['public']['Tables']['categories']['Update']).eq('id', currentId)
                 if (error) throw error
 
                 // Audit
@@ -155,11 +160,11 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     row_pk: currentId,
                     action: 'UPDATE',
                     before: initialData,
-                    after: payload,
+                    after: cleanPayload,
                     comment: 'Update category via Modal'
                 })
             } else {
-                const { data: newCat, error } = await supabase.from('categories').insert(payload).select('id').single()
+                const { data: newCat, error } = await supabase.from('categories').insert(cleanPayload).select('id').single()
                 if (error) throw error
                 currentId = newCat.id
 
@@ -169,7 +174,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     row_pk: currentId,
                     action: 'INSERT',
                     before: null,
-                    after: payload,
+                    after: cleanPayload,
                     comment: 'Create category via Modal'
                 })
             }
