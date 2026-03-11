@@ -48,6 +48,7 @@ export const tr = {
     prev: "Önceki",
     next: "Sonraki",
     remove: "Kaldır",
+    more: "Daha Fazla",
   },
   search: {
     recentSearches: "Son Aramalar",
