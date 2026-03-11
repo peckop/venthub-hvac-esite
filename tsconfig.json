@@ -45,6 +45,7 @@
     "src/AppWrapper.tsx",
     "src/App.tsx",
     "src/vite-env.d.ts",
+    "tmp_old_report.tsx",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/__tests__/*",
