@@ -68,13 +68,13 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                 <div className="m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
                                     {/* Category Header */}
                                     <div className="row-span-3">
-                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7 relative overflow-hidden">
+                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-slate-50 border border-slate-100 p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7 relative overflow-hidden">
                                             <MegaMenu3DBackground categorySlug={category.slug} />
                                             <div className="relative z-10">
-                                                <div className="text-white mb-4">
+                                                <div className="text-primary-navy mb-4">
                                                     {getCategoryIcon(category.slug, { size: 48 })}
                                                 </div>
-                                                <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
+                                                <div className="mb-[7px] mt-4 text-[18px] font-bold leading-[1.2] text-slate-900">
                                                     {getCategoryDisplayName(category)}
                                                 </div>
                                                 <p className="text-[14px] leading-[1.3] text-white/90">
@@ -83,9 +83,9 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                                 <Link
                                                     href={`/category/${category.slug}`}
                                                     onClick={() => handleLinkClick(0, category.slug)}
-                                                    className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
+                                                    className="mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary-blue hover:text-primary-navy"
                                                 >
-                                                    Tümünü Gör <ExternalLink size={14} />
+                                                    Tümünü Gör <ExternalLink size={14} className="text-secondary-blue" />
                                                 </Link>
                                             </div>
                                         </div>

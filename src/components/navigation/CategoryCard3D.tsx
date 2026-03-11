@@ -28,7 +28,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
             className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
         >
             {/* Background Layer - Absolute */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-navy to-secondary-blue rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors -z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-slate-50 group-hover:bg-white rounded-2xl border border-slate-200/60 group-hover:border-secondary-blue/30 transition-colors -z-10 pointer-events-none" />
 
             {/* 3D Canvas Area - Extended height and negative margin for Pop-out effect */}
             <div className="h-56 relative -mt-12 z-10 pointer-events-none">
@@ -37,9 +37,9 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     style={{ background: 'transparent' }}
                 >
                     {/* Lighting Setup for Menu Tiles */}
-                    <ambientLight intensity={1.5} />
+                    <ambientLight intensity={1.2} />
                     <pointLight position={[10, 10, 10]} intensity={2} />
-                    <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
+                    <pointLight position={[-10, -10, -10]} intensity={1} color="#ffffff" />
 
                     <Suspense fallback={null}>
                         <Category3DIcon categorySlug={category.slug} scale={0.9} />
@@ -57,16 +57,16 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
 
             {/* Text Content */}
             <div className="px-4 pb-4 relative z-20">
-                <h3 className="text-lg font-bold text-white mb-1 group-hover:text-secondary-blue transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-secondary-blue transition-colors">
                     {getCategoryDisplayName(category)}
                 </h3>
 
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/70">
+                    <span className="text-sm text-slate-500">
                         {subCategoryCount} seri
                     </span>
                     <ChevronRight
-                        className="w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all"
+                        className="w-5 h-5 text-slate-400 group-hover:text-secondary-blue group-hover:translate-x-1 transition-all"
                     />
                 </div>
             </div>

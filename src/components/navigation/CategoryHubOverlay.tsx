@@ -125,37 +125,34 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
             {/* Modal Content */}
             <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 w-[95vw] max-w-6xl max-h-[85vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-primary-navy to-slate-900 rounded-3xl shadow-2xl transition-all duration-300 ${isAnimating
-                    ? '-translate-y-1/2 scale-100'
-                    : '-translate-y-[40%] scale-95'
-                    }`}
+                className={`absolute top-0 left-0 w-full h-auto min-h-[50vh] max-h-[85vh] pt-[104px] pb-8 overflow-y-auto bg-white/95 backdrop-blur-3xl shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isAnimating ? "translate-y-0" : "-translate-y-full"}`}
             >
                 {/* Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-transparent border-b border-slate-200/50">
                     <div className="flex items-center gap-3">
                         {selectedCategory ? (
                             <>
                                 <button
                                     onClick={() => setSelectedCategory(null)}
-                                    className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group mr-4"
+                                    className="flex items-center gap-2 text-slate-500 hover:text-primary-navy transition-colors group mr-4"
                                 >
-                                    <div className="p-1.5 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                                    <div className="p-1.5 rounded-full bg-slate-100 group-hover:bg-slate-200 transition-colors">
                                         <ArrowLeft className="w-4 h-4" />
                                     </div>
                                     <span className="text-sm font-medium">Ana Kategoriler</span>
-                                    <ChevronRight className="w-4 h-4 text-white/30" />
+                                    <ChevronRight className="w-4 h-4 text-slate-400" />
                                 </button>
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h2 className="text-xl font-bold text-white">
+                                        <h2 className="text-xl font-bold text-slate-900">
                                             {getCategoryDisplayName(selectedCategory)}
                                         </h2>
-                                        <span className="text-sm text-white/50">
+                                        <span className="text-sm text-slate-500">
                                             ({subCategories.length} seri)
                                         </span>
                                     </div>
                                     {selectedCategory.description && (
-                                        <p className="text-sm text-gray-400 mt-0.5 line-clamp-1 max-w-xl">
+                                        <p className="text-sm text-slate-500 mt-0.5 line-clamp-1 max-w-xl">
                                             {selectedCategory.description}
                                         </p>
                                     )}
@@ -164,7 +161,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                         ) : (
                             <>
                                 <Grid3X3 className="w-6 h-6 text-secondary-blue" />
-                                <h2 className="text-xl font-bold text-white">
+                                <h2 className="text-xl font-bold text-slate-900">
                                     Kategoriler
                                 </h2>
                             </>
@@ -172,10 +169,10 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-full hover:bg-slate-200 transition-colors"
                         aria-label="Kapat"
                     >
-                        <X className="w-6 h-6 text-white/70 hover:text-white" />
+                        <X className="w-6 h-6 text-slate-500 hover:text-primary-navy" />
                     </button>
                 </div>
 
@@ -202,7 +199,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                 <div className="p-3 rounded-full bg-secondary-blue/20 group-hover:bg-secondary-blue/30 mb-3 transition-colors">
                                     <ChevronRight className="w-8 h-8 text-secondary-blue" />
                                 </div>
-                                <span className="font-semibold text-secondary-blue text-center group-hover:text-white transition-colors">
+                                <span className="font-semibold text-secondary-blue text-center group-hover:text-primary-navy transition-colors">
                                     Tüm {getCategoryDisplayName(selectedCategory)} <br /> Ürünlerini Gör
                                 </span>
                             </Link>
@@ -222,9 +219,9 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                             ) : (
                                 /* Skeleton-like loading state */
                                 Array.from({ length: 8 }).map((_, i) => (
-                                    <div key={i} className="h-48 bg-white/5 rounded-2xl animate-pulse flex flex-col justify-end p-4">
-                                        <div className="h-4 w-3/4 bg-white/10 rounded mb-2" />
-                                        <div className="h-3 w-1/4 bg-white/5 rounded" />
+                                    <div key={i} className="h-48 bg-slate-100 rounded-2xl animate-pulse flex flex-col justify-end p-4">
+                                        <div className="h-4 w-3/4 bg-slate-200 rounded mb-2" />
+                                        <div className="h-3 w-1/4 bg-slate-100 rounded" />
                                     </div>
                                 ))
                             )}
@@ -234,7 +231,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
                 {/* Footer hint */}
                 <div className="px-6 pb-6 text-center">
-                    <p className="text-sm text-white/50">
+                    <p className="text-sm text-slate-500">
                         {selectedCategory
                             ? 'Bir alt kategori seçerek ürünleri görüntüleyin'
                             : 'Bir kategori seçerek alt serileri görüntüleyin'}

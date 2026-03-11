@@ -67,7 +67,7 @@ export const GuidedCategoryDiscovery: React.FC = () => {
                   <Link
                     key={category.id}
                     href={`/category/${category.slug}`}
-                    className="group relative flex flex-col items-start gap-4 rounded-none border-b border-slate-200/60 pb-8 pt-4 transition-all duration-500 hover:-translate-y-1 hover:border-secondary-blue sm:flex-row"
+                    className="group rounded-[1.8rem] border border-slate-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-5 shadow-[0_24px_50px_-38px_rgba(15,23,42,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary-blue/35 hover:shadow-[0_28px_60px_-36px_rgba(15,23,42,0.3)] sm:p-6"
                   >
                     <div className="flex items-start gap-4">
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-primary-navy/[0.03] text-secondary-blue transition-colors group-hover:border-secondary-blue/20 group-hover:bg-secondary-blue/10">
@@ -94,23 +94,23 @@ export const GuidedCategoryDiscovery: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-none border-l-2 border-slate-900 bg-slate-50 p-8 text-slate-950 sm:p-10 lg:sticky lg:top-32">
+          <div className="rounded-[1.9rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_28px_70px_-42px_rgba(15,23,42,0.6)] sm:p-6 lg:sticky lg:top-24">
             <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-secondary-blue">
               {t('home.guidedDiscovery.panelEyebrow')}
             </div>
-            <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-slate-900">
+            <h3 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-white">
               {t('home.guidedDiscovery.panelTitle')}
             </h3>
-            <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-[15px]">
+            <p className="mt-3 text-sm leading-6 text-white/70 sm:text-[15px]">
               {t('home.guidedDiscovery.panelBody')}
             </p>
 
             <div className="mt-6 grid gap-3">
               {stepKeys.map((stepKey, index) => (
-                <div key={stepKey} className="rounded-[1.35rem] border border-slate-200/70 bg-white px-4 py-4">
+                <div key={stepKey} className="rounded-[1.35rem] border border-white/10 bg-white/[0.05] px-4 py-4">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-blue">0{index + 1}</div>
-                  <div className="mt-2 text-base font-semibold text-slate-900">{t(`home.guidedDiscovery.steps.${stepKey}.title`)}</div>
-                  <p className="mt-2 text-sm leading-6 text-slate-900/68">{t(`home.guidedDiscovery.steps.${stepKey}.description`)}</p>
+                  <div className="mt-2 text-base font-semibold text-white">{t(`home.guidedDiscovery.steps.${stepKey}.title`)}</div>
+                  <p className="mt-2 text-sm leading-6 text-white/68">{t(`home.guidedDiscovery.steps.${stepKey}.description`)}</p>
                 </div>
               ))}
             </div>
@@ -118,19 +118,19 @@ export const GuidedCategoryDiscovery: React.FC = () => {
             <div className="mt-6 flex flex-col gap-3">
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-secondary-blue hover:text-slate-900"
+                className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-secondary-blue hover:text-white"
               >
                 {t('home.featuredCommercial.cta')}
               </Link>
               <Link
                 href="#applications"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-white/[0.08]"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.05] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/[0.08]"
               >
                 {t('home.guidedDiscovery.secondaryCta')}
               </Link>
             </div>
 
-            <div className="mt-6 border-t border-slate-200/70 pt-4 text-sm leading-6 text-slate-900/58">
+            <div className="mt-6 border-t border-white/10 pt-4 text-sm leading-6 text-white/58">
               {t('home.guidedDiscovery.footerNote')}
             </div>
           </div>
