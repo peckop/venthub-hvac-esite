@@ -7,6 +7,7 @@ export type NavigationItemId =
     | 'knowledgeHub'
     | 'about'
     | 'contact'
+    | 'account'
 
 export interface NavigationItemConfig {
     id: NavigationItemId
@@ -37,13 +38,6 @@ export const NAVIGATION_PRIMARY_ITEMS: NavigationItemConfig[] = [
         minWidthClass: 'min-w-[100px]',
         showInCompact: true,
     },
-    {
-        id: 'contact',
-        labelKey: 'common.contact',
-        href: '/contact',
-        minWidthClass: 'min-w-[92px]',
-        showInCompact: true,
-    },
 ]
 
 export const NAVIGATION_SECONDARY_ITEMS: NavigationItemConfig[] = [
@@ -68,4 +62,16 @@ export const NAVIGATION_SECONDARY_ITEMS: NavigationItemConfig[] = [
         minWidthClass: 'min-w-[92px]',
         showInCompact: false,
     },
+    {
+        id: 'contact',
+        labelKey: 'common.contact',
+        href: '/contact',
+        showInCompact: false,
+    },
+    {
+        id: 'account',
+        labelKey: 'header.account',
+        href: '/account',
+        showInCompact: false,
+    }
 ]
