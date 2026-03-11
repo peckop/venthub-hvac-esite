@@ -104,7 +104,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
   }
 
   // URL Doğrudan erişim koruması
-  if (!canAccess(pathname)) {
+  if (!canAccess(pathname ?? '')) {
     return <AccessDenied />
   }
 

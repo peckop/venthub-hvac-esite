@@ -136,7 +136,11 @@ const AdminDashboardPage: React.FC = () => {
         const prods = productsRes.data as { stock_qty: number | null, price: number | null, low_stock_threshold: number | null }[]
 
         // Bağlı Sermaye
-        const capital = prods.reduce((acc, p) => acc + ((p.stock_qty || 0) > 0 ? (p.stock_qty * (p.price || 0)) : 0), 0)
+        const capital = prods.reduce((acc, p) => {
+          const stockQty = p.stock_qty ?? 0
+          const price = p.price ?? 0
+          return acc + (stockQty > 0 ? stockQty * price : 0)
+        }, 0)
         setTiedCapital(capital)
 
         // Alarm sayısı (stoku eşik altında olanlar)

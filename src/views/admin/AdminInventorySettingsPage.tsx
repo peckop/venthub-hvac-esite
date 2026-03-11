@@ -52,7 +52,11 @@ const AdminInventorySettingsPage: React.FC = () => {
       setError('')
       const value = (defaultThreshold === '' ? null : Number(defaultThreshold))
       // Global eşik ve toplu uygulama için yeni RPC
-      const { error } = await supabase.rpc('update_inventory_thresholds', { p_default: value as number | null, p_reset_overrides: resetAll })
+      const rpc = supabase.rpc as unknown as (
+        fn: string,
+        args: { p_default: number | null; p_reset_overrides: boolean }
+      ) => Promise<{ error: Error | null }>
+      const { error } = await rpc('update_inventory_thresholds', { p_default: value, p_reset_overrides: resetAll })
       if (error) throw error
       setSuccess(resetAll ? 'Kaydedildi ve tüm ürünlere uygulandı' : 'Kaydedildi')
       await load() // kaydettikten sonra güncel değeri yeniden yükle
