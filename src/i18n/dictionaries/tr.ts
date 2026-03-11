@@ -596,7 +596,8 @@ export const tr = {
       errorGroups: 'Hata Grupları',
       products: 'Ürünler',
       categories: 'Kategoriler',
-      logistics: 'Kargo & Lojistik'
+      logistics: 'Kargo & Lojistik',
+      settings: 'Ayarlar'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -610,7 +611,39 @@ export const tr = {
       errorGroups: 'Hata Grupları',
       products: 'Ürünler',
       categories: 'Kategoriler',
-      coupons: 'Kuponlar'
+      coupons: 'Kuponlar',
+      settings: 'Admin Ayarları'
+    },
+    settings: {
+      siteName: 'Site Adı',
+      tagline: 'Slogan',
+      contactEmail: 'İletişim E-postası',
+      supportPhone: 'Destek Telefonu',
+      headquarters: 'Merkez Adresi',
+      logo: 'Logo',
+      dropLogo: 'Logoyu buraya bırakın',
+      paymentTitle: 'Ödeme Yapılandırması',
+      iyzicoMode: 'iyzico Modu',
+      iyzicoApiKey: 'iyzico API Anahtarı',
+      iyzicoSecretKey: 'iyzico Secret Anahtarı',
+      saveSuccess: 'Ayarlar başarıyla kaydedildi',
+      saveError: 'Ayarlar kaydedilirken hata oluştu',
+      generalTab: 'Genel Ayarlar',
+      paymentTab: 'Ödeme Ayarları',
+      adminsTab: 'Admin Yönetimi',
+      systemTab: 'Sistem Durumu',
+      platformIdentity: 'Platform Kimliği',
+      platformIdentityDesc: 'Mağaza adınızı, logonuzu ve iletişim detaylarını yönetin.',
+      adminsTitle: 'Yönetici Listesi',
+      adminsDesc: 'Platform yöneticilerini buradan yönetebilirsiniz.',
+      systemTitle: 'Sistem Durumu',
+      systemDesc: 'Sunucu ve altyapı durumunu anlık olarak izleyin.',
+      dbStatus: 'Veritabanı Durumu',
+      apiLatency: 'API Gecikmesi',
+      versionInfo: 'Sürüm Bilgisi',
+      lastUpdate: 'Son Güncelleme',
+      addAdmin: 'Yeni Yönetici Ekle',
+      systemLogs: 'Sistem Günlüğü'
     },
     products: {
       toolbar: {
