@@ -252,9 +252,12 @@ export interface FtsProductResult {
 }
 
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
-  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as Record<string, unknown> }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('fts_search_products', payload)
+  const payload = { 
+    p_q: q, 
+    p_limit: limit, 
+    p_filters: (filters || {}) as any 
+  }
+  const { data, error } = await supabase.rpc('fts_search_products', payload as any)
   if (error) throw error
   return (data || []) as FtsProductResult[]
 }
@@ -281,10 +284,10 @@ export interface AdminSearchResult {
 export async function adminSearchProducts(
   q: string, limit = 50, offset = 0, categoryId?: string
 ): Promise<AdminSearchResult[]> {
-  const payload: Record<string, unknown> = { p_q: q, p_limit: limit, p_offset: offset }
+  const payload: Record<string, any> = { p_q: q, p_limit: limit, p_offset: offset }
   if (categoryId) payload.p_category_id = categoryId
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('admin_search_products', payload)
+  
+  const { data, error } = await supabase.rpc('admin_search_products', payload as any)
   if (error) throw error
   return (data || []) as AdminSearchResult[]
 }
@@ -293,12 +296,11 @@ export interface SearchSuggestion {
   type: 'product' | 'category' | 'brand'
   label: string
   url: string
-  metadata: Record<string, unknown>
+  metadata: Record<string, any>
 }
 
 export async function getSearchSuggestions(q: string, limit = 5) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('get_search_suggestions', { p_q: q, p_limit: limit })
+  const { data, error } = await supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit } as any)
   if (error) throw error
   return (data || []) as SearchSuggestion[]
 }
@@ -311,6 +313,8 @@ export interface UserAddress {
   full_name?: string | null
   phone?: string | null
   full_address: string
+  address_line: string
+  address_type: string
   city: string
   district: string
   postal_code?: string | null
@@ -319,8 +323,7 @@ export interface UserAddress {
   is_default_billing: boolean
   created_at: string
   updated_at: string
-  // DB fields not in CreateAddressInput
-  street_address?: string | null // DB column for full_address
+  street_address?: string | null
 }
 
 export interface CreateAddressInput {
@@ -346,7 +349,7 @@ export async function listAddresses() {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return data as UserAddress[]
+  return (data || []) as UserAddress[]
 }
 
 export async function createAddress(payload: CreateAddressInput) {
@@ -357,10 +360,19 @@ export async function createAddress(payload: CreateAddressInput) {
 
   const dbPayload = {
     user_id: user.id,
+    label: payload.label || 'Adres',
+    full_name: payload.full_name,
+    phone: payload.phone,
+    full_address: payload.full_address,
+    address_line: payload.full_address,
     street_address: payload.full_address,
-    address_line: payload.full_address, // Map both
-    address_type: payload.is_default_shipping ? 'shipping' : 'billing', // Mandatory in DB
-    ...payload
+    address_type: payload.is_default_shipping ? 'shipping' : 'billing',
+    city: payload.city,
+    district: payload.district,
+    postal_code: payload.postal_code,
+    country: payload.country || 'Türkiye',
+    is_default_shipping: !!payload.is_default_shipping,
+    is_default_billing: !!payload.is_default_billing
   } as any
 
   const { data, error } = await supabase
@@ -371,21 +383,22 @@ export async function createAddress(payload: CreateAddressInput) {
 
   if (error) throw error
 
-  if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id)
-  if (payload.is_default_billing) await setDefaultAddress('billing', data.id)
+  if (payload.is_default_shipping) await setDefaultAddress('shipping', (data as any).id)
+  if (payload.is_default_billing) await setDefaultAddress('billing', (data as any).id)
 
   return (data as unknown) as UserAddress
 }
 
 export async function updateAddress(id: string, payload: UpdateAddressInput) {
-  const updatePatch = { ...payload } as Record<string, unknown>
+  const updatePatch: Record<string, any> = { ...payload }
   if (payload.full_address) {
-    (updatePatch as Record<string, unknown>).street_address = payload.full_address
+    updatePatch.street_address = payload.full_address
+    updatePatch.address_line = payload.full_address
   }
 
   const { data, error } = await supabase
     .from('user_addresses')
-    .update(updatePatch)
+    .update(updatePatch as any)
     .eq('id', id)
     .select('*')
     .single()
@@ -395,7 +408,7 @@ export async function updateAddress(id: string, payload: UpdateAddressInput) {
   if (payload.is_default_shipping) await setDefaultAddress('shipping', id)
   if (payload.is_default_billing) await setDefaultAddress('billing', id)
 
-  return data as UserAddress
+  return (data as unknown) as UserAddress
 }
 
 export async function deleteAddress(id: string) {
@@ -414,27 +427,27 @@ export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const flag: 'is_default_shipping' | 'is_default_billing' = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
+  const flag = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
 
   // Clear others
-  const clearPatch = { [flag]: false } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const clearPatch = { [flag]: false }
   const clear = await supabase
     .from('user_addresses')
-    .update(clearPatch)
+    .update(clearPatch as any)
     .eq('user_id', user.id)
 
   if (clear.error) throw clear.error
 
-  const setPatch = { [flag]: true } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const setPatch = { [flag]: true }
   const { data, error } = await supabase
     .from('user_addresses')
-    .update(setPatch)
+    .update(setPatch as any)
     .eq('id', id)
     .select('*')
     .single()
 
   if (error) throw error
-  return data as UserAddress
+  return (data as unknown) as UserAddress
 }
 
 // ========== Account: Invoice Profiles ==========
@@ -442,27 +455,25 @@ export type InvoiceProfileType = 'individual' | 'corporate'
 export interface InvoiceProfile {
   id: string
   user_id: string
-  type: string // Maps to profile_type in DB
+  type: InvoiceProfileType
   title?: string | null
   company_name?: string | null
-  tax_number?: string | null // Maps to tckn/vkn
+  tax_number?: string | null
   tax_office?: string | null
   is_default: boolean
   created_at: string
   updated_at: string
-  // DB fields not in CreateInvoiceProfileInput
-  profile_type?: string | null // DB column for type
-  tckn?: string | null // DB column for tax_number (individual)
-  vkn?: string | null // DB column for tax_number (corporate)
+  // DB specific fields for mapping
+  profile_type?: string | null
+  tckn?: string | null
+  vkn?: string | null
   e_invoice?: boolean | null
 }
 
 export interface CreateInvoiceProfileInput {
   type: InvoiceProfileType
   title?: string
-  // individual
   tckn?: string
-  // corporate
   company_name?: string
   vkn?: string
   tax_office?: string
@@ -478,14 +489,17 @@ export async function listInvoiceProfiles() {
     .order('is_default', { ascending: false })
     .order('created_at', { ascending: false })
   if (error) {
-    const e = error as unknown as { code?: string; message?: string }
+    const e = error as any
     if (e?.code === 'PGRST205' || (e?.message || '').includes("Could not find the table 'public.user_invoice_profiles'")) {
-      // Table not yet migrated on the target — return empty list gracefully
       return [] as InvoiceProfile[]
     }
     throw error
   }
-  return (data as unknown) as InvoiceProfile[]
+  return (data || []).map((row: any) => ({
+    ...row,
+    type: row.profile_type as InvoiceProfileType,
+    tax_number: row.profile_type === 'individual' ? row.tckn : row.vkn
+  })) as InvoiceProfile[]
 }
 
 export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
@@ -494,20 +508,20 @@ export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const dbPayload: Record<string, unknown> = {
+  const dbPayload: any = {
     user_id: user.id,
-    profile_type: payload.type, // Map 'type' to 'profile_type'
+    profile_type: payload.type,
     title: payload.title,
     company_name: payload.company_name,
     tax_office: payload.tax_office,
-    e_invoice: payload.e_invoice,
-    is_default: payload.is_default,
-  };
+    e_invoice: !!payload.e_invoice,
+    is_default: !!payload.is_default,
+  }
 
   if (payload.type === 'individual') {
-    dbPayload.tckn = payload.tckn;
+    dbPayload.tckn = payload.tckn
   } else if (payload.type === 'corporate') {
-    dbPayload.vkn = payload.vkn;
+    dbPayload.vkn = payload.vkn
   }
 
   const { data, error } = await supabase
@@ -516,28 +530,33 @@ export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
     .select('*')
     .single()
   if (error) throw error
-  return (data as unknown) as InvoiceProfile
+  
+  const row = data as any
+  return {
+    ...row,
+    type: row.profile_type as InvoiceProfileType,
+    tax_number: row.profile_type === 'individual' ? row.tckn : row.vkn
+  } as InvoiceProfile
 }
 
 export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
-  const dbPayload: Record<string, unknown> = {};
-  if (payload.type !== undefined) dbPayload.profile_type = payload.type;
-  if (payload.title !== undefined) dbPayload.title = payload.title;
-  if (payload.company_name !== undefined) dbPayload.company_name = payload.company_name;
-  if (payload.tax_office !== undefined) dbPayload.tax_office = payload.tax_office;
-  if (payload.e_invoice !== undefined) dbPayload.e_invoice = payload.e_invoice;
-  if (payload.is_default !== undefined) dbPayload.is_default = payload.is_default;
+  const dbPayload: any = {}
+  if (payload.type !== undefined) dbPayload.profile_type = payload.type
+  if (payload.title !== undefined) dbPayload.title = payload.title
+  if (payload.company_name !== undefined) dbPayload.company_name = payload.company_name
+  if (payload.tax_office !== undefined) dbPayload.tax_office = payload.tax_office
+  if (payload.e_invoice !== undefined) dbPayload.e_invoice = payload.e_invoice
+  if (payload.is_default !== undefined) dbPayload.is_default = payload.is_default
 
   if (payload.type === 'individual') {
-    dbPayload.tckn = payload.tckn;
-    dbPayload.vkn = null; // Clear VKN if changing to individual
+    dbPayload.tckn = payload.tckn
+    dbPayload.vkn = null
   } else if (payload.type === 'corporate') {
-    dbPayload.vkn = payload.vkn;
-    dbPayload.tckn = null; // Clear TCKN if changing to corporate
+    dbPayload.vkn = payload.vkn
+    dbPayload.tckn = null
   } else {
-    // If type is not specified in update, handle tckn/vkn directly if present
-    if (payload.tckn !== undefined) dbPayload.tckn = payload.tckn;
-    if (payload.vkn !== undefined) dbPayload.vkn = payload.vkn;
+    if (payload.tckn !== undefined) dbPayload.tckn = payload.tckn
+    if (payload.vkn !== undefined) dbPayload.vkn = payload.vkn
   }
 
   const { data, error } = await supabase
@@ -547,7 +566,13 @@ export async function updateInvoiceProfile(id: string, payload: UpdateInvoicePro
     .select('*')
     .single()
   if (error) throw error
-  return (data as unknown) as InvoiceProfile
+  
+  const row = data as any
+  return {
+    ...row,
+    type: row.profile_type as InvoiceProfileType,
+    tax_number: row.profile_type === 'individual' ? row.tckn : row.vkn
+  } as InvoiceProfile
 }
 
 export async function deleteInvoiceProfile(id: string) {
@@ -870,9 +895,10 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
         .eq('is_active', true)
 
       if (pq.price_list_id === null) {
-        query = query.is('price_list_id', null as any)
+        // Use casting to bypass NOT NULL constraint in types if we want to check for global prices (null)
+        query = (query as any).is('price_list_id', null)
       } else {
-        query = query.eq('price_list_id', pq.price_list_id as any)
+        query = query.eq('price_list_id' as any, pq.price_list_id as any)
       }
 
       const { data: rows, error: prErr } = await query

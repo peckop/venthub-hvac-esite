@@ -17,16 +17,20 @@ import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
-export const CategoryPage: React.FC = () => {
+export interface CategoryPageProps {
+  initialCategory?: Category | null
+}
+
+export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) => {
   const params = useParams()
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
   const navigate = useRouter()
-  const [category, setCategory] = useState<Category | null>(null)
+  const [category, setCategory] = useState<Category | null>(initialCategory || null)
   const [parentCategory, setParentCategory] = useState<Category | null>(null)
   const [subCategories, setSubCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialCategory)
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   // Varsayılan fiyat aralığını geniş tut (ürünler yüksek fiyatlı olabilir)
@@ -87,19 +91,26 @@ export const CategoryPage: React.FC = () => {
 
     async function fetchData() {
       try {
-        setLoading(true)
-        const categories = await getCategories()
-
-        let targetCategory: Category | null = null
+        // Hydration check: if initialCategory matches current slug, we can skip initial category fetch
+        let targetCategory: Category | null = initialCategory || null
         let targetParentCategory: Category | null = null
+        let categories: Category[] = []
 
-        if (parentSlug && slug) {
-          // Sub-category page
-          targetParentCategory = categories.find(c => c.slug === parentSlug && c.level === 0) || null
-          targetCategory = categories.find(c => c.slug === slug && c.level === 1) || null
-        } else if (slug) {
-          // Main category page
-          targetCategory = categories.find(c => c.slug === slug && c.level === 0) || null
+        if (!targetCategory || targetCategory.slug !== slug) {
+          setLoading(true)
+          categories = await getCategories()
+
+          if (parentSlug && slug) {
+            // Sub-category page
+            targetParentCategory = categories.find(c => c.slug === parentSlug && c.level === 0) || null
+            targetCategory = categories.find(c => c.slug === slug && c.level === 1) || null
+          } else if (slug) {
+            // Main category page
+            targetCategory = categories.find(c => c.slug === slug && c.level === 0) || null
+          }
+        } else if (targetCategory.level === 0) {
+          // Fetch categories to find subcategories even if targetCategory is from props
+          categories = await getCategories()
         }
 
         if (!targetCategory) {

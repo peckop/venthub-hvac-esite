@@ -25,8 +25,7 @@ import {
   Truck,
   Menu,
   X,
-  ExternalLink,
-  Search as SearchIcon
+  ExternalLink
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
@@ -186,9 +185,9 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           {/* External Site Link - Standard Requirement */}
           <Link 
             href="/" 
-            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white glass border-white/5 hover:border-white/10 rounded-xl transition-all"
+            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white glass border-white/5 hover:border-white/10 rounded-xl transition-all hover:scale-105 active:scale-95 group"
           >
-            <ExternalLink size={14} />
+            <ExternalLink size={14} className="transition-transform group-hover:-translate-x-1" />
             <span>Mağazaya Git</span>
           </Link>
 
