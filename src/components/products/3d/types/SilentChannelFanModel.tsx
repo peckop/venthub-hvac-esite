@@ -1,3 +1,4 @@
+"use client";
 /*
    SILENT CHANNEL FAN MODEL (Sessiz Kanal Tipi Fan)
    ------------------------------------------------
@@ -446,6 +447,7 @@ export function SilentChannelFanModel({ explode = 0, onPartClick, selectedPart, 
         </group>
     )
 }
+
 
 
 

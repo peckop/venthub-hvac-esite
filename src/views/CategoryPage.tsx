@@ -6,7 +6,11 @@ import Link from 'next/link'
 import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { 
+  getCategoryDisplayName, 
+  attachCovers,
+  parsePriceToNumber
+} from '../utils/categoryHelpers'
 import { ChevronRight, Filter, Grid, List, ArrowLeft } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
@@ -52,43 +56,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
   useManualScrollRestoration(loading)
 
   useEffect(() => {
-    const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-    async function attachCovers(list: Product[]): Promise<Product[]> {
-      if (!Array.isArray(list) || list.length === 0) return list
-      try {
-        const ids = list.map(p => p.id)
-        const { data: imgs } = await supabase
-          .from('product_images')
-          .select('product_id,path,sort_order,alt')
-          .in('product_id', ids)
-          .order('sort_order', { ascending: true })
-        const firstMap = new Map<string, { path: string, alt?: string | null }>()
-        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
-        }
-        return list.map(p => {
-          const cover = firstMap.get(p.id)
-          return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-        })
-      } catch {
-        return list
-      }
-    }
-
-    // Yardımcı: fiyatı güvenle sayıya çevir ("12.345,67" -> 12345.67, "12345" -> 12345)
-    const parsePriceToNumber = (val: unknown): number | null => {
-      if (typeof val === 'number') return Number.isFinite(val) ? val : null
-      if (typeof val === 'string') {
-        const trimmed = val.trim()
-        if (!trimmed) return null
-        // TR format desteği: nokta binlik, virgül ondalık
-        const normalized = trimmed.replace(/\./g, '').replace(/,/g, '.')
-        const n = Number(normalized)
-        return Number.isFinite(n) ? n : null
-      }
-      return null
-    }
-
     async function fetchData() {
       try {
         // Hydration check: if initialCategory matches current slug, we can skip initial category fetch
@@ -127,14 +94,9 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
           subs = categories
             .filter(c => c.parent_id === targetCategory.id)
             .sort((a, b) => {
-              // Primary sort: sort_order (descending - higher number first if that's the convention, or ascending. 
-              // Usually sort_order is ascending (0, 1, 2...). Let's assume ascending.
-              // If sort_order is missing/null, treat as 0 or put at end? defaulting to 0.
               const orderA = a.sort_order ?? 0
               const orderB = b.sort_order ?? 0
               if (orderA !== orderB) return orderA - orderB
-
-              // Secondary sort: alphabetical
               return a.name.localeCompare(b.name)
             })
           setSubCategories(subs)
@@ -156,7 +118,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
           if (error) throw error
           productsData = data as Product[]
         } else if (targetCategory.level === 1) {
-          // Alt kategori: category_id ile eşleşen ürünleri çek (ürünler artık category_id ile alt kategorilere atanıyor)
+          // Alt kategori: category_id ile eşleşen ürünleri çek
           const { data, error } = await supabase
             .from('products')
             .select('*')
@@ -174,13 +136,12 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
         const withCovers = await attachCovers(productsData)
         setProducts(withCovers)
 
-        // Ürünlerden dinamik maksimum fiyatı hesapla ve üst sınırı buna ayarla
+        // Ürünlerden dinamik maksimum fiyatı hesapla
         const prices = withCovers
           .map(p => parsePriceToNumber((p as unknown as { price?: unknown }).price))
           .filter((v): v is number => v != null && Number.isFinite(v))
         if (prices.length > 0) {
           const maxPrice = Math.max(...prices)
-          // Eğer mevcut üst sınır daha düşükse, güncelle (kullanıcıyı rahatsız etmemek için sadece genişlet)
           setPriceRange(([lo, hi]) => [lo, Math.max(hi, Math.ceil(maxPrice))])
         }
 

@@ -73,19 +73,19 @@ const CategoryShowcaseCards: React.FC = () => {
                                 <path d="M8 28 C14 24 22 24 24 28 C22 32 14 32 8 28" fill="currentColor" opacity="0.7" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">Exproof Fanlar</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">Endüstriyel & Sessiz Fanlar</h3>
                         <p className="text-sm text-gray-400 leading-relaxed">
-                            Geniş hacimli mekanlar için güçlü ve dayanıklı havalandırma çözümleri.
+                            Aero-akustik optimizasyonlu, yüksek performanslı kanal tipi karma akışlı fanlar.
                         </p>
                     </div>
 
-                    {/* Product Image - Industrial Fan */}
+                    {/* Product Image - Premium Lineo */}
                     <div className="flex-1 flex items-center justify-center px-6 py-4 min-h-[140px] relative">
                         <Image 
-                            src="/images/products/isometric-fan.png"
+                            src="/images/vortice_lineo_futuristic.png"
                             alt="Endüstriyel Fan"
-                            width={160}
-                            height={140}
+                            width={180}
+                            height={160}
                             className="object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
                         />
                     </div>
