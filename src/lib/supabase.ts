@@ -888,7 +888,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: (chosen as { id: string }).id }, { price_list_id: null }] : [{ price_list_id: null }]
 
     for (const pq of priceQueries) {
-      let query = supabase
+      let query: any = supabase
         .from('product_prices')
         .select('base_price, sale_price, discount_percentage, is_active, valid_from, valid_until')
         .eq('product_id', product.id)
@@ -896,9 +896,9 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 
       if (pq.price_list_id === null) {
         // Use casting to bypass NOT NULL constraint in types if we want to check for global prices (null)
-        query = (query as any).is('price_list_id', null)
+        query = query.is('price_list_id', null)
       } else {
-        query = query.eq('price_list_id' as any, pq.price_list_id as any)
+        query = query.eq('price_list_id', pq.price_list_id)
       }
 
       const { data: rows, error: prErr } = await query
