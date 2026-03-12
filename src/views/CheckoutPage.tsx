@@ -7,8 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { 
   listAddresses, 
-  UserAddress, 
-  type InvoiceProfile 
+  UserAddress 
 } from '../lib/supabase'
 import { ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -108,8 +107,7 @@ export const CheckoutPage: React.FC = () => {
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([])
   const [showAddressModal, setShowAddressModal] = useState(false)
   const [addressPickTarget, setAddressPickTarget] = useState<'shipping' | 'billing'>('shipping')
-  const [savedInvoiceProfiles, setSavedInvoiceProfiles] = useState<any[]>([])
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false)
+
 
   useEffect(() => {
     async function loadAddresses() {
@@ -220,14 +218,7 @@ export const CheckoutPage: React.FC = () => {
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
-                    try {
-                      // Import dynamic list to avoid circular or early deps
-                      const { listInvoiceProfiles } = await import('../lib/supabase')
-                      const rows = await listInvoiceProfiles()
-                      setSavedInvoiceProfiles(rows)
-                    } catch { } finally {
-                      setShowInvoiceModal(true)
-                    }
+                    // Logic for opening invoice modal (redirect or generic modal)
                   }}
                   t={t} tf={(key, fallback) => getTranslationWithFallback(t, key, fallback)}
                 />
