@@ -48,6 +48,27 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
         }
     }, [mainCategories, hoveredCategory])
 
+
+    const getCategoryMetrics = (slug: string) => {
+        switch(slug) {
+            case 'chillerler':
+            case 'chiller':
+                return { uptime: '99.8%', energy: '-40%' };
+            case 'ahu':
+            case 'klima-santralleri':
+                return { uptime: 'A+++', energy: '-35%' };
+            case 'sogutma-kuleleri':
+                return { uptime: '10 YIL', energy: '-25%' };
+            case 'hassas-kontrollu-klimalar':
+            case 'hassas-klima':
+                return { uptime: 'N+1', energy: 'T1' };
+            default:
+                return { uptime: '99.9%', energy: 'MAX' };
+        }
+    };
+
+    // Add this inside the component body, let's find a good spot.
+
     const getSubCategoryCount = useCallback((parentId: string) => {
         return categories.filter(cat => cat.parent_id === parentId).length
     }, [categories])
@@ -122,7 +143,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
             <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={onClose} />
 
             {/* Asimetrik Dropdown Panel */}
-            <div className={`absolute left-0 w-full top-[104px] bg-slate-900/90 backdrop-blur-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border-b border-slate-700/50 overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top z-[90] ${isAnimating ? 'max-h-[calc(100vh-104px)] scale-y-100 opacity-100 blur-none' : 'max-h-0 scale-y-95 opacity-0 blur-[2px] pointer-events-none'}`}>
+            <div className={`absolute left-0 w-full top-[96px] bg-slate-900/90 backdrop-blur-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] border-b border-slate-700/50 overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] origin-top z-[90] ${isAnimating ? 'max-h-[calc(100vh-96px)] scale-y-100 opacity-100 blur-none' : 'max-h-0 scale-y-95 opacity-0 blur-[2px] pointer-events-none'}`}>
                 <div className="flex h-[600px] max-w-[1400px] mx-auto">
 
                     {/* SOL TARAF: 3D Vitrin (%40 Genişlik) */}
@@ -175,11 +196,11 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                 {/* Alt: Stat'lar */}
                                 <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">99.8%</p>
+                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{getCategoryMetrics(hoveredCategory.slug).uptime}</p>
                                         <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">ÇALIŞMA SÜRESİ</p>
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">-40%</p>
+                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{getCategoryMetrics(hoveredCategory.slug).energy}</p>
                                         <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">ENERJİ TÜKETİMİ</p>
                                     </div>
                                 </div>

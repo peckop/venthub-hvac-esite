@@ -56,7 +56,7 @@ const NavShell: React.FC<NavShellProps> = ({
                     'transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
                     // Hide the top tier if we are not at the top (unless we want it to stay when scrolling up?
                     // Usually we hide the top tier when scrolled, and only show bottom tier when scrolling up)
-                    !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-10 md:opacity-100 relative'
+                    !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-8 md:opacity-100 relative'
                 )}
             >
                 <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
