@@ -27,21 +27,27 @@ export const getCategoryDescription = (category: Category | null | undefined): s
     return category.description || ''
 }
 
+interface ProductImageCover {
+    product_id: string
+    path: string
+    alt: string
+}
+
 /**
  * Attaches cover images to products from the product_images table.
  */
 export const attachCovers = async (products: Product[]): Promise<Product[]> => {
     if (!products.length) return []
     const ids = products.map(p => p.id)
-    const { data: covers } = await supabase
-        .from('product_images')
+    const { data: covers } = await (supabase
+        .from('product_images') as any)
         .select('product_id, path, alt')
         .in('product_id', ids)
-        .eq('is_cover', true)
+        .eq('is_cover', true) as { data: ProductImageCover[] | null }
 
     if (!covers) return products
 
-    const coverMap = new Map(covers.map(c => [c.product_id, c]))
+    const coverMap = new Map<string, ProductImageCover>(covers.map(c => [c.product_id, c]))
     return products.map(p => {
         const c = coverMap.get(p.id)
         if (c) {
