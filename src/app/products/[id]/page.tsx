@@ -46,8 +46,16 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
-  // Fetch product data for detailed JSON-LD
-  const productData = await getProductBySlugOrId(params.id)
+  let productData: Product | null = null
+  
+  try {
+    // If we are prerendering 'generic' or the database is down, handle it gracefully
+    if (params.id !== 'generic') {
+      productData = await getProductBySlugOrId(params.id)
+    }
+  } catch (e) {
+    console.error(`Error fetching product data for ${params.id}:`, e)
+  }
 
   const jsonLd = {
     "@context": "https://schema.org",
