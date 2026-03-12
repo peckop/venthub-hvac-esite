@@ -71,7 +71,11 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 seo_desc: data.seo_desc,
                 is_featured: data.is_featured ?? false,
                 sort_order: data.sort_order ?? 0,
-                image_url: data.image_url
+                image_url: data.image_url,
+                metric1_value: (data.metadata as any)?.metric1?.value || '',
+                metric1_label: (data.metadata as any)?.metric1?.label || '',
+                metric2_value: (data.metadata as any)?.metric2?.value || '',
+                metric2_label: (data.metadata as any)?.metric2?.label || ''
             })
 
             if (data.image_url) {
