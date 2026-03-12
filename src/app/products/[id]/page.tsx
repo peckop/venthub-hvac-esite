@@ -49,8 +49,12 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 export default async function Page({ params }: { params: { id: string } }) {
   // Fetch product data for detailed JSON-LD
-  const productData: Product | null = await getProductById(params.id).catch((e) => {
-    console.error('fetch error for JSON-LD:', e)
+  const productData: Product | null = await getProductById(params.id).catch((e: any) => {
+    if (e?.message?.includes('fetch failed')) {
+      console.warn('Network fetch failed for JSON-LD (expected if Supabase env is missing)')
+    } else {
+      console.error('fetch error for JSON-LD:', e)
+    }
     return null
   })
 
