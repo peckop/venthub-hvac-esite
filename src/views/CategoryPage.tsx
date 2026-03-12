@@ -192,7 +192,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     }
 
     fetchData()
-  }, [slug, parentSlug])
+  }, [slug, parentSlug, initialCategory])
 
   // Filter and sort products
   const filteredProducts = products
