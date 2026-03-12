@@ -1,24 +1,17 @@
-import type { Category } from '../lib/supabase'
+import type { Category, Product } from '../lib/supabase'
 import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
+import { supabase } from '../lib/supabase'
 
 /**
  * Returns the display name for a category.
  * Prioritizes the 'hero_title' from static metadata configuration (SSOT).
  * If not present, falls back to the database name.
- * 
- * This ensures that even if the database has an old name (e.g. cache issues),
- * the UI consistently shows the configured name (e.g. "Exproof Fanlar").
  */
 export const getCategoryDisplayName = (category: Category | null | undefined): string => {
     if (!category) return ''
-
-    // 1. Config Override (High Priority)
-    // Check if there is a hero_title defined in metadata for this slug
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_title) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_title!
     }
-
-    // 2. Database Name (Fallback)
     return category.name
 }
 
@@ -28,12 +21,47 @@ export const getCategoryDisplayName = (category: Category | null | undefined): s
  */
 export const getCategoryDescription = (category: Category | null | undefined): string => {
     if (!category) return ''
-
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_description) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_description!
     }
-
     return category.description || ''
+}
+
+/**
+ * Attaches cover images to products from the product_images table.
+ */
+export const attachCovers = async (products: Product[]): Promise<Product[]> => {
+    if (!products.length) return []
+    const ids = products.map(p => p.id)
+    const { data: covers } = await supabase
+        .from('product_images')
+        .select('product_id, path, alt')
+        .in('product_id', ids)
+        .eq('is_cover', true)
+
+    if (!covers) return products
+
+    const coverMap = new Map(covers.map(c => [c.product_id, c]))
+    return products.map(p => {
+        const c = coverMap.get(p.id)
+        if (c) {
+            return { ...p, image_url: c.path, image_alt: c.alt }
+        }
+        return p
+    })
+}
+
+/**
+ * Safely parses a price string or number to a number.
+ */
+export const parsePriceToNumber = (val: any): number => {
+    if (typeof val === 'number') return val
+    if (typeof val === 'string') {
+        const cleaned = val.replace(/[^\d.,]/g, '').replace(',', '.')
+        const parsed = parseFloat(cleaned)
+        return isNaN(parsed) ? 0 : parsed
+    }
+    return 0
 }
 
 
