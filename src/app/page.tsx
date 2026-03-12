@@ -1,26 +1,23 @@
-'use client'
-
 import React from 'react'
-import dynamic from 'next/dynamic'
+import HomePage from '../views/HomePage'
 
-const PageComponent = dynamic(() => import('../views/HomePage'), {
-    ssr: false,
-    loading: () => (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
-        </div>
-    )
-})
+export const metadata = {
+    title: 'VentHub - Endüstriyel Havalandırma Çözümleri',
+    description: 'Havalandırma sistemlerinde uzman kadro, kaliteli ürünler ve profesyonel çözümler. VentHub ile temiz havaya ulaşın.',
+    alternates: {
+        canonical: 'https://venthub-hvac.com/',
+    },
+}
 
 export default function RootPage() {
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "VentHub",
-        "url": "https://venthub.com",
+        "url": "https://venthub-hvac.com",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://venthub.com/products?q={search_term_string}",
+            "target": "https://venthub-hvac.com/products?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     }
@@ -31,7 +28,7 @@ export default function RootPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <PageComponent />
+            <HomePage />
         </>
     )
 }

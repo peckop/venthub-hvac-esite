@@ -21,15 +21,16 @@ export default function RootLayout({
                 <Providers>
                     <ClientLayout>
                         <script
-                          type="application/ld+json"
-                          dangerouslySetInnerHTML={{
-                            __html: JSON.stringify({
-                              "@context": "https://schema.org",
-                              "@type": "WebSite",
-                              "name": "VentHub",
-                              "url": "https://venthub.com"
-                            })
-                          }}
+                            id="json-ld-website"
+                            type="application/ld+json"
+                            dangerouslySetInnerHTML={{
+                                __html: JSON.stringify({
+                                    "@context": "https://schema.org",
+                                    "@type": "WebSite",
+                                    "name": "VentHub",
+                                    "url": "https://venthub.com"
+                                })
+                            }}
                         />
                         {children}
                     </ClientLayout>

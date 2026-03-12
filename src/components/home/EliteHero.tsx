@@ -22,7 +22,9 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
           alt={t('home.hero.visualAlt')}
           fill
           priority
-          className="object-cover object-center scale-105 animate-[slow-pan_20s_ease-in-out_infinite_alternate]"
+          sizes="100vw"
+          fetchPriority="high"
+          className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
@@ -68,13 +70,6 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
         <span className="text-[10px] uppercase tracking-widest text-white">Scroll</span>
         <div className="w-[1px] h-8 bg-white/50" />
       </div>
-
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes slow-pan {
-          from { transform: scale(1.05) translate(0, 0); }
-          to { transform: scale(1.1) translate(-2%, 1%); }
-        }
-      `}} />
     </section>
   )
 }

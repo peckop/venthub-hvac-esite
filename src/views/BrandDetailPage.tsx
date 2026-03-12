@@ -83,9 +83,13 @@ const BRAND_DETAILS: Record<string, {
   }
 }
 
-const BrandDetailPage: React.FC = () => {
+export interface BrandDetailPageProps {
+  initialBrandSlug?: string
+}
+
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
   const params = useParams()
-  const slug = params?.slug as string
+  const slug = (initialBrandSlug || params?.slug) as string
   const brand = HVAC_BRANDS.find((b) => b.slug === slug)
   const brandDetails = slug ? BRAND_DETAILS[slug] : null
   const { t } = useI18n()

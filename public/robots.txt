@@ -1,3 +1,0 @@
-User-agent: *
-Disallow: /
-Sitemap: https://venthub-hvac-esite.pages.dev/sitemap.xml
