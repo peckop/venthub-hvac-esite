@@ -21,7 +21,6 @@ import {
   ShoppingCart,
   Heart,
   Share2,
-  Check,
   Truck,
   Shield,
   Phone,

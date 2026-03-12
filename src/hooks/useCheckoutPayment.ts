@@ -47,18 +47,14 @@ export const useCheckoutPayment = ({
   const [paymentUrl, setPaymentUrl] = useState('')
   const [orderId, setOrderId] = useState('')
   const [convId, setConvId] = useState('')
-  const [iyzScriptLoaded, setIyzScriptLoaded] = useState(false)
+  const [iyzScriptLoaded] = useState(false)
   const [formReady, setFormReady] = useState(false)
   const [progressPct, setProgressPct] = useState(20)
-  const [paymentFrameContent, setPaymentFrameContent] = useState('')
+  const [paymentFrameContent] = useState('')
 
   const isTest = typeof (globalThis as any).vi !== 'undefined'
 
-  const debug = (...args: unknown[]) => {
-    if (process.env.NEXT_PUBLIC_DEBUG === 'true') {
-      console.warn('[CheckoutPayment]', ...args)
-    }
-  }
+
 
   const initiatePayment = async () => {
     if (isTest) return true
