@@ -15,7 +15,7 @@ describe('ProductsHero', () => {
     render(<ProductsHero searchValue="" onSearchChange={onSearchChange} />)
     
     // The search bar container is the parent of the input
-    const input = screen.getByRole('textbox')
+    const input = screen.getByRole('searchbox')
     const container = input.parentElement
     
     expect(container?.className).toContain('focus-within:ring-2')
