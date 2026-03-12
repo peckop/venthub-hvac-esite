@@ -176,15 +176,19 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                 </div>
 
                                 {/* Alt: Stat'lar */}
-                                <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric1?.value || '99.8%'}</p>
-                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric1?.label || 'ÇALIŞMA SÜRESİ'}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric2?.value || '-40%'}</p>
-                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric2?.label || 'ENERJİ TASARRUFU'}</p>
-                                    </div>
+                                <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[40px]">
+                                    {(hoveredCategory?.metadata as any)?.metric1?.value && (
+                                        <div>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric1?.value}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric1?.label}</p>
+                                        </div>
+                                    )}
+                                    {(hoveredCategory?.metadata as any)?.metric2?.value && (
+                                        <div>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric2?.value}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric2?.label}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         ) : (
