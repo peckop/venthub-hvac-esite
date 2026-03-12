@@ -209,6 +209,25 @@ export async function getProductById(id: string) {
   return data as Product | null
 }
 
+export async function getProductBySlugOrId(identifier: string) {
+  // Check if identifier is a valid UUID
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const isUuid = uuidRegex.test(identifier)
+
+  let query = supabase.from('products').select('*')
+
+  if (isUuid) {
+    query = query.eq('id', identifier)
+  } else {
+    query = query.eq('slug', identifier)
+  }
+
+  const { data, error } = await query.maybeSingle()
+
+  if (error) throw error
+  return data as Product | null
+}
+
 export async function getFeaturedProducts() {
   const { data, error } = await supabase
     .from('products')
