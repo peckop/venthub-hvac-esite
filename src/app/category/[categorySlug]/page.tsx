@@ -23,21 +23,44 @@ export async function generateStaticParams() {
   }
 }
 
+async function getCategoryData(slug: string) {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+  
+  if (error || !data) return null
+  return data
+}
+
 export async function generateMetadata({ params }: { params: { categorySlug: string } }) {
-  // Option: Fetch category detail here for true dynamic metadata.
+  const category = await getCategoryData(params.categorySlug)
+  
+  if (!category) {
+    return {
+      title: 'Kategori Bulunamadı | VentHub',
+    }
+  }
+
   return {
-    title: `${params.categorySlug} | VentHub Kategoriler`,
-    description: `${params.categorySlug} kategorisindeki en iyi ürünleri keşfedin.`,
+    title: `${category.name} | VentHub`,
+    description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`,
+    alternates: {
+      canonical: `https://venthub-hvac.com/category/${params.categorySlug}`,
+    },
   }
 }
 
-export default function Page({ params }: { params: { categorySlug: string } }) {
+export default async function Page({ params }: { params: { categorySlug: string } }) {
+  const category = await getCategoryData(params.categorySlug)
+  
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": `${params.categorySlug} Kategorisi`,
-    "description": `${params.categorySlug} kategorisindeki ürünler`,
-    "url": `https://venthub.com/category/${params.categorySlug}`
+    "name": category?.name || params.categorySlug,
+    "description": `${category?.name || params.categorySlug} kategorisindeki ürünler`,
+    "url": `https://venthub-hvac.com/category/${params.categorySlug}`
   }
 
   return (
@@ -51,7 +74,7 @@ export default function Page({ params }: { params: { categorySlug: string } }) {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
         </div>
       }>
-        <PageComponent />
+        <PageComponent initialCategory={category} />
       </Suspense>
     </>
   )

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { adminSelectClass, adminSelectStyle, adminButtonPrimaryClass, adminSettingsInputClass } from '../../utils/adminUi'
+import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'
 import { useI18n } from '../../i18n/I18nProvider'
 import { SlidersHorizontal, Search } from 'lucide-react'
@@ -132,9 +132,10 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     } finally {
       hydratedRef.current = true
     }
-  }, [storageKey])
+  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, chips, toggles])
 
   // Kalıcılık: kaydetme
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!storageKey || !hydratedRef.current) return
     try {
@@ -152,7 +153,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
     } catch {
       // no-op
     }
-  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, select?.value, chips, toggles])
+  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, select?.value, chips, toggles, search])
 
   const hasFilters = !!(select || (toggles && toggles.length > 0) || (chips && chips.length > 0) || rightExtra || onClear)
 
