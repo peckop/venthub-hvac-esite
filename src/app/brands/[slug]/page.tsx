@@ -1,5 +1,5 @@
 import PageComponent from '../../../views/BrandDetailPage'
-import { supabase, HVAC_BRANDS } from '../../../lib/supabase'
+import { HVAC_BRANDS } from '../../../lib/supabase'
 
 export async function generateStaticParams() {
   try {

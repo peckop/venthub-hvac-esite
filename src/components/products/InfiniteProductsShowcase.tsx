@@ -65,7 +65,7 @@ const ProductCard: React.FC<{
 
     const sphereWidth = total * gap
 
-    useFrame((state, delta) => {
+    useFrame((state, _delta) => {
         if (!groupRef.current) return
 
         // Smoother infinite scroll calculation
