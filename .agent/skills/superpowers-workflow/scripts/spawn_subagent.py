@@ -7,23 +7,25 @@ with isolated context and specific skill instructions.
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 
 def find_repo_root(start: Path) -> Path:
     """Traverse upwards to find the repository root (containing .agent/)."""
-    curr = start.resolve()
+    curr_str = str(start.resolve())
     for _ in range(10):
-        if (curr / ".agent").exists():
-            return curr
-        if curr.parent == curr:
+        if os.path.exists(os.path.join(curr_str, ".agent")):
+            return Path(curr_str)
+        parent_str = os.path.dirname(curr_str)
+        if parent_str == curr_str:
             break
-        curr = curr.parent
+        curr_str = parent_str
     return Path.cwd()
 
 
@@ -55,19 +57,20 @@ def spawn_subagent(
         dict with keys: success, output, error, log_file, duration_s
     """
     # Generate unique subagent ID
-    subagent_id = uuid.uuid4().hex[:8]
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    raw_id: str = uuid.uuid4().hex
+    subagent_id: str = cast(str, raw_id)[0:8]
+    timestamp: str = time.strftime("%Y%m%d-%H%M%S")
 
     # Setup logging directory
-    log_dir = repo_root / "artifacts" / "superpowers" / "subagents"
+    log_dir = repo_root.joinpath("artifacts", "superpowers", "subagents")
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / f"{skill}-{timestamp}-{subagent_id}.log"
+    log_file = log_dir.joinpath(f"{skill}-{timestamp}-{subagent_id}.log")
 
     # Load skill instructions
     # Try direct skill name first, then superpowers- prefix
-    skill_file = repo_root / ".agent" / "skills" / skill / "SKILL.md"
+    skill_file = repo_root.joinpath(".agent", "skills", skill, "SKILL.md")
     if not skill_file.exists():
-        skill_file = repo_root / ".agent" / "skills" / f"superpowers-{skill}" / "SKILL.md"
+        skill_file = repo_root.joinpath(".agent", "skills", f"superpowers-{skill}", "SKILL.md")
     
     skill_instructions = load_skill_instructions(skill_file)
 
@@ -81,6 +84,7 @@ def spawn_subagent(
         }
 
     # Construct focused prompt
+    subagent_path = f"artifacts/superpowers/subagent-{subagent_id}/"
     prompt = f"""You are a specialized subagent focused on: {skill}
 
 IMPORTANT: You have ISOLATED CONTEXT. Do not assume knowledge from other conversations.
@@ -100,7 +104,7 @@ Requirements:
 2. Complete the task fully
 3. Output ONLY the final result at the end
 4. Do not include meta-commentary or thinking process in final output
-5. Write any artifacts to artifacts/superpowers/subagent-{subagent_id}/
+5. Write any artifacts to {subagent_path}
 
 When complete, output:
 ---SUBAGENT-RESULT-START---
@@ -134,12 +138,12 @@ When complete, output:
 
             # For Windows, use CREATE_NEW_CONSOLE to avoid sharing the same TTY/console
             # which causes hangs and KeyboardInterrupt issues in parallel execution.
-            kwargs = {}
+            kwargs: dict[str, Any] = {}
             if sys.platform == "win32":
                 import subprocess
                 # CREATE_NEW_CONSOLE = 0x00000010
                 # CREATE_NO_WINDOW = 0x08000000
-                kwargs["creationflags"] = subprocess.CREATE_NEW_CONSOLE
+                kwargs["creationflags"] = 0x00000010  # subprocess.CREATE_NEW_CONSOLE
 
             result = subprocess.run(
                 cmd,
