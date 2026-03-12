@@ -7,7 +7,6 @@ import type { Density } from '../../components/admin/ColumnsMenu'
 import { 
   adminSectionTitleClass, 
   adminSubtitleClass,
-  adminCardClass, 
   adminTableHeadCellClass, 
   adminTableCellClass, 
   adminTableContainerClass,
@@ -22,7 +21,7 @@ import { ProductFormModal } from '../../components/admin/products/ProductFormMod
 import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
-import { ChevronDown, ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
+import { ChevronRight, Pencil, Plus, SearchX } from 'lucide-react'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useRole } from '../../hooks/useRole'

@@ -417,6 +417,17 @@ function getAirflowPerArea(buildingType: BuildingType): number {
 }
 
 /**
+ * İklim bölgesine göre ortalama sıcaklık farkları
+ */
+function getClimateDeltaT(zone: ClimateZone): { heating: number; cooling: number } {
+    switch (zone) {
+        case 'cold': return { heating: 32, cooling: 6 }
+        case 'temperate': return { heating: 22, cooling: 10 }
+        case 'hot': return { heating: 12, cooling: 18 }
+    }
+}
+
+/**
  * HRV Isı Geri Kazanımı Hesaplaması
  * 
  * Formül: Q = ṁ × Cp × ΔT × η
@@ -427,6 +438,7 @@ export function calculateHRV(input: HRVInput): HRVResult {
     const {
         recoveryType,
         buildingType,
+        climateZone,
         occupancy,
         area,
         sensibleEfficiency,
@@ -443,18 +455,46 @@ export function calculateHRV(input: HRVInput): HRVResult {
         area * airflowPerArea
     )
 
-    // Average values for calculation
-    const efficiency = sensibleEfficiency / 100
-    const winterDeltaT = 20 // Standard indoor vs outdoor cold
-    const summerDeltaT = 10 // Standard indoor vs outdoor hot
+    if (requiredAirflow <= 0) {
+        return {
+            requiredAirflow: 0,
+            airflowPerPerson: 0,
+            heatingRecovery: 0,
+            coolingRecovery: 0,
+            totalEfficiency: 0,
+            annualEnergySaving: 0,
+            annualCostSaving: 0,
+            co2Reduction: 0,
+            paybackPeriod: 99,
+            recommendations: ['Geçerli bina verileri giriniz']
+        }
+    }
+
+    // İklim bazlı Delta-T
+    const deltaT = getClimateDeltaT(climateZone)
+    const sensEff = sensibleEfficiency / 100
+    const latEff = latentEfficiency / 100
 
     // Isı kazanımı (W)
-    const heatingRecovery = requiredAirflow * 0.34 * winterDeltaT * efficiency
-    const coolingRecovery = requiredAirflow * 0.34 * summerDeltaT * (recoveryType === 'erv' ? latentEfficiency / 100 : efficiency)
+    // Isıtma: Sadece sensible (duyulur) ısı geri kazanılır
+    const heatingRecovery = requiredAirflow * 0.34 * deltaT.heating * sensEff
+
+    // Soğutma: HRV sadece sensible, ERV hem sensible hem latent (gizli) ısıyı geri kazanır
+    // Soğutma yükü hem duyulur hem gizli ısı içerir. 
+    // ERV, toplam soğutma geri kazanımında (sensEff + latEff * k) şeklinde daha yüksek performans gösterir.
+    const coolingEfficiency = recoveryType === 'erv' 
+        ? sensEff + (latEff * 0.4) // Gizli ısı geri kazanımı eklenir
+        : sensEff
+    
+    const coolingRecovery = requiredAirflow * 0.34 * deltaT.cooling * coolingEfficiency
 
     // Yıllık enerji tasarrufu (kWh)
-    const totalHours = operatingHoursPerDay * 300 // assume 300 days
-    const annualEnergySaving = Math.round(((heatingRecovery + coolingRecovery) * totalHours) / 1000)
+    // assume 300 days operation, roughly 180 days heating, 120 days cooling weighted
+    const heatingHours = operatingHoursPerDay * 180
+    const coolingHours = operatingHoursPerDay * 120
+    const annualEnergySaving = Math.round(
+        (heatingRecovery * heatingHours + coolingRecovery * coolingHours) / 1000
+    )
 
     // Maliyet tasarrufu (₺/yıl)
     const annualCostSaving = Math.round(annualEnergySaving * electricityCostPerKWh)
@@ -463,20 +503,31 @@ export function calculateHRV(input: HRVInput): HRVResult {
     const co2Reduction = Math.round(annualEnergySaving * 0.45)
 
     // Geri ödeme süresi
-    const estimatedDeviceCost = requiredAirflow * 20
-    const paybackPeriod = annualCostSaving > 0 ? Math.round((estimatedDeviceCost / annualCostSaving) * 10) / 10 : 99
+    // Cihaz maliyeti: kapasiteye göre logaritmik maliyet (ekonomi ölçeği)
+    // 500 m3/h ~ 15.000 TL, 5000 m3/h ~ 80.000 TL gibi bir model
+    const baseCost = 10000
+    const capacityFactor = Math.pow(requiredAirflow / 500, 0.7) * 15000
+    const estimatedDeviceCost = baseCost + capacityFactor
+    const paybackPeriod = annualCostSaving > 100 
+        ? Math.round((estimatedDeviceCost / annualCostSaving) * 10) / 10 
+        : 99
+
+    const recommendations: string[] = []
+    if (sensibleEfficiency < 70) recommendations.push('Daha yüksek verimli (Eurovent sertifikalı) cihazlar tercih edilerek tasarruf artırılabilir')
+    if (recoveryType === 'hrv' && climateZone === 'hot') recommendations.push('Sıcak ve nemli iklimlerde ERV (entalpik) cihazlar daha yüksek konfor ve tasarruf sağlar')
+    if (paybackPeriod > 7) recommendations.push('Yatırım geri dönüş süresi uzun; sistem tasarımı veya çalışma saatleri optimize edilebilir')
 
     return {
         requiredAirflow: Math.round(requiredAirflow),
         airflowPerPerson: Math.round(airflowPerPerson),
         heatingRecovery: Math.round(heatingRecovery),
         coolingRecovery: Math.round(coolingRecovery),
-        totalEfficiency: sensibleEfficiency,
+        totalEfficiency: Math.round(coolingEfficiency * 100),
         annualEnergySaving,
         annualCostSaving,
         co2Reduction,
         paybackPeriod,
-        recommendations: []
+        recommendations
     }
 }
 

@@ -276,14 +276,18 @@ const SPEC_SORT_ORDER: Record<string, number> = {
   'weight': 24
 };
 
-export const ProductDetailPage: React.FC = () => {
+export interface ProductDetailPageProps {
+  initialProduct?: Product | null
+}
+
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
   const params = useParams()
   const id = params?.id as string
   const router = useRouter()
   const { addToCart } = useCart()
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialProduct)
   const [mainCategory, setMainCategory] = useState<Category | null>(null)
   const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
@@ -311,9 +315,17 @@ export const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     async function fetchProduct() {
       if (!id) return
+      
+      // If we already have the product from SSR, skip first fetch
+      if (initialProduct && (id === initialProduct.id || id === initialProduct.sku)) {
+        // Still need to fetch ancillary data like images and related products if not in initialProduct
+        // But we can skip the main product fetch
+        setProduct(initialProduct)
+        setLoading(false)
+      }
 
       try {
-        setLoading(true)
+        if (!product) setLoading(true)
         const productData = await getProductById(id)
 
         if (!productData) {
@@ -359,6 +371,7 @@ export const ProductDetailPage: React.FC = () => {
     }
 
     fetchProduct()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, router])
 
   // Scroll listener for sticky nav behavior

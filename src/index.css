@@ -4,20 +4,14 @@
 
 /* Self-hosted fonts imported via main.tsx to avoid PostCSS @import ordering warnings */
 
-/* Smooth scroll behavior */
+/* Smooth scroll behavior - scoped to html only for performance */
 html {
   scroll-behavior: smooth;
-  /* Stabilize layout width when vertical scrollbar appears */
   scrollbar-gutter: stable;
 }
 
-/* Scroll behavior optimization for better performance */
-* {
-  scroll-behavior: smooth;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  * {
+  html {
     scroll-behavior: auto;
   }
 }

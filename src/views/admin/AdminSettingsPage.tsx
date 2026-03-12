@@ -9,18 +9,9 @@ import {
   Save, 
   Upload, 
   CheckCircle2, 
-  AlertCircle,
-  ChevronRight
+  AlertCircle
 } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
-import { 
-  adminSettingsLayoutClass, 
-  adminSettingsCardClass, 
-  adminSettingsInputClass, 
-  adminSettingsLabelClass,
-  adminSettingsSidebarItemClass,
-  adminSettingsSectionTitleClass
-} from '../../utils/adminUi'
 import { useSettings } from '../../hooks/useSettings'
 
 const AdminSettingsPage: React.FC = () => {
