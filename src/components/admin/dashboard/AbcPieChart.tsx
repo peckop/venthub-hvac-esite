@@ -1,5 +1,4 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
-import { adminCardPaddedClass } from '../../../utils/adminUi'
 import AdminEmptyState from '../AdminEmptyState'
 import { PieChart as PieIcon } from 'lucide-react'
 

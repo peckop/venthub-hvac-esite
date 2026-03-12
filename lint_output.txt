@@ -1,0 +1,52 @@
+
+> react_repo@0.0.0 lint /app
+> next lint
+
+
+./src/views/admin/AdminAuditLogPage.tsx
+7:3  Warning: 'adminCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+12:3  Warning: 'adminInputClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminCategoriesPage.tsx
+11:3  Warning: 'adminCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminErrorGroupsPage.tsx
+248:9  Warning: 'pageCount' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminErrorsPage.tsx
+9:3  Warning: 'adminButtonSecondaryClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminLayout.tsx
+29:13  Warning: 'SearchIcon' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminLogisticsPage.tsx
+296:10  Warning: 'ChevronDown' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminOrdersPage.tsx
+7:3  Warning: 'adminButtonPrimaryClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+10:3  Warning: 'adminTableCellClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+12:3  Warning: 'adminTableActionPrimaryClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'adminTableActionWarningClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+14:3  Warning: 'adminTableActionNeutralClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminProductsPage.tsx
+10:3  Warning: 'adminCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+25:10  Warning: 'ChevronDown' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminSettingsPage.tsx
+13:3  Warning: 'ChevronRight' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+17:3  Warning: 'adminSettingsLayoutClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+18:3  Warning: 'adminSettingsCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+19:3  Warning: 'adminSettingsInputClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+20:3  Warning: 'adminSettingsLabelClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+21:3  Warning: 'adminSettingsSidebarItemClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'adminSettingsSectionTitleClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminUsersPage.tsx
+12:3  Warning: 'adminCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+201:9  Warning: 'getRoleColor' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/views/admin/AdminWebhookEventsPage.tsx
+8:3  Warning: 'adminCardClass' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
