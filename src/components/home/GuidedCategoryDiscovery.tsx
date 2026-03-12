@@ -96,7 +96,7 @@ export const GuidedCategoryDiscovery: React.FC = () => {
                   {/* Background Image with Decocasa-style zoom and tint */}
                   <div className="absolute inset-0 z-0">
                     <Image
-                      src={categoryImages[category.slug] || '/images/vortice_placeholder.jpg'}
+                      src={categoryImages[category.slug] || '/images/vortice_lineo_futuristic.png'}
                       alt={category.name}
                       fill
                       className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
