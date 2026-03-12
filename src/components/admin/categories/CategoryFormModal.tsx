@@ -21,6 +21,10 @@ const categorySchema = z.object({
     is_featured: z.boolean().optional().default(false),
     sort_order: z.number().int().optional().default(0),
     image_url: z.string().optional().nullable(),
+    metric1_value: z.string().optional().nullable(),
+    metric1_label: z.string().optional().nullable(),
+    metric2_value: z.string().optional().nullable(),
+    metric2_label: z.string().optional().nullable(),
 })
 
 type CategoryFormValues = z.infer<typeof categorySchema>
@@ -139,8 +143,22 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
-            const payload = { ...data, image_url: imgPath } as unknown as Category
-            if (payload.parent_id === '') payload.parent_id = null
+            const payload = {
+                name: data.name,
+                slug: data.slug,
+                parent_id: data.parent_id === '' ? null : data.parent_id,
+                description: data.description,
+                seo_title: data.seo_title,
+                seo_desc: data.seo_desc,
+                is_featured: data.is_featured,
+                sort_order: data.sort_order,
+                image_url: imgPath,
+                metadata: {
+                    ...(initialData?.metadata || {}),
+                    metric1: { value: data.metric1_value, label: data.metric1_label },
+                    metric2: { value: data.metric2_value, label: data.metric2_label }
+                }
+            } as any
 
             let currentId = categoryId
 
@@ -224,6 +242,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         <TabTrigger value="info" label="Genel Bilgiler" />
                                         <TabTrigger value="image" label="Görsel" />
                                         <TabTrigger value="seo" label="SEO" />
+                                        <TabTrigger value="metrics" label="3D Metrikleri" />
                                     </Tabs.List>
 
                                     <Tabs.Content value="info" className="space-y-4">
@@ -294,6 +313,33 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                             <textarea {...register('seo_desc')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" placeholder="Sayfa içeriğini özetleyen kısa bir açıklama..." />
                                         </div>
                                     </Tabs.Content>
+
+                                    <Tabs.Content value="metrics" className="space-y-6">
+                                        <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-4">
+                                            <p className="text-sm text-sky-800 font-medium">Mega menüdeki 3D vitrin alanında görünecek olan istatistik değerleri.</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Değer</label>
+                                                <input {...register('metric1_value')} placeholder="Örn: 99.8%" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Etiket</label>
+                                                <input {...register('metric1_label')} placeholder="Örn: ÇALIŞMA SÜRESİ" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all uppercase" />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Değer</label>
+                                                <input {...register('metric2_value')} placeholder="Örn: -40%" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Etiket</label>
+                                                <input {...register('metric2_label')} placeholder="Örn: ENERJİ" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all uppercase" />
+                                            </div>
+                                        </div>
+                                    </Tabs.Content>
+
                                 </Tabs.Root>
                             </form>
                         )}

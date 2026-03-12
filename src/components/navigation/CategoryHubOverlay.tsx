@@ -49,24 +49,6 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     }, [mainCategories, hoveredCategory])
 
 
-    const getCategoryMetrics = (slug: string) => {
-        switch(slug) {
-            case 'chillerler':
-            case 'chiller':
-                return { uptime: '99.8%', energy: '-40%' };
-            case 'ahu':
-            case 'klima-santralleri':
-                return { uptime: 'A+++', energy: '-35%' };
-            case 'sogutma-kuleleri':
-                return { uptime: '10 YIL', energy: '-25%' };
-            case 'hassas-kontrollu-klimalar':
-            case 'hassas-klima':
-                return { uptime: 'N+1', energy: 'T1' };
-            default:
-                return { uptime: '99.9%', energy: 'MAX' };
-        }
-    };
-
     // Add this inside the component body, let's find a good spot.
 
     const getSubCategoryCount = useCallback((parentId: string) => {
@@ -196,12 +178,12 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                 {/* Alt: Stat'lar */}
                                 <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{getCategoryMetrics(hoveredCategory.slug).uptime}</p>
-                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">ÇALIŞMA SÜRESİ</p>
+                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric1?.value || '99.8%'}</p>
+                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric1?.label || 'ÇALIŞMA SÜRESİ'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{getCategoryMetrics(hoveredCategory.slug).energy}</p>
-                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">ENERJİ TÜKETİMİ</p>
+                                        <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric2?.value || '-40%'}</p>
+                                        <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric2?.label || 'ENERJİ TASARRUFU'}</p>
                                     </div>
                                 </div>
                             </>
