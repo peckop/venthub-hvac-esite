@@ -19,9 +19,15 @@ Kod içinde `t()` fonksiyonuna bağlanmamış, tırnak içinde direkt yazılan v
 - **Regex:** `(['"])(?:(?!\bt\().)*?[şğüöçıŞĞÜÖÇİ].*?\1`
 - **Hedef:** `.tsx`, `.ts` dosyaları.
 
-### 2. TypeScript Denetimi ('any' Kullanımı)
-Güvenli olmayan `as any` tip dönüşümlerini bulur.
-- **Regex:** `\bas any\b`
+### 2. TypeScript Denetimi (Tip Güvenliği)
+- **Regex:** `\bas any\b`, `\bas unknown\b`, `\b: any\b`, `\b: unknown\b`
+- **Hedef:** Kodda tip güvenliğini bozan dökümleri (cast) ve belirsiz tip atamalarını bulur.
+- **Kural:** Herhangi bir `as any` kullanımı teknik borçtur. Bunun yerine `src/types/db-rows.ts` içindeki modeller kullanılmalıdır.
+
+### 5. JSON ve Record Denetimi
+- **Regex:** `\.technical_specs\[`, `\.specs\[`
+- **Hedef:** JSON alanlarına Type Guard olmadan erişimi bulur.
+- **Kural:** `(specs as any)[key]` gibi yapılar yasaktır. Önce `isRecord` guard'ı veya `TypedRecord<T>` kullanılmalıdır.
 
 ### 3. Performans Denetimi (Next.js Image)
 Next.js optimizasyonu yerine kullanılan düz HTML resim etiketlerini bulur.
