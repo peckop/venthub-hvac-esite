@@ -175,7 +175,39 @@ export const en = {
         airCurtains: 'Move toward the right air curtain family for entrance comfort and energy-loss control.',
         heatRecovery: 'Evaluate fresh-air and efficiency balance through a heat recovery route.',
         speedControl: 'Select fan control, drive and speed management in the right equipment layer.'
+      },
+      sinevizyon: {
+        slides: [
+          {
+            eyebrow: 'ADVANCED AERODYNAMIC ENGINEERING',
+            title: 'Industrial Ventilation Layers',
+            subtitle: 'Statically balanced and acoustically optimized solution axes in high-flow systems.'
+          },
+          {
+            eyebrow: 'FUTURISTIC CLIMATE CONTROL',
+            title: 'Vortice Lineo Quiet: The Future of Silence',
+            subtitle: 'The perfect balance of minimum energy consumption, maximum air transfer efficiency, and premium silent comfort.'
+          },
+          {
+            eyebrow: 'PRECISION HVAC SYSTEMS',
+            title: 'Technical Excellence and Smart Flow',
+            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.'
+          }
+        ]
       }
+    },
+        cinematicShowcase: {
+      eyebrow: 'ENGINEERING FOCUS',
+      title: 'Vortice Lineo Quiet Series',
+      subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
+      description: 'Provides ultra-quiet operation efficiency even at high static pressure, thanks to its special silencer-layered outer body and dynamically balanced motor structure.',
+      hotspots: {
+        motor: 'High Efficiency EC Motor - Precise Speed and Torque Management',
+        clamps: 'Anti-Vibration Clamps - Quick Service and Assembly Module',
+        housing: 'Sound-Absorbing Composite Housing - Minimum Acoustic Emission',
+        airflow: 'Air Guiding Vane Structure - Maximum Laminar Flow Efficiency'
+      },
+      cta: 'Access High-Resolution Technical Data'
     },
     quickEntry: {
       eyebrow: 'Starting Layer',
@@ -596,7 +628,8 @@ export const en = {
       errorGroups: 'Error Groups',
       products: 'Products',
       categories: 'Categories',
-      logistics: 'Shipping & Logistics'
+      logistics: 'Shipping & Logistics',
+      settings: 'Settings'
     },
     titles: {
       dashboard: 'Dashboard',
@@ -610,7 +643,39 @@ export const en = {
       errorGroups: 'Error Groups',
       products: 'Products',
       categories: 'Categories',
-      coupons: 'Coupons'
+      coupons: 'Coupons',
+      settings: 'Admin Settings'
+    },
+    settings: {
+      siteName: 'Site Name',
+      tagline: 'Tagline',
+      contactEmail: 'Contact Email',
+      supportPhone: 'Support Phone',
+      headquarters: 'Headquarters Address',
+      logo: 'Logo',
+      dropLogo: 'Drop logo here',
+      paymentTitle: 'Payment Configuration',
+      iyzicoMode: 'iyzico Mode',
+      iyzicoApiKey: 'iyzico API Key',
+      iyzicoSecretKey: 'iyzico Secret Key',
+      saveSuccess: 'Settings saved successfully',
+      saveError: 'An error occurred while saving settings',
+      generalTab: 'General Settings',
+      paymentTab: 'Payment Settings',
+      adminsTab: 'Admin Management',
+      systemTab: 'System Status',
+      platformIdentity: 'Platform Identity',
+      platformIdentityDesc: 'Manage your store name, logo, and contact details.',
+      adminsTitle: 'Administrator List',
+      adminsDesc: 'You can manage platform administrators here.',
+      systemTitle: 'System Status',
+      systemDesc: 'Monitor server and infrastructure status in real-time.',
+      dbStatus: 'Database Status',
+      apiLatency: 'API Latency',
+      versionInfo: 'Version Info',
+      lastUpdate: 'Last Update',
+      addAdmin: 'Add New Administrator',
+      systemLogs: 'System Logs'
     },
     products: {
       toolbar: {
