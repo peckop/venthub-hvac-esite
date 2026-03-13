@@ -260,13 +260,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
   return (
-    <div className="min-h-screen bg-slate-50/20">
+    <div className="min-h-screen bg-slate-50/20 pt-[64px] md:pt-[104px]">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* Seamless Integrated Breadcrumb - Even Lighter */}
-      <div className="relative z-20 border-b border-light-gray/30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold text-steel-gray/50">
+      {/* Seamless Integrated Breadcrumb - Lighter & High Tracking */}
+      <div className="relative z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold text-steel-gray/40">
             <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
             <span className="opacity-30">/</span>
             {mainCategory && (
@@ -281,17 +281,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <span className="opacity-30">/</span>
               </>
             )}
-            <span className="text-industrial-gray truncate max-w-[120px] sm:max-w-none">
+            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none opacity-80">
               {product.name}
             </span>
           </nav>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
+        {/* Back Button - Technical Minimalist Style */}
+        <button
+          onClick={() => {
+            if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
+            let stack: string[] = [];
+            try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
+            const lastSafeStop = stack[stack.length - 1];
+            if (lastSafeStop) { router.push(lastSafeStop, { scroll: false }); }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false }) }
+            else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
+            else { router.push('/', { scroll: false }) }
+          }}
+          className="flex items-center space-x-2 text-steel-gray/60 hover:text-primary-navy mb-8 transition-all group font-black text-[9px] uppercase tracking-[0.2em]"
+        >
+          <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-1" />
+          <span>{t('pdp.back')}</span>
+        </button>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-          {/* Product Image Gallery (Refined Container) */}
-          <div className="lg:col-span-7 xl:col-span-7 sticky top-24 self-start z-10">
+          {/* Product Image Gallery */}
+          <div className="lg:col-span-7 xl:col-span-7 sticky top-32 self-start z-10">
             <div className="relative group bg-white rounded-2xl border border-light-gray/40 shadow-sm overflow-hidden p-1.5">
               <ImageGallery
                 key={product.id}
@@ -303,9 +321,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-5 left-5 z-20 pointer-events-none">
                   <div className="bg-white/95 backdrop-blur-md border border-primary-navy/10 px-2.5 py-1.5 rounded-full shadow-sm flex items-center space-x-2">
-                    <div className="flex h-1.5 w-1.5 relative">
+                    <div className="flex h-1 w-1 relative">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-navy"></span>
+                      <span className="relative inline-flex rounded-full h-1 w-1 bg-primary-navy"></span>
                     </div>
                     <span className="text-[8px] font-black text-primary-navy uppercase tracking-[0.2em]">
                       INTERACTIVE 3D
@@ -316,14 +334,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
           </div>
 
-          {/* Product Info (Elegant technical layout) */}
+          {/* Product Info */}
           <div className="lg:col-span-5 xl:col-span-5 flex flex-col">
-            <div className="flex items-center space-x-2.5 mb-2">
-              <div className="w-7 h-7 bg-white rounded-lg border border-light-gray/50 p-1 flex items-center justify-center">
-                <BrandIcon brand={product.brand} className="w-full h-full" />
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2.5">
+                <div className="w-7 h-7 bg-white rounded-lg border border-light-gray/50 p-1 flex items-center justify-center shadow-xs">
+                  <BrandIcon brand={product.brand} className="w-full h-full" />
+                </div>
+                <span className="text-secondary-blue font-black text-[10px] tracking-[0.2em] uppercase">{product.brand}</span>
               </div>
-              <span className="text-secondary-blue font-black text-[10px] tracking-[0.2em] uppercase">{product.brand}</span>
-              <span className="text-steel-gray text-[8px] font-bold tracking-[0.1em] opacity-40">• OFFICIAL PARTNER</span>
+              {product.is_featured && (
+                <div className="bg-gold-accent/10 text-gold-accent px-2 py-1 rounded text-[8px] font-black flex items-center space-x-1 border border-gold-accent/20 tracking-widest">
+                  <Star size={10} fill="currentColor" />
+                  <span>ÖNE ÇIKAN</span>
+                </div>
+              )}
             </div>
 
             <h1 className="text-2xl sm:text-2xl font-black text-industrial-gray leading-tight mb-4 tracking-tight uppercase">
