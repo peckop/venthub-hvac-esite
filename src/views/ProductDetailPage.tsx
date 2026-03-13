@@ -128,7 +128,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
-  }, [id, router, initialProduct, product])
+  }, [id, initialProduct]) // Removed product and router to prevent infinite loop and unnecessary re-runs
 
   useEffect(() => {
     const handleScroll = () => {
@@ -177,12 +177,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const handleAddToCart = () => { if (product) addToCart(product, quantity) }
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (typeof window === 'undefined') return
     if (navigator.share && product) {
-      navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
+      try {
+        await navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') console.error('Share error:', err)
+      }
     } else {
-      navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(window.location.href)
+      toast.success(t('pdp.shareCopied') || 'Link kopyalandı!')
     }
   }
 
@@ -673,7 +678,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
                       {product.technical_specs ? (
                         <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs)).map(([groupKey, group]) => {
+                          {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
                             const isOpen = openSpecSections.includes(groupKey);
                             const Icon = group.icon;
                             return (
