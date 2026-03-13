@@ -1216,7 +1216,9 @@ export const tr = {
     actions: {
       download: 'İndir',
       downloadCatalog: 'Kataloğu İndir',
-      downloadBrochure: 'Broşürü İndir'
+      downloadBrochure: 'Broşürü İndir',
+      liveDataNotice: "ℹ️ Veriler anlık güncellenir",
+      interactive3D: "3D Görünüm"
     },
     cert: {
       ceCertificate: 'CE Sertifikası',
