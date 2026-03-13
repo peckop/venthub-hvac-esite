@@ -6,6 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
 import { supabase, Category } from '../../../lib/supabase'
+import type { Database } from '../../../types/database.types'
+type CategoryUpdate = Database['public']['Tables']['categories']['Update']
+type CategoryInsert = Database['public']['Tables']['categories']['Insert']
+type Json = Database['public']['Tables']['categories']['Insert']['metadata']
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
@@ -56,7 +60,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         try {
             const { data, error } = await supabase.from('categories').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(data as unknown as Category)
+            setInitialData(data as Category)
 
             reset({
                 name: data.name,
@@ -139,13 +143,17 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
-            const payload = { ...data, image_url: imgPath } as unknown as Category
+            const payload = { ...data, image_url: imgPath }
             if (payload.parent_id === '') payload.parent_id = null
 
             let currentId = categoryId
 
             if (currentId) {
-                const { error } = await supabase.from('categories').update(payload).eq('id', currentId)
+                // Clean data for DB constraints
+                const updateData: CategoryUpdate = Object.fromEntries(
+                    Object.entries(payload).filter(([_, v]) => v !== undefined)
+                ) as CategoryUpdate
+                const { error } = await supabase.from('categories').update(updateData).eq('id', currentId)
                 if (error) throw error
 
                 // Audit
@@ -154,12 +162,15 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     table_name: 'categories',
                     row_pk: currentId,
                     action: 'UPDATE',
-                    before: initialData,
-                    after: payload,
+                    before: initialData as unknown as Json,
+                    after: payload as unknown as Json,
                     comment: 'Update category via Modal'
                 })
             } else {
-                const { data: newCat, error } = await supabase.from('categories').insert(payload).select('id').single()
+                const insertData: CategoryInsert = Object.fromEntries(
+                    Object.entries(payload).filter(([_, v]) => v !== undefined)
+                ) as CategoryInsert
+                const { data: newCat, error } = await supabase.from('categories').insert(insertData).select('id').single()
                 if (error) throw error
                 currentId = newCat.id
 
@@ -169,7 +180,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     row_pk: currentId,
                     action: 'INSERT',
                     before: null,
-                    after: payload,
+                    after: payload as unknown as Json,
                     comment: 'Create category via Modal'
                 })
             }
