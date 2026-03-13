@@ -103,44 +103,47 @@ export async function getCategories() {
   return (data || []).map(mapDatabaseCategoryToDomain)
 }
 
-export async function getProducts(limit?: number) {
-  let query = supabase
-    .from('products')
-    .select('*')
-    .eq('status', 'active')
-    .order('is_featured', { ascending: false })
-    .order('name', { ascending: true })
+export interface GetProductsParams {
+  categoryIds?: string[]
+  limit?: number
+  offset?: number
+  searchQuery?: string
+  sortBy?: string
+  brand?: string
+  minPrice?: number
+  maxPrice?: number
+}
 
-  if (limit) query = query.limit(limit)
+/**
+ * Enriched product fetcher using PostgreSQL RPC for high performance (Lighthouse optimization)
+ */
+export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
+  const { data, error } = await (supabase.rpc as any)('get_products_enriched', {
+    p_category_ids: params.categoryIds,
+    p_limit: params.limit || 50,
+    p_offset: params.offset || 0,
+    p_search_query: params.searchQuery,
+    p_sort_by: params.sortBy || 'name',
+    p_brand: params.brand,
+    p_min_price: params.minPrice,
+    p_max_price: params.maxPrice
+  })
 
-  const { data, error } = await query
   if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain)
+  // Data already matches DomainProduct structure from RPC, but we use the mapper for safety/consistency
+  return (data || []).map((row: any) => mapDatabaseProductToDomain(row as DbProduct))
+}
+
+export async function getProducts(limit?: number) {
+  return getProductsEnriched({ limit, sortBy: 'featured' })
 }
 
 export async function getAllProducts() {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('status', 'active')
-    .order('is_featured', { ascending: false })
-    .order('name', { ascending: true })
-
-  if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain)
+  return getProductsEnriched({ limit: 1000 })
 }
 
 export async function getProductsByCategory(categoryId: string) {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId}`)
-    .eq('status', 'active')
-    .order('is_featured', { ascending: false })
-    .order('name', { ascending: true })
-
-  if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain)
+  return getProductsEnriched({ categoryIds: [categoryId], sortBy: 'featured' })
 }
 
 // Alias for compatibility
