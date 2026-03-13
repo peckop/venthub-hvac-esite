@@ -34,31 +34,31 @@ export function useSettings() {
 
       if (error) throw error
 
-      const settingsObj: any = {}
+      const settingsObj: Record<string, unknown> = {}
       data?.forEach(item => {
         settingsObj[item.key] = item.value
       })
 
-      setSettings(settingsObj as SiteSettings)
-    } catch (err: any) {
-      setError(err.message)
+      setSettings(settingsObj as unknown as SiteSettings)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
   }
 
-  const updateSettings = async (key: keyof SiteSettings, value: any) => {
+  const updateSettings = async (key: keyof SiteSettings, value: unknown) => {
     try {
       const { error } = await supabase
         .from('site_settings')
-        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+        .upsert({ key, value: value as any, updated_at: new Date().toISOString() }, { onConflict: 'key' })
 
       if (error) throw error
       
-      setSettings(prev => prev ? { ...prev, [key]: value } : null)
+      setSettings(prev => prev ? { ...prev, [key]: value as any } : null)
       return { success: true }
-    } catch (err: any) {
-      return { success: false, error: err.message }
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : 'Unknown error' }
     }
   }
 

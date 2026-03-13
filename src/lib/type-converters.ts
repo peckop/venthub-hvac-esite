@@ -1,5 +1,4 @@
-
-import { Json } from '@/types/database.types'
+import { DbProduct, DbCategory } from '@/types/db-rows';
 
 /**
  * Ürün teknik özellikleri için iç yapı tanımı.
@@ -78,11 +77,18 @@ export interface DomainProduct {
 }
 
 /**
+ * Type Guard: Verilen değerin bir Record (object) olup olmadığını kontrol eder.
+ */
+export function isRecord(value: unknown): value is Record<string, any> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
  * Veritabanından gelen ham 'Json' verisini güvenli bir şekilde objeye dönüştürür.
  */
-export function parseJsonField<T>(data: Json | null | undefined): T | null {
+export function parseJsonField<T>(data: unknown): T | null {
   if (!data) return null;
-  if (typeof data === 'object' && !Array.isArray(data)) {
+  if (isRecord(data)) {
     return data as unknown as T;
   }
   return null;
@@ -91,22 +97,27 @@ export function parseJsonField<T>(data: Json | null | undefined): T | null {
 /**
  * Veritabanı Product Row nesnesini Domain nesnesine dönüştürür.
  */
-export function mapDatabaseProductToDomain(dbProduct: any): DomainProduct {
-  if (!dbProduct) return dbProduct;
+export function mapDatabaseProductToDomain(dbProduct: DbProduct): DomainProduct {
   return {
     ...dbProduct,
     price: Number(dbProduct.price || 0),
     stock_qty: dbProduct.stock_qty ?? 0,
     technical_specs: parseJsonField<ProductTechnicalSpecs>(dbProduct.technical_specs),
     is_featured: !!dbProduct.is_featured,
+    low_stock_threshold: dbProduct.low_stock_threshold ?? null,
+    low_stock_override: !!dbProduct.low_stock_override,
+    airflow_capacity: dbProduct.airflow_capacity ?? null,
+    noise_level: dbProduct.noise_level ?? null,
+    pressure_rating: dbProduct.pressure_rating ?? null,
+    warehouse_location: dbProduct.warehouse_location ?? null,
+    supplier_name: dbProduct.supplier_name ?? null,
   };
 }
 
 /**
  * Veritabanı Category Row nesnesini Domain nesnesine dönüştürür.
  */
-export function mapDatabaseCategoryToDomain(dbCategory: any): DomainCategory {
-  if (!dbCategory) return dbCategory;
+export function mapDatabaseCategoryToDomain(dbCategory: DbCategory): DomainCategory {
   return {
     ...dbCategory,
     metadata: parseJsonField<CategoryMetadata>(dbCategory.metadata),

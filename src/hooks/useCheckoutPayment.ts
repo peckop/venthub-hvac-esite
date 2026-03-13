@@ -1,17 +1,25 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { supabase } from '../lib/supabase'
+import { supabase, UserAddress, InvoiceProfile } from '../lib/supabase'
 import { validateServerCart } from '../lib/order'
 import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
 import { CartItem } from '../contexts/CartContext'
+import type { User } from '@supabase/supabase-js'
+
+export interface CustomerInfo {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+}
 
 interface UseCheckoutPaymentProps {
   items: CartItem[]
   getCartTotal: () => number
-  user: any
+  user: User | null
   clearCart: (options?: { silent: boolean }) => void
-  applyServerPricing: (items: any[]) => void
+  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
   customerInfo: any
   shippingAddress: any
   billingAddress: any

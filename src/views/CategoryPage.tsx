@@ -139,7 +139,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
 
         // Ürünlerden dinamik maksimum fiyatı hesapla
         const prices = withCovers
-          .map(p => parsePriceToNumber((p as unknown as { price?: unknown }).price))
+          .map(p => p.price)
           .filter((v): v is number => v != null && Number.isFinite(v))
         if (prices.length > 0) {
           const maxPrice = Math.max(...prices)
