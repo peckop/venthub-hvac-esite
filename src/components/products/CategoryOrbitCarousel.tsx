@@ -353,6 +353,18 @@ const CategoryOrbitCarousel = () => {
         }
     }, [activeMainCategory, router])
 
+    // [NEW] Responsive constants
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768)
+        checkMobile()
+        window.addEventListener('resize', checkMobile)
+        return () => window.removeEventListener('resize', checkMobile)
+    }, [])
+
+    const responsiveHeight = isMobile ? 380 : 500
+    const responsiveModelScale = isMobile ? 1.1 : 1.5
+
     return (
         <section className="bg-[#020617] overflow-hidden relative">
             {/* Background Atmosphere */}
@@ -376,30 +388,31 @@ const CategoryOrbitCarousel = () => {
                         transition={{ duration: 0.3 }}
                         className="absolute top-4 left-0 right-0 z-40 container mx-auto px-4"
                     >
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                             {/* Geri Butonu + Breadcrumb */}
                             <motion.button
                                 onClick={handleBack}
                                 className="flex items-center gap-2 px-4 py-2 rounded-full
                                            bg-white/10 backdrop-blur-md border border-white/20
                                            text-white hover:bg-white/20 transition-all duration-300
-                                           group"
+                                           group w-full sm:w-auto"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                                <span className="text-sm font-medium">Ana Kategoriler</span>
+                                <span className="text-sm font-medium">Geri</span>
                                 <ChevronRight className="w-4 h-4 text-white/50" />
-                                <span className="text-sm font-bold text-cyan-400">{activeMainCategory.title}</span>
+                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px]">{activeMainCategory.title}</span>
                             </motion.button>
 
                             {/* Tüm Ürünleri Gör */}
                             <motion.button
                                 onClick={handleViewAllProducts}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full
+                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full
                                            bg-gradient-to-r from-cyan-500 to-blue-600
                                            text-white font-medium text-sm
-                                           hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
+                                           hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300
+                                           w-full sm:w-auto"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
@@ -423,9 +436,9 @@ const CategoryOrbitCarousel = () => {
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.3 }}
                         className="text-center"
-                        style={{ marginTop: level === 'subcategory' ? '3rem' : 0 }}
+                        style={{ marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
                     >
-                        <h2 className="text-2xl md:text-3xl font-bold text-white/90">
+                        <h2 className="text-xl md:text-3xl font-bold text-white/90">
                             {focusedItemTitle
                                 ? focusedItemTitle
                                 : frontCardTitle
@@ -433,11 +446,11 @@ const CategoryOrbitCarousel = () => {
                                     : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
                             }
                         </h2>
-                        <p className="text-white/50 text-sm mt-2 font-medium tracking-wide">
+                        <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
                                 ? (level === 'main'
-                                    ? 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git'
-                                    : 'Tıklayarak Ürün Sayfasına Gidin')
+                                    ? (isMobile ? 'Dokun: Aç • Çift Dokun: Git' : 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git')
+                                    : (isMobile ? 'Dokunarak Sayfaya Gidin' : 'Tıklayarak Ürün Sayfasına Gidin'))
                                 : ROTATING_HINTS[hintIndex]
                             }
                         </p>
@@ -446,20 +459,20 @@ const CategoryOrbitCarousel = () => {
             </div>
 
             {/* 3D Carousel Container */}
-            <div className="container mx-auto px-4 relative z-10 w-full">
+            <div className="w-full relative z-10 flex justify-center items-center overflow-hidden" style={{ minHeight: responsiveHeight }}>
                 <AnimatePresence mode="wait">
                     <motion.div
-                        key={level + (activeMainCategory?.id || '')}
-                        initial={{ opacity: 0, scale: 0.9, rotateY: level === 'subcategory' ? 15 : -15 }}
-                        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, rotateY: level === 'subcategory' ? -15 : 15 }}
+                        key={level}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
                         transition={{
                             duration: 0.6,
                             type: 'spring',
-                            damping: 20,
-                            stiffness: 100
+                            damping: 25,
+                            stiffness: 120
                         }}
-                        style={{ perspective: '1000px' }}
+                        className="w-full max-w-[1600px]"
                     >
                         <OrbitalProductsShowcase
                             items={displayItems}
@@ -467,9 +480,9 @@ const CategoryOrbitCarousel = () => {
                             externalPause={isTransitioning}
                             onFocusedItemChange={handleFocusedItemChange}
                             onFrontCardChange={handleFrontCardChange}
-                            modelScale={1.5}
-                            containerHeight={500}
-                            skipHints={level === 'subcategory'} // Alt kategoride hint animasyonunu tekrarlama
+                            modelScale={responsiveModelScale}
+                            containerHeight={responsiveHeight}
+                            skipHints={level === 'subcategory'} 
                         />
                     </motion.div>
                 </AnimatePresence>

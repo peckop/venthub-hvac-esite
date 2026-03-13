@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { Suspense, useEffect, useState } from 'react'
 
@@ -14,6 +14,7 @@ import KnowledgeBlock from '../components/home/KnowledgeBlock'
 import FinalCTA from '../components/home/FinalCTA'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
+import { Category, Product } from '../lib/supabase'
 
 const LeadModal = React.lazy(() => import('../components/LeadModal'))
 
@@ -28,7 +29,12 @@ const RevealSection: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   </motion.div>
 )
 
-export const HomePage: React.FC = () => {
+interface HomePageProps {
+  initialCategories?: Category[]
+  initialProducts?: Product[]
+}
+
+export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
   const [leadOpen, setLeadOpen] = useState(false)
   const { t } = useI18n()
 
@@ -56,7 +62,7 @@ export const HomePage: React.FC = () => {
 
       <RevealSection>
         <div className="-mt-16 relative z-10">
-          <GuidedCategoryDiscovery />
+          <GuidedCategoryDiscovery categories={initialCategories} />
         </div>
       </RevealSection>
 
@@ -78,7 +84,7 @@ export const HomePage: React.FC = () => {
         </RevealSection>
 
         <RevealSection>
-          <FeaturedCommercialBlocks />
+          <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
         </RevealSection>
 
         <RevealSection>

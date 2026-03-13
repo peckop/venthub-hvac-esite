@@ -68,7 +68,7 @@ export const ApplicationSolutions: React.FC = () => {
   const { t } = useI18n()
 
   return (
-    <section id="applications" className="relative overflow-hidden bg-white py-20 sm:py-24">
+    <section id="applications" className="relative overflow-hidden bg-white py-24 sm:py-32">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -81,45 +81,61 @@ export const ApplicationSolutions: React.FC = () => {
         </svg>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between text-center lg:text-left">
-          <div className="max-w-2xl">
+      <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+        {/* Standartlaştırılmış Başlık Bloğu */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="max-w-3xl">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.3em] text-primary-navy"
+              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
-              <span className="h-px w-8 bg-primary-navy/40" />
               {t('home.applicationSolutions.eyebrow')}
             </motion.div>
-            <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+            >
               {t('home.applicationSolutions.title')}
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600">
-              {t('home.applicationSolutions.subtitle')}
-            </p>
+            </motion.h2>
           </div>
-
-          <Link 
-            href="/products#applications" 
-            className="group hidden lg:inline-flex items-center gap-2 text-sm font-bold text-primary-navy transition-all hover:gap-3"
-          >
-            <span className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:scale-x-0 after:bg-primary-navy after:transition-transform group-hover:after:scale-x-100">
-              {t('home.applicationSolutions.viewAll')}
-            </span>
-            <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-1">
-              <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </Link>
+          
+          <div className="flex flex-col items-start md:items-end gap-4">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            >
+              {t('home.applicationSolutions.subtitle')}
+            </motion.p>
+            
+            <Link 
+              href="/products#applications" 
+              className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-950 transition-all hover:gap-3"
+            >
+              <span className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:scale-x-0 after:bg-slate-950 after:transition-transform group-hover:after:scale-x-100">
+                {t('home.applicationSolutions.viewAll')}
+              </span>
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
 
+        {/* Ürün Kartları - Konteyner İçinde */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-6 lg:grid-cols-3"
         >
           {solutionItems.map((item) => (
             <motion.div key={item.id} variants={itemVariants} className={item.span}>
@@ -140,7 +156,7 @@ export const ApplicationSolutions: React.FC = () => {
                 {/* Content */}
                 <div className="relative z-10 flex h-full flex-col justify-end p-8 sm:p-10">
                   <div className="mb-auto self-end">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-primary-navy group-hover:border-primary-navy">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-cyan-500 group-hover:border-cyan-500">
                       <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -148,19 +164,19 @@ export const ApplicationSolutions: React.FC = () => {
                   </div>
 
                   <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary-blue/90">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">
                       {t(`home.applicationSolutions.items.${item.id}.eyebrow`)}
                     </div>
                     <h3 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
                       {item.techTitle}
                     </h3>
-                    <p className="mt-4 text-[15px] leading-relaxed text-slate-300">
+                    <p className="mt-4 text-[15px] leading-relaxed text-slate-300 font-light">
                       {item.techDesc}
                     </p>
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       {item.tags.map((tag) => (
-                        <div key={tag} className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors group-hover:bg-white/15">
+                        <div key={tag} className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors group-hover:bg-white/15">
                           {tag}
                         </div>
                       ))}
