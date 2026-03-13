@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
@@ -278,7 +279,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         </div>
                                         {image && (
                                             <div className="relative border rounded-lg overflow-hidden w-full h-64 bg-gray-50 flex items-center justify-center">
-                                                <img src={image.url} alt="Kategori" className="max-w-full max-h-full object-contain" />
+                                                <VentImage src={image.url} alt="Kategori" className="max-w-full max-h-full object-contain"  />
                                                 <button
                                                     type="button"
                                                     onClick={removeImage}

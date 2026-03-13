@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize } from 'lucide-react'
@@ -129,11 +130,10 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                         <div className="absolute inset-0">
                             <div className="absolute inset-0 bg-black/40 z-10" />
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
-                            <img
-                                src={bgImage}
+                            <VentImage src={bgImage}
                                 alt={cat.name}
                                 className={`w-full h-full object-cover object-center transform transition-transform duration-[2000ms] ${isActive ? 'scale-105' : 'scale-100'}`}
-                                onError={(e) => {
+                                 onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.onerror = null;
                                     target.src = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg';
@@ -205,13 +205,13 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                 <button
                     onClick={handlePrev}
                     className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10"
-                >
+                 aria-label="Önceki">
                     <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
                     onClick={handleNext}
                     className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all border border-white/10"
-                >
+                 aria-label="Sonraki">
                     <ChevronRight className="w-6 h-6" />
                 </button>
             </div>

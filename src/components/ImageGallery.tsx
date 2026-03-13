@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
 import { ChevronLeft, ChevronRight, X, Box, Maximize2 } from 'lucide-react'
+import { VentImage } from './ui/VentImage'
+import { useI18n } from '../i18n/I18nProvider'
 
 const Product3DViewer = dynamic(
     () => import('./products/3d/Product3DViewer').then((mod) => mod.Product3DViewer),
     { ssr: false }
 )
-import { useI18n } from '../i18n/I18nProvider'
 
 interface ImageGalleryProps {
     images: { path: string; alt?: string | null }[]
@@ -19,16 +20,15 @@ interface ImageGalleryProps {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, modelType }) => {
     const { t } = useI18n()
     const [activeIdx, setActiveIdx] = useState(0)
-    const [isLightboxOpen, setIsLightboxOpen] = useState(false) // Only for Images
-    const [is3DMode, setIs3DMode] = useState(false) // Toggle between Image and 3D in the square container
-    const [is3DFullscreen, setIs3DFullscreen] = useState(false) // Dedicated 3D Fullscreen
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+    const [is3DMode, setIs3DMode] = useState(false)
+    const [is3DFullscreen, setIs3DFullscreen] = useState(false)
     const [zoomStyle, setZoomStyle] = useState<React.CSSProperties>({})
     const imageContainerRef = useRef<HTMLDivElement>(null)
 
     const activeImage = images.length > 0 ? images[activeIdx] : null
-    const storageUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '') + '/storage/v1/object/public/product-images/'
 
-    // Handle Zoom Effect (Only for Image Mode)
+    // Handle Zoom Effect
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (is3DMode || !imageContainerRef.current) return
         const { left, top, width, height } = imageContainerRef.current.getBoundingClientRect()
@@ -36,8 +36,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
         const y = ((e.clientY - top) / height) * 100
 
         setZoomStyle({
-            transformOrigin: `${x}% ${y}% `,
-            transform: 'scale(2)', // Adjust zoom level
+            transformOrigin: `${x}% ${y}%`,
+            transform: 'scale(2)',
         })
     }
 
@@ -59,62 +59,45 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
         setActiveIdx((prev) => (prev - 1 + images.length) % images.length)
     }, [images.length])
 
-    // Keyboard navigation
+    // Keyboard & Scroll Locks
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Image Lightbox Nav
             if (isLightboxOpen) {
                 if (e.key === 'Escape') setIsLightboxOpen(false)
                 if (e.key === 'ArrowRight') nextImage()
                 if (e.key === 'ArrowLeft') prevImage()
             }
-            // 3D Fullscreen Nav
-            if (is3DFullscreen) {
-                if (e.key === 'Escape') setIs3DFullscreen(false)
-            }
+            if (is3DFullscreen && e.key === 'Escape') setIs3DFullscreen(false)
         }
         window.addEventListener('keydown', handleKeyDown)
-        return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [isLightboxOpen, is3DFullscreen, nextImage, prevImage])
-
-    // Lock body scroll
-    useEffect(() => {
+        
         const locked = isLightboxOpen || is3DFullscreen
-        if (locked) {
-            document.documentElement.style.overflow = 'hidden'
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.documentElement.style.overflow = ''
-            document.body.style.overflow = ''
-        }
+        document.body.style.overflow = locked ? 'hidden' : ''
+        
         return () => {
-            document.documentElement.style.overflow = ''
+            window.removeEventListener('keydown', handleKeyDown)
             document.body.style.overflow = ''
         }
-    }, [isLightboxOpen, is3DFullscreen])
-
+    }, [isLightboxOpen, is3DFullscreen, nextImage, prevImage])
 
     if (!activeImage && !slug) {
         return (
-            <div className="aspect-square bg-light-gray rounded-xl flex items-center justify-center text-steel-gray">
-                No Visuals
+            <div className="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
+                {t('common.noVisuals') || 'Görsel Mevcut Değil'}
             </div>
         )
     }
 
     return (
         <div className="space-y-4 select-none">
-            {/* Main Container (Square) - Adjusted for Laptop Screens (max-h-55vh equiv) */}
+            {/* Main Container */}
             <div
                 ref={imageContainerRef}
-                className={`relative w-full md:max-w-[55vh] mx-auto aspect-square bg-white rounded-xl overflow-hidden border border-light-gray group ${!is3DMode ? 'cursor-zoom-in' : ''}`}
+                className={`relative w-full md:max-w-[55vh] mx-auto aspect-square bg-white rounded-xl overflow-hidden border border-gray-200 group ${!is3DMode ? 'cursor-zoom-in' : ''}`}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                // Image mode click -> Open Lightbox
-                // Image mode click -> Disable auto fullscreen
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* MODE: 3D VIEWER (Inline) */}
                 {is3DMode ? (
                     <div className="w-full h-full relative">
                         <Product3DViewer
@@ -126,128 +109,110 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                         />
                     </div>
                 ) : (
-                    /* MODE: IMAGE VIEWER (Inline) */
                     activeImage ? (
                         <div className="w-full h-full transition-transform duration-200 ease-out relative z-0" style={zoomStyle}>
-                            <picture>
-                                <source
-                                    srcSet={`${storageUrl}${activeImage.path}?format=avif&quality=90&width=1200`}
-                                    type="image/avif"
-                                />
-                                <source
-                                    srcSet={`${storageUrl}${activeImage.path}?format=webp&quality=90&width=1200`}
-                                    type="image/webp"
-                                />
-                                <img
-                                    src={`${storageUrl}${activeImage.path}?width=1200`}
-                                    alt={activeImage.alt || productName}
-                                    className="w-full h-full object-contain"
-                                />
-                            </picture>
+                            <VentImage
+                                src={`product-images/${activeImage.path}`}
+                                alt={activeImage.alt || productName}
+                                fallbackType="product"
+                                fill
+                                priority
+                                sizes="(max-width: 1024px) 100vw, 55vh"
+                                className="object-contain p-4"
+                            />
                         </div>
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">Görsel Yok</div>
                     )
                 )}
 
-                {/* ── OVERLAY ICONS (Always on top, outside conditional) ──────── */}
-                {/* These are OUTSIDE the zoom div to avoid stacking context issues */}
-
-                {/* Fullscreen Icon (Top Right) — Image mode only */}
+                {/* Overlays */}
                 {!is3DMode && activeImage && (
-                    <div className="absolute top-3 right-16 z-50 pointer-events-auto">
+                    <div className="absolute top-3 right-16 z-50">
                         <button
                             onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
-                            className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200/80 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white hover:shadow-xl transition-all"
-                            title={t('common.viewFullscreen')}
-                            aria-label={t('common.viewFullscreen')}
+                            className="bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-gray-200 shadow-lg text-gray-700 hover:text-blue-600 hover:bg-white transition-all"
+                            aria-label={t('common.viewFullscreen') || 'Tam Ekran Gör'}
                         >
-                            <Maximize2 size={20} strokeWidth={1.8} />
+                            <Maximize2 size={20} />
                         </button>
                     </div>
                 )}
 
-                {/* 3D Toggle Button (Top Right - Left of Fullscreen) */}
                 {!is3DMode && slug && (
                     <button
                         onClick={(e) => { e.stopPropagation(); setIs3DMode(true); }}
-                        className="absolute top-2 right-2 z-50 pointer-events-auto bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200/80 flex flex-col items-center gap-0.5 transition-all hover:shadow-xl group min-w-[50px]"
-                        aria-label={t('common.view3D')}
+                        className="absolute top-3 right-3 z-50 bg-white/95 backdrop-blur-sm hover:bg-white text-primary-navy px-2 py-1.5 rounded-lg shadow-lg border border-gray-200 flex flex-col items-center gap-0.5 transition-all"
+                        aria-label={t('common.view3D') || '3D Model'}
                     >
-                        <div className="bg-blue-50 p-1 rounded-md text-blue-600 group-hover:bg-blue-100 transition-colors">
-                            <Box size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-[9px] font-bold tracking-wide">3D</span>
+                        <Box size={18} className="text-blue-600" />
+                        <span className="text-[9px] font-bold">3D</span>
                     </button>
                 )}
 
-
-
-                {/* Floating Nav Arrows (Image Mode Only) */}
                 {!is3DMode && images.length > 1 && (
                     <>
                         <button
                             onClick={prevImage}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-30 pointer-events-auto"
-                            aria-label={t('common.prev')}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-30"
+                            aria-label={t('common.prev') || 'Geri'}
                         >
                             <ChevronLeft size={24} />
                         </button>
                         <button
                             onClick={nextImage}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 z-30 pointer-events-auto"
-                            aria-label={t('common.next')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-primary-navy p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all z-30"
+                            aria-label={t('common.next') || 'İleri'}
                         >
                             <ChevronRight size={24} />
                         </button>
                     </>
                 )}
-
             </div>
 
-
-            {/* Thumbnail Strip + 3D Toggle */}
+            {/* Thumbnails */}
             <div className="flex flex-wrap gap-2">
-
-
-
-                {/* Image Thumbnails */}
                 {images.map((img, idx) => (
                     <button
                         key={idx}
                         onClick={() => { setIs3DMode(false); setActiveIdx(idx); }}
-                        className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${!is3DMode && activeIdx === idx
+                        className={`relative w-16 h-16 aspect-square rounded-lg overflow-hidden border-2 transition-all ${!is3DMode && activeIdx === idx
                             ? 'border-primary-navy ring-2 ring-primary-navy/20'
                             : 'border-transparent hover:border-gray-300'
                             }`}
+                        aria-label={`${productName} thumbnail ${idx + 1}`}
                     >
-                        <picture>
-                            <img
-                                src={`${storageUrl}${img.path}?format=webp&quality=70&width=200`}
-                                alt={img.alt || `${productName} view ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                            />
-                        </picture>
+                        <VentImage
+                            src={`product-images/${img.path}`}
+                            alt={img.alt || `${productName} view ${idx + 1}`}
+                            fallbackType="product"
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                        />
                     </button>
                 ))}
             </div>
 
-            {/* PORTAL: Image Lightbox (Existing Logic) */}
+            {/* Lightbox Portal */}
             {isLightboxOpen && createPortal(
-                <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+                <div className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex items-center justify-center">
                     <button
                         onClick={() => setIsLightboxOpen(false)}
-                        className="absolute top-6 right-6 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all cursor-pointer z-50 shadow-lg"
-                        aria-label={t('common.close')}
+                        className="absolute top-6 right-6 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all z-50"
+                        aria-label={t('common.close') || 'Kapat'}
                     >
-                        <X size={28} strokeWidth={2.5} />
+                        <X size={28} />
                     </button>
 
                     <div className="w-full h-full flex items-center justify-center p-4">
                         {activeImage && (
-                            <img
-                                src={`${storageUrl}${activeImage.path}`}
+                            <VentImage
+                                src={`product-images/${activeImage.path}`}
                                 alt={activeImage.alt || productName}
+                                fallbackType="product"
+                                width={1200}
+                                height={1200}
                                 className="object-contain max-h-[90vh] max-w-[90vw]"
                             />
                         )}
@@ -255,21 +220,22 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
 
                     {images.length > 1 && (
                         <>
-                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all" aria-label={t('common.prev')}>
+                            <button onClick={prevImage} className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.prev') || 'Geri'}>
                                 <ChevronLeft size={32} />
                             </button>
-                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white text-white hover:text-black p-3 rounded-full transition-all" aria-label={t('common.next')}>
+                            <button onClick={nextImage} className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition-all" aria-label={t('common.next') || 'İleri'}>
                                 <ChevronRight size={32} />
                             </button>
 
-                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/50 rounded-lg backdrop-blur-sm">
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/20 rounded-xl backdrop-blur-sm">
                                 {images.map((img, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setActiveIdx(idx)}
-                                        className={`w-14 h-14 rounded-md overflow-hidden border-2 transition-all ${activeIdx === idx ? 'border-white' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                                        className={`relative w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${activeIdx === idx ? 'border-white ring-2 ring-white/20' : 'border-transparent opacity-50 hover:opacity-100'}`}
+                                        aria-label={`Go to image ${idx + 1}`}
                                     >
-                                        <img src={`${storageUrl}${img.path}?width=100`} alt="" className="w-full h-full object-cover" />
+                                        <VentImage src={`product-images/${img.path}`} alt="" fill sizes="56px" className="object-cover" />
                                     </button>
                                 ))}
                             </div>
@@ -279,7 +245,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName, slug, 
                 document.body
             )}
 
-            {/* PORTAL: 3D Fullscreen Viewer (New Professional Logic) */}
+            {/* 3D Portal */}
             {is3DFullscreen && createPortal(
                 <Product3DViewer
                     slug={slug}

@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Zap, Wind, Check, X, HelpCircle, ArrowRight } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
@@ -77,11 +78,10 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                 {/* Comparison Visual */}
                 <div className={`flex justify-center mb-8 sm:mb-12 ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
-                    <img
-                        src="/images/category/electric-vs-ambient.png"
+                    <VentImage src="/images/category/electric-vs-ambient.png"
                         alt="Elektrikli vs Ortam Havalı Karşılaştırma"
                         className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
-                    />
+                     />
                 </div>
 
                 {/* Comparison Cards */}

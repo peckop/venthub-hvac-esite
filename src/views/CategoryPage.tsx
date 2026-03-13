@@ -1,5 +1,6 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -393,11 +394,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
           <div className="flex items-center space-x-6">
             <div className="text-primary-navy shrink-0">
               {categoryImageUrl ? (
-                <img
-                  src={categoryImageUrl}
+                <VentImage src={categoryImageUrl}
                   alt={getCategoryDisplayName(category)}
                   className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm border border-light-gray"
-                />
+                 />
               ) : (
                 getCategoryIcon(parentCategory?.slug || category.slug, { size: 64 })
               )}

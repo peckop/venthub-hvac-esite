@@ -1,5 +1,6 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -415,10 +416,10 @@ export default function OrderDetailPage() {
                           {item.product_image_url ? (
                             item.product_id ? (
                               <Link href={`/products/${item.product_id}`}>
-                                <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity" />
+                                <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)] hover:opacity-80 transition-opacity"  />
                               </Link>
                             ) : (
-                              <img src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]" />
+                              <VentImage src={item.product_image_url} alt={item.product_name} className="w-12 h-12 object-cover rounded-lg border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]"  />
                             )
                           ) : (
                             <div className="w-12 h-12 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders.noImage')}</div>

@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useRef } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import Link from 'next/link'
@@ -23,7 +24,7 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
     <div
       className={`relative overflow-hidden rounded-2xl border border-light-gray shadow-sm group ${large ? 'md:col-span-2 md:row-span-2' : ''}`}
     >
-      <img src={item.image} alt={item.title} className="w-full h-full object-cover object-center" loading="lazy" />
+      <VentImage src={item.image} alt={item.title} className="w-full h-full object-cover object-center" loading="lazy"  />
       {mounted && item.video && !isCoarse && (
         <video
           ref={videoRef}
