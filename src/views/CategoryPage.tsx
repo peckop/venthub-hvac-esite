@@ -611,13 +611,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
                       key={product.id}
                       product={product}
                       highlightFeatured={false}
-                      showCompare
-                      compareSelected={compareIds.includes(product.id)}
-                      onToggleCompare={(pid) => {
-                        setCompareIds(prev => prev.includes(pid) ? prev.filter(id => id !== pid) : (prev.length < 4 ? [...prev, pid] : prev))
-                      }}
                       layout={viewMode}
-                      relatedTopicSlug={relatedTopicSlug || undefined}
                       priority={i === 0}
                       hidePrice={!!category.metadata?.hide_price}
                     />
