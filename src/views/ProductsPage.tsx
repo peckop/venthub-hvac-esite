@@ -277,81 +277,30 @@ const ProductsPage: React.FC = () => {
     async function fetchData() {
       setLoading(true)
       try {
-        const { ftsSearchProducts, getAllProducts } = await import('../lib/supabase')
+        const { getProductsEnriched } = await import('../lib/supabase')
 
-        // Mode A: Search (Query or Filters active)
+        // Mode A: Search or Filters active
         const hasFilters = catParam || brandsParam.length > 0 || minPriceParam || maxPriceParam
 
         if (activeQuery || hasFilters) {
-          // Construct Filters
-          const filters: Record<string, string | string[] | undefined> = {}
-          // For category: Get all descendant IDs for hierarchical filtering
-          const categoryIdsToFilter = catParam ? getAllDescendantIds(categories, catParam) : []
-          if (categoryIdsToFilter.length > 0) filters.category_ids = categoryIdsToFilter
-          if (brandsParam.length > 0) filters.brand = brandsParam[0] // Single brand support
-          if (minPriceParam) filters.price_min = minPriceParam
-          if (maxPriceParam) filters.price_max = maxPriceParam
-
-          // Fetch products - if no query but category filter, get all products in those categories
-          let results: FtsProductResult[]
-          if (activeQuery) {
-            results = await ftsSearchProducts(activeQuery, 50, Object.keys(filters).length ? filters : undefined)
-          } else {
-            // No search query, just filtering by category - fetch all products and filter client-side
-            const allProds = await getAllProducts()
-            results = allProds
-              .filter(p => {
-                // Category filter
-                if (categoryIdsToFilter.length > 0 && !categoryIdsToFilter.includes(p.category_id || '')) return false
-                // Brand filter
-                if (filters.brand && p.brand !== filters.brand) return false
-                // Price filters
-                const price = typeof p.price === 'number' ? p.price : Number(p.price || 0)
-                if (filters.price_min && price < Number(filters.price_min)) return false
-                if (filters.price_max && price > Number(filters.price_max)) return false
-                return true
-              })
-              .map(p => ({
-                ...p,
-                price: typeof p.price === 'number' ? p.price : Number(p.price || 0),
-                rank: null,
-                is_fuzzy_match: false,
-              }))
-          }
-
-          // Enhanced results with generic attachCovers + active status patch
-          const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-
-          async function attachCovers<T extends { id: string }>(list: T[]): Promise<(T & { image_url?: string, image_alt?: string | null })[]> {
-            if (!Array.isArray(list) || list.length === 0) return list
-            try {
-              const ids = list.map(p => p.id)
-              const { supabase } = await import('../lib/supabase')
-              const { data: imgs } = await supabase
-                .from('product_images')
-                .select('product_id,path,sort_order,alt')
-                .in('product_id', ids)
-                .order('sort_order', { ascending: true })
-              const firstMap = new Map<string, { path: string, alt?: string | null }>()
-              for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-                if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
-              }
-              return list.map(p => {
-                const cover = firstMap.get(p.id)
-                return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-              })
-            } catch { return list }
-          }
-
-          const withCovers = await attachCovers(results)
+          const categoryIds = catParam ? getAllDescendantIds(categories, catParam) : undefined
+          
+          const results = await getProductsEnriched({
+            searchQuery: activeQuery || undefined,
+            categoryIds,
+            brand: brandsParam[0], // Single brand support
+            minPrice: minPriceParam ? Number(minPriceParam) : undefined,
+            maxPrice: maxPriceParam ? Number(maxPriceParam) : undefined,
+            limit: 50
+          })
 
           if (active) {
-            setProducts(withCovers as Product[])
+            setProducts(results)
           }
         }
         // Mode B: All Products
         else if (isAll) {
-          const all = await getAllProducts()
+          const all = await getProductsEnriched({ limit: 1000 })
           if (active) setProducts(all)
         }
         // Mode C: Discovery (Empty)
