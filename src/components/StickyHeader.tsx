@@ -28,6 +28,26 @@ const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
 const MegaMenu = React.lazy(() => import('./MegaMenu'))
 const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
 
+import { 
+  FileText, 
+  Ruler, 
+  Download, 
+  Award, 
+  Settings, 
+  Info 
+} from 'lucide-react'
+
+// Icon mapping for contextual technical links
+const SECTION_ICON_MAP: Record<string, any> = {
+  'genel': FileText,
+  'olcuiler': Ruler,
+  'diyagramlar': FileText,
+  'dokumanlar': FileText,
+  'pdf': Download,
+  'sertifikalar': Award,
+  'modeller': Settings
+}
+
 interface StickyHeaderProps {
   isScrolled: boolean
 }
@@ -270,8 +290,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             
             <div className="flex items-center gap-4 overflow-x-auto no-scrollbar ml-4 py-1">
               {technicalLinks?.map(link => {
-                // Find icon based on label
-                const Icon = sections.find(s => s.title === link.label)?.icon || Info
+                const Icon = SECTION_ICON_MAP[link.id] || Info
                 return (
                   <button
                     key={link.id}

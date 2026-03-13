@@ -109,7 +109,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     async function fetchProduct() {
       if (!id) return
       
-      // If we already have the product from SSR, use it but still sync context
+      // If we already have the product from SSR, use it
       if (initialProduct && (id === initialProduct.id || id === initialProduct.sku)) {
         setProduct(initialProduct)
         setLoading(false)
@@ -127,19 +127,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         }
         setProduct(productData)
         
-        // Fetch categories early for header sync
+        // Fetch categories for breadcrumb
         const cats = await getCategories()
-        let mc: Category | null = null
-        let sc: Category | null = null
+        const mc = cats.find(c => c.id === productData.category_id) || null
+        const sc = cats.find(c => c.id === productData.subcategory_id) || null
         
-        if (productData.category_id) {
-          mc = cats.find(c => c.id === productData.category_id) || null
-          setMainCategory(mc)
-        }
-        if (productData.subcategory_id) {
-          sc = cats.find(c => c.id === productData.subcategory_id) || null
-          setSubCategory(sc)
-        }
+        setMainCategory(mc)
+        setSubCategory(sc)
 
         // Sync with Header
         setPageContext({
@@ -324,7 +318,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
                 <span className={UI_SYSTEM.typography.label + " opacity-50"}>Quantity</span>
                 <div className="flex items-center bg-slate-50 rounded-xl p-0.5 border border-slate-200/40">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-semibold text-industrial-gray">-</button>
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all font-semibold text-industrial-gray">-</button>
                   <span className="w-10 text-center font-semibold text-primary-navy text-xs">{quantity}</span>
                   <button onClick={() => setQuantity(quantity + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-semibold text-industrial-gray">+</button>
                 </div>
@@ -488,7 +482,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                           <div className="aspect-square bg-slate-50 rounded-2xl mb-6 flex items-center justify-center border border-slate-100 group-hover:bg-air-blue/5 transition-colors">
                             <BrandIcon brand={product.brand} className="scale-125 grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
                           </div>
-                          <h4 className="font-black text-industrial-gray mb-2 text-base tracking-tight uppercase">{product.sku}-{v}</h4>
+                          <h4 className="font-semibold text-industrial-gray mb-2 text-base tracking-tight uppercase">{product.sku}-{v}</h4>
                           <p className="text-steel-gray text-[10px] font-medium mb-6 leading-relaxed">Advanced variant with optimized performance metrics for professional HVAC deployments.</p>
                           <div className="flex items-center justify-between pt-5 border-t border-slate-100">
                             <div className="text-primary-navy font-semibold text-lg">{formatCurrency((product.price + (v - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
@@ -504,7 +498,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
                         <div key={i} className={"bg-white rounded-3xl p-8 transition-all group text-center " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry + " hover:shadow-md"}>
                           <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-navy group-hover:rotate-12 transition-all duration-500 shadow-inner"><FileText size={36} className="text-primary-navy group-hover:text-white transition-colors" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-6 min-h-[2.5rem] leading-relaxed px-4">{t(`pdp.docs.${doc}`)}</h4>
+                          <h4 className="font-semibold text-industrial-gray uppercase tracking-tight text-xs mb-6 min-h-[2.5rem] leading-relaxed px-4">{t(`pdp.docs.${doc}`)}</h4>
                           <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-4 px-6 rounded-xl transition-all font-semibold text-[9px] uppercase tracking-widest flex items-center justify-center space-x-3 active:scale-95">
                             <Download size={16} /> <span>DOWNLOAD PDF</span>
                           </button>
