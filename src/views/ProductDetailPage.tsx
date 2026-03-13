@@ -23,7 +23,6 @@ import {
   Share2,
   Truck,
   Shield,
-  Phone,
   Star,
   ChevronRight,
   FileText,
@@ -32,9 +31,9 @@ import {
   Ruler,
   Settings,
   Info,
-  AlertCircle,
   ChevronDown,
-  FolderPlus
+  FolderPlus,
+  Loader2
 } from 'lucide-react'
 import ImageGallery from '../components/ImageGallery'
 import { RichTextRenderer } from '../components/products/RichTextRenderer'
