@@ -128,7 +128,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
-  }, [id, router, initialProduct, product])
+  }, [id, router])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -236,8 +236,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-navy mx-auto mb-4" />
-          <p className="text-steel-gray text-xs font-bold uppercase tracking-widest">{t('pdp.loading')}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy mx-auto mb-4" />
+          <p className="text-steel-gray text-[10px] font-bold uppercase tracking-widest">{t('pdp.loading')}</p>
         </div>
       </div>
     )
@@ -247,8 +247,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
         <div className="text-center">
-          <h1 className="text-xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold text-sm uppercase tracking-widest">
+          <h1 className="text-lg font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
+          <Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold text-xs uppercase tracking-widest">
             {t('pdp.backHome')}
           </Link>
         </div>
@@ -260,63 +260,39 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
   return (
-    <div className="min-h-screen bg-slate-50/30">
+    <div className="min-h-screen bg-slate-50/20">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* Seamless Integrated Breadcrumb */}
-      <div className="relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-          <nav className="flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href="/" className="hover:text-primary-navy transition-colors">
-              {t('category.breadcrumbHome')}
-            </Link>
-            <ChevronRight size={10} className="flex-shrink-0" />
+      {/* Seamless Integrated Breadcrumb - Even Lighter */}
+      <div className="relative z-20 border-b border-light-gray/30">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold text-steel-gray/50">
+            <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
+            <span className="opacity-30">/</span>
             {mainCategory && (
               <>
-                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors">
-                  {mainCategory.name}
-                </Link>
+                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors">{mainCategory.name}</Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
-                    <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors">
-                      {subCategory.name}
-                    </Link>
+                    <span className="opacity-30">/</span>
+                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors">{subCategory.name}</Link>
                   </>
                 )}
-                <ChevronRight size={10} className="flex-shrink-0" />
+                <span className="opacity-30">/</span>
               </>
             )}
-            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none">
+            <span className="text-industrial-gray truncate max-w-[120px] sm:max-w-none">
               {product.name}
             </span>
           </nav>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Back Button - Lighter Style */}
-        <button
-          onClick={() => {
-            if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
-            let stack: string[] = [];
-            try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
-            const lastSafeStop = stack[stack.length - 1];
-            if (lastSafeStop) { router.push(lastSafeStop, { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false }) }
-            else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
-            else { router.push('/', { scroll: false }) }
-          }}
-          className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-all group font-bold text-xs uppercase tracking-widest"
-        >
-          <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
-          <span>{t('pdp.back')}</span>
-        </button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Product Image Gallery (60% width on large screens) */}
-          <div className="lg:col-span-7 xl:col-span-8 sticky top-24 self-start z-10">
-            <div className="relative group bg-white rounded-3xl border border-light-gray/50 shadow-sm overflow-hidden p-2">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+          {/* Product Image Gallery (Refined Container) */}
+          <div className="lg:col-span-7 xl:col-span-7 sticky top-24 self-start z-10">
+            <div className="relative group bg-white rounded-2xl border border-light-gray/40 shadow-sm overflow-hidden p-1.5">
               <ImageGallery
                 key={product.id}
                 images={images}
@@ -325,14 +301,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 modelType={mainCategory?.metadata?.model_type}
               />
               {topicSlug === 'hava-perdesi' && (
-                <div className="absolute top-6 left-6 z-20 pointer-events-none">
-                  <div className="bg-white/95 backdrop-blur-md border border-primary-navy/20 px-3 py-2 rounded-full shadow-hvac flex items-center space-x-2 animate-pulse-subtle">
-                    <div className="flex h-2 w-2 relative">
+                <div className="absolute top-5 left-5 z-20 pointer-events-none">
+                  <div className="bg-white/95 backdrop-blur-md border border-primary-navy/10 px-2.5 py-1.5 rounded-full shadow-sm flex items-center space-x-2">
+                    <div className="flex h-1.5 w-1.5 relative">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-navy"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-navy"></span>
                     </div>
-                    <span className="text-[9px] font-bold text-primary-navy uppercase tracking-widest">
-                      {t('pdp.actions.interactive3D')}
+                    <span className="text-[8px] font-black text-primary-navy uppercase tracking-[0.2em]">
+                      INTERACTIVE 3D
                     </span>
                   </div>
                 </div>
@@ -340,169 +316,122 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
           </div>
 
-          {/* Product Info (40% width on large screens) */}
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col">
-            {/* Brand & Badge */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2.5">
-                <BrandIcon brand={product.brand} className="w-8 h-8" />
-                <div className="flex flex-col">
-                  <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{product.brand}</span>
-                  <span className="text-steel-gray text-[8px] font-medium tracking-[0.2em]">OFFICIAL DISTRIBUTOR</span>
-                </div>
+          {/* Product Info (Elegant technical layout) */}
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col">
+            <div className="flex items-center space-x-2.5 mb-2">
+              <div className="w-7 h-7 bg-white rounded-lg border border-light-gray/50 p-1 flex items-center justify-center">
+                <BrandIcon brand={product.brand} className="w-full h-full" />
               </div>
-              {product.is_featured && (
-                <div className="bg-gold-accent/10 text-gold-accent px-2.5 py-1 rounded-lg text-[9px] font-bold flex items-center space-x-1 border border-gold-accent/20">
-                  <Star size={10} fill="currentColor" />
-                  <span>{t('pdp.featured') || 'ÖNE ÇIKAN'}</span>
-                </div>
-              )}
+              <span className="text-secondary-blue font-black text-[10px] tracking-[0.2em] uppercase">{product.brand}</span>
+              <span className="text-steel-gray text-[8px] font-bold tracking-[0.1em] opacity-40">• OFFICIAL PARTNER</span>
             </div>
 
-            {/* Product Name - Refined Size */}
-            <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-[1.1] mb-4 tracking-tight">
+            <h1 className="text-2xl sm:text-2xl font-black text-industrial-gray leading-tight mb-4 tracking-tight uppercase">
               {product.name}
             </h1>
 
-            {/* Quick Specs Jump - Accessibility Feature */}
-            <div className="flex flex-wrap gap-1.5 mb-6">
+            {/* Technical Jump Bar (New Design) */}
+            <div className="flex flex-wrap gap-1 mb-6">
               {sections.slice(0, 4).map((s) => (
                 <button
                   key={`jump-${s.id}`}
                   onClick={() => scrollToSection(s.id)}
-                  className="px-3 py-1.5 bg-air-blue/30 hover:bg-air-blue text-primary-navy rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border border-secondary-blue/10"
+                  className="px-3 py-1.5 bg-slate-50 hover:bg-air-blue/30 text-industrial-gray/60 hover:text-primary-navy rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border border-light-gray/40 shadow-xs"
                 >
                   {s.title}
                 </button>
               ))}
             </div>
 
-            {/* Price Area - Elegant & Technical */}
-            <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
-              <div className="flex flex-col relative z-10">
-                <span className="text-[9px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">Price & Availability</span>
-                <div className="flex items-baseline justify-between">
-                  <div className="flex flex-col">
-                    <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
-                      {mainCategory?.metadata?.hide_price ? (
-                        <span className="text-xl text-industrial-gray font-bold">{t('common.requestQuote') || 'Teklif İste'}</span>
-                      ) : (
-                        formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
-                      )}
-                    </div>
-                    {!mainCategory?.metadata?.hide_price && (
-                      <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
-                        {t('pdp.vatIncluded')} Included
-                      </span>
+            <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray/40 shadow-sm">
+              <div className="flex items-baseline justify-between">
+                <div className="flex flex-col">
+                  <div className="text-3xl sm:text-3xl font-black text-primary-navy tracking-tight">
+                    {mainCategory?.metadata?.hide_price ? (
+                      <span className="text-base text-industrial-gray font-bold">TEKLİF İSTEYİN</span>
+                    ) : (
+                      formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                     )}
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className={`px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider flex items-center space-x-1.5 ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
-                      <div className={`w-1 h-1 rounded-full ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green' : 'bg-warning-orange'}`} />
-                      <span>{typeof product.stock_qty === 'number' && product.stock_qty > 0 ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
-                    </div>
-                    <span className="text-[9px] text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">SKU: {product.sku}</span>
+                  {!mainCategory?.metadata?.hide_price && (
+                    <span className="text-[8px] font-black text-steel-gray uppercase tracking-widest mt-1 opacity-50">
+                      VAT INCLUDED
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green' : 'bg-warning-orange/10 text-warning-orange'}`}>
+                    {typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'IN STOCK' : 'PRE-ORDER'}
                   </div>
+                  <span className="text-[8px] text-steel-gray font-bold mt-1.5 opacity-30 uppercase tracking-[0.2em]">SKU: {product.sku}</span>
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons Area - Compact & Unified */}
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl border border-light-gray p-5 space-y-5">
-                {/* Quantity Control */}
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
-                  <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray">-</button>
-                    <span className="w-10 text-center font-black text-primary-navy text-sm">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray">+</button>
+              <div className="bg-white rounded-2xl border border-light-gray/40 p-5">
+                <div className="flex items-center justify-between mb-5">
+                  <span className="text-[9px] font-black text-industrial-gray uppercase tracking-[0.2em] opacity-50">Quantity</span>
+                  <div className="flex items-center bg-slate-50 rounded-xl p-0.5 border border-light-gray/30">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-bold text-industrial-gray">-</button>
+                    <span className="w-8 text-center font-black text-primary-navy text-xs">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-bold text-industrial-gray">+</button>
                   </div>
                 </div>
 
-                {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
-                  {mainCategory?.metadata?.hide_price ? (
-                    <button
-                      onClick={() => setLeadOpen(true)}
-                      className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group"
-                    >
-                      <Settings size={16} className="group-hover:rotate-90 transition-transform duration-500" />
-                      <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.techQuote') || 'Teklif Al'}</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleAddToCart}
-                      disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                      className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-[0.98]"
-                    >
-                      <ShoppingCart size={16} className="group-hover:translate-x-1 transition-transform" />
-                      <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.addToCart')}</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={mainCategory?.metadata?.hide_price ? () => setLeadOpen(true) : handleAddToCart}
+                    disabled={!mainCategory?.metadata?.hide_price && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                    className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group disabled:opacity-50 active:scale-[0.98]"
+                  >
+                    {mainCategory?.metadata?.hide_price ? <Settings size={14} /> : <ShoppingCart size={14} />}
+                    <span className="text-[10px] uppercase tracking-[0.2em]">{mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : t('pdp.addToCart')}</span>
+                  </button>
                   
                   <button
                     onClick={() => setIsProjectModalOpen(true)}
-                    className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
+                    className="w-full bg-white border border-primary-navy/10 hover:border-primary-navy text-primary-navy font-black py-3 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
                   >
-                    <FolderPlus size={16} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-xs uppercase tracking-[0.15em]">Proje Listesine Ekle</span>
+                    <FolderPlus size={14} className="opacity-70 group-hover:opacity-100" />
+                    <span className="text-[10px] uppercase tracking-[0.2em]">PROJE LİSTESİ</span>
                   </button>
                 </div>
 
-                {/* Secondary Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`flex-1 flex items-center justify-center space-x-2 py-2.5 border rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all ${isWishlisted
-                      ? 'border-red-500 text-red-500 bg-red-50'
-                      : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
-                      }`}
-                  >
-                    <Heart size={14} fill={isWishlisted ? 'currentColor' : 'none'} />
-                    <span>Favori</span>
+                <div className="flex items-center gap-2 mt-4">
+                  <button onClick={() => setIsWishlisted(!isWishlisted)} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-light-gray/50 rounded-lg font-black text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-red-500 transition-all">
+                    <Heart size={12} fill={isWishlisted ? 'currentColor' : 'none'} className={isWishlisted ? 'text-red-500' : ''} />
+                    <span>FAVORİ</span>
                   </button>
-
-                  <button
-                    onClick={handleShare}
-                    className="flex-1 flex items-center justify-center space-x-2 py-2.5 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all"
-                  >
-                    <Share2 size={14} />
-                    <span>Paylaş</span>
+                  <button onClick={handleShare} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-light-gray/50 rounded-lg font-black text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-primary-navy transition-all">
+                    <Share2 size={12} />
+                    <span>PAYLAŞ</span>
                   </button>
                 </div>
               </div>
 
-              {/* Trust Signals - Lighter Grid */}
-              <div className="grid grid-cols-3 gap-2.5">
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Truck className="text-success-green mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">Ücretsiz Kargo</p>
-                </div>
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Shield className="text-primary-navy mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">Güvenli Ödeme</p>
-                </div>
-                <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
-                  <Award className="text-secondary-blue mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">2 Yıl Garanti</p>
-                </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[ { icon: Truck, label: 'KARGO' }, { icon: Shield, label: 'GÜVENLİ' }, { icon: Award, label: 'GARANTİ' } ].map((item, i) => (
+                  <div key={i} className="flex flex-col items-center p-3 bg-white/50 rounded-xl border border-light-gray/20 text-center">
+                    <item.icon className="text-industrial-gray opacity-40 mb-1" size={14} />
+                    <p className="text-[7px] font-black text-industrial-gray uppercase tracking-tighter opacity-60">{item.label}</p>
+                  </div>
+                ))}
               </div>
 
-              {/* Quick Tech PDF Link */}
               <button
                 onClick={handleDownloadPdf}
                 disabled={isGeneratingPdf}
-                className="w-full bg-slate-900 hover:bg-primary-navy text-white font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50"
+                className="w-full bg-slate-900 hover:bg-primary-navy text-white font-black py-3 px-5 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50 shadow-sm"
               >
                 <div className="flex items-center space-x-3 text-left">
-                  {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
+                  {isGeneratingPdf ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} className="group-hover:animate-bounce" />}
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider">TEKNİK ÜRÜN FÖYÜ</span>
-                    <span className="text-[8px] text-white/50 font-medium uppercase tracking-[0.2em]">DATASHEET (PDF)</span>
+                    <span className="text-[9px] uppercase tracking-widest font-black">TEKNİK FÖY</span>
+                    <span className="text-[7px] text-white/40 font-bold uppercase tracking-[0.2em]">DATASHEET PDF</span>
                   </div>
                 </div>
-                <ChevronRight size={16} className="opacity-30 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight size={12} className="opacity-20 group-hover:opacity-100" />
               </button>
             </div>
           </div>

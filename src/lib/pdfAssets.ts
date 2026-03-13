@@ -2,12 +2,12 @@
  * Assets and constants for PDF generation
  */
 
-// Roboto font URLs from reliable CDN (for runtime loading)
+// Roboto font URLs from reliable source
 export const PDF_FONTS = {
     Roboto: {
-        regular: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf',
-        medium: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Medium.ttf',
-        bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Bold.ttf'
+        regular: 'https://cdn.jsdelivr.net/gh/bpampuch/pdfmake@master/examples/fonts/Roboto-Regular.ttf',
+        medium: 'https://cdn.jsdelivr.net/gh/bpampuch/pdfmake@master/examples/fonts/Roboto-Medium.ttf',
+        bold: 'https://cdn.jsdelivr.net/gh/bpampuch/pdfmake@master/examples/fonts/Roboto-Bold.ttf'
     }
 };
 
