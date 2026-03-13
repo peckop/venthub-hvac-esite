@@ -18,6 +18,10 @@ interface ProductCardProps {
   priority?: boolean
   hidePrice?: boolean
   compact?: boolean
+  showCompare?: boolean
+  compareSelected?: boolean
+  onToggleCompare?: (pid: string) => void
+  relatedTopicSlug?: string
 }
 
 // Resim adresini Supabase veya Yerel dizine göre çözen akıllı fonksiyon
