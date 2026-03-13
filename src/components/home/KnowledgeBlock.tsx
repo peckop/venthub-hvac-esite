@@ -6,7 +6,13 @@ import React from 'react'
 
 import { useI18n } from '../../i18n/I18nProvider'
 
-const knowledgeItems = [
+interface KnowledgeItem {
+  id: 'guides' | 'calculators' | 'support'
+  href: string
+  icon: React.ReactNode
+}
+
+const knowledgeItems: KnowledgeItem[] = [
   { 
     id: 'guides', 
     href: '/destek/merkez',
@@ -36,9 +42,9 @@ const knowledgeItems = [
       </svg>
     )
   },
-] as const
+]
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -51,7 +57,7 @@ const cardVariants: Variants = {
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" as any }
+    transition: { duration: 0.6, ease: "easeOut" }
   }
 }
 
@@ -66,7 +72,7 @@ export const KnowledgeBlock: React.FC = () => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        {/* Standartlaştırılmış Başlık Bloğu */}
+        {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
             <motion.div 
@@ -84,7 +90,7 @@ export const KnowledgeBlock: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="text-4xl font-light tracking-tighter text-white sm:text-6xl"
             >
-              Mühendislik <span className="text-cyan-400">Merkezi</span>
+              {t('home.knowledge.title')}
             </motion.h2>
           </div>
           <motion.p 
@@ -134,7 +140,7 @@ export const KnowledgeBlock: React.FC = () => {
 
                 <div className="mt-10 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
                   <span className="h-px w-6 bg-cyan-400/40" />
-                  Keşfet
+                  {t('home.knowledge.cta')}
                   <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-1">
                     <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

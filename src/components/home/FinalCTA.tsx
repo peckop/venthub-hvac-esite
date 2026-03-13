@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, Variants } from 'framer-motion'
 import Link from 'next/link'
 import React from 'react'
 
@@ -8,6 +8,15 @@ import { useI18n } from '../../i18n/I18nProvider'
 
 interface FinalCTAProps {
   onQuoteClick: () => void
+}
+
+const revealVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" }
+  })
 }
 
 export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
@@ -30,7 +39,7 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
       </div>
 
       <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        {/* Standartlaştırılmış Başlık Bloğu (Sayfa Ritmi ile Uyumlu) */}
+        {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
           <div className="max-w-4xl">
             <motion.div 
@@ -62,7 +71,7 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
           </motion.p>
         </div>
 
-        {/* Aksiyon ve Bilgi Alanı */}
+        {/* Action and Info Area */}
         <div className="grid gap-12 lg:grid-cols-2 items-center">
           <div className="flex flex-wrap gap-6">
             <button
@@ -75,24 +84,25 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
             </button>
             
             <Link
-              href="https://wa.me/905000000000"
+              href="https://wa.me/905442450205"
               target="_blank"
               className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all active:scale-95"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              WhatsApp Destek
+              {t('home.finalCta.secondaryCta')}
             </Link>
           </div>
 
-          {/* Visual Unit - Simplified & Integrated */}
+          {/* Visual Unit */}
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            custom={2}
+            variants={revealVariants}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
             className="relative"
           >
             <div className="relative rounded-[3rem] border border-white/10 bg-white/[0.02] p-10 backdrop-blur-3xl overflow-hidden group max-w-xl lg:ml-auto">
-              {/* Visual HUD Accents */}
               <div className="absolute top-6 left-6 w-8 h-8 border-t border-l border-white/20" />
               <div className="absolute bottom-6 right-6 w-8 h-8 border-b border-r border-white/20" />
               
@@ -100,7 +110,9 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
                 <div className="flex-1">
                   <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 mb-2">Project Pipeline</div>
                   <div className="text-5xl font-black text-white tracking-tighter">1540<span className="text-cyan-400">+</span></div>
-                  <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">Tamamlanan Mühendislik</div>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">
+                    {t('home.aboutPage.stats.yearsExperience')}
+                  </div>
                 </div>
                 
                 <div className="w-32 space-y-3">
@@ -113,7 +125,7 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
                     />
                   </div>
                   <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-slate-500">
-                    <span>92% Optimizasyon</span>
+                    <span>92% Optimization</span>
                   </div>
                 </div>
               </div>
