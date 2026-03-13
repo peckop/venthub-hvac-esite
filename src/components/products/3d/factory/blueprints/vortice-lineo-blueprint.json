@@ -1,0 +1,78 @@
+{
+  "slug": "vortice-lineo",
+  "scale": 1.0,
+  "parts": [
+    {
+      "name": "MainChassis",
+      "type": "mechanical",
+      "geometry": { "type": "cylinder", "args": [0.35, 0.4, 0.8, 32] },
+      "position": [0, -0.05, 0],
+      "rotation": [0, 0, 1.57],
+      "material": "matteBlack",
+      "description": "The main dark grey/black aerodynamic body of the fan."
+    },
+    {
+      "name": "IntakeCone",
+      "type": "mechanical",
+      "geometry": { "type": "cylinder", "args": [0.3, 0.35, 0.2, 32] },
+      "position": [-0.5, -0.05, 0],
+      "rotation": [0, 0, 1.57],
+      "material": "matteBlack",
+      "description": "Inlet cone on the left side."
+    },
+    {
+      "name": "ExhaustCone",
+      "type": "mechanical",
+      "geometry": { "type": "cylinder", "args": [0.35, 0.3, 0.2, 32] },
+      "position": [0.5, -0.05, 0],
+      "rotation": [0, 0, 1.57],
+      "material": "matteBlack",
+      "description": "Outlet cone on the right side."
+    },
+    {
+      "name": "GreenClampLeft",
+      "type": "detail",
+      "geometry": { "type": "torus", "args": [0.35, 0.02, 16, 100] },
+      "position": [-0.4, -0.05, 0],
+      "rotation": [0, 1.57, 0],
+      "material": "vorticeGreen",
+      "description": "Signature green mounting clamp on the inlet side."
+    },
+    {
+      "name": "GreenClampRight",
+      "type": "detail",
+      "geometry": { "type": "torus", "args": [0.35, 0.02, 16, 100] },
+      "position": [0.4, -0.05, 0],
+      "rotation": [0, 1.57, 0],
+      "material": "vorticeGreen",
+      "description": "Signature green mounting clamp on the outlet side."
+    },
+    {
+      "name": "ElectricalBox",
+      "type": "detail",
+      "geometry": { "type": "box", "args": [0.3, 0.2, 0.3] },
+      "position": [0, 0.3, 0],
+      "rotation": [0, 0, 0],
+      "material": "matteBlack",
+      "description": "The rectangular junction box on top of the fan."
+    },
+    {
+      "name": "MountingBase",
+      "type": "mechanical",
+      "geometry": { "type": "box", "args": [0.8, 0.1, 0.4] },
+      "position": [0, -0.4, 0],
+      "rotation": [0, 0, 0],
+      "material": "industrialSteel",
+      "description": "The base plate supporting the fan unit."
+    },
+    {
+      "name": "InternalFanRotor",
+      "type": "rotor",
+      "geometry": { "type": "cylinder", "args": [0.28, 0.28, 0.05, 12] },
+      "position": [0, -0.05, 0],
+      "rotation": [0, 0, 1.57],
+      "material": "vorticeGreen",
+      "description": "The internal green fan blades visible from the side/inlet."
+    }
+  ]
+}
