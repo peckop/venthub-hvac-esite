@@ -1,10 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, FolderPlus, Check, ChevronRight, Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'
 import { useProjectLists } from '../../hooks/useProjectLists'
-import { useI18n } from '../../i18n/I18nProvider'
 import type { Product } from '../../lib/supabase'
 
 interface AddToProjectModalProps {
@@ -14,8 +13,7 @@ interface AddToProjectModalProps {
 }
 
 export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, isOpen, onClose }) => {
-  const { t } = useI18n()
-  const { projects, addProject, addItemToProject, loading } = useProjectLists()
+  const { projects, addProject, addItemToProject } = useProjectLists()
   const [newProjectName, setNewProjectName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
