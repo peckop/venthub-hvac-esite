@@ -2,7 +2,6 @@
 
 import React, { Suspense, useEffect, useState } from 'react'
 
-import Seo from '../components/Seo'
 import HomeSinevizyon from '../components/home/HomeSinevizyon'
 import CinematicProductShowcase from '../components/home/CinematicProductShowcase'
 import GuidedCategoryDiscovery from '../components/home/GuidedCategoryDiscovery'
@@ -36,7 +35,6 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
   const [leadOpen, setLeadOpen] = useState(false)
-  const { t } = useI18n()
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -47,12 +45,6 @@ export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], init
 
   return (
     <div className="min-h-screen bg-white selection:bg-cyan-100 selection:text-cyan-900">
-      <Seo
-        title={t('home.seoTitle')}
-        description={t('home.seoDesc')}
-        canonical={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/`}
-      />
-
       <HomeSinevizyon onQuoteClick={() => setLeadOpen(true)} />
 
       {/* Cinematic Spacing and Transition: Dark to Light */}
@@ -65,10 +57,6 @@ export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], init
           <GuidedCategoryDiscovery categories={initialCategories} />
         </div>
       </RevealSection>
-
-      {/* JSON-LD Scripts for SEO */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'VentHub', url: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/` }) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'VentHub', url: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/`, potentialAction: { '@type': 'SearchAction', target: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/products?q={search_term_string}`, 'query-input': 'required name=search_term_string' } }) }} />
 
       <div className="space-y-32 lg:space-y-48 pb-32">
         <RevealSection>

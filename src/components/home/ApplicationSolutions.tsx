@@ -1,56 +1,52 @@
 'use client'
 
 import { motion, Variants } from 'framer-motion'
-import Link from 'next/link'
 import React from 'react'
-
 import { useI18n } from '../../i18n/I18nProvider'
+import Link from 'next/link'
+import Image from 'next/image'
 
-const solutionItems = [
+interface SolutionItem {
+  id: 'parking' | 'kitchen' | 'entrance' | 'comfort'
+  href: string
+  image: string
+  span: string
+}
+
+const solutions: SolutionItem[] = [
   { 
     id: 'parking', 
     href: '/category/fanlar/otopark-jet-fanlari', 
     image: '/images/bento/parking.jpg',
-    span: 'lg:col-span-2',
-    techTitle: 'Duman Tahliye Senaryosu',
-    techDesc: 'Yangın anında akıllı jet fan otomasyonu ile dumanı bloke ederek güvenli kaçış koridorları oluşturuyoruz.',
-    tags: ['Yangın Otomasyonu', 'Hava Akış Analizi']
+    span: 'lg:col-span-2'
   },
   { 
     id: 'kitchen', 
     href: '/category/fanlar/kanal-tipi-fanlar', 
     image: '/images/bento/kitchen.jpg',
-    span: 'lg:col-span-1',
-    techTitle: 'Mutfak Filtrasyonu',
-    techDesc: 'Yüksek yoğunluklu duman ve koku kontrolü için elektrostatik filtreleme çözümleri.',
-    tags: ['Yağ Tutucu', 'Koku Kontrolü']
+    span: 'lg:col-span-1'
   },
   { 
     id: 'entrance', 
-    href: '/category/hava-perdeleri', 
-    image: '/images/bento/air-curtain.jpg',
-    span: 'lg:col-span-1',
-    techTitle: 'Isı Bariyeri Kontrolü',
-    techDesc: 'Giriş alanlarında görünmez bir hava kalkanı kurarak iklimlendirme maliyetlerini %80 azaltıyoruz.',
-    tags: ['Enerji Verimliliği', 'Termal Bariyer']
+    href: '/category/fanlar/hava-perdeleri', 
+    image: '/images/bento/entrance.jpg',
+    span: 'lg:col-span-1'
   },
   { 
     id: 'comfort', 
     href: '/category/isi-geri-kazanim-cihazlari', 
-    image: '/images/bento/hrv.jpg',
-    span: 'lg:col-span-2',
-    techTitle: 'Isı Geri Kazanım Sistemi',
-    techDesc: 'Kirli havayı dışarı atarken ısısını koruyarak taze havaya aktaran, yüksek verimli mühendislik çözümü.',
-    tags: ['%93 Verim', 'Hassas Filtrasyon']
-  },
-] as const
+    image: '/images/bento/comfort.jpg',
+    span: 'lg:col-span-2'
+  }
+]
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15
+      staggerChildren: 0.15,
+      delayChildren: 0.3
     }
   }
 }
@@ -60,7 +56,7 @@ const itemVariants: Variants = {
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" as any }
+    transition: { duration: 0.6, ease: "easeOut" }
   }
 }
 
@@ -68,23 +64,13 @@ export const ApplicationSolutions: React.FC = () => {
   const { t } = useI18n()
 
   return (
-    <section id="applications" className="relative overflow-hidden bg-white py-24 sm:py-32">
-      {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        {/* Standartlaştırılmış Başlık Bloğu */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-          <div className="max-w-3xl">
+    <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 translate-x-1/4" />
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <div className="max-w-2xl">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -103,90 +89,88 @@ export const ApplicationSolutions: React.FC = () => {
               {t('home.applicationSolutions.title')}
             </motion.h2>
           </div>
-          
-          <div className="flex flex-col items-start md:items-end gap-4">
-            <motion.p 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
-            >
-              {t('home.applicationSolutions.subtitle')}
-            </motion.p>
-            
-            <Link 
-              href="/products#applications" 
-              className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-950 transition-all hover:gap-3"
-            >
-              <span className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:scale-x-0 after:bg-slate-950 after:transition-transform group-hover:after:scale-x-100">
-                {t('home.applicationSolutions.viewAll')}
-              </span>
-              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
+          >
+            {t('home.applicationSolutions.subtitle')}
+          </motion.p>
         </div>
 
-        {/* Ürün Kartları - Konteyner İçinde */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {solutionItems.map((item) => (
-            <motion.div key={item.id} variants={itemVariants} className={item.span}>
-              <Link
-                href={item.href}
-                className="group relative flex h-full min-h-[380px] flex-col overflow-hidden rounded-[2.5rem] border border-slate-200 bg-slate-50 transition-all duration-500 hover:border-primary-navy/20 hover:shadow-2xl hover:shadow-primary-navy/10"
-              >
-                {/* Background Image with Overlay */}
-                <div className="absolute inset-0 z-0">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent opacity-80 transition-opacity group-hover:opacity-90" />
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10 flex h-full flex-col justify-end p-8 sm:p-10">
-                  <div className="mb-auto self-end">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white backdrop-blur-md transition-all duration-300 group-hover:bg-cyan-500 group-hover:border-cyan-500">
-                      <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400">
+          {solutions.map((item) => (
+            <motion.div
+              key={item.id}
+              variants={itemVariants}
+              className={`group relative overflow-hidden rounded-3xl bg-slate-100 aspect-[4/3] ${item.span}`}
+            >
+              <Link href={item.href} className="block w-full h-full relative">
+                <Image
+                  src={item.image}
+                  alt={t(`home.applicationSolutions.items.${item.id}.title`)}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                />
+                
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
+                
+                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                  <div className="mb-4 overflow-hidden">
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                       {t(`home.applicationSolutions.items.${item.id}.eyebrow`)}
                     </div>
-                    <h3 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
-                      {item.techTitle}
+                    <h3 className="text-2xl font-bold text-white tracking-tight">
+                      {t(`home.applicationSolutions.items.${item.id}.title`)}
                     </h3>
-                    <p className="mt-4 text-[15px] leading-relaxed text-slate-300 font-light">
-                      {item.techDesc}
-                    </p>
-
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {item.tags.map((tag) => (
-                        <div key={tag} className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-colors group-hover:bg-white/15">
-                          {tag}
-                        </div>
-                      ))}
-                    </div>
                   </div>
+                  
+                  <p className="text-sm text-slate-300 font-light leading-relaxed mb-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 line-clamp-2">
+                    {t(`home.applicationSolutions.items.${item.id}.description`)}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                    <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] text-white font-medium">
+                      {t(`home.applicationSolutions.items.${item.id}.point1`)}
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] text-white font-medium">
+                      {t(`home.applicationSolutions.items.${item.id}.point2`)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Corner Arrow */}
+                <div className="absolute top-8 right-8 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center opacity-0 -translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
                 </div>
               </Link>
             </motion.div>
           ))}
         </motion.div>
+
+        <div className="mt-16 text-center">
+          <Link 
+            href="/products"
+            className="inline-flex items-center gap-4 group"
+          >
+            <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">
+              {t('home.applicationSolutions.viewAll')}
+            </span>
+            <div className="w-12 h-[1px] bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-all duration-500" />
+          </Link>
+        </div>
       </div>
     </section>
   )
