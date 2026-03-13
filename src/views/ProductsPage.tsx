@@ -418,7 +418,7 @@ const ProductsPage: React.FC = () => {
   const breadcrumbLabel = activeQuery ? `"${activeQuery}"` : (isAll ? t('common.allProducts') : t('common.discover'))
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <Seo
         title={`${breadcrumbLabel} | VentHub`}
         description={t('products.discoverSeoDesc')}
@@ -426,7 +426,7 @@ const ProductsPage: React.FC = () => {
       />
 
       {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-steel-gray mb-6">
+      <div className="flex items-center text-sm text-steel-gray mb-4 sm:mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
         <span className="text-industrial-gray font-medium">{
           activeQuery
             ? breadcrumbLabel
@@ -441,7 +441,7 @@ const ProductsPage: React.FC = () => {
 
       {/* Search Header - Only in Search/Filter Mode */}
       {!isDiscovery && (
-        <div className="flex flex-col lg:flex-row gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="flex-1 relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -450,19 +450,19 @@ const ProductsPage: React.FC = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
-              className="w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2.5 sm:py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all text-sm sm:text-base"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-end">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-3 rounded-lg border ${viewMode === 'grid' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+              className={`p-2.5 sm:p-3 rounded-lg border ${viewMode === 'grid' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
             >
               <GridIcon size={20} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-3 rounded-lg border ${viewMode === 'list' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+              className={`p-2.5 sm:p-3 rounded-lg border ${viewMode === 'list' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
             >
               <ListIcon size={20} />
             </button>
@@ -470,7 +470,7 @@ const ProductsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Sidebar */}
         {showSidebar && (
           <FilterSidebar
@@ -487,54 +487,53 @@ const ProductsPage: React.FC = () => {
         )}
 
         {/* Listenin Ana Gövdesi */}
-        <div className="flex-1">
+        <div className="flex-1 w-full min-w-0">
           {/* Discovery Content */}
           {isDiscovery && (
             <DiscoveryContent appSectionRef={appSectionRef} />
           )}
 
-
-
-          // Inside ProductsPage component render, after product grid:
           {/* Product Grid */}
           {!isDiscovery && (
-            <div>
+            <div className="w-full">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map(n => <div key={n} className="bg-gray-100 rounded-xl h-80 animate-pulse" />)}
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <div key={n} className="bg-gray-100 rounded-xl h-64 sm:h-80 animate-pulse" />)}
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                  <div className="text-4xl mb-4">🔍</div>
-                  <h3 className="text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
-                  <p className="text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
+                <div className="text-center py-16 sm:py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <div className="text-3xl sm:text-4xl mb-4">🔍</div>
+                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
+                  <p className="text-sm sm:text-base text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
                   <button
                     onClick={() => router.push('/products')}
-                    className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                    className="mt-6 px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
                   >
                     Filtreleri Temizle
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                  <div className={`grid gap-4 sm:gap-6 ${viewMode === 'grid' ? 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
                     {products.map(p => (
                       <ProductCard
                         key={p.id}
-                        product={p as Product} // Safe cast now due to compatibility patch
+                        product={p as Product}
                         layout={viewMode}
                         hidePrice={Boolean(p.category_id && categoryHidePriceMap.get(p.category_id))}
+                        compact={viewMode === 'grid'}
                       />
                     ))}
                   </div>
 
-                  {/* Undecided User CTA - Only show if we found results, or even if filtered but empty? Better if results exist or generally bottom of list */}
-                  {products.length > 0 && <UndecidedUserCTA />}
+                  {/* Undecided User CTA */}
+                  <div className="mt-12 sm:mt-16">
+                    <UndecidedUserCTA />
+                  </div>
                 </>
               )}
             </div>
           )}
-
         </div>
       </div>
 
@@ -550,17 +549,21 @@ const DiscoveryContent = ({
   appSectionRef: React.RefObject<HTMLDivElement>
 }) => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 sm:space-y-16">
       {/* 3D Orbit Category Carousel - Now the hero */}
-      <CategoryOrbitCarousel />
+      <div className="-mx-4 sm:mx-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-primary-navy/10 border border-white/10 bg-[#020617]">
+        <CategoryOrbitCarousel />
+      </div>
 
       {/* Application Areas */}
-      <div ref={appSectionRef}>
+      <div ref={appSectionRef} className="px-1">
         <ApplicationCards />
       </div>
 
-      <BrandsShowcase />
-      <TrustSection />
+      <div className="space-y-12 sm:space-y-16">
+        <BrandsShowcase />
+        <TrustSection />
+      </div>
     </div>
   )
 }

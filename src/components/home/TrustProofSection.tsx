@@ -51,8 +51,40 @@ export const TrustProofSection: React.FC = () => {
   const { t } = useI18n()
 
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-white py-24 sm:py-32">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+        {/* Standartlaştırılmış Başlık Bloğu */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="max-w-3xl">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
+            >
+              {t('home.trustProof.eyebrow')}
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+            >
+              {t('home.trustProof.title')}
+            </motion.h2>
+          </div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
+          >
+            {t('home.trustProof.subtitle')}
+          </motion.p>
+        </div>
+
         <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
           {/* Left Side: Visual & Badges */}
           <motion.div
@@ -61,18 +93,7 @@ export const TrustProofSection: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary-navy">
-              <span className="mr-3 h-px w-8 bg-primary-navy/40 inline-block align-middle" />
-              {t('home.trustProof.eyebrow')}
-            </div>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
-              {t('home.trustProof.title')}
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-slate-600">
-              {t('home.trustProof.subtitle')}
-            </p>
-
-            <div className="relative mt-10 aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
               <img
                 src="/images/hvac_installation_close_up_premium_3.png"
                 alt="Technical Installation"
@@ -118,7 +139,7 @@ export const TrustProofSection: React.FC = () => {
                   <h3 className="mt-2 text-xl font-bold text-slate-950">
                     {t(`home.trustProof.items.${item.key}.title`)}
                   </h3>
-                  <p className="mt-3 text-[15px] leading-relaxed text-slate-500">
+                  <p className="mt-3 text-[15px] leading-relaxed text-slate-500 font-light">
                     {t(`home.trustProof.items.${item.key}.description`)}
                   </p>
                 </div>

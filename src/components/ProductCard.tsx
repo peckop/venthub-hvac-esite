@@ -5,52 +5,40 @@ import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
-import { getStockInquiryLink } from '../utils/whatsapp'
 import { formatCurrency } from '../i18n/format'
 
 interface ProductCardProps {
   product: Product
   onQuickView?: (product: Product) => void
   highlightFeatured?: boolean
-  showCompare?: boolean
-  compareSelected?: boolean
-  onToggleCompare?: (productId: string) => void
   layout?: 'grid' | 'list'
-  relatedTopicSlug?: string
-  /**
-   * LCP adayı olan ilk ürün görseli için öncelikli yükleme.
-   * true ise loading="eager" ve fetchpriority="high" kullanılır.
-   */
   priority?: boolean
-  /**
-   * Fiyatın gizlenmesi ve "Teklif Al" moduna geçilmesi durumu (B2B kategorileri için).
-   */
   hidePrice?: boolean
+  compact?: boolean
 }
 
-/**
- * Ürün kartı bileşeni.
- * Gereksiz re-renderları önlemek için React.memo ile sarılmıştır.
- * next/image kullanarak görsel optimizasyonu sağlar.
- */
+// Resim adresini Supabase veya Yerel dizine göre çözen akıllı fonksiyon
+const resolveProductImage = (url: string | null | undefined): string => {
+  if (!url || url.trim().length === 0) return '/images/vortice_lineo_futuristic.png';
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('data:')) return trimmed;
+  
+  // Eğer sadece dosya adıysa Supabase Storage yolunu ekle
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return `${supabaseUrl}/storage/v1/object/public/product-images/${trimmed}`;
+};
+
 export const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({
   product,
-  onQuickView,
-  highlightFeatured = false,
-  showCompare = false,
-  compareSelected = false,
-  onToggleCompare,
   layout = 'grid',
-  relatedTopicSlug,
   priority = false,
-  hidePrice = false
+  hidePrice = false,
+  compact = false
 }) {
-  const { t, lang } = useI18n()
-  const router = useRouter()
+  const { lang } = useI18n()
   const isList = layout === 'list'
   const { addToCart } = useCart()
 
@@ -60,248 +48,94 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
     addToCart(product)
   }
 
-  const handleAskQuote = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    router.push('/contact?product=' + encodeURIComponent(product.name || ''))
-  }
+  const finalSrc = resolveProductImage(product.image_url);
 
-  const handleQuickView = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (onQuickView) {
-      onQuickView(product)
-    }
-  }
-
-  // Supabase Image Transform loader for next/image
-  const supabaseLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
-    const base = src.split('?')[0]
-    const renderUrl = base.includes('/object/')
-      ? base.replace('/object/', '/render/image/')
-      : base
-    const params = new URLSearchParams()
-    if (width) params.set('width', String(width))
-    params.set('quality', String(quality || 70))
-    params.set('format', 'webp')
-    return `${renderUrl}?${params.toString()}`
-  }
-
-  const sizes = isList
-    ? '(max-width: 768px) 25vw, 144px'
-    : '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px'
-
-  return (
-    <Link href={`/products/${product.id}`}>
-      <div className={`product-card group relative bg-white rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 hover:bg-slate-50 motion-safe:transition-all motion-safe:duration-300 overflow-hidden border ${highlightFeatured && product.is_featured ? 'border-gold-accent border-2' : 'border-slate-100 hover:border-slate-200'
-        } ${isList ? 'flex items-stretch' : ''}`}>
-        {/* Featured Badge */}
-        {product.is_featured && (
-          <div className="absolute top-3 left-3 z-10">
-            <div className="bg-gold-accent text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
-              <svg width={12} height={12} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
-                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" />
-              </svg>
-              <span>{t('pdp.featured')}</span>
+  // LIST VIEW LAYOUT
+  if (isList) {
+    return (
+      <Link href={`/products/${product.id}`} className="block w-full">
+        <div className="group relative flex items-center bg-white rounded-[1.5rem] border border-slate-100 p-4 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
+          <div className="relative w-32 h-32 flex-shrink-0 bg-slate-50 rounded-xl overflow-hidden p-2">
+            <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:10px_10px]" />
+            <Image
+              src={finalSrc}
+              alt={product.name}
+              fill
+              sizes="128px"
+              className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
+            />
+          </div>
+          
+          <div className="ml-6 flex-1 flex flex-col justify-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-600 mb-1">{product.brand}</div>
+            <h3 className="text-lg font-bold text-slate-900 group-hover:text-cyan-600 transition-colors line-clamp-1">{product.name}</h3>
+            <div className="mt-2 flex items-center gap-4">
+              <div className="text-xl font-black text-slate-950">
+                {hidePrice ? <span className="text-sm font-medium text-cyan-600">Teklif İste</span> : formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
+              </div>
+              <span className="text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-md uppercase font-bold">{product.sku}</span>
             </div>
           </div>
-        )}
 
+          <button onClick={handleAddToCart} className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center hover:bg-cyan-500 transition-all shadow-lg active:scale-90 ml-4">
+            <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+      </Link>
+    )
+  }
 
-        {/* Brand Badge */}
-        <div className="absolute top-3 right-3 z-10">
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1.5 shadow-sm">
+  // GRID VIEW
+  return (
+    <Link href={`/products/${product.id}`} className="block h-full">
+      <div className={`group relative flex flex-col h-full bg-white rounded-[2rem] border border-slate-100 transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
+        
+        <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
+          {product.is_featured && (
+            <div className="bg-slate-900/90 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/10 shadow-xl">PRO</div>
+          )}
+          <div className="bg-white/80 backdrop-blur-md rounded-xl p-1.5 border border-slate-100 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <BrandIcon brand={product.brand} />
           </div>
         </div>
 
-        {/* Product Image */}
-        <div className={`${isList ? 'w-28 h-28 md:w-36 md:h-36 m-4 md:m-4 flex-shrink-0 rounded-xl overflow-hidden' : 'aspect-square w-full rounded-t-2xl overflow-hidden'} bg-gradient-to-br from-air-blue/50 to-slate-100 flex items-center justify-center relative`}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            {product.image_url ? (
-              <Image
-                loader={supabaseLoader}
-                src={product.image_url}
-                alt={product.image_alt || product.name || 'Product Image'}
-                fill
-                sizes={sizes}
-                priority={priority}
-                className="object-cover"
-              />
-            ) : (
-              <div className={`${isList ? 'text-3xl md:text-4xl' : 'text-6xl'} text-secondary-blue/30`}>
-                🌪️
-              </div>
-            )}
+        <div className="relative aspect-square w-full rounded-[1.5rem] overflow-hidden bg-slate-50 mb-6 group-hover:bg-slate-100 transition-colors">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div className="absolute inset-0 p-6 flex items-center justify-center">
+            <Image
+              src={finalSrc}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 50vw, 300px"
+              className="object-contain transition-transform duration-700 group-hover:scale-110 p-4"
+              priority={priority}
+            />
           </div>
         </div>
 
-        {/* Content */}
-        <div className={`p-4 ${isList ? 'flex-1' : ''}`}>
-          {/* Product Name */}
-          <h3 className="font-semibold text-industrial-gray motion-safe:group-hover:text-primary-navy motion-safe:transition-colors line-clamp-2 mb-2">
+        <div className="flex flex-col flex-1 px-2 pb-2">
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-600 mb-2">
+            {product.brand}
+          </div>
+          <h3 className="text-sm font-bold text-slate-900 leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-cyan-600 transition-colors">
             {product.name}
           </h3>
-
-          {/* Brand & Model */}
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-secondary-blue">
-              {product.brand}
-            </span>
-            <span className="text-xs text-steel-gray bg-light-gray px-2 py-1 rounded">
-              {product.model_code ?? product.sku}
-            </span>
-          </div>
-
-          {/* Price + Stock badge */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xl font-bold text-primary-navy">
-              {hidePrice ? (
-                <span className="text-base font-medium text-secondary-blue flex items-center gap-1 group-hover:text-primary-navy transition-colors">
-                  Fiyat için Tıklayın
-                  <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="group-hover:translate-x-1 transition-transform">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              ) : (
-                (() => {
-                  const label = formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 });
-                  return label;
-                })()
-              )}
+          <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Price</span>
+              <div className="text-lg font-black text-slate-950 tracking-tight">
+                {hidePrice ? <span className="text-xs text-cyan-600">Teklif İste</span> : formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
+              </div>
             </div>
-            {(() => {
-              const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
-              return (
-                <span className={`text-xs px-2 py-1 rounded ${inStock ? 'text-success-green bg-success-green/10' : 'text-warning-orange bg-warning-orange/10'}`}>
-                  {inStock ? t('pdp.inStock') : t('pdp.outOfStock')}
-                </span>
-              )
-            })()}
-          </div>
-
-          {/* Compare inside content */}
-          {showCompare && (
-            <div className="mb-3">
-              <label
-                className="inline-flex items-center gap-2 text-xs text-steel-gray cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  if (onToggleCompare) {
-                    onToggleCompare(product.id)
-                  }
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={compareSelected}
-                  readOnly
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="accent-primary-navy"
-                />
-                {t('category.compareBar')}
-              </label>
-            </div>
-          )}
-
-          {/* Related Guide (optional) */}
-          {relatedTopicSlug ? (
-            <div className="mb-2 text-xs">
-              <span className="text-steel-gray">{t('pdp.relatedGuide')}:</span>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  router.push(`/destek/konular/${relatedTopicSlug || ''}`)
-                }}
-                className="ml-1 text-primary-navy hover:text-secondary-blue underline bg-transparent border-none cursor-pointer"
-              >
-                {t(`knowledge.topics.${relatedTopicSlug}.title`)}
-              </button>
-            </div>
-          ) : null}
-
-          {/* Actions */}
-          <div className="flex items-center space-x-2">
-            {hidePrice ? (
-              <button
-                onClick={handleAskQuote}
-                className="flex-1 h-10 bg-slate-700 hover:bg-primary-navy text-white px-4 rounded-lg motion-safe:transition-all flex items-center justify-center space-x-2"
-              >
-                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <span className="text-sm font-medium">{t('pdp.askPriceButton') || 'Teklif İste'}</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleAddToCart}
-                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="flex-1 h-10 bg-gradient-to-r from-primary-navy to-secondary-blue hover:from-secondary-blue hover:to-primary-navy shadow hover:shadow-md text-white px-4 rounded-lg motion-safe:transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
-              >
-                <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" />
-                  <path strokeWidth={2} d="M5 6L4 2H2" />
-                  <circle cx="16" cy="19" r="2" />
-                  <circle cx="8" cy="19" r="2" />
-                </svg>
-                <span className="text-sm font-medium">{t('pdp.addToCart')}</span>
-              </button>
-            )}
-
-            {(!hidePrice && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')) && (() => {
-              const whatsappLink = getStockInquiryLink(product.name, product.sku)
-              if (whatsappLink) {
-                return (
-                  <a
-                    href={whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => { e.stopPropagation() }}
-                    className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors text-sm text-slate-500 hover:text-secondary-blue"
-                    title={t('pdp.askStock') as string}
-                  >
-                    {t('pdp.askStock')}
-                  </a>
-                )
-              }
-              return (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    router.push('/contact')
-                  }}
-                  className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors text-sm text-slate-500 hover:text-secondary-blue"
-                  title={t('pdp.askStock') as string}
-                >
-                  {t('pdp.askStock')}
-                </button>
-              )
-            })()}
-
-            {onQuickView ? (
-              <button
-                type="button"
-                onClick={handleQuickView}
-                className="h-10 px-3 flex items-center justify-center border border-slate-200 hover:border-secondary-blue hover:bg-air-blue/10 rounded-lg transition-colors"
-              >
-                <span className="text-sm text-slate-500 hover:text-secondary-blue">
-                  {t('quickView.title')}
-                </span>
-              </button>
-            ) : null}
+            <button onClick={handleAddToCart} className="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center transition-all hover:bg-cyan-500 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-90">
+              <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
+              </svg>
+            </button>
           </div>
         </div>
-
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-primary-navy/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       </div>
     </Link>
   )
