@@ -346,17 +346,7 @@ const ProductsPage: React.FC = () => {
           const withCovers = await attachCovers(results)
 
           if (active) {
-            // Cast to compatible type
-            const compatible = withCovers.map(p => ({
-              ...p,
-              status: 'active' as const, // Patch status
-              is_featured: false, // Default
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              category_id: (p as any).category_id || (filters.category_id as string) || '', // Try to preserve category_id from result, fallback to filter
-              subcategory_id: '' // Missing
-            }))
-            // We cast to Product[] for state simplicity as we know ProductCard handles partials if status is present
-            setProducts(compatible as unknown as Product[])
+            setProducts(withCovers as Product[])
           }
         }
         // Mode B: All Products
