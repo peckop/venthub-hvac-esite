@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import React from 'react'
-
+import Image from 'next/image'
 import { useI18n } from '../../i18n/I18nProvider'
 
 const proofItems = [
@@ -53,7 +53,6 @@ export const TrustProofSection: React.FC = () => {
   return (
     <section className="relative overflow-hidden bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        {/* Standartlaştırılmış Başlık Bloğu */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-3xl">
             <motion.div 
@@ -94,9 +93,10 @@ export const TrustProofSection: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[2.5rem] border border-slate-200 shadow-2xl">
-              <img
+              <Image
                 src="/images/hvac_installation_close_up_premium_3.png"
                 alt="Technical Installation"
+                fill
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
@@ -108,7 +108,9 @@ export const TrustProofSection: React.FC = () => {
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
               {trustStripKeys.map((key) => (
                 <div key={key} className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-200/50">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Trusted</div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {t('home.trustProof.badge') || 'Trusted'}
+                  </div>
                   <div className="mt-1 text-xs font-bold text-slate-900 leading-tight">
                     {t(`home.hero.trustStrip.${key}`)}
                   </div>
