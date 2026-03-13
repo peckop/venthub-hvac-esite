@@ -19,13 +19,16 @@ const AddToCartToast = lazy(() => import('../AddToCartToast'))
 const WhatsAppFloat = lazy(() => import('../WhatsAppFloat'))
 
 import { I18nProvider } from '../../i18n/I18nProvider'
+import { ProjectProvider } from '../../contexts/ProjectProvider'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <I18nProvider>
             <AuthProvider>
                 <CartProvider>
-                    {children}
+                    <ProjectProvider>
+                        {children}
+                    </ProjectProvider>
                 </CartProvider>
             </AuthProvider>
         </I18nProvider>

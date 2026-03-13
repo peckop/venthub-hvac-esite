@@ -16,7 +16,7 @@ import legalConfig from '../config/legal'
 import { getStockInquiryLink } from '../utils/whatsapp'
 import toast from 'react-hot-toast'
 import { generateProductDatasheet } from '../lib/pdfGenerator'
-import {
+import { 
   ArrowLeft,
   ShoppingCart,
   Heart,
@@ -33,10 +33,13 @@ import {
   Settings,
   Info,
   AlertCircle,
-  ChevronDown
+  ChevronDown,
+  FolderPlus
 } from 'lucide-react'
 import ImageGallery from '../components/ImageGallery'
 import { RichTextRenderer } from '../components/products/RichTextRenderer'
+import { AddToProjectModal } from '../components/products'
+import { useProjectLists } from '../hooks/useProjectLists'
 import { 
   translateSpecKey, 
   formatSpecValue, 
@@ -53,6 +56,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const id = params?.id as string
   const router = useRouter()
   const { addToCart } = useCart()
+  const { refreshProjects } = useProjectLists()
   const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProduct)
@@ -64,6 +68,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [activeSection, setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance']) // First section open by default
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
@@ -79,6 +84,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         : [...prev, sectionKey]
     );
   };
+
+  useEffect(() => {
+    refreshProjects()
+  }, [refreshProjects])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -150,7 +159,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         const scrollY = window.scrollY
 
         // Nav becomes sticky when we scroll past the trigger point
-        setIsNavSticky(scrollY > triggerTop)
+        setIsNavSticky(scrollY > (triggerTop - 80))
       }
     }
 
@@ -167,7 +176,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   useEffect(() => {
     const handleScrollSpy = () => {
       const navEl = document.getElementById('pdp-sticky-nav')
-      const headerOffset = navEl ? navEl.offsetHeight + 100 : 180 // Buffer for sticky header + breathing room
+      const headerOffset = navEl ? navEl.offsetHeight + 120 : 200 // Adjusted for global header
 
       const scrollPosition = window.scrollY + headerOffset
 
@@ -204,7 +213,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     if (element) {
       const navEl = document.getElementById('pdp-sticky-nav')
       const currentNavHeight = navEl ? navEl.offsetHeight : 0
-      const extraGap = 8
+      const extraGap = 84 // Account for sticky header
       const y = element.getBoundingClientRect().top + window.pageYOffset - currentNavHeight - extraGap
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
@@ -261,11 +270,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
     { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' }, // Was "Ölçüler" - now covers Performance/Physical/Electrical
-    { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-air-blue' },
+    { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-air-blue/30' },
     { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-light-gray' },
+    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-light-gray/50' },
     { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
-    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-light-gray' } // Moved to end per user request
+    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-light-gray/50' } // Moved to end per user request
   ]
 
   // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
@@ -291,7 +300,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy mx-auto mb-4"></div>
-          <p className="text-steel-gray">{t('pdp.loading')}</p>
+          <p className="text-steel-gray font-medium">{t('pdp.loading')}</p>
         </div>
       </div>
     )
@@ -302,7 +311,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link href="/" className="text-primary-navy hover:text-secondary-blue">
+          <Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold">
             {t('pdp.backHome')}
           </Link>
         </div>
@@ -318,73 +327,58 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   return (
     <div className="min-h-screen bg-white">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
-      {/* Breadcrumb */}
-      <div className="bg-light-gray border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-steel-gray hover:text-primary-navy">
+      
+      {/* Dynamic Breadcrumb & Navigation Harmony */}
+      <div className="bg-light-gray/50 border-b border-light-gray/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <nav className="flex items-center space-x-2 text-xs sm:text-sm overflow-x-auto whitespace-nowrap scrollbar-hide pb-1 sm:pb-0">
+            <Link href="/" className="text-steel-gray hover:text-primary-navy transition-colors">
               {t('category.breadcrumbHome')}
             </Link>
-            <ChevronRight size={16} className="text-steel-gray" />
+            <ChevronRight size={14} className="text-steel-gray/60 flex-shrink-0" />
             {mainCategory && (
               <>
-                <Link href={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                <Link href={`/category/${mainCategory.slug}`} className="text-steel-gray hover:text-primary-navy transition-colors">
                   {mainCategory.name}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
-                    <ChevronRight size={16} className="text-steel-gray" />
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy">
+                    <ChevronRight size={14} className="text-steel-gray/60 flex-shrink-0" />
+                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="text-steel-gray hover:text-primary-navy transition-colors">
                       {subCategory.name}
                     </Link>
                   </>
                 )}
-                <ChevronRight size={16} className="text-steel-gray" />
+                <ChevronRight size={14} className="text-steel-gray/60 flex-shrink-0" />
               </>
             )}
-            <span className="text-industrial-gray font-medium">
+            <span className="text-industrial-gray font-bold truncate max-w-[200px] sm:max-w-none">
               {product.name}
             </span>
-          </div>
+          </nav>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Back Button - Akıllı: ürünün kategorisine yönlendir */}
         <button
           onClick={() => {
-            // POP aksiyonu yapıldığını sisteme bildir (scroll restore için)
-            if (typeof window !== 'undefined') {
-              sessionStorage.setItem('vh_is_pop', 'true');
-            }
-
-            // Akıllı Navigasyon (Smart Stack): sessionStorage'daki durak geçmişini kontrol et
+            if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
             let stack: string[] = [];
-            try {
-              stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : [];
-            } catch { stack = []; }
-
+            try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
-
-            if (lastSafeStop) {
-              // Eğer bir durak geçmişi varsa (Home, Kategori vb.) oraya git
-              router.push(lastSafeStop, { scroll: false });
-            } else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) {
-              router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false })
-            } else if (mainCategory) {
-              router.push(`/category/${mainCategory.slug}`, { scroll: false })
-            } else {
-              router.push('/', { scroll: false }) // Tam fallback
-            }
+            if (lastSafeStop) { router.push(lastSafeStop, { scroll: false }); }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false }) }
+            else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
+            else { router.push('/', { scroll: false }) }
           }}
-
-          className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 transition-colors"
+          className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-8 transition-all group font-bold text-sm"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
           <span>{t('pdp.back')}</span>
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* Product Image Gallery (Premium) */}
           <div className="sticky top-24 self-start z-10">
             <div className="relative group">
@@ -392,10 +386,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 key={product.id}
                 images={images}
                 productName={product.name}
-                slug={product.slug || product.name} // Fallback for 3D model detection
+                slug={product.slug || product.name}
                 modelType={mainCategory?.metadata?.model_type}
               />
-              {/* 3D Experience Vurgusu (Hava Perdesi ise) */}
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-4 left-4 z-20 pointer-events-none">
                   <div className="bg-white/95 backdrop-blur-md border border-primary-navy/20 px-3 py-2 rounded-full shadow-hvac flex items-center space-x-2 animate-pulse-subtle">
@@ -413,334 +406,202 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <div className="flex flex-col">
             {/* Brand & Featured Badge */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <BrandIcon brand={product.brand} />
-                <span className="text-secondary-blue font-semibold">{product.brand}</span>
+                <BrandIcon brand={product.brand} className="w-10 h-10" />
+                <div className="flex flex-col">
+                  <span className="text-secondary-blue font-bold text-sm tracking-wide uppercase">{product.brand}</span>
+                  <span className="text-steel-gray text-[10px] font-medium tracking-widest">OFFICIAL DISTRIBUTOR</span>
+                </div>
               </div>
               {product.is_featured && (
-                <div className="bg-gold-accent text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                  <Star size={14} fill="currentColor" />
-                  <span>{t('pdp.featured')}</span>
+                <div className="bg-gold-accent text-white px-3 py-1.5 rounded-full text-[10px] font-bold flex items-center space-x-1.5 shadow-sm tracking-wider">
+                  <Star size={12} fill="currentColor" />
+                  <span>{t('pdp.featured') || 'ÖNE ÇIKAN'}</span>
                 </div>
               )}
             </div>
 
             {/* Product Name */}
-            <h1 className="text-3xl font-bold text-industrial-gray">
+            <h1 className="text-3xl sm:text-4xl font-black text-industrial-gray leading-tight mb-4">
               {product.name}
             </h1>
 
-            {/* Quick technical chips (varsa) */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.brand')}: {product.brand}</span>
-              <span className="text-xs px-2 py-1 rounded bg-light-gray text-steel-gray">{t('pdp.model')}: {product.model_code ?? product.sku}</span>
-            </div>
-
-            {/* SKU & Status */}
-            <div className="flex items-center space-x-4">
-              <span className="text-steel-gray">
-                SKU: <span className="font-medium">{product.sku}</span>
-              </span>
+            {/* SKU & Quick technical chips */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="flex items-center px-3 py-1.5 bg-light-gray rounded-lg border border-light-gray/50">
+                <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest mr-2">SKU:</span>
+                <span className="text-sm font-bold text-industrial-gray">{product.sku}</span>
+              </div>
+              <div className="flex items-center px-3 py-1.5 bg-light-gray rounded-lg border border-light-gray/50">
+                <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest mr-2">MODEL:</span>
+                <span className="text-sm font-bold text-industrial-gray">{product.model_code ?? product.sku}</span>
+              </div>
               {(() => {
                 const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
                 return (
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${inStock ? 'bg-success-green/10 text-success-green' : 'bg-warning-orange/10 text-warning-orange'}`}>
-                    {inStock ? t('pdp.inStock') : t('pdp.outOfStock')}
+                  <div className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center space-x-1.5 ${inStock ? 'bg-success-green/10 text-success-green border border-success-green/20' : 'bg-warning-orange/10 text-warning-orange border border-warning-orange/20'}`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-success-green' : 'bg-warning-orange'}`} />
+                    <span>{inStock ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                   </div>
                 )
               })()}
             </div>
 
-            {/* Price */}
-            <div className="text-4xl font-bold text-primary-navy">
-              {mainCategory?.metadata?.hide_price ? (
-                <span className="text-lg text-industrial-gray font-normal">Fiyat Teklifi Alın</span>
-              ) : (
-                <>
-                  {formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
-                  <span className="text-sm text-steel-gray font-normal ml-2">
-                    {t('pdp.vatIncluded')}
-                  </span>
-                </>
-              )}
+            {/* Price Area */}
+            <div className="mb-8 p-6 bg-gradient-to-br from-light-gray/30 to-white rounded-2xl border border-light-gray/50 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary-navy/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="flex flex-col relative z-10">
+                <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1">Current Price</span>
+                <div className="flex items-baseline space-x-2">
+                  <div className="text-4xl sm:text-5xl font-black text-primary-navy tracking-tighter">
+                    {mainCategory?.metadata?.hide_price ? (
+                      <span className="text-2xl text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                    ) : (
+                      formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
+                    )}
+                  </div>
+                  {!mainCategory?.metadata?.hide_price && (
+                    <span className="text-xs font-bold text-steel-gray uppercase bg-white px-2 py-1 rounded border border-light-gray/80 shadow-xs">
+                      {t('pdp.vatIncluded')}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-
-            {/* Description */}
-
 
             {/* Related Guide */}
             {topicSlug && (
-              <div className="pt-2">
-                <div className="text-sm text-steel-gray">
-                  <span className="font-medium text-industrial-gray">{t('pdp.relatedGuide')}:</span>
-                  <Link
-                    href={`/destek/konular/${topicSlug}`}
-                    className="ml-2 text-primary-navy hover:text-secondary-blue underline"
-                  >
+              <div className="mb-8 p-4 bg-air-blue/20 rounded-xl border border-secondary-blue/10 flex items-center space-x-4">
+                <div className="p-2 bg-white rounded-lg shadow-sm">
+                  <Info className="text-primary-navy" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-primary-navy uppercase tracking-wider mb-0.5">{t('pdp.relatedGuide')}</p>
+                  <Link href={`/destek/konular/${topicSlug}`} className="text-sm font-semibold text-industrial-gray hover:text-secondary-blue underline underline-offset-4 decoration-secondary-blue/30">
                     {t(`knowledge.topics.${topicSlug}.title`)}
                   </Link>
                 </div>
               </div>
             )}
 
-            {/* Trust Signals (Standardized - Matches Cart/Checkout) */}
-            <div className="bg-gradient-to-r from-light-gray to-white rounded-xl p-4 space-y-3 border border-light-gray/50">
-              {/* Stock Urgency - ONLY if stock is low (≤3) */}
-              {typeof product.stock_qty === 'number' && product.stock_qty > 0 && product.stock_qty <= 3 && (
-                <div className="flex items-center space-x-2 bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <AlertCircle className="text-orange-600 flex-shrink-0" size={20} />
-                  <span className="text-sm font-semibold text-orange-700">
-                    Son {product.stock_qty} ürün! Hızlı karar verin.
-                  </span>
+            {/* Action Buttons Area */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6 space-y-6">
+                {/* Quantity Control */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
+                  <div className="flex items-center bg-light-gray/50 rounded-xl p-1 border border-light-gray/50">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-lg transition-all text-xl font-bold text-industrial-gray">-</button>
+                    <span className="w-12 text-center font-black text-primary-navy text-lg">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-lg transition-all text-xl font-bold text-industrial-gray">+</button>
+                  </div>
                 </div>
-              )}
 
-              {/* Shipping Guarantee - Consistent with Cart */}
-              <div className="flex items-center space-x-3">
-                <div className="bg-success-green/10 p-2 rounded-lg">
-                  <Truck className="text-success-green" size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-industrial-gray">Ücretsiz Kargo</p>
-                  <p className="text-xs text-steel-gray">500 TL ve üzeri siparişlerde</p>
-                </div>
-              </div>
-
-              {/* Secure Payment - iyzico Branding */}
-              <div className="flex items-center space-x-3">
-                <div className="bg-primary-navy/10 p-2 rounded-lg">
-                  <Shield className="text-primary-navy" size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-industrial-gray">Güvenli Ödeme</p>
-                  <p className="text-xs text-steel-gray">iyzico altyapısı ile 256-bit SSL</p>
-                </div>
-              </div>
-
-              {/* Warranty Badge */}
-              <div className="flex items-center space-x-3">
-                <div className="bg-secondary-blue/10 p-2 rounded-lg">
-                  <Award className="text-secondary-blue" size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-industrial-gray">2 Yıl Garanti</p>
-                  <p className="text-xs text-steel-gray">Resmi distribütör garantisi</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Quantity & Add to Cart */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <span className="text-steel-gray">{t('pdp.qty')}</span>
-                <div className="flex items-center border-2 border-light-gray rounded-lg">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    aria-label="Adeti azalt"
-                    className="px-3 py-2 hover:bg-light-gray transition-colors"
-                  >
-                    -
-                  </button>
-                  <span className="px-4 py-2 font-medium" aria-live="polite">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    aria-label="Adeti artır"
-                    className="px-3 py-2 hover:bg-light-gray transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex space-x-2 sm:space-x-4">
-                {mainCategory?.metadata?.hide_price ? (
-                  <button
-                    onClick={() => setLeadOpen(true)}
-                    className="flex-1 bg-industrial-gray hover:bg-primary-navy text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                  >
-                    <Settings size={18} />
-                    <span>{t('pdp.techQuote') || 'Teklif Al'}</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                    className="flex-1 bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ShoppingCart size={18} />
-                    <span>{t('pdp.addToCart')}</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => setIsWishlisted(!isWishlisted)}
-                  aria-label={isWishlisted ? 'İstek listesinden çıkar' : 'İstek listesine ekle'}
-                  aria-pressed={isWishlisted}
-                  className={`p-2 sm:p-4 border-2 rounded-lg transition-colors ${isWishlisted
-                    ? 'border-red-500 text-red-500 bg-red-50'
-                    : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
-                    }`}
-                >
-                  <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
-                </button>
-
-                <button
-                  onClick={handleShare}
-                  aria-label="Paylaş"
-                  className="p-2 sm:p-4 border-2 border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-lg transition-colors"
-                >
-                  <Share2 size={18} />
-                </button>
-              </div>
-
-              {/* Lead CTA and Stock Inquiry */}
-              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                <button
-                  onClick={() => setLeadOpen(true)}
-                  className="w-full md:w-auto mt-2 bg-success-green hover:bg-success-green/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-                >
-                  {t('pdp.techQuote')}
-                </button>
-                {(() => {
-                  const inStock = typeof product.stock_qty === 'number' ? product.stock_qty > 0 : product.status !== 'out_of_stock'
-                  if (inStock) return null
-
-                  const whatsappLink = getStockInquiryLink(product.name, product.sku)
-                  if (whatsappLink) {
-                    return (
-                      <a
-                        href={whatsappLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full md:w-auto mt-2 text-primary-navy hover:text-secondary-blue underline"
-                      >
-                        {t('pdp.askStock') || 'Stok sor'}
-                      </a>
-                    )
-                  }
-
-                  const mail = legalConfig?.sellerEmail || 'info@example.com'
-                  const subject = encodeURIComponent('Stok Bilgisi Talebi')
-                  const body = encodeURIComponent(`Merhaba, ${product.name}${product.sku ? ` (SKU: ${product.sku})` : ''} ürünü için stok durumu hakkında bilgi alabilir miyim?`)
-                  return (
-                    <a
-                      href={`mailto:${mail}?subject=${subject}&body=${body}`}
-                      className="w-full md:w-auto mt-2 text-primary-navy hover:text-secondary-blue underline"
+                {/* Primary Actions */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {mainCategory?.metadata?.hide_price ? (
+                    <button
+                      onClick={() => setLeadOpen(true)}
+                      className="flex-[2] bg-industrial-gray hover:bg-primary-navy text-white font-black py-4 px-8 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-3 group"
                     >
-                      {t('pdp.askStock') || 'Stok sor'}
-                    </a>
-                  )
-                })()}
+                      <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500" />
+                      <span className="uppercase tracking-widest">{t('pdp.techQuote') || 'Teklif Al'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                      className="flex-[2] bg-primary-navy hover:bg-secondary-blue text-white font-black py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-primary-navy/20 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed group active:scale-95"
+                    >
+                      <ShoppingCart size={20} className="group-hover:translate-x-1 transition-transform" />
+                      <span className="uppercase tracking-widest">{t('pdp.addToCart')}</span>
+                    </button>
+                  )}
+                  
+                  {/* PROJECT LIST BUTTON - Professional Feature */}
+                  <button
+                    onClick={() => setIsProjectModalOpen(true)}
+                    className="flex-1 bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-4 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-95"
+                    title="Proje Listesine Ekle"
+                  >
+                    <FolderPlus size={20} className="group-hover:scale-110 transition-transform" />
+                    <span className="sm:hidden lg:inline text-xs uppercase tracking-widest">Proje Listesi</span>
+                  </button>
+                </div>
+
+                {/* Secondary Actions */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className={`flex-1 flex items-center justify-center space-x-2 py-3 border rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${isWishlisted
+                      ? 'border-red-500 text-red-500 bg-red-50'
+                      : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
+                      }`}
+                  >
+                    <Heart size={16} fill={isWishlisted ? 'currentColor' : 'none'} />
+                    <span>{isWishlisted ? 'Favorilerimde' : 'Favorilere Ekle'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 flex items-center justify-center space-x-2 py-3 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
+                  >
+                    <Share2 size={16} />
+                    <span>{t('common.share') || 'Paylaş'}</span>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* PDF Generate Button */}
-            <div className="mt-2 space-y-3">
-              <div className="flex items-center space-x-2 text-xs font-medium text-steel-gray/80 px-2">
-                <Info size={14} className="text-secondary-blue" />
-                <span>{t('pdp.actions.liveDataNotice')}</span>
+              {/* Trust & Logistics Panel */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="flex flex-col items-center p-4 bg-light-gray/20 rounded-xl border border-light-gray/50 text-center">
+                  <Truck className="text-success-green mb-2" size={24} />
+                  <p className="text-[10px] font-black text-industrial-gray uppercase tracking-tighter mb-1">Ücretsiz Kargo</p>
+                  <p className="text-[9px] text-steel-gray">500 TL Üzeri</p>
+                </div>
+                <div className="flex flex-col items-center p-4 bg-light-gray/20 rounded-xl border border-light-gray/50 text-center">
+                  <Shield className="text-primary-navy mb-2" size={24} />
+                  <p className="text-[10px] font-black text-industrial-gray uppercase tracking-tighter mb-1">Güvenli Ödeme</p>
+                  <p className="text-[9px] text-steel-gray">256-bit SSL</p>
+                </div>
+                <div className="flex flex-col items-center p-4 bg-light-gray/20 rounded-xl border border-light-gray/50 text-center">
+                  <Award className="text-secondary-blue mb-2" size={24} />
+                  <p className="text-[10px] font-black text-industrial-gray uppercase tracking-tighter mb-1">2 Yıl Garanti</p>
+                  <p className="text-[9px] text-steel-gray">Resmi Distribütör</p>
+                </div>
               </div>
-              <button
-                onClick={handleDownloadPdf}
-                disabled={isGeneratingPdf}
-                className="w-full bg-primary-navy hover:bg-industrial-gray text-white shadow-md hover:shadow-lg font-bold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 disabled:opacity-50 transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {isGeneratingPdf ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                ) : (
-                  <Download size={22} className="animate-bounce-subtle" />
-                )}
-                <span className="text-lg">{isGeneratingPdf ? 'PDF Hazırlanıyor...' : 'Teknik Ürün Föyü İndir (PDF)'}</span>
-              </button>
-            </div>
 
-            {/* Value Props - DIFFERENT from Trust Signals above */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-light-gray">
-              <div className="text-center">
-                <Phone className="text-primary-navy mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">{t('pdp.support247')}</p>
-              </div>
-              <div className="text-center">
-                <Settings className="text-primary-navy mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">Teknik Destek</p>
-              </div>
-              <div className="text-center">
-                <Award className="text-primary-navy mx-auto mb-2" size={24} />
-                <p className="text-sm text-steel-gray">Hızlı Teslimat</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Sticky Nav Trigger Point */}
-      <div ref={navTriggerRef} className="h-0" />
-
-      {/* Section Navigation */}
-      <div
-        id="pdp-sticky-nav"
-        className={`transition-all duration-300 z-30 bg-white/95 backdrop-blur-md border-b border-light-gray shadow-sm ${isNavSticky ? 'fixed top-14 md:top-16 left-0 right-0' : 'relative'
-          }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <nav className="flex space-x-1 overflow-x-auto py-3 no-scrollbar">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => scrollToSection(section.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${activeSection === section.id
-                  ? 'bg-primary-navy text-white shadow-sm'
-                  : 'text-steel-gray hover:text-primary-navy hover:bg-light-gray'
-                  }`}
-              >
-                <section.icon size={16} />
-                <span>{section.title}</span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Quick Actions (only when sticky) */}
-          {isNavSticky && (
-            <div className="hidden lg:flex items-center space-x-4 pl-4 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex flex-col items-end">
-                <span className="text-sm font-semibold text-industrial-gray line-clamp-1 max-w-[200px]">{product.name}</span>
-                <span className="text-xs text-primary-navy font-bold">{formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}</span>
-              </div>
-              <button
-                onClick={handleAddToCart}
-                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="bg-primary-navy hover:bg-secondary-blue text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2"
-              >
-                <ShoppingCart size={16} />
-                <span>{t('pdp.addToCart')}</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Sticky Nav Spacer - prevents content from jumping when nav becomes fixed */}
-      {isNavSticky && (
-        <div className="bg-white/95 border-b border-light-gray">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex space-x-1 overflow-x-auto py-3 invisible">
-              {sections.map((section) => (
+              {/* PDF & Documentation Action */}
+              <div className="p-1 bg-gradient-to-r from-primary-navy via-secondary-blue to-primary-navy rounded-2xl shadow-lg">
                 <button
-                  key={`spacer-${section.id}`}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap"
+                  onClick={handleDownloadPdf}
+                  disabled={isGeneratingPdf}
+                  className="w-full bg-white hover:bg-white/95 text-industrial-gray font-black py-4 px-6 rounded-[14px] transition-all flex items-center justify-center space-x-4 disabled:opacity-50 group"
                 >
-                  <section.icon size={16} />
-                  <span>{section.title}</span>
+                  {isGeneratingPdf ? (
+                    <Loader2 size={24} className="animate-spin text-primary-navy" />
+                  ) : (
+                    <Download size={24} className="text-primary-navy group-hover:animate-bounce" />
+                  )}
+                  <div className="flex flex-col items-start">
+                    <span className="text-base uppercase tracking-tighter">TEKNİK ÜRÜN FÖYÜ İNDİR</span>
+                    <span className="text-[10px] text-steel-gray font-medium uppercase tracking-widest">DETAYLI ŞARTNAME VE DATA-SHEET (PDF)</span>
+                  </div>
                 </button>
-              ))}
-            </nav>
+              </div>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      <AddToProjectModal 
+        product={product} 
+        isOpen={isProjectModalOpen} 
+        onClose={() => setIsProjectModalOpen(false)} 
+      />
 
       {/* JSON-LD Product Schema */}
       <script
@@ -775,12 +636,69 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: (typeof t === 'function' ? t('category.breadcrumbHome') : 'Ana Sayfa'), item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/` },
               ...(mainCategory ? [{ '@type': 'ListItem', position: 2, name: mainCategory.name, item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/category/${mainCategory.slug}` }] : []),
-              ...(subCategory ? [{ '@type': 'ListItem', position: mainCategory ? 3 : 2, name: subCategory.name, item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/category/${mainCategory?.slug}/${subCategory.slug}` }] : []),
+              ...(subCategory ? [{ '@type': 'ListItem', position: 3, name: subCategory.name, item: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/category/${mainCategory?.slug}/${subCategory.slug}` }] : []),
               { '@type': 'ListItem', position: (mainCategory && subCategory) ? 4 : (mainCategory ? 3 : 2), name: product.name, item: canonicalUrl },
             ],
           }),
         }}
       />
+
+      {/* Sticky Nav Trigger Point */}
+      <div ref={navTriggerRef} className="h-0" />
+
+      {/* Section Navigation - Refactored for global header harmony */}
+      <div
+        id="pdp-sticky-nav"
+        className={`transition-all duration-500 z-[40] bg-white/90 backdrop-blur-xl border-b border-light-gray shadow-sm ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0' : 'relative'
+          }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+          <nav className="flex space-x-1 overflow-x-auto py-2.5 sm:py-3 no-scrollbar">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => scrollToSection(section.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeSection === section.id
+                  ? 'bg-primary-navy text-white shadow-hvac'
+                  : 'text-steel-gray hover:text-primary-navy hover:bg-light-gray/50'
+                  }`}
+              >
+                <section.icon size={14} className={activeSection === section.id ? 'animate-pulse' : ''} />
+                <span>{section.title}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Quick Actions (only when sticky) */}
+          {isNavSticky && (
+            <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
+              <div className="flex flex-col items-end mr-2">
+                <span className="text-xs font-black text-industrial-gray line-clamp-1 max-w-[150px] uppercase tracking-tighter">{product.name}</span>
+                <span className="text-[10px] text-primary-navy font-black tracking-widest">
+                  {mainCategory?.metadata?.hide_price ? t('common.requestQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                </span>
+              </div>
+              
+              <button
+                onClick={() => setIsProjectModalOpen(true)}
+                className="p-2.5 bg-white border border-primary-navy/20 text-primary-navy rounded-xl hover:bg-primary-navy hover:text-white transition-all shadow-sm active:scale-95"
+                title="Projeye Ekle"
+              >
+                <FolderPlus size={18} />
+              </button>
+
+              <button
+                onClick={handleAddToCart}
+                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                className="bg-primary-navy hover:bg-secondary-blue text-white text-[10px] font-black uppercase tracking-[0.2em] py-2.5 px-5 rounded-xl transition-all shadow-md active:scale-95 flex items-center space-x-2"
+              >
+                <ShoppingCart size={16} />
+                <span>{t('pdp.addToCart')}</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Vertical Section Layout */}
       <div className="space-y-0">
@@ -791,67 +709,68 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
               data-section={section.id}
-              className={`${section.bgClass} py-16 transition-all duration-500`}
+              className={`${section.bgClass} py-16 sm:py-24 transition-all duration-500 border-b border-light-gray/30 last:border-0`}
             >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
-                <div className="flex items-center space-x-3 mb-8">
-                  <div className="bg-primary-navy text-white p-3 rounded-lg">
-                    <IconComponent size={24} />
+                <div className="flex items-center space-x-4 mb-12 sm:mb-16">
+                  <div className="bg-primary-navy text-white p-4 rounded-2xl shadow-hvac">
+                    <IconComponent size={28} />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-industrial-gray">
+                    <h2 className="text-3xl sm:text-4xl font-black text-industrial-gray tracking-tighter uppercase">
                       {section.title}
                     </h2>
-                    <p className="text-steel-gray mt-1">
-                      {product.name} - {section.title.toLowerCase()} bilgileri
-                    </p>
+                    <div className="h-1 w-12 bg-secondary-blue mt-2 rounded-full" />
                   </div>
                 </div>
 
                 {/* Section Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
                   {section.id === 'genel' && (
                     <>
                       {/* Product Features */}
                       {/* Product Dictionary / Rich Description */}
-                      <div className="space-y-6">
-                        <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                          <h4 className="font-semibold text-industrial-gray mb-4 flex items-center">
-                            <Info className="text-primary-navy mr-2" size={20} />
+                      <div className="space-y-8">
+                        <div className="bg-white rounded-2xl p-8 border border-light-gray shadow-sm">
+                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-sm uppercase tracking-[0.2em]">
+                            <Info className="text-primary-navy mr-3" size={20} />
                             {t('pdp.labels.productDescription')}
                           </h4>
-                          <RichTextRenderer content={product.description || t('pdp.descFallback')} />
+                          <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed font-medium">
+                            <RichTextRenderer content={product.description || t('pdp.descFallback')} />
+                          </div>
                         </div>
                       </div>
 
-                      {/* Technical Specifications */}
-                      <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.labels.technicalSpecs')}</h4>
-                        <div className="space-y-3">
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.brand')}</span>
-                            <span className="font-medium text-industrial-gray">{product.brand}</span>
+                      {/* Technical Specifications Summary */}
+                      <div className="bg-white rounded-2xl p-8 border border-light-gray shadow-sm">
+                        <h4 className="font-black text-industrial-gray mb-6 text-sm uppercase tracking-[0.2em]">{t('pdp.labels.technicalSpecs')}</h4>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center py-3 border-b border-light-gray/50 group">
+                            <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{t('pdp.brand')}</span>
+                            <span className="text-sm font-black text-industrial-gray group-hover:text-primary-navy transition-colors">{product.brand}</span>
                           </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.model')}</span>
-                            <span className="font-medium text-industrial-gray">{product.model_code ?? product.sku}</span>
+                          <div className="flex justify-between items-center py-3 border-b border-light-gray/50 group">
+                            <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{t('pdp.model')}</span>
+                            <span className="text-sm font-black text-industrial-gray group-hover:text-primary-navy transition-colors">{product.model_code ?? product.sku}</span>
                           </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.statusLabel')}</span>
-                            <span className={`font-medium ${product.status === 'active' ? 'text-success-green' : 'text-warning-orange'
+                          <div className="flex justify-between items-center py-3 border-b border-light-gray/50 group">
+                            <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{t('pdp.statusLabel')}</span>
+                            <span className={`text-sm font-black flex items-center space-x-2 ${product.status === 'active' ? 'text-success-green' : 'text-warning-orange'
                               }`}>
-                              {product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}
+                              <div className={`w-1.5 h-1.5 rounded-full ${product.status === 'active' ? 'bg-success-green animate-pulse' : 'bg-warning-orange'}`} />
+                              <span>{product.status === 'active' ? t('pdp.inStock') : t('pdp.outOfStock')}</span>
                             </span>
                           </div>
-                          <div className="flex justify-between py-2 border-b border-light-gray/50">
-                            <span className="text-steel-gray">{t('pdp.labels.category')}</span>
-                            <span className="font-medium text-industrial-gray">{mainCategory?.name || '-'}</span>
+                          <div className="flex justify-between items-center py-3 border-b border-light-gray/50 group">
+                            <span className="text-xs font-bold text-steel-gray uppercase tracking-widest">{t('pdp.labels.category')}</span>
+                            <span className="text-sm font-black text-industrial-gray group-hover:text-primary-navy transition-colors">{mainCategory?.name || '-'}</span>
                           </div>
-                          <div className="flex justify-between py-2">
-                            <span className="text-steel-gray">{t('pdp.labels.price')}</span>
-                            <span className="font-bold text-primary-navy">
-                              {formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                          <div className="flex justify-between items-center py-4 px-4 bg-light-gray/30 rounded-xl mt-4">
+                            <span className="text-xs font-bold text-steel-gray uppercase tracking-[0.2em]">{t('pdp.labels.price')}</span>
+                            <span className="text-xl font-black text-primary-navy">
+                              {mainCategory?.metadata?.hide_price ? t('common.requestQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                             </span>
                           </div>
                         </div>
@@ -862,21 +781,27 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'modeller' && (
                     <>
                       <div className="col-span-full">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                           {/* Model Variants */}
                           {[1, 2, 3].map((variant) => (
-                            <div key={variant} className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                              <div className="aspect-square bg-gradient-to-br from-primary-navy/10 to-secondary-blue/10 rounded-lg mb-4 flex items-center justify-center">
-                                <BrandIcon brand={product.brand} className="scale-150" />
+                            <div key={variant} className="bg-white rounded-2xl p-8 border border-light-gray shadow-sm hover:shadow-hvac-lg transition-all group overflow-hidden relative">
+                              <div className="absolute top-0 right-0 w-16 h-16 bg-primary-navy/5 rounded-bl-3xl" />
+                              <div className="aspect-square bg-gradient-to-br from-light-gray/50 to-white rounded-xl mb-6 flex items-center justify-center border border-light-gray/30 group-hover:border-primary-navy/20 transition-all">
+                                <BrandIcon brand={product.brand} className="scale-150 grayscale group-hover:grayscale-0 transition-all duration-500" />
                               </div>
-                              <h4 className="font-semibold text-industrial-gray mb-2">
+                              <h4 className="font-black text-industrial-gray mb-2 text-lg uppercase tracking-tighter">
                                 {product.sku}-{variant}
                               </h4>
-                              <p className="text-steel-gray text-sm mb-3">
-                                {t('pdp.variantDetails')}
+                              <p className="text-steel-gray text-xs font-medium mb-6 leading-relaxed">
+                                {t('pdp.variantDetails') || 'Teknik özelliklerde özelleştirilmiş model varyantı.'}
                               </p>
-                              <div className="text-primary-navy font-semibold">
-                                {formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}
+                              <div className="flex items-center justify-between pt-4 border-t border-light-gray/50">
+                                <div className="text-primary-navy font-black text-lg">
+                                  {formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}
+                                </div>
+                                <button className="p-2 bg-light-gray hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-all">
+                                  <ChevronRight size={18} />
+                                </button>
                               </div>
                             </div>
                           ))}
@@ -888,9 +813,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                   {section.id === 'olcuiler' && (
                     <>
-                      <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                        {/* Title already shown in navigation tab, no need for redundant header */}
-
+                      <div className="col-span-full bg-white rounded-3xl p-8 sm:p-12 border border-light-gray shadow-sm">
                         {product.technical_specs ? (
                           <>
                             {(() => {
@@ -898,76 +821,53 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                               if (!groupedSpecs || Object.keys(groupedSpecs).length === 0) {
                                 return (
-                                  <div className="text-steel-gray italic">
+                                  <div className="text-steel-gray italic font-medium py-12 text-center">
                                     {t('pdp.labels.noSpecsAvailable')}
                                   </div>
                                 );
                               }
 
                               return (
-                                <div className="space-y-4">
+                                <div className="space-y-6">
                                   {Object.entries(groupedSpecs).map(([groupKey, group]) => {
                                     const isOpen = openSpecSections.includes(groupKey);
                                     const Icon = group.icon;
 
                                     return (
-                                      <div key={groupKey} className="border border-light-gray/40 rounded-lg overflow-hidden shadow-sm">
+                                      <div key={groupKey} className="border border-light-gray/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-sm transition-all">
                                         {/* Accordion Header */}
                                         <button
                                           onClick={() => toggleSpecSection(groupKey)}
-                                          className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-air-blue/20 to-light-gray/30 hover:from-air-blue/30 hover:to-light-gray/40 transition-all"
+                                          className="w-full flex items-center justify-between p-5 bg-gradient-to-r from-light-gray/30 to-white hover:from-air-blue/10 hover:to-white transition-all group"
                                         >
-                                          <div className="flex items-center space-x-3">
-                                            <Icon size={22} className="text-primary-navy" />
-                                            <span className="font-semibold text-industrial-gray">{group.label}</span>
-                                            <span className="text-xs text-steel-gray">
-                                              ({Object.keys(group.specs).length} özellik)
-                                            </span>
+                                          <div className="flex items-center space-x-4">
+                                            <div className="p-2 bg-white rounded-lg shadow-xs group-hover:shadow-sm transition-all border border-light-gray/50">
+                                              <Icon size={22} className="text-primary-navy" />
+                                            </div>
+                                            <div className="flex flex-col items-start">
+                                              <span className="font-black text-industrial-gray text-xs sm:text-sm uppercase tracking-widest">{group.label}</span>
+                                              <span className="text-[10px] font-bold text-steel-gray uppercase tracking-tighter">
+                                                {Object.keys(group.specs).length} SPECIFICATIONS
+                                              </span>
+                                            </div>
                                           </div>
-                                          <ChevronDown
-                                            size={22}
-                                            className={`text-primary-navy transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-                                              }`}
-                                          />
+                                          <div className={`p-2 rounded-full bg-light-gray/50 text-primary-navy transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : ''}`}>
+                                            <ChevronDown size={20} />
+                                          </div>
                                         </button>
 
                                         {/* Accordion Content */}
                                         <div
-                                          className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                                          className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                                             } overflow-hidden`}
                                         >
-                                          <div className="p-4 bg-white space-y-2">
+                                          <div className="p-6 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                                             {Object.entries(group.specs)
-                                              .sort(([keyA], [keyB]) => {
-                                                // Use standard sort order
-                                                const weightA = SPEC_SORT_ORDER[keyA] || 99;
-                                                const weightB = SPEC_SORT_ORDER[keyB] || 99;
-
-                                                if (weightA !== weightB) {
-                                                  return weightA - weightB;
-                                                }
-
-                                                // Fallback for non-listed items: Min -> Max -> Alpha
-                                                const a = keyA.toLowerCase();
-                                                const b = keyB.toLowerCase();
-
-                                                const isMinA = a.includes('min') || a.includes('1st');
-                                                const isMaxA = a.includes('max');
-
-                                                const isMinB = b.includes('min') || b.includes('1st');
-                                                const isMaxB = b.includes('max');
-
-                                                if (isMinA && !isMinB) return -1;
-                                                if (!isMinA && isMinB) return 1;
-                                                if (isMaxA && !isMaxB) return 1;
-                                                if (!isMaxA && isMaxB) return -1;
-
-                                                return keyA.localeCompare(keyB);
-                                              })
+                                              .sort(([keyA], [keyB]) => (SPEC_SORT_ORDER[keyA] || 99) - (SPEC_SORT_ORDER[keyB] || 99))
                                               .map(([key, value]) => (
-                                                <div key={key} className="flex justify-between items-center py-3 border-b border-light-gray/50 last:border-0 group hover:bg-air-blue/10 transition-colors px-2 rounded">
-                                                  <span className="text-steel-gray font-medium">{translateSpecKey(key)}</span>
-                                                  <span className="font-bold text-industrial-gray text-right">
+                                                <div key={key} className="flex justify-between items-center py-3.5 border-b border-light-gray/40 last:border-0 md:last:border-b group hover:bg-air-blue/5 px-2 rounded-lg transition-colors">
+                                                  <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{translateSpecKey(key)}</span>
+                                                  <span className="text-sm font-black text-industrial-gray text-right">
                                                     {formatSpecValue(key, value)}
                                                   </span>
                                                 </div>
@@ -982,7 +882,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             })()}
                           </>
                         ) : (
-                          <div className="text-steel-gray italic">
+                          <div className="text-steel-gray italic font-medium py-12 text-center">
                             {t('pdp.labels.noSpecsAvailable')}
                           </div>
                         )}
@@ -994,43 +894,61 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'diyagramlar' && (
                     <>
                       <div className="col-span-full">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                           {/* Technical Diagrams */}
-                          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
-                            <div className="space-y-4">
-                              <div className="aspect-video bg-gradient-to-br from-primary-navy/10 to-secondary-blue/10 rounded-lg flex items-center justify-center">
-                                <div className="text-center">
-                                  <FileText size={32} className="text-primary-navy mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.mounting')}</p>
-                                  <p className="text-sm text-steel-gray">PDF - 2.4 MB</p>
+                          <div className="bg-white rounded-3xl p-8 border border-light-gray shadow-sm">
+                            <h4 className="font-black text-industrial-gray mb-8 text-sm uppercase tracking-[0.2em]">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
+                            <div className="space-y-6">
+                              <div className="group relative aspect-video bg-gradient-to-br from-primary-navy/5 to-secondary-blue/5 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-all cursor-pointer overflow-hidden">
+                                <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                                  <div className="p-3 bg-primary-navy text-white rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <Download size={24} />
+                                  </div>
+                                </div>
+                                <div className="text-center relative z-0">
+                                  <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 border border-light-gray/50">
+                                    <FileText size={32} className="text-primary-navy" />
+                                  </div>
+                                  <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t('pdp.diagramsExtra.mounting')}</p>
+                                  <p className="text-[10px] text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF - 2.4 MB</p>
                                 </div>
                               </div>
-                              <div className="aspect-video bg-gradient-to-br from-secondary-blue/10 to-air-blue/20 rounded-lg flex items-center justify-center">
-                                <div className="text-center">
-                                  <FileText size={32} className="text-secondary-blue mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.electrical')}</p>
-                                  <p className="text-sm text-steel-gray">PDF - 1.8 MB</p>
+                              <div className="group relative aspect-video bg-gradient-to-br from-secondary-blue/5 to-air-blue/10 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-secondary-blue/30 transition-all cursor-pointer overflow-hidden">
+                                <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                                  <div className="p-3 bg-secondary-blue text-white rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <Download size={24} />
+                                  </div>
+                                </div>
+                                <div className="text-center relative z-0">
+                                  <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 border border-light-gray/50">
+                                    <FileText size={32} className="text-secondary-blue" />
+                                  </div>
+                                  <p className="text-industrial-gray font-black text-xs uppercase tracking-widest">{t('pdp.diagramsExtra.electrical')}</p>
+                                  <p className="text-[10px] text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF - 1.8 MB</p>
                                 </div>
                               </div>
                             </div>
                           </div>
 
-                          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <h4 className="font-semibold text-industrial-gray mb-4">{t('pdp.diagramsExtra.threeDViews')}</h4>
-                            <div className="space-y-4">
-                              <div className="aspect-video bg-gradient-to-br from-air-blue/20 to-light-gray rounded-lg flex items-center justify-center">
-                                <div className="text-center">
-                                  <Settings size={32} className="text-primary-navy mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.view3DModel')}</p>
-                                  <p className="text-sm text-steel-gray">{t('pdp.diagramsExtra.interactiveModel')}</p>
+                          <div className="bg-white rounded-3xl p-8 border border-light-gray shadow-sm">
+                            <h4 className="font-black text-industrial-gray mb-8 text-sm uppercase tracking-[0.2em]">{t('pdp.diagramsExtra.threeDViews')}</h4>
+                            <div className="space-y-6">
+                              <div className="p-6 bg-light-gray/30 rounded-2xl border border-light-gray/50 flex items-center space-x-6 group hover:bg-white hover:shadow-md transition-all">
+                                <div className="w-14 h-14 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-primary-navy group-hover:text-white transition-all">
+                                  <Settings size={28} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{t('pdp.diagramsExtra.view3DModel')}</p>
+                                  <p className="text-[10px] text-steel-gray font-bold uppercase tracking-widest mt-1">{t('pdp.diagramsExtra.interactiveModel')}</p>
                                 </div>
                               </div>
-                              <div className="aspect-video bg-gradient-to-br from-success-green/10 to-light-gray rounded-lg flex items-center justify-center">
-                                <div className="text-center">
-                                  <Ruler size={32} className="text-success-green mx-auto mb-2" />
-                                  <p className="text-steel-gray font-medium">{t('pdp.diagramsExtra.dimensionedDrawing')}</p>
-                                  <p className="text-sm text-steel-gray">{t('pdp.diagramsExtra.cadDwg')}</p>
+                              <div className="p-6 bg-light-gray/30 rounded-2xl border border-light-gray/50 flex items-center space-x-6 group hover:bg-white hover:shadow-md transition-all">
+                                <div className="w-14 h-14 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-success-green group-hover:text-white transition-all">
+                                  <Ruler size={28} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-black text-industrial-gray uppercase tracking-tight">{t('pdp.diagramsExtra.dimensionedDrawing')}</p>
+                                  <p className="text-[10px] text-steel-gray font-bold uppercase tracking-widest mt-1">CAD/DWG AVAILABLE</p>
                                 </div>
                               </div>
                             </div>
@@ -1043,15 +961,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   {section.id === 'dokumanlar' && (
                     <>
                       <div className="col-span-full">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                           {/* Technical Documents */}
-                          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                            <div className="text-center mb-4">
-                              <FileText size={48} className="text-primary-navy mx-auto mb-3" />
-                              <h4 className="font-semibold text-industrial-gray">{t('pdp.docs.installationGuide')}</h4>
-                              <p className="text-sm text-steel-gray">PDF - 3.2 MB</p>
+                          <div className="bg-white rounded-3xl p-8 border border-light-gray shadow-sm hover:shadow-md transition-all group">
+                            <div className="text-center mb-8">
+                              <div className="w-20 h-20 bg-primary-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                <FileText size={40} className="text-primary-navy" />
+                              </div>
+                              <h4 className="font-black text-industrial-gray uppercase tracking-tight text-base">{t('pdp.docs.installationGuide')}</h4>
+                              <p className="text-[10px] font-bold text-steel-gray uppercase tracking-widest mt-2">TECHNICAL PDF - 3.2 MB</p>
                             </div>
-                            <button className="w-full bg-primary-navy hover:bg-secondary-blue text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+                            <button className="w-full bg-light-gray hover:bg-primary-navy text-industrial-gray hover:text-white py-4 px-6 rounded-xl transition-all font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center space-x-3 active:scale-95 shadow-xs">
                               <Download size={16} />
                               <span>{t('pdp.actions.download')}</span>
                             </button>
