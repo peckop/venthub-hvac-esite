@@ -1,3 +1,4 @@
+"use client";
 import React from 'react'
 import { JetFanModel } from './types/JetFanModel'
 import { RoofFanModel } from './types/RoofFanModel'
@@ -13,6 +14,7 @@ import { AirCurtainModel } from './types/AirCurtainModel'
 import { AirPurifierModel } from './types/AirPurifierModel'
 import { PlugFanModel } from './types/PlugFanModel'
 import { WallMountedCompactFanModel } from './types/WallMountedCompactFanModel'
+import { VorticeLineoModel } from './factory/VorticeLineoModel'
 
 interface FanRendererProps {
     slug: string
@@ -106,8 +108,19 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
             return <AirCurtainModel isHeated={isHeated} showMixed={showMixed} />
         }
 
-        // Sessiz Kanal Tipi (Interaction Destekli)
-        if (s.includes('sessiz') || s.includes('silent') || s.includes('lineo') || s.includes('td')) {
+        // Vortice Lineo Serisi (Yeni Fabrika Çıktısı)
+        if (s.includes('lineo')) {
+            return <VorticeLineoModel 
+                explode={explode} 
+                onPartClick={onPartClick}
+                selectedPart={selectedPart}
+                isolatedPart={isolatedPart}
+                hiddenParts={hiddenParts}
+            />
+        }
+
+        // Sessiz Kanal Tipi (Generic)
+        if (s.includes('sessiz') || s.includes('silent') || s.includes('td')) {
             return <SilentChannelFanModel
                 explode={explode}
                 onPartClick={onPartClick}
@@ -191,6 +204,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
         </group>
     )
 }
+
 
 
 

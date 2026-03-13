@@ -57,8 +57,10 @@ def spawn_subagent(
         dict with keys: success, output, error, log_file, duration_s
     """
     # Generate unique subagent ID
-    raw_id: str = uuid.uuid4().hex
-    subagent_id: str = cast(str, raw_id)[0:8]
+    raw_id = str(uuid.uuid4().hex)
+    subagent_id = ""
+    for i in range(8):
+        subagent_id += raw_id[i]
     timestamp: str = time.strftime("%Y%m%d-%H%M%S")
 
     # Setup logging directory
@@ -78,7 +80,7 @@ def spawn_subagent(
         return {
             "success": False,
             "output": "",
-            "error": f"Skill not found in {repo_root / '.agent/skills/'}. Tried '{skill}' and 'superpowers-{skill}'.",
+            "error": f"Skill not found in {repo_root.joinpath('.agent', 'skills')}. Tried '{skill}' and 'superpowers-{skill}'.",
             "log_file": str(log_file),
             "duration_s": 0,
         }

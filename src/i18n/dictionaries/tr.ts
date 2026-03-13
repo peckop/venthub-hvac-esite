@@ -175,62 +175,94 @@ export const tr = {
         airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için doğru hava perdesi ailesine yaklaşın.',
         heatRecovery: 'Taze hava ve verimlilik dengesini ısı geri kazanım ekseninde değerlendirin.',
         speedControl: 'Fan kontrol, sürücü ve hız yönetimini doğru ekipman katmanında seçin.'
+      },
+      sinevizyon: {
+        slides: [
+          {
+            eyebrow: 'İLERİ AERODİNAMİK MÜHENDİSLİĞİ',
+            title: 'Endüstriyel Havalandırma Katmanları',
+            subtitle: 'Yüksek debili sistemlerde statik balanslı ve akustik optimize edilmiş çözüm eksenleri.'
+          },
+          {
+            eyebrow: 'FÜTÜRİSTİK İKLİMLENDİRME',
+            title: 'Vortice Lineo Quiet: Sessizliğin Geleceği',
+            subtitle: 'Minimum enerji tüketimi, maksimum hava transfer verimliliği ve premium sessiz konforun kusursuz dengesi.'
+          },
+          {
+            eyebrow: 'HASSAS HVAC SİSTEMLERİ',
+            title: 'Teknik Mükemmeliyet ve Akıllı Akış',
+            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca determisitik havalandırma mühendisliği.'
+          }
+        ]
       }
     },
+    cinematicShowcase: {
+      eyebrow: 'MÜHENDİSLİK ODAK NOKTASI',
+      title: 'Vortice Lineo Quiet Serisi',
+      subtitle: 'Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı.',
+      description: 'Özel susturucu katmanlara sahip dış gövdesi ve dinamik balanslı motor yapısı ile yüksek statik basınçta bile ultra sessiz operasyon verimliliği sunar.',
+      hotspots: {
+        motor: 'Yüksek Verimli EC Motor - Hassas Devir ve Tork Yönetimi',
+        clamps: 'Vibrasyon Önleyici Kelepçeler - Hızlı Servis ve Montaj Modülü',
+        housing: 'Ses Absorbe Edici Kompozit Gövde - Minimum Akustik Yayılım',
+        airflow: 'Hava Yönlendirici Kanat Yapısı - Maksimum Laminer Akış Verimliliği'
+      },
+      cta: 'Yüksek Çöllünürlüklü Teknik Verilere Ulaş'
+    },
     quickEntry: {
-      eyebrow: 'Başlangıç Katmanı',
-      title: 'İlk adımı kafa karışıklığı olmadan seçin.',
-      subtitle: 'Kategori, uygulama veya destek yolundan başlayarak aynı premium karar akışına girin.',
+      eyebrow: 'MÜHENDİSLİK GİRİŞ NOKTASI',
+      title: 'İhtiyacınıza En Uygun Teknik Ekseni Seçin',
+      subtitle: 'Ürün kategorisi, spesifik uygulama senaryosu veya teknik destek katmanı üzerinden profesyonel çözüme ilerleyin.',
       items: {
         category: {
-          title: 'Kategoriye Göre Ara',
-          description: 'Ana ürün ailelerinden başlayarak doğru kategoriye ilerleyin.'
+          title: 'Ürün Gruplarını İncele',
+          description: 'Atex fanlardan sessiz kanal tiplerine, ana ürün ailelerini teknik verileriyle keşfedin.'
         },
         application: {
-          title: 'Uygulamaya Göre Bul',
-          description: 'Otopark, mutfak, giriş ve konfor senaryolarına göre çözüm seçin.'
+          title: 'Uygulama Senaryoları',
+          description: 'Otopark jet fan sistemleri, mutfak egzoz çözümleri ve hassas iklimlendirme projeleri.'
         },
         support: {
-          title: 'Teknik Destek Al',
-          description: 'Sık sorulanlar, destek akışları ve bilgi merkezine hızlıca ulaşın.'
+          title: 'Mühendislik Desteği',
+          description: 'Boyutlandırma, hesaplama araçları ve sistem entegrasyonu için teknik bilgi merkezine ulaşın.'
         },
         quote: {
-          title: 'Hızlı Teklif İste',
-          description: 'İhtiyacınızı kısaca paylaşın, doğru çözüm için uzman yönlendirmesi alın.'
+          title: 'Proje Bazlı Teklif Al',
+          description: 'Teknik şartnamenizi bizimle paylaşın, optimize edilmiş özel fiyatlandırma akışını başlatın.'
         }
       }
     },
     guidedDiscovery: {
-      eyebrow: 'Ana Keşif Katmanı',
-      title: 'Ana kategori yapısını tek bakışta görün ve doğru giriş noktasını seçin.',
-      subtitle: 'Bu alan, 3D hero deneyimini tekrar etmez; ana ürün ailelerini sade biçimde gösterir ve kullanıcıyı kategori, seri ve ürün detayına daha kontrollü taşır.',
-      seriesCount: '{{count}} seri',
-      categoryFallback: 'Bu kategori için seçimi hızlandıran premium HVAC çözümleri.',
-      panelEyebrow: 'Karar Akışı',
-      panelTitle: 'Kategori seçiminden ürün kararına daha kısa ilerleyin.',
-      panelBody: 'Kullanıcıyı önce doğru aileye, ardından ilgili seriye ve son olarak ürün detayına taşıyan daha net bir navigasyon yapısı kuruyoruz.',
-      panelFallback: 'Kategoriye ait ürün ailelerini, alt serileri ve sonraki keşif adımlarını net biçimde görüntüleyin.',
-      primaryCta: 'Kategoriye Git',
-      secondaryCta: 'Senaryolara Bak',
-      seriesEyebrow: 'Seri Kısa Yolları',
-      seriesTitle: '{{category}} serileri',
-      seriesFallback: 'Bu seri için ürün ailesini ve varyasyonlarını inceleyin.',
-      footerNote: 'Kategori keşfi burada başlar; ürün detayına gitmeden önce seri mantığını kavramanızı kolaylaştırır.',
+      eyebrow: 'DETERMİNİSTİK SİSTEMLER',
+      title: 'Hava Akışının Mühendislik Estetiği',
+      subtitle: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin. Proje tipinize göre en verimli giriş noktasını seçin.',
+      seriesCount: '{{count}} Seri',
+      categoryFallback: 'Premium HVAC çözümleri ile sistem verimliliğinizi maksimize edin.',
+      panelEyebrow: 'KARAR MATRİSİ',
+      panelTitle: 'Kategori Seçiminden Teknik Karara Net Geçiş',
+      panelBody: 'Kullanıcıyı önce doğru ürün ailesine, ardından spesifik seri katmanına ve nihayetinde aerodinamik detaylara taşıyan profesyonel navigasyon.',
+      panelFallback: 'Kategoriye ait ürün serilerini ve teknik varyasyonları net biçimde analiz edin.',
+      primaryCta: 'TEKNİK KOLEKSİYONU İNCELE',
+      secondaryCta: 'Uygulama Senaryolarına Bak',
+      seriesEyebrow: 'SERİ HIZLI ERİŞİM',
+      seriesTitle: '{{category}} Mühendislik Serileri',
+      seriesFallback: 'Bu seri için performans eğrilerini ve varyasyonları inceleyin.',
+      footerNote: 'Kategori keşfi burada başlar; karmaşık sistem yapılarını seri mantığıyla basitleştiriyoruz.',
       steps: {
         select: {
-          title: 'Doğru ana kategoriyi seçin',
-          description: 'Fan, hava perdesi, ısı geri kazanım veya hız kontrolü gibi çekirdek ailelerden başlayın.'
+          title: 'Primer Kategoriyi Belirleyin',
+          description: 'Fan, hava perdesi veya ısı geri kazanım gibi ana mühendislik gruplarından başlayın.'
         },
         compare: {
-          title: 'Seri mantığını hızla daraltın',
-          description: 'Alt seri yapısı ile uygulama, kapasite veya teknik ihtiyaca göre doğru kola geçin.'
+          title: 'Seri Seviyesinde Filtreleyin',
+          description: 'Kapasite, akustik izole veya Atex gereksinimine göre doğru ürün koluna geçin.'
         },
         convert: {
-          title: 'Ürüne ve teklife kontrollü geçin',
-          description: 'Kategori ve seri netleşince ürün değerlendirmesi ve teklif akışı daha az sürtünmeyle ilerler.'
+          title: 'Ürün ve Teklif Seviyesine İnin',
+          description: 'Teknik parametreler netleşince veri dökümanlarına ve proje teklifine odaklanın.'
         }
       },
-      loading: 'Kategoriler hazırlanıyor...'
+      loading: 'Sistem katmanları hazırlanıyor...'
     },
     applicationSolutions: {
       eyebrow: 'Senaryo Odaklı Çözümler',
@@ -269,51 +301,51 @@ export const tr = {
       }
     },
     featuredCommercial: {
-      eyebrow: 'Ticari Ürün Vitrini',
-      title: 'Ticaret katmanını gerçek ürün verisiyle öne çıkarın.',
-      subtitle: 'Öne çıkan ürünler ve güçlü ürün aileleri arasında hızlı geçiş yaparak kategori keşfinden satın alma niyetine daha kısa ilerleyin.',
-      cta: 'Tüm Ürünleri Gör',
-      panelEyebrow: 'Odak Paneli',
+      eyebrow: 'Ürün Showroom',
+      title: 'Yüksek Performanslı HVAC Seçkisi',
+      subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
+      cta: 'Tüm Koleksiyonu İncele',
+      panelEyebrow: 'Teknik Odak',
       tabs: {
         featured: 'Öne Çıkanlar',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
-        featured: 'Öne çıkan ürün seçkisi',
-        airCurtains: 'Hava perdesi odağı',
-        heatRecovery: 'Isı geri kazanım odağı'
+        featured: 'Performans Liderleri',
+        airCurtains: 'İklim Koruma Sistemleri',
+        heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Gerçek veriden gelen öne çıkan ürünleri, daha kısa ürün değerlendirme akışına yardımcı olacak şekilde sunuyoruz.',
-        airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için hava perdesi ürünlerini bir arada görün.',
-        heatRecovery: 'Verimlilik odaklı ticari iklimlendirme için ısı geri kazanım ürün ailesine doğrudan yaklaşın.'
+        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin en çok tercih edilen amiral gemisi çözümleri.',
+        airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan ve enerji kaybını minimize eden profesyonel seriler.',
+        heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan, çevre dostu ve ekonomik iklimlendirme üniteleri.'
       }
     },
     trustProof: {
-      eyebrow: 'Güven ve Kanıt',
-      title: 'Güven duygusunu süslü vaatlerle değil, net operasyonel gerçeklerle kuruyoruz.',
-      subtitle: 'VentHub ana sayfasındaki güven katmanı, doğrulanabilir iş yapış biçimini ve uzman destek yaklaşımını görünür kılmalıdır.',
+      eyebrow: 'Güven ve Uzmanlık',
+      title: 'Mühendislik Hassasiyeti, Operasyonel Güven',
+      subtitle: 'Havalandırma projelerinizde sadece bir tedarikçi değil, teknik çözüm ortağınızız. Her adımda doğrulanabilir kalite ve uzman desteği sunuyoruz.',
       items: {
         brands: {
-          eyebrow: 'Marka Katmanı',
-          title: 'Premium marka seçkisi',
-          description: 'Temsil edilen markalar yalnızca vitrin değil; kategori ve çözüm kalitesinin ana taşıyıcılarıdır.'
+          eyebrow: 'Otorite',
+          title: 'Yetkili Distribütör Güvencesi',
+          description: 'Dünya devi HVAC markalarının doğrudan yetki belgesi ile en güncel, sertifikalı ve orijinal ürün gamına erişim sağlıyoruz.'
         },
         guidance: {
-          eyebrow: 'Uzmanlık Katmanı',
-          title: 'Mühendislik odaklı yönlendirme',
-          description: 'Kullanıcıyı yalnızca ürün listesine değil, daha doğru seçim akışına taşımayı hedefliyoruz.'
+          eyebrow: 'Analiz',
+          title: 'Mühendislik Odaklı Seçim',
+          description: 'İhtiyacınızı sadece ürünle değil, debi ve basınç hesaplamaları içeren teknik analizlerle en verimli şekilde çözüyoruz.'
         },
         delivery: {
-          eyebrow: 'Operasyon Katmanı',
-          title: 'Sevkiyat ve tedarik görünürlüğü',
-          description: 'Teslimat ve tedarik beklentileri daha net, daha öngörülebilir ve daha profesyonel hissettirilir.'
+          eyebrow: 'Lojistik',
+          title: 'Hızlı ve Güvenli Sevkiyat',
+          description: 'Geniş stok ağımız ve profesyonel lojistik partnerlerimizle, proje takviminizi aksatmadan tam zamanında teslimat yapıyoruz.'
         },
         support: {
-          eyebrow: 'Süreklilik Katmanı',
-          title: 'Satış sonrası erişilebilir destek',
-          description: 'Destek, teklif ve bilgi merkezi akışları birbirinden kopuk değil; aynı güven mimarisinin parçalarıdır.'
+          eyebrow: 'Süreklilik',
+          title: 'Kesintisiz Teknik Destek',
+          description: 'Satış sonrası teknik dökümantasyon, montaj rehberliği ve uzman kadromuzla sisteminizin ömrü boyunca yanınızdayız.'
         }
       }
     },
