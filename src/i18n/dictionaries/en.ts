@@ -309,17 +309,23 @@ export const en = {
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers'
+        bestSellers: 'Best Sellers',
+        airCurtains: 'Air Curtains',
+        heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Featured selection',
         newArrivals: 'New arrivals focus',
-        bestSellers: 'Most preferred'
+        bestSellers: 'Most preferred',
+        airCurtains: 'Climate Protection Systems',
+        heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
         featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
         newArrivals: 'Discover our latest additions to the HVAC inventory, featuring newest technology.',
-        bestSellers: 'Explore products that set the industry standard for reliability and performance.'
+        bestSellers: 'Explore products that set the industry standard for reliability and performance.',
+        airCurtains: 'Professional series that maintain indoor comfort by creating an invisible thermal barrier at entrances.',
+        heatRecovery: 'Economical units that recover heat from exhaust air with up to 90% efficiency while supplying fresh air.'
       }
     },
     trustProof: {
@@ -1766,46 +1772,38 @@ export const en = {
       name: 'Please enter full name',
       contact: 'Email or phone is required',
       consent: 'Consent is required'
-    },
-    aboutPage: {
-      stats: {
-        yearsExperience: 'Project Pipeline'
-      }
-    },
-    cinematicShowcase: {
-      eyebrow: 'TECHNICAL DETAIL',
-      title: 'Masterpiece of Engineering',
-      subtitle: 'Peak Performance and Efficiency',
-      description: 'Each component is optimized to provide uninterrupted airflow in the most demanding industrial conditions.',
-      cta: 'Review Technical Catalog',
-      badge: 'Industrial Grade',
-      componentLabel: 'System Component',
-      hotspots: {
-        motor: 'EC Motor Technology',
-        motorDetail: 'Brushless motor structure providing low energy consumption and high torque.',
-        clamps: 'Easy-Fit Clamps',
-        clampsDetail: 'Special connection system allowing tool-free fast assembly and maintenance.',
-        housing: 'Polymer Housing',
-        housingDetail: 'Impact and corrosion-resistant, lightweight aerodynamic exterior surface.',
-        airflow: 'Laminar Flow',
-        airflowDetail: 'Internal vane design minimizing turbulence and reducing noise levels.'
-      }
-    },
-    trustProof: {
-      badge: 'Trusted',
-      eyebrow: 'WHY VENTHUB?',
-      title: 'Engineering and Trust-Driven Approach',
-      subtitle: 'We add value to your projects with industry-leading brands and our expert engineering team.',
-      items: {
-        brands: { eyebrow: 'Competence', title: 'Global Brands', description: 'Official partner of the world\'s most reliable HVAC manufacturers.' },
-        guidance: { eyebrow: 'Expertise', title: 'Project Support', description: 'Supporting you at every step from specification to commissioning.' },
-        delivery: { eyebrow: 'Speed', title: 'Fast Delivery', description: 'On-time delivery across Turkey with our extensive stock network.' },
-        support: { eyebrow: 'Continuity', title: 'After-Sales', description: 'Uninterrupted operation with technical support and spare parts warranty.' }
-      }
+    }
+  },
+
+  cinematicShowcase: {
+    eyebrow: 'TECHNICAL DETAIL',
+    title: 'Masterpiece of Engineering',
+    subtitle: 'Peak Performance and Efficiency',
+    description: 'Each component is optimized to provide uninterrupted airflow in the most demanding industrial conditions.',
+    cta: 'Review Technical Catalog',
+    badge: 'Industrial Grade',
+    componentLabel: 'System Component',
+    hotspots: {
+      motor: 'EC Motor Technology',
+      motorDetail: 'Brushless motor structure providing low energy consumption and high torque.',
+      clamps: 'Easy-Fit Clamps',
+      clampsDetail: 'Special connection system allowing tool-free fast assembly and maintenance.',
+      housing: 'Polymer Housing',
+      housingDetail: 'Impact and corrosion-resistant, lightweight aerodynamic exterior surface.',
+      airflow: 'Laminar Flow',
+      airflowDetail: 'Internal vane design minimizing turbulence and reducing noise levels.'
+    }
+  },
+  trustProof: {
+    badge: 'Trusted',
+    eyebrow: 'WHY VENTHUB?',
+    title: 'Engineering and Trust-Driven Approach',
+    subtitle: 'We add value to your projects with industry-leading brands and our expert engineering team.',
+    items: {
+      brands: { eyebrow: 'Competence', title: 'Global Brands', description: 'Official partner of the world\'s most reliable HVAC manufacturers.' },
+      guidance: { eyebrow: 'Expertise', title: 'Project Support', description: 'Supporting you at every step from specification to commissioning.' },
+      delivery: { eyebrow: 'Speed', title: 'Fast Delivery', description: 'On-time delivery across Turkey with our extensive stock network.' },
+      support: { eyebrow: 'Continuity', title: 'After-Sales', description: 'Uninterrupted operation with technical support and spare parts warranty.' }
     }
   }
 }
-
-
-
-
