@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo } from 'react'
 // import * as THREE from 'three'
 import { useFanMaterials } from '../materials/useFanMaterials'
@@ -69,6 +70,7 @@ export const Motor: React.FC<MotorProps> = ({ scale = 1, color = 'galvanized', s
         </group>
     )
 }
+
 
 
 
