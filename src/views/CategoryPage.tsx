@@ -244,17 +244,6 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     ? `${origin}/category/${parentCategory.slug}/${category.slug}`
     : `${origin}/category/${category.slug}`
 
-  // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
-  const mapSlugToTopic = (s?: string | null): string | null => {
-    if (!s) return null
-    const slug = s.toLowerCase()
-    if (slug.includes('hava-perde')) return 'hava-perdesi'
-    if (slug.includes('jet-fan')) return 'jet-fan'
-    if (slug.includes('isi-geri-kazanim') || slug.includes('hrv')) return 'hrv'
-    return null
-  }
-  const relatedTopicSlug = mapSlugToTopic(parentCategory?.slug || category.slug)
-
   // Construct image URL if available
   const categoryImageUrl = category.image_url
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`

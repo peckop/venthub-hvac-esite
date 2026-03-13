@@ -387,13 +387,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image Gallery (Premium) */}
           <div className="sticky top-24 self-start z-10">
-            <ImageGallery
-              key={product.id}
-              images={images}
-              productName={product.name}
-              slug={product.slug || product.name} // Fallback for 3D model detection
-              modelType={mainCategory?.metadata?.model_type}
-            />
+            <div className="relative group">
+              <ImageGallery
+                key={product.id}
+                images={images}
+                productName={product.name}
+                slug={product.slug || product.name} // Fallback for 3D model detection
+                modelType={mainCategory?.metadata?.model_type}
+              />
+              {/* 3D Experience Vurgusu (Hava Perdesi ise) */}
+              {topicSlug === 'hava-perdesi' && (
+                <div className="absolute top-4 left-4 z-20 pointer-events-none">
+                  <div className="bg-white/95 backdrop-blur-md border border-primary-navy/20 px-3 py-2 rounded-full shadow-hvac flex items-center space-x-2 animate-pulse-subtle">
+                    <div className="flex h-2 w-2 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-navy"></span>
+                    </div>
+                    <span className="text-[10px] font-bold text-primary-navy uppercase tracking-widest">
+                      {t('pdp.actions.interactive3D')}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Product Info */}
@@ -622,18 +638,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
 
             {/* PDF Generate Button */}
-            <div className="pt-4 mt-2">
+            <div className="mt-2 space-y-3">
+              <div className="flex items-center space-x-2 text-xs font-medium text-steel-gray/80 px-2">
+                <Info size={14} className="text-secondary-blue" />
+                <span>{t('pdp.actions.liveDataNotice')}</span>
+              </div>
               <button
                 onClick={handleDownloadPdf}
                 disabled={isGeneratingPdf}
-                className="w-full bg-air-blue/10 hover:bg-air-blue/20 text-primary-navy border border-air-blue/30 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                className="w-full bg-primary-navy hover:bg-industrial-gray text-white shadow-md hover:shadow-lg font-bold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 disabled:opacity-50 transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 {isGeneratingPdf ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-navy"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : (
-                  <FileText size={20} />
+                  <Download size={22} className="animate-bounce-subtle" />
                 )}
-                <span>{isGeneratingPdf ? 'PDF Hazırlanıyor...' : 'Teknik Ürün Föyü İndir (PDF)'}</span>
+                <span className="text-lg">{isGeneratingPdf ? 'PDF Hazırlanıyor...' : 'Teknik Ürün Föyü İndir (PDF)'}</span>
               </button>
             </div>
 
@@ -1133,14 +1153,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <button
                               onClick={handleDownloadPdf}
                               disabled={isGeneratingPdf}
-                              className="w-full bg-secondary-blue hover:bg-primary-navy text-white py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                              className="w-full bg-primary-navy hover:bg-industrial-gray text-white shadow-soft font-bold py-4 px-4 rounded-xl transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
                             >
                               {isGeneratingPdf ? (
                                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                               ) : (
-                                <Download size={20} />
+                                <Download size={22} />
                               )}
-                              <span>{isGeneratingPdf ? 'Hazırlanıyor...' : t('pdp.actions.downloadBrochure')}</span>
+                              <span className="text-lg">{isGeneratingPdf ? 'Hazırlanıyor...' : t('pdp.actions.downloadBrochure')}</span>
                             </button>
                           </div>
                         </div>
