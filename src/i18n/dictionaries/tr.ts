@@ -302,24 +302,30 @@ export const tr = {
     },
     featuredCommercial: {
       eyebrow: 'Ürün Showroom',
-      title: 'Yüksek Performanslı HVAC Seçkisi',
+      title: 'Endüstriyel Ürün Portföyü',
       subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
       cta: 'Tüm Koleksiyonu İncele',
       panelEyebrow: 'Teknik Odak',
       tabs: {
         featured: 'Öne Çıkanlar',
+        newArrivals: 'Yeni Gelenler',
+        bestSellers: 'Çok Satanlar',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
         featured: 'Performans Liderleri',
+        newArrivals: 'En Yeni Teknolojiler',
+        bestSellers: 'En Çok Tercih Edilenler',
         airCurtains: 'İklim Koruma Sistemleri',
         heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin en çok tercih edilen amiral gemisi çözümleri.',
-        airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan ve enerji kaybını minimize eden profesyonel seriler.',
-        heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan, çevre dostu ve ekonomik iklimlendirme üniteleri.'
+        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri.',
+        newArrivals: 'VentHub ürün ailesine yeni katılan, enerji verimliliği en yüksek ve modern tasarımlı yeni nesil cihazlar.',
+        bestSellers: 'Sektör profesyonelleri ve büyük projeler tarafından en çok sipariş edilen, güvenilirliği sahada kanıtlanmış modeller.',
+        airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan profesyonel seriler.',
+        heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan ekonomik üniteler.'
       }
     },
     trustProof: {

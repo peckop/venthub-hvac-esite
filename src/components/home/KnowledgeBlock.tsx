@@ -59,43 +59,42 @@ export const KnowledgeBlock: React.FC = () => {
   const { t } = useI18n()
 
   return (
-    <section className="relative overflow-hidden bg-slate-950 py-24 text-white">
+    <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 left-0 h-full w-full bg-[radial-gradient(circle_at_50%_20%,rgba(30,64,175,0.2),transparent_70%)]" />
+        <div className="absolute top-0 left-0 h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(34,211,238,0.1),transparent_70%)]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Centered Header with Rhythm Break */}
-        <div className="flex flex-col items-center text-center">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-4 mb-6"
-          >
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-secondary-blue" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.5em] text-secondary-blue">Bilgi Portalı</span>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-secondary-blue" />
-          </motion.div>
-          
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold tracking-tight text-white sm:text-6xl"
-          >
-            Mühendislik <span className="text-secondary-blue">Merkezi</span>
-          </motion.h2>
-          
+      <div className="relative z-10 mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+        {/* Standartlaştırılmış Başlık Bloğu */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div className="max-w-3xl">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-4"
+            >
+              {t('home.knowledge.eyebrow')}
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl font-light tracking-tighter text-white sm:text-6xl"
+            >
+              Mühendislik <span className="text-cyan-400">Merkezi</span>
+            </motion.h2>
+          </div>
           <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="mt-8 max-w-2xl text-lg text-slate-400"
+            transition={{ delay: 0.4 }}
+            className="max-w-md text-lg text-slate-400 font-light leading-relaxed"
           >
-            Hesaplama araçları, teknik dökümanlar ve uzman rehberlerle projelerinizi daha verimli hale getirin.
+            {t('home.knowledge.subtitle')}
           </motion.p>
         </div>
 
@@ -111,33 +110,31 @@ export const KnowledgeBlock: React.FC = () => {
             <motion.div 
               key={item.id} 
               variants={cardVariants}
-              className={index === 1 ? 'lg:-translate-y-8' : ''} // Visual stagger
             >
               <Link
                 href={item.href}
-                className="group relative block h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-10 backdrop-blur-md transition-all duration-500 hover:border-secondary-blue/40 hover:bg-white/[0.05]"
+                className="group relative block h-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-10 backdrop-blur-md transition-all duration-500 hover:border-cyan-500/40 hover:bg-white/[0.05]"
               >
-                {/* ID Number Detail */}
-                <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-secondary-blue/10">
+                <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">
                   0{index + 1}
                 </div>
 
-                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary-blue/10 text-secondary-blue transition-all duration-500 group-hover:bg-secondary-blue group-hover:text-white">
+                <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400 transition-all duration-500 group-hover:bg-cyan-500 group-hover:text-slate-950">
                   {item.icon}
                 </div>
 
                 <div className="mt-12">
-                  <h3 className="text-2xl font-bold text-white transition-colors group-hover:text-secondary-blue">
+                  <h3 className="text-2xl font-bold text-white transition-colors group-hover:text-cyan-400">
                     {t(`home.knowledge.items.${item.id}.title`)}
                   </h3>
-                  <p className="mt-4 text-base leading-relaxed text-slate-400 group-hover:text-slate-300">
+                  <p className="mt-4 text-base leading-relaxed text-slate-400 group-hover:text-slate-300 font-light">
                     {t(`home.knowledge.items.${item.id}.description`)}
                   </p>
                 </div>
 
-                <div className="mt-10 flex items-center gap-3 text-sm font-bold text-secondary-blue">
-                  <span className="h-px w-6 bg-secondary-blue/40" />
-                  İncele
+                <div className="mt-10 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">
+                  <span className="h-px w-6 bg-cyan-400/40" />
+                  Keşfet
                   <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-1">
                     <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>

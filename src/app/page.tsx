@@ -1,5 +1,6 @@
 import React from 'react'
 import HomePage from '../views/HomePage'
+import { getCategories, getProducts, type Category, type Product } from '../lib/supabase'
 
 export const metadata = {
     title: 'VentHub - Endüstriyel Havalandırma Çözümleri',
@@ -9,7 +10,22 @@ export const metadata = {
     },
 }
 
-export default function RootPage() {
+export default async function RootPage() {
+    // Değişkenleri doğru tiplerle tanımlayarak 'never[]' hatasını engelliyoruz
+    let categories: Category[] = []
+    let products: Product[] = []
+
+    try {
+        const [catData, prodData] = await Promise.all([
+            getCategories(),
+            getProducts(12)
+        ])
+        categories = (catData as Category[]) || []
+        products = (prodData as Product[]) || []
+    } catch (error) {
+        console.error('SSR Data Fetch Error:', error)
+    }
+
     const jsonLd = {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -28,7 +44,7 @@ export default function RootPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-            <HomePage />
+            <HomePage initialCategories={categories} initialProducts={products} />
         </>
     )
 }
