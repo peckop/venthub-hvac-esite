@@ -11,7 +11,6 @@ import FeaturedCommercialBlocks from '../components/home/FeaturedCommercialBlock
 import StrategicBrands from '../components/home/StrategicBrands'
 import KnowledgeBlock from '../components/home/KnowledgeBlock'
 import FinalCTA from '../components/home/FinalCTA'
-import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
 import { Category, Product } from '../lib/supabase'
 
