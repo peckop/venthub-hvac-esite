@@ -8,9 +8,7 @@ import {
   addProductToProject, 
   removeProductFromProject, 
   listProjectItems,
-  UserProject,
-  ProjectItem,
-  Product
+  UserProject
 } from '../lib/supabase'
 import { ProjectContext } from './ProjectContext'
 import { useAuth } from '../hooks/useAuth'
