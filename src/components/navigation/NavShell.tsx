@@ -8,9 +8,10 @@ interface NavShellProps {
     isScrollingDown?: boolean
     isAtTop?: boolean
     isAnyOverlayOpen?: boolean
-    // children prop is separated into two tiers
+    // children prop is separated into tiers
     topTierChildren?: React.ReactNode
     bottomTierChildren: React.ReactNode
+    contextTierChildren?: React.ReactNode
     onHoverStart?: () => void
     onHoverEnd?: () => void
 }
@@ -24,12 +25,12 @@ const NavShell: React.FC<NavShellProps> = ({
     isAnyOverlayOpen = false,
     topTierChildren,
     bottomTierChildren,
+    contextTierChildren,
     onHoverStart,
     onHoverEnd,
 }) => {
-    // When scrolling down, we translate both headers UP by their total height so they hide.
-    // The top tier is ~40px (h-10), the bottom tier is ~64px (h-16).
-    // Let's use Tailwind's -translate-y-full and group them inside a container.
+    // Determine context tier visibility
+    const hasContext = Boolean(contextTierChildren)
 
     return (
         <div
@@ -54,15 +55,12 @@ const NavShell: React.FC<NavShellProps> = ({
             <div
                 className={cn(
                     'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
-                    // Hide the top tier if we are not at the top (unless we want it to stay when scrolling up?
-                    // Usually we hide the top tier when scrolled, and only show bottom tier when scrolling up)
                     !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-10 md:opacity-100 relative'
                 )}
             >
                 <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                     {topTierChildren}
                 </div>
-                {/* Backdrop dimming for top tier when mega menu or search is open */}
                 <div className={cn("absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none", isAnyOverlayOpen ? "opacity-100" : "opacity-0")} />
             </div>
 
@@ -80,6 +78,18 @@ const NavShell: React.FC<NavShellProps> = ({
                     </div>
                 </div>
             </header>
+
+            {/* Context Tier: PDP Product Bar (Systemair Style) */}
+            <div
+                className={cn(
+                    'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/40 overflow-hidden',
+                    hasContext ? 'h-10 opacity-100' : 'h-0 opacity-0'
+                )}
+            >
+                <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                    {contextTierChildren}
+                </div>
+            </div>
         </div>
     )
 }

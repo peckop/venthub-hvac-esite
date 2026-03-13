@@ -43,6 +43,8 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER
 } from '../utils/productHelpers'
+import { UI_SYSTEM } from '../utils/uiSystem'
+import { usePageContext } from '../contexts/PageContext'
 
 export interface ProductDetailPageProps {
   initialProduct?: Product | null
@@ -54,6 +56,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const router = useRouter()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
+  const { setPageContext, clearPageContext } = usePageContext()
+  
   const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProduct)
@@ -65,17 +69,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
-  const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
-  const navTriggerRef = useRef<HTMLDivElement>(null)
+
+  const { t, lang } = useI18n()
+
+  const sections = [
+    { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
+    { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
+    { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-slate-50/50' },
+    { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
+    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-slate-50/50' },
+    { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
+    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-slate-50/50' }
+  ]
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
-      prev.includes(sectionKey)
-        ? prev.filter(k => k !== sectionKey)
-        : [...prev, sectionKey]
+      prev.includes(sectionKey) ? prev.filter(k => k !== sectionKey) : [...prev, sectionKey]
     );
   };
 
@@ -98,95 +110,55 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           return
         }
         setProduct(productData)
+        
+        // Sync with Header
+        setPageContext({
+          productName: productData.name,
+          modelCode: productData.model_code || productData.sku,
+          technicalLinks: sections.map(s => ({ id: s.id, label: s.title }))
+        })
+
         try {
           const { data: imgs } = await supabase
             .from('product_images')
             .select('path, alt, sort_order')
             .eq('product_id', productData.id)
             .order('sort_order', { ascending: true })
-          const list = (imgs || []) as { path: string; alt?: string | null }[]
-          setImages(list)
+          setImages((imgs || []) as { path: string; alt?: string | null }[])
         } catch { }
+
         const cats = await getCategories()
         if (productData.category_id) {
-          const mc = cats.find(c => c.id === productData.category_id) || null
-          setMainCategory(mc)
+          setMainCategory(cats.find(c => c.id === productData.category_id) || null)
         }
         if (productData.subcategory_id) {
-          const sc = cats.find(c => c.id === productData.subcategory_id) || null
-          setSubCategory(sc)
+          setSubCategory(cats.find(c => c.id === productData.subcategory_id) || null)
         }
         if (productData.subcategory_id) {
           const related = await getProductsBySubcategory(productData.subcategory_id)
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
-        console.error('Error fetching product:', error)
+        console.error('Error:', error)
         setProduct(null)
       } finally {
         setLoading(false)
       }
     }
     fetchProduct()
+    return () => clearPageContext()
   }, [id, router])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (navTriggerRef.current) {
-        const triggerTop = navTriggerRef.current.offsetTop
-        const scrollY = window.scrollY
-        setIsNavSticky(scrollY > (triggerTop - 80))
-      }
-    }
-    window.addEventListener('scroll', handleScroll)
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [product])
-
-  useEffect(() => {
-    const handleScrollSpy = () => {
-      const navEl = document.getElementById('pdp-sticky-nav')
-      const headerOffset = navEl ? navEl.offsetHeight + 120 : 200
-      const scrollPosition = window.scrollY + headerOffset
-      const sectionOffsets = Object.entries(sectionRefs.current).map(([id, ref]) => {
-        if (!ref) return null
-        return { id, top: ref.offsetTop, bottom: ref.offsetTop + ref.offsetHeight }
-      }).filter(Boolean) as { id: string, top: number, bottom: number }[]
-      for (const section of sectionOffsets) {
-        if (scrollPosition >= section.top && scrollPosition < section.bottom) {
-          setActiveSection(section.id)
-          return
-        }
-      }
-    }
-    window.addEventListener('scroll', handleScrollSpy)
-    handleScrollSpy()
-    return () => window.removeEventListener('scroll', handleScrollSpy)
-  }, [product, activeSection])
 
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
     if (element) {
-      const navEl = document.getElementById('pdp-sticky-nav')
-      const currentNavHeight = navEl ? navEl.offsetHeight : 0
-      const extraGap = 84
-      const y = element.getBoundingClientRect().top + window.pageYOffset - currentNavHeight - extraGap
+      const offset = 140
+      const y = element.getBoundingClientRect().top + window.pageYOffset - offset
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
   }
 
   const handleAddToCart = () => { if (product) addToCart(product, quantity) }
-
-  const handleShare = () => {
-    if (typeof window === 'undefined') return
-    if (navigator.share && product) {
-      navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
-    } else {
-      navigator.clipboard.writeText(window.location.href)
-    }
-  }
-
-  const { t, lang } = useI18n()
 
   const handleDownloadPdf = async () => {
     if (!product) return;
@@ -200,96 +172,70 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         fullImageUrl = product.image_url;
       }
       await generateProductDatasheet(product, fullImageUrl, translateSpecKey, lang);
-      toast.success(t('pdp.pdfSuccess') || 'Teknik PDF Föyü başarıyla indirildi.');
+      toast.success(t('pdp.pdfSuccess') || 'Teknik PDF Föyü indirildi.');
     } catch (err) {
       console.error(err);
-      toast.error(t('pdp.pdfError') || 'PDF oluşturulurken bir hata meydana geldi.');
+      toast.error(t('pdp.pdfError') || 'PDF hatası.');
     } finally {
       setIsGeneratingPdf(false);
     }
   };
 
-  const sections = [
-    { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
-    { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-slate-50/50' },
-    { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-slate-50/50' },
-    { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
-    { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-slate-50/50' }
-  ]
-
-  const mapSlugToTopic = (slug?: string | null): string | null => {
-    if (!slug) return null
-    const s = slug.toLowerCase()
-    if (s.includes('hava-perde')) return 'hava-perdesi'
-    if (s.includes('jet-fan')) return 'jet-fan'
-    if (s.includes('isi-geri-kazanim') || s.includes('hrv')) return 'hrv'
-    return null
-  }
-
-  const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
   const [origin, setOrigin] = useState('')
   useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy mx-auto mb-4" />
-          <p className="text-steel-gray text-[10px] font-bold uppercase tracking-widest">{t('pdp.loading')}</p>
-        </div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy mx-auto mb-4" />
+        <p className={UI_SYSTEM.typography.label}>{t('pdp.loading')}</p>
       </div>
-    )
-  }
+    </div>
+  )
 
-  if (!product) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
-        <div className="text-center">
-          <h1 className="text-lg font-bold text-industrial-gray mb-4">{t('pdp.productNotFound')}</h1>
-          <Link href="/" className="text-primary-navy hover:text-secondary-blue font-bold text-xs uppercase tracking-widest">
-            {t('pdp.backHome')}
-          </Link>
-        </div>
+  if (!product) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
+      <div className="text-center">
+        <h1 className={UI_SYSTEM.typography.h1}>{t('pdp.productNotFound')}</h1>
+        <Link href="/" className="text-primary-navy hover:text-secondary-blue font-semibold text-xs uppercase tracking-widest mt-4 block">
+          {t('pdp.backHome')}
+        </Link>
       </div>
-    )
-  }
+    </div>
+  )
 
   const canonicalUrl = `${origin}/products/${product.id}`
-  const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
+  const metaDesc = product.description || `${product.brand} ${product.name} ürünü.`
 
   return (
     <div className="min-h-screen bg-slate-50/20 pt-[64px] md:pt-[104px]">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* Seamless Integrated Breadcrumb - Lighter & High Tracking */}
+      {/* ── Breadcrumb ────────────────────────────────────────────────────────── */}
       <div className="relative z-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold text-steel-gray/40">
-            <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
+        <div className={UI_SYSTEM.layout.containerNarrow + " py-4 sm:py-5"}>
+          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/40">
+            <Link href="/" className="hover:text-primary-navy transition-colors font-semibold">HOME</Link>
             <span className="opacity-30">/</span>
             {mainCategory && (
               <>
-                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors">{mainCategory.name}</Link>
+                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors font-semibold">{mainCategory.name}</Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <span className="opacity-30">/</span>
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors">{subCategory.name}</Link>
+                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors font-semibold">{subCategory.name}</Link>
                   </>
                 )}
                 <span className="opacity-30">/</span>
               </>
             )}
-            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none opacity-80">
-              {product.name}
-            </span>
+            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none opacity-80 font-semibold">{product.name}</span>
           </nav>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-20">
-        {/* Back Button - Technical Minimalist Style */}
+      <div className={UI_SYSTEM.layout.containerNarrow + " pb-12 sm:pb-20"}>
+        {/* Back Button */}
         <button
           onClick={() => {
             if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
@@ -301,244 +247,144 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
             else { router.push('/', { scroll: false }) }
           }}
-          className="flex items-center space-x-2 text-steel-gray/60 hover:text-primary-navy mb-8 transition-all group font-black text-[9px] uppercase tracking-[0.2em]"
+          className="flex items-center space-x-2 text-steel-gray/60 hover:text-primary-navy mb-8 transition-all group font-semibold text-[9px] uppercase tracking-[0.2em]"
         >
           <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-1" />
           <span>{t('pdp.back')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-          {/* Product Image Gallery */}
-          <div className="lg:col-span-7 xl:col-span-7 sticky top-32 self-start z-10">
-            <div className="relative group bg-white rounded-2xl border border-light-gray/40 shadow-sm overflow-hidden p-1.5">
-              <ImageGallery
-                key={product.id}
-                images={images}
-                productName={product.name}
-                slug={product.slug || product.name}
-                modelType={mainCategory?.metadata?.model_type}
-              />
-              {topicSlug === 'hava-perdesi' && (
-                <div className="absolute top-5 left-5 z-20 pointer-events-none">
-                  <div className="bg-white/95 backdrop-blur-md border border-primary-navy/10 px-2.5 py-1.5 rounded-full shadow-sm flex items-center space-x-2">
-                    <div className="flex h-1 w-1 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-navy opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1 w-1 bg-primary-navy"></span>
-                    </div>
-                    <span className="text-[8px] font-black text-primary-navy uppercase tracking-[0.2em]">
-                      INTERACTIVE 3D
-                    </span>
-                  </div>
-                </div>
-              )}
+          
+          {/* ── Visual Side (60%) ────────────────────────────────────────────── */}
+          <div className="lg:col-span-7 xl:col-span-7">
+            <div className="sticky top-32 space-y-6">
+              <div className={"bg-white rounded-2xl p-1.5 overflow-hidden " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+                <ImageGallery
+                  key={product.id}
+                  images={images}
+                  productName={product.name}
+                  slug={product.slug || product.name}
+                  modelType={mainCategory?.metadata?.model_type}
+                />
+              </div>
+              
+              {/* Quick Jump Dashboard */}
+              <div className="grid grid-cols-4 gap-2">
+                {sections.slice(0, 4).map(s => (
+                  <button key={s.id} onClick={() => scrollToSection(s.id)} className={"p-3 rounded-xl bg-white transition-all text-center group hover:bg-air-blue/10 " + UI_SYSTEM.layout.borderLight}>
+                    <s.icon size={16} className="mx-auto mb-2 text-steel-gray group-hover:text-primary-navy transition-colors" />
+                    <span className="text-[8px] font-semibold uppercase tracking-widest text-steel-gray group-hover:text-primary-navy">{s.title}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Product Info */}
+          {/* ── Content Side (40%) ───────────────────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-5 flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 bg-white rounded-lg border border-light-gray/50 p-1 flex items-center justify-center shadow-xs">
+                <div className={"w-7 h-7 bg-white rounded-lg p-1 flex items-center justify-center " + UI_SYSTEM.layout.borderLight}>
                   <BrandIcon brand={product.brand} className="w-full h-full" />
                 </div>
-                <span className="text-secondary-blue font-black text-[10px] tracking-[0.2em] uppercase">{product.brand}</span>
+                <span className="text-secondary-blue font-semibold text-[10px] tracking-[0.2em] uppercase">{product.brand}</span>
               </div>
               {product.is_featured && (
-                <div className="bg-gold-accent/10 text-gold-accent px-2 py-1 rounded text-[8px] font-black flex items-center space-x-1 border border-gold-accent/20 tracking-widest">
+                <div className="bg-gold-accent/10 text-gold-accent px-2 py-1 rounded text-[8px] font-semibold flex items-center space-x-1 border border-gold-accent/20 tracking-widest uppercase">
                   <Star size={10} fill="currentColor" />
-                  <span>ÖNE ÇIKAN</span>
+                  <span>FEATURED</span>
                 </div>
               )}
             </div>
 
-            <h1 className="text-2xl sm:text-2xl font-black text-industrial-gray leading-tight mb-4 tracking-tight uppercase">
+            <h1 className={UI_SYSTEM.typography.h1 + " uppercase leading-tight mb-6"}>
               {product.name}
             </h1>
 
-            {/* Technical Jump Bar (New Design) */}
-            <div className="flex flex-wrap gap-1 mb-6">
-              {sections.slice(0, 4).map((s) => (
+            {/* Action Card (Airy Redesign) */}
+            <div className={"bg-white rounded-2xl p-6 space-y-6 " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+              <div className="flex items-baseline justify-between">
+                <div className="flex flex-col">
+                  <span className={UI_SYSTEM.typography.label + " mb-1 opacity-40"}>Unit Price</span>
+                  <div className={UI_SYSTEM.typography.price}>
+                    {mainCategory?.metadata?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                  </div>
+                  {!mainCategory?.metadata?.hide_price && <span className="text-[8px] font-semibold text-steel-gray/40 uppercase tracking-widest mt-1">VAT INCLUDED</span>}
+                </div>
+                <div className="flex flex-col items-end">
+                  <div className={`px-2 py-0.5 rounded text-[8px] font-semibold uppercase tracking-widest ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green' : 'bg-warning-orange/10 text-warning-orange'}`}>
+                    {typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'IN STOCK' : 'PRE-ORDER'}
+                  </div>
+                  <span className="text-[8px] text-steel-gray font-semibold mt-1.5 opacity-20 tracking-widest uppercase">SKU: {product.sku}</span>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100 flex items-center justify-between">
+                <span className={UI_SYSTEM.typography.label + " opacity-50"}>Quantity</span>
+                <div className="flex items-center bg-slate-50 rounded-xl p-0.5 border border-slate-200/40">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-semibold text-industrial-gray">-</button>
+                  <span className="w-10 text-center font-semibold text-primary-navy text-xs">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-semibold text-industrial-gray">+</button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2.5">
                 <button
-                  key={`jump-${s.id}`}
-                  onClick={() => scrollToSection(s.id)}
-                  className="px-3 py-1.5 bg-slate-50 hover:bg-air-blue/30 text-industrial-gray/60 hover:text-primary-navy rounded-lg text-[8px] font-black uppercase tracking-widest transition-all border border-light-gray/40 shadow-xs"
+                  onClick={mainCategory?.metadata?.hide_price ? () => setLeadOpen(true) : handleAddToCart}
+                  disabled={!mainCategory?.metadata?.hide_price && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
+                  className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group active:scale-[0.98] disabled:opacity-50"
                 >
-                  {s.title}
+                  {mainCategory?.metadata?.hide_price ? <Settings size={16} /> : <ShoppingCart size={16} />}
+                  <span className="text-[10px] uppercase tracking-[0.2em]">{mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : t('pdp.addToCart')}</span>
                 </button>
+                
+                <button
+                  onClick={() => setIsProjectModalOpen(true)}
+                  className="w-full bg-white border border-slate-200 hover:border-primary-navy text-primary-navy font-semibold py-3 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
+                >
+                  <FolderPlus size={16} className="opacity-60 group-hover:opacity-100" />
+                  <span className="text-[10px] uppercase tracking-[0.2em]">PROJE LİSTESİ</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button onClick={() => setIsWishlisted(!isWishlisted)} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-slate-100 rounded-lg font-semibold text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-red-500 transition-all">
+                  <Heart size={12} fill={isWishlisted ? 'currentColor' : 'none'} className={isWishlisted ? 'text-red-500' : ''} />
+                  <span>FAVORİ</span>
+                </button>
+                <button onClick={handleShare} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-slate-100 rounded-lg font-semibold text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-primary-navy transition-all">
+                  <Share2 size={12} />
+                  <span>PAYLAŞ</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {[ { icon: Truck, label: 'KARGO' }, { icon: Shield, label: 'GÜVENLİ' }, { icon: Award, label: 'GARANTİ' } ].map((item, i) => (
+                <div key={i} className="flex flex-col items-center p-3 bg-white rounded-xl border border-slate-100 text-center">
+                  <item.icon className="text-industrial-gray opacity-30 mb-1" size={14} />
+                  <p className="text-[7px] font-semibold text-industrial-gray uppercase tracking-tighter opacity-40">{item.label}</p>
+                </div>
               ))}
             </div>
 
-            <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray/40 shadow-sm">
-              <div className="flex items-baseline justify-between">
+            <button onClick={handleDownloadPdf} disabled={isGeneratingPdf} className="w-full bg-slate-900 hover:bg-primary-navy text-white font-semibold py-4 px-6 rounded-2xl transition-all flex items-center justify-between group mt-6 disabled:opacity-50 shadow-sm">
+              <div className="flex items-center space-x-4 text-left">
+                {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
                 <div className="flex flex-col">
-                  <div className="text-3xl sm:text-3xl font-black text-primary-navy tracking-tight">
-                    {mainCategory?.metadata?.hide_price ? (
-                      <span className="text-base text-industrial-gray font-bold">TEKLİF İSTEYİN</span>
-                    ) : (
-                      formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
-                    )}
-                  </div>
-                  {!mainCategory?.metadata?.hide_price && (
-                    <span className="text-[8px] font-black text-steel-gray uppercase tracking-widest mt-1 opacity-50">
-                      VAT INCLUDED
-                    </span>
-                  )}
-                </div>
-                <div className="flex flex-col items-end">
-                  <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'bg-success-green/10 text-success-green' : 'bg-warning-orange/10 text-warning-orange'}`}>
-                    {typeof product.stock_qty === 'number' && product.stock_qty > 0 ? 'IN STOCK' : 'PRE-ORDER'}
-                  </div>
-                  <span className="text-[8px] text-steel-gray font-bold mt-1.5 opacity-30 uppercase tracking-[0.2em]">SKU: {product.sku}</span>
+                  <span className="text-[10px] uppercase tracking-widest font-semibold">TEKNİK ÜRÜN FÖYÜ</span>
+                  <span className="text-[7px] text-white/30 font-medium uppercase tracking-[0.2em]">DOWNLOAD DATASHEET PDF</span>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl border border-light-gray/40 p-5">
-                <div className="flex items-center justify-between mb-5">
-                  <span className="text-[9px] font-black text-industrial-gray uppercase tracking-[0.2em] opacity-50">Quantity</span>
-                  <div className="flex items-center bg-slate-50 rounded-xl p-0.5 border border-light-gray/30">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-bold text-industrial-gray">-</button>
-                    <span className="w-8 text-center font-black text-primary-navy text-xs">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-7 h-7 flex items-center justify-center hover:bg-white rounded-lg transition-all font-bold text-industrial-gray">+</button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={mainCategory?.metadata?.hide_price ? () => setLeadOpen(true) : handleAddToCart}
-                    disabled={!mainCategory?.metadata?.hide_price && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                    className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-black py-3 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group disabled:opacity-50 active:scale-[0.98]"
-                  >
-                    {mainCategory?.metadata?.hide_price ? <Settings size={14} /> : <ShoppingCart size={14} />}
-                    <span className="text-[10px] uppercase tracking-[0.2em]">{mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : t('pdp.addToCart')}</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setIsProjectModalOpen(true)}
-                    className="w-full bg-white border border-primary-navy/10 hover:border-primary-navy text-primary-navy font-black py-3 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
-                  >
-                    <FolderPlus size={14} className="opacity-70 group-hover:opacity-100" />
-                    <span className="text-[10px] uppercase tracking-[0.2em]">PROJE LİSTESİ</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-2 mt-4">
-                  <button onClick={() => setIsWishlisted(!isWishlisted)} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-light-gray/50 rounded-lg font-black text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-red-500 transition-all">
-                    <Heart size={12} fill={isWishlisted ? 'currentColor' : 'none'} className={isWishlisted ? 'text-red-500' : ''} />
-                    <span>FAVORİ</span>
-                  </button>
-                  <button onClick={handleShare} className="flex-1 flex items-center justify-center space-x-2 py-2 border border-light-gray/50 rounded-lg font-black text-[8px] uppercase tracking-[0.2em] text-steel-gray hover:text-primary-navy transition-all">
-                    <Share2 size={12} />
-                    <span>PAYLAŞ</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                {[ { icon: Truck, label: 'KARGO' }, { icon: Shield, label: 'GÜVENLİ' }, { icon: Award, label: 'GARANTİ' } ].map((item, i) => (
-                  <div key={i} className="flex flex-col items-center p-3 bg-white/50 rounded-xl border border-light-gray/20 text-center">
-                    <item.icon className="text-industrial-gray opacity-40 mb-1" size={14} />
-                    <p className="text-[7px] font-black text-industrial-gray uppercase tracking-tighter opacity-60">{item.label}</p>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={handleDownloadPdf}
-                disabled={isGeneratingPdf}
-                className="w-full bg-slate-900 hover:bg-primary-navy text-white font-black py-3 px-5 rounded-xl transition-all flex items-center justify-between group disabled:opacity-50 shadow-sm"
-              >
-                <div className="flex items-center space-x-3 text-left">
-                  {isGeneratingPdf ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} className="group-hover:animate-bounce" />}
-                  <div className="flex flex-col">
-                    <span className="text-[9px] uppercase tracking-widest font-black">TEKNİK FÖY</span>
-                    <span className="text-[7px] text-white/40 font-bold uppercase tracking-[0.2em]">DATASHEET PDF</span>
-                  </div>
-                </div>
-                <ChevronRight size={12} className="opacity-20 group-hover:opacity-100" />
-              </button>
-            </div>
+              <ChevronRight size={14} className="opacity-20 group-hover:opacity-100 transition-all" />
+            </button>
           </div>
         </div>
       </div>
 
-      <AddToProjectModal 
-        product={product} 
-        isOpen={isProjectModalOpen} 
-        onClose={() => setIsProjectModalOpen(false)} 
-      />
+      <AddToProjectModal product={product} isOpen={isProjectModalOpen} onClose={() => setIsProjectModalOpen(false)} />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            brand: product.brand,
-            sku: product.sku,
-            image: product.image_url ? [product.image_url] : [],
-            mpn: product.model_code ?? undefined,
-            description: metaDesc,
-            offers: {
-              '@type': 'Offer',
-              priceCurrency: 'TRY',
-              price: product.price || 0,
-              availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              url: canonicalUrl,
-            },
-          }),
-        }}
-      />
-
-      <div ref={navTriggerRef} className="h-0" />
-
-      {/* Section Navigation - Airy Integrated Design */}
-      <div
-        id="pdp-sticky-nav"
-        className={`transition-all duration-500 z-[40] bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
-          }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <nav className="flex space-x-1 overflow-x-auto py-3 sm:py-4 no-scrollbar">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => scrollToSection(section.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-bold text-[9px] sm:text-[10px] uppercase tracking-[0.2em] whitespace-nowrap transition-all ${activeSection === section.id
-                  ? 'bg-primary-navy text-white shadow-hvac scale-105'
-                  : 'text-industrial-gray/60 hover:text-primary-navy hover:bg-air-blue/50'
-                  }`}
-              >
-                <section.icon size={12} className={activeSection === section.id ? 'animate-pulse' : ''} />
-                <span>{section.title}</span>
-              </button>
-            ))}
-          </nav>
-
-          {isNavSticky && (
-            <div className="hidden lg:flex items-center space-x-3 pl-6 border-l border-light-gray ml-4 animate-in fade-in slide-in-from-right-8 duration-500">
-              <div className="flex flex-col items-end mr-2">
-                <span className="text-[10px] font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
-                <span className="text-[10px] text-primary-navy font-black tracking-widest">
-                  {mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
-                </span>
-              </div>
-              
-              <button
-                onClick={handleAddToCart}
-                disabled={(typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                className="bg-primary-navy hover:bg-secondary-blue text-white text-[9px] font-black uppercase tracking-widest py-2.5 px-5 rounded-xl transition-all shadow-md active:scale-95 flex items-center space-x-2"
-              >
-                <ShoppingCart size={14} />
-                <span>{t('pdp.addToCart')}</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
+      {/* ── Content Sections ────────────────────────────────────────────────── */}
       <div className="space-y-0">
         {sections.map((section) => {
           const IconComponent = section.icon
@@ -546,191 +392,121 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             <section
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
-              data-section={section.id}
-              className={`${section.bgClass} py-12 sm:py-20 transition-all duration-500 border-b border-light-gray/20 last:border-0`}
+              id={section.id}
+              className={`${section.bgClass} py-12 sm:py-24 border-b border-light-gray/20 last:border-0`}
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center space-x-4 mb-10 sm:mb-12">
-                  <div className="bg-slate-900 text-white p-3 rounded-xl shadow-sm">
-                    <IconComponent size={20} />
+              <div className={UI_SYSTEM.layout.containerNarrow}>
+                <div className="flex items-center space-x-4 mb-12">
+                  <div className="bg-slate-900 text-white p-3.5 rounded-xl shadow-sm">
+                    <IconComponent size={22} />
                   </div>
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-industrial-gray tracking-tight uppercase">
-                      {section.title}
-                    </h2>
-                    <div className="h-0.5 w-8 bg-secondary-blue mt-1.5 rounded-full" />
+                    <h2 className={UI_SYSTEM.typography.h2 + " uppercase"}>{section.title}</h2>
+                    <div className="h-0.5 w-8 bg-secondary-blue mt-2 rounded-full" />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
                   {section.id === 'genel' && (
                     <>
-                      <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm hover:shadow-md transition-all">
-                          <h4 className="font-black text-industrial-gray mb-6 flex items-center text-[10px] uppercase tracking-[0.2em] opacity-60">
+                      <div className="lg:col-span-8 space-y-8">
+                        <div className={"bg-white rounded-3xl p-8 transition-all " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+                          <h4 className={UI_SYSTEM.typography.label + " mb-8 opacity-40 flex items-center"}>
                             <Info className="text-primary-navy mr-2.5" size={16} />
-                            {t('pdp.labels.productDescription')}
+                            PRODUCT OVERVIEW
                           </h4>
-                          <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
+                          <div className={UI_SYSTEM.typography.body}>
                             <RichTextRenderer content={product.description || t('pdp.descFallback')} />
                           </div>
                         </div>
                       </div>
 
-                      <div className="lg:col-span-5 xl:col-span-4">
-                        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray/50 shadow-sm sticky top-36">
-                          <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">Quick Details</h4>
-                          <div className="space-y-4">
+                      <div className="lg:col-span-4">
+                        <div className={"bg-white rounded-3xl p-8 sticky top-40 " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+                          <h4 className={UI_SYSTEM.typography.label + " mb-8 opacity-40"}>Quick Reference</h4>
+                          <div className="space-y-5">
                             {[
                               { label: t('pdp.brand'), value: product.brand },
                               { label: t('pdp.model'), value: product.model_code ?? product.sku },
                               { label: t('pdp.labels.category'), value: mainCategory?.name || '-' }
                             ].map((item, i) => (
-                              <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
-                                <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
-                                <span className="text-xs font-black text-industrial-gray group-hover:text-primary-navy transition-colors">{item.value}</span>
+                              <div key={i} className="flex justify-between items-center py-3 border-b border-slate-100 group">
+                                <span className={UI_SYSTEM.typography.label + " opacity-60"}>{item.label}</span>
+                                <span className="text-[11px] font-semibold text-industrial-gray group-hover:text-primary-navy transition-colors">{item.value}</span>
                               </div>
                             ))}
-                            <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em]">Listing Price</span>
-                              <span className="text-lg font-black text-primary-navy">
-                                {mainCategory?.metadata?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>
                     </>
                   )}
 
-                  {section.id === 'modeller' && (
-                    <div className="col-span-full">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3].map((variant) => (
-                          <div key={variant} className="bg-white rounded-2xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                            <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center border border-light-gray/30 group-hover:bg-air-blue/10 transition-all">
-                              <BrandIcon brand={product.brand} className="scale-125 grayscale group-hover:grayscale-0 transition-all duration-500" />
-                            </div>
-                            <h4 className="font-black text-industrial-gray mb-1 text-sm uppercase tracking-tight">{product.sku}-{variant}</h4>
-                            <p className="text-steel-gray text-[10px] font-medium mb-4">{t('pdp.variantDetails') || 'Teknik özelliklerde özelleştirilmiş model varyantı.'}</p>
-                            <div className="flex items-center justify-between pt-3 border-t border-light-gray/50">
-                              <div className="text-primary-navy font-black text-sm">{formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
-                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-all"><ChevronRight size={14} /></button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
                   {section.id === 'olcuiler' && (
-                    <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
-                      {product.technical_specs ? (
-                        <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs)).map(([groupKey, group]) => {
-                            const isOpen = openSpecSections.includes(groupKey);
-                            const Icon = group.icon;
-                            return (
-                              <div key={groupKey} className="border border-light-gray/40 rounded-2xl overflow-hidden">
-                                <button onClick={() => toggleSpecSection(groupKey)} className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-air-blue/10 transition-all group">
-                                  <div className="flex items-center space-x-3">
-                                    <div className="p-1.5 bg-white rounded-lg shadow-xs group-hover:shadow-sm border border-light-gray/50"><Icon size={18} className="text-primary-navy" /></div>
-                                    <span className="font-black text-industrial-gray text-xs uppercase tracking-widest">{group.label}</span>
-                                  </div>
-                                  <div className={`p-1.5 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy'}`}><ChevronDown size={16} /></div>
-                                </button>
-                                <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                                  <div className="p-5 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-1">
-                                    {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
-                                      <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
-                                        <span className="text-[10px] font-bold text-steel-gray uppercase tracking-wider">{translateSpecKey(key)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                    <div className="col-span-full">
+                      <div className={"bg-white rounded-3xl p-8 sm:p-12 " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+                        {product.technical_specs ? (
+                          <div className="space-y-6">
+                            {Object.entries(groupTechnicalSpecs(product.technical_specs)).map(([groupKey, group]) => {
+                              const isOpen = openSpecSections.includes(groupKey);
+                              const Icon = group.icon;
+                              return (
+                                <div key={groupKey} className={"rounded-2xl overflow-hidden " + UI_SYSTEM.layout.borderLight}>
+                                  <button onClick={() => toggleSpecSection(groupKey)} className="w-full flex items-center justify-between p-5 bg-slate-50 hover:bg-air-blue/10 transition-all group text-left">
+                                    <div className="flex items-center space-x-4">
+                                      <div className="p-2 bg-white rounded-lg shadow-xs group-hover:shadow-sm border border-slate-200/40"><Icon size={20} className="text-primary-navy" /></div>
+                                      <div className="flex flex-col">
+                                        <span className={UI_SYSTEM.typography.h3 + " uppercase"}>{group.label}</span>
+                                        <span className="text-[8px] font-semibold text-steel-gray/40 uppercase tracking-[0.2em]">{Object.keys(group.specs).length} SPECIFICATIONS</span>
                                       </div>
-                                    ))}
+                                    </div>
+                                    <div className={`p-2 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy shadow-sm'}`}><ChevronDown size={18} /></div>
+                                  </button>
+                                  <div className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+                                    <div className="p-8 bg-white grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-2">
+                                      {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
+                                        <div key={key} className="flex justify-between items-center py-3.5 border-b border-slate-50 group hover:bg-slate-50/50 px-3 rounded-lg transition-colors">
+                                          <span className={UI_SYSTEM.typography.label + " opacity-60"}>{translateSpecKey(key)}</span>
+                                          <span className="text-xs font-semibold text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        </div>
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : <div className="text-steel-gray italic font-medium py-10 text-center text-xs uppercase tracking-widest">{t('pdp.labels.noSpecsAvailable')}</div>}
+                              );
+                            })}
+                          </div>
+                        ) : <div className="text-steel-gray italic font-medium py-16 text-center text-xs uppercase tracking-widest opacity-40">TECHNICAL DATA COMING SOON</div>}
+                      </div>
                     </div>
                   )}
 
-                  {section.id === 'diyagramlar' && (
-                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.technicalDiagrams')}</h4>
-                        <div className="space-y-4">
-                          {['mounting', 'electrical'].map(type => (
-                            <div key={type} className="group relative aspect-video bg-slate-50 rounded-2xl flex items-center justify-center border-2 border-dashed border-light-gray hover:border-primary-navy/30 transition-all cursor-pointer overflow-hidden">
-                              <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
-                                <div className="p-2.5 bg-primary-navy text-white rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform"><Download size={20} /></div>
-                              </div>
-                              <div className="text-center">
-                                <FileText size={28} className="text-primary-navy/40 mx-auto mb-2" />
-                                <p className="text-industrial-gray font-black text-[10px] uppercase tracking-widest">{t(`pdp.diagramsExtra.${type}`)}</p>
-                                <p className="text-[8px] text-steel-gray font-bold mt-1 uppercase tracking-tighter">PDF DATASHEET</p>
-                              </div>
-                            </div>
-                          ))}
+                  {section.id === 'modeller' && (
+                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {[1, 2, 3].map((v) => (
+                        <div key={v} className={"bg-white rounded-2xl p-8 transition-all group overflow-hidden " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry + " hover:scale-[1.02]"}>
+                          <div className="aspect-square bg-slate-50 rounded-2xl mb-6 flex items-center justify-center border border-slate-100 group-hover:bg-air-blue/5 transition-colors">
+                            <BrandIcon brand={product.brand} className="scale-125 grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                          </div>
+                          <h4 className="font-semibold text-industrial-gray mb-2 text-base tracking-tight uppercase">{product.sku}-{v}</h4>
+                          <p className="text-steel-gray text-[10px] font-medium mb-6 leading-relaxed">Advanced variant with optimized performance metrics for professional HVAC deployments.</p>
+                          <div className="flex items-center justify-between pt-5 border-t border-slate-100">
+                            <div className="text-primary-navy font-semibold text-lg">{formatCurrency((product.price + (v - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
+                            <button className="p-2 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-xl transition-all shadow-sm"><ChevronRight size={16} /></button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                        <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t('pdp.diagramsExtra.threeDViews')}</h4>
-                        <div className="space-y-4">
-                          {[ { icon: Settings, label: 'view3DModel', sub: 'interactiveModel' }, { icon: Ruler, label: 'dimensionedDrawing', sub: 'CAD/DWG AVAILABLE' } ].map((item, i) => (
-                            <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-light-gray/50 flex items-center space-x-5 group hover:bg-white hover:shadow-md transition-all">
-                              <div className="w-12 h-12 bg-white rounded-xl shadow-xs flex items-center justify-center flex-shrink-0 group-hover:bg-primary-navy group-hover:text-white transition-all"><item.icon size={22} /></div>
-                              <div>
-                                <p className="text-xs font-black text-industrial-gray uppercase tracking-tight">{t(`pdp.diagramsExtra.${item.label}`)}</p>
-                                <p className="text-[9px] text-steel-gray font-bold uppercase tracking-widest mt-1">{item.sub.startsWith('CAD') ? item.sub : t(`pdp.diagramsExtra.${item.sub}`)}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   )}
 
                   {section.id === 'dokumanlar' && (
-                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                       {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm hover:shadow-md transition-all group text-center">
-                          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:bg-air-blue/20 transition-all"><FileText size={32} className="text-primary-navy/40" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-4 min-h-[2rem]">{t(`pdp.docs.${doc}`)}</h4>
-                          <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-3 px-4 rounded-xl transition-all font-black text-[9px] uppercase tracking-widest flex items-center justify-center space-x-2">
-                            <Download size={14} /> <span>{t('pdp.actions.download')}</span>
+                        <div key={i} className={"bg-white rounded-3xl p-8 transition-all group text-center " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry + " hover:shadow-md"}>
+                          <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-navy group-hover:rotate-12 transition-all duration-500 shadow-inner"><FileText size={36} className="text-primary-navy group-hover:text-white transition-colors" /></div>
+                          <h4 className="font-semibold text-industrial-gray uppercase tracking-tight text-xs mb-6 min-h-[2.5rem] leading-relaxed px-4">{t(`pdp.docs.${doc}`)}</h4>
+                          <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-4 px-6 rounded-xl transition-all font-semibold text-[9px] uppercase tracking-widest flex items-center justify-center space-x-3 active:scale-95">
+                            <Download size={16} /> <span>DOWNLOAD PDF</span>
                           </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {section.id === 'pdf' && (
-                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {['productCatalog', 'technicalBrochure'].map(type => (
-                        <div key={type} className="bg-white rounded-3xl p-6 sm:p-8 border border-light-gray shadow-sm">
-                          <h4 className="font-black text-industrial-gray mb-6 text-[10px] uppercase tracking-[0.2em] opacity-60">{t(`pdp.docs.${type}`)}</h4>
-                          <div className="aspect-[4/3] bg-slate-50 rounded-xl mb-6 flex items-center justify-center border border-light-gray/30"><Download size={40} className="text-primary-navy/20" /></div>
-                          <button onClick={type === 'technicalBrochure' ? handleDownloadPdf : undefined} className="w-full bg-slate-900 hover:bg-primary-navy text-white py-3.5 px-6 rounded-xl transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-2">
-                            <Download size={18} /> <span>{t(`pdp.actions.download${type === 'productCatalog' ? 'Catalog' : 'Brochure'}`)}</span>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {section.id === 'sertifikalar' && (
-                    <div className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {['ceCertificate', 'iso9001', 'tseCertificate', 'energyStar', 'ulCertificate', 'ecoFriendly'].map((cert, i) => (
-                        <div key={i} className="bg-white rounded-3xl p-6 border border-light-gray shadow-sm text-center">
-                          <div className="bg-slate-50 rounded-2xl p-5 mb-5 group-hover:bg-air-blue/10 transition-all"><Award size={36} className="text-primary-navy/30 mx-auto" /></div>
-                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-3">{t(`pdp.cert.${cert}`)}</h4>
-                          <div className="text-[9px] text-steel-gray space-y-1 font-bold uppercase tracking-widest opacity-60">
-                            <p>{t('pdp.certLabels.certificateNo')}: {cert.toUpperCase()}-2024</p>
-                            <p>{t('pdp.certLabels.standard')}: ISO/EN-STD</p>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -742,20 +518,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         })}
       </div>
 
-      <div className="bg-white py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {relatedProducts.length > 0 && (
-            <>
-              <h2 className="text-xl sm:text-2xl font-black text-industrial-gray mb-10 uppercase tracking-tight">
-                {t('pdp.relatedProducts')}
-              </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                {relatedProducts.map((p) => <ProductCard key={p.id} product={p} compact />)}
-              </div>
-            </>
-          )}
+      {relatedProducts.length > 0 && (
+        <div className="bg-white py-20 sm:py-32">
+          <div className={UI_SYSTEM.layout.containerNarrow + " text-center"}>
+            <h2 className={UI_SYSTEM.typography.h2 + " mb-12 uppercase"}>{t('pdp.relatedProducts')}</h2>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
+              {relatedProducts.map((p) => <ProductCard key={p.id} product={p} compact />)}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} productId={product.id} />
     </div>
   )

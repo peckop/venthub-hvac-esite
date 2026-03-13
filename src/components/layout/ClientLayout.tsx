@@ -20,6 +20,7 @@ const WhatsAppFloat = lazy(() => import('../WhatsAppFloat'))
 
 import { I18nProvider } from '../../i18n/I18nProvider'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
+import { PageProvider } from '../../contexts/PageContext'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -27,7 +28,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <AuthProvider>
                 <CartProvider>
                     <ProjectProvider>
-                        {children}
+                        <PageProvider>
+                            {children}
+                        </PageProvider>
                     </ProjectProvider>
                 </CartProvider>
             </AuthProvider>

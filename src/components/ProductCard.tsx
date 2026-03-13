@@ -31,6 +31,8 @@ const resolveProductImage = (url: string | null | undefined): string => {
   return `${supabaseUrl}/storage/v1/object/public/product-images/${trimmed}`;
 };
 
+import { UI_SYSTEM } from '../utils/uiSystem'
+
 export const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({
   product,
   layout = 'grid',
@@ -54,8 +56,8 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   if (isList) {
     return (
       <Link href={`/products/${product.id}`} className="block w-full">
-        <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
+        <div className={"group relative flex items-center bg-white rounded-xl p-4 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 bg-slate-50 rounded-lg overflow-hidden p-2">
             <Image
               src={finalSrc}
               alt={product.name}
@@ -67,31 +69,30 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
           
           <div className="ml-5 flex-1 flex flex-col justify-center min-w-0">
             <div className="flex items-center space-x-2 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">{product.brand}</span>
-              <span className="text-[10px] text-steel-gray">/</span>
-              <span className="text-[10px] text-steel-gray font-medium truncate">{product.sku}</span>
+              <span className={UI_SYSTEM.typography.label + " text-secondary-blue"}>{product.brand}</span>
+              <span className="text-[10px] text-steel-gray/30">/</span>
+              <span className={UI_SYSTEM.typography.label + " opacity-40"}>{product.sku}</span>
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-1">
+            <h3 className={UI_SYSTEM.typography.h3 + " group-hover:text-primary-navy transition-colors line-clamp-1"}>
               {product.name}
             </h3>
             <div className="mt-2 flex items-baseline gap-3">
-              <div className="text-xl font-bold text-primary-navy">
+              <div className={UI_SYSTEM.typography.price + " text-lg"}>
                 {hidePrice ? (
-                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                  <span className="text-xs font-semibold text-industrial-gray">TEKLİF ALIN</span>
                 ) : (
                   formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
                 )}
               </div>
-              {!hidePrice && <span className="text-[10px] text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
+              {!hidePrice && <span className="text-[8px] text-steel-gray font-black uppercase tracking-widest opacity-40">VAT INCLUDED</span>}
             </div>
           </div>
 
           <button 
             onClick={handleAddToCart} 
-            className="w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-all shadow-md active:scale-95 ml-4 flex-shrink-0"
-            title={t('common.addToCart') || 'Sepete Ekle'}
+            className="w-10 h-10 rounded-lg bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-all shadow-sm active:scale-95 ml-4 flex-shrink-0"
           >
-            <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
             </svg>
           </button>
@@ -103,22 +104,22 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   // GRID VIEW
   return (
     <Link href={`/products/${product.id}`} className="block h-full">
-      <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
+      <div className={`group relative flex flex-col h-full bg-white rounded-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden ${UI_SYSTEM.layout.borderLight} ${UI_SYSTEM.layout.shadowAiry} ${compact ? 'p-3' : 'p-4'}`}>
         
         {/* Badges Overlay */}
         <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
           {product.is_featured && (
-            <div className="bg-gold-accent/90 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
-              {t('pdp.featured') || 'ÖNE ÇIKAN'}
+            <div className="bg-gold-accent/10 backdrop-blur-sm text-gold-accent text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded border border-gold-accent/20">
+              PRO
             </div>
           )}
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-light-gray shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <BrandIcon brand={product.brand} />
+            <BrandIcon brand={product.brand} className="w-4 h-4" />
           </div>
         </div>
 
         {/* Product Image */}
-        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-50/50 mb-4 transition-colors group-hover:bg-air-blue/5">
           <Image
             src={finalSrc}
             alt={product.name}
@@ -132,33 +133,30 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
         {/* Product Details */}
         <div className="flex flex-col flex-1 px-1">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">
+            <span className={UI_SYSTEM.typography.label + " text-secondary-blue"}>
               {product.brand}
             </span>
-            <span className="text-[9px] text-steel-gray font-medium">{product.sku}</span>
+            <span className="text-[8px] text-steel-gray/40 font-bold uppercase tracking-widest">{product.sku}</span>
           </div>
           
-          <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
+          <h3 className={UI_SYSTEM.typography.h3 + " text-xs leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors"}>
             {product.name}
           </h3>
 
-          <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between">
-            <div className="flex flex-col">
-              <div className="text-lg font-bold text-primary-navy tracking-tight">
-                {hidePrice ? (
-                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
-                ) : (
-                  formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
-                )}
-              </div>
+          <div className="mt-auto pt-3 border-t border-slate-50 flex items-center justify-between">
+            <div className={UI_SYSTEM.typography.price + " text-base"}>
+              {hidePrice ? (
+                <span className="text-[10px] text-industrial-gray font-bold">TEKLİF ALIN</span>
+              ) : (
+                formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
+              )}
             </div>
             
             <button 
               onClick={handleAddToCart} 
-              className="w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-all hover:bg-secondary-blue hover:shadow-lg active:scale-95"
-              title={t('common.addToCart') || 'Sepete Ekle'}
+              className="w-8 h-8 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-all hover:bg-secondary-blue active:scale-95"
             >
-              <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
               </svg>
             </button>
