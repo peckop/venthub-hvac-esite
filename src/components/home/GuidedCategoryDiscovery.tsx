@@ -2,49 +2,37 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useI18n } from '../../i18n/I18nProvider'
-import { getCategories, type Category } from '../../lib/supabase'
+import { type Category } from '../../lib/supabase'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
-// Mock images for cinematic feel - we'll use these as fallbacks or matches
-const categoryImages: Record<string, string> = {
-  'fanlar': '/images/vortice_lineo_futuristic.png',
-  'hava-perdeleri': '/images/products/vortice_lineo_360.png',
-  'isi-geri-kazanim-cihazlari': '/images/vortice_lineo_futuristic.png',
-  'hiz-kontrolu-cihazlari': '/images/products/vortice_lineo_360.png',
-  'mutfak-havalandirma': '/images/vortice_lineo_futuristic.png',
-  'otopark-havalandirma': '/images/products/vortice_lineo_360.png',
-  'cati-tipi-fanlar': '/images/vortice_lineo_futuristic.png',
-  'aksesuarlar': '/images/products/vortice_lineo_360.png'
+interface GuidedCategoryDiscoveryProps {
+  categories?: Category[]
 }
 
-export const GuidedCategoryDiscovery: React.FC = () => {
+// Güvenli yedek görsel (Veritabanında resim yoksa bu gösterilecek)
+const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.png'
+
+// Resim adresini Next.js Image bileşenine uygun hale getiren yardımcı fonksiyon
+const normalizeImageUrl = (url: string | null | undefined): string => {
+  if (!url || url.trim().length === 0) return FALLBACK_CATEGORY_IMAGE;
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('data:')) return trimmed;
+  
+  // Eğer sadece dosya adıysa Supabase Storage (category-images) yolunu ekle
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return `${supabaseUrl}/storage/v1/object/public/category-images/${trimmed}`;
+};
+
+export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ categories = [] }) => {
   const { t } = useI18n()
-  const [categories, setCategories] = useState<Category[]>([])
 
-  useEffect(() => {
-    let active = true
-    const load = async () => {
-      try {
-        const data = await getCategories()
-        if (!active) return
-        // Sadece ana kategorileri (level 0) al ve sırala
-        const mainCats = data
-          .filter((c) => c.level === 0)
-          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-        setCategories(mainCats)
-      } catch (error) {
-        console.error('Failed to load homepage categories:', error)
-      }
-    }
-    void load()
-    return () => { active = false }
-  }, [])
-
-  // Tüm kategorileri kullanacağımız için artık useMemo ile filtrelemeye gerek yok
-  const displayCategories = categories;
+  // Sadece ana kategorileri (level 0) filtrele ve sırala
+  const displayCategories = categories
+    .filter((c) => c.level === 0)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">
@@ -83,6 +71,8 @@ export const GuidedCategoryDiscovery: React.FC = () => {
         {/* Mobile: Horizontal Scroll | Desktop: Grid */}
         <div className="flex overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-2 md:overflow-visible md:pb-0">
           {displayCategories.map((category, idx) => {
+            const finalSrc = normalizeImageUrl(category.image_url);
+            
             return (
               <motion.div
                 key={category.id}
@@ -93,12 +83,13 @@ export const GuidedCategoryDiscovery: React.FC = () => {
                 className="group relative flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto snap-center overflow-hidden bg-slate-100 aspect-square lg:aspect-[0.85/1] transition-all duration-700"
               >
                 <Link href={`/category/${category.slug}`} className="block w-full h-full">
-                  {/* Background Image with Decocasa-style zoom and tint */}
+                  {/* Background Image with Fallback Logic */}
                   <div className="absolute inset-0 z-0">
                     <Image
-                      src={categoryImages[category.slug] || '/images/vortice_lineo_futuristic.png'}
+                      src={finalSrc}
                       alt={category.name}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
                     />
                     {/* Architectural Overlay */}
