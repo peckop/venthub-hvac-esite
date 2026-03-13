@@ -308,18 +308,18 @@ export const en = {
       panelEyebrow: 'Focus Panel',
       tabs: {
         featured: 'Featured',
-        airCurtains: 'Air Curtains',
-        heatRecovery: 'Heat Recovery'
+        newArrivals: 'New Arrivals',
+        bestSellers: 'Best Sellers'
       },
       panelTitles: {
-        featured: 'Featured product selection',
-        airCurtains: 'Air curtain focus',
-        heatRecovery: 'Heat recovery focus'
+        featured: 'Featured selection',
+        newArrivals: 'New arrivals focus',
+        bestSellers: 'Most preferred'
       },
       panelDescriptions: {
         featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
-        airCurtains: 'See air curtain products together for entrance comfort and energy-loss control.',
-        heatRecovery: 'Approach the heat recovery product family directly for efficiency-led commercial climate control.'
+        newArrivals: 'Discover our latest additions to the HVAC inventory, featuring newest technology.',
+        bestSellers: 'Explore products that set the industry standard for reliability and performance.'
       }
     },
     trustProof: {
