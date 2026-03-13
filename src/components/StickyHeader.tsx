@@ -257,36 +257,32 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
         }
         contextTierChildren={productName ? (
           <div className="flex w-full items-center justify-between h-full">
-            <div className="flex items-center gap-2 overflow-hidden py-1">
-              <div className="flex items-center space-x-1 sm:space-x-1.5 text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/30 overflow-x-auto no-scrollbar whitespace-nowrap max-w-[120px] sm:max-w-none">
-                <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
-                {breadcrumb?.map((item, i) => (
-                  <React.Fragment key={i}>
-                    <span className="opacity-30">/</span>
-                    <Link href={item.href} className="hover:text-primary-navy transition-colors truncate max-w-[80px] sm:max-w-[120px]">{item.label}</Link>
-                  </React.Fragment>
-                ))}
-                <span className="opacity-30">/</span>
-              </div>
-              <span className={UI_SYSTEM.typography.nav + " text-primary-navy truncate max-w-[180px] sm:max-w-xs font-semibold"}>
+            <div className="flex items-center gap-3 overflow-hidden py-1">
+              <span className="text-[11px] font-semibold text-industrial-gray tracking-tight truncate max-w-[200px] sm:max-w-xs uppercase">
                 {productName}
               </span>
               {modelCode && (
-                <span className="text-[8px] font-semibold text-steel-gray/20 border border-slate-200/40 px-1.5 py-0.5 rounded tracking-widest hidden lg:block ml-2 uppercase">
+                <span className="text-[9px] font-medium text-steel-gray/40 border border-slate-200/60 px-1.5 py-0.5 rounded tracking-widest hidden lg:block uppercase">
                   {modelCode}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar ml-4 py-1">
-              {technicalLinks?.map(link => (
-                <button
-                  key={link.id}
-                  onClick={() => handleTechLinkClick(link.id)}
-                  className="px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-steel-gray/60 hover:text-primary-navy hover:bg-air-blue/10 rounded-lg transition-all whitespace-nowrap"
-                >
-                  {link.label}
-                </button>
-              ))}
+            
+            <div className="flex items-center gap-4 overflow-x-auto no-scrollbar ml-4 py-1">
+              {technicalLinks?.map(link => {
+                // Find icon based on label
+                const Icon = sections.find(s => s.title === link.label)?.icon || Info
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => handleTechLinkClick(link.id)}
+                    className="flex items-center gap-1.5 px-2 py-1 text-[9px] font-semibold uppercase tracking-wider text-steel-gray/70 hover:text-primary-navy transition-all whitespace-nowrap group"
+                  >
+                    <Icon size={12} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+                    <span>{link.label}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         ) : null}

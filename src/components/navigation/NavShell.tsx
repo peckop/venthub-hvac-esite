@@ -64,7 +64,7 @@ const NavShell: React.FC<NavShellProps> = ({
                 <div className={cn("absolute inset-0 bg-black/40 transition-opacity duration-500 pointer-events-none", isAnyOverlayOpen ? "opacity-100" : "opacity-0")} />
             </div>
 
-            {/* Bottom Tier: The Action Bar */}
+            {/* Bottom Tier & Context Tier: Unified Expanding Block */}
             <header
                 className={cn(
                     'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
@@ -73,23 +73,19 @@ const NavShell: React.FC<NavShellProps> = ({
                 )}
             >
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {/* Row 1: The Main Action Bar */}
                     <div className="flex h-16 items-center justify-between gap-3">
                         {bottomTierChildren}
                     </div>
+
+                    {/* Row 2: Contextual Product Information (Expanded Bottom) */}
+                    {hasContext && (
+                        <div className="border-t border-slate-100/60 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] h-10 flex items-center">
+                            {contextTierChildren}
+                        </div>
+                    )}
                 </div>
             </header>
-
-            {/* Context Tier: PDP Product Bar (Systemair Style) */}
-            <div
-                className={cn(
-                    'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-slate-50/80 backdrop-blur-xl border-b border-slate-200/40 overflow-hidden',
-                    hasContext ? 'h-10 opacity-100' : 'h-0 opacity-0'
-                )}
-            >
-                <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-                    {contextTierChildren}
-                </div>
-            </div>
         </div>
     )
 }
