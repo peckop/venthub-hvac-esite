@@ -16,7 +16,7 @@ export const UI_SYSTEM = {
         h3: "text-sm md:text-base font-semibold tracking-tight text-industrial-gray",
         
         // Technical labels (SKU, Qty, Attribute names)
-        label: "text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-steel-gray/60",
+        label: "text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em] text-steel-gray/60",
         
         // Main body text
         body: "text-sm md:text-base text-steel-gray leading-relaxed font-medium",
@@ -28,7 +28,7 @@ export const UI_SYSTEM = {
         price: "text-xl md:text-2xl font-semibold text-primary-navy tracking-tight",
         
         // Navigation / Breadcrumb items
-        nav: "text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em]",
+        nav: "text-[9px] md:text-[10px] font-semibold uppercase tracking-[0.2em]",
     },
 
     /** Layout & Spacing */

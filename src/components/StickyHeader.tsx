@@ -38,7 +38,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const { getCartCount, syncing, getCartTotal } = useCart()
   const { user, signOut } = useAuth()
   const isAdmin = checkAdminAccess(user)
-  const { productName, modelCode, technicalLinks } = usePageContext()
+  const { productName, modelCode, technicalLinks, breadcrumb } = usePageContext()
 
   const {
     activeSurface,
@@ -56,7 +56,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     closeSearchOverlay,
   } = useNavigationState({ isScrolled })
 
-  const [scrollProgress, setScrollProgress] = useState(0)
+  const [scrollProgress, _setScrollProgress] = useState(0)
   const { isScrollingDown, isAtTop } = useHideOnScroll({ threshold: 60 })
   const [categoriesLoaded, setCategoriesLoaded] = useState(false)
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(false)
@@ -118,7 +118,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       setCategoriesLoaded(true)
       return data
     } catch (error) {
-      console.error('Error fetching categories:', error)
+      console.error('Error:', error)
       return null
     } finally {
       setIsCategoriesLoading(false)
@@ -164,10 +164,10 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     if (!user) {
       return (
         <div className="flex items-center gap-2">
-          <Link href="/auth/login" className="text-[10px] font-bold uppercase tracking-widest text-industrial-gray hover:text-primary-navy transition-colors px-3 py-2">
+          <Link href="/auth/login" className="text-[10px] font-semibold uppercase tracking-widest text-industrial-gray hover:text-primary-navy transition-colors px-3 py-2">
             {t('header.signIn')}
           </Link>
-          <Link href="/auth/register" className="bg-primary-navy hover:bg-secondary-blue text-white text-[10px] font-black uppercase tracking-[0.2em] py-2 px-5 rounded-xl shadow-md transition-all active:scale-95">
+          <Link href="/auth/register" className="bg-primary-navy hover:bg-secondary-blue text-white text-[10px] font-semibold uppercase tracking-[0.2em] py-2 px-5 rounded-xl shadow-md transition-all active:scale-95">
             {t('header.signUp')}
           </Link>
         </div>
@@ -213,7 +213,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   return (
     <>
       <a href="#main-content" className="skip-link">{t('common.skipToContent')}</a>
-      <div className="h-20" aria-hidden="true" />
+      <div className={`transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${productName ? 'h-24 md:h-32' : 'h-16 md:h-24'}`} aria-hidden="true" />
       <NavShell
         fixed={true}
         showProgress={isScrolled}
@@ -231,11 +231,11 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
             </div>
             <NavUtilityRail>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">
-                <NavActionButton ariaLabel={t('header.quickOrder')} title={t('header.quickOrder')} onClick={() => router.push('/products?all=1&sort=bestsellers')} tone="warning" icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" /></svg>} label={t('header.quickOrder')} />
+                <NavActionButton ariaLabel={t('header.quickOrder')} title={t('header.quickOrder')} onClick={() => router.push('/products?all=1&sort=bestsellers')} tone="warning" icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="13,2 3,14 12,14 11,22 21,10 12,10 13,2" /></svg>} label={t('header.quickOrder')} labelClassName="hidden 2xl:block font-semibold" />
                 {recentProducts.length > 0 && <NavActionButton ariaLabel={t('header.recentlyViewed')} title={t('header.recentlyViewed')} onClick={() => { if (recentProducts.length > 0) router.push(`/products/${recentProducts[0]}`) }} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,6 12,12 16,14" /></svg>} />}
                 <NavActionButton ariaLabel={t('header.favorites')} title={t('header.favorites')} onClick={() => router.push('/account/favorites')} icon={<svg width={16} height={16} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" /></svg>} />
               </div>
-              <NavActionButton href="/cart" ariaLabel={t('header.cart')} tone="success" icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300"><path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" /><path strokeWidth={2} d="M5 6L4 2H2" /><circle cx="16" cy="19" r="2" /><circle cx="8" cy="19" r="2" /></svg>} label={cartTotal > 0 ? formatCurrency(String(cartTotal), lang, { maximumFractionDigits: 0 }) : undefined} labelClassName="hidden 2xl:block font-semibold text-success-green transition-all" badge={<>{showSyncPulse && syncing && <span title={t('header.syncing')} aria-label={t('header.syncing')} className="absolute -left-1 -top-1 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse" />}{cartCount > 0 && <span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md transition-all duration-300 -right-2 -top-2 h-5 w-5 text-[11px]">{cartCount}</span>}</>} />
+              <NavActionButton href="/cart" ariaLabel={t('header.cart')} tone="success" icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300"><path strokeWidth={2} d="M5 6h16l-1.68 8.39a2 2 0 0 1-1.97 1.61H8.66a2 2 0 0 1-1.97-1.61L5 6Z" /><path strokeWidth={2} d="M5 6L4 2H2" /><circle cx="16" cy="19" r="2" /><circle cx="8" cy="19" r="2" /></svg>} label={cartTotal > 0 ? formatCurrency(String(cartTotal), lang, { maximumFractionDigits: 0 }) : undefined} labelClassName="hidden 2xl:block font-semibold text-success-green transition-all" badge={<>{showSyncPulse && syncing && <span title={t('header.syncing')} aria-label={t('header.syncing')} className="absolute -left-1 -top-1 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse" />}{cartCount > 0 && <span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-semibold text-white shadow-md transition-all duration-300 -right-2 -top-2 h-5 w-5 text-[11px]">{cartCount}</span>}</>} />
               <div className="hidden lg:block">{renderUserMenu()}</div>
               <div className="transition-all duration-300 overflow-hidden sm:hidden"><NavActionButton ariaLabel={t('common.search')} onClick={openSearchOverlay} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>} /></div>
               <NavActionButton ariaLabel={t('header.menu')} onClick={handleOpenMenu} icon={<svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24" className="transition-all duration-300"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>} tone={activeSurface === 'menu' ? 'accent' : 'default'} className="lg:hidden" />
@@ -243,14 +243,34 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
           </>
         }
         contextTierChildren={productName ? (
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className={UI_SYSTEM.typography.nav + " text-primary-navy truncate max-w-[200px] sm:max-w-xs"}>{productName}</span>
-              {modelCode && <span className="text-[9px] font-black text-steel-gray/40 border border-slate-200/60 px-1.5 py-0.5 rounded tracking-widest hidden sm:block">{modelCode}</span>}
+          <div className="flex w-full items-center justify-between h-full">
+            <div className="flex items-center gap-2 overflow-hidden py-1">
+              <div className="flex items-center space-x-1 sm:space-x-1.5 text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/30 overflow-x-auto no-scrollbar whitespace-nowrap max-w-[120px] sm:max-w-none">
+                <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
+                {breadcrumb?.map((item, i) => (
+                  <React.Fragment key={i}>
+                    <span className="opacity-30">/</span>
+                    <Link href={item.href} className="hover:text-primary-navy transition-colors truncate max-w-[80px] sm:max-w-[120px]">{item.label}</Link>
+                  </React.Fragment>
+                ))}
+                <span className="opacity-30">/</span>
+              </div>
+              <span className={UI_SYSTEM.typography.nav + " text-primary-navy truncate max-w-[180px] sm:max-w-xs font-semibold"}>
+                {productName}
+              </span>
+              {modelCode && (
+                <span className="text-[8px] font-semibold text-steel-gray/20 border border-slate-200/40 px-1.5 py-0.5 rounded tracking-widest hidden lg:block ml-2 uppercase">
+                  {modelCode}
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar ml-4">
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar ml-4 py-1">
               {technicalLinks?.map(link => (
-                <button key={link.id} onClick={() => handleTechLinkClick(link.id)} className="px-3 py-1 text-[9px] font-black uppercase tracking-widest text-steel-gray hover:text-primary-navy transition-colors whitespace-nowrap">
+                <button
+                  key={link.id}
+                  onClick={() => handleTechLinkClick(link.id)}
+                  className="px-3 py-1.5 text-[9px] font-semibold uppercase tracking-widest text-steel-gray/60 hover:text-primary-navy hover:bg-air-blue/10 rounded-lg transition-all whitespace-nowrap"
+                >
                   {link.label}
                 </button>
               ))}

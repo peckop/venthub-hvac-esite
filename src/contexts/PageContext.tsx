@@ -6,6 +6,7 @@ export interface PageContextType {
   productName?: string
   modelCode?: string
   technicalLinks?: { id: string; label: string }[]
+  breadcrumb?: { label: string; href: string }[]
   setPageContext: (data: Partial<Omit<PageContextType, 'setPageContext'>>) => void
   clearPageContext: () => void
 }
