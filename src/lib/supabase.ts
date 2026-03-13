@@ -887,7 +887,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 }
 
 export async function removeProductFromProject(projectId: string, productId: string) {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('project_items')
     .delete()
     .eq('project_id', projectId)
