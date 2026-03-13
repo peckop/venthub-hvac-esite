@@ -441,7 +441,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       <div className={"bg-white rounded-3xl p-8 sm:p-12 " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
                         {product.technical_specs ? (
                           <div className="space-y-6">
-                            {Object.entries(groupTechnicalSpecs(product.technical_specs)).map(([groupKey, group]) => {
+                            {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
                               const isOpen = openSpecSections.includes(groupKey);
                               const Icon = group.icon;
                               return (

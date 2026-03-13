@@ -113,7 +113,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
         return
       }
       try {
-        const role = await getUserRole()
+        const role = await getUserRole(user.id)
         if (active) setUserRole(role)
       } catch (e) {
         console.error('getUserRole in StickyHeader failed', e)

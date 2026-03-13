@@ -831,13 +831,13 @@ export async function clearCartItems(cartId: string) {
 
 // ========== B2B: Project Lists ==========
 export async function listUserProjects() {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_projects')
     .select('*')
     .order('created_at', { ascending: false })
   
   if (error) throw error
-  return (data || []) as UserProject[]
+  return (data || []) as any as UserProject[]
 }
 
 export async function createProject(name: string, description?: string) {
@@ -845,18 +845,18 @@ export async function createProject(name: string, description?: string) {
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_projects')
     .insert({ user_id: user.id, name, description })
     .select('*')
     .single()
   
   if (error) throw error
-  return data as UserProject
+  return data as any as UserProject
 }
 
 export async function listProjectItems(projectId: string) {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('project_items')
     .select(`
       *,
@@ -866,11 +866,11 @@ export async function listProjectItems(projectId: string) {
     .order('created_at', { ascending: false })
   
   if (error) throw error
-  return (data || []) as (ProjectItem & { product: Product })[]
+  return (data || []) as any as (ProjectItem & { product: Product })[]
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity = 1) {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('project_items')
     .upsert({ 
       project_id: projectId, 
@@ -883,11 +883,11 @@ export async function addProductToProject(projectId: string, productId: string, 
     .single()
   
   if (error) throw error
-  return data as ProjectItem
+  return data as any as ProjectItem
 }
 
 export async function removeProductFromProject(projectId: string, productId: string) {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('project_items')
     .delete()
     .eq('project_id', projectId)
@@ -898,7 +898,7 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function deleteProject(projectId: string) {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('user_projects')
     .delete()
     .eq('id', projectId)
