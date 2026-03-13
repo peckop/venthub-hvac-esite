@@ -141,8 +141,15 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     if (id === 'categories') void ensureCategories()
   }, [ensureCategories])
 
-  const secondaryItems = NAVIGATION_SECONDARY_ITEMS(t)
-  const primaryItems = NAVIGATION_PRIMARY_ITEMS(t)
+  // Resolve labels for navigation items
+  const secondaryItems = NAVIGATION_SECONDARY_ITEMS.map(item => ({
+    ...item,
+    label: t(item.labelKey)
+  }))
+  const primaryItems = NAVIGATION_PRIMARY_ITEMS.map(item => ({
+    ...item,
+    label: t(item.labelKey)
+  }))
 
   const userDisplayName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'
   const roleLabel = (role: string) => {
@@ -246,7 +253,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
           <div className="flex w-full items-center justify-between h-full">
             <div className="flex items-center gap-2 overflow-hidden py-1">
               <div className="flex items-center space-x-1 sm:space-x-1.5 text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/30 overflow-x-auto no-scrollbar whitespace-nowrap max-w-[120px] sm:max-w-none">
-                <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
+                <Link href="/" className="hover:text-primary-navy transition-colors whitespace-nowrap">HOME</Link>
                 {breadcrumb?.map((item, i) => (
                   <React.Fragment key={i}>
                     <span className="opacity-30">/</span>

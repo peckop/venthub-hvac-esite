@@ -65,7 +65,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
   const [quantity, setQuantity] = useState(1)
-  const [activeSection, setActiveSection] = useState('genel')
+  const [activeSection, _setActiveSection] = useState('genel')
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [leadOpen, setLeadOpen] = useState(false)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
@@ -111,11 +111,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         }
         setProduct(productData)
         
+        // Fetch categories early for header sync
+        const cats = await getCategories()
+        let mc: Category | null = null
+        let sc: Category | null = null
+        
+        if (productData.category_id) {
+          mc = cats.find(c => c.id === productData.category_id) || null
+          setMainCategory(mc)
+        }
+        if (productData.subcategory_id) {
+          sc = cats.find(c => c.id === productData.subcategory_id) || null
+          setSubCategory(sc)
+        }
+
         // Sync with Header
         setPageContext({
           productName: productData.name,
           modelCode: productData.model_code || productData.sku,
-          technicalLinks: sections.map(s => ({ id: s.id, label: s.title }))
+          technicalLinks: sections.map(s => ({ id: s.id, label: s.title })),
+          breadcrumb: [
+            ...(mc ? [{ label: mc.name, href: `/category/${mc.slug}` }] : []),
+            ...(sc && sc.slug !== mc?.slug ? [{ label: sc.name, href: `/category/${mc?.slug}/${sc.slug}` }] : [])
+          ]
         })
 
         try {
@@ -127,13 +145,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           setImages((imgs || []) as { path: string; alt?: string | null }[])
         } catch { }
 
-        const cats = await getCategories()
-        if (productData.category_id) {
-          setMainCategory(cats.find(c => c.id === productData.category_id) || null)
-        }
-        if (productData.subcategory_id) {
-          setSubCategory(cats.find(c => c.id === productData.subcategory_id) || null)
-        }
         if (productData.subcategory_id) {
           const related = await getProductsBySubcategory(productData.subcategory_id)
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
@@ -211,30 +222,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     <div className="min-h-screen bg-slate-50/20 pt-[64px] md:pt-[104px]">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* ── Breadcrumb ────────────────────────────────────────────────────────── */}
-      <div className="relative z-20">
-        <div className={UI_SYSTEM.layout.containerNarrow + " py-4 sm:py-5"}>
-          <nav className="flex items-center space-x-2 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/40">
-            <Link href="/" className="hover:text-primary-navy transition-colors font-semibold">HOME</Link>
-            <span className="opacity-30">/</span>
-            {mainCategory && (
-              <>
-                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors font-semibold">{mainCategory.name}</Link>
-                {subCategory && subCategory.slug !== mainCategory.slug && (
-                  <>
-                    <span className="opacity-30">/</span>
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors font-semibold">{subCategory.name}</Link>
-                  </>
-                )}
-                <span className="opacity-30">/</span>
-              </>
-            )}
-            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none opacity-80 font-semibold">{product.name}</span>
-          </nav>
-        </div>
-      </div>
-
-      <div className={UI_SYSTEM.layout.containerNarrow + " pb-12 sm:pb-20"}>
+      <div className={UI_SYSTEM.layout.containerNarrow + " py-8 sm:py-12"}>
         {/* Back Button */}
         <button
           onClick={() => {
@@ -255,7 +243,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
           
-          {/* ── Visual Side (60%) ────────────────────────────────────────────── */}
           <div className="lg:col-span-7 xl:col-span-7">
             <div className="sticky top-32 space-y-6">
               <div className={"bg-white rounded-2xl p-1.5 overflow-hidden " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
@@ -268,7 +255,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 />
               </div>
               
-              {/* Quick Jump Dashboard */}
               <div className="grid grid-cols-4 gap-2">
                 {sections.slice(0, 4).map(s => (
                   <button key={s.id} onClick={() => scrollToSection(s.id)} className={"p-3 rounded-xl bg-white transition-all text-center group hover:bg-air-blue/10 " + UI_SYSTEM.layout.borderLight}>
@@ -280,7 +266,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
           </div>
 
-          {/* ── Content Side (40%) ───────────────────────────────────────────── */}
           <div className="lg:col-span-5 xl:col-span-5 flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2.5">
@@ -301,7 +286,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               {product.name}
             </h1>
 
-            {/* Action Card (Airy Redesign) */}
             <div className={"bg-white rounded-2xl p-6 space-y-6 " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry}>
               <div className="flex items-baseline justify-between">
                 <div className="flex flex-col">
@@ -332,7 +316,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <button
                   onClick={mainCategory?.metadata?.hide_price ? () => setLeadOpen(true) : handleAddToCart}
                   disabled={!mainCategory?.metadata?.hide_price && (typeof product.stock_qty === 'number' ? product.stock_qty <= 0 : product.status === 'out_of_stock')}
-                  className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group active:scale-[0.98] disabled:opacity-50"
+                  className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group active:scale-[0.98] disabled:opacity-50"
                 >
                   {mainCategory?.metadata?.hide_price ? <Settings size={16} /> : <ShoppingCart size={16} />}
                   <span className="text-[10px] uppercase tracking-[0.2em]">{mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : t('pdp.addToCart')}</span>
@@ -384,7 +368,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
       <AddToProjectModal product={product} isOpen={isProjectModalOpen} onClose={() => setIsProjectModalOpen(false)} />
 
-      {/* ── Content Sections ────────────────────────────────────────────────── */}
       <div className="space-y-0">
         {sections.map((section) => {
           const IconComponent = section.icon
