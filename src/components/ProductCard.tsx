@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   hidePrice = false,
   compact = false
 }) {
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   const isList = layout === 'list'
   const { addToCart } = useCart()
 
@@ -54,30 +54,43 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   if (isList) {
     return (
       <Link href={`/products/${product.id}`} className="block w-full">
-        <div className="group relative flex items-center bg-white rounded-[1.5rem] border border-slate-100 p-4 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
-          <div className="relative w-32 h-32 flex-shrink-0 bg-slate-50 rounded-xl overflow-hidden p-2">
-            <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:10px_10px]" />
+        <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
+          <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <Image
               src={finalSrc}
               alt={product.name}
               fill
               sizes="128px"
-              className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
+              className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
             />
           </div>
           
-          <div className="ml-6 flex-1 flex flex-col justify-center">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-cyan-600 mb-1">{product.brand}</div>
-            <h3 className="text-lg font-bold text-slate-900 group-hover:text-cyan-600 transition-colors line-clamp-1">{product.name}</h3>
-            <div className="mt-2 flex items-center gap-4">
-              <div className="text-xl font-black text-slate-950">
-                {hidePrice ? <span className="text-sm font-medium text-cyan-600">Teklif İste</span> : formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
+          <div className="ml-5 flex-1 flex flex-col justify-center min-w-0">
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">{product.brand}</span>
+              <span className="text-[10px] text-steel-gray">/</span>
+              <span className="text-[10px] text-steel-gray font-medium truncate">{product.sku}</span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-1">
+              {product.name}
+            </h3>
+            <div className="mt-2 flex items-baseline gap-3">
+              <div className="text-xl font-bold text-primary-navy">
+                {hidePrice ? (
+                  <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                ) : (
+                  formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
+                )}
               </div>
-              <span className="text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-md uppercase font-bold">{product.sku}</span>
+              {!hidePrice && <span className="text-[10px] text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
             </div>
           </div>
 
-          <button onClick={handleAddToCart} className="w-12 h-12 rounded-2xl bg-slate-950 text-white flex items-center justify-center hover:bg-cyan-500 transition-all shadow-lg active:scale-90 ml-4">
+          <button 
+            onClick={handleAddToCart} 
+            className="w-11 h-11 rounded-xl bg-primary-navy text-white flex items-center justify-center hover:bg-secondary-blue transition-all shadow-md active:scale-95 ml-4 flex-shrink-0"
+            title={t('common.addToCart') || 'Sepete Ekle'}
+          >
             <svg width={20} height={20} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
             </svg>
@@ -90,46 +103,61 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   // GRID VIEW
   return (
     <Link href={`/products/${product.id}`} className="block h-full">
-      <div className={`group relative flex flex-col h-full bg-white rounded-[2rem] border border-slate-100 transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1.5 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
+      <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
         
-        <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
+        {/* Badges Overlay */}
+        <div className="absolute top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
           {product.is_featured && (
-            <div className="bg-slate-900/90 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-white/10 shadow-xl">PRO</div>
+            <div className="bg-gold-accent/90 backdrop-blur-sm text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+              {t('pdp.featured') || 'ÖNE ÇIKAN'}
+            </div>
           )}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl p-1.5 border border-slate-100 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-light-gray shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <BrandIcon brand={product.brand} />
           </div>
         </div>
 
-        <div className="relative aspect-square w-full rounded-[1.5rem] overflow-hidden bg-slate-50 mb-6 group-hover:bg-slate-100 transition-colors">
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
-          <div className="absolute inset-0 p-6 flex items-center justify-center">
-            <Image
-              src={finalSrc}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 50vw, 300px"
-              className="object-contain transition-transform duration-700 group-hover:scale-110 p-4"
-              priority={priority}
-            />
-          </div>
+        {/* Product Image */}
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
+          <Image
+            src={finalSrc}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, 300px"
+            className="object-contain transition-transform duration-500 group-hover:scale-105 p-6"
+            priority={priority}
+          />
         </div>
 
-        <div className="flex flex-col flex-1 px-2 pb-2">
-          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-600 mb-2">
-            {product.brand}
+        {/* Product Details */}
+        <div className="flex flex-col flex-1 px-1">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-secondary-blue">
+              {product.brand}
+            </span>
+            <span className="text-[9px] text-steel-gray font-medium">{product.sku}</span>
           </div>
-          <h3 className="text-sm font-bold text-slate-900 leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-cyan-600 transition-colors">
+          
+          <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-[2.5rem] line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">
             {product.name}
           </h3>
-          <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+
+          <div className="mt-auto pt-3 border-t border-light-gray flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Price</span>
-              <div className="text-lg font-black text-slate-950 tracking-tight">
-                {hidePrice ? <span className="text-xs text-cyan-600">Teklif İste</span> : formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
+              <div className="text-lg font-bold text-primary-navy tracking-tight">
+                {hidePrice ? (
+                  <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
+                ) : (
+                  formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
+                )}
               </div>
             </div>
-            <button onClick={handleAddToCart} className="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center transition-all hover:bg-cyan-500 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-90">
+            
+            <button 
+              onClick={handleAddToCart} 
+              className="w-9 h-9 rounded-lg bg-primary-navy text-white flex items-center justify-center transition-all hover:bg-secondary-blue hover:shadow-lg active:scale-95"
+              title={t('common.addToCart') || 'Sepete Ekle'}
+            >
               <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v16m8-8H4" />
               </svg>
