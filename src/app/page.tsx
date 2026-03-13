@@ -56,7 +56,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function RootPage({ searchParams }: Props) {
-  const params = await searchParams
+  await searchParams
 
   // Değişkenleri doğru tiplerle tanımlayarak 'never[]' hatasını engelliyoruz
   let categories: Category[] = []
