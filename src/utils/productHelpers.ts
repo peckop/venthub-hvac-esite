@@ -68,7 +68,7 @@ export const formatSpecValue = (key: string, value: unknown): string => {
 export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
-  const groups: Record<string, { label: string; icon: any; specs: Record<string, unknown> }> = {
+  const groups: Record<string, { label: string; icon: React.ComponentType<{ size?: string | number; className?: string }>; specs: Record<string, unknown> }> = {
     performance: {
       label: 'Performans Ölçüleri',
       icon: Settings,
