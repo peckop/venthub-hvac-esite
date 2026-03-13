@@ -10,28 +10,41 @@ interface HomeSinevizyonProps {
   onQuoteClick: () => void
 }
 
-const slidesData = [
+interface SlideProduct {
+  url: string
+  labelKey: string
+  subLabelKey: string
+  link: string
+}
+
+interface SlideData {
+  image: string
+  key: number
+  products: SlideProduct[]
+}
+
+const slidesData: SlideData[] = [
   {
     image: '/images/hero_hvac_industrial_premium_1.png',
     products: [
-      { url: '/images/vortice_lineo_futuristic.png', label: '4500 m³/h', subLabel: 'Yüksek Debi', link: '/category/fanlar/kanal-tipi-fanlar' },
-      { url: '/images/products/vortice_lineo_360.png', label: '24 dB(A)', subLabel: 'Ultra Sessiz', link: '/category/fanlar/sessiz-fanlar' }
+      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', link: '/category/fanlar/kanal-tipi-fanlar' },
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', link: '/category/fanlar/sessiz-fanlar' }
     ],
     key: 0
   },
   {
     image: '/images/vortice_lineo_futuristic.png',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', label: 'EC Motor', subLabel: 'Düşük Enerji', link: '/category/fanlar/kanal-tipi-fanlar' },
-      { url: '/images/vortice_lineo_futuristic.png', label: 'IP44', subLabel: 'Tam Koruma', link: '/category/fanlar/kanal-tipi-fanlar' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', link: '/category/fanlar/kanal-tipi-fanlar' },
+      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', link: '/category/fanlar/kanal-tipi-fanlar' }
     ],
     key: 1
   },
   {
     image: '/images/hvac_installation_close_up_premium_3.png',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', label: '900 Pa', subLabel: 'Statik Basınç', link: '/category/fanlar/kanal-tipi-fanlar' },
-      { url: '/images/vortice_lineo_futuristic.png', label: 'Easy-Fit', subLabel: 'Hızlı Montaj', link: '/category/fanlar/kanal-tipi-fanlar' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', link: '/category/fanlar/kanal-tipi-fanlar' },
+      { url: '/images/vortice_lineo_futuristic.png', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', link: '/category/fanlar/kanal-tipi-fanlar' }
     ],
     key: 2
   }
@@ -53,7 +66,6 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
     return () => clearInterval(timer)
   }, [paginate])
 
-  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') paginate(1)
@@ -78,7 +90,16 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
     touchStartX.current = null
   }
 
-  const currentContent = (t('home.hero.sinevizyon.slides') as any)[currentSlide] || {}
+  // Fallback labels for robustness
+  const getSlideContent = (index: number) => {
+    return {
+      eyebrow: t(`home.hero.sinevizyon.slides.${index}.eyebrow`) || 'VentHub Engineering',
+      title: t(`home.hero.sinevizyon.slides.${index}.title`) || 'High Performance HVAC',
+      subtitle: t(`home.hero.sinevizyon.slides.${index}.subtitle`) || 'Advanced solutions for industrial ventilation.'
+    }
+  }
+
+  const currentContent = getSlideContent(currentSlide)
 
   return (
     <section 
@@ -104,7 +125,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             src={slidesData[currentSlide].image}
             alt="VentHub Sinevizyon"
             fill
-            priority
+            priority={currentSlide === 0}
             className="object-cover object-center brightness-[0.4] saturate-[1.2]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
@@ -195,8 +216,8 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                       <div className="flex items-center gap-3">
                         <div className="h-px w-12 bg-cyan-400/50" />
                         <div className="rounded-lg border border-cyan-500/30 bg-slate-950/80 p-3 backdrop-blur-md">
-                          <div className="text-[14px] font-black text-white">{p.label}</div>
-                          <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400">{p.subLabel}</div>
+                          <div className="text-[14px] font-black text-white">{t(p.labelKey)}</div>
+                          <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400">{t(p.subLabelKey)}</div>
                         </div>
                       </div>
                     </motion.div>
@@ -223,6 +244,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
+              aria-label={`Go to slide ${idx + 1}`}
               className={`h-1.5 rounded-full transition-all duration-500 ${idx === currentSlide ? 'w-12 bg-cyan-400' : 'w-3 bg-white/20'}`}
             />
           ))}
