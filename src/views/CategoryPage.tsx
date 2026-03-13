@@ -4,13 +4,11 @@ import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
+import { getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { 
-  getCategoryDisplayName, 
-  attachCovers,
-  parsePriceToNumber
+  getCategoryDisplayName
 } from '../utils/categoryHelpers'
 import { ChevronRight, Filter, Grid, List, ArrowLeft } from 'lucide-react'
 import Seo from '../components/Seo'
@@ -103,42 +101,31 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
           setSubCategories(subs)
         }
 
-        // Fetch products + attach cover images
-        let productsData: Product[]
+        // Fetch products via enriched RPC
+        let productsData: Product[] = []
+        const { getProductsEnriched } = await import('../lib/supabase')
+
         if (targetCategory.level === 0 && subs.length > 0) {
-          // Ana kategori ve alt kategorileri varsa: ana kategori + tüm alt kategorilerdeki ürünleri çek
+          // Ana kategori ve alt kategorileri varsa: tümünü kapsayan liste
           const allCategoryIds = [targetCategory.id, ...subs.map(s => s.id)]
-          const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .in('category_id', allCategoryIds)
-            .eq('status', 'active')
-            .order('is_featured', { ascending: false })
-            .order('name', { ascending: true })
-
-          if (error) throw error
-          productsData = data as Product[]
-        } else if (targetCategory.level === 1) {
-          // Alt kategori: category_id ile eşleşen ürünleri çek
-          const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category_id', targetCategory.id)
-            .eq('status', 'active')
-            .order('is_featured', { ascending: false })
-            .order('name', { ascending: true })
-
-          if (error) throw error
-          productsData = data as Product[]
+          productsData = await getProductsEnriched({
+            categoryIds: allCategoryIds,
+            sortBy: 'featured',
+            limit: 100
+          })
         } else {
-          // Diğer durumlar: normal query
-          productsData = await getProductsByCategory(targetCategory.id)
+          // Alt kategori veya tekil kategori
+          productsData = await getProductsEnriched({
+            categoryIds: [targetCategory.id],
+            sortBy: 'featured',
+            limit: 100
+          })
         }
-        const withCovers = await attachCovers(productsData)
-        setProducts(withCovers)
+        
+        setProducts(productsData)
 
         // Ürünlerden dinamik maksimum fiyatı hesapla
-        const prices = withCovers
+        const prices = productsData
           .map(p => p.price)
           .filter((v): v is number => v != null && Number.isFinite(v))
         if (prices.length > 0) {
