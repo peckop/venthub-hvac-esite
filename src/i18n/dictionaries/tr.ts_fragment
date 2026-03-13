@@ -1,0 +1,38 @@
+    aboutPage: {
+      stats: {
+        yearsExperience: 'Tamamlanan Mühendislik'
+      }
+    },
+    cinematicShowcase: {
+      eyebrow: 'TEKNİK DETAY',
+      title: 'Mühendislik Harikası Tasarım',
+      subtitle: 'Performans ve Verimliliğin Zirvesi',
+      description: 'Her bir bileşen, en zorlu endüstriyel koşullarda kesintisiz hava akışı sağlamak üzere optimize edildi.',
+      cta: 'Teknik Katalogu İncele',
+      badge: 'Endüstriyel Sınıf',
+      componentLabel: 'Sistem Bileşeni',
+      hotspots: {
+        motor: 'EC Motor Teknolojisi',
+        motorDetail: 'Düşük enerji tüketimi ve yüksek tork sağlayan fırçasız motor yapısı.',
+        clamps: 'Easy-Fit Klipsler',
+        clampsDetail: 'Alet gerektirmeyen hızlı montaj ve servis imkanı sağlayan özel bağlantı sistemi.',
+        housing: 'Polimer Gövde',
+        housingDetail: 'Darbelere ve korozyona dayanıklı, hafifletilmiş aerodinamik dış yüzey.',
+        airflow: 'Laminer Akış',
+        airflowDetail: 'Türbülansı minimize eden ve ses seviyesini düşüren iç kanat tasarımı.'
+      }
+    },
+    trustProof: {
+      badge: 'Güvenilir',
+      eyebrow: 'NEDEN VENTHUB?',
+      title: 'Mühendislik ve Güven Odaklı Yaklaşım',
+      subtitle: 'Sektörün lider markaları ve uzman mühendis kadromuzla projelerinize değer katıyoruz.',
+      items: {
+        brands: { eyebrow: 'Yetkinlik', title: 'Global Markalar', description: 'Dünyanın en güvenilir HVAC üreticilerinin resmi partneriyiz.' },
+        guidance: { eyebrow: 'Uzmanlık', title: 'Proje Desteği', description: 'Şartname hazırlığından devreye almaya kadar her adımda yanınızdayız.' },
+        delivery: { eyebrow: 'Hız', title: 'Hızlı Sevkiyat', description: 'Geniş stok ağımızla Türkiye\'nin her yerine zamanında teslimat.' },
+        support: { eyebrow: 'Süreklilik', title: 'Satış Sonrası', description: 'Teknik destek ve yedek parça garantisi ile kesintisiz operasyon.' }
+      }
+    }
+  }
+}
