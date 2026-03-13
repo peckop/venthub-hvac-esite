@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useEffect, useState, useMemo } from 'react'
 import { getFeaturedProducts, getProducts, Product } from '../lib/supabase'
 
@@ -50,14 +51,13 @@ function SimpleLane({ urls, direction }: { urls: string[]; direction: 'left' | '
         }`}
       >
         {items.map((src, idx) => (
-          <img
-            key={idx}
+          <VentImage key={idx}
             src={src}
             loading="lazy"
             decoding="async"
             alt="product"
             className="h-24 sm:h-28 md:h-32 w-auto rounded-xl object-cover bg-gray-100 border border-light-gray shadow-sm flex-shrink-0"
-          />
+           />
         ))}
       </div>
     </div>

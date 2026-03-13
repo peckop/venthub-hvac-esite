@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
@@ -423,7 +424,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                                         <div className="grid grid-cols-4 gap-4 mt-4">
                                             {images.map((img, idx) => (
                                                 <div key={idx} className="relative group border rounded-lg overflow-hidden aspect-square bg-gray-50">
-                                                    <img src={img.url} alt="Product" className="w-full h-full object-contain" />
+                                                    <VentImage src={img.url} alt="Product" className="w-full h-full object-contain"  />
                                                     <button
                                                         type="button"
                                                         onClick={() => removeImage(idx)}

@@ -503,7 +503,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                     <circle cx="8" cy="19" r="2" />
                   </svg>
                 }
-                label={cartTotal > 0 ? formatCurrency(String(cartTotal), lang, { maximumFractionDigits: 0 }) : undefined}
+                label={cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined}
                 labelClassName="hidden 2xl:block font-semibold text-success-green transition-all"
                 badge={
                   <>

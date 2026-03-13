@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { Award, Globe, Clock, Shield, Star } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
@@ -95,11 +96,10 @@ const VorticeBrand: React.FC = () => {
                     <div className={scrollAnimationClasses.slideLeft(isVisible)} style={{ transitionDelay: '200ms' }}>
                         {/* Vortice Hero Image */}
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl mb-6">
-                            <img
-                                src="/images/category/hero-vortice.png"
+                            <VentImage src="/images/category/hero-vortice.png"
                                 alt="Vortice Air Curtain Application"
                                 className="w-full h-auto"
-                            />
+                             />
                             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                                 <span className="text-yellow-400 text-xs font-bold tracking-wider uppercase">Premium Konfor</span>
                             </div>

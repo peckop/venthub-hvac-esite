@@ -312,19 +312,10 @@ const ProductsPage: React.FC = () => {
                 return true
               })
               .map(p => ({
-                id: p.id,
-                name: p.name,
-                sku: p.sku,
-                brand: p.brand,
+                ...p,
                 price: typeof p.price === 'number' ? p.price : Number(p.price || 0),
                 rank: null,
                 is_fuzzy_match: false,
-                status: p.status,
-                image_url: p.image_url,
-                image_alt: p.image_alt,
-                is_featured: p.is_featured,
-                stock_qty: p.stock_qty,
-                model_code: p.model_code
               }))
           }
 

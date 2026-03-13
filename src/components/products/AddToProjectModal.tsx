@@ -1,5 +1,6 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, Plus, FolderPlus, ChevronRight, Loader2 } from 'lucide-react'
@@ -76,11 +77,10 @@ export const AddToProjectModal: React.FC<AddToProjectModalProps> = ({ product, i
         <div className="p-6 space-y-6">
           <div className="flex items-start space-x-4">
             <div className="w-16 h-16 bg-light-gray rounded-lg flex-shrink-0 overflow-hidden border border-light-gray">
-              <img 
-                src={product.image_url || '/images/vortice_lineo_futuristic.png'} 
+              <VentImage src={product.image_url || '/images/vortice_lineo_futuristic.png'} 
                 alt={product.name} 
                 className="w-full h-full object-contain p-1"
-              />
+               />
             </div>
             <div>
               <div className="text-[10px] font-bold text-secondary-blue uppercase tracking-wider">{product.brand}</div>

@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronRight, Package, Tag, Info } from 'lucide-react'
@@ -106,11 +107,10 @@ const CategoryPreviewPanel: React.FC<CategoryPreviewPanelProps> = ({ category, i
                         <div className="relative p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-200px)]">
                             {/* Category Image */}
                             <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-800">
-                                <img
-                                    src={category.image}
+                                <VentImage src={category.image}
                                     alt={category.title}
                                     className="w-full h-full object-cover"
-                                />
+                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
                             </div>
 
