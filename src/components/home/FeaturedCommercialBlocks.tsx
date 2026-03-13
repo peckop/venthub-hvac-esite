@@ -124,7 +124,7 @@ export const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> =
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                   >
-                    <ProductCard product={product} variant="minimal" />
+                    <ProductCard product={product} compact />
                   </motion.div>
                 ))}
               </motion.div>
