@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -175,6 +176,7 @@ export const SnailFanModel: React.FC = () => {
         </group>
     )
 }
+
 
 
 

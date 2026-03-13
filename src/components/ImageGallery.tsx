@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import dynamic from 'next/dynamic'
 import { ChevronLeft, ChevronRight, X, Box, Maximize2 } from 'lucide-react'
-import { Product3DViewer } from './products/3d/Product3DViewer'
+
+const Product3DViewer = dynamic(
+    () => import('./products/3d/Product3DViewer').then((mod) => mod.Product3DViewer),
+    { ssr: false }
+)
 import { useI18n } from '../i18n/I18nProvider'
 
 interface ImageGalleryProps {

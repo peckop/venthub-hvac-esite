@@ -83,6 +83,61 @@ export const useFanMaterials = () => {
             metalness: 0.0,
         })
 
+        // 12. Vortice Green (Karakteristik Marka Rengi)
+        const vorticeGreen = new THREE.MeshStandardMaterial({
+            color: '#00B140',
+            roughness: 0.4,
+            metalness: 0.1,
+        })
+
+        // 13. Vortice High-Fidelity Materials (Mapped from standard ones)
+        const chassisMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xf0f0f0),
+            roughness: 0.35,
+            metalness: 0.04,
+        })
+
+        const chassisInnerMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xd8d8d8),
+            roughness: 0.55,
+            metalness: 0.02,
+            side: THREE.BackSide,
+        })
+
+        const bladesMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xb8c0cc),
+            roughness: 0.22,
+            metalness: 0.78,
+        })
+
+        const hubMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0x1a1a1a),
+            roughness: 0.5,
+            metalness: 0.6,
+        })
+
+        const clampMat = vorticeGreen;
+
+        const clampRingMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0x3dbd3d),
+            roughness: 0.3,
+            metalness: 0.15,
+        })
+
+        const boxMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xe8e8e8),
+            roughness: 0.45,
+            metalness: 0.02,
+        })
+
+        const baseMat = industrialSteel;
+
+        const screwMat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0x9aa0a8),
+            roughness: 0.18,
+            metalness: 0.9,
+        })
+
         return {
             galvanizedSteel,
             industrialSteel,
@@ -94,7 +149,17 @@ export const useFanMaterials = () => {
             safetyOrange,
             castIron,
             brass,
-            rubber
+            rubber,
+            vorticeGreen,
+            chassisMat,
+            chassisInnerMat,
+            bladesMat,
+            hubMat,
+            clampMat,
+            clampRingMat,
+            boxMat,
+            baseMat,
+            screwMat
         }
     }, [])
 }

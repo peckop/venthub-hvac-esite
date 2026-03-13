@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-
+import { motion } from 'framer-motion'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface EliteHeroProps {
@@ -14,42 +14,67 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
 
   return (
-    <section className="relative w-full h-[85vh] min-h-[600px] overflow-hidden bg-slate-950 flex items-center">
-      {/* Background Image & Overlay */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative w-full h-[100vh] min-h-[700px] overflow-hidden bg-slate-950 flex items-center">
+      {/* Background Image & Overlay with Motion */}
+      <motion.div 
+        initial={{ scale: 1.1 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 10, ease: "linear" }}
+        className="absolute inset-0 z-0"
+      >
         <Image
-          src="/images/industrial_HVAC_air_handling_unit_warehouse.jpg"
+          src="/images/hero_hvac_industrial_premium_1.png"
           alt={t('home.hero.visualAlt')}
           fill
           priority
           sizes="100vw"
           fetchPriority="high"
-          className="object-cover object-center"
+          className="object-cover object-center brightness-[0.6] saturate-[1.1]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-      </div>
+      </motion.div>
 
-      {/* Content */}
+      {/* Content with Motion */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur-md mb-6">
-            <span className="h-2 w-2 rounded-full bg-blue-400" />
+        <div className="max-w-3xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white shadow-sm backdrop-blur-md mb-8"
+          >
+            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
             <span>{t('home.hero.eyebrow')}</span>
-          </div>
+          </motion.div>
 
-          <h1 className="text-4xl font-light leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[4rem]">
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.7 }}
+            className="text-5xl font-light leading-[1.05] tracking-tighter text-white sm:text-6xl lg:text-[5.5rem]"
+          >
             {t('home.hero.title')}
-          </h1>
+          </motion.h1>
 
-          <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-slate-300 sm:text-xl">
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.9 }}
+            className="mt-8 max-w-xl text-lg font-light leading-relaxed text-slate-300 sm:text-2xl"
+          >
             {t('home.hero.subtitle')}
-          </p>
+          </motion.p>
 
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.1 }}
+            className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center"
+          >
             <Link
               href="/products"
-              className="inline-flex h-14 items-center justify-center rounded-none bg-white px-8 text-[15px] font-semibold tracking-wide text-slate-950 transition-all duration-300 hover:bg-slate-200"
+              className="inline-flex h-16 items-center justify-center rounded-none bg-white px-10 text-[15px] font-bold uppercase tracking-widest text-slate-950 transition-all duration-500 hover:bg-cyan-400 hover:scale-105"
             >
               {t('home.hero.primaryCta')}
             </Link>
@@ -57,19 +82,28 @@ export const EliteHero: React.FC<EliteHeroProps> = ({ onQuoteClick }) => {
             <button
               type="button"
               onClick={onQuoteClick}
-              className="inline-flex h-14 items-center justify-center rounded-none border border-white/30 bg-transparent px-8 text-[15px] font-semibold tracking-wide text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/50"
+              className="inline-flex h-16 items-center justify-center rounded-none border border-white/30 bg-white/5 px-10 text-[15px] font-bold uppercase tracking-widest text-white backdrop-blur-sm transition-all duration-500 hover:bg-white/10 hover:border-white/60 hover:scale-105"
             >
               {t('home.hero.secondaryCta')}
             </button>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 opacity-70 animate-bounce">
-        <span className="text-[10px] uppercase tracking-widest text-white">Scroll</span>
-        <div className="w-[1px] h-8 bg-white/50" />
-      </div>
+      {/* Scroll indicator with Motion */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.7 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3"
+      >
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/60">Explore</span>
+        <motion.div 
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="w-[1px] h-12 bg-gradient-to-b from-cyan-400 to-transparent" 
+        />
+      </motion.div>
     </section>
   )
 }

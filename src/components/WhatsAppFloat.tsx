@@ -19,7 +19,7 @@ const WhatsAppFloat: React.FC = () => {
       aria-label="WhatsApp ile yaz"
       title="WhatsApp ile yaz"
     >
-      <WhatsAppIcon size={22} />
+      <WhatsAppIcon size={34} />
     </a>
   )
 }

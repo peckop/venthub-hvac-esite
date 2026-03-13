@@ -1,3 +1,4 @@
+"use client";
 import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
@@ -213,6 +214,7 @@ function showHeatedParts() {
     // Audit amaçlı veya mixed modda ısıtıcı bataryayı göster
     return true
 }
+
 
 
 

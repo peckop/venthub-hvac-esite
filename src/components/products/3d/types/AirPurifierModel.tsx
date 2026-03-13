@@ -1,3 +1,4 @@
+"use client";
 import React from 'react'
 import { useFanMaterials } from '../materials/useFanMaterials'
 
@@ -62,6 +63,7 @@ export function AirPurifierModel() {
         </group>
     )
 }
+
 
 
 
