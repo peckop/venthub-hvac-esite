@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
 import '@splidejs/react-splide/css'
@@ -71,8 +72,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
                   overflow: 'hidden',
                 }}
               >
-                <img
-                  src={item.src}
+                <VentImage src={item.src}
                   alt={item.alt || ''}
                   width={itemWidth}
                   height={itemHeight}
@@ -84,7 +84,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
                   }}
                   loading="eager"
                   decoding="async"
-                />
+                 />
               </div>
             </Link>
           ) : (
@@ -99,8 +99,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
                 overflow: 'hidden',
               }}
             >
-              <img
-                src={item.src}
+              <VentImage src={item.src}
                 alt={item.alt || ''}
                 width={itemWidth}
                 height={itemHeight}
@@ -112,7 +111,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
                 }}
                 loading="eager"
                 decoding="async"
-              />
+               />
             </div>
           )}
         </SplideSlide>

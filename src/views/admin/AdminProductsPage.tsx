@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { supabase, adminSearchProducts } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
@@ -683,11 +684,10 @@ const AdminProductsPage: React.FC = () => {
                           <td className={`${adminTableCellClass} ${cellPad}`}>
                             <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
                               {covers[r.id] ? (
-                                <img
-                                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
+                                <VentImage src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${covers[r.id]}`}
                                   alt=""
                                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
+                                 />
                               ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-white/5 text-slate-700 uppercase font-black text-[10px]">No Img</div>
                               )}

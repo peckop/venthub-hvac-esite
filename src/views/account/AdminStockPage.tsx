@@ -37,7 +37,7 @@ export default function AdminStockPage() {
           .select('id, name, sku, brand, price, status, is_featured, stock_qty, low_stock_threshold')
           .order('name', { ascending: true })
         if (error) throw error
-        if (mounted) setAll((data || []) as Product[])
+        if (mounted) setAll((data || []) as unknown as Product[])
       } catch {
         // no-op
       }

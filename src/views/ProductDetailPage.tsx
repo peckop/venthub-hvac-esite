@@ -177,6 +177,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const handleAddToCart = () => { if (product) addToCart(product, quantity) }
 
+  const handleDownloadPdf = async () => {
+    if (!product || isGeneratingPdf) return
+    setIsGeneratingPdf(true)
+    try {
+      await generateProductDatasheet(
+        product, 
+        product.image_url || undefined,
+        translateSpecKey,
+        lang
+      )
+      toast.success(t('pdp.messages.pdfStarted') || 'PDF üretiliyor...')
+    } catch (error) {
+      console.error('PDF generation error:', error)
+      toast.error(t('pdp.errors.pdfFailed') || 'PDF üretilemedi.')
+    } finally {
+      setIsGeneratingPdf(false)
+    }
+  }
+
   const handleShare = async () => {
     if (typeof window === 'undefined') return
     if (navigator.share && product) {
@@ -193,30 +212,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const { t, lang } = useI18n()
 
-  const handleDownloadPdf = async () => {
-    if (!product) return;
-    try {
-      setIsGeneratingPdf(true);
-      let fullImageUrl: string | undefined = undefined;
-      if (images?.length > 0 && images[0]?.path) {
-        const { data } = supabase.storage.from('product-images').getPublicUrl(images[0].path);
-        fullImageUrl = data?.publicUrl;
-      } else if (product.image_url) {
-        fullImageUrl = product.image_url;
-      }
-      await generateProductDatasheet(product, fullImageUrl, translateSpecKey, lang);
-      toast.success(t('pdp.pdfSuccess') || 'Teknik PDF Föyü başarıyla indirildi.');
-    } catch (err) {
-      console.error(err);
-      toast.error(t('pdp.pdfError') || 'PDF oluşturulurken bir hata meydana geldi.');
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
-
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
-    { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
+    { id: 'olcuiler', title: t('pdp.sections.specs') || 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
     { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-slate-50/50' },
     { id: 'dokumanlar', title: t('pdp.sections.documents'), icon: FileText, bgClass: 'bg-white' },
     { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-slate-50/50' },
@@ -353,7 +351,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <BrandIcon brand={product.brand} className="w-8 h-8" />
                 <div className="flex flex-col">
                   <span className="text-secondary-blue font-bold text-xs tracking-tight uppercase">{product.brand}</span>
-                  <span className="text-steel-gray text-[8px] font-medium tracking-[0.2em]">OFFICIAL DISTRIBUTOR</span>
+                  <span className="text-steel-gray text-[8px] font-medium tracking-[0.2em]">{t('pdp.officialDistributor') || 'OFFICIAL DISTRIBUTOR'}</span>
                 </div>
               </div>
               {product.is_featured && (
@@ -376,6 +374,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   key={`jump-${s.id}`}
                   onClick={() => scrollToSection(s.id)}
                   className="px-3 py-1.5 bg-air-blue/30 hover:bg-air-blue text-primary-navy rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border border-secondary-blue/10"
+                  aria-label={`${s.title} ${t('common.scrollTo') || 'bölümüne git'}`}
                 >
                   {s.title}
                 </button>
@@ -385,7 +384,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-[9px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">Price & Availability</span>
+                <span className="text-[9px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -397,7 +396,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     </div>
                     {!mainCategory?.metadata?.hide_price && (
                       <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
-                        {t('pdp.vatIncluded')} Included
+                        {t('pdp.vatIncluded')}
                       </span>
                     )}
                   </div>
@@ -419,9 +418,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
                   <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray">-</button>
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray" aria-label={t('common.decrease') || 'Azalt'}>-</button>
                     <span className="w-10 text-center font-black text-primary-navy text-sm">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray">+</button>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-all text-lg font-bold text-industrial-gray" aria-label={t('common.increase') || 'Artır'}>+</button>
                   </div>
                 </div>
 
@@ -451,7 +450,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     className="w-full bg-white border-2 border-primary-navy/10 hover:border-primary-navy text-primary-navy font-bold py-3.5 px-6 rounded-xl transition-all flex items-center justify-center space-x-2 group active:scale-[0.98]"
                   >
                     <FolderPlus size={16} className="group-hover:scale-110 transition-transform" />
-                    <span className="text-xs uppercase tracking-[0.15em]">Proje Listesine Ekle</span>
+                    <span className="text-xs uppercase tracking-[0.15em]">{t('pdp.actions.addToProject') || 'Proje Listesine Ekle'}</span>
                   </button>
                 </div>
 
@@ -463,17 +462,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       ? 'border-red-500 text-red-500 bg-red-50'
                       : 'border-light-gray text-steel-gray hover:border-red-500 hover:text-red-500'
                       }`}
+                    aria-label={isWishlisted ? t('pdp.actions.removeFromWishlist') : t('pdp.actions.addToWishlist')}
                   >
                     <Heart size={14} fill={isWishlisted ? 'currentColor' : 'none'} />
-                    <span>Favori</span>
+                    <span>{t('pdp.actions.favorite') || 'Favori'}</span>
                   </button>
 
                   <button
                     onClick={handleShare}
                     className="flex-1 flex items-center justify-center space-x-2 py-2.5 border border-light-gray text-steel-gray hover:border-primary-navy hover:text-primary-navy rounded-xl font-bold text-[9px] uppercase tracking-widest transition-all"
+                    aria-label={t('common.share') || 'Paylaş'}
                   >
                     <Share2 size={14} />
-                    <span>Paylaş</span>
+                    <span>{t('pdp.actions.share') || 'Paylaş'}</span>
                   </button>
                 </div>
               </div>
@@ -482,15 +483,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="grid grid-cols-3 gap-2.5">
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Truck className="text-success-green mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">Ücretsiz Kargo</p>
+                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.freeShipping') || 'Ücretsiz Kargo'}</p>
                 </div>
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Shield className="text-primary-navy mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">Güvenli Ödeme</p>
+                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.securePayment') || 'Güvenli Ödeme'}</p>
                 </div>
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Award className="text-secondary-blue mb-1.5" size={18} />
-                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">2 Yıl Garanti</p>
+                  <p className="text-[8px] font-black text-industrial-gray uppercase tracking-tighter">{t('pdp.trust.warranty') || '2 Yıl Garanti'}</p>
                 </div>
               </div>
 
@@ -503,7 +504,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-center space-x-3 text-left">
                   {isGeneratingPdf ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} className="group-hover:animate-bounce" />}
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider">TEKNİK ÜRÜN FÖYÜ</span>
+                    <span className="text-[10px] uppercase tracking-wider">{t('pdp.labels.technicalDatasheet') || 'TEKNİK ÜRÜN FÖYÜ'}</span>
                     <span className="text-[8px] text-white/50 font-medium uppercase tracking-[0.2em]">DATASHEET (PDF)</span>
                   </div>
                 </div>
@@ -666,7 +667,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <p className="text-steel-gray text-[10px] font-medium mb-4">{t('pdp.variantDetails') || 'Teknik özelliklerde özelleştirilmiş model varyantı.'}</p>
                             <div className="flex items-center justify-between pt-3 border-t border-light-gray/50">
                               <div className="text-primary-navy font-black text-sm">{formatCurrency((product.price + (variant - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
-                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-all"><ChevronRight size={14} /></button>
+                              <button className="p-1.5 bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white rounded-lg transition-all" aria-label="Sonraki"><ChevronRight size={14} /></button>
                             </div>
                           </div>
                         ))}
