@@ -1,6 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database.types'
 import { 
+  DbProduct, 
+  DbShoppingCart, 
+  DbCartItem,
+  DbUserAddressInsert,
+  DbUserAddressUpdate
+} from '../types/db-rows'
+import { 
   mapDatabaseProductToDomain, 
   mapDatabaseCategoryToDomain,
   DomainProduct,
@@ -194,10 +201,10 @@ export interface FtsProductResult extends Product {
 }
 
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }) {
-  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as any }
-  const { data, error } = await supabase.rpc('fts_search_products', payload as any)
+  const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
+  const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain) as FtsProductResult[]
+  return (data || []).map((row: any) => mapDatabaseProductToDomain(row as DbProduct)) as FtsProductResult[]
 }
 
 // Admin panel search
@@ -208,23 +215,23 @@ export interface AdminSearchResult extends Product {
 }
 
 export async function adminSearchProducts(q: string, limit = 50, offset = 0, categoryId?: string): Promise<AdminSearchResult[]> {
-  const payload: Record<string, any> = { p_q: q, p_limit: limit, p_offset: offset }
+  const payload: { p_q: string, p_limit: number, p_offset: number, p_category_id?: string } = { p_q: q, p_limit: limit, p_offset: offset }
   if (categoryId) payload.p_category_id = categoryId
   
-  const { data, error } = await supabase.rpc('admin_search_products', payload as any)
+  const { data, error } = await supabase.rpc('admin_search_products', payload)
   if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain) as AdminSearchResult[]
+  return (data || []).map((row: any) => mapDatabaseProductToDomain(row as DbProduct)) as AdminSearchResult[]
 }
 
 export interface SearchSuggestion {
   type: 'product' | 'category' | 'brand'
   label: string
   url: string
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
 }
 
 export async function getSearchSuggestions(q: string, limit = 5) {
-  const { data, error } = await supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit } as any)
+  const { data, error } = await supabase.rpc('get_search_suggestions', { p_q: q, p_limit: limit })
   if (error) throw error
   return (data || []) as SearchSuggestion[]
 }
@@ -263,7 +270,7 @@ export interface CreateAddressInput {
   is_default_billing?: boolean
 }
 
-export async function listAddresses() {
+export async function listAddresses(): Promise<UserAddress[]> {
   const { data, error } = await supabase
     .from('user_addresses')
     .select('*')
@@ -274,13 +281,13 @@ export async function listAddresses() {
   return (data || []) as UserAddress[]
 }
 
-export async function createAddress(payload: CreateAddressInput) {
+export async function createAddress(payload: CreateAddressInput): Promise<UserAddress> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const dbPayload = {
+  const dbPayload: DbUserAddressInsert = {
     user_id: user.id,
     label: payload.label || 'Adres',
     full_name: payload.full_name,
@@ -295,7 +302,7 @@ export async function createAddress(payload: CreateAddressInput) {
     country: payload.country || 'Türkiye',
     is_default_shipping: !!payload.is_default_shipping,
     is_default_billing: !!payload.is_default_billing
-  } as any
+  }
 
   const { data, error } = await supabase
     .from('user_addresses')
@@ -304,22 +311,23 @@ export async function createAddress(payload: CreateAddressInput) {
     .single()
 
   if (error) throw error
-  if (payload.is_default_shipping && data) await setDefaultAddress('shipping', (data as any).id)
-  if (payload.is_default_billing && data) await setDefaultAddress('billing', (data as any).id)
+  if (payload.is_default_shipping && data) await setDefaultAddress('shipping', data.id)
+  if (payload.is_default_billing && data) await setDefaultAddress('billing', data.id)
 
-  return (data || {}) as unknown as UserAddress
+  return data as UserAddress
 }
 
-export async function updateAddress(id: string, payload: Partial<CreateAddressInput>) {
+export async function updateAddress(id: string, payload: Partial<CreateAddressInput>): Promise<UserAddress> {
+  const dbUpdate: DbUserAddressUpdate = payload as DbUserAddressUpdate
   const { data, error } = await supabase
     .from('user_addresses')
-    .update(payload as any)
+    .update(dbUpdate)
     .eq('id', id)
     .select('*')
     .single()
 
   if (error) throw error
-  return (data || {}) as unknown as UserAddress
+  return data as UserAddress
 }
 
 export async function deleteAddress(id: string) {
@@ -328,16 +336,16 @@ export async function deleteAddress(id: string) {
   return true
 }
 
-export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string) {
+export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string): Promise<UserAddress> {
   const { data: authData } = await supabase.auth.getUser()
   if (!authData?.user) throw new Error('Not authenticated')
 
   const flag = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
-  await supabase.from('user_addresses').update({ [flag]: false } as any).eq('user_id', authData.user.id)
+  await supabase.from('user_addresses').update({ [flag]: false } as DbUserAddressUpdate).eq('user_id', authData.user.id)
   
-  const { data, error } = await supabase.from('user_addresses').update({ [flag]: true } as any).eq('id', id).select('*').single()
+  const { data, error } = await supabase.from('user_addresses').update({ [flag]: true } as DbUserAddressUpdate).eq('id', id).select('*').single()
   if (error) throw error
-  return (data || {}) as unknown as UserAddress
+  return data as UserAddress
 }
 
 // ========== Account: Invoice Profiles ==========
@@ -348,41 +356,38 @@ export interface InvoiceProfile {
   type: InvoiceProfileType
   title?: string | null
   company_name?: string | null
-  tax_number?: string | null
+  tckn?: string | null
+  vkn?: string | null
   tax_office?: string | null
+  e_invoice?: boolean
+  e_archive?: boolean
   is_default: boolean
   created_at: string
   updated_at: string
-  profile_type?: string | null
-  tckn?: string | null
-  vkn?: string | null
-  e_invoice?: boolean | null
-  e_archive?: boolean | null
 }
 
-export async function listInvoiceProfiles() {
+export async function listInvoiceProfiles(): Promise<InvoiceProfile[]> {
   const { data, error } = await supabase.from('user_invoice_profiles').select('*').order('is_default', { ascending: false })
   if (error) return []
   return (data || []).map((row: any) => ({
     ...row,
-    type: row.profile_type as InvoiceProfileType,
-    tax_number: row.profile_type === 'individual' ? row.tckn : row.vkn,
+    type: (row.type || 'individual') as InvoiceProfileType,
     e_invoice: !!row.e_invoice,
     e_archive: !!row.e_archive
-  })) as InvoiceProfile[]
+  }))
 }
 
-export async function createInvoiceProfile(payload: any) {
+export async function createInvoiceProfile(payload: Partial<InvoiceProfile>): Promise<InvoiceProfile> {
   const { data: authData } = await supabase.auth.getUser()
   if (!authData?.user) throw new Error('Not authenticated')
 
-  const { data, error } = await supabase.from('user_invoice_profiles').insert({ ...payload, user_id: authData.user.id }).select('*').single()
+  const { data, error } = await supabase.from('user_invoice_profiles').insert({ ...payload, user_id: authData.user.id } as any).select('*').single()
   if (error) throw error
   return data as unknown as InvoiceProfile
 }
 
-export async function updateInvoiceProfile(id: string, payload: any) {
-  const { data, error } = await supabase.from('user_invoice_profiles').update(payload).eq('id', id).select('*').single()
+export async function updateInvoiceProfile(id: string, payload: Partial<InvoiceProfile>): Promise<InvoiceProfile> {
+  const { data, error } = await supabase.from('user_invoice_profiles').update(payload as any).eq('id', id).select('*').single()
   if (error) throw error
   return data as unknown as InvoiceProfile
 }
@@ -393,12 +398,12 @@ export async function deleteInvoiceProfile(id: string) {
   return true
 }
 
-export async function setDefaultInvoiceProfile(id: string) {
+export async function setDefaultInvoiceProfile(id: string): Promise<InvoiceProfile> {
   const { data: authData } = await supabase.auth.getUser()
   if (!authData?.user) throw new Error('Not authenticated')
 
-  await supabase.from('user_invoice_profiles').update({ is_default: false }).eq('user_id', authData.user.id)
-  const { data, error } = await supabase.from('user_invoice_profiles').update({ is_default: true }).eq('id', id).select('*').single()
+  await supabase.from('user_invoice_profiles').update({ is_default: false } as any).eq('user_id', authData.user.id)
+  const { data, error } = await supabase.from('user_invoice_profiles').update({ is_default: true } as any).eq('id', id).select('*').single()
   if (error) throw error
   return data as unknown as InvoiceProfile
 }
@@ -413,33 +418,37 @@ export interface CartDbItem {
   price_list_id?: string | null
 }
 
-export async function getOrCreateShoppingCart(userId: string) {
+export async function getOrCreateShoppingCart(userId: string): Promise<DbShoppingCart> {
   const { data: existing } = await supabase.from('shopping_carts').select('*').eq('user_id', userId).maybeSingle()
   if (existing) return existing
-  const { data, error } = await supabase.from('shopping_carts').insert({ user_id: userId }).select('*').single()
+  const { data, error } = await supabase.from('shopping_carts').insert({ user_id: userId } as any).select('*').single()
   if (error) throw error
-  return data as any
+  return data
 }
 
-export async function listCartItemsWithProducts(cartId: string) {
+export async function listCartItemsWithProducts(cartId: string): Promise<{ item: DbCartItem, product: Product }[]> {
   const { data: items } = await supabase.from('cart_items').select('*').eq('cart_id', cartId)
   if (!items || items.length === 0) return []
   
   const productIds = items.map(i => i.product_id)
   const { data: products } = await supabase.from('products').select('*').in('id', productIds)
   
-  const domainProducts = (products || []).map(mapDatabaseProductToDomain)
+  const domainProducts = (products || []).map((row: DbProduct) => mapDatabaseProductToDomain(row))
   const map = new Map<string, Product>()
   domainProducts.forEach(p => map.set(p.id, p))
   
-  return items.map(i => ({ item: i, product: map.get(i.product_id)! } as { item: any, product: Product })).filter(x => !!x.product)
+  return items.map(i => ({ item: i, product: map.get(i.product_id)! })).filter(x => !!x.product)
 }
 
-export async function upsertCartItem(params: any) {
-  const { cartId, productId, quantity } = params
-  const { data, error } = await supabase.from('cart_items').upsert({ cart_id: cartId, product_id: productId, quantity }, { onConflict: 'cart_id,product_id' }).select('*')
+export async function upsertCartItem(params: { cartId: string, productId: string, quantity: number, unitPrice?: number, priceListId?: string | null }): Promise<DbCartItem[]> {
+  const { cartId, productId, quantity, unitPrice, priceListId } = params
+  const payload: any = { cart_id: cartId, product_id: productId, quantity }
+  if (unitPrice !== undefined) payload.unit_price = unitPrice
+  if (priceListId !== undefined) payload.price_list_id = priceListId
+  
+  const { data, error } = await supabase.from('cart_items').upsert(payload, { onConflict: 'cart_id,product_id' }).select('*')
   if (error) throw error
-  return data as any
+  return data
 }
 
 export async function removeCartItem(cartId: string, productId: string) {
@@ -455,13 +464,13 @@ export async function clearCartItems(cartId: string) {
 }
 
 // ========== B2B: Projects ==========
-export async function listUserProjects() {
+export async function listUserProjects(): Promise<UserProject[]> {
   const { data, error } = await supabase.from('user_projects' as any).select('*').order('created_at', { ascending: false })
   if (error) throw error
   return (data || []) as unknown as UserProject[]
 }
 
-export async function createProject(name: string, description?: string) {
+export async function createProject(name: string, description?: string): Promise<UserProject> {
   const { data: authData } = await supabase.auth.getUser()
   const { data, error } = await supabase.from('user_projects' as any).insert({ user_id: authData?.user?.id, name, description }).select('*').single()
   if (error) throw error
@@ -474,7 +483,7 @@ export async function deleteProject(id: string) {
   return true
 }
 
-export async function listProjectItems(projectId: string) {
+export async function listProjectItems(projectId: string): Promise<(ProjectItem & { product: Product })[]> {
   const { data, error } = await supabase.from('project_items' as any).select('*, product:products(*)').eq('project_id', projectId)
   if (error) throw error
   return (data || []).map((row: any) => ({
@@ -483,10 +492,10 @@ export async function listProjectItems(projectId: string) {
   })) as (ProjectItem & { product: Product })[]
 }
 
-export async function addProductToProject(projectId: string, productId: string, quantity = 1) {
+export async function addProductToProject(projectId: string, productId: string, quantity = 1): Promise<ProjectItem> {
   const { data, error } = await supabase.from('project_items' as any).upsert({ project_id: projectId, product_id: productId, quantity }, { onConflict: 'project_id,product_id' }).select('*').single()
   if (error) throw error
-  return (data || {}) as unknown as ProjectItem
+  return data as unknown as ProjectItem
 }
 
 export async function removeProductFromProject(projectId: string, productId: string) {

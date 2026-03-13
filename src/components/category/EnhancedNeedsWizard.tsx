@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-    X, ChevronRight, ChevronLeft,
+    X, ChevronLeft,
     DoorOpen, Snowflake, Factory, ShoppingCart,
     Store, UtensilsCrossed, HeartPulse, Truck, Building2,
-    Ruler, Wind, Zap,
-    HelpCircle, MapPin, Clock, Home,
-    CheckCircle2, ArrowRight, Lightbulb, Package, ExternalLink
+    Ruler, ArrowRight
 } from 'lucide-react'
 import { supabase, type Product } from '../../lib/supabase'
 import { mapDatabaseProductToDomain } from '../../lib/type-converters'
@@ -119,7 +117,7 @@ const getMaxHeight = (product: Product): number | null => {
 
     const heightKeys = ['max_yukseklik', 'maksimum_yukseklik', 'max_height', 'montaj_yuksekligi', 'asma_yuksekligi', 'yükseklik', 'height']
     for (const key of heightKeys) {
-        const val = (specs as any)[key]
+        const val = specs[key]
         if (val) {
             const num = extractNumber(val)
             if (num) return num
@@ -270,7 +268,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 if (specs) {
                     const widthKeys = ['genislik', 'genişlik', 'width', 'uzunluk', 'length', 'size', 'ebat', 'Size']
                     for (const key of widthKeys) {
-                        const val = (specs as any)[key]
+                        const val = specs[key]
                         if (val) {
                             const num = extractNumber(val)
                             if (num && num > 50) return { value: num, fromName: false }
@@ -292,7 +290,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 if (!specs) return null
                 const airflowKeys = ['debi', 'hava_debisi', 'max_airflow_m3h', 'airflow', 'capacity', 'kapasite', 'm3h', 'Debi']
                 for (const key of airflowKeys) {
-                    const val = (specs as any)[key]
+                    const val = specs[key]
                     if (val) {
                         const num = extractNumber(val)
                         if (num && num > 100) return num
@@ -306,7 +304,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 if (!specs) return null
                 const noiseKeys = ['ses_seviyesi', 'noise_dbA', 'noise', 'ses', 'ses_db', 'Noise']
                 for (const key of noiseKeys) {
-                    const val = (specs as any)[key]
+                    const val = specs[key]
                     if (val) {
                         return extractNumber(val)
                     }
