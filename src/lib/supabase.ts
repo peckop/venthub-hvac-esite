@@ -81,6 +81,27 @@ export interface CartItem {
   price: number
 }
 
+// B2B/Project management types
+export interface UserProject {
+  id: string
+  user_id: string
+  name: string
+  description?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface ProjectItem {
+  id: string
+  project_id: string
+  product_id: string
+  product?: Product // Optional joined product data
+  quantity: number
+  notes?: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 // HVAC specific types
 export interface HVACBrand {
   name: string
@@ -804,6 +825,84 @@ export async function clearCartItems(cartId: string) {
     .from('cart_items')
     .delete()
     .eq('cart_id', cartId)
+  if (error) throw error
+  return true
+}
+
+// ========== B2B: Project Lists ==========
+export async function listUserProjects() {
+  const { data, error } = await supabase
+    .from('user_projects')
+    .select('*')
+    .order('created_at', { ascending: false })
+  
+  if (error) throw error
+  return (data || []) as UserProject[]
+}
+
+export async function createProject(name: string, description?: string) {
+  const { data: authData } = await supabase.auth.getUser()
+  const user = authData?.user
+  if (!user) throw new Error('Not authenticated')
+
+  const { data, error } = await supabase
+    .from('user_projects')
+    .insert({ user_id: user.id, name, description })
+    .select('*')
+    .single()
+  
+  if (error) throw error
+  return data as UserProject
+}
+
+export async function listProjectItems(projectId: string) {
+  const { data, error } = await supabase
+    .from('project_items')
+    .select(`
+      *,
+      product:products(*)
+    `)
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false })
+  
+  if (error) throw error
+  return (data || []) as (ProjectItem & { product: Product })[]
+}
+
+export async function addProductToProject(projectId: string, productId: string, quantity = 1) {
+  const { data, error } = await supabase
+    .from('project_items')
+    .upsert({ 
+      project_id: projectId, 
+      product_id: productId, 
+      quantity 
+    }, { 
+      onConflict: 'project_id,product_id' 
+    })
+    .select('*')
+    .single()
+  
+  if (error) throw error
+  return data as ProjectItem
+}
+
+export async function removeProductFromProject(projectId: string, productId: string) {
+  const { error } = await supabase
+    .from('project_items')
+    .delete()
+    .eq('project_id', projectId)
+    .eq('product_id', productId)
+  
+  if (error) throw error
+  return true
+}
+
+export async function deleteProject(projectId: string) {
+  const { error } = await supabase
+    .from('user_projects')
+    .delete()
+    .eq('id', projectId)
+  
   if (error) throw error
   return true
 }
