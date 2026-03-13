@@ -128,6 +128,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, initialProduct]) // Removed product and router to prevent infinite loop and unnecessary re-runs
 
   useEffect(() => {

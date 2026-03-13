@@ -309,20 +309,26 @@ export const en = {
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers'
+        bestSellers: 'Best Sellers',
+        airCurtains: 'Air Curtains',
+        heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Featured selection',
         newArrivals: 'New arrivals focus',
-        bestSellers: 'Most preferred'
+        bestSellers: 'Most preferred',
+        airCurtains: 'Climate Protection Systems',
+        heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
         featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
         newArrivals: 'Discover our latest additions to the HVAC inventory, featuring newest technology.',
-        bestSellers: 'Explore products that set the industry standard for reliability and performance.'
+        bestSellers: 'Explore products that set the industry standard for reliability and performance.',
+        airCurtains: 'Professional series that maintain indoor comfort by creating an invisible thermal barrier at entrances.',
+        heatRecovery: 'Economical units that recover heat from exhaust air with up to 90% efficiency while supplying fresh air.'
       }
     },
-    trustProof: {
+  trustProof: {
       eyebrow: 'Trust and Proof',
       title: 'We build trust with clear operational realities, not decorative promises.',
       subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
@@ -1093,7 +1099,7 @@ export const en = {
     stats: {
       premiumBrands: 'Premium Brands',
       productTypes: 'Product Types',
-      yearsExperience: 'Years Experience'
+      yearsExperience: 'Project Pipeline'
     },
     whyTitle: 'Why VentHub?',
     bullets: {
@@ -1766,13 +1772,9 @@ export const en = {
       name: 'Please enter full name',
       contact: 'Email or phone is required',
       consent: 'Consent is required'
-    },
-    aboutPage: {
-      stats: {
-        yearsExperience: 'Project Pipeline'
-      }
-    },
-    cinematicShowcase: {
+    }
+  },
+  cinematicShowcase: {
       eyebrow: 'TECHNICAL DETAIL',
       title: 'Masterpiece of Engineering',
       subtitle: 'Peak Performance and Efficiency',
@@ -1791,7 +1793,7 @@ export const en = {
         airflowDetail: 'Internal vane design minimizing turbulence and reducing noise levels.'
       }
     },
-    trustProof: {
+  trustProof: {
       badge: 'Trusted',
       eyebrow: 'WHY VENTHUB?',
       title: 'Engineering and Trust-Driven Approach',
@@ -1801,11 +1803,6 @@ export const en = {
         guidance: { eyebrow: 'Expertise', title: 'Project Support', description: 'Supporting you at every step from specification to commissioning.' },
         delivery: { eyebrow: 'Speed', title: 'Fast Delivery', description: 'On-time delivery across Turkey with our extensive stock network.' },
         support: { eyebrow: 'Continuity', title: 'After-Sales', description: 'Uninterrupted operation with technical support and spare parts warranty.' }
-      }
     }
   }
 }
-
-
-
-

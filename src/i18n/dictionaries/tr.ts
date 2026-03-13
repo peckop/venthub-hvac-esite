@@ -1099,7 +1099,7 @@ export const tr = {
     stats: {
       premiumBrands: 'Premium Marka',
       productTypes: 'Ürün Çeşidi',
-      yearsExperience: 'Yıl Deneyim'
+      yearsExperience: 'Tamamlanan Mühendislik'
     },
     whyTitle: 'Neden VentHub?',
     bullets: {
@@ -1774,11 +1774,6 @@ export const tr = {
       consent: 'Aydınlatma metni onayı zorunludur'
     }
   },
-  aboutPage: {
-      stats: {
-        yearsExperience: 'Tamamlanan Mühendislik'
-      }
-    },
     cinematicShowcase: {
       eyebrow: 'TEKNİK DETAY',
       title: 'Mühendislik Harikası Tasarım',
@@ -1808,9 +1803,6 @@ export const tr = {
         guidance: { eyebrow: 'Uzmanlık', title: 'Proje Desteği', description: 'Şartname hazırlığından devreye almaya kadar her adımda yanınızdayız.' },
         delivery: { eyebrow: 'Hız', title: 'Hızlı Sevkiyat', description: 'Geniş stok ağımızla Türkiye\'nin her yerine zamanında teslimat.' },
         support: { eyebrow: 'Süreklilik', title: 'Satış Sonrası', description: 'Teknik destek ve yedek parça garantisi ile kesintisiz operasyon.' }
-      }
-      }
-      }
-      }
-
-
+    }
+  }
+}
