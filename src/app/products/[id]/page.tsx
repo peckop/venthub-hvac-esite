@@ -53,9 +53,14 @@ export default async function Page({ params }: { params: { id: string } }) {
     if (params.id !== 'generic') {
       productData = await getProductBySlugOrId(params.id)
     }
-  } catch (e) {
-    console.error(`Error fetching product data for ${params.id}:`, e)
+  } catch (e: any) {
+    if (e?.message?.includes('fetch failed')) {
+      console.warn(`Network fetch failed for product ${params.id} (expected if Supabase env is missing)`)
+    } else {
+      console.error(`Error fetching product data for ${params.id}:`, e)
+    }
   }
+
 
   const jsonLd = {
     "@context": "https://schema.org",
