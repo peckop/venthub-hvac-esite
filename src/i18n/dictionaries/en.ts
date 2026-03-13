@@ -1210,7 +1210,9 @@ export const en = {
     actions: {
       download: 'Download',
       downloadCatalog: 'Download Catalog',
-      downloadBrochure: 'Download Brochure'
+      downloadBrochure: 'Download Brochure',
+      liveDataNotice: "ℹ️ Data is updated in real-time",
+      interactive3D: "3D View"
     },
     cert: {
       ceCertificate: 'CE Certificate',
