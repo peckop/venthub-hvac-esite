@@ -5,7 +5,7 @@ import React from 'react'
 import type { Product } from '../lib/supabase'
 import { BrandIcon } from './HVACIcons'
 import Link from 'next/link'
-import Image from 'next/image'
+import { VentImage } from './ui/VentImage'
 import { useCart } from '../hooks/useCartHook'
 import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
@@ -19,17 +19,6 @@ interface ProductCardProps {
   hidePrice?: boolean
   compact?: boolean
 }
-
-// Resim adresini Supabase veya Yerel dizine göre çözen akıllı fonksiyon
-const resolveProductImage = (url: string | null | undefined): string => {
-  if (!url || url.trim().length === 0) return '/images/vortice_lineo_futuristic.png';
-  const trimmed = url.trim();
-  if (trimmed.startsWith('http') || trimmed.startsWith('/') || trimmed.startsWith('data:')) return trimmed;
-  
-  // Eğer sadece dosya adıysa Supabase Storage yolunu ekle
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return `${supabaseUrl}/storage/v1/object/public/product-images/${trimmed}`;
-};
 
 export const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard({
   product,
@@ -48,17 +37,16 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
     addToCart(product)
   }
 
-  const finalSrc = resolveProductImage(product.image_url);
-
   // LIST VIEW LAYOUT
   if (isList) {
     return (
       <Link href={`/products/${product.id}`} className="block w-full">
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
-            <Image
-              src={finalSrc}
+            <VentImage
+              src={product.image_url ? `product-images/${product.image_url}` : null}
               alt={product.name}
+              fallbackType="product"
               fill
               sizes="128px"
               className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
@@ -79,7 +67,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
                 {hidePrice ? (
                   <span className="text-sm font-medium text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
                 ) : (
-                  formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
+                  formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                 )}
               </div>
               {!hidePrice && <span className="text-[10px] text-steel-gray font-medium uppercase">{t('pdp.vatIncluded') || 'KDV Dahil'}</span>}
@@ -119,9 +107,10 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
 
         {/* Product Image */}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
-          <Image
-            src={finalSrc}
+          <VentImage
+            src={product.image_url ? `product-images/${product.image_url}` : null}
             alt={product.name}
+            fallbackType="product"
             fill
             sizes="(max-width: 768px) 50vw, 300px"
             className="object-contain transition-transform duration-500 group-hover:scale-105 p-6"
@@ -148,7 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
                 {hidePrice ? (
                   <span className="text-xs font-semibold text-industrial-gray">{t('common.requestQuote') || 'Teklif İste'}</span>
                 ) : (
-                  formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })
+                  formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                 )}
               </div>
             </div>

@@ -125,6 +125,7 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             src={slidesData[currentSlide].image}
             alt="VentHub Sinevizyon"
             fill
+            sizes="100vw"
             priority={currentSlide === 0}
             className="object-cover object-center brightness-[0.4] saturate-[1.2]"
           />

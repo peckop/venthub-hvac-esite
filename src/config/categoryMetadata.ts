@@ -105,6 +105,36 @@ export const STATIC_CATEGORY_METADATA: Record<string, NonNullable<Category['meta
         hide_price: true,
         hero_description: 'Patlayıcı atmosferlerde güvenli havalandırma sağlayan ATEX sertifikalı fan çözümleri.',
         features: []
+    },
+    'sessiz-kanal-tipi-fanlar': {
+        display_mode: 'showcase',
+        model_type: 'FanModel',
+        hide_price: false,
+        hero_title: 'Sessiz Kanal Tipi Fanlar',
+        hero_description: 'Vortice Lineo Quiet ES serisi ile yüksek performans ve fısıltı sessizliğinde havalandırma. Modern yaşam alanları ve ofisler için ideal çözüm.',
+        showcase_images: [
+            {
+                desktop: '/images/vortice/vortice_lineo_hero.png',
+                mobile: '/images/vortice/vortice_lineo_hero.png'
+            },
+            {
+                desktop: '/images/vortice/vortice_lineo_neon.png',
+                mobile: '/images/vortice/vortice_lineo_neon.png'
+            },
+            {
+                desktop: '/images/vortice/vortice_lineo_loft.png',
+                mobile: '/images/vortice/vortice_lineo_loft.png'
+            },
+            {
+                desktop: '/images/vortice/vortice_lineo_technical.png',
+                mobile: '/images/vortice/vortice_lineo_technical.png'
+            }
+        ],
+        features: [
+            { icon: 'activity', title: 'Fısıltı Sessizliği', description: 'Gelişmiş aerodinamik tasarım ile minimum ses seviyesi.' },
+            { icon: 'zap', title: 'ES Teknoloji', description: 'Elektronik komütasyonlu motor ile %70\'e varan enerji tasarrufu.' },
+            { icon: 'shield-check', title: 'Vortice Güvencesi', description: 'İtalyan mühendisliği ve 2 yıl tam garanti.' }
+        ]
     }
 }
 

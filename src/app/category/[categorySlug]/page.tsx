@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import PageComponent from '../../../views/CategoryPage'
 import { supabase } from '../../../lib/supabase'
+import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
 
 export async function generateStaticParams() {
   try {
@@ -31,7 +32,7 @@ async function getCategoryData(slug: string) {
     .single()
   
   if (error || !data) return null
-  return data
+  return mapDatabaseCategoryToDomain(data)
 }
 
 export async function generateMetadata({ params }: { params: { categorySlug: string } }) {

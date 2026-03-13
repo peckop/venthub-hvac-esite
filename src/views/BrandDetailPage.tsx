@@ -1,5 +1,6 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
@@ -269,11 +270,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                 >
                   <div className="aspect-square bg-light-gray rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     {product.image_url ? (
-                      <img
-                        src={product.image_url}
+                      <VentImage src={product.image_url}
                         alt={product.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-                      />
+                       />
                     ) : (
                       <Package size={48} className="text-steel-gray" />
                     )}

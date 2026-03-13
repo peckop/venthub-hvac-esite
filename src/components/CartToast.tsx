@@ -109,7 +109,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                       {product.name}
                     </p>
                     <p className="text-sm text-steel-gray">
-                      {product.brand} • {formatCurrency(String(product.price), lang, { maximumFractionDigits: 0 })}
+                      {product.brand} • {formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                     </p>
                   </div>
                 </div>

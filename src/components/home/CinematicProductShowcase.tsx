@@ -159,6 +159,7 @@ export const CinematicProductShowcase: React.FC = () => {
                       src={productImages[activeImageIdx].src}
                       alt={productImages[activeImageIdx].label}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
                       className="object-contain drop-shadow-[0_50px_100px_rgba(0,0,0,0.8)] z-20"
                       // Only priority for the first element or if visible
                       priority={activeImageIdx === 0}

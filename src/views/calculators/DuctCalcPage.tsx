@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { Wind, Ruler, RotateCcw, Circle, Square } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
   CalculatorLayout,
   ResultCard,
@@ -14,31 +15,32 @@ import {
   type DuctMaterial
 } from '../../lib/hvacCalculations'
 
-// Kanal tipi seçenekleri
-const DUCT_TYPE_OPTIONS = [
-  {
-    value: 'circular',
-    label: 'Dairesel',
-    description: 'Spiral veya kaynaklı boru',
-    icon: <Circle size={24} />
-  },
-  {
-    value: 'rectangular',
-    label: 'Dikdörtgen',
-    description: 'Köşeli kanal',
-    icon: <Square size={24} />
-  }
-]
-
-// Malzeme seçenekleri
-const MATERIAL_OPTIONS = [
-  { value: 'galvanized', label: 'Galvaniz Sac', description: 'Standart' },
-  { value: 'pvc', label: 'PVC', description: 'Düşük sürtünme' },
-  { value: 'flex', label: 'Flex Kanal', description: 'Esnek bağlantı' }
-]
-
 const DuctCalcPage: React.FC = () => {
-  // Form durumu
+  const { t } = useI18n()
+
+  // Dynamic Options
+  const ductTypeOptions = useMemo(() => [
+    {
+      value: 'circular',
+      label: t('calculators.duct.form.round'),
+      description: t('calculators.duct.form.roundDesc'),
+      icon: <Circle size={24} />
+    },
+    {
+      value: 'rectangular',
+      label: t('calculators.duct.form.rectangular'),
+      description: t('calculators.duct.form.rectangularDesc'),
+      icon: <Square size={24} />
+    }
+  ], [t])
+
+  const materialOptions = useMemo(() => [
+    { value: 'galvanized', label: t('calculators.duct.form.steel'), description: 'Standart' },
+    { value: 'pvc', label: t('calculators.duct.form.pvc'), description: 'Low Friction' },
+    { value: 'flex', label: t('calculators.duct.form.flex'), description: 'Flexible' }
+  ], [t])
+
+  // Form state
   const [airflow, setAirflow] = useState('500')
   const [ductType, setDuctType] = useState<DuctType>('rectangular')
   const [diameter, setDiameter] = useState('200')
@@ -47,7 +49,7 @@ const DuctCalcPage: React.FC = () => {
   const [length, setLength] = useState('10')
   const [material, setMaterial] = useState<DuctMaterial>('galvanized')
 
-  // Gerçek zamanlı hesaplama
+  // Real-time calculation
   const result = useMemo(() => {
     const flow = parseFloat(airflow) || 0
     const len = parseFloat(length) || 0
@@ -70,17 +72,6 @@ const DuctCalcPage: React.FC = () => {
     })
   }, [airflow, ductType, diameter, width, height, length, material])
 
-  // Hız durumu rengi
-  const getVelocityStatus = (status: string | undefined): 'optimal' | 'acceptable' | 'warning' | 'critical' => {
-    switch (status) {
-      case 'optimal': return 'optimal'
-      case 'low': return 'warning'
-      case 'high': return 'warning'
-      case 'critical': return 'critical'
-      default: return 'acceptable'
-    }
-  }
-
   const reset = () => {
     setAirflow('500')
     setDuctType('rectangular')
@@ -93,62 +84,58 @@ const DuctCalcPage: React.FC = () => {
 
   return (
     <CalculatorLayout
-      title="Kanal Hesap Makinesi"
-      description="Hava kanalı hız hesabı ve basınç kaybı tahmini"
+      title={t('calculators.duct.title')}
+      description={t('calculators.duct.description')}
       icon={<Ruler size={32} />}
-      infoText="Debi ve kanal boyutlarına göre hava hızını ve tahmini basınç kaybını hesaplar. ASHRAE standartlarına uygun öneriler sunar."
+      infoText={t('calculators.duct.infoText')}
     >
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Sol Panel - Girdiler */}
         <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-primary-navy/10 rounded-lg">
               <Wind className="text-primary-navy" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">Kanal Parametreleri</h2>
-              <p className="text-sm text-steel-gray">Değerleri girerek anlık sonuç alın</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.form.inputSummary')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
             </div>
           </div>
 
           <div className="space-y-6">
-            {/* Debi */}
             <InputField
-              label="Hava Debisi"
+              label={t('calculators.duct.form.airflow')}
               value={airflow}
               onChange={setAirflow}
               unit="m³/h"
               min={10}
               max={100000}
               step={10}
-              tooltip="Kanaldan geçmesi gereken hava miktarı"
+              tooltip={t('calculators.duct.form.airflowTooltip')}
             />
 
-            {/* Kanal Tipi */}
             <RadioGroup
-              label="Kanal Tipi"
+              label={t('calculators.duct.form.shape')}
               value={ductType}
               onChange={(v) => setDuctType(v as DuctType)}
-              options={DUCT_TYPE_OPTIONS}
+              options={ductTypeOptions}
               columns={2}
             />
 
-            {/* Boyutlar - Tip'e göre */}
             {ductType === 'circular' ? (
               <InputField
-                label="Kanal Çapı"
+                label={t('calculators.duct.form.diameter')}
                 value={diameter}
                 onChange={setDiameter}
                 unit="mm"
                 min={50}
                 max={2000}
                 step={25}
-                tooltip="İç çap (50-2000 mm)"
+                tooltip={t('calculators.duct.form.diameterTooltip')}
               />
             ) : (
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label="Genişlik (a)"
+                  label={t('calculators.duct.form.width')}
                   value={width}
                   onChange={setWidth}
                   unit="mm"
@@ -157,7 +144,7 @@ const DuctCalcPage: React.FC = () => {
                   step={50}
                 />
                 <InputField
-                  label="Yükseklik (b)"
+                  label={t('calculators.duct.form.height')}
                   value={height}
                   onChange={setHeight}
                   unit="mm"
@@ -168,99 +155,44 @@ const DuctCalcPage: React.FC = () => {
               </div>
             )}
 
-            {/* Uzunluk */}
             <InputField
-              label="Kanal Uzunluğu"
+              label={t('calculators.duct.form.length')}
               value={length}
               onChange={setLength}
               unit="m"
               min={0.5}
               max={500}
               step={0.5}
-              tooltip="Toplam kanal uzunluğu"
+              tooltip={t('calculators.duct.form.lengthTooltip')}
             />
 
-            {/* Malzeme */}
             <RadioGroup
-              label="Kanal Malzemesi"
+              label={t('calculators.duct.form.material')}
               value={material}
               onChange={(v) => setMaterial(v as DuctMaterial)}
-              options={MATERIAL_OPTIONS}
+              options={materialOptions}
               columns={3}
             />
 
-            {/* Reset Button */}
             <button
               onClick={reset}
               className="flex items-center gap-2 text-sm text-steel-gray hover:text-industrial-gray transition-colors"
+              aria-label={t('common.reset')}
             >
               <RotateCcw size={16} />
-              Değerleri Sıfırla
+              {t('common.reset')}
             </button>
-          </div>
-
-          {/* SVG Diagram */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-            <div className="flex justify-center">
-              <svg viewBox="0 0 240 100" className="w-full max-w-xs">
-                {ductType === 'circular' ? (
-                  <>
-                    {/* Circular Duct */}
-                    <ellipse cx="40" cy="50" rx="25" ry="25" fill="none" stroke="#1C3D5A" strokeWidth="2" />
-                    <ellipse cx="200" cy="50" rx="25" ry="25" fill="none" stroke="#1C3D5A" strokeWidth="2" />
-                    <line x1="40" y1="25" x2="200" y2="25" stroke="#1C3D5A" strokeWidth="2" />
-                    <line x1="40" y1="75" x2="200" y2="75" stroke="#1C3D5A" strokeWidth="2" />
-
-                    {/* Airflow Arrow */}
-                    <path d="M80 50 L160 50" stroke="#0EA5E9" strokeWidth="2" markerEnd="url(#arrowhead)" />
-                    <defs>
-                      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="#0EA5E9" />
-                      </marker>
-                    </defs>
-
-                    {/* Diameter */}
-                    <line x1="40" y1="25" x2="40" y2="75" stroke="#6B7280" strokeWidth="1" strokeDasharray="3,3" />
-                    <text x="30" y="52" textAnchor="middle" className="text-[8px] fill-steel-gray">Ø{diameter}</text>
-                  </>
-                ) : (
-                  <>
-                    {/* Rectangular Duct */}
-                    <rect x="15" y="25" width="50" height="50" fill="none" stroke="#1C3D5A" strokeWidth="2" />
-                    <rect x="175" y="25" width="50" height="50" fill="none" stroke="#1C3D5A" strokeWidth="2" />
-                    <line x1="65" y1="25" x2="175" y2="25" stroke="#1C3D5A" strokeWidth="2" />
-                    <line x1="65" y1="75" x2="175" y2="75" stroke="#1C3D5A" strokeWidth="2" />
-                    <line x1="65" y1="25" x2="175" y2="25" stroke="#1C3D5A" strokeWidth="2" />
-
-                    {/* Airflow Arrow */}
-                    <path d="M80 50 L160 50" stroke="#0EA5E9" strokeWidth="2" markerEnd="url(#arrowhead2)" />
-                    <defs>
-                      <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="#0EA5E9" />
-                      </marker>
-                    </defs>
-
-                    {/* Dimensions */}
-                    <text x="40" y="85" textAnchor="middle" className="text-[8px] fill-steel-gray">{width}×{height}</text>
-                  </>
-                )}
-
-                {/* Length */}
-                <text x="120" y="95" textAnchor="middle" className="text-[8px] fill-steel-gray">L = {length} m</text>
-              </svg>
-            </div>
           </div>
         </div>
 
-        {/* Sağ Panel - Sonuçlar */}
         <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-success-green/10 rounded-lg">
               <Wind className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">Hesaplama Sonuçları</h2>
-              <p className="text-sm text-steel-gray">Anlık güncellenmiş değerler</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.results.title')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.results.subtitle')}</p>
             </div>
           </div>
 
@@ -268,56 +200,35 @@ const DuctCalcPage: React.FC = () => {
             <>
               <ResultGrid>
                 <ResultCard
-                  title="Hava Hızı"
+                  title={t('calculators.duct.results.velocity')}
                   value={result.velocity}
                   unit="m/s"
-                  status={getVelocityStatus(result.velocityStatus)}
+                  status={result.velocityStatus === 'optimal' ? 'optimal' : 'warning'}
                   large
                   description={result.velocityMessage}
                 />
                 <ResultCard
-                  title="Basınç Kaybı (Özgül)"
+                  title={t('calculators.duct.results.specificLoss')}
                   value={result.pressureLossPerMeter}
                   unit="Pa/m"
                   status={result.pressureLossPerMeter > 1.5 ? 'warning' : 'optimal'}
                 />
                 <ResultCard
-                  title="Toplam Basınç Kaybı"
+                  title={t('calculators.duct.results.totalLoss')}
                   value={result.totalPressureLoss}
                   unit="Pa"
                   status={result.totalPressureLoss > 100 ? 'warning' : 'optimal'}
                 />
                 {result.equivalentDiameter && (
                   <ResultCard
-                    title="Eşdeğer Çap"
+                    title={t('calculators.duct.results.equivDiameter')}
                     value={result.equivalentDiameter}
                     unit="mm"
                     status="info"
-                    description="Dairesel kanal eşdeğeri"
+                    description={t('calculators.duct.results.equivDiameterDesc')}
                   />
                 )}
               </ResultGrid>
-
-              {/* Alternatif Ebatlar */}
-              {result.suggestedDimensions.length > 0 && (
-                <div className="mt-6 p-4 bg-secondary-blue/5 rounded-xl">
-                  <h4 className="font-medium text-industrial-gray mb-3">Alternatif Ebat Önerileri</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {result.suggestedDimensions.map((dim, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setWidth(dim.width.toString())
-                          setHeight(dim.height.toString())
-                        }}
-                        className="px-3 py-2 bg-white border border-secondary-blue/30 rounded-lg text-sm hover:bg-secondary-blue/10 transition-colors"
-                      >
-                        {dim.width} × {dim.height} mm
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               <Recommendations items={result.recommendations} />
             </>
@@ -327,7 +238,7 @@ const DuctCalcPage: React.FC = () => {
                 <Ruler className="text-steel-gray" size={32} />
               </div>
               <p className="text-steel-gray">
-                Geçerli değerler girerek<br />sonuçları görüntüleyin
+                {t('common.notFound')}
               </p>
             </div>
           )}
@@ -338,6 +249,3 @@ const DuctCalcPage: React.FC = () => {
 }
 
 export default DuctCalcPage
-
-
-

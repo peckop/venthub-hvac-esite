@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { Leaf, Users, RotateCcw, TrendingUp, ThermometerSun, Snowflake, DollarSign } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 import {
   CalculatorLayout,
   ResultCard,
@@ -15,38 +16,38 @@ import {
   type ClimateZone
 } from '../../lib/hvacCalculations'
 
-// Sistem tipi seçenekleri
-const SYSTEM_OPTIONS = [
-  {
-    value: 'hrv',
-    label: 'HRV',
-    description: 'Sadece ısı geri kazanımı',
-    icon: <ThermometerSun size={24} />
-  },
-  {
-    value: 'erv',
-    label: 'ERV',
-    description: 'Isı + Nem geri kazanımı',
-    icon: <Snowflake size={24} />
-  }
-]
-
-// Bina tipi seçenekleri
-const BUILDING_OPTIONS = [
-  { value: 'residential', label: 'Konut', description: 'Ev, daire' },
-  { value: 'office', label: 'Ofis', description: 'İş yeri, büro' },
-  { value: 'commercial', label: 'Ticari', description: 'Mağaza, AVM' }
-]
-
-// İklim bölgesi seçenekleri
-const CLIMATE_OPTIONS = [
-  { value: 'cold', label: 'Soğuk', description: 'Kuzey, dağlık' },
-  { value: 'temperate', label: 'Ilıman', description: 'Orta Anadolu' },
-  { value: 'hot', label: 'Sıcak', description: 'Güney, kıyı' }
-]
-
 const HRVCalcPage: React.FC = () => {
-  // Form durumu
+  const { t } = useI18n()
+
+  // Dynamic Options
+  const systemOptions = useMemo(() => [
+    {
+      value: 'hrv',
+      label: t('calculators.hrv.form.hrv'),
+      description: t('calculators.hrv.form.hrvDesc'),
+      icon: <ThermometerSun size={24} />
+    },
+    {
+      value: 'erv',
+      label: t('calculators.hrv.form.erv'),
+      description: t('calculators.hrv.form.ervDesc'),
+      icon: <Snowflake size={24} />
+    }
+  ], [t])
+
+  const buildingOptions = useMemo(() => [
+    { value: 'residential', label: t('common.home'), description: 'Domestic' },
+    { value: 'office', label: t('calculators.hrv.form.office'), description: 'Workplace' },
+    { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: 'Retail/Mall' }
+  ], [t])
+
+  const climateOptions = useMemo(() => [
+    { value: 'cold', label: t('calculators.hrv.form.cold'), description: 'North/Mountain' },
+    { value: 'temperate', label: t('calculators.hrv.form.temperate'), description: 'Central' },
+    { value: 'hot', label: t('calculators.hrv.form.hot'), description: 'South/Coast' }
+  ], [t])
+
+  // Form state
   const [recoveryType, setRecoveryType] = useState<RecoveryType>('hrv')
   const [buildingType, setBuildingType] = useState<BuildingType>('office')
   const [climateZone, setClimateZone] = useState<ClimateZone>('temperate')
@@ -57,7 +58,7 @@ const HRVCalcPage: React.FC = () => {
   const [latentEfficiency, setLatentEfficiency] = useState('65')
   const [electricityCost, setElectricityCost] = useState('3.5')
 
-  // Gerçek zamanlı hesaplama
+  // Real-time calculation
   const result = useMemo(() => {
     const areaVal = parseFloat(area) || 0
     const occVal = parseFloat(occupancy) || 0
@@ -95,92 +96,87 @@ const HRVCalcPage: React.FC = () => {
 
   return (
     <CalculatorLayout
-      title="HRV/ERV Hesap Makinesi"
-      description="Isı geri kazanım cihazı verimlilik ve enerji tasarruf hesabı"
+      title={t('calculators.hrv.title')}
+      description={t('calculators.hrv.description')}
       icon={<Leaf size={32} />}
-      infoText="Isı geri kazanım cihazlarının (HRV) veya entalpik geri kazanım cihazlarının (ERV) yıllık tasarruf potansiyelini hesaplar."
+      infoText={t('calculators.hrv.infoText')}
     >
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Sol Panel - Girdiler */}
         <div className="space-y-6">
-          {/* Sistem Tipi */}
           <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-success-green/10 rounded-lg">
                 <Leaf className="text-success-green" size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-industrial-gray">Sistem Tipi</h2>
-                <p className="text-sm text-steel-gray">Geri kazanım türünü seçin</p>
+                <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.type')}</h2>
+                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
               </div>
             </div>
 
             <RadioGroup
-              label="Cihaz Tipi"
+              label={t('calculators.hrv.form.type')}
               value={recoveryType}
               onChange={(v) => setRecoveryType(v as RecoveryType)}
-              options={SYSTEM_OPTIONS}
+              options={systemOptions}
               columns={2}
             />
 
             <div className="grid grid-cols-2 gap-4 mt-4">
               <InputField
-                label="Sensible Verimlilik"
+                label="Sensible Efficiency"
                 value={sensibleEfficiency}
                 onChange={setSensibleEfficiency}
                 unit="%"
                 min={40}
                 max={95}
                 step={1}
-                tooltip="Isı geri kazanım verimi (40-95%)"
               />
               {recoveryType === 'erv' && (
                 <InputField
-                  label="Latent Verimlilik"
+                  label="Latent Efficiency"
                   value={latentEfficiency}
                   onChange={setLatentEfficiency}
                   unit="%"
                   min={30}
                   max={85}
                   step={1}
-                  tooltip="Nem geri kazanım verimi (30-85%)"
                 />
               )}
             </div>
           </div>
 
-          {/* Bina ve Ortam */}
           <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-primary-navy/10 rounded-lg">
                 <Users className="text-primary-navy" size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-industrial-gray">Bina Bilgileri</h2>
-                <p className="text-sm text-steel-gray">Mekan özelliklerini girin</p>
+                <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.usage')}</h2>
+                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.steps.dimensionsDesc')}</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <RadioGroup
-                label="Bina Tipi"
+                label={t('calculators.hrv.form.usage')}
                 value={buildingType}
                 onChange={(v) => setBuildingType(v as BuildingType)}
-                options={BUILDING_OPTIONS}
+                options={buildingOptions}
                 columns={3}
               />
 
               <RadioGroup
-                label="İklim Bölgesi"
+                label={t('calculators.hrv.form.climate')}
                 value={climateZone}
                 onChange={(v) => setClimateZone(v as ClimateZone)}
-                options={CLIMATE_OPTIONS}
+                options={climateOptions}
                 columns={3}
               />
 
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label="Alan"
+                  label="Area (m²)"
                   value={area}
                   onChange={setArea}
                   unit="m²"
@@ -189,10 +185,10 @@ const HRVCalcPage: React.FC = () => {
                   step={10}
                 />
                 <InputField
-                  label="Kişi Sayısı"
+                  label={t('calculators.hrv.form.occupancy')}
                   value={occupancy}
                   onChange={setOccupancy}
-                  unit="kişi"
+                  unit="people"
                   min={0}
                   max={1000}
                   step={1}
@@ -201,16 +197,16 @@ const HRVCalcPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label="Günlük Çalışma"
+                  label={t('calculators.hrv.form.workingHours')}
                   value={operatingHours}
                   onChange={setOperatingHours}
-                  unit="saat"
+                  unit="h"
                   min={1}
                   max={24}
                   step={1}
                 />
                 <InputField
-                  label="Elektrik Birim Fiyatı"
+                  label={t('calculators.hrv.form.electricityPrice')}
                   value={electricityCost}
                   onChange={setElectricityCost}
                   unit="₺/kWh"
@@ -224,59 +220,37 @@ const HRVCalcPage: React.FC = () => {
             <button
               onClick={reset}
               className="flex items-center gap-2 text-sm text-steel-gray hover:text-industrial-gray transition-colors mt-4"
+              aria-label={t('common.reset')}
             >
               <RotateCcw size={16} />
-              Değerleri Sıfırla
+              {t('common.reset')}
             </button>
           </div>
         </div>
 
-        {/* Sağ Panel - Sonuçlar */}
         <div className="bg-white rounded-2xl border border-light-gray shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-success-green/10 rounded-lg">
               <TrendingUp className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">Analiz Sonuçları</h2>
-              <p className="text-sm text-steel-gray">Tahmini tasarruf ve çevresel etki</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.results.title')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.results.subtitle')}</p>
             </div>
           </div>
 
           {result ? (
             <>
-              {/* Debi Sonuçları */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-steel-gray mb-3">Hava Debisi Hesabı</h3>
                 <ResultGrid>
                   <ResultCard
-                    title="Gerekli Taze Hava"
-                    value={result.requiredAirflow}
-                    unit="m³/h"
-                    status="optimal"
-                    large
-                  />
-                  <ResultCard
-                    title="Toplam Verimlilik"
-                    value={result.totalEfficiency}
-                    unit="%"
-                    status={result.totalEfficiency >= 70 ? 'optimal' : result.totalEfficiency >= 50 ? 'acceptable' : 'warning'}
-                  />
-                </ResultGrid>
-              </div>
-
-              {/* Enerji Sonuçları */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-steel-gray mb-3">Enerji Geri Kazanımı</h3>
-                <ResultGrid>
-                  <ResultCard
-                    title="Isıtma Kazanımı"
+                    title={t('calculators.hrv.results.heatingGain')}
                     value={result.heatingRecovery}
                     unit="W"
                     status="optimal"
                   />
                   <ResultCard
-                    title="Soğutma Kazanımı"
+                    title={t('calculators.hrv.results.coolingGain')}
                     value={result.coolingRecovery}
                     unit="W"
                     status="optimal"
@@ -284,47 +258,44 @@ const HRVCalcPage: React.FC = () => {
                 </ResultGrid>
               </div>
 
-              {/* Yıllık Tasarruf */}
               <div className="mb-6 p-4 bg-success-green/10 rounded-xl border border-success-green/20">
                 <div className="flex items-center gap-3 mb-4">
                   <DollarSign className="text-success-green" size={24} />
-                  <h3 className="font-semibold text-industrial-gray">Yıllık Tasarruf</h3>
+                  <h3 className="font-semibold text-industrial-gray">{t('cart.itemTotal')}</h3>
                 </div>
                 <ResultGrid>
                   <ResultCard
-                    title="Enerji Tasarrufu"
+                    title="Annual Energy Saving"
                     value={result.annualEnergySaving}
-                    unit="kWh/yıl"
+                    unit="kWh/y"
                     status="optimal"
                     large
                   />
                   <ResultCard
-                    title="Maliyet Tasarrufu"
+                    title="Annual Cost Saving"
                     value={result.annualCostSaving}
-                    unit="₺/yıl"
+                    unit="₺/y"
                     status="optimal"
                     large
                   />
                 </ResultGrid>
               </div>
 
-              {/* Çevresel Etki */}
               <div className="mb-6">
-                <h3 className="text-sm font-medium text-steel-gray mb-3">Çevresel Etki</h3>
                 <ResultGrid>
                   <ResultCard
-                    title="CO₂ Azaltımı"
+                    title={t('calculators.hrv.results.co2Reduction')}
                     value={result.co2Reduction}
-                    unit="kg/yıl"
+                    unit="kg/y"
                     status="optimal"
-                    description="Yıllık karbon emisyon azaltımı"
+                    description={t('calculators.hrv.results.co2Desc')}
                   />
                   <ResultCard
-                    title="Geri Ödeme Süresi"
+                    title={t('calculators.hrv.results.payback')}
                     value={result.paybackPeriod}
-                    unit="yıl"
-                    status={result.paybackPeriod <= 3 ? 'optimal' : result.paybackPeriod <= 5 ? 'acceptable' : 'warning'}
-                    description="Tahmini yatırım geri dönüşü"
+                    unit="years"
+                    status={result.paybackPeriod <= 3 ? 'optimal' : 'acceptable'}
+                    description={t('calculators.hrv.results.paybackDesc')}
                   />
                 </ResultGrid>
               </div>
@@ -336,9 +307,7 @@ const HRVCalcPage: React.FC = () => {
               <div className="p-4 bg-gray-100 rounded-full mb-4">
                 <Leaf className="text-steel-gray" size={32} />
               </div>
-              <p className="text-steel-gray">
-                Geçerli değerler girerek<br />sonuçları görüntüleyin
-              </p>
+              <p className="text-steel-gray">{t('common.notFound')}</p>
             </div>
           )}
         </div>
@@ -348,6 +317,3 @@ const HRVCalcPage: React.FC = () => {
 }
 
 export default HRVCalcPage
-
-
-
