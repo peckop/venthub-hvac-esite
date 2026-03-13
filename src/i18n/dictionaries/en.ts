@@ -308,16 +308,22 @@ export const en = {
       panelEyebrow: 'Focus Panel',
       tabs: {
         featured: 'Featured',
+        newArrivals: 'New Arrivals',
+        bestSellers: 'Best Sellers',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Featured product selection',
+        newArrivals: 'Newest Technologies',
+        bestSellers: 'Most Preferred',
         airCurtains: 'Air curtain focus',
         heatRecovery: 'Heat recovery focus'
       },
       panelDescriptions: {
         featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
+        newArrivals: 'Next-generation devices newly added to the VentHub product family, featuring the highest energy efficiency and modern design.',
+        bestSellers: 'The most ordered models by industry professionals and large projects, with proven reliability in the field.',
         airCurtains: 'See air curtain products together for entrance comfort and energy-loss control.',
         heatRecovery: 'Approach the heat recovery product family directly for efficiency-led commercial climate control.'
       }
