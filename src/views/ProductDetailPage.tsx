@@ -75,7 +75,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
   const { t, lang } = useI18n()
 
-  const sections = [
+  const sections = React.useMemo(() => [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
     { id: 'olcuiler', title: 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
     { id: 'diyagramlar', title: t('pdp.sections.diagrams'), icon: FileText, bgClass: 'bg-slate-50/50' },
@@ -83,13 +83,23 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     { id: 'pdf', title: t('pdp.sections.brochure'), icon: Download, bgClass: 'bg-slate-50/50' },
     { id: 'sertifikalar', title: t('pdp.sections.certificates'), icon: Award, bgClass: 'bg-white' },
     { id: 'modeller', title: t('pdp.sections.models'), icon: Settings, bgClass: 'bg-slate-50/50' }
-  ]
+  ], [t])
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
       prev.includes(sectionKey) ? prev.filter(k => k !== sectionKey) : [...prev, sectionKey]
     );
   };
+
+  const handleShare = () => {
+    if (typeof window === 'undefined') return
+    if (navigator.share && product) {
+      navigator.share({ title: product.name, text: `${product.brand} - ${product.name}`, url: window.location.href })
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+      toast.success('Bağlantı kopyalandı.')
+    }
+  }
 
   useEffect(() => {
     refreshProjects()
@@ -98,12 +108,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   useEffect(() => {
     async function fetchProduct() {
       if (!id) return
+      
+      // If we already have the product from SSR, use it but still sync context
       if (initialProduct && (id === initialProduct.id || id === initialProduct.sku)) {
         setProduct(initialProduct)
         setLoading(false)
       }
+
       try {
-        if (!product) setLoading(true)
+        if (!product || (initialProduct && id !== initialProduct.id && id !== initialProduct.sku)) {
+          setLoading(true)
+        }
+        
         const productData = await getProductBySlugOrId(id)
         if (!productData) {
           setProduct(null)
@@ -136,6 +152,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           ]
         })
 
+        // Images
         try {
           const { data: imgs } = await supabase
             .from('product_images')
@@ -145,12 +162,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           setImages((imgs || []) as { path: string; alt?: string | null }[])
         } catch { }
 
+        // Related
         if (productData.subcategory_id) {
           const related = await getProductsBySubcategory(productData.subcategory_id)
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
-        console.error('Error:', error)
+        console.error('Error fetching PDP:', error)
         setProduct(null)
       } finally {
         setLoading(false)
@@ -158,7 +176,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     }
     fetchProduct()
     return () => clearPageContext()
-  }, [id, router])
+  }, [id, initialProduct, sections, setPageContext, clearPageContext])
 
   const scrollToSection = (sectionId: string) => {
     const element = sectionRefs.current[sectionId]
@@ -439,7 +457,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                                       <div className="p-2 bg-white rounded-lg shadow-xs group-hover:shadow-sm border border-slate-200/40"><Icon size={20} className="text-primary-navy" /></div>
                                       <div className="flex flex-col">
                                         <span className={UI_SYSTEM.typography.h3 + " uppercase"}>{group.label}</span>
-                                        <span className="text-[8px] font-semibold text-steel-gray/40 uppercase tracking-[0.2em]">{Object.keys(group.specs).length} SPECIFICATIONS</span>
+                                        <span className="text-[8px] font-black text-steel-gray/40 uppercase tracking-[0.2em]">{Object.keys(group.specs).length} SPECIFICATIONS</span>
                                       </div>
                                     </div>
                                     <div className={`p-2 rounded-full transition-transform duration-300 ${isOpen ? 'rotate-180 bg-primary-navy text-white' : 'bg-white text-primary-navy shadow-sm'}`}><ChevronDown size={18} /></div>
@@ -470,7 +488,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                           <div className="aspect-square bg-slate-50 rounded-2xl mb-6 flex items-center justify-center border border-slate-100 group-hover:bg-air-blue/5 transition-colors">
                             <BrandIcon brand={product.brand} className="scale-125 grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
                           </div>
-                          <h4 className="font-semibold text-industrial-gray mb-2 text-base tracking-tight uppercase">{product.sku}-{v}</h4>
+                          <h4 className="font-black text-industrial-gray mb-2 text-base tracking-tight uppercase">{product.sku}-{v}</h4>
                           <p className="text-steel-gray text-[10px] font-medium mb-6 leading-relaxed">Advanced variant with optimized performance metrics for professional HVAC deployments.</p>
                           <div className="flex items-center justify-between pt-5 border-t border-slate-100">
                             <div className="text-primary-navy font-semibold text-lg">{formatCurrency((product.price + (v - 1) * 200), lang, { maximumFractionDigits: 0 })}</div>
@@ -486,7 +504,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                       {['installationGuide', 'userManual', 'maintenanceManual', 'safetyInfo', 'warrantyTerms', 'technicalSpecsDoc'].map((doc, i) => (
                         <div key={i} className={"bg-white rounded-3xl p-8 transition-all group text-center " + UI_SYSTEM.layout.borderLight + " " + UI_SYSTEM.layout.shadowAiry + " hover:shadow-md"}>
                           <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-navy group-hover:rotate-12 transition-all duration-500 shadow-inner"><FileText size={36} className="text-primary-navy group-hover:text-white transition-colors" /></div>
-                          <h4 className="font-semibold text-industrial-gray uppercase tracking-tight text-xs mb-6 min-h-[2.5rem] leading-relaxed px-4">{t(`pdp.docs.${doc}`)}</h4>
+                          <h4 className="font-black text-industrial-gray uppercase tracking-tight text-xs mb-6 min-h-[2.5rem] leading-relaxed px-4">{t(`pdp.docs.${doc}`)}</h4>
                           <button className="w-full bg-slate-100 hover:bg-primary-navy text-industrial-gray hover:text-white py-4 px-6 rounded-xl transition-all font-semibold text-[9px] uppercase tracking-widest flex items-center justify-center space-x-3 active:scale-95">
                             <Download size={16} /> <span>DOWNLOAD PDF</span>
                           </button>

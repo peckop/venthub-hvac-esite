@@ -88,14 +88,20 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   useEffect(() => {
     let active = true
     async function loadRole() {
+      if (!user) {
+        if (active) setUserRole('user')
+        return
+      }
       try {
         const role = await getUserRole()
         if (active) setUserRole(role)
-      } catch { }
+      } catch (e) {
+        console.error('getUserRole in StickyHeader failed', e)
+      }
     }
     loadRole()
     return () => { active = false }
-  }, [])
+  }, [user])
 
   const cartCount = getCartCount()
   const cartTotal = getCartTotal()
@@ -118,7 +124,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
       setCategoriesLoaded(true)
       return data
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Error fetching categories:', error)
       return null
     } finally {
       setIsCategoriesLoading(false)
@@ -253,7 +259,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
           <div className="flex w-full items-center justify-between h-full">
             <div className="flex items-center gap-2 overflow-hidden py-1">
               <div className="flex items-center space-x-1 sm:space-x-1.5 text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-semibold text-steel-gray/30 overflow-x-auto no-scrollbar whitespace-nowrap max-w-[120px] sm:max-w-none">
-                <Link href="/" className="hover:text-primary-navy transition-colors whitespace-nowrap">HOME</Link>
+                <Link href="/" className="hover:text-primary-navy transition-colors">HOME</Link>
                 {breadcrumb?.map((item, i) => (
                   <React.Fragment key={i}>
                     <span className="opacity-30">/</span>
