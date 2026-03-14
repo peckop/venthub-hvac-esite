@@ -149,7 +149,7 @@ export async function getProductsByCategory(categoryId: string) {
 // Alias for compatibility
 export const getProductsBySubcategory = getProductsByCategory;
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -157,11 +157,11 @@ export async function getProductById(id: string) {
     .maybeSingle()
 
   if (error) throw error
-  return data ? mapDatabaseProductToDomain(data) : null
+  return data ? mapDatabaseProductToDomain(data as DbProduct) : null
 }
 
-export async function getProductBySlugOrId(identifier: string) {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export async function getProductBySlugOrId(identifier: string): Promise<Product | null> {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
   const isUuid = uuidRegex.test(identifier)
 
   let query = supabase.from('products').select('*')
@@ -170,10 +170,10 @@ export async function getProductBySlugOrId(identifier: string) {
 
   const { data, error } = await query.maybeSingle()
   if (error) throw error
-  return data ? mapDatabaseProductToDomain(data) : null
+  return data ? mapDatabaseProductToDomain(data as DbProduct) : null
 }
 
-export async function getFeaturedProducts() {
+export async function getFeaturedProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -182,10 +182,10 @@ export async function getFeaturedProducts() {
     .limit(6)
 
   if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain)
+  return (data || []).map(row => mapDatabaseProductToDomain(row as DbProduct))
 }
 
-export async function searchProducts(query: string) {
+export async function searchProducts(query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -194,7 +194,7 @@ export async function searchProducts(query: string) {
     .limit(20)
 
   if (error) throw error
-  return (data || []).map(mapDatabaseProductToDomain)
+  return (data || []).map(row => mapDatabaseProductToDomain(row as DbProduct))
 }
 
 // Full‑text search
@@ -214,7 +214,7 @@ export async function ftsSearchProducts(q: string, limit = 20, filters?: { categ
 export interface AdminSearchResult extends Product {
   rank: number
   total_count: number
-  purchase_price?: number | null
+  purchase_price: number | null
 }
 
 export async function adminSearchProducts(q: string, limit = 50, offset = 0, categoryId?: string): Promise<AdminSearchResult[]> {

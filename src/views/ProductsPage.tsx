@@ -31,7 +31,7 @@ const getAllDescendantIds = (categories: Category[], parentId: string): string[]
 }
 
 // Recursive Category Item
-interface CategoryNode extends Category {
+type CategoryNode = Category & {
   children: CategoryNode[]
 }
 
