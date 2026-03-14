@@ -61,10 +61,21 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
                     )
                 }
 
+                if (!item.href) {
+                    return (
+                        <div
+                            key={item.id}
+                            className={cn(itemBaseClass, "cursor-default opacity-80")}
+                        >
+                            <span className="whitespace-nowrap">{item.label}</span>
+                        </div>
+                    )
+                }
+
                 return (
                     <Link
                         key={item.id}
-                        href={item.href || '#'}
+                        href={item.href}
                         onMouseEnter={() => onItemHover?.(item.id)}
                         className={itemBaseClass}
                     >

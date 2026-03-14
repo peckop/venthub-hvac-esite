@@ -69,16 +69,14 @@ export function AxialFanModel() {
             <group rotation={[Math.PI / 2, 0, 0]}>
                 <mesh material={glossyBlack}>
                     <cylinderGeometry args={[0.55, 0.55, 0.5, 64, 1, true]} />
-                    <meshStandardMaterial {...glossyBlack} />
                 </mesh>
 
                 {/* Ön ve Arka Flanşlar (Kıvrımlar) */}
                 {[0.25, -0.25].map((y, i) => (
                     <group key={i} position={[0, y, 0]}>
-                        <mesh rotation={[Math.PI / 2, 0, 0]}>
+                        <mesh rotation={[Math.PI / 2, 0, 0]} material={glossyBlack}>
                             {/* Dışa doğru genişleyen flanş */}
                             <ringGeometry args={[0.55, 0.60, 64]} />
-                            <meshStandardMaterial {...glossyBlack} />
                         </mesh>
                     </group>
                 ))}
@@ -90,15 +88,13 @@ export function AxialFanModel() {
                 {/* --- PERVANE GRUBU (Dönen Kısım) --- */}
                 <group ref={fanRef} position={[0, 0, 0.05]}>
                     {/* Pervane Göbeği (Siyah) */}
-                    <mesh rotation={[Math.PI / 2, 0, 0]}>
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={bladeBlack}>
                         <cylinderGeometry args={[0.16, 0.16, 0.06, 32]} />
-                        <meshStandardMaterial {...bladeBlack} />
                     </mesh>
 
                     {/* Marka Logosu (Kırmızı Daire) */}
-                    <mesh position={[0, 0, 0.031]} rotation={[Math.PI / 2, 0, 0]}>
+                    <mesh position={[0, 0, 0.031]} rotation={[Math.PI / 2, 0, 0]} material={logoRed}>
                         <circleGeometry args={[0.08, 32]} />
-                        <meshStandardMaterial {...logoRed} />
                     </mesh>
 
                     {/* 7 ADET SİYAH ORAK KANAT */}
@@ -108,24 +104,21 @@ export function AxialFanModel() {
                                 geometry={bladeGeometry}
                                 position={[0.14, 0, -0.01]} // Göbeğe montaj
                                 rotation={[0.45, 0.15, -0.15]} // Pitch açısı (Hava itme)
-                            >
-                                <meshStandardMaterial {...bladeBlack} />
-                            </mesh>
+                                material={bladeBlack}
+                            />
                         </group>
                     ))}
                 </group>
 
                 {/* Sabit Motor (Arka) */}
                 <group position={[0, 0, -0.1]}>
-                    <mesh rotation={[Math.PI / 2, 0, 0]}>
+                    <mesh rotation={[Math.PI / 2, 0, 0]} material={glossyBlack}>
                         <cylinderGeometry args={[0.18, 0.18, 0.25, 32]} />
-                        <meshStandardMaterial {...glossyBlack} />
                     </mesh>
                     {/* Motor Ayakları (3 Kollu) */}
                     {[0, 120, 240].map((angle, i) => (
-                        <mesh key={i} rotation={[0, 0, (angle * Math.PI) / 180]} position={[0, 0.28, 0]}>
+                        <mesh key={i} rotation={[0, 0, (angle * Math.PI) / 180]} position={[0, 0.28, 0]} material={glossyBlack}>
                             <boxGeometry args={[0.04, 0.25, 0.02]} />
-                            <meshStandardMaterial {...glossyBlack} />
                         </mesh>
                     ))}
                 </group>
@@ -155,13 +148,11 @@ export function AxialFanModel() {
 
             {/* 4. KLEMENS KUTUSU (Üstte Siyah) */}
             <group position={[0.4, 0.35, 0.1]} rotation={[0, 0, 0.2]}>
-                <mesh>
+                <mesh material={glossyBlack}>
                     <boxGeometry args={[0.12, 0.15, 0.08]} />
-                    <meshStandardMaterial {...glossyBlack} />
                 </mesh>
-                <mesh position={[0, -0.08, 0]}>
+                <mesh position={[0, -0.08, 0]} material={glossyBlack}>
                     <cylinderGeometry args={[0.015, 0.015, 0.04, 8]} />
-                    <meshStandardMaterial {...glossyBlack} />
                 </mesh>
             </group>
 

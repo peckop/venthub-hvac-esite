@@ -2,7 +2,8 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import OrbitalProductsShowcase from './OrbitalProductsShowcase'
+import dynamic from 'next/dynamic'
+const OrbitalProductsShowcase = dynamic(() => import('./OrbitalProductsShowcase'), { ssr: false, loading: () => <div className="w-full h-full bg-slate-900 animate-pulse rounded-2xl flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest">[ 3D MODULE LOADING ]</div> })
 import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
 
 // --- Category Data using OFFICIAL SLUGS from categoryRegistry ---

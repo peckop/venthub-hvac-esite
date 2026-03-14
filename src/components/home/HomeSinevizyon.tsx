@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface HomeSinevizyonProps {
-  onQuoteClick: () => void
+  onQuoteClick?: () => void
 }
 
 interface SlideProduct {
@@ -53,8 +53,15 @@ const slidesData: SlideData[] = [
 export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
   const [direction, setDirection] = useState(0)
   const touchStartX = useRef<number | null>(null)
+
+  const isInitialMount = useRef(true)
+  useEffect(() => {
+    setIsMounted(true)
+    isInitialMount.current = false
+  }, [])
 
   const paginate = useCallback((newDirection: number) => {
     setDirection(newDirection)
@@ -62,9 +69,10 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
   }, [])
 
   useEffect(() => {
+    if (!isMounted) return
     const timer = setInterval(() => paginate(1), 12000)
     return () => clearInterval(timer)
-  }, [paginate])
+  }, [paginate, isMounted])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -90,7 +98,6 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
     touchStartX.current = null
   }
 
-  // Fallback labels for robustness
   const getSlideContent = (index: number) => {
     return {
       eyebrow: t(`home.hero.sinevizyon.slides.${index}.eyebrow`) || 'VentHub Engineering',
@@ -103,19 +110,41 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
 
   return (
     <section 
-      className="relative w-full h-[80vh] lg:h-[90vh] min-h-[650px] overflow-hidden bg-slate-950 flex items-center touch-pan-y"
+      className="relative w-full h-[80vh] lg:h-[90vh] min-h-[650px] overflow-hidden bg-slate-950 flex items-center touch-pan-y contain-layout"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Background Blueprint Grid */}
+      {/* Background Blueprint Grid - Static CSS is better for TBT */}
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none" 
            style={{ backgroundImage: 'linear-gradient(#38BDF8 1px, transparent 1px), linear-gradient(90deg, #38BDF8 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
+
+      {/* Animated Air Flow Particles using CSS Keyframes instead of Framer Motion for better TBT */}
+      <style jsx>{`
+        @keyframes flow {
+          0% { transform: translateX(-100px); opacity: 0; }
+          20% { opacity: 0.2; }
+          80% { opacity: 0.2; }
+          100% { transform: translateX(600px); opacity: 0; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        .particle {
+          position: absolute;
+          height: 1px;
+          width: 96px;
+          background: linear-gradient(90deg, transparent, #22D3EE, transparent);
+          animation: flow 3s linear infinite;
+        }
+      `}</style>
 
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentSlide}
           custom={direction}
-          initial={{ opacity: 0 }}
+          // LCP Optimization: Do not start with opacity 0 for the initial slide to avoid painting delays
+          initial={isInitialMount.current ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
@@ -127,6 +156,8 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             fill
             sizes="100vw"
             priority={currentSlide === 0}
+            fetchPriority={currentSlide === 0 ? "high" : "auto"}
+            loading={currentSlide === 0 ? "eager" : "lazy"}
             className="object-cover object-center brightness-[0.4] saturate-[1.2]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
@@ -168,7 +199,10 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
 
                 <button
                   type="button"
-                  onClick={onQuoteClick}
+                  onClick={() => {
+                    if (onQuoteClick) onQuoteClick();
+                    else if (typeof window !== "undefined") window.openLeadModal?.();
+                  }}
                   className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-12 text-[14px] font-bold uppercase tracking-widest text-white backdrop-blur-md transition-all duration-300 hover:bg-white/10"
                 >
                   {t('home.hero.secondaryCta')}
@@ -180,16 +214,13 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
 
         {/* Right Side: Floating High-Tech Products */}
         <div className="w-full lg:w-1/2 relative h-[450px] sm:h-[550px]">
-          {/* Animated Air Flow Particles */}
+          {/* Animated Air Flow Particles using optimized CSS */}
           <div className="absolute inset-0 pointer-events-none z-0">
             {[...Array(6)].map((_, i) => (
-              <motion.div
+              <div
                 key={i}
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 600, opacity: [0, 0.2, 0] }}
-                transition={{ duration: 3, repeat: Infinity, delay: i * 0.5, ease: "linear" }}
-                className="absolute h-px w-24 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"
-                style={{ top: `${20 + i * 15}%` }}
+                className="particle"
+                style={{ top: `${20 + i * 15}%`, animationDelay: `${i * 0.5}s` }}
               />
             ))}
           </div>
@@ -208,28 +239,61 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                   className={`absolute ${i === 0 ? 'z-20' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'}`}
                 >
                   <Link href={p.link} className="relative block group">
-                    {/* Technical HUD Label */}
-                    <motion.div 
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className={`absolute ${i === 0 ? '-right-16 top-0' : '-left-16 bottom-0'} z-30 hidden lg:block`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="h-px w-12 bg-cyan-400/50" />
-                        <div className="rounded-lg border border-cyan-500/30 bg-slate-950/80 p-3 backdrop-blur-md">
-                          <div className="text-[14px] font-black text-white">{t(p.labelKey)}</div>
-                          <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400">{t(p.subLabelKey)}</div>
+                    {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
+                    <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative"
+                      >
+                        {/* Connecting Line with Animated Dot */}
+                        <div className={`absolute ${i === 0 ? 'right-full' : 'left-full'} top-1/2 -translate-y-1/2 flex items-center`}>
+                          <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-cyan-500 to-cyan-400" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22D3EE] animate-pulse" />
                         </div>
-                      </div>
-                    </motion.div>
 
-                    <motion.div
-                      animate={{ y: [0, -20, 0], rotate: [0, 1, 0] }}
-                      transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut" }}
+                        <div className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+                          {/* HUD Corner Accents */}
+                          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400/60" />
+                          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
+                          
+                          {/* Animated Scan Line Inside HUD */}
+                          <motion.div 
+                            animate={{ top: ['-100%', '200%'] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none"
+                          />
+
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <div className="h-1 w-1 bg-cyan-400 rounded-full" />
+                              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400/80">System.Data.Live</div>
+                            </div>
+                            <div className="text-[15px] font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="text-[9px] font-medium uppercase tracking-widest text-slate-400">{t(p.subLabelKey)}</div>
+                              <div className="h-px flex-1 bg-white/5" />
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div
                       className="relative w-64 h-64 sm:w-80 sm:h-80 drop-shadow-[0_30px_60px_rgba(0,0,0,0.9)] transition-transform group-hover:scale-105"
+                      style={{ 
+                        animation: `float ${5 + i}s ease-in-out infinite`,
+                        transform: 'translate3d(0, 0, 0)' // Trigger GPU acceleration
+                      }}
                     >
-                      <Image src={p.url} alt="Technical Product" fill className="object-contain" />
-                    </motion.div>
+                      <Image 
+                        src={p.url} 
+                        alt="Technical Product" 
+                        fill 
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-contain" 
+                      />
+                    </div>
                   </Link>
                 </motion.div>
               ))}

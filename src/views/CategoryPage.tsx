@@ -451,7 +451,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
                   <input
                     type="range"
                     min="0"
-                    max="10000"
+                    max={Math.max(100000, priceRange[1])}
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full"
@@ -512,7 +512,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
               {/* Clear Filters */}
               <button
                 onClick={() => {
-                  setPriceRange([0, 10000])
+                  setPriceRange([0, 1000000000])
                   setSelectedBrands([])
                   setAirflowMin(''); setAirflowMax(''); setPressureMin(''); setPressureMax(''); setNoiseMax('')
                 }}
@@ -720,7 +720,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
                   <input
                     type="range"
                     min="0"
-                    max="10000"
+                    max={Math.max(100000, priceRange[1])}
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full"

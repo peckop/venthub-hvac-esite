@@ -31,11 +31,18 @@ export const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> =
   const [activeTab, setActiveTab] = useState<CommercialTab>('featured')
 
   const productsByTab = useMemo(() => {
-    const featured = initialProducts.filter((p) => p.is_featured).slice(0, 4)
+    // Featured: specific flag or fallback to first 4
+    let featured = initialProducts.filter((p) => p.is_featured).slice(0, 4)
+    if (featured.length === 0) featured = initialProducts.slice(0, 4)
+
+    // New Arrivals: sort by creation date
     const newArrivals = [...initialProducts]
       .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
       .slice(0, 4)
-    const bestSellers = initialProducts.slice(4, 8) // Placeholder for best sellers logic
+
+    // Best Sellers: fallback to another slice of the list
+    let bestSellers = initialProducts.slice(4, 8)
+    if (bestSellers.length === 0) bestSellers = initialProducts.slice(0, 4)
 
     return { featured, newArrivals, bestSellers }
   }, [initialProducts])

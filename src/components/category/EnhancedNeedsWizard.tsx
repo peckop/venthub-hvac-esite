@@ -525,7 +525,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             </div>
                             <div className="space-y-3">
                                 {matchedProducts.map(product => (
-                                    <Link key={product.id} href={`/product/${product.id}`} onClick={handleClose} className="block p-4 border rounded-xl hover:bg-blue-50 transition-all">
+                                    <Link key={product.id} href={`/products/${product.id}`} onClick={handleClose} className="block p-4 border rounded-xl hover:bg-blue-50 transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="flex-1">
                                                 <h5 className="font-semibold text-gray-800">{product.name}</h5>

@@ -8,14 +8,14 @@ import BuildTag from './BuildTag'
 const Footer: React.FC = () => {
   const { t } = useI18n()
   const mainCategories = [
-    { name: 'EXPROOF FANLAR', slug: 'fanlar' },
-    { name: 'ISI GERİ KAZANIM CİHAZLARI', slug: 'isi-geri-kazanim-cihazlari' },
-    { name: 'HAVA PERDELERİ', slug: 'hava-perdeleri' },
-    { name: 'NEM ALMA CİHAZLARI', slug: 'nem-alma-cihazlari' },
-    { name: 'HAVA TEMİZLEYİCİLER', slug: 'hava-temizleyiciler' },
-    { name: 'FLEXİBLE HAVA KANALLARI', slug: 'flexible-hava-kanallari' },
-    { name: 'HIZ KONTROLÜ CİHAZLARI', slug: 'hiz-kontrolu-cihazlari' },
-    { name: 'AKSESUARLAR', slug: 'aksesuarlar' }
+    { name: t('common.categoryList.exproofFans'), slug: 'fanlar' },
+    { name: t('common.categoryList.heatRecovery'), slug: 'isi-geri-kazanim-cihazlari' },
+    { name: t('common.categoryList.airCurtains'), slug: 'hava-perdeleri' },
+    { name: t('common.categoryList.dehumidifiers'), slug: 'nem-alma-cihazlari' },
+    { name: t('common.categoryList.airPurifiers'), slug: 'hava-temizleyiciler' },
+    { name: t('common.categoryList.flexibleDucts'), slug: 'flexible-hava-kanallari' },
+    { name: t('common.categoryList.speedControllers'), slug: 'hiz-kontrolu-cihazlari' },
+    { name: t('common.categoryList.accessories'), slug: 'aksesuarlar' }
   ]
 
   return (
