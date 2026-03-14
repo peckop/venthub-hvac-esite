@@ -86,12 +86,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   useEffect(() => {
     async function fetchProduct() {
       if (!id) return
+      
+      // If we already have the correct product (from initialProduct or previous fetch), don't fetch again
+      if (product && (product.id === id || product.sku === id)) {
+        return
+      }
+
       if (initialProduct && (id === initialProduct.id || id === initialProduct.sku)) {
         setProduct(initialProduct)
         setLoading(false)
+        return
       }
+
       try {
-        if (!product) setLoading(true)
+        setLoading(true)
         const productData = await getProductBySlugOrId(id)
         if (!productData) {
           setProduct(null)
@@ -128,7 +136,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
-  }, [id, initialProduct]) // Removed product and router to prevent infinite loop and unnecessary re-runs
+  }, [id, initialProduct, product]) // Included product to satisfy lint, but fetch logic is guarded
 
   useEffect(() => {
     const handleScroll = () => {
