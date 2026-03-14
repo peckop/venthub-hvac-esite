@@ -63,10 +63,6 @@ export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], init
           <RevealSection>
             <KnowledgeBlock />
           </RevealSection>
-
-          <RevealSection>
-            <FinalCTA />
-          </RevealSection>
         </div>
       </HomePageClientWrapper>
     </div>

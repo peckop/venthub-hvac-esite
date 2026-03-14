@@ -251,70 +251,56 @@ export const WhatsAppIcon: React.FC<IconProps> = ({ className = '', size = 24 })
   )
 }
 
-// Brand specific icons (32x32px)
+// Brand specific icons using real images from public/images/ekran
 export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({ 
   brand, 
   className = '' 
 }) => {
-  const size = 32
+  const normalizedBrand = brand.toLowerCase()
   
-  switch (brand.toLowerCase()) {
+  // Base path for brand images
+  const basePath = '/images/ekran'
+  
+  let src = ''
+  const alt = brand
+
+  switch (normalizedBrand) {
     case 'avens':
     case 'avensair':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <circle cx="16" cy="16" r="14" fill="#1E40AF" />
-          <path d="M10 20 L16 12 L22 20 L16 16 Z" fill="white" />
-          <text x="16" y="26" textAnchor="middle" fontSize="8" fill="white">A</text>
-        </svg>
-      )
+      src = `${basePath}/avens.svg`
+      break
     case 'vortice':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <circle cx="16" cy="16" r="14" fill="#10B981" />
-          <path d="M16 6 Q24 16 16 26 Q8 16 16 6" fill="white" opacity="0.9" />
-        </svg>
-      )
+    case 'vortic':
+      src = `${basePath}/vortic.jpg`
+      break
     case 'casals':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <rect x="2" y="2" width="28" height="28" rx="4" fill="#D97706" />
-          <circle cx="16" cy="16" r="8" fill="white" />
-          <circle cx="16" cy="16" r="4" fill="#D97706" />
-        </svg>
-      )
+      src = `${basePath}/casals.png`
+      break
     case 'nicotra-gebhardt':
     case 'nicotra gebhardt':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <rect x="2" y="2" width="28" height="28" rx="2" fill="#374151" />
-          <rect x="6" y="6" width="20" height="20" rx="2" fill="white" opacity="0.9" />
-          <text x="16" y="18" textAnchor="middle" fontSize="10" fill="#374151">NG</text>
-        </svg>
-      )
+    case 'nicotra':
+      src = `${basePath}/nicotra.webp`
+      break
     case 'flexiva':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <circle cx="16" cy="16" r="14" fill="#38BDF8" />
-          <path d="M8 16 Q16 8 24 16 Q16 24 8 16" stroke="white" strokeWidth="3" fill="none" />
-        </svg>
-      )
-    case 'danfoss':
-      return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <rect x="2" y="2" width="28" height="28" rx="14" fill="#EF4444" />
-          <rect x="8" y="12" width="16" height="8" rx="2" fill="white" />
-          <text x="16" y="18" textAnchor="middle" fontSize="8" fill="#EF4444">D</text>
-        </svg>
-      )
+      src = `${basePath}/flexiva.png`
+      break
     default:
+      // Fallback to a placeholder or generic icon if needed
       return (
-        <svg width={size} height={size} viewBox="0 0 32 32" className={className}>
-          <circle cx="16" cy="16" r="14" fill="#6B7280" />
-          <text x="16" y="18" textAnchor="middle" fontSize="10" fill="white">?</text>
-        </svg>
+        <div className={`flex items-center justify-center bg-slate-100 rounded-lg p-2 ${className}`}>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{brand}</span>
+        </div>
       )
   }
+
+  return (
+    <img 
+      src={src} 
+      alt={alt} 
+      className={`object-contain ${className}`}
+      loading="lazy"
+    />
+  )
 }
 
 

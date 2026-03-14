@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
-import { getCategories, getAllProducts, HVAC_BRANDS } from '../lib/supabase'
+import { getCategories, getAllProducts } from '../lib/supabase'
+import { HVAC_BRANDS } from '../lib/brands'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://venthub-hvac.com'

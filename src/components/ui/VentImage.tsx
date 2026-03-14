@@ -40,50 +40,61 @@ export const VentImage: React.FC<VentImageProps> = ({
 
   // 1. Kaynak kontrolü ve URL inşası
   const getImageUrl = (): string => {
-    // Hata durumunda veya kaynak boşsa doğrudan fallback döndür
     if (!src || error) return FALLBACK_IMAGES[fallbackType];
-
-    // Eğer tam bir URL ise (http...) doğrudan döndür
     if (src.startsWith('http')) return src;
-
-    // Eğer projenin kendi public klasöründeyse (/images/...) doğrudan döndür
     if (src.startsWith('/')) return src;
 
-    // Eğer Supabase path ise (örn: 'product-images/fan.png') tam URL'e çevir
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (supabaseUrl) {
-      // Path içinde zaten storage URL'i varsa temizle (duplicate engelleme)
       const cleanPath = src.replace(`${supabaseUrl}/storage/v1/object/public/`, '');
       return `${supabaseUrl}/storage/v1/object/public/${cleanPath}`;
     }
-
     return src;
   };
 
   const finalSrc = getImageUrl();
+  
+  const { width, height, fill, ...rest } = props;
+  
+  // Strateji: 
+  // 1. Eğer 'fill' varsa, wrapper tam boy kaplar.
+  // 2. Eğer boyutlar yoksa ve 'fill' de yoksa, Next.js çökmesini önlemek için varsayılan bir oran verilir.
+  const isFillMode = !!fill;
+  const needsDefaultSizes = !isFillMode && !width && !height;
+  
+  // Wrapper sınıfları ve stilleri
+  const wrapperClass = `relative overflow-hidden bg-gray-50 flex items-center justify-center ${
+    isFillMode ? 'w-full h-full' : ''
+  } ${className || ''}`;
 
   return (
     <div 
-      className={`relative overflow-hidden bg-gray-50 flex items-center justify-center ${className || ''}`} 
-      style={{ width: props.width, height: props.height }}
+      className={wrapperClass} 
+      style={{ 
+        width: isFillMode ? undefined : (width || (needsDefaultSizes ? '100%' : undefined)), 
+        height: isFillMode ? undefined : height 
+      }}
     >
       <Image
-        {...props}
+        {...rest}
         src={finalSrc}
         alt={alt || 'VentHub HVAC'}
+        fill={isFillMode}
+        width={isFillMode ? undefined : (width || (needsDefaultSizes ? 1200 : undefined))}
+        height={isFillMode ? undefined : (height || (needsDefaultSizes ? 800 : undefined))}
+        sizes={props.sizes || (isFillMode ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" : undefined)}
         className={`transition-all duration-500 ease-in-out ${
           (isLoaded || props.priority) ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-95 blur-sm'
-        } ${className || ''}`}
+        } ${isFillMode ? 'object-cover' : 'w-full h-auto'} ${className || ''}`}
         onLoad={() => setIsLoaded(true)}
         onError={() => {
-          console.warn(`VentImage: Failed to load image -> ${src}`);
+          console.warn(`VentImage: Failed to load -> ${src}`);
           setError(true);
         }}
       />
       
-      {/* Loading Skeleton Placeholder (Opsiyonel) */}
       {!isLoaded && !error && (
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-gray-50 via-gray-100 to-gray-50" />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-gray-50 via-gray-100 to-gray-50 z-0" />
       )}
     </div>
   );

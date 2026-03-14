@@ -25,6 +25,17 @@ export const en = {
     allProducts: "All Products",
     exploreProducts: "Explore Products",
     getQuote: "Get a Quote",
+    addToCart: 'Add to Cart',
+    categoryList: {
+      exproofFans: 'EX-PROOF FANS',
+      heatRecovery: 'HEAT RECOVERY UNITS',
+      airCurtains: 'AIR CURTAINS',
+      dehumidifiers: 'DEHUMIDIFIERS',
+      airPurifiers: 'AIR PURIFIERS',
+      flexibleDucts: 'FLEXIBLE AIR DUCTS',
+      speedControllers: 'SPEED CONTROLLERS',
+      accessories: 'ACCESSORIES'
+    },
     byApplication: "Solutions by Application",
     viewAll: "View all",
     featured: "Featured Products",
@@ -75,14 +86,26 @@ export const en = {
   },
   knowledge: {
     hub: {
-      title: 'Knowledge & Guides Center',
-      subtitle: 'Topic-based guides with (coming soon) calculators and a selection wizard to help you choose the right product.',
-      searchPlaceholder: 'Search topic…',
-      readMore: 'Read more',
-      calculatorsSoon: 'Calculators (Coming Soon)',
-      calculatorsSoonDesc: 'HRV airflow, jet fan coverage, air curtain velocity/flow and duct pressure drop.',
-      selectorSoon: 'Product Selector (Coming Soon)',
-      selectorSoonDesc: 'Build a product list in 4–6 questions.'
+      title: 'Knowledge is the Raw Material of Engineering',
+      subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
+      eyebrow: 'Technical Intelligence Unit',
+      searchPlaceholder: 'Search for topic, technical term or product family...',
+      readStart: 'Start Reading',
+      readTime: '{{count}} min read',
+      calculatorsSoon: 'Calculators Soon',
+      calculatorsSoonDesc: 'Perform your engineering calculations in seconds.',
+      selectorSoon: 'Product Selector Soon',
+      selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
+      inDevelopment: 'In Development',
+      inPlanning: 'In Planning',
+      notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
+      notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
+      contactExpert: 'Talk to an Expert',
+      categories: {
+        comfort: 'Comfort',
+        safety: 'Safety',
+        efficiency: 'Efficiency'
+      }
     },
     tags: {
       all: 'All',
@@ -196,18 +219,24 @@ export const en = {
         ]
       }
     },
-        cinematicShowcase: {
+    cinematicShowcase: {
       eyebrow: 'ENGINEERING FOCUS',
       title: 'Vortice Lineo Quiet Series',
       subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
       description: 'Provides ultra-quiet operation efficiency even at high static pressure, thanks to its special silencer-layered outer body and dynamically balanced motor structure.',
+      cta: 'Access High-Resolution Technical Data',
+      badge: 'INDUSTRIAL FOCUS',
+      componentLabel: 'System Component',
       hotspots: {
-        motor: 'High Efficiency EC Motor - Precise Speed and Torque Management',
-        clamps: 'Anti-Vibration Clamps - Quick Service and Assembly Module',
-        housing: 'Sound-Absorbing Composite Housing - Minimum Acoustic Emission',
-        airflow: 'Air Guiding Vane Structure - Maximum Laminar Flow Efficiency'
-      },
-      cta: 'Access High-Resolution Technical Data'
+        motor: 'High Efficiency EC Motor',
+        motorDetail: 'EC motor technology providing precise speed and torque management.',
+        clamps: 'Anti-Vibration Clamps',
+        clampsDetail: 'Vibration damping modules for quick service and assembly.',
+        housing: 'Acoustic Composite Housing',
+        housingDetail: 'Sound-absorbing layers for minimum acoustic emission.',
+        airflow: 'Laminar Flow Vanes',
+        airflowDetail: 'Vane design providing maximum air guidance efficiency.'
+      }
     },
     quickEntry: {
       eyebrow: 'Starting Layer',
@@ -326,6 +355,7 @@ export const en = {
       eyebrow: 'Trust and Proof',
       title: 'We build trust with clear operational realities, not decorative promises.',
       subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
+      badge: 'VERIFIED',
       items: {
         brands: {
           eyebrow: 'Brand Layer',
@@ -511,7 +541,10 @@ export const en = {
     hubBadge: "Turkey's HVAC Expert",
     hubTitle: "Professional HVAC Solutions",
     hubSubtitle: "Air curtain, industrial fan and heat recovery systems. Let's find the right product for your needs together.",
-    searchPlaceholder: "Search product or model..."
+    searchPlaceholder: "Search product or model...",
+    noResults: 'No Results Found',
+    noResultsDesc: 'Please clear filters or try a different term.',
+    clearFilters: 'Clear Filters',
   },
   applications: {
     parking: {
@@ -1102,16 +1135,50 @@ export const en = {
   aboutPage: {
     title: 'About VentHub',
     subtitle: 'Your trusted partner for premium HVAC solutions. Corporate supply, engineering-assisted selection and fast quote processes.',
+    heroTitle: 'Turkey\'s Trusted HVAC Platform',
+    heroSubtitle: 'With over 15 years of experience in professional ventilation solutions, we bring world-class products to Turkey.',
+    experienceLabel: 'Since 2009',
     stats: {
+      launchYear: 'Launch Year',
       premiumBrands: 'Premium Brands',
       productTypes: 'Product Types',
-      yearsExperience: 'Years Experience'
+      deliveryTarget: 'Delivery Target',
+      yearsExperience: 'Years experience'
+    },
+    values: {
+      itemsTitle: 'Values That Define Us',
+      itemsSubtitle: 'We prioritize our customers\' needs in every decision we make',
+      mission: {
+        title: 'Our Mission',
+        description: 'To make professional HVAC solutions accessible in Turkey, offering world-class products to our B2B customers.'
+      },
+      vision: {
+        title: 'Our Vision',
+        description: 'To be Turkey\'s reference e-commerce platform in the ventilation industry, growing as a trusted representative of global brands.'
+      },
+      values: {
+        title: 'Our Values',
+        description: 'Quality, reliability, customer satisfaction, and sustainability form the basis of our principles.'
+      }
     },
     whyTitle: 'Why VentHub?',
+    whySubtitle: 'We work to be worthy of your trust',
+    trustBadges: {
+      premium: { label: 'Premium Brands', sublabel: 'Global Manufacturers' },
+      ce: { label: 'CE Certified Products', sublabel: 'European Standards' },
+      original: { label: 'Original Products', sublabel: 'Quality Guarantee' },
+      reliable: { label: 'Reliable Platform', sublabel: 'Professional Service' }
+    },
     bullets: {
       bullet1: 'Engineering-focused selection support and proper product guidance',
       bullet2: 'Transparent communication in stock, delivery and after-sales',
       bullet3: 'KVKK/iyzico compliant, secure payment and data protection'
+    },
+    cta: {
+      title: 'Let\'s Work Together',
+      subtitle: 'Find the most suitable HVAC solution for your project together. Our expert team is ready to help you.',
+      primary: 'Explore Products',
+      secondary: 'Contact Us'
     }
   },
   category: {
@@ -1172,6 +1239,9 @@ export const en = {
     relatedGuide: 'Related Guide',
     statusLabel: 'Status',
     relatedProducts: 'Related Products',
+    officialDistributor: 'OFFICIAL DISTRIBUTOR',
+    priceAvailability: 'Price & Availability',
+
     labels: {
       productFeatures: 'Product Features',
       productDescription: 'Product Description',
@@ -1187,7 +1257,9 @@ export const en = {
       airflow: 'Airflow',
       pressure: 'Pressure',
       power: 'Power',
-      noise: 'Noise Level'
+      noise: 'Noise Level',
+      noSpecsAvailable: 'No technical specifications available for this product.',
+      technicalDatasheet: 'TECHNICAL DATASHEET'
     },
     features: {
       materialQuality: 'Premium material and manufacturing quality',
@@ -1224,7 +1296,8 @@ export const en = {
       downloadCatalog: 'Download Catalog',
       downloadBrochure: 'Download Brochure',
       liveDataNotice: "ℹ️ Data is updated in real-time",
-      interactive3D: "3D View"
+      interactive3D: "3D VIEW",
+      addToProject: "Add to Project"
     },
     cert: {
       ceCertificate: 'CE Certificate',
@@ -1251,7 +1324,8 @@ export const en = {
       diagrams: 'Diagrams',
       documents: 'Documents',
       brochure: 'Brochure/Catalog',
-      certificates: 'Certificates'
+      certificates: 'Certificates',
+      specs: 'Technical Specifications'
     }
   },
   cart: {
@@ -1569,14 +1643,24 @@ export const en = {
   },
   brands: {
     sectionTitle: 'Premium HVAC Brands',
-    sectionSubtitle: "As Turkey's distributor of leading HVAC brands, we offer top-quality ventilation solutions.",
-    viewAll: 'See all brands',
+    sectionSubtitle: 'As the authorized distributor of leading global HVAC brands in Turkey, we offer top-quality ventilation solutions.',
+    viewAll: 'See All Brands',
     pageTitle: 'Brands',
-    seoDesc: 'Premium HVAC brands under VentHub',
+    pageSubtitle: 'As the authorized representative of the world\'s most prestigious HVAC manufacturers, we bring engineering masterpieces to your projects.',
+    eyebrow: 'Global Signatures of Excellence',
+    exploreBrand: 'Explore Brand',
+    seoDesc: 'Premium HVAC brands under the VentHub umbrella',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     countryLabel: 'Country:',
-    aboutBrand: 'information'
+    aboutBrand: 'information',
+    trust: {
+      eyebrow: 'Supply Chain Authority',
+      title: 'Guaranteed Supply Directly from Manufacturer',
+      description: 'Thanks to our direct strategic partnership with all our brands, you have access to the latest technologies, full technical support, and the most competitive lead times.',
+      original: '100% Original Product',
+      standard: 'Global Standard Compliance'
+    }
   },
   categories: {
     title: 'Product Categories',

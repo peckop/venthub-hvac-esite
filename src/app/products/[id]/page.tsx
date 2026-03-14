@@ -26,8 +26,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
+  const cleanId = params.id?.replace(/cc$/, '')
   try {
-    const product = await getProductBySlugOrId(params.id)
+    const product = await getProductBySlugOrId(cleanId)
 
     if (product) {
       return {
@@ -46,18 +47,19 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
+  const cleanId = params.id?.replace(/cc$/, '')
   let productData: Product | null = null
   
   try {
     // If we are prerendering 'generic' or the database is down, handle it gracefully
-    if (params.id !== 'generic') {
-      productData = await getProductBySlugOrId(params.id)
+    if (cleanId !== 'generic') {
+      productData = await getProductBySlugOrId(cleanId)
     }
   } catch (e: any) {
     if (e?.message?.includes('fetch failed')) {
-      console.warn(`Network fetch failed for product ${params.id} (expected if Supabase env is missing)`)
+      console.warn(`Network fetch failed for product ${cleanId} (expected if Supabase env is missing)`)
     } else {
-      console.error(`Error fetching product data for ${params.id}:`, e)
+      console.error(`Error fetching product data for ${cleanId}:`, e)
     }
   }
 
@@ -65,10 +67,10 @@ export default async function Page({ params }: { params: { id: string } }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "productID": params.id,
+    "productID": cleanId,
     "name": productData?.name || "Product Details",
     "description": productData?.description || "VentHub Product Details",
-    "url": `https://venthub.com/products/${params.id}`,
+    "url": `https://venthub.com/products/${cleanId}`,
     ...(productData?.image_url && { "image": productData.image_url }),
     ...(productData?.brand && {
       "brand": {
@@ -81,7 +83,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       "availability": (productData?.stock_qty ?? 0) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       "price": productData?.price || "0.00",
       "priceCurrency": "TRY",
-      "url": `https://venthub.com/products/${params.id}`
+      "url": `https://venthub.com/products/${cleanId}`
     }
   }
 
