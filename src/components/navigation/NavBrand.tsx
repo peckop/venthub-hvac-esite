@@ -5,7 +5,7 @@ interface NavBrandProps {
     brandName: string
 }
 
-const NavBrand: React.FC<NavBrandProps> = ({ brandName }) => {
+const NavBrand: React.FC<NavBrandProps> = React.memo(({ brandName }) => {
     return (
         <Link
             href="/"
@@ -23,6 +23,8 @@ const NavBrand: React.FC<NavBrandProps> = ({ brandName }) => {
             </div>
         </Link>
     )
-}
+})
 
-export default React.memo(NavBrand)
+NavBrand.displayName = 'NavBrand';
+
+export default NavBrand

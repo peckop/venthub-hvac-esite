@@ -48,7 +48,7 @@ const getIconForId = (id: string) => {
     }
 }
 
-const NavSecondaryRail: React.FC<NavSecondaryRailProps> = ({ items }) => {
+const NavSecondaryRail: React.FC<NavSecondaryRailProps> = React.memo(({ items }) => {
     // Separate left-aligned corporate links from right-aligned profile link
     const leftItems = items.filter(item => item.id !== 'account')
     const rightItems = items.filter(item => item.id === 'account')
@@ -84,6 +84,8 @@ const NavSecondaryRail: React.FC<NavSecondaryRailProps> = ({ items }) => {
             </div>
         </div>
     )
-}
+})
 
-export default React.memo(NavSecondaryRail)
+NavSecondaryRail.displayName = 'NavSecondaryRail';
+
+export default NavSecondaryRail

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect } from 'react'
 import { printQrLabel } from './InventoryQrLabel'
 import { InventoryRow, ReservedRow } from '../../types/inventory'
