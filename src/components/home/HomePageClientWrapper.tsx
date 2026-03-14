@@ -5,7 +5,7 @@ import React, { Suspense, useEffect, useState } from 'react'
 const LeadModal = React.lazy(() => import('../LeadModal'))
 
 interface Props {
-  children: (onQuoteClick: () => void) => React.ReactNode
+  children: React.ReactNode
 }
 
 export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
@@ -13,16 +13,13 @@ export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const target = window as unknown as { openLeadModal?: () => void }
-    target.openLeadModal = () => setLeadOpen(true)
-    return () => { delete target.openLeadModal }
+    window.openLeadModal = () => setLeadOpen(true)
+    return () => { window.openLeadModal = undefined }
   }, [])
-
-  const handleQuoteClick = () => setLeadOpen(true)
 
   return (
     <>
-      {children(handleQuoteClick)}
+      {children}
       {leadOpen && (
         <Suspense fallback={null}>
           <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />

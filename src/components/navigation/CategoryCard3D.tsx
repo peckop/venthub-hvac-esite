@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { ChevronRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
-const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => <div className="w-full h-full animate-pulse bg-slate-800/20 rounded-xl" /> })
+const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => null })
 import type { Category } from '../../lib/supabase'
 
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
@@ -36,22 +36,15 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                 <Canvas
                     camera={{ position: [0, 0, 2.2], fov: 45 }}
                     style={{ background: 'transparent' }}
+                    gl={{ antialias: false, powerPreference: "high-performance" }}
+                    dpr={1}
                 >
-                    {/* Lighting Setup for Menu Tiles */}
-                    <ambientLight intensity={1.5} />
-                    <pointLight position={[10, 10, 10]} intensity={2} />
-                    <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
+                    <ambientLight intensity={1.2} />
+                    <pointLight position={[5, 5, 5]} intensity={1.5} />
+                    <pointLight position={[-5, -5, -5]} intensity={0.5} color="#b0e0e6" />
 
                     <Suspense fallback={null}>
                         <Category3DIcon categorySlug={category.slug} scale={0.9} />
-                        <OrbitControls
-                            enableZoom={false}
-                            enablePan={false}
-                            enableRotate={false}
-                            autoRotate
-                            autoRotateSpeed={2}
-                        />
-                        <Environment preset="city" />
                     </Suspense>
                 </Canvas>
             </div>

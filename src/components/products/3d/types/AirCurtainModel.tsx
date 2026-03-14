@@ -160,8 +160,10 @@ function AirFlow({ isHeated, showMixed }: { isHeated: boolean, showMixed: boolea
         })
     }, [isHeated, showMixed])
 
-    useFrame((state) => {
-        const time = state.clock.elapsedTime
+    const timeRef = useRef(0)
+    useFrame((state, delta) => {
+        timeRef.current += delta
+        const time = timeRef.current
 
         slices.forEach((s, i) => {
             const mesh = meshRefs.current[i]

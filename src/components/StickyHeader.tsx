@@ -28,9 +28,11 @@ import NavSearchTrigger from './navigation/NavSearchTrigger'
 import NavShell from './navigation/NavShell'
 import NavUtilityRail from './navigation/NavUtilityRail'
 
-const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
-const MegaMenu = React.lazy(() => import('./MegaMenu'))
-const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
+import dynamic from 'next/dynamic'
+
+const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
+const MegaMenu = dynamic(() => import('./MegaMenu'), { ssr: false })
+const CategoryHubOverlay = dynamic(() => import('./navigation/CategoryHubOverlay'), { ssr: false })
 
 interface StickyHeaderProps {
   isScrolled: boolean

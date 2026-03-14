@@ -20,55 +20,54 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
+  // SSR to Client Prop aktarım kuralı gereği, 'onQuoteClick' gibi event handlerlar Server Component'ten geçilemez.
+  // Bu nedenle butona basılınca tetiklenecek fonksiyonlar artık doğrudan Client wrapper içerisinden çağrılıyor olacak veya 'window' bazlı çağrılacak.
+
   return (
     <div className="min-h-screen bg-white selection:bg-cyan-100 selection:text-cyan-900">
       <HomePageClientWrapper>
-        {(onQuoteClick) => (
-          <>
-            <HomeSinevizyon onQuoteClick={onQuoteClick} />
+        <HomeSinevizyon />
 
-            {/* Cinematic Spacing and Transition: Dark to Light */}
-            <div className="relative h-32 lg:h-64 bg-white overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-white h-32 lg:h-64 opacity-100" />
-            </div>
+        {/* Cinematic Spacing and Transition: Dark to Light */}
+        <div className="relative h-32 lg:h-64 bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-white h-32 lg:h-64 opacity-100" />
+        </div>
 
-            <RevealSection>
-              <div className="-mt-16 relative z-10">
-                <GuidedCategoryDiscovery categories={initialCategories} />
-              </div>
-            </RevealSection>
+        <RevealSection>
+          <div className="-mt-16 relative z-10">
+            <GuidedCategoryDiscovery categories={initialCategories} />
+          </div>
+        </RevealSection>
 
-            <div className="space-y-32 lg:space-y-48 pb-32">
-              <RevealSection>
-                <CinematicProductShowcase />
-              </RevealSection>
+        <div className="space-y-32 lg:space-y-48 pb-32">
+          <RevealSection>
+            <CinematicProductShowcase />
+          </RevealSection>
 
-              <RevealSection>
-                <ApplicationSolutions />
-              </RevealSection>
+          <RevealSection>
+            <ApplicationSolutions />
+          </RevealSection>
 
-              <RevealSection>
-                <TrustProofSection />
-              </RevealSection>
+          <RevealSection>
+            <TrustProofSection />
+          </RevealSection>
 
-              <RevealSection>
-                <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
-              </RevealSection>
+          <RevealSection>
+            <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
+          </RevealSection>
 
-              <RevealSection>
-                <StrategicBrands />
-              </RevealSection>
+          <RevealSection>
+            <StrategicBrands />
+          </RevealSection>
 
-              <RevealSection>
-                <KnowledgeBlock />
-              </RevealSection>
+          <RevealSection>
+            <KnowledgeBlock />
+          </RevealSection>
 
-              <RevealSection>
-                <FinalCTA onQuoteClick={onQuoteClick} />
-              </RevealSection>
-            </div>
-          </>
-        )}
+          <RevealSection>
+            <FinalCTA />
+          </RevealSection>
+        </div>
       </HomePageClientWrapper>
     </div>
   )
