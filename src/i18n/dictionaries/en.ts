@@ -1666,9 +1666,28 @@ export const en = {
       description: 'Thanks to our direct strategic partnership with all our brands, you have access to the latest technologies, full technical support, and the most competitive lead times.',
       original: '100% Original Product',
       standard: 'Global Standard Compliance'
+    },
+    detail: {
+      heritage: 'Engineering Heritage',
+      authorityTitle: 'Technological Authority of Engineering',
+      globalVision: 'Global Vision',
+      globalVisionDesc: 'setting standards for efficiency and sustainability in projects worldwide, building the ventilation technologies of the future today.',
+      technicalExcellence: 'Technical Excellence',
+      technicalExcellenceDesc: 'Each product is tested to withstand the toughest industrial conditions and optimized for acoustic performance.',
+      corporateSnapshot: 'Corporate Snapshot',
+      headquarters: 'Headquarters',
+      webAuthority: 'Web Authority',
+      officialSite: 'Official Site',
+      requestCatalog: 'Request Brand Catalogs',
+      featuredSystems: 'Featured Systems',
+      allProductGroups: 'All Product Groups',
+      noProducts: 'Products for this brand will be added soon.',
+      originSuffix: 'Origin',
+      estPrefix: 'EST.'
     }
-  },
-  categories: {
+    }
+    }
+
     title: 'Product Categories',
     subtitle: 'Find professional ventilation solutions with our wide range covering all HVAC areas.',
     subCount: '{{count}} subcategories',
