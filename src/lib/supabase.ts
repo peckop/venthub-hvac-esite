@@ -72,24 +72,6 @@ export interface ProjectItem {
   updated_at?: string
 }
 
-// HVAC specific types
-export interface HVACBrand {
-  name: string
-  slug: string
-  description: string
-  country: string
-  logo?: string
-}
-
-export const HVAC_BRANDS: HVACBrand[] = [
-  { name: 'AVenS', slug: 'avens', description: 'Türk premium HVAC çözümleri', country: 'TR' },
-  { name: 'Vortice', slug: 'vortice', description: 'İtalyan havalandırma teknolojisi', country: 'IT' },
-  { name: 'Casals', slug: 'casals', description: 'İspanyol güvenilir çözümler', country: 'ES' },
-  { name: 'Nicotra Gebhardt', slug: 'nicotra-gebhardt', description: 'Alman endüstriyel teknoloji', country: 'DE' },
-  { name: 'Flexiva', slug: 'flexiva', description: 'Esnek kanal sistemleri', country: 'EU' },
-  { name: 'Frekans Konvertörü', slug: 'frekans-konvertoru', description: 'Yüksek verimli hız kontrolü', country: 'DK' }
-]
-
 // API functions
 export async function getCategories() {
   const { data, error } = await supabase
@@ -161,14 +143,36 @@ export async function getProductById(id: string): Promise<Product | null> {
 }
 
 export async function getProductBySlugOrId(identifier: string): Promise<Product | null> {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  const isUuid = uuidRegex.test(identifier)
+  if (!identifier) return null
+  
+  // Clean potential 'cc' suffix and whitespace
+  const cleanId = identifier.trim().replace(/cc$/, '')
+  
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const isUuid = uuidRegex.test(cleanId)
 
-  let query = supabase.from('products').select('*')
-  if (isUuid) query = query.eq('id', identifier)
-  else query = query.eq('slug', identifier)
+  // Try fetching by ID or Slug regardless of regex for maximum robustness
+  // First attempt: Primary key if it looks like UUID, otherwise slug
+  const field = isUuid ? 'id' : 'slug'
+  
+  let { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq(field, cleanId)
+    .maybeSingle()
 
-  const { data, error } = await query.maybeSingle()
+  // Second attempt: Fallback to the other field if first fetch yielded nothing
+  if (!data && !error) {
+    const otherField = isUuid ? 'slug' : 'id'
+    const fallbackRes = await supabase
+      .from('products')
+      .select('*')
+      .eq(otherField, cleanId)
+      .maybeSingle()
+    data = fallbackRes.data
+    error = fallbackRes.error
+  }
+
   if (error) throw error
   return data ? mapDatabaseProductToDomain(data as DbProduct) : null
 }
@@ -261,6 +265,8 @@ export interface UserAddress {
 }
 
 export interface CreateAddressInput {
+  address_type?: string;
+  address_line?: string;
   label?: string
   full_name?: string
   phone?: string
@@ -291,14 +297,14 @@ export async function createAddress(payload: CreateAddressInput): Promise<UserAd
   if (!user) throw new Error('Not authenticated')
 
   const dbPayload: DbUserAddressInsert = {
+    address_type: payload.address_type || (payload.is_default_shipping ? 'shipping' : 'billing'),
+    address_line: payload.address_line || payload.full_address || '',
     user_id: user.id,
     label: payload.label || 'Adres',
     full_name: payload.full_name,
     phone: payload.phone,
     full_address: payload.full_address,
-    address_line: payload.full_address,
     street_address: payload.full_address,
-    address_type: payload.is_default_shipping ? 'shipping' : 'billing',
     city: payload.city,
     district: payload.district,
     postal_code: payload.postal_code,
@@ -381,6 +387,7 @@ export async function listInvoiceProfiles(): Promise<InvoiceProfile[]> {
 }
 
 export async function createInvoiceProfile(payload: Partial<InvoiceProfile>): Promise<InvoiceProfile> {
+  if (!payload.type) payload.type = 'individual';
   const { data: authData } = await supabase.auth.getUser()
   if (!authData?.user) throw new Error('Not authenticated')
 

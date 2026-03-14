@@ -1,0 +1,10 @@
+        stats: [
+          { label: 'Yıl Deneyim', value: '70+' },
+          { label: 'Ülke', value: '90+' },
+          { label: "Compasso d'Oro", value: '3x' },
+          { label: 'Avrupa', value: '#1' }
+        ]
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import { Plus, Minus, HelpCircle } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../../hooks/useScrollAnimation'
-import { useI18n } from '../../../../i18n/I18nProvider'
+import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 const SilentFanFAQ: React.FC = () => {
     const { t } = useI18n()

@@ -290,7 +290,7 @@ const AdminMovementsPage: React.FC = () => {
           </span>
           <button
             className={`${adminTableActionWarningClass} !h-8 !px-4`}
-            onClick={() => { setBatchFilter(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
+            onClick={() => { setBatchFilter(''); const url = new URL(typeof window !== 'undefined' ? window.location.href : 'http://localhost'); url.searchParams.delete('batch'); router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) }}
           >{t('admin.ui.clear')}</button>
         </div>
       )}

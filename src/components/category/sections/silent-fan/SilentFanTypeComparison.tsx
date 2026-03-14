@@ -1,8 +1,8 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { Check, X } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../../../../hooks/useScrollAnimation'
-import { useI18n } from '../../../../i18n/I18nProvider'
+import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
+import { useI18n } from '@/i18n/I18nProvider'
 
 const SilentFanTypeComparison: React.FC = () => {
     const { t } = useI18n()
@@ -50,6 +50,7 @@ const SilentFanTypeComparison: React.FC = () => {
                         <VentImage src="/images/vortice/vortice_lineo_neon.png"
                             alt="Neon Engineering"
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            fill
                          />
                         <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]" />
                         <div className="relative text-center z-10 p-8">

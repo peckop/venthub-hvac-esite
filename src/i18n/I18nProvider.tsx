@@ -22,7 +22,18 @@ function get(obj: Dict, path: string): string {
         break
       }
     }
-    return (current as string) ?? path
+    
+    // Safety check: React cannot render objects as children
+    if (typeof current === 'string') {
+      return current
+    }
+    
+    if (typeof current === 'number' || typeof current === 'boolean') {
+      return String(current)
+    }
+
+    // If it's an object or undefined, return the path itself to avoid "Objects are not valid as a React child"
+    return path
   } catch {
     return path
   }
@@ -73,7 +84,16 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setLang = React.useCallback((l: Lang) => setLangState(l), [])
 
   const t = useMemo(() => {
-    return (key: string, params?: Record<string, unknown>) => interpolate(get(DICTS[lang], key), params)
+    return (key: string, paramsOrAlt?: Record<string, any> | string) => {
+      const translation = get(DICTS[lang], key)
+      const hasTranslation = translation !== key
+      
+      if (!hasTranslation && typeof paramsOrAlt === 'string') {
+        return paramsOrAlt
+      }
+      
+      return interpolate(translation, typeof paramsOrAlt === 'object' ? paramsOrAlt : undefined)
+    }
   }, [lang])
 
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t])
@@ -88,7 +108,9 @@ export function useI18n() {
     return {
       lang: 'tr' as Lang,
       setLang: () => { },
-      t: (key: string, _params?: Record<string, unknown>) => key
+      t: (key: string, paramsOrAlt?: Record<string, any> | string) => {
+        return typeof paramsOrAlt === 'string' ? paramsOrAlt : key
+      }
     }
   }
   return ctx

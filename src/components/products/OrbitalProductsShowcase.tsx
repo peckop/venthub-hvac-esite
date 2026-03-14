@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'
@@ -472,7 +474,7 @@ const CarouselItems: React.FC<{
 
     useFrame((state, delta) => {
         // Kameranın nefes alma efekti
-        camera.position.x = Math.sin(state.clock.elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
+        camera.position.x = Math.sin(state.clock.getElapsedTime() * 0.1) * CONFIG.cameraBreathAmplitude
         camera.position.y = CONFIG.cameraHeight
 
         const now = Date.now()
@@ -515,7 +517,7 @@ const CarouselItems: React.FC<{
             let currentSpeed = delta * CONFIG.autoRotateSpeed
             if (shouldShowDragHint) {
                 currentSpeed *= 0.05
-                const t = state.clock.elapsedTime % 3
+                const t = state.clock.getElapsedTime() % 3
                 const step = (Math.PI * 2) / items.length
                 const maxSway = step * 0.8
                 let targetSway = 0
@@ -729,7 +731,7 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
         >
             <Canvas
-                shadows
+                shadows={{ type: THREE.PCFShadowMap }}
                 frameloop="always"
                 gl={{ antialias: true, alpha: true }}
                 dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}

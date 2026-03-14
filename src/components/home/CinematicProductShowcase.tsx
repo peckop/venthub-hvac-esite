@@ -194,7 +194,13 @@ export const CinematicProductShowcase: React.FC = () => {
                   aria-label={`Showcase view ${idx + 1}`}
                   className={`group relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all duration-500 ${activeImageIdx === idx ? 'border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.4)] scale-110' : 'border-white/10 opacity-40 hover:opacity-100 hover:scale-105'}`}
                 >
-                  <Image src={img.src} alt={img.label} fill className="object-cover p-2" />
+                  <Image 
+                    src={img.src} 
+                    alt={img.label} 
+                    fill 
+                    sizes="(max-width: 768px) 80px, 80px"
+                    className="object-cover p-2" 
+                  />
                   <div className={`absolute inset-0 bg-cyan-500/10 transition-opacity ${activeImageIdx === idx ? 'opacity-100' : 'opacity-0'}`} />
                 </button>
               ))}

@@ -1,31 +1,18 @@
-"use client";
+import React from 'react'
 
-import React, { Suspense, useEffect, useState } from 'react'
-
-import HomeSinevizyon from '../components/home/HomeSinevizyon'
-import CinematicProductShowcase from '../components/home/CinematicProductShowcase'
-import GuidedCategoryDiscovery from '../components/home/GuidedCategoryDiscovery'
-import ApplicationSolutions from '../components/home/ApplicationSolutions'
-import TrustProofSection from '../components/home/TrustProofSection'
-import FeaturedCommercialBlocks from '../components/home/FeaturedCommercialBlocks'
-import StrategicBrands from '../components/home/StrategicBrands'
-import KnowledgeBlock from '../components/home/KnowledgeBlock'
-import FinalCTA from '../components/home/FinalCTA'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
+const HomeSinevizyon = dynamic(() => import('../components/home/HomeSinevizyon'), { ssr: false, loading: () => <div className="w-full h-[80vh] lg:h-[90vh] min-h-[650px] bg-slate-950 animate-pulse" /> })
+const CinematicProductShowcase = dynamic(() => import('../components/home/CinematicProductShowcase'), { ssr: false, loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
+const GuidedCategoryDiscovery = dynamic(() => import('../components/home/GuidedCategoryDiscovery'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const ApplicationSolutions = dynamic(() => import('../components/home/ApplicationSolutions'), { ssr: false, loading: () => <div className="w-full h-[500px] bg-white animate-pulse" /> })
+const TrustProofSection = dynamic(() => import('../components/home/TrustProofSection'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const FeaturedCommercialBlocks = dynamic(() => import('../components/home/FeaturedCommercialBlocks'), { ssr: false, loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
+const StrategicBrands = dynamic(() => import('../components/home/StrategicBrands'), { ssr: false, loading: () => <div className="w-full h-[300px] bg-white animate-pulse" /> })
+const KnowledgeBlock = dynamic(() => import('../components/home/KnowledgeBlock'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const FinalCTA = dynamic(() => import('../components/home/FinalCTA'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
+const RevealSection = dynamic(() => import('../components/home/RevealSection'), { ssr: false })
+import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
 import { Category, Product } from '../lib/supabase'
-
-const LeadModal = React.lazy(() => import('../components/LeadModal'))
-
-const RevealSection: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 40 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-100px" }}
-    transition={{ duration: 0.8, ease: "easeOut" }}
-  >
-    {children}
-  </motion.div>
-)
 
 interface HomePageProps {
   initialCategories?: Category[]
@@ -33,65 +20,51 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
-  const [leadOpen, setLeadOpen] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const target = window as unknown as { openLeadModal?: () => void }
-    target.openLeadModal = () => setLeadOpen(true)
-    return () => { delete target.openLeadModal }
-  }, [])
+  // SSR to Client Prop aktarım kuralı gereği, 'onQuoteClick' gibi event handlerlar Server Component'ten geçilemez.
+  // Bu nedenle butona basılınca tetiklenecek fonksiyonlar artık doğrudan Client wrapper içerisinden çağrılıyor olacak veya 'window' bazlı çağrılacak.
 
   return (
     <div className="min-h-screen bg-white selection:bg-cyan-100 selection:text-cyan-900">
-      <HomeSinevizyon onQuoteClick={() => setLeadOpen(true)} />
+      <HomePageClientWrapper>
+        <HomeSinevizyon />
 
-      {/* Cinematic Spacing and Transition: Dark to Light */}
-      <div className="relative h-32 lg:h-64 bg-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-white h-32 lg:h-64 opacity-100" />
-      </div>
-
-      <RevealSection>
-        <div className="-mt-16 relative z-10">
-          <GuidedCategoryDiscovery categories={initialCategories} />
+        {/* Cinematic Spacing and Transition: Dark to Light */}
+        <div className="relative h-32 lg:h-64 bg-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-white h-32 lg:h-64 opacity-100" />
         </div>
-      </RevealSection>
-
-      <div className="space-y-32 lg:space-y-48 pb-32">
-        <RevealSection>
-          <CinematicProductShowcase />
-        </RevealSection>
 
         <RevealSection>
-          <ApplicationSolutions />
+          <div className="-mt-16 relative z-10">
+            <GuidedCategoryDiscovery categories={initialCategories} />
+          </div>
         </RevealSection>
 
-        <RevealSection>
-          <TrustProofSection />
-        </RevealSection>
+        <div className="space-y-32 lg:space-y-48 pb-32">
+          <RevealSection>
+            <CinematicProductShowcase />
+          </RevealSection>
 
-        <RevealSection>
-          <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
-        </RevealSection>
+          <RevealSection>
+            <ApplicationSolutions />
+          </RevealSection>
 
-        <RevealSection>
-          <StrategicBrands />
-        </RevealSection>
+          <RevealSection>
+            <TrustProofSection />
+          </RevealSection>
 
-        <RevealSection>
-          <KnowledgeBlock />
-        </RevealSection>
+          <RevealSection>
+            <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={initialCategories} />
+          </RevealSection>
 
-        <RevealSection>
-          <FinalCTA onQuoteClick={() => setLeadOpen(true)} />
-        </RevealSection>
-      </div>
+          <RevealSection>
+            <StrategicBrands />
+          </RevealSection>
 
-      {leadOpen && (
-        <Suspense fallback={null}>
-          <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} />
-        </Suspense>
-      )}
+          <RevealSection>
+            <KnowledgeBlock />
+          </RevealSection>
+        </div>
+      </HomePageClientWrapper>
     </div>
   )
 }

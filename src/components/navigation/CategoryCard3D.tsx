@@ -1,8 +1,9 @@
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
+import { Environment } from '@react-three/drei'
 import { ChevronRight } from 'lucide-react'
-import Category3DIcon from '../products/Category3DIcon'
+import dynamic from 'next/dynamic'
+const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => null })
 import type { Category } from '../../lib/supabase'
 
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
@@ -35,23 +36,17 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                 <Canvas
                     camera={{ position: [0, 0, 2.2], fov: 45 }}
                     style={{ background: 'transparent' }}
+                    gl={{ antialias: false, powerPreference: "high-performance" }}
+                    dpr={1}
                 >
                     {/* Lighting Setup for Menu Tiles */}
                     <Environment preset="city" />
-                    <ambientLight intensity={0.5} />
+                    <ambientLight intensity={0.8} />
                     <directionalLight position={[10, 10, 5]} intensity={1} />
                     <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
 
                     <Suspense fallback={null}>
                         <Category3DIcon categorySlug={category.slug} scale={0.9} />
-                        <OrbitControls
-                            enableZoom={false}
-                            enablePan={false}
-                            enableRotate={false}
-                            autoRotate
-                            autoRotateSpeed={2}
-                        />
-                        <Environment preset="city" />
                     </Suspense>
                 </Canvas>
             </div>
@@ -76,6 +71,3 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
 }
 
 export default CategoryCard3D
-
-
-
