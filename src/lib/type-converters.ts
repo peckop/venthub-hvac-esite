@@ -1,11 +1,14 @@
 import type { DbCategory, DbProduct } from '../types/db-rows'
-import type { UICategory, UIProduct } from '../types/ui-models'
+import type { DomainCategory, DomainProduct } from '../types/ui-models'
+
+// Re-export domain types so they can be accessed through this module (as expected by other files)
+export type { DomainCategory, DomainProduct }
 
 /**
  * Safely converts a Database Category row to a UI-ready Category model.
  * Centralizes the handling of potential Json/Text mismatches from Supabase.
  */
-export const toUICategory = (dbCat: DbCategory): UICategory => {
+export const mapDatabaseCategoryToDomain = (dbCat: DbCategory): DomainCategory => {
   return {
     ...dbCat,
     name: String(dbCat.name || ''),
@@ -16,7 +19,7 @@ export const toUICategory = (dbCat: DbCategory): UICategory => {
 /**
  * Safely converts a Database Product row to a UI-ready Product model.
  */
-export const toUIProduct = (dbProd: DbProduct): UIProduct => {
+export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => {
   return {
     ...dbProd,
     name: String(dbProd.name || ''),
@@ -28,5 +31,5 @@ export const toUIProduct = (dbProd: DbProduct): UIProduct => {
 /**
  * List converters for bulk data.
  */
-export const toUICategoryList = (cats: DbCategory[]): UICategory[] => cats.map(toUICategory)
-export const toUIProductList = (prods: DbProduct[]): UIProduct[] => prods.map(toUIProduct)
+export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => cats.map(mapDatabaseCategoryToDomain)
+export const toUIProductList = (prods: DbProduct[]): DomainProduct[] => prods.map(mapDatabaseProductToDomain)

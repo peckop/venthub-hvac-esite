@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import PageComponent from '../../../views/CategoryPage'
 import { supabase } from '../../../lib/supabase'
 import { mapDatabaseCategoryToDomain } from '../../../lib/type-converters'
+import { DbCategory } from '../../../types/db-rows'
 
 export async function generateStaticParams() {
   try {
@@ -32,7 +33,7 @@ async function getCategoryData(slug: string) {
     .single()
   
   if (error || !data) return null
-  return mapDatabaseCategoryToDomain(data)
+  return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
 }
 
 export async function generateMetadata({ params }: { params: { categorySlug: string } }) {
