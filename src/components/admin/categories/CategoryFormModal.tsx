@@ -77,10 +77,10 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured ?? false,
                 sort_order: data.sort_order ?? 0,
                 image_url: data.image_url,
-                metric1_value: (data.metadata as any)?.metric1?.value || '',
-                metric1_label: (data.metadata as any)?.metric1?.label || '',
-                metric2_value: (data.metadata as any)?.metric2?.value || '',
-                metric2_label: (data.metadata as any)?.metric2?.label || ''
+                metric1_value: ((data.metadata as Record<string, unknown>)?.metric1 as Record<string, string>)?.value || '',
+                metric1_label: ((data.metadata as Record<string, unknown>)?.metric1 as Record<string, string>)?.label || '',
+                metric2_value: ((data.metadata as Record<string, unknown>)?.metric2 as Record<string, string>)?.value || '',
+                metric2_label: ((data.metadata as Record<string, unknown>)?.metric2 as Record<string, string>)?.label || ''
             })
 
             if (data.image_url) {
@@ -163,11 +163,11 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 sort_order: data.sort_order,
                 image_url: imgPath,
                 metadata: {
-                    ...(initialData?.metadata || {}),
+                    ...(typeof initialData?.metadata === 'object' && initialData?.metadata !== null ? initialData.metadata : {}),
                     metric1: { value: data.metric1_value, label: data.metric1_label },
                     metric2: { value: data.metric2_value, label: data.metric2_label }
-                }
-            } as any
+                } as Json
+            }
 
             let currentId = categoryId
 

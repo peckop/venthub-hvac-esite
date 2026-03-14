@@ -3,16 +3,13 @@ import { adminSectionTitleClass, adminSubtitleClass } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useI18n } from '../../i18n/I18nProvider'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import ActivityHeatmap from '../../components/admin/dashboard/ActivityHeatmap'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
-import AbcPieChart from '../../components/admin/dashboard/AbcPieChart'
 import { 
   TrendingUp, 
-  ChevronRight, 
   PackageSearch,
   AlertCircle,
   PieChart,
@@ -45,17 +42,17 @@ const AdminDashboardPage: React.FC = () => {
   const [pendingShipments, setPendingShipments] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [dailyCounts, setDailyCounts] = useState<Array<{ date: string; orders: number; revenue: number; returns: number }>>([])
+  const [dailyCounts, _setDailyCounts] = useState<Array<{ date: string; orders: number; revenue: number; returns: number }>>([])
   const [recentOrders, setRecentOrders] = useState<Array<{ id: string; created_at: string; total_amount: number; status: string; order_number?: string | null }>>([])
   const [carrierDist, setCarrierDist] = useState<Array<{ key: string; count: number }>>([])
   const [returnsByStatus, setReturnsByStatus] = useState<Array<{ status: string; count: number }>>([])
-  const [shipAges, setShipAges] = useState<Array<{ bucket: string; count: number }>>([])
-  const [returnsWeekly, setReturnsWeekly] = useState<Array<{ week: string; count: number }>>([])
-  const [activityData, setActivityData] = useState<Array<{ day: number; hour: number; count: number }>>([])
+  const [_shipAges, _setShipAges] = useState<Array<{ bucket: string; count: number }>>([])
+  const [_returnsWeekly, _setReturnsWeekly] = useState<Array<{ week: string; count: number }>>([])
+  const [activityData, _setActivityData] = useState<Array<{ day: number; hour: number; count: number }>>([])
 
   // Financial & Inventory
   const [tiedCapital, setTiedCapital] = useState<number | null>(null)
-  const [abcDist, setAbcDist] = useState<Array<{ name: string; value: number; color: string }>>([])
+  const [_abcDist, _setAbcDist] = useState<Array<{ name: string; value: number; color: string }>>([])
   const [alarmCount, setAlarmCount] = useState<number | null>(null)
 
   const rangeStartISO = useMemo(() => {
@@ -93,7 +90,7 @@ const AdminDashboardPage: React.FC = () => {
         .gte('created_at', prevRangeISO.start)
         .lt('created_at', prevRangeISO.end)
 
-      const [ordersRes, prevOrdersRes, returnsRes, shipRes, shipListRes, returnsListRes, shipAgeRes, returnsWeeklyRes, productsRes] = await Promise.all([
+      const [ordersRes, prevOrdersRes, returnsRes, shipRes, shipListRes, returnsListRes, _shipAgeRes, _returnsWeeklyRes, productsRes] = await Promise.all([
         ordersQuery,
         prevOrdersQuery,
         supabase.from('venthub_returns').select('id', { count: 'exact', head: true }).in('status', ['requested', 'approved', 'in_transit', 'received']),
@@ -111,7 +108,7 @@ const AdminDashboardPage: React.FC = () => {
         setTiedCapital(capital)
         const alarms = prods.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length
         setAlarmCount(alarms)
-        setAbcDist([{ name: 'A', value: 30, color: '#10b981' }, { name: 'B', value: 45, color: '#3b82f6' }, { name: 'C', value: 25, color: '#f59e0b' }])
+        _setAbcDist([{ name: 'A', value: 30, color: '#10b981' }, { name: 'B', value: 45, color: '#3b82f6' }, { name: 'C', value: 25, color: '#f59e0b' }])
       }
 
       if (ordersRes.error) throw ordersRes.error
