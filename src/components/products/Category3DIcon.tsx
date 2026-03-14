@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -32,24 +34,17 @@ const FlexDuctModel: React.FC = () => {
         }
         return new THREE.CatmullRomCurve3(points)
     }
+    const timeRef = useRef(0)
     useFrame((state) => {
         if (!meshRef.current || !spiralRef.current) return
-        const time = state.clock.elapsedTime
-        const curve = createWaveCurve(time)
-        const newGeometry = new THREE.TubeGeometry(curve, 64, 0.28, 24, false)
-        meshRef.current.geometry.dispose()
-        meshRef.current.geometry = newGeometry
-        const spiralCount = spiralRef.current.children.length
-        for (let i = 0; i < spiralCount; i++) {
-            const t = i / (spiralCount - 1)
-            const point = curve.getPoint(t)
-            const tangent = curve.getTangent(t)
-            const child = spiralRef.current.children[i]
-            child.position.copy(point)
-            const quaternion = new THREE.Quaternion()
-            quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), tangent)
-            child.quaternion.copy(quaternion)
-        }
+        const time = state.clock.getElapsedTime()
+        
+        // Optimized: Instead of regenerating whole geometry, just do light breathing/pulse
+        const pulse = Math.sin(time * 2) * 0.05
+        meshRef.current.scale.set(1, 1 + pulse, 1 + pulse)
+        
+        // Shift spiral slightly to simulate airflow
+        spiralRef.current.position.x = Math.sin(time * 1.5) * 0.05
     })
     const initialCurve = createWaveCurve(0)
     const spiralCount = 20
@@ -154,8 +149,10 @@ const CrossFlowAnimation: React.FC = () => {
     const cleanRef = useRef<THREE.Group>(null)
     const dirtyRef = useRef<THREE.Group>(null)
 
-    useFrame((state) => {
-        const t = state.clock.elapsedTime
+    const timeRef = useRef(0)
+    useFrame((state, delta) => {
+        timeRef.current += delta
+        const t = timeRef.current
         if (cleanRef.current) {
             cleanRef.current.position.x = (t * 0.5) % 1.5 - 0.75
         }
@@ -227,9 +224,11 @@ const SpeedControlIcon: React.FC = () => {
 const AccessoryIcon: React.FC = () => {
     const materials = useFanMaterials()
     const bladeRef = useRef<THREE.Group>(null)
-    useFrame((state) => {
+    const timeRef = useRef(0)
+    useFrame((state, delta) => {
         if (bladeRef.current) {
-            const angle = Math.sin(state.clock.elapsedTime * 0.5) * 0.4
+            timeRef.current += delta
+            const angle = Math.sin(timeRef.current * 0.5) * 0.4
             bladeRef.current.children.forEach(child => {
                 child.rotation.x = angle
             })

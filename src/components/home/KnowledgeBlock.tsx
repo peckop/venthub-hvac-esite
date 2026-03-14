@@ -61,7 +61,11 @@ const cardVariants: Variants = {
   }
 }
 
-export const KnowledgeBlock: React.FC = () => {
+interface KnowledgeBlockProps {
+  onQuoteClick?: () => void
+}
+
+export const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
 
   return (
@@ -83,14 +87,14 @@ export const KnowledgeBlock: React.FC = () => {
             >
               {t('home.knowledge.eyebrow')}
             </motion.div>
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-4xl font-light tracking-tighter text-white sm:text-6xl"
+              className="text-5xl lg:text-7xl font-extralight tracking-tighter leading-[1.1] text-white"
             >
-              {t('home.knowledge.title')}
+              Mühendislik <span className="font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">Katmanı</span>
             </motion.h2>
           </div>
           <motion.p 
@@ -98,7 +102,7 @@ export const KnowledgeBlock: React.FC = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="max-w-md text-lg text-slate-400 font-light leading-relaxed"
+            className="max-w-md text-lg text-slate-400 font-light leading-relaxed border-l-2 border-cyan-500/30 pl-8"
           >
             {t('home.knowledge.subtitle')}
           </motion.p>
@@ -110,7 +114,7 @@ export const KnowledgeBlock: React.FC = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="mt-20 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
           {knowledgeItems.map((item, index) => (
             <motion.div 
@@ -149,6 +153,52 @@ export const KnowledgeBlock: React.FC = () => {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Integrated Final Action Layer (Unified Conversion) */}
+        <div className="mt-24 pt-24 border-t border-white/5 grid gap-12 lg:grid-cols-2 items-center">
+          <div className="flex flex-wrap gap-6">
+            <button
+              type="button"
+              onClick={() => {
+                if (onQuoteClick) onQuoteClick();
+                else if (typeof window !== "undefined") window.openLeadModal?.();
+              }}
+              className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+            >
+              <span className="relative z-10">{t('home.finalCta.primaryCta')}</span>
+              <div className="absolute inset-0 bg-cyan-400 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            </button>
+            
+            <Link
+              href="https://wa.me/905442450205"
+              target="_blank"
+              className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              {t('home.finalCta.secondaryCta')}
+            </Link>
+          </div>
+
+          <div className="relative">
+            <div className="relative rounded-[2rem] border border-white/10 bg-white/[0.02] p-8 backdrop-blur-3xl overflow-hidden max-w-md lg:ml-auto">
+              <div className="flex items-center gap-8">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-cyan-400 mb-1">Project Pipeline</div>
+                  <div className="text-4xl font-black text-white tracking-tighter">15<span className="text-cyan-400">+</span></div>
+                  <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-500 mt-1">
+                    {t('aboutPage.stats.yearsExperience')}
+                  </div>
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full w-[92%] bg-gradient-to-r from-cyan-600 to-cyan-400" />
+                  </div>
+                  <div className="text-[8px] font-bold uppercase tracking-widest text-slate-500">92% Optimization</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

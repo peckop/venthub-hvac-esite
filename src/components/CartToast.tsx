@@ -67,7 +67,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 {product.name}
               </p>
             </div>
-            <button onClick={onClose} className="text-steel-gray hover:text-industrial-gray">
+            <button onClick={onClose} className="text-steel-gray hover:text-industrial-gray" aria-label={t('common.close')}>
               <X size={16} />
             </button>
           </div>
@@ -95,6 +95,7 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 <button
                   onClick={() => { setShowChoiceModal(false); onClose() }}
                   className="ml-auto text-steel-gray hover:text-industrial-gray"
+                  aria-label={t('common.close')}
                 >
                   <X size={20} />
                 </button>
@@ -120,13 +121,17 @@ export const CartToast: React.FC<CartToastProps> = ({ isVisible, product, onClos
                 <button
                   onClick={handleContinueShopping}
                   className="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold rounded-lg transition-colors"
+                  aria-label={t('cartToast.continue')}
                 >
                   <ShoppingBag size={20} />
                   <span>{t('cartToast.continue')}</span>
                 </button>
 
                 <Link href="/cart" onClick={handleGoToCart}>
-                  <button className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors">
+                  <button 
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-primary-navy hover:bg-secondary-blue text-white font-semibold rounded-lg transition-colors"
+                    aria-label={t('cartToast.goToCart')}
+                  >
                     <ArrowRight size={20} />
                     <span>{t('cartToast.goToCart')}</span>
                   </button>

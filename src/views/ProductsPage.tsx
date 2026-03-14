@@ -1,26 +1,45 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import dynamic from 'next/dynamic'
 import ProductCard from '../components/ProductCard'
 
-// Lazy load heavy components
+// Skeleton components for lazy-loaded components to prevent CLS
+const OrbitSkeleton = () => <div className="h-[400px] bg-slate-100 animate-pulse rounded-3xl" />
+const ApplicationSkeleton = () => <div className="h-[300px] bg-slate-50 animate-pulse rounded-xl" />
+const BrandsSkeleton = () => <div className="h-[150px] bg-white animate-pulse" />
+
+// Lazy load heavy components with proper skeletons
+// Lazy load heavy components with proper skeletons - Moved to ssr: false for Canvas/Motion heavy components to boost TBT
 const CategoryOrbitCarousel = dynamic(() => import('../components/products').then(mod => mod.CategoryOrbitCarousel), { 
-  ssr: true,
-  loading: () => <div className="h-[400px] bg-slate-900 animate-pulse rounded-3xl" />
+  ssr: false,
+  loading: () => <OrbitSkeleton />
 })
-const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { ssr: true })
-const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { ssr: true })
-const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: true })
-const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: true })
+const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { 
+  ssr: false,
+  loading: () => <ApplicationSkeleton />
+})
+const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { 
+  ssr: false,
+  loading: () => <BrandsSkeleton />
+})
+const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: false })
+const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: false })
 const LeadModal = dynamic(() => import('../components/LeadModal'), { ssr: false })
 const Seo = dynamic(() => import('../components/Seo'), { ssr: true })
 
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
+
+// Define global window interface for type safety
+declare global {
+  interface Window {
+    openLeadModal?: () => void
+  }
+}
 
 
 // Helper: Get all descendant category IDs (including self)
@@ -185,15 +204,15 @@ const FilterSidebar = ({
 }
 
 interface ProductsPageProps {
-  initialCategories?: Category[]
+  initialCategories: Category[]
   initialBrands?: string[]
-  serverSearchParams?: { [key: string]: string | string[] | undefined }
+  serverProducts?: any[]
 }
 
 const ProductsPage: React.FC<ProductsPageProps> = ({ 
   initialCategories = [], 
   initialBrands = [],
-  serverSearchParams = {}
+  serverProducts = []
 }) => {
   const pathname = usePathname()
   const router = useRouter()
@@ -203,21 +222,21 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   // Use server params for initial paint, fallback to hook for dynamic updates
   const getParam = (key: string): string => {
-    const val = serverSearchParams[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
+    const val = {}[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
     return typeof val === 'string' ? val : (Array.isArray(val) ? val[0] : '')
   }
 
   const qParam = getParam('q').trim()
-  const catParam = getParam('category') || null
+  const catParamRaw = getParam('category')
+  const catParam = catParamRaw?.replace(/cc$/, '') || null
   const brandsParam = useMemo(() => {
-    const b = serverSearchParams['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
-    const str = typeof b === 'string' ? b : (Array.isArray(b) ? b[0] : '')
-    return str ? str.split(',').filter(Boolean) : []
-  }, [serverSearchParams, hookSearchParams])
+    const b = hookSearchParams ? hookSearchParams.get('brands') : null
+    return b ? b.split(',').filter(Boolean) : []
+  }, [hookSearchParams])
 
   const minPriceParam = getParam('min_price')
   const maxPriceParam = getParam('max_price')
-  const isAll = getParam('all') === '1'
+  const isAll = getParam('all') === 'true' || getParam('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -227,6 +246,15 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   const [products, setProducts] = useState<Product[] | FtsProductResult[]>([])
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [loading, setLoading] = useState(false)
+
+  // Hydration sync
+  const isInitialMount = useRef(true)
+
+  useEffect(() => {
+    if (serverProducts.length > 0) {
+      setProducts(serverProducts)
+    }
+  }, [serverProducts])
 
   // Filter State
   const [availableBrands, setAvailableBrands] = useState<string[]>(initialBrands)
@@ -248,7 +276,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      (window as any).openLeadModal = () => setLeadOpen(true)
+      window.openLeadModal = () => setLeadOpen(true)
+    }
+    return () => {
+      if (typeof window !== 'undefined') window.openLeadModal = undefined
     }
   }, [])
 
@@ -275,6 +306,12 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
     let active = true
 
     async function fetchData() {
+      // Skip if it's the first mount and we already have server-side data
+      if (isInitialMount.current && serverProducts.length > 0) {
+        isInitialMount.current = false
+        return
+      }
+
       setLoading(true)
       try {
         const { getProductsEnriched } = await import('../lib/supabase')
@@ -301,7 +338,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           if (active) setProducts(all)
         }
         else {
-          setProducts([])
+          // If no filters and not 'all', fetch a few featured products instead of nothing
+          const featured = await getProductsEnriched({ limit: 12 })
+          if (active) setProducts(featured)
         }
       } catch (e) {
         console.error('Fetch error', e)
@@ -312,7 +351,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
     fetchData()
     return () => { active = false }
-  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories, brandsParam])
+  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories])
 
 
   // Helper: Update URL params
@@ -369,7 +408,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
+              placeholder={t('common.searchPlaceholderLong') || t('common.searchPlaceholder') || 'Ürün ara...'}
               className="w-full pl-10 pr-4 py-2.5 sm:py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all text-sm sm:text-base"
             />
           </div>
@@ -419,13 +458,13 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               ) : products.length === 0 ? (
                 <div className="text-center py-16 sm:py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <div className="text-3xl sm:text-4xl mb-4">🔍</div>
-                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
-                  <p className="text-sm sm:text-base text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
+                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">{t('products.noResults')}</h3>
+                  <p className="text-sm sm:text-base text-steel-gray mt-1">{t('products.noResultsDesc')}</p>
                   <button
                     onClick={() => router.push('/products')}
                     className="mt-6 px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
                   >
-                    Filtreleri Temizle
+                    {t('products.clearFilters')}
                   </button>
                 </div>
               ) : (

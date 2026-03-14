@@ -31,7 +31,12 @@ export const NAVIGATION_PRIMARY_ITEMS: NavigationItemConfig[] = [
         minWidthClass: 'min-w-[132px]',
         showInCompact: true,
     },
-
+    {
+        id: 'products',
+        labelKey: 'common.products',
+        minWidthClass: 'min-w-[100px]',
+        showInCompact: true,
+    },
 ]
 
 export const NAVIGATION_SECONDARY_ITEMS: NavigationItemConfig[] = [

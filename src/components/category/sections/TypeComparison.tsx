@@ -78,10 +78,13 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
 
                 {/* Comparison Visual */}
                 <div className={`flex justify-center mb-8 sm:mb-12 ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
-                    <VentImage src="/images/category/electric-vs-ambient.png"
-                        alt="Elektrikli vs Ortam Havalı Karşılaştırma"
-                        className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
-                     />
+                    <div className="relative w-full max-w-3xl aspect-[16/9]">
+                        <VentImage src="/images/category/electric-vs-ambient.png"
+                            alt="Elektrikli vs Ortam Havalı Karşılaştırma"
+                            className="rounded-xl shadow-lg object-cover"
+                            fill
+                        />
+                    </div>
                 </div>
 
                 {/* Comparison Cards */}

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
@@ -14,7 +16,7 @@ interface MegaMenu3DBackgroundProps {
 const MegaMenu3DBackground: React.FC<MegaMenu3DBackgroundProps> = ({ categorySlug }) => {
     return (
         <>
-            {/* 3D Canvas - üst 2/3 alan */}
+            {/* 3D Canvas - üst 3/4 alan */}
             <div className="absolute top-0 left-0 right-0 h-3/4 pointer-events-none">
                 <Canvas
                     camera={{ position: [0, 0.1, 2.2], fov: 40 }}
@@ -35,14 +37,10 @@ const MegaMenu3DBackground: React.FC<MegaMenu3DBackgroundProps> = ({ categorySlu
                     </Suspense>
                 </Canvas>
             </div>
-            {/* Gradient overlay - yazıların okunabilirliği için */}
-            {/* Subtle light gradient for high contrast white space feel */}
+            {/* Gradient overlay - ferah beyaz geçiş */}
             <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent pointer-events-none" />
         </>
     )
 }
 
 export default MegaMenu3DBackground
-
-
-
