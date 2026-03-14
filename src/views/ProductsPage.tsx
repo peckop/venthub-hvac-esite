@@ -3,15 +3,20 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
-import ProductCard from '../components/ProductCard'
-import BrandsShowcase from '../components/BrandsShowcase'
-import TrustSection from '../components/TrustSection'
-import LeadModal from '../components/LeadModal'
-import Seo from '../components/Seo'
-import { useI18n } from '../i18n/I18nProvider'
-import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
-import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
-import { CategoryOrbitCarousel, ApplicationCards } from '../components/products'
+import dynamic from 'next/dynamic'
+
+// Lazy load heavy components
+const CategoryOrbitCarousel = dynamic(() => import('../components/products').then(mod => mod.CategoryOrbitCarousel), { 
+  ssr: true,
+  loading: () => <div className="h-[400px] bg-slate-900 animate-pulse rounded-3xl" />
+})
+const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { ssr: true })
+const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { ssr: true })
+const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: true })
+const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: true })
+const LeadModal = dynamic(() => import('../components/LeadModal'), { ssr: false })
+const Seo = dynamic(() => import('../components/Seo'), { ssr: true })
+
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 
