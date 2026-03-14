@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { supabase, type Product } from '../../lib/supabase'
 import { mapDatabaseProductToDomain } from '../../lib/type-converters'
+import { DbProduct } from '../../types/db-rows'
 import { calculateAirCurtain, type WindCondition, type TrafficIntensity, type AirCurtainApplication } from '../../lib/hvacCalculations'
 import { useI18n } from '../../i18n/I18nProvider'
 
@@ -261,7 +262,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                 return
             }
 
-            const domainProducts = products.map(p => mapDatabaseProductToDomain(p))
+            const domainProducts = products.map(p => mapDatabaseProductToDomain(p as unknown as DbProduct))
 
             const getProductWidth = (product: Product): { value: number | null, fromName: boolean } => {
                 const specs = product.technical_specs
