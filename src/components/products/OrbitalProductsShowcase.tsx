@@ -129,10 +129,23 @@ const OrbitalCard: React.FC<{
     }, [isFrontCard, externalShouldShowHint])
 
     const texture = useMemo(() => {
-        if (item.categorySlug) return null
-        const tex = new THREE.TextureLoader().load(item.image)
-        tex.colorSpace = THREE.SRGBColorSpace
-        return tex
+        if (item.categorySlug || !item.image) return null
+        
+        // Resim yolunu normalize et (Supabase desteği)
+        let finalPath = item.image.trim();
+        if (!finalPath.startsWith('http') && !finalPath.startsWith('/') && !finalPath.startsWith('data:')) {
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+            finalPath = `${supabaseUrl}/storage/v1/object/public/category-images/${finalPath}`;
+        }
+
+        try {
+            const tex = new THREE.TextureLoader().load(finalPath)
+            tex.colorSpace = THREE.SRGBColorSpace
+            return tex
+        } catch (e) {
+            console.error("3D Texture Load Error:", e);
+            return null;
+        }
     }, [item.image, item.categorySlug])
 
     const triggerAction = useCallback((event?: MouseEvent) => {
@@ -719,10 +732,10 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
                 shadows
                 frameloop="always"
                 gl={{ antialias: true, alpha: true }}
-                dpr={[1, 1.5]}
+                dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}
                 camera={{
-                    position: [0, CONFIG.cameraHeight, CONFIG.cameraDistance],
-                    fov: CONFIG.cameraFOV
+                    position: [0, (CONFIG.cameraHeight * (typeof containerHeight === 'number' && containerHeight < 400 ? 0.8 : 1)), CONFIG.cameraDistance],
+                    fov: (CONFIG.cameraFOV * (typeof containerHeight === 'number' && containerHeight < 400 ? 1.15 : 1))
                 }}
             >
                 <ambientLight intensity={0.5} />
@@ -757,8 +770,8 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             </Canvas>
 
             {/* Sol-Sağ Gradient */}
-            <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
-            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-12 sm:w-16 bg-gradient-to-r from-[#020617] to-transparent pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-12 sm:w-16 bg-gradient-to-l from-[#020617] to-transparent pointer-events-none" />
         </div>
     )
 }

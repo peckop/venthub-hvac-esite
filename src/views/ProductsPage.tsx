@@ -1,17 +1,25 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
+import dynamic from 'next/dynamic'
 import ProductCard from '../components/ProductCard'
-import BrandsShowcase from '../components/BrandsShowcase'
-import TrustSection from '../components/TrustSection'
-import LeadModal from '../components/LeadModal'
-import Seo from '../components/Seo'
+
+// Lazy load heavy components
+const CategoryOrbitCarousel = dynamic(() => import('../components/products').then(mod => mod.CategoryOrbitCarousel), { 
+  ssr: true,
+  loading: () => <div className="h-[400px] bg-slate-900 animate-pulse rounded-3xl" />
+})
+const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { ssr: true })
+const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { ssr: true })
+const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: true })
+const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: true })
+const LeadModal = dynamic(() => import('../components/LeadModal'), { ssr: false })
+const Seo = dynamic(() => import('../components/Seo'), { ssr: true })
+
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
-import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
-import { CategoryOrbitCarousel, ApplicationCards } from '../components/products'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 
@@ -31,7 +39,7 @@ const getAllDescendantIds = (categories: Category[], parentId: string): string[]
 }
 
 // Recursive Category Item
-interface CategoryNode extends Category {
+type CategoryNode = Category & {
   children: CategoryNode[]
 }
 
@@ -120,9 +128,6 @@ const FilterSidebar = ({
   onPriceChange: (type: 'min' | 'max', val: string) => void,
   t: (key: string) => string
 }) => {
-  // Prefix unused var with underscore
-  const _rootCats = categories.filter(c => c.level === 0)
-
   return (
     <aside className="w-full lg:w-64 flex-shrink-0 space-y-8">
       {/* Categories */}
@@ -179,27 +184,40 @@ const FilterSidebar = ({
   )
 }
 
-const ProductsPage: React.FC = () => {
+interface ProductsPageProps {
+  initialCategories?: Category[]
+  initialBrands?: string[]
+  serverSearchParams?: { [key: string]: string | string[] | undefined }
+}
+
+const ProductsPage: React.FC<ProductsPageProps> = ({ 
+  initialCategories = [], 
+  initialBrands = [],
+  serverSearchParams = {}
+}) => {
   const pathname = usePathname()
   const router = useRouter()
+  const hookSearchParams = useSearchParams()
   const { t } = useI18n()
   const [leadOpen, setLeadOpen] = useState(false)
 
-  // URL Params State - Wrapped in useMemo for safe SSR access
-  const [params, setParams] = useState<URLSearchParams | null>(null)
+  // Use server params for initial paint, fallback to hook for dynamic updates
+  const getParam = (key: string): string => {
+    const val = serverSearchParams[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
+    return typeof val === 'string' ? val : (Array.isArray(val) ? val[0] : '')
+  }
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setParams(new URLSearchParams(window.location.search))
-    }
-  }, [pathname])
+  const qParam = getParam('q').trim()
+  const catParam = getParam('category') || null
+  const brandsParam = useMemo(() => {
+    const b = serverSearchParams['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
+    const str = typeof b === 'string' ? b : (Array.isArray(b) ? b[0] : '')
+    return str ? str.split(',').filter(Boolean) : []
+  }, [serverSearchParams, hookSearchParams])
 
-  const qParam = params?.get('q')?.trim() || ''
-  const catParam = params?.get('category') || null
-  const brandsParam = params?.get('brands')?.split(',').filter(Boolean) || []
-  const minPriceParam = params?.get('min_price') || ''
-  const maxPriceParam = params?.get('max_price') || ''
-  const isAll = params?.get('all') === '1'
+  const minPriceParam = getParam('min_price')
+  const maxPriceParam = getParam('max_price')
+  const isAll = getParam('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -207,21 +225,19 @@ const ProductsPage: React.FC = () => {
 
   // Data State
   const [products, setProducts] = useState<Product[] | FtsProductResult[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [loading, setLoading] = useState(false)
 
   // Filter State
-  const [availableBrands, setAvailableBrands] = useState<string[]>([])
+  const [availableBrands, setAvailableBrands] = useState<string[]>(initialBrands)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   // Scroll Restoration
   useManualScrollRestoration(loading)
 
-  // Create map of category ID -> hide_price for efficient lookup
-  const categoryHidePriceMap = React.useMemo(() => {
+  const categoryHidePriceMap = useMemo(() => {
     const map = new Map<string, boolean>()
     categories.forEach(c => {
-      // Check for strict boolean true to avoid accidental hiding
       if (c.metadata?.hide_price === true) map.set(c.id, true)
     })
     return map
@@ -230,36 +246,19 @@ const ProductsPage: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const appSectionRef = useRef<HTMLDivElement>(null)
 
-    // Global Lead Modal Trigger
-    ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
-
-  // 1. Initialize & Fetch Metadata (Cats, Brands)
   useEffect(() => {
-    async function init() {
-      try {
-        const { getCategories, getAllProducts } = await import('../lib/supabase')
-        const cats = await getCategories()
-        setCategories(cats)
-
-        // Extract unique brands for filter
-        // Note: Ideally this comes from a 'brands' table or RPC, but distinct on products works for now
-        const allProds = await getAllProducts()
-        const brands = Array.from(new Set(allProds.map(p => p.brand).filter(Boolean))) as string[]
-        setAvailableBrands(brands.sort())
-      } catch (e) {
-        console.error('Init error', e)
-      }
+    if (typeof window !== 'undefined') {
+      (window as any).openLeadModal = () => setLeadOpen(true)
     }
-    init()
   }, [])
 
-  // 2. Sync Input with URL
+  // Sync Input with URL
   useEffect(() => {
     setInputValue(qParam)
     setActiveQuery(qParam)
   }, [qParam])
 
-  // 3. Debounce Input -> URL Update
+  // Debounce Input -> URL Update
   useEffect(() => {
     const timer = setTimeout(() => {
       if (inputValue !== qParam) {
@@ -267,113 +266,40 @@ const ProductsPage: React.FC = () => {
       }
     }, 600)
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, qParam])
+  }, [inputValue, qParam, pathname, router])
 
-  // 4. Main Data Fetcher
+  const joinedBrands = brandsParam.join(',')
+
+  // Main Data Fetcher
   useEffect(() => {
     let active = true
 
     async function fetchData() {
       setLoading(true)
       try {
-        const { ftsSearchProducts, getAllProducts } = await import('../lib/supabase')
-
-        // Mode A: Search (Query or Filters active)
+        const { getProductsEnriched } = await import('../lib/supabase')
         const hasFilters = catParam || brandsParam.length > 0 || minPriceParam || maxPriceParam
 
         if (activeQuery || hasFilters) {
-          // Construct Filters
-          const filters: Record<string, string | string[] | undefined> = {}
-          // For category: Get all descendant IDs for hierarchical filtering
-          const categoryIdsToFilter = catParam ? getAllDescendantIds(categories, catParam) : []
-          if (categoryIdsToFilter.length > 0) filters.category_ids = categoryIdsToFilter
-          if (brandsParam.length > 0) filters.brand = brandsParam[0] // Single brand support
-          if (minPriceParam) filters.price_min = minPriceParam
-          if (maxPriceParam) filters.price_max = maxPriceParam
-
-          // Fetch products - if no query but category filter, get all products in those categories
-          let results: FtsProductResult[]
-          if (activeQuery) {
-            results = await ftsSearchProducts(activeQuery, 50, Object.keys(filters).length ? filters : undefined)
-          } else {
-            // No search query, just filtering by category - fetch all products and filter client-side
-            const allProds = await getAllProducts()
-            results = allProds
-              .filter(p => {
-                // Category filter
-                if (categoryIdsToFilter.length > 0 && !categoryIdsToFilter.includes(p.category_id || '')) return false
-                // Brand filter
-                if (filters.brand && p.brand !== filters.brand) return false
-                // Price filters
-                const price = typeof p.price === 'number' ? p.price : Number(p.price || 0)
-                if (filters.price_min && price < Number(filters.price_min)) return false
-                if (filters.price_max && price > Number(filters.price_max)) return false
-                return true
-              })
-              .map(p => ({
-                id: p.id,
-                name: p.name,
-                sku: p.sku,
-                brand: p.brand,
-                price: typeof p.price === 'number' ? p.price : Number(p.price || 0),
-                rank: null,
-                is_fuzzy_match: false,
-                status: p.status,
-                image_url: p.image_url,
-                image_alt: p.image_alt,
-                is_featured: p.is_featured,
-                stock_qty: p.stock_qty,
-                model_code: p.model_code
-              }))
-          }
-
-          // Enhanced results with generic attachCovers + active status patch
-          const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-
-          async function attachCovers<T extends { id: string }>(list: T[]): Promise<(T & { image_url?: string, image_alt?: string | null })[]> {
-            if (!Array.isArray(list) || list.length === 0) return list
-            try {
-              const ids = list.map(p => p.id)
-              const { supabase } = await import('../lib/supabase')
-              const { data: imgs } = await supabase
-                .from('product_images')
-                .select('product_id,path,sort_order,alt')
-                .in('product_id', ids)
-                .order('sort_order', { ascending: true })
-              const firstMap = new Map<string, { path: string, alt?: string | null }>()
-              for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-                if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
-              }
-              return list.map(p => {
-                const cover = firstMap.get(p.id)
-                return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-              })
-            } catch { return list }
-          }
-
-          const withCovers = await attachCovers(results)
+          const categoryIds = catParam ? getAllDescendantIds(categories, catParam) : undefined
+          
+          const results = await getProductsEnriched({
+            searchQuery: activeQuery || undefined,
+            categoryIds,
+            brand: brandsParam[0],
+            minPrice: minPriceParam ? Number(minPriceParam) : undefined,
+            maxPrice: maxPriceParam ? Number(maxPriceParam) : undefined,
+            limit: 50
+          })
 
           if (active) {
-            // Cast to compatible type
-            const compatible = withCovers.map(p => ({
-              ...p,
-              status: 'active' as const, // Patch status
-              is_featured: false, // Default
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              category_id: (p as any).category_id || (filters.category_id as string) || '', // Try to preserve category_id from result, fallback to filter
-              subcategory_id: '' // Missing
-            }))
-            // We cast to Product[] for state simplicity as we know ProductCard handles partials if status is present
-            setProducts(compatible as unknown as Product[])
+            setProducts(results)
           }
         }
-        // Mode B: All Products
         else if (isAll) {
-          const all = await getAllProducts()
+          const all = await getProductsEnriched({ limit: 1000 })
           if (active) setProducts(all)
         }
-        // Mode C: Discovery (Empty)
         else {
           setProducts([])
         }
@@ -386,26 +312,23 @@ const ProductsPage: React.FC = () => {
 
     fetchData()
     return () => { active = false }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuery, catParam, brandsParam.join(','), minPriceParam, maxPriceParam, isAll, categories])
+  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories, brandsParam])
 
 
   // Helper: Update URL params
   const updateUrl = (patch: Record<string, string | null>) => {
-    if (typeof window === 'undefined') return
-    const next = new URLSearchParams(window.location.search)
+    const current = hookSearchParams ? new URLSearchParams(hookSearchParams.toString()) : new URLSearchParams()
     Object.entries(patch).forEach(([k, v]) => {
-      if (v === null || v === '') next.delete(k)
-      else next.set(k, v)
+      if (v === null || v === '') current.delete(k)
+      else current.set(k, v)
     })
-    router.push(`?${next.toString()}`)
+    router.push(`${pathname}?${current.toString()}`)
   }
 
 
   // Handlers
   const handleCategorySelect = (id: string | null) => updateUrl({ category: id })
   const handleBrandToggle = (brand: string) => {
-    // Single brand mode for current SQL
     const current = brandsParam[0]
     updateUrl({ brands: current === brand ? null : brand })
   }
@@ -414,19 +337,17 @@ const ProductsPage: React.FC = () => {
   const showSidebar = isAll || activeQuery || catParam || brandsParam.length > 0
   const isDiscovery = !showSidebar
 
-  // Breadcrumb
   const breadcrumbLabel = activeQuery ? `"${activeQuery}"` : (isAll ? t('common.allProducts') : t('common.discover'))
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <Seo
         title={`${breadcrumbLabel} | VentHub`}
         description={t('products.discoverSeoDesc')}
         noindex={Boolean(activeQuery)}
       />
 
-      {/* Breadcrumb */}
-      <div className="flex items-center text-sm text-steel-gray mb-6">
+      <div className="flex items-center text-sm text-steel-gray mb-4 sm:mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
         <span className="text-industrial-gray font-medium">{
           activeQuery
             ? breadcrumbLabel
@@ -439,9 +360,8 @@ const ProductsPage: React.FC = () => {
         }</span>
       </div>
 
-      {/* Search Header - Only in Search/Filter Mode */}
       {!isDiscovery && (
-        <div className="flex flex-col lg:flex-row gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="flex-1 relative">
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -450,19 +370,19 @@ const ProductsPage: React.FC = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
-              className="w-full pl-10 pr-4 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2.5 sm:py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all text-sm sm:text-base"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-end">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-3 rounded-lg border ${viewMode === 'grid' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+              className={`p-2.5 sm:p-3 rounded-lg border ${viewMode === 'grid' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
             >
               <GridIcon size={20} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-3 rounded-lg border ${viewMode === 'list' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
+              className={`p-2.5 sm:p-3 rounded-lg border ${viewMode === 'list' ? 'bg-primary-navy text-white border-primary-navy' : 'bg-white text-steel-gray border-gray-200 hover:border-primary-navy'}`}
             >
               <ListIcon size={20} />
             </button>
@@ -470,8 +390,7 @@ const ProductsPage: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {showSidebar && (
           <FilterSidebar
             categories={categories}
@@ -486,55 +405,49 @@ const ProductsPage: React.FC = () => {
           />
         )}
 
-        {/* Listenin Ana Gövdesi */}
-        <div className="flex-1">
-          {/* Discovery Content */}
+        <div className="flex-1 w-full min-w-0">
           {isDiscovery && (
             <DiscoveryContent appSectionRef={appSectionRef} />
           )}
 
-
-
-          // Inside ProductsPage component render, after product grid:
-          {/* Product Grid */}
           {!isDiscovery && (
-            <div>
+            <div className="w-full">
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map(n => <div key={n} className="bg-gray-100 rounded-xl h-80 animate-pulse" />)}
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <div key={n} className="bg-gray-100 rounded-xl h-64 sm:h-80 animate-pulse" />)}
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                  <div className="text-4xl mb-4">🔍</div>
-                  <h3 className="text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
-                  <p className="text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
+                <div className="text-center py-16 sm:py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <div className="text-3xl sm:text-4xl mb-4">🔍</div>
+                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
+                  <p className="text-sm sm:text-base text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
                   <button
                     onClick={() => router.push('/products')}
-                    className="mt-4 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                    className="mt-6 px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
                   >
                     Filtreleri Temizle
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+                  <div className={`grid gap-4 sm:gap-6 ${viewMode === 'grid' ? 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
                     {products.map(p => (
                       <ProductCard
                         key={p.id}
-                        product={p as Product} // Safe cast now due to compatibility patch
+                        product={p as Product}
                         layout={viewMode}
                         hidePrice={Boolean(p.category_id && categoryHidePriceMap.get(p.category_id))}
+                        compact={viewMode === 'grid'}
                       />
                     ))}
                   </div>
-
-                  {/* Undecided User CTA - Only show if we found results, or even if filtered but empty? Better if results exist or generally bottom of list */}
-                  {products.length > 0 && <UndecidedUserCTA />}
+                  <div className="mt-12 sm:mt-16">
+                    <UndecidedUserCTA />
+                  </div>
                 </>
               )}
             </div>
           )}
-
         </div>
       </div>
 
@@ -543,29 +456,27 @@ const ProductsPage: React.FC = () => {
   )
 }
 
-// Sub-component to keep main file clean
 const DiscoveryContent = ({
   appSectionRef
 }: {
   appSectionRef: React.RefObject<HTMLDivElement>
 }) => {
   return (
-    <div className="space-y-8">
-      {/* 3D Orbit Category Carousel - Now the hero */}
-      <CategoryOrbitCarousel />
-
-      {/* Application Areas */}
-      <div ref={appSectionRef}>
+    <div className="space-y-12 sm:space-y-16">
+      <div className="-mx-4 sm:mx-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-primary-navy/10 border border-white/10 bg-[#020617]">
+        <CategoryOrbitCarousel />
+      </div>
+      <div ref={appSectionRef} className="px-1">
         <ApplicationCards />
       </div>
-
-      <BrandsShowcase />
-      <TrustSection />
+      <div className="space-y-12 sm:space-y-16">
+        <BrandsShowcase />
+        <TrustSection />
+      </div>
     </div>
   )
 }
 
-// Icons
 function GridIcon({ size = 16 }: { size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
 }
@@ -577,8 +488,3 @@ function SearchIcon({ size = 16, className = "" }: { size?: number, className?: 
 }
 
 export default ProductsPage
-
-
-
-
-

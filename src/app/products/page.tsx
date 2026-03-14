@@ -1,26 +1,29 @@
 import React, { Suspense } from 'react'
-import dynamic from 'next/dynamic'
+import ProductsPage from '../../views/ProductsPage'
+import ProductsSkeleton from '../../components/products/ProductsSkeleton'
+import { getCategories, getAllProducts } from '../../lib/supabase'
 
-const PageComponent = dynamic(() => import('../../views/ProductsPage'), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
-    </div>
-  )
-})
+export const dynamic = 'force-dynamic' // Ensure fresh data on each request
 
-export default function Page() {
+interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  // Fetch initial data on the server (PostgreSQL speed is now direct!)
+  const categoriesPromise = getCategories()
+  const allProductsPromise = getAllProducts()
+
+  const [categories, allProducts] = await Promise.all([categoriesPromise, allProductsPromise])
+  const initialBrands = Array.from(new Set(allProducts.map(p => p.brand).filter(Boolean))) as string[]
+
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
-      </div>
-    }>
-      <PageComponent />
+    <Suspense fallback={<ProductsSkeleton />}>
+      <ProductsPage 
+        initialCategories={categories} 
+        initialBrands={initialBrands.sort()}
+        serverSearchParams={searchParams} // Pass params from server
+      />
     </Suspense>
   )
 }
-
-
-

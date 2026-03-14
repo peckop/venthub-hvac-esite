@@ -10,7 +10,6 @@ import { listAdminUsers, setUserAdminRole } from '../../config/admin'
 import { 
   adminSectionTitleClass, 
   adminSubtitleClass,
-  adminCardClass, 
   adminTableHeadCellClass, 
   adminTableCellClass, 
   adminTableContainerClass 
@@ -196,16 +195,6 @@ export default function AdminUsersPage() {
       case 'warehouse':
       case 'sales': return <ShieldCheck className="text-cyan-400" size={14} />
       default: return <Users className="text-slate-500" size={14} />
-    }
-  }
-
-  const getRoleColor = (roleCode: string): string => {
-    switch (roleCode) {
-      case 'super_admin': return 'bg-purple-500/10 text-purple-400 border-purple-500/20 ring-1 ring-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
-      case 'admin': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 ring-1 ring-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]'
-      case 'warehouse':
-      case 'sales': return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 ring-1 ring-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]'
-      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20 ring-1 ring-slate-500/10'
     }
   }
 

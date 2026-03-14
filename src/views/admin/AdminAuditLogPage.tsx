@@ -5,12 +5,10 @@ import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { 
   adminSectionTitleClass, 
   adminSubtitleClass,
-  adminCardClass, 
   adminTableHeadCellClass, 
   adminTableCellClass, 
   adminButtonSecondaryClass, 
-  adminTableActionClass,
-  adminInputClass
+  adminTableActionClass
 } from '../../utils/adminUi'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { useI18n } from '../../i18n/I18nProvider'

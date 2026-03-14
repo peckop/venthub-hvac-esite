@@ -1,3 +1,4 @@
+"use client";
 import React, { useMemo } from 'react'
 import * as THREE from 'three'
 import { useFanMaterials } from '../materials/useFanMaterials'
@@ -136,6 +137,7 @@ export const SnailHousing: React.FC<{ scale?: number }> = ({ scale = 1 }) => {
         </group>
     )
 }
+
 
 
 

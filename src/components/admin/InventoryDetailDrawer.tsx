@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect } from 'react'
-import { adminButtonPrimaryClass } from '../../utils/adminUi'
 import { printQrLabel } from './InventoryQrLabel'
 import { InventoryRow, ReservedRow } from '../../types/inventory'
 import InventoryStockAdjust from './InventoryStockAdjust'

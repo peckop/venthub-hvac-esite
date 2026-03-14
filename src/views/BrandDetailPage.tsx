@@ -1,5 +1,6 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
@@ -83,9 +84,13 @@ const BRAND_DETAILS: Record<string, {
   }
 }
 
-const BrandDetailPage: React.FC = () => {
+export interface BrandDetailPageProps {
+  initialBrandSlug?: string
+}
+
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
   const params = useParams()
-  const slug = params?.slug as string
+  const slug = (initialBrandSlug || params?.slug) as string
   const brand = HVAC_BRANDS.find((b) => b.slug === slug)
   const brandDetails = slug ? BRAND_DETAILS[slug] : null
   const { t } = useI18n()
@@ -265,11 +270,10 @@ const BrandDetailPage: React.FC = () => {
                 >
                   <div className="aspect-square bg-light-gray rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     {product.image_url ? (
-                      <img
-                        src={product.image_url}
+                      <VentImage src={product.image_url}
                         alt={product.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-                      />
+                       />
                     ) : (
                       <Package size={48} className="text-steel-gray" />
                     )}

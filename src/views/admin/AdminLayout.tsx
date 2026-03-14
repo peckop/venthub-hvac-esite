@@ -26,8 +26,7 @@ import {
   Truck,
   Menu,
   X,
-  ExternalLink,
-  Search as SearchIcon
+  ExternalLink
 } from 'lucide-react'
 import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
@@ -96,7 +95,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
       <div className="h-screen bg-[#0A0F1E] flex flex-col items-center justify-center space-y-6">
         <div className="w-16 h-16 border-4 border-cyan-400/20 border-t-cyan-400 rounded-full animate-spin shadow-[0_0_15px_rgba(34,211,238,0.2)]"></div>
         <div className="text-slate-400 text-xs font-black uppercase tracking-[0.3em] animate-pulse">
-          Sistem Hazırlanıyor...
+          {t('common.systemPreparing')}
         </div>
       </div>
     )
@@ -178,7 +177,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
               <h1 className="text-lg font-bold tracking-tight text-white leading-none">
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text">Vent</span>Hub
               </h1>
-              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-0.5">Yönetim Paneli</span>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-0.5">{t('common.adminPanel')}</span>
             </div>
           </Link>
         </div>
@@ -187,10 +186,10 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
           {/* External Site Link - Standard Requirement */}
           <Link 
             href="/" 
-            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white glass border-white/5 hover:border-white/10 rounded-xl transition-all"
+            className="hidden md:flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white glass border-white/5 hover:border-white/10 rounded-xl transition-all hover:scale-105 active:scale-95 group"
           >
-            <ExternalLink size={14} />
-            <span>Mağazaya Git</span>
+            <ExternalLink size={14} className="transition-transform group-hover:-translate-x-1" />
+            <span>{t('common.goToStore')}</span>
           </Link>
 
           <div className="w-px h-6 bg-white/5 mx-2 hidden md:block" />
@@ -295,7 +294,7 @@ const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => 
                     onClick={() => setSidebarOpen(false)}
                 >
                     <ExternalLink size={16} />
-                    <span>Siteye Dön</span>
+                    <span>{t('common.backToSite')}</span>
                 </Link>
             </div>
           </div>

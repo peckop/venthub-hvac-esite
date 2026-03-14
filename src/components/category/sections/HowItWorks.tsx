@@ -1,3 +1,4 @@
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { Wind, ArrowDown, Shield, Thermometer, ChevronDown, ChevronUp } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
@@ -53,12 +54,11 @@ const HowItWorks: React.FC = () => {
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     {/* Technical Diagram Image */}
                     <div className={`relative rounded-2xl overflow-hidden shadow-xl ${scrollAnimationClasses.scaleIn(isVisible)}`} style={{ transitionDelay: '200ms' }}>
-                        <img
-                            src="/images/category/air-curtain-diagram.png"
+                        <VentImage src="/images/category/air-curtain-diagram.png"
                             alt="Hava Perdesi Çalışma Prensibi"
                             className="w-full h-auto"
                             loading="lazy"
-                        />
+                         />
                     </div>
 
                     {/* Steps */}

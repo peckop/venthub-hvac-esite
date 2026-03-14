@@ -5,14 +5,9 @@ import { format as _format } from 'date-fns'
 import {
   adminSectionTitleClass,
   adminSubtitleClass,
-  adminButtonPrimaryClass,
   adminButtonSecondaryClass,
   adminTableHeadCellClass,
-  adminTableCellClass,
   adminTableContainerClass,
-  adminTableActionPrimaryClass,
-  adminTableActionWarningClass,
-  adminTableActionNeutralClass,
   adminSelectClass,
   adminSelectStyle
 } from '../../utils/adminUi'

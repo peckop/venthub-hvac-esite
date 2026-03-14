@@ -4,20 +4,14 @@
 
 /* Self-hosted fonts imported via main.tsx to avoid PostCSS @import ordering warnings */
 
-/* Smooth scroll behavior */
+/* Smooth scroll behavior - scoped to html only for performance */
 html {
   scroll-behavior: smooth;
-  /* Stabilize layout width when vertical scrollbar appears */
   scrollbar-gutter: stable;
 }
 
-/* Scroll behavior optimization for better performance */
-* {
-  scroll-behavior: smooth;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  * {
+  html {
     scroll-behavior: auto;
   }
 }
@@ -87,6 +81,24 @@ html {
 
 .animate-scaleIn {
   animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
 }
 
 /* Enhanced Glass Effect */
@@ -197,39 +209,47 @@ textarea:focus-visible {
   @apply text-gray-600;
 }
 
-/* WhatsApp floating button (if needed) */
+/* WhatsApp floating button - Modern & Responsive */
 .whatsapp-float {
-  @apply fixed z-40 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-xl transition-all duration-300;
-  bottom: max(env(safe-area-inset-bottom), 96px);
-  right: max(env(safe-area-inset-right), 20px);
+  @apply fixed z-[9999] bg-emerald-500 text-white rounded-full shadow-2xl transition-all duration-500 ease-in-out flex items-center justify-center border-2 border-white;
+  bottom: 110px;
+  right: 20px;
   width: 56px;
   height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid #ffffff;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  overflow: hidden;
 }
 
-/* Avoid overlap with BackToTop and Language Switcher */
-#whatsapp-float {
-  z-index: 60;
+/* Desktop Hover Effect */
+@media (min-width: 1024px) {
+  .whatsapp-float:hover {
+    width: 200px;
+    border-radius: 30px;
+    @apply bg-emerald-600 px-5 justify-start;
+  }
+
+  .whatsapp-float::after {
+    content: 'Mühendislik Hattı';
+    @apply absolute left-14 opacity-0 transition-opacity duration-300 whitespace-nowrap font-bold text-sm pointer-events-none;
+  }
+
+  .whatsapp-float:hover::after {
+    @apply opacity-100;
+  }
+  
+  /* Keep icon stable during expansion */
+  .whatsapp-float svg {
+    @apply shrink-0;
+  }
 }
 
-/* WhatsApp pulse animation */
+.whatsapp-pulse {
+  animation: whatsappPulse 2s infinite;
+}
+
 @keyframes whatsappPulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-  }
-  70% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
 .whatsapp-pulse {

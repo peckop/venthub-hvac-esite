@@ -23,7 +23,7 @@ import {
     ThermometerSun
 } from 'lucide-react'
 import ProductCard from '../ProductCard'
-// import { useI18n } from '../../i18n/I18nProvider'
+import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 // import { Link, useNavigate } from 'react-router-dom'
 // Premium section components for air curtains
@@ -34,11 +34,17 @@ import {
     TypeComparison,
     FAQ,
     TrustSignals,
-    BottomCTA
+    BottomCTA,
+    SilentFanProblem,
+    SilentFanHowItWorks,
+    SilentFanVorticeBrand,
+    SilentFanTypeComparison,
+    SilentFanFAQ
 } from './sections'
 import { Breadcrumb } from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { VentImage } from '../ui/VentImage'
 
 interface CategoryLandingProps {
     category: Category
@@ -67,7 +73,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 }
 
 const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [], parentCategory }) => {
-    // const { t } = useI18n()
+    const { t } = useI18n()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)
@@ -77,6 +83,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const subcategoryProductsRef = useRef<HTMLDivElement>(null)
 
     const isAirCurtain = category.slug === 'hava-perdeleri'
+    const isSilentFan = category.slug === 'sessiz-kanal-tipi-fanlar'
 
     // Restore state from URL hash on mount or back navigation
     useEffect(() => {
@@ -172,26 +179,25 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         ? products.filter(p => p.category_id === selectedSubcategory)
         : []
 
-    // "Smart" stats calculations (Optional, can be used as fallback or supplementary)
-    const maxAirflow = Math.max(...products.map(p => p.airflow_capacity || 0))
-    // const minNoise = Math.min(...products.map(p => p.noise_level || 100).filter(n => n > 0))
+    // stats calculations
+    const maxAirflow = products.length > 0
+        ? Math.max(...products.map(p => p.airflow_capacity || 0))
+        : 1000
 
     // Filter products based on active filter
-    const filteredProducts = products.filter(p => {
+    const filteredProducts = products.filter((p: Product) => {
         if (activeFilter === 'all') return true
         if (activeFilter === 'quiet') return (p.noise_level || 100) <= 50
         if (activeFilter === 'powerful') return (p.airflow_capacity || 0) >= maxAirflow * 0.8
         return true
     })
 
-    const heroImage = category.image_url
-        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}`
-        : null
+    const heroImagePath = category.image_url ? `category-images/${category.image_url}` : null
 
     const features = category.metadata?.features || []
 
     // Build breadcrumb items
-    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, 'Ana Sayfa')
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.home'))
 
     return (
         <div className="min-h-screen bg-white">
@@ -270,19 +276,15 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
                         {/* Hero Image */}
                         <div className="relative hidden lg:block h-[500px]">
-                            {heroImage ? (
-                                <img
-                                    src={heroImage}
-                                    alt={category.name}
-                                    className="w-full h-full object-contain drop-shadow-2xl filter contrast-125 select-none"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <div className="p-12 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                                        <Wind size={120} className="text-white/20" />
-                                    </div>
-                                </div>
-                            )}
+                            <VentImage
+                                src={heroImagePath}
+                                alt={category.name}
+                                fallbackType="category"
+                                fill
+                                sizes="(max-width: 1024px) 100vw, 50vw"
+                                className="object-contain drop-shadow-2xl filter contrast-125 select-none"
+                                priority
+                            />
 
                             {/* Animated Scroll Down Indicator */}
                             <button
@@ -401,6 +403,28 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 onShowProducts={handleShowProducts}
                                 showWizard={true}
                                 categoryName="Hava Perdesi"
+                            />
+                        </>
+                    )
+                }
+
+                {/* ====== SILENT FAN EXPERIENCE (Vortice Lineo Quiet) ====== */}
+                {
+                    isSilentFan && (
+                        <>
+                            <SilentFanProblem />
+                            <SilentFanHowItWorks />
+                            <SilentFanVorticeBrand />
+                            <SilentFanTypeComparison />
+                            
+                            <TrustSignals />
+                            <SilentFanFAQ />
+
+                            <BottomCTA
+                                onOpenWizard={handleShowProducts}
+                                onShowProducts={handleShowProducts}
+                                showWizard={false}
+                                categoryName="Sessiz Kanal Tipi Fan"
                             />
                         </>
                     )

@@ -246,8 +246,6 @@ const AdminErrorGroupsPage: React.FC = () => {
     } catch { }
   }
 
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
-
   // CSV export (tüm filtrelere göre, 1000'erlik parça ile)
   const exportGroupsCsv = React.useCallback(async () => {
     const CHUNK = 1000

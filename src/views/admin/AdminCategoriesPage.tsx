@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import { VentImage } from '@/components/ui/VentImage'
 import React, { lazy, Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -9,7 +9,6 @@ import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { 
   adminSectionTitleClass, 
   adminSubtitleClass,
-  adminCardClass, 
   adminTableHeadCellClass, 
   adminTableCellClass, 
   adminTableContainerClass,
@@ -251,11 +250,10 @@ const AdminCategoriesPage: React.FC = () => {
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="relative w-12 h-12 rounded-xl border border-white/5 overflow-hidden glass group-hover:border-white/10 transition-all duration-500">
                           {r.image_url ? (
-                            <img
-                              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
+                            <VentImage src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${r.image_url}`}
                               alt=""
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                            />
+                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-700 uppercase">NO IMG</div>
                           )}

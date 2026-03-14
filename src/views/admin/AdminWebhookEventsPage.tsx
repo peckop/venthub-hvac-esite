@@ -6,7 +6,6 @@ import {
   adminSubtitleClass,
   adminTableHeadCellClass, 
   adminTableCellClass, 
-  adminCardClass,
   adminButtonSecondaryClass 
 } from '../../utils/adminUi'
 import { supabase } from '../../lib/supabase'

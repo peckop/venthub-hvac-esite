@@ -1,0 +1,15 @@
+import { createContext } from 'react'
+import type { UserProject, ProjectItem, Product } from '../lib/supabase'
+
+export interface ProjectContextType {
+  projects: UserProject[]
+  loading: boolean
+  refreshProjects: () => Promise<void>
+  addProject: (name: string, description?: string) => Promise<UserProject>
+  removeProject: (projectId: string) => Promise<void>
+  addItemToProject: (projectId: string, productId: string, quantity?: number) => Promise<void>
+  removeItemFromProject: (projectId: string, productId: string) => Promise<void>
+  getProjectItems: (projectId: string) => Promise<(ProjectItem & { product: Product })[]>
+}
+
+export const ProjectContext = createContext<ProjectContextType | undefined>(undefined)

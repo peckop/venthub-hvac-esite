@@ -1,17 +1,19 @@
 import PageComponent from '../../../views/ProductDetailPage'
-import { getProductById, supabase } from '../../../lib/supabase'
+import { getProductBySlugOrId, supabase } from '../../../lib/supabase'
 import type { Product } from '../../../lib/supabase'
 
 export async function generateStaticParams() {
   try {
     const { data: products } = await supabase
       .from('products')
-      .select('id')
+      .select('id, slug')
       .eq('status', 'active')
 
-    const paths = (products || []).map((p) => ({
-      id: p.id,
-    }))
+    const paths = (products || []).flatMap((p) => {
+      const results = [{ id: p.id }]
+      if (p.slug) results.push({ id: p.slug })
+      return results
+    })
 
     if (paths.length === 0) {
       return [{ id: 'generic' }]
@@ -25,11 +27,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   try {
-    const { data: product } = await supabase
-      .from('products')
-      .select('name, description')
-      .eq('id', params.id)
-      .single()
+    const product = await getProductBySlugOrId(params.id)
 
     if (product) {
       return {
@@ -48,11 +46,21 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
-  // Fetch product data for detailed JSON-LD
-  const productData: Product | null = await getProductById(params.id).catch((e) => {
-    console.error('fetch error for JSON-LD:', e)
-    return null
-  })
+  let productData: Product | null = null
+  
+  try {
+    // If we are prerendering 'generic' or the database is down, handle it gracefully
+    if (params.id !== 'generic') {
+      productData = await getProductBySlugOrId(params.id)
+    }
+  } catch (e: any) {
+    if (e?.message?.includes('fetch failed')) {
+      console.warn(`Network fetch failed for product ${params.id} (expected if Supabase env is missing)`)
+    } else {
+      console.error(`Error fetching product data for ${params.id}:`, e)
+    }
+  }
+
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -83,7 +91,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PageComponent />
+      <PageComponent initialProduct={productData} />
     </>
   )
 }

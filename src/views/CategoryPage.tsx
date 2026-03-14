@@ -1,12 +1,15 @@
 'use client'
 
+import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getCategories, getProductsByCategory, Category, Product, supabase } from '../lib/supabase'
+import { getCategories, Product, Category } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { 
+  getCategoryDisplayName
+} from '../utils/categoryHelpers'
 import { ChevronRight, Filter, Grid, List, ArrowLeft } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
@@ -17,16 +20,20 @@ import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
 
-export const CategoryPage: React.FC = () => {
+export interface CategoryPageProps {
+  initialCategory?: Category | null
+}
+
+export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) => {
   const params = useParams()
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
   const navigate = useRouter()
-  const [category, setCategory] = useState<Category | null>(null)
+  const [category, setCategory] = useState<Category | null>(initialCategory || null)
   const [parentCategory, setParentCategory] = useState<Category | null>(null)
   const [subCategories, setSubCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialCategory)
   const [sortBy, setSortBy] = useState('name')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   // Varsayılan fiyat aralığını geniş tut (ürünler yüksek fiyatlı olabilir)
@@ -48,58 +55,28 @@ export const CategoryPage: React.FC = () => {
   useManualScrollRestoration(loading)
 
   useEffect(() => {
-    const buildPublicUrl = (path: string) => `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`
-    async function attachCovers(list: Product[]): Promise<Product[]> {
-      if (!Array.isArray(list) || list.length === 0) return list
-      try {
-        const ids = list.map(p => p.id)
-        const { data: imgs } = await supabase
-          .from('product_images')
-          .select('product_id,path,sort_order,alt')
-          .in('product_id', ids)
-          .order('sort_order', { ascending: true })
-        const firstMap = new Map<string, { path: string, alt?: string | null }>()
-        for (const r of (imgs || []) as { product_id: string, path: string, sort_order: number, alt?: string | null }[]) {
-          if (!firstMap.has(r.product_id)) firstMap.set(r.product_id, { path: r.path, alt: r.alt ?? null })
-        }
-        return list.map(p => {
-          const cover = firstMap.get(p.id)
-          return cover ? { ...p, image_url: buildPublicUrl(cover.path), image_alt: cover.alt ?? null } : p
-        })
-      } catch {
-        return list
-      }
-    }
-
-    // Yardımcı: fiyatı güvenle sayıya çevir ("12.345,67" -> 12345.67, "12345" -> 12345)
-    const parsePriceToNumber = (val: unknown): number | null => {
-      if (typeof val === 'number') return Number.isFinite(val) ? val : null
-      if (typeof val === 'string') {
-        const trimmed = val.trim()
-        if (!trimmed) return null
-        // TR format desteği: nokta binlik, virgül ondalık
-        const normalized = trimmed.replace(/\./g, '').replace(/,/g, '.')
-        const n = Number(normalized)
-        return Number.isFinite(n) ? n : null
-      }
-      return null
-    }
-
     async function fetchData() {
       try {
-        setLoading(true)
-        const categories = await getCategories()
-
-        let targetCategory: Category | null = null
+        // Hydration check: if initialCategory matches current slug, we can skip initial category fetch
+        let targetCategory: Category | null = initialCategory || null
         let targetParentCategory: Category | null = null
+        let categories: Category[] = []
 
-        if (parentSlug && slug) {
-          // Sub-category page
-          targetParentCategory = categories.find(c => c.slug === parentSlug && c.level === 0) || null
-          targetCategory = categories.find(c => c.slug === slug && c.level === 1) || null
-        } else if (slug) {
-          // Main category page
-          targetCategory = categories.find(c => c.slug === slug && c.level === 0) || null
+        if (!targetCategory || targetCategory.slug !== slug) {
+          setLoading(true)
+          categories = await getCategories()
+
+          if (parentSlug && slug) {
+            // Sub-category page
+            targetParentCategory = categories.find(c => c.slug === parentSlug && c.level === 0) || null
+            targetCategory = categories.find(c => c.slug === slug && c.level === 1) || null
+          } else if (slug) {
+            // Main category page
+            targetCategory = categories.find(c => c.slug === slug && c.level === 0) || null
+          }
+        } else if (targetCategory.level === 0) {
+          // Fetch categories to find subcategories even if targetCategory is from props
+          categories = await getCategories()
         }
 
         if (!targetCategory) {
@@ -116,60 +93,43 @@ export const CategoryPage: React.FC = () => {
           subs = categories
             .filter(c => c.parent_id === targetCategory.id)
             .sort((a, b) => {
-              // Primary sort: sort_order (descending - higher number first if that's the convention, or ascending. 
-              // Usually sort_order is ascending (0, 1, 2...). Let's assume ascending.
-              // If sort_order is missing/null, treat as 0 or put at end? defaulting to 0.
               const orderA = a.sort_order ?? 0
               const orderB = b.sort_order ?? 0
               if (orderA !== orderB) return orderA - orderB
-
-              // Secondary sort: alphabetical
               return a.name.localeCompare(b.name)
             })
           setSubCategories(subs)
         }
 
-        // Fetch products + attach cover images
-        let productsData: Product[]
+        // Fetch products via enriched RPC
+        let productsData: Product[] = []
+        const { getProductsEnriched } = await import('../lib/supabase')
+
         if (targetCategory.level === 0 && subs.length > 0) {
-          // Ana kategori ve alt kategorileri varsa: ana kategori + tüm alt kategorilerdeki ürünleri çek
+          // Ana kategori ve alt kategorileri varsa: tümünü kapsayan liste
           const allCategoryIds = [targetCategory.id, ...subs.map(s => s.id)]
-          const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .in('category_id', allCategoryIds)
-            .eq('status', 'active')
-            .order('is_featured', { ascending: false })
-            .order('name', { ascending: true })
-
-          if (error) throw error
-          productsData = data as Product[]
-        } else if (targetCategory.level === 1) {
-          // Alt kategori: category_id ile eşleşen ürünleri çek (ürünler artık category_id ile alt kategorilere atanıyor)
-          const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category_id', targetCategory.id)
-            .eq('status', 'active')
-            .order('is_featured', { ascending: false })
-            .order('name', { ascending: true })
-
-          if (error) throw error
-          productsData = data as Product[]
+          productsData = await getProductsEnriched({
+            categoryIds: allCategoryIds,
+            sortBy: 'featured',
+            limit: 100
+          })
         } else {
-          // Diğer durumlar: normal query
-          productsData = await getProductsByCategory(targetCategory.id)
+          // Alt kategori veya tekil kategori
+          productsData = await getProductsEnriched({
+            categoryIds: [targetCategory.id],
+            sortBy: 'featured',
+            limit: 100
+          })
         }
-        const withCovers = await attachCovers(productsData)
-        setProducts(withCovers)
+        
+        setProducts(productsData)
 
-        // Ürünlerden dinamik maksimum fiyatı hesapla ve üst sınırı buna ayarla
-        const prices = withCovers
-          .map(p => parsePriceToNumber((p as unknown as { price?: unknown }).price))
+        // Ürünlerden dinamik maksimum fiyatı hesapla
+        const prices = productsData
+          .map(p => p.price)
           .filter((v): v is number => v != null && Number.isFinite(v))
         if (prices.length > 0) {
           const maxPrice = Math.max(...prices)
-          // Eğer mevcut üst sınır daha düşükse, güncelle (kullanıcıyı rahatsız etmemek için sadece genişlet)
           setPriceRange(([lo, hi]) => [lo, Math.max(hi, Math.ceil(maxPrice))])
         }
 
@@ -181,7 +141,7 @@ export const CategoryPage: React.FC = () => {
     }
 
     fetchData()
-  }, [slug, parentSlug])
+  }, [slug, parentSlug, initialCategory])
 
   // Filter and sort products
   const filteredProducts = products
@@ -271,17 +231,6 @@ export const CategoryPage: React.FC = () => {
   const canonicalUrl = (parentCategory && parentCategory.slug !== category.slug)
     ? `${origin}/category/${parentCategory.slug}/${category.slug}`
     : `${origin}/category/${category.slug}`
-
-  // Knowledge Hub: kategori/alt kategori slug → konu slug eşleme
-  const mapSlugToTopic = (s?: string | null): string | null => {
-    if (!s) return null
-    const slug = s.toLowerCase()
-    if (slug.includes('hava-perde')) return 'hava-perdesi'
-    if (slug.includes('jet-fan')) return 'jet-fan'
-    if (slug.includes('isi-geri-kazanim') || slug.includes('hrv')) return 'hrv'
-    return null
-  }
-  const relatedTopicSlug = mapSlugToTopic(parentCategory?.slug || category.slug)
 
   // Construct image URL if available
   const categoryImageUrl = category.image_url
@@ -432,11 +381,10 @@ export const CategoryPage: React.FC = () => {
           <div className="flex items-center space-x-6">
             <div className="text-primary-navy shrink-0">
               {categoryImageUrl ? (
-                <img
-                  src={categoryImageUrl}
+                <VentImage src={categoryImageUrl}
                   alt={getCategoryDisplayName(category)}
                   className="w-16 h-16 sm:w-24 sm:h-24 object-cover rounded-lg shadow-sm border border-light-gray"
-                />
+                 />
               ) : (
                 getCategoryIcon(parentCategory?.slug || category.slug, { size: 64 })
               )}
@@ -639,13 +587,7 @@ export const CategoryPage: React.FC = () => {
                       key={product.id}
                       product={product}
                       highlightFeatured={false}
-                      showCompare
-                      compareSelected={compareIds.includes(product.id)}
-                      onToggleCompare={(pid) => {
-                        setCompareIds(prev => prev.includes(pid) ? prev.filter(id => id !== pid) : (prev.length < 4 ? [...prev, pid] : prev))
-                      }}
                       layout={viewMode}
-                      relatedTopicSlug={relatedTopicSlug || undefined}
                       priority={i === 0}
                       hidePrice={!!category.metadata?.hide_price}
                     />

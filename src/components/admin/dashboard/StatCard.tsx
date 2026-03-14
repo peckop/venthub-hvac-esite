@@ -3,7 +3,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { adminCardPaddedClass } from '../../../utils/adminUi'
 import { formatCurrency } from '../../../i18n/format'
 
 interface StatCardProps {

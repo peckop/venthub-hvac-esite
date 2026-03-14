@@ -19,13 +19,16 @@ const AddToCartToast = lazy(() => import('../AddToCartToast'))
 const WhatsAppFloat = lazy(() => import('../WhatsAppFloat'))
 
 import { I18nProvider } from '../../i18n/I18nProvider'
+import { ProjectProvider } from '../../contexts/ProjectProvider'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <I18nProvider>
             <AuthProvider>
                 <CartProvider>
-                    {children}
+                    <ProjectProvider>
+                        {children}
+                    </ProjectProvider>
                 </CartProvider>
             </AuthProvider>
         </I18nProvider>
@@ -58,24 +61,22 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
     const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
     React.useEffect(() => {
-        try {
-            const coarse = window.matchMedia('(pointer: coarse)').matches
-            if (!coarse || enableWhatsApp) return
-            const enable = () => {
-                setEnableWhatsApp(true)
-                window.removeEventListener('scroll', enable)
-                window.removeEventListener('pointerdown', enable)
-                window.removeEventListener('touchstart', enable)
-            }
-            window.addEventListener('scroll', enable, { once: true, passive: true })
-            window.addEventListener('pointerdown', enable, { once: true })
-            window.addEventListener('touchstart', enable, { once: true })
-            return () => {
-                window.removeEventListener('scroll', enable)
-                window.removeEventListener('pointerdown', enable)
-                window.removeEventListener('touchstart', enable)
-            }
-        } catch { }
+        if (enableWhatsApp) return
+        const enable = () => {
+            setEnableWhatsApp(true)
+            window.removeEventListener('scroll', enable)
+            window.removeEventListener('pointerdown', enable)
+            window.removeEventListener('touchstart', enable)
+        }
+        // Load WhatsApp icon after first interaction or scroll to save initial bundle size
+        window.addEventListener('scroll', enable, { once: true, passive: true })
+        window.addEventListener('pointerdown', enable, { once: true })
+        window.addEventListener('touchstart', enable, { once: true })
+        return () => {
+            window.removeEventListener('scroll', enable)
+            window.removeEventListener('pointerdown', enable)
+            window.removeEventListener('touchstart', enable)
+        }
     }, [enableWhatsApp])
 
     // --- Navigation History Tracker (VH Smart Nav Stack Logic) ---

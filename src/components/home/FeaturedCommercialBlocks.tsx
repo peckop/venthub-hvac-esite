@@ -1,123 +1,187 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
-
+import { motion, AnimatePresence } from 'framer-motion'
+import React, { useMemo, useState } from 'react'
 import ProductCard from '../ProductCard'
 import { useI18n } from '../../i18n/I18nProvider'
-import { getCategories, getProducts, type Category, type Product } from '../../lib/supabase'
+import { type Category, type Product } from '../../lib/supabase'
+import Link from 'next/link'
+import Image from 'next/image'
 
-type CommercialTab = 'featured' | 'airCurtains' | 'heatRecovery'
+type CommercialTab = 'featured' | 'newArrivals' | 'bestSellers'
 
-const tabOrder: CommercialTab[] = ['featured', 'airCurtains', 'heatRecovery']
+const tabOrder: CommercialTab[] = ['featured', 'newArrivals', 'bestSellers']
 
-export const FeaturedCommercialBlocks: React.FC = () => {
+interface FeaturedCommercialBlocksProps {
+  initialProducts?: Product[]
+  initialCategories?: Category[]
+}
+
+const normalizeImageUrl = (url: string | null | undefined): string => {
+  if (!url || url.trim().length === 0) return '/images/vortice_lineo_futuristic.png';
+  const trimmedUrl = url.trim();
+  if (trimmedUrl.startsWith('http') || trimmedUrl.startsWith('/')) return trimmedUrl;
+  return `/${trimmedUrl}`;
+};
+
+export const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
+  initialProducts = []
+}) => {
   const { t } = useI18n()
-  const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
   const [activeTab, setActiveTab] = useState<CommercialTab>('featured')
 
-  useEffect(() => {
-    let active = true
-
-    const load = async () => {
-      try {
-        const [productData, categoryData] = await Promise.all([getProducts(12), getCategories()])
-        if (!active) return
-        setProducts(productData)
-        setCategories(categoryData)
-      } catch (error) {
-        console.error('Failed to load featured commerce data:', error)
-      }
-    }
-
-    void load()
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  const categoryIds = useMemo(
-    () => ({
-      airCurtains: categories.find((category) => category.slug === 'hava-perdeleri')?.id || null,
-      heatRecovery: categories.find((category) => category.slug === 'isi-geri-kazanim-cihazlari')?.id || null,
-    }),
-    [categories]
-  )
-
   const productsByTab = useMemo(() => {
-    const featured = products.filter((product) => product.is_featured).slice(0, 4)
-    const airCurtains = categoryIds.airCurtains
-      ? products.filter((product) => product.category_id === categoryIds.airCurtains || product.subcategory_id === categoryIds.airCurtains).slice(0, 4)
-      : []
-    const heatRecovery = categoryIds.heatRecovery
-      ? products.filter((product) => product.category_id === categoryIds.heatRecovery || product.subcategory_id === categoryIds.heatRecovery).slice(0, 4)
-      : []
+    const featured = initialProducts.filter((p) => p.is_featured).slice(0, 4)
+    const newArrivals = [...initialProducts]
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+      .slice(0, 4)
+    const bestSellers = initialProducts.slice(4, 8) // Placeholder for best sellers logic
 
-    return {
-      featured: featured.length > 0 ? featured : products.slice(0, 4),
-      airCurtains: airCurtains.length > 0 ? airCurtains : products.slice(0, 4),
-      heatRecovery: heatRecovery.length > 0 ? heatRecovery : products.slice(0, 4),
-    }
-  }, [categoryIds.airCurtains, categoryIds.heatRecovery, products])
+    return { featured, newArrivals, bestSellers }
+  }, [initialProducts])
 
   const activeProducts = productsByTab[activeTab]
 
   return (
-    <section className="border-b border-slate-200/75 bg-slate-50 py-14 sm:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-steel-gray">
-            {t('home.featuredCommercial.eyebrow')}
-          </div>
-          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2.2rem]">
-            {t('home.featuredCommercial.title')}
-          </h2>
-          <p className="mt-3 text-base leading-7 text-steel-gray sm:text-lg sm:leading-8">
-            {t('home.featuredCommercial.subtitle')}
-          </p>
-        </div>
-
-        <div className="mt-7 flex flex-wrap gap-2">
-          {tabOrder.map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setActiveTab(tab)}
-              className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${activeTab === tab ? 'border-primary-navy bg-primary-navy text-white shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-primary-navy'}`}
+    <section className="relative py-24 lg:py-32 bg-white overflow-hidden">
+      <div className="max-w-[1600px] mx-auto px-6">
+        
+        {/* Header Block */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="max-w-3xl">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
-              {t(`home.featuredCommercial.tabs.${tab}`)}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-7 grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_320px] lg:items-start">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {activeProducts.map((product, index) => (
-              <ProductCard key={`${activeTab}-${product.id}`} product={product} priority={index === 0} highlightFeatured />
-            ))}
+              {t('home.featuredCommercial.eyebrow')}
+            </motion.div>
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
+            >
+              {t('home.featuredCommercial.title')}
+            </motion.h2>
           </div>
 
-          <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-[0_20px_40px_-34px_rgba(15,23,42,0.35)]">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-steel-gray">
-              {t('home.featuredCommercial.panelEyebrow')}
-            </div>
-            <h3 className="mt-2 text-xl font-semibold text-slate-950">{t(`home.featuredCommercial.panelTitles.${activeTab}`)}</h3>
-            <p className="mt-3 text-sm leading-6 text-steel-gray">{t(`home.featuredCommercial.panelDescriptions.${activeTab}`)}</p>
+          <div className="flex flex-col items-start md:items-end gap-6">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
+            >
+              {t('home.featuredCommercial.subtitle')}
+            </motion.p>
 
-            <div className="mt-5 grid gap-2">
-              {activeProducts.slice(0, 3).map((product) => (
-                <div key={`summary-${product.id}`} className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3 text-sm text-slate-700">
-                  <div className="font-semibold text-slate-900">{product.name}</div>
-                  <div className="mt-1 text-xs uppercase tracking-[0.16em] text-steel-gray">{product.brand}</div>
-                </div>
+            <div className="flex p-1 bg-slate-200/50 backdrop-blur-sm rounded-xl border border-slate-200 gap-1" role="tablist">
+              {tabOrder.map((tab) => (
+                <button
+                  key={tab}
+                  role="tab"
+                  aria-selected={activeTab === tab}
+                  aria-label={t(`home.featuredCommercial.tabs.${tab}`)}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-500 rounded-lg ${
+                    activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  {activeTab === tab && (
+                    <motion.div 
+                      layoutId="v3TabGlow"
+                      className="absolute inset-0 bg-slate-900 rounded-lg shadow-lg shadow-slate-900/20"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10">{t(`home.featuredCommercial.tabs.${tab}`)}</span>
+                </button>
               ))}
             </div>
-
-            <a href="/products" className="mt-6 inline-flex items-center text-sm font-semibold text-primary-navy transition-colors hover:text-secondary-blue">
-              {t('home.featuredCommercial.cta')} →
-            </a>
           </div>
+        </div>
+
+        {/* Main Showcase Grid + Sidebar */}
+        <div className="grid gap-10 lg:grid-cols-[1fr,320px]">
+          <div className="space-y-12">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5, ease: "circOut" }}
+                className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+              >
+                {activeProducts.map((product, idx) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    <ProductCard product={product} compact />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Contextual Focus Sidebar */}
+          <aside className="relative">
+            <motion.div 
+              layout
+              className="sticky top-32 p-10 rounded-[2.5rem] bg-slate-950 text-white overflow-hidden"
+            >
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl rounded-full" />
+              
+              <div className="relative z-10">
+                <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8 flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  {t('home.featuredCommercial.panelEyebrow')}
+                </div>
+
+                <div className="aspect-square relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-8 p-8">
+                  <Image
+                    src={normalizeImageUrl(activeProducts[0]?.image_url)}
+                    alt={activeProducts[0]?.name || "Product Focus"}
+                    fill
+                    sizes="300px"
+                    className="object-contain opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700 p-8"
+                  />
+                  <div className="absolute inset-0 border border-cyan-500/10 rounded-full animate-pulse" />
+                </div>
+
+                <h3 className="text-xl font-bold mb-4 tracking-tight">{t(`home.featuredCommercial.panelTitles.${activeTab}`)}</h3>
+                <p className="text-[13px] text-slate-400 leading-relaxed mb-8 font-light italic">
+                  {t(`home.featuredCommercial.panelDescriptions.${activeTab}`)}
+                </p>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                    <div className="text-[8px] text-slate-500 uppercase mb-1 font-bold">Grade</div>
+                    <div className="text-xl font-black text-cyan-400">A++</div>
+                  </div>
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                    <div className="text-[8px] text-slate-500 uppercase mb-1 font-bold">Standard</div>
+                    <div className="text-xl font-black text-white">ERP</div>
+                  </div>
+                </div>
+
+                <Link 
+                  href="/products"
+                  className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 hover:scale-[1.02] active:scale-95 shadow-xl"
+                >
+                  {t('home.featuredCommercial.cta')}
+                </Link>
+              </div>
+            </motion.div>
+          </aside>
         </div>
       </div>
     </section>

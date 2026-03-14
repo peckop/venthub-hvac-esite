@@ -19,6 +19,10 @@ export const tr = {
     quickSearch: "Hızlı ara...",
     allCategories: "Tüm Kategoriler",
     priceRange: "Fiyat Aralığı",
+    systemPreparing: "Sistem Hazırlanıyor...",
+    adminPanel: "Yönetim Paneli",
+    goToStore: "Mağazaya Git",
+    backToSite: "Siteye Dön",
 
     // Existing
     discover: "Keşfet",
@@ -175,62 +179,94 @@ export const tr = {
         airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için doğru hava perdesi ailesine yaklaşın.',
         heatRecovery: 'Taze hava ve verimlilik dengesini ısı geri kazanım ekseninde değerlendirin.',
         speedControl: 'Fan kontrol, sürücü ve hız yönetimini doğru ekipman katmanında seçin.'
+      },
+      sinevizyon: {
+        slides: [
+          {
+            eyebrow: 'İLERİ AERODİNAMİK MÜHENDİSLİĞİ',
+            title: 'Endüstriyel Havalandırma Katmanları',
+            subtitle: 'Yüksek debili sistemlerde statik balanslı ve akustik optimize edilmiş çözüm eksenleri.'
+          },
+          {
+            eyebrow: 'FÜTÜRİSTİK İKLİMLENDİRME',
+            title: 'Vortice Lineo Quiet: Sessizliğin Geleceği',
+            subtitle: 'Minimum enerji tüketimi, maksimum hava transfer verimliliği ve premium sessiz konforun kusursuz dengesi.'
+          },
+          {
+            eyebrow: 'HASSAS HVAC SİSTEMLERİ',
+            title: 'Teknik Mükemmeliyet ve Akıllı Akış',
+            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca determisitik havalandırma mühendisliği.'
+          }
+        ]
       }
     },
+    cinematicShowcase: {
+      eyebrow: 'MÜHENDİSLİK ODAK NOKTASI',
+      title: 'Vortice Lineo Quiet Serisi',
+      subtitle: 'Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı.',
+      description: 'Özel susturucu katmanlara sahip dış gövdesi ve dinamik balanslı motor yapısı ile yüksek statik basınçta bile ultra sessiz operasyon verimliliği sunar.',
+      hotspots: {
+        motor: 'Yüksek Verimli EC Motor - Hassas Devir ve Tork Yönetimi',
+        clamps: 'Vibrasyon Önleyici Kelepçeler - Hızlı Servis ve Montaj Modülü',
+        housing: 'Ses Absorbe Edici Kompozit Gövde - Minimum Akustik Yayılım',
+        airflow: 'Hava Yönlendirici Kanat Yapısı - Maksimum Laminer Akış Verimliliği'
+      },
+      cta: 'Yüksek Çöllünürlüklü Teknik Verilere Ulaş'
+    },
     quickEntry: {
-      eyebrow: 'Başlangıç Katmanı',
-      title: 'İlk adımı kafa karışıklığı olmadan seçin.',
-      subtitle: 'Kategori, uygulama veya destek yolundan başlayarak aynı premium karar akışına girin.',
+      eyebrow: 'MÜHENDİSLİK GİRİŞ NOKTASI',
+      title: 'İhtiyacınıza En Uygun Teknik Ekseni Seçin',
+      subtitle: 'Ürün kategorisi, spesifik uygulama senaryosu veya teknik destek katmanı üzerinden profesyonel çözüme ilerleyin.',
       items: {
         category: {
-          title: 'Kategoriye Göre Ara',
-          description: 'Ana ürün ailelerinden başlayarak doğru kategoriye ilerleyin.'
+          title: 'Ürün Gruplarını İncele',
+          description: 'Atex fanlardan sessiz kanal tiplerine, ana ürün ailelerini teknik verileriyle keşfedin.'
         },
         application: {
-          title: 'Uygulamaya Göre Bul',
-          description: 'Otopark, mutfak, giriş ve konfor senaryolarına göre çözüm seçin.'
+          title: 'Uygulama Senaryoları',
+          description: 'Otopark jet fan sistemleri, mutfak egzoz çözümleri ve hassas iklimlendirme projeleri.'
         },
         support: {
-          title: 'Teknik Destek Al',
-          description: 'Sık sorulanlar, destek akışları ve bilgi merkezine hızlıca ulaşın.'
+          title: 'Mühendislik Desteği',
+          description: 'Boyutlandırma, hesaplama araçları ve sistem entegrasyonu için teknik bilgi merkezine ulaşın.'
         },
         quote: {
-          title: 'Hızlı Teklif İste',
-          description: 'İhtiyacınızı kısaca paylaşın, doğru çözüm için uzman yönlendirmesi alın.'
+          title: 'Proje Bazlı Teklif Al',
+          description: 'Teknik şartnamenizi bizimle paylaşın, optimize edilmiş özel fiyatlandırma akışını başlatın.'
         }
       }
     },
     guidedDiscovery: {
-      eyebrow: 'Ana Keşif Katmanı',
-      title: 'Ana kategori yapısını tek bakışta görün ve doğru giriş noktasını seçin.',
-      subtitle: 'Bu alan, 3D hero deneyimini tekrar etmez; ana ürün ailelerini sade biçimde gösterir ve kullanıcıyı kategori, seri ve ürün detayına daha kontrollü taşır.',
-      seriesCount: '{{count}} seri',
-      categoryFallback: 'Bu kategori için seçimi hızlandıran premium HVAC çözümleri.',
-      panelEyebrow: 'Karar Akışı',
-      panelTitle: 'Kategori seçiminden ürün kararına daha kısa ilerleyin.',
-      panelBody: 'Kullanıcıyı önce doğru aileye, ardından ilgili seriye ve son olarak ürün detayına taşıyan daha net bir navigasyon yapısı kuruyoruz.',
-      panelFallback: 'Kategoriye ait ürün ailelerini, alt serileri ve sonraki keşif adımlarını net biçimde görüntüleyin.',
-      primaryCta: 'Kategoriye Git',
-      secondaryCta: 'Senaryolara Bak',
-      seriesEyebrow: 'Seri Kısa Yolları',
-      seriesTitle: '{{category}} serileri',
-      seriesFallback: 'Bu seri için ürün ailesini ve varyasyonlarını inceleyin.',
-      footerNote: 'Kategori keşfi burada başlar; ürün detayına gitmeden önce seri mantığını kavramanızı kolaylaştırır.',
+      eyebrow: 'DETERMİNİSTİK SİSTEMLER',
+      title: 'Hava Akışının Mühendislik Estetiği',
+      subtitle: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin. Proje tipinize göre en verimli giriş noktasını seçin.',
+      seriesCount: '{{count}} Seri',
+      categoryFallback: 'Premium HVAC çözümleri ile sistem verimliliğinizi maksimize edin.',
+      panelEyebrow: 'KARAR MATRİSİ',
+      panelTitle: 'Kategori Seçiminden Teknik Karara Net Geçiş',
+      panelBody: 'Kullanıcıyı önce doğru ürün ailesine, ardından spesifik seri katmanına ve nihayetinde aerodinamik detaylara taşıyan profesyonel navigasyon.',
+      panelFallback: 'Kategoriye ait ürün serilerini ve teknik varyasyonları net biçimde analiz edin.',
+      primaryCta: 'TEKNİK KOLEKSİYONU İNCELE',
+      secondaryCta: 'Uygulama Senaryolarına Bak',
+      seriesEyebrow: 'SERİ HIZLI ERİŞİM',
+      seriesTitle: '{{category}} Mühendislik Serileri',
+      seriesFallback: 'Bu seri için performans eğrilerini ve varyasyonları inceleyin.',
+      footerNote: 'Kategori keşfi burada başlar; karmaşık sistem yapılarını seri mantığıyla basitleştiriyoruz.',
       steps: {
         select: {
-          title: 'Doğru ana kategoriyi seçin',
-          description: 'Fan, hava perdesi, ısı geri kazanım veya hız kontrolü gibi çekirdek ailelerden başlayın.'
+          title: 'Primer Kategoriyi Belirleyin',
+          description: 'Fan, hava perdesi veya ısı geri kazanım gibi ana mühendislik gruplarından başlayın.'
         },
         compare: {
-          title: 'Seri mantığını hızla daraltın',
-          description: 'Alt seri yapısı ile uygulama, kapasite veya teknik ihtiyaca göre doğru kola geçin.'
+          title: 'Seri Seviyesinde Filtreleyin',
+          description: 'Kapasite, akustik izole veya Atex gereksinimine göre doğru ürün koluna geçin.'
         },
         convert: {
-          title: 'Ürüne ve teklife kontrollü geçin',
-          description: 'Kategori ve seri netleşince ürün değerlendirmesi ve teklif akışı daha az sürtünmeyle ilerler.'
+          title: 'Ürün ve Teklif Seviyesine İnin',
+          description: 'Teknik parametreler netleşince veri dökümanlarına ve proje teklifine odaklanın.'
         }
       },
-      loading: 'Kategoriler hazırlanıyor...'
+      loading: 'Sistem katmanları hazırlanıyor...'
     },
     applicationSolutions: {
       eyebrow: 'Senaryo Odaklı Çözümler',
@@ -269,51 +305,57 @@ export const tr = {
       }
     },
     featuredCommercial: {
-      eyebrow: 'Ticari Ürün Vitrini',
-      title: 'Ticaret katmanını gerçek ürün verisiyle öne çıkarın.',
-      subtitle: 'Öne çıkan ürünler ve güçlü ürün aileleri arasında hızlı geçiş yaparak kategori keşfinden satın alma niyetine daha kısa ilerleyin.',
-      cta: 'Tüm Ürünleri Gör',
-      panelEyebrow: 'Odak Paneli',
+      eyebrow: 'Ürün Showroom',
+      title: 'Endüstriyel Ürün Portföyü',
+      subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
+      cta: 'Tüm Koleksiyonu İncele',
+      panelEyebrow: 'Teknik Odak',
       tabs: {
         featured: 'Öne Çıkanlar',
+        newArrivals: 'Yeni Gelenler',
+        bestSellers: 'Çok Satanlar',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
-        featured: 'Öne çıkan ürün seçkisi',
-        airCurtains: 'Hava perdesi odağı',
-        heatRecovery: 'Isı geri kazanım odağı'
+        featured: 'Performans Liderleri',
+        newArrivals: 'En Yeni Teknolojiler',
+        bestSellers: 'En Çok Tercih Edilenler',
+        airCurtains: 'İklim Koruma Sistemleri',
+        heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Gerçek veriden gelen öne çıkan ürünleri, daha kısa ürün değerlendirme akışına yardımcı olacak şekilde sunuyoruz.',
-        airCurtains: 'Giriş konforu ve enerji kaybı kontrolü için hava perdesi ürünlerini bir arada görün.',
-        heatRecovery: 'Verimlilik odaklı ticari iklimlendirme için ısı geri kazanım ürün ailesine doğrudan yaklaşın.'
+        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri.',
+        newArrivals: 'VentHub ürün ailesine yeni katılan, enerji verimliliği en yüksek ve modern tasarımlı yeni nesil cihazlar.',
+        bestSellers: 'Sektör profesyonelleri ve büyük projeler tarafından en çok sipariş edilen, güvenilirliği sahada kanıtlanmış modeller.',
+        airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan profesyonel seriler.',
+        heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan ekonomik üniteler.'
       }
     },
     trustProof: {
-      eyebrow: 'Güven ve Kanıt',
-      title: 'Güven duygusunu süslü vaatlerle değil, net operasyonel gerçeklerle kuruyoruz.',
-      subtitle: 'VentHub ana sayfasındaki güven katmanı, doğrulanabilir iş yapış biçimini ve uzman destek yaklaşımını görünür kılmalıdır.',
+      eyebrow: 'Güven ve Uzmanlık',
+      title: 'Mühendislik Hassasiyeti, Operasyonel Güven',
+      subtitle: 'Havalandırma projelerinizde sadece bir tedarikçi değil, teknik çözüm ortağınızız. Her adımda doğrulanabilir kalite ve uzman desteği sunuyoruz.',
       items: {
         brands: {
-          eyebrow: 'Marka Katmanı',
-          title: 'Premium marka seçkisi',
-          description: 'Temsil edilen markalar yalnızca vitrin değil; kategori ve çözüm kalitesinin ana taşıyıcılarıdır.'
+          eyebrow: 'Otorite',
+          title: 'Yetkili Distribütör Güvencesi',
+          description: 'Dünya devi HVAC markalarının doğrudan yetki belgesi ile en güncel, sertifikalı ve orijinal ürün gamına erişim sağlıyoruz.'
         },
         guidance: {
-          eyebrow: 'Uzmanlık Katmanı',
-          title: 'Mühendislik odaklı yönlendirme',
-          description: 'Kullanıcıyı yalnızca ürün listesine değil, daha doğru seçim akışına taşımayı hedefliyoruz.'
+          eyebrow: 'Analiz',
+          title: 'Mühendislik Odaklı Seçim',
+          description: 'İhtiyacınızı sadece ürünle değil, debi ve basınç hesaplamaları içeren teknik analizlerle en verimli şekilde çözüyoruz.'
         },
         delivery: {
-          eyebrow: 'Operasyon Katmanı',
-          title: 'Sevkiyat ve tedarik görünürlüğü',
-          description: 'Teslimat ve tedarik beklentileri daha net, daha öngörülebilir ve daha profesyonel hissettirilir.'
+          eyebrow: 'Lojistik',
+          title: 'Hızlı ve Güvenli Sevkiyat',
+          description: 'Geniş stok ağımız ve profesyonel lojistik partnerlerimizle, proje takviminizi aksatmadan tam zamanında teslimat yapıyoruz.'
         },
         support: {
-          eyebrow: 'Süreklilik Katmanı',
-          title: 'Satış sonrası erişilebilir destek',
-          description: 'Destek, teklif ve bilgi merkezi akışları birbirinden kopuk değil; aynı güven mimarisinin parçalarıdır.'
+          eyebrow: 'Süreklilik',
+          title: 'Kesintisiz Teknik Destek',
+          description: 'Satış sonrası teknik dökümantasyon, montaj rehberliği ve uzman kadromuzla sisteminizin ömrü boyunca yanınızdayız.'
         }
       }
     },
@@ -557,7 +599,19 @@ export const tr = {
         salesTotal: 'Satış Toplamı',
         pendingReturns: 'Bekleyen İade',
         pendingShipments: 'Bekleyen Kargo',
-        avgBasket: 'Ortalama Sepet'
+        avgBasket: 'Ortalama Sepet',
+        tiedCapital: 'Bağlı Sermaye',
+        inventoryValue: 'Envanter Değeri',
+        stockAlarms: 'Stok Alarmları',
+        criticalLevel: 'Kritik Seviye'
+      },
+      charts: {
+        orderTrend: 'Sipariş Trendi',
+        orderDensity: 'Sipariş Yoğunluğu',
+        carrierDist: 'Kargo Dağılımı',
+        returnStatus: 'İade Durum Kırılımı',
+        pendingShipmentAge: 'Bekleyen Kargo (Yaş)',
+        weeklyReturns: 'İadeler - Haftalık Trend'
       },
       trend: 'Son {{days}} gün sipariş trendi',
       recent: { title: 'Son Siparişler' },
@@ -1178,7 +1232,9 @@ export const tr = {
     actions: {
       download: 'İndir',
       downloadCatalog: 'Kataloğu İndir',
-      downloadBrochure: 'Broşürü İndir'
+      downloadBrochure: 'Broşürü İndir',
+      liveDataNotice: "ℹ️ Veriler anlık güncellenir",
+      interactive3D: "3D Görünüm"
     },
     cert: {
       ceCertificate: 'CE Sertifikası',
@@ -1733,8 +1789,221 @@ export const tr = {
       contact: 'E-posta veya telefon zorunludur',
       consent: 'Aydınlatma metni onayı zorunludur'
     }
-  }
-}
+  },
+
+  calculators: {
+    airCurtain: {
+      title: 'Hava Perdesi Hesap Makinesi',
+      description: 'Kapı boyutlarına ve kullanım koşullarına göre ideal hava perdesi seçimi',
+      infoText: 'Bu araç, mühendislik standartlarına (ISO 27327-1) uygun ön boyutlandırma yapar. Gerekli hava debisi, nozül hızı ve motor gücünü hesaplar.',
+      steps: {
+        dimensions: 'Kapı Boyutları',
+        dimensionsDesc: 'Genişlik ve yükseklik',
+        application: 'Uygulama',
+        applicationDesc: 'Kullanım amacı',
+        conditions: 'Koşullar',
+        conditionsDesc: 'Rüzgar ve trafik',
+        results: 'Sonuçlar',
+        resultsDesc: 'Hesaplama sonuçları'
+      },
+      form: {
+        doorWidth: 'Kapı Genişliği',
+        doorHeight: 'Kapı Yüksekliği',
+        doorWidthTooltip: 'Kapının iç açıklık genişliği (0.5 - 10 m)',
+        doorHeightTooltip: 'Kapının iç açıklık yüksekliği (1.5 - 6 m)',
+        applicationLabel: 'Uygulama Seçin',
+        applicationPurpose: 'Hava perdesinin kullanım amacını seçin',
+        environmentalConditions: 'Çevresel Koşullar',
+        windStatus: 'Rüzgar Durumu',
+        windTooltip: 'Kapının dışında beklenen rüzgar şiddeti',
+        trafficIntensity: 'Trafik Yoğunluğu',
+        trafficTooltip: 'Saatlik geçiş sayısı tahmini',
+        inputSummary: 'Girdi Özeti'
+      },
+      applications: {
+        comfort: { label: 'Konfor / Enerji', desc: 'Genel ticari alanlar, mağazalar', info: 'Genel ticari alanlar için enerji tasarrufu sağlar. Nozül hızı: 8-12 m/s' },
+        insect: { label: 'Böcek Kontrolü', desc: 'Gıda işletmeleri, restoranlar', info: 'Gıda işletmeleri ve restoranlar için böcek girişini engeller. Nozül hızı: 12-15 m/s' },
+        coldRoom: { label: 'Soğuk Oda', desc: 'Soğuk hava depoları, frigorifik', info: 'Soğuk hava depolarında sıcaklık kaybını minimize eder. Nozül hızı: 15-18 m/s' }
+      },
+      conditions: {
+        wind: { none: 'Yok', light: 'Hafif', moderate: 'Orta', strong: 'Güçlü' },
+        traffic: { low: 'Düşük', medium: 'Orta', high: 'Yüksek' }
+      },
+      results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Önerilen hava perdesi özellikleri',
+        gridTitle: 'Hesaplanan Değerler',
+        airflow: 'Gerekli Hava Debisi',
+        airflowDesc: 'Etkili hava bariyeri için gereken toplam debi',
+        velocity: 'Nozül Hızı',
+        velocityDesc: 'Hava perdesi çıkışındaki hava hızı',
+        floorVelocity: 'Zemin Hızı (Tahmini)',
+        floorVelocityDesc: 'Zemin seviyesinde beklenen hava hızı',
+        power: 'Önerilen Motor Gücü',
+        powerDesc: 'Minimum motor gücü gereksinimi',
+        nozzleWidth: 'Nozül Genişliği',
+        nozzleHeight: 'Nozül Yüksekliği',
+        efficiency: 'Verimlilik',
+        efficiencyOptimal: 'Optimal',
+        efficiencyAcceptable: 'Kabul Edilebilir',
+        efficiencyWarning: 'Sınırda',
+        efficiencyOptimalDesc: 'Hesaplanan parametreler ideal performans sağlayacaktır',
+        efficiencyAcceptableDesc: 'Performans kabul edilebilir seviyede, gerekirse iyileştirme düşünülebilir',
+        efficiencyWarningDesc: 'Daha güçlü bir model veya ek önlemler gerekebilir'
+      },
+      diagram: {
+        unit: 'Hava Perdesi'
+      }
+    },
+    duct: {
+      title: 'Kanal Basınç Kaybı Hesaplayıcı',
+      description: 'Hava kanalı hız hesabı ve basınç kaybı tahmini',
+      infoText: 'Debi ve kanal boyutlarına göre hava hızını ve tahmini basınç kaybını hesaplar.',
+      form: {
+        shape: 'Kanal Tipi',
+        round: 'Dairesel',
+        roundDesc: 'Spiral veya kaynaklı boru',
+        rectangular: 'Dikdörtgen',
+        rectangularDesc: 'Köşeli kanal',
+        material: 'Malzeme',
+        steel: 'Galvaniz Çelik',
+        pvc: 'PVC',
+        flex: 'Flex Kanal',
+        airflow: 'Hava Debisi',
+        airflowTooltip: 'Kanaldan geçmesi gereken hava miktarı',
+        diameter: 'Kanal Çapı',
+        diameterTooltip: 'İç çap (50-2000 mm)',
+        width: 'Genişlik (a)',
+        height: 'Yükseklik (b)',
+        length: 'Kanal Uzunluğu',
+        lengthTooltip: 'Toplam kanal uzunluğu'
+      },
+      results: {
+        velocity: 'Hava Hızı',
+        specificLoss: 'Basınç Kaybı (Özgül)',
+        totalLoss: 'Toplam Basınç Kaybı',
+        equivDiameter: 'Eşdeğer Çap',
+        equivDiameterDesc: 'Dairesel kanal eşdeğeri'
+      }
+    },
+    hrv: {
+      title: 'HRV Enerji Tasarruf Hesaplayıcı',
+      description: 'Isı geri kazanım cihazı verimlilik ve enerji tasarruf hesabı',
+      infoText: 'Isı geri kazanım cihazlarının (HRV) veya entalpik geri kazanım cihazlarının yıllık enerji tasarrufu potansiyelini hesaplar.',
+      form: {
+        type: 'Cihaz Tipi',
+        hrv: 'HRV (Isı Geri Kazanım)',
+        hrvDesc: 'Sadece ısı geri kazanımı',
+        erv: 'ERV (Enerji Geri Kazanım)',
+        ervDesc: 'Isı + Nem geri kazanımı',
+        climate: 'İklim Bölgesi',
+        cold: 'Soğuk',
+        temperate: 'Ilıman',
+        hot: 'Sıcak',
+        usage: 'Mahal Tipi',
+        office: 'Ofis',
+        commercial: 'Ticari',
+        occupancy: 'Kişi Sayısı',
+        workingHours: 'Günlük Çalışma',
+        electricityPrice: 'Elektrik Birim Fiyatı'
+      },
+      results: {
+        heatingGain: 'Isıtma Kazanımı',
+        coolingGain: 'Soğutma Kazanımı',
+        co2Reduction: 'CO₂ Azaltımı',
+        co2Desc: 'Yıllık karbon emisyon azaltımı',
+        payback: 'Geri Ödeme Süresi',
+        paybackDesc: 'Tahmini yatırım geri dönüşü'
+      }
+    },
+    jetFan: {
+      title: 'Jet Fan Hesaplayıcı',
+      description: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
+      infoText: 'Kapalı otopark veya tünellerde gerekli jet fan sayısı, itki kuvveti ve hava değişim miktarını hesaplar.',
+      form: {
+        appType: 'Uygulama Alanı',
+        parking: 'Otopark',
+        parkingDesc: 'Kapalı otopark havalandırma',
+        tunnel: 'Tünel',
+        tunnelDesc: 'Yol veya metro tüneli',
+        mode: 'Havalandırma Modu',
+        normal: 'Normal',
+        normalDesc: 'Günlük havalandırma',
+        smoke: 'Duman Tahliye',
+        smokeDesc: 'Yangın senaryosu',
+        capacity: 'Araç Kapasitesi',
+        width: 'Genişlik',
+        height: 'Yükseklik'
+      },
+      results: {
+        ach: 'Hava Değişim Hızı',
+        totalThrust: 'Toplam İtki Kuvveti',
+        count: 'Jet Fan Sayısı'
+      }
+    }
+  },
+
+  categorySilentFan: {
+      problem: {
+        eyebrow: 'SES VE KONFOR',
+        title: 'Huzurunuzu Bozan Gürültüye Son Verin',
+        subtitle: 'Standart kanal tipi fanlar sadece hava taşımaz, aynı zamanda yaşam alanlarınıza gürültü taşır. Vortice Lineo Quiet ile sessizliğin yeni standardını keşfedin.',
+        painPoints: [
+          { title: 'Akustik Kirlilik', description: 'Geleneksel fanların yarattığı uğultu, odaklanmayı zorlaştırır ve konforu düşürür.' },
+          { title: 'Düşük Verim', description: 'Gürültülü fanlar genellikle aerodinamik olarak verimsizdir ve daha fazla enerji tüketir.' },
+          { title: 'Titreşim Sorunları', description: 'Yeterince izole edilmemiş cihazlar montaj yüzeyinde titreşime ve ikincil seslere neden olur.' },
+          { title: 'Bozulan Odaklanma', description: 'Sabit gürültü, kütüphane ve ofislerde verimliliği %20 düşürebilir.' }
+        ],
+        visual: {
+          without: 'Standart Fan İle',
+          with: 'Lineo Quiet İle',
+          withoutPoints: ['Yüksek desibel seviyesi', 'Mekanik titreşim', 'Türbülanslı hava', 'Enerji kaybı'],
+          withPoints: ['Fısıltı sessizliği', '%60 enerji tasarrufu', 'Laminer hava akışı', 'Titreşimsiz çalışma']
+        }
+      },
+      howItWorks: {
+        eyebrow: 'TEKNOLOJİ',
+        title: 'Sessiz Gücün Arkasındaki Mühendislik',
+        subtitle: 'Vortice Lineo Quiet, aerodinamik optimize edilmiş gövdesi ve ses yutucu katmanları ile fısıltı seviyesinde performans sunar.',
+        steps: [
+          { title: 'Ses Yutucu Gövde', description: 'Özel kompozit dış gövde, motor sesini içeride hapseder.' },
+          { title: 'Laminer Akış', description: 'Hava yönlendirici kanatlar, türbülansı azaltarak sesi kaynağında keser.' },
+          { title: 'Dinamik Denge', description: 'Yüksek hassasiyetli fan pervanesi, sarsıntısız ve sessiz bir devir daim sağlar.' }
+        ]
+      },
+      comparison: {
+        title: 'Neden Lineo Quiet?',
+        standard: 'Standart Fanlar',
+        quiet: 'Vortice Lineo Quiet',
+        features: [
+          { label: 'Ses Seviyesi', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
+          { label: 'Enerji Tüketimi', standard: 'Yüksek (AC Motor)', quiet: '%60 Tasarruf (ES/EC Motor)' },
+          { label: 'Hava Kalitesi', standard: 'Türbülanslı Akış', quiet: 'Laminer ve Kesintisiz' },
+          { label: 'Montaj', standard: 'Karmaşık ve Rijit', quiet: 'Hızlı ve Titreşim İzoleli' }
+        ]
+      },
+      faq: {
+        title: 'Sıkça Sorulan Sorular',
+        items: [
+          { q: 'Gerçekten ne kadar sessiz?', a: 'Lineo Quiet, düşük devirde fısıltı sesine (yaklaşık 25 dB) yakındır. Bu, normal bir konuşmanın yarısından daha azdır.' },
+          { q: 'Montajı zor mu?', a: 'Hayır, hızlı montaj kelepçeleri sayesinde bakım ve kurulum için cihazı kanaldan ayırmanıza gerek kalmaz.' },
+          { q: 'Hangi alanlar için uygundur?', a: 'Kütüphaneler, ofisler, yatak odaları ve otel odaları gibi sessizliğin kritik olduğu her yer için idealdir.' }
+        ]
+      },
+      brand: {
+        eyebrow: 'MÜHENDİSLİK MİRASI',
+        title: 'İtalyan Sessizliği: Vortice Efsanesi',
+        description: "1954'ten beri havalandırma dünyasına yön veren Vortice, Lineo Quiet serisi ile sessiz kanal tipi fan kategorisinde zirveyi temsil ediyor.",
+        badges: ['Yetkili Distribütör', '2 Yıl Garanti'],
+        stats: [
+          { label: 'Yıl Deneyim', value: '70+' },
+          { label: 'Ülke', value: '90+' },
+          { label: "Compasso d'Oro", value: '3x' },
+          { label: 'Avrupa', value: '#1' }
+        ]
+      }
+    }
+};
 
 
 
