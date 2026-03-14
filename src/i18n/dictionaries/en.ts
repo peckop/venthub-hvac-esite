@@ -19,6 +19,10 @@ export const en = {
     quickSearch: "Quick search...",
     allCategories: "All Categories",
     priceRange: "Price Range",
+    systemPreparing: "System Preparing...",
+    adminPanel: "Admin Panel",
+    goToStore: "Go to Store",
+    backToSite: "Back to Site",
 
     // Existing
     discover: "Discover",
@@ -2034,10 +2038,217 @@ export const en = {
         ]
       }
     }
-  }
+  },
+  calculators: {
+    airCurtain: {
+      title: 'Air Curtain Calculator',
+      description: 'Ideal air curtain selection based on door dimensions and usage conditions',
+      infoText: 'This tool performs pre-sizing according to engineering standards (ISO 27327-1). It calculates required airflow, nozzle velocity, and motor power.',
+      steps: {
+        dimensions: 'Door Dimensions',
+        dimensionsDesc: 'Width and height',
+        application: 'Application',
+        applicationDesc: 'Purpose of use',
+        conditions: 'Conditions',
+        conditionsDesc: 'Wind and traffic',
+        results: 'Results',
+        resultsDesc: 'Calculation results'
+      },
+      form: {
+        doorWidth: 'Door Width',
+        doorHeight: 'Door Height',
+        doorWidthTooltip: 'Door inner opening width (0.5 - 10 m)',
+        doorHeightTooltip: 'Door inner opening height (1.5 - 6 m)',
+        applicationLabel: 'Select Application',
+        applicationPurpose: 'Select the purpose of the air curtain',
+        environmentalConditions: 'Environmental Conditions',
+        windStatus: 'Wind Status',
+        windTooltip: 'Expected wind intensity outside the door',
+        trafficIntensity: 'Traffic Intensity',
+        trafficTooltip: 'Estimated hourly passage count',
+        inputSummary: 'Input Summary'
+      },
+      applications: {
+        comfort: { label: 'Comfort / Energy', desc: 'General commercial areas, shops', info: 'Provides energy savings for general commercial areas. Nozzle velocity: 8-12 m/s' },
+        insect: { label: 'Insect Control', desc: 'Food businesses, restaurants', info: 'Prevents insect entry for food businesses and restaurants. Nozzle velocity: 12-15 m/s' },
+        coldRoom: { label: 'Cold Room', desc: 'Cold storage, refrigerated', info: 'Minimizes temperature loss in cold storage. Nozzle velocity: 15-18 m/s' }
+      },
+      conditions: {
+        wind: { none: 'None', light: 'Light', moderate: 'Medium', strong: 'Strong' },
+        traffic: { low: 'Low', medium: 'Medium', high: 'High' }
+      },
+      results: {
+        title: 'Calculation Results',
+        subtitle: 'Recommended air curtain features',
+        gridTitle: 'Calculated Values',
+        airflow: 'Required Airflow',
+        airflowDesc: 'Total airflow required for an effective air barrier',
+        velocity: 'Nozzle Velocity',
+        velocityDesc: 'Air velocity at air curtain outlet',
+        floorVelocity: 'Floor Velocity (Estimated)',
+        floorVelocityDesc: 'Expected air velocity at floor level',
+        power: 'Recommended Motor Power',
+        powerDesc: 'Minimum motor power requirement',
+        nozzleWidth: 'Nozzle Width',
+        nozzleHeight: 'Nozzle Height',
+        efficiency: 'Efficiency',
+        efficiencyOptimal: 'Optimal',
+        efficiencyAcceptable: 'Acceptable',
+        efficiencyWarning: 'Borderline',
+        efficiencyOptimalDesc: 'Calculated parameters will provide ideal performance',
+        efficiencyAcceptableDesc: 'Performance is at an acceptable level, improvement can be considered if necessary',
+        efficiencyWarningDesc: 'A more powerful model or additional measures may be required'
+      },
+      diagram: {
+        unit: 'Air Curtain'
+      }
+    },
+    duct: {
+      title: 'Duct Pressure Drop Calculator',
+      description: 'Air duct velocity calculation and pressure drop estimation',
+      infoText: 'Calculates air velocity and estimated pressure drop based on airflow and duct dimensions.',
+      form: {
+        shape: 'Duct Type',
+        round: 'Circular',
+        roundDesc: 'Spiral or welded pipe',
+        rectangular: 'Rectangular',
+        rectangularDesc: 'Square duct',
+        material: 'Material',
+        steel: 'Galvanized Steel',
+        pvc: 'PVC',
+        flex: 'Flex Duct',
+        airflow: 'Airflow',
+        airflowTooltip: 'Amount of air that needs to pass through the duct',
+        diameter: 'Duct Diameter',
+        diameterTooltip: 'Inner diameter (50-2000 mm)',
+        width: 'Width (a)',
+        height: 'Height (b)',
+        length: 'Duct Length',
+        lengthTooltip: 'Total duct length'
+      },
+      results: {
+        velocity: 'Air Velocity',
+        specificLoss: 'Pressure Drop (Specific)',
+        totalLoss: 'Total Pressure Drop',
+        equivDiameter: 'Equivalent Diameter',
+        equivDiameterDesc: 'Circular duct equivalent'
+      }
+    },
+    hrv: {
+      title: 'HRV Energy Saving Calculator',
+      description: 'Heat recovery unit efficiency and energy saving calculation',
+      infoText: 'Calculates the annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units.',
+      form: {
+        type: 'Device Type',
+        hrv: 'HRV (Heat Recovery)',
+        hrvDesc: 'Only heat recovery',
+        erv: 'ERV (Energy Recovery)',
+        ervDesc: 'Heat + Moisture recovery',
+        climate: 'Climate Zone',
+        cold: 'Cold',
+        temperate: 'Temperate',
+        hot: 'Hot',
+        usage: 'Space Type',
+        office: 'Office',
+        commercial: 'Commercial',
+        occupancy: 'Number of People',
+        workingHours: 'Daily Operation',
+        electricityPrice: 'Electricity Unit Price'
+      },
+      results: {
+        heatingGain: 'Heating Gain',
+        coolingGain: 'Cooling Gain',
+        co2Reduction: 'CO₂ Reduction',
+        co2Desc: 'Annual carbon emission reduction',
+        payback: 'Payback Period',
+        paybackDesc: 'Estimated return on investment'
+      }
+    },
+    jetFan: {
+      title: 'Jet Fan Calculator',
+      description: 'Parking and tunnel jet fan thrust and ventilation calculation',
+      infoText: 'Calculates the required number of jet fans, thrust force, and air exchange rate in enclosed parking lots or tunnels.',
+      form: {
+        appType: 'Application Area',
+        parking: 'Parking',
+        parkingDesc: 'Enclosed parking ventilation',
+        tunnel: 'Tunnel',
+        tunnelDesc: 'Road or subway tunnel',
+        mode: 'Ventilation Mode',
+        normal: 'Normal',
+        normalDesc: 'Daily ventilation',
+        smoke: 'Smoke Exhaust',
+        smokeDesc: 'Fire scenario',
+        capacity: 'Vehicle Capacity',
+        width: 'Width',
+        height: 'Height'
+      },
+      results: {
+        ach: 'Air Change Rate',
+        totalThrust: 'Total Thrust Force',
+        count: 'Number of Jet Fans'
+      }
+    }
+  },
+
+  categorySilentFan: {
+      problem: {
+        eyebrow: 'SOUND AND COMFORT',
+        title: 'Put an End to Noise that Disrupts Your Peace',
+        subtitle: 'Standard duct fans don\'t just carry air, they also carry noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
+        painPoints: [
+          { title: 'Acoustic Pollution', description: 'The hum created by traditional fans makes focusing difficult and reduces comfort.' },
+          { title: 'Low Efficiency', description: 'Noisy fans are often aerodynamically inefficient and consume more energy.' },
+          { title: 'Vibration Issues', description: 'Inadequately isolated devices cause vibration and secondary noises on the mounting surface.' },
+          { title: 'Disrupted Focus', description: 'Constant noise can reduce productivity by 20% in libraries and offices.' }
+        ],
+        visual: {
+          without: 'With Standard Fan',
+          with: 'With Lineo Quiet',
+          withoutPoints: ['High decibel level', 'Mechanical vibration', 'Turbulent air', 'Energy loss'],
+          withPoints: ['Whisper silence', '60% energy savings', 'Laminar airflow', 'Vibration-free operation']
+        }
+      },
+      howItWorks: {
+        eyebrow: 'TECHNOLOGY',
+        title: 'The Engineering Behind Silent Power',
+        subtitle: 'Vortice Lineo Quiet offers whisper-level performance with its aerodynamically optimized body and sound-absorbing layers.',
+        steps: [
+          { title: 'Sound Absorbing Body', description: 'The special composite outer body traps motor noise inside.' },
+          { title: 'Laminar Flow', description: 'Air guiding vanes reduce turbulence and cut noise at the source.' },
+          { title: 'Dynamic Balance', description: 'High-precision fan impeller ensures vibration-free and silent circulation.' }
+        ]
+      },
+      comparison: {
+        title: 'Why Lineo Quiet?',
+        standard: 'Standard Fans',
+        quiet: 'Vortice Lineo Quiet',
+        features: [
+          { label: 'Noise Level', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
+          { label: 'Energy Consumption', standard: 'High (AC Motor)', quiet: '60% Savings (ES/EC Motor)' },
+          { label: 'Air Quality', standard: 'Turbulent Flow', quiet: 'Laminar and Continuous' },
+          { label: 'Mounting', standard: 'Complex and Rigid', quiet: 'Fast and Vibration Isolated' }
+        ]
+      },
+      faq: {
+        title: 'Frequently Asked Questions',
+        items: [
+          { q: 'How quiet is it really?', a: 'Lineo Quiet is close to whisper sound (approx. 25 dB) at low speeds. This is less than half of a normal conversation.' },
+          { q: 'Is mounting difficult?', a: 'No, thanks to quick-release clamps, you don\'t need to detach the device from the duct for maintenance and installation.' },
+          { q: 'Which areas is it suitable for?', a: 'It is ideal for anywhere silence is critical, such as libraries, offices, bedrooms, and hotel rooms.' }
+        ]
+      },
+      brand: {
+        eyebrow: 'ENGINEERING HERITAGE',
+        title: 'Italian Silence: The Vortice Legend',
+        description: "Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.",
+        badges: ['Authorized Distributor', '2 Year Warranty'],
+        stats: [
+          { label: 'Years Experience', value: '70+' },
+          { label: 'Countries', value: '90+' },
+          { label: "Compasso d'Oro", value: '3x' },
+          { label: 'Europe', value: '#1' }
+        ]
+      }
+    },
 };
-
-
-
-
-
