@@ -185,15 +185,15 @@ const FilterSidebar = ({
 }
 
 interface ProductsPageProps {
-  initialCategories?: Category[]
+  initialCategories: Category[]
   initialBrands?: string[]
-  serverSearchParams?: { [key: string]: string | string[] | undefined }
+  serverProducts?: any[]
 }
 
 const ProductsPage: React.FC<ProductsPageProps> = ({ 
   initialCategories = [], 
   initialBrands = [],
-  serverSearchParams = {}
+  serverProducts = []
 }) => {
   const pathname = usePathname()
   const router = useRouter()
@@ -203,17 +203,17 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   // Use server params for initial paint, fallback to hook for dynamic updates
   const getParam = (key: string): string => {
-    const val = serverSearchParams[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
+    const val = {}[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
     return typeof val === 'string' ? val : (Array.isArray(val) ? val[0] : '')
   }
 
   const qParam = getParam('q').trim()
   const catParam = getParam('category') || null
   const brandsParam = useMemo(() => {
-    const b = serverSearchParams['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
+    const b = {}['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
     const str = typeof b === 'string' ? b : (Array.isArray(b) ? b[0] : '')
     return str ? str.split(',').filter(Boolean) : []
-  }, [serverSearchParams, hookSearchParams])
+  }, [{}, hookSearchParams])
 
   const minPriceParam = getParam('min_price')
   const maxPriceParam = getParam('max_price')
@@ -227,6 +227,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   const [products, setProducts] = useState<Product[] | FtsProductResult[]>([])
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setProducts(serverProducts)
+  }, [serverProducts])
 
   // Filter State
   const [availableBrands, setAvailableBrands] = useState<string[]>(initialBrands)
