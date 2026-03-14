@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
@@ -194,7 +194,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   // URL Params - Using Next.js searchParams hook (no more window.location)
   const qParam = searchParams.get('q')?.trim() || ''
   const catParam = searchParams.get('category') || null
-  const brandsParam = searchParams.get('brands')?.split(',').filter(Boolean) || []
+  const brandsParam = useMemo(() => searchParams.get('brands')?.split(',').filter(Boolean) || [], [searchParams])
   const minPriceParam = searchParams.get('min_price') || ''
   const maxPriceParam = searchParams.get('max_price') || ''
   const isAll = searchParams.get('all') === '1'
@@ -269,11 +269,15 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   useEffect(() => {
     const timer = setTimeout(() => {
       if (inputValue !== qParam) {
-        updateUrl({ q: inputValue })
+        const next = new URLSearchParams(searchParams.toString())
+        next.set('q', inputValue)
+        router.push(`${pathname}?${next.toString()}`)
       }
     }, 600)
     return () => clearTimeout(timer)
-  }, [inputValue, qParam])
+  }, [inputValue, qParam, pathname, router, searchParams])
+
+  const joinedBrands = brandsParam.join(',')
 
   // 4. Main Data Fetcher
   useEffect(() => {
@@ -321,7 +325,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
 
     fetchData()
     return () => { active = false }
-  }, [activeQuery, catParam, brandsParam.join(','), minPriceParam, maxPriceParam, isAll, categories])
+  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories, brandsParam])
 
 
   // Helper: Update URL params
