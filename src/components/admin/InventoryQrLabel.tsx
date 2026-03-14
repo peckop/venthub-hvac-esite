@@ -1,4 +1,4 @@
-import { VentImage } from '@/components/ui/VentImage'
+
 import toast from 'react-hot-toast'
 
 interface QrLabelProps {
@@ -135,7 +135,7 @@ export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) 
         <div class="card-wrapper">
           <div class="card">
             <div class="qr-wrapper">
-              <VentImage src="${url}" class="qr" onload="window.print();" alt="QR Code"  />
+              <img src="${url}" class="qr" onload="window.print();" alt="QR Code" />
             </div>
             <div class="title">${safeName}</div>
             <div class="separator"></div>
