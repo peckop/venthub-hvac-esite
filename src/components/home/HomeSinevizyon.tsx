@@ -53,6 +53,11 @@ const slidesData: SlideData[] = [
 export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) => {
   const { t } = useI18n()
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
   const [direction, setDirection] = useState(0)
   const touchStartX = useRef<number | null>(null)
 
@@ -62,9 +67,10 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
   }, [])
 
   useEffect(() => {
+    if (!isMounted) return
     const timer = setInterval(() => paginate(1), 12000)
     return () => clearInterval(timer)
-  }, [paginate])
+  }, [paginate, isMounted])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -127,6 +133,8 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
             fill
             sizes="100vw"
             priority={currentSlide === 0}
+            fetchPriority={currentSlide === 0 ? "high" : "auto"}
+            loading={currentSlide === 0 ? "eager" : "lazy"}
             className="object-cover object-center brightness-[0.4] saturate-[1.2]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
