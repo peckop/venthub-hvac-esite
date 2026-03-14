@@ -11,7 +11,7 @@ export const getCategoryDisplayName = (category: Category | null | undefined): s
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_title) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_title!
     }
-    return category.name
+    return typeof category.name === 'string' ? category.name : ''
 }
 
 /**
@@ -23,7 +23,7 @@ export const getCategoryDescription = (category: Category | null | undefined): s
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_description) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_description!
     }
-    return category.description || ''
+    return typeof category.description === 'string' ? category.description : ''
 }
 
 /**

@@ -323,9 +323,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <ImageGallery
                 key={product.id}
                 images={images}
-                productName={product.name}
-                slug={product.slug || product.name}
-                modelType={mainCategory?.metadata?.model_type}
+                productName={product.name as string}
+                slug={String(product.slug || product.name || '')}
+                modelType={mainCategory?.metadata?.model_type as string | undefined}
               />
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-6 left-6 z-20 pointer-events-none">
