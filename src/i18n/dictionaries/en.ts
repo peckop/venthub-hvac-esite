@@ -301,25 +301,31 @@ export const en = {
       }
     },
     featuredCommercial: {
-      eyebrow: 'Commercial Product Showcase',
-      title: 'Bring the commerce layer forward with real product data.',
-      subtitle: 'Move faster from category discovery to buying intent by switching between featured products and strong product families.',
-      cta: 'View All Products',
-      panelEyebrow: 'Focus Panel',
+      eyebrow: 'Product Showroom',
+      title: 'Industrial Product Portfolio',
+      subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
+      cta: 'Explore Entire Collection',
+      panelEyebrow: 'Technical Focus',
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers'
+        bestSellers: 'Best Sellers',
+        airCurtains: 'Air Curtains',
+        heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
-        featured: 'Featured selection',
-        newArrivals: 'New arrivals focus',
-        bestSellers: 'Most preferred'
+        featured: 'Performance Leaders',
+        newArrivals: 'Latest Technologies',
+        bestSellers: 'Most Preferred',
+        airCurtains: 'Climate Protection Systems',
+        heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
-        featured: 'We present featured products powered by real data in a way that helps users evaluate faster.',
-        newArrivals: 'Discover our latest additions to the HVAC inventory, featuring newest technology.',
-        bestSellers: 'Explore products that set the industry standard for reliability and performance.'
+        featured: 'Flagship project solutions that have received full marks in durability and efficiency tests by our engineering team.',
+        newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
+        bestSellers: 'Reliable models proven in the field, most ordered by industry professionals and large projects.',
+        airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
+        heatRecovery: 'Economic units that recover heat from waste air with up to 90% efficiency while meeting fresh air needs.'
       }
     },
     trustProof: {
