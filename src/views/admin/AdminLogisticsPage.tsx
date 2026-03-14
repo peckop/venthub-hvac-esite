@@ -16,7 +16,7 @@ import {
     adminSelectStyle
 } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Truck, CheckCircle2, RefreshCw } from 'lucide-center'
+import { Truck, CheckCircle2, RefreshCw } from 'lucide-react'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
