@@ -629,6 +629,25 @@ export const tr = {
       description: 'Tüm markalarımızla olan doğrudan stratejik ortaklığımız sayesinde, en yeni teknolojilere, tam teknik desteğe ve en rekabetçi termin sürelerine sahip olursunuz.',
       original: '100% Orijinal Ürün',
       standard: 'Global Standart Uyumu'
+    },
+    detail: {
+      heritage: 'Mühendislik Mirası',
+      authorityTitle: 'Mühendisliğin Teknolojik Otoritesi',
+      globalVision: 'Küresel Vizyon',
+      globalVisionDesc: 'dünya çapındaki projelerde verimlilik ve sürdürülebilirlik standartlarını belirleyerek, geleceğin havalandırma teknolojilerini bugün inşa ediyor.',
+      technicalExcellence: 'Teknik Mükemmeliyet',
+      technicalExcellenceDesc: 'Her bir ürün, en zorlu endüstriyel koşullara dayanacak şekilde test edilmiş ve akustik performans açısından optimize edilmiştir.',
+      corporateSnapshot: 'Kurumsal Özet',
+      headquarters: 'Merkez',
+      webAuthority: 'Web Otoritesi',
+      officialSite: 'Resmi Web Sitesi',
+      requestCatalog: 'Marka Kataloglarını İste',
+      featuredSystems: 'Öne Çıkan Sistemler',
+      allProductGroups: 'Tüm Ürün Grupları',
+      noProducts: 'Bu markaya ait ürünler yakında eklenecektir.',
+      originSuffix: 'Menşei',
+      estPrefix: 'Kuruluş'
     }
   }
 }
+
