@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
+import ProductCard from '../components/ProductCard'
 import dynamic from 'next/dynamic'
 
 // Lazy load heavy components
@@ -17,6 +18,8 @@ const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: 
 const LeadModal = dynamic(() => import('../components/LeadModal'), { ssr: false })
 const Seo = dynamic(() => import('../components/Seo'), { ssr: true })
 
+import { useI18n } from '../i18n/I18nProvider'
+import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 
