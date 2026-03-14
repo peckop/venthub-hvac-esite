@@ -28,11 +28,9 @@ import NavSearchTrigger from './navigation/NavSearchTrigger'
 import NavShell from './navigation/NavShell'
 import NavUtilityRail from './navigation/NavUtilityRail'
 
-import dynamic from 'next/dynamic'
-
-const SearchOverlay = dynamic(() => import('./SearchOverlay'), { ssr: false })
-const MegaMenu = dynamic(() => import('./MegaMenu'), { ssr: false })
-const CategoryHubOverlay = dynamic(() => import('./navigation/CategoryHubOverlay'), { ssr: false })
+const SearchOverlay = React.lazy(() => import('./SearchOverlay'))
+const MegaMenu = React.lazy(() => import('./MegaMenu'))
+const CategoryHubOverlay = React.lazy(() => import('./navigation/CategoryHubOverlay'))
 
 interface StickyHeaderProps {
   isScrolled: boolean
@@ -324,9 +322,9 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
           onClick={toggleUserMenu}
           aria-label={t('header.account')}
           aria-expanded={isUserMenuOpen}
-          className="group flex items-center gap-3 rounded-2xl px-2.5 py-2 text-left transition-all duration-300 hover:bg-air-blue/25"
+          className="group flex items-center gap-2.5 rounded-2xl px-2 py-1 text-left transition-all duration-300 hover:bg-air-blue/25"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue text-white shadow-[0_16px_28px_-18px_rgba(37,99,235,0.75)]">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue text-white shadow-[0_16px_28px_-18px_rgba(37,99,235,0.75)]">
             <svg width={18} height={18} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 3a4 4 0 100 8 4 4 0 000-8z" />
             </svg>

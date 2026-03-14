@@ -227,7 +227,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   }
 
   const qParam = getParam('q').trim()
-  const catParam = getParam('category') || null
+  const catParamRaw = getParam('category')
+  const catParam = catParamRaw?.replace(/cc$/, '') || null
   const brandsParam = useMemo(() => {
     const b = hookSearchParams ? hookSearchParams.get('brands') : null
     return b ? b.split(',').filter(Boolean) : []
@@ -235,7 +236,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   const minPriceParam = getParam('min_price')
   const maxPriceParam = getParam('max_price')
-  const isAll = getParam('all') === '1'
+  const isAll = getParam('all') === 'true' || getParam('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -337,7 +338,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           if (active) setProducts(all)
         }
         else {
-          setProducts([])
+          // If no filters and not 'all', fetch a few featured products instead of nothing
+          const featured = await getProductsEnriched({ limit: 12 })
+          if (active) setProducts(featured)
         }
       } catch (e) {
         console.error('Fetch error', e)
@@ -405,7 +408,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={t('common.searchPlaceholderLong') || 'Ürün ara...'}
+              placeholder={t('common.searchPlaceholderLong') || t('common.searchPlaceholder') || 'Ürün ara...'}
               className="w-full pl-10 pr-4 py-2.5 sm:py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy outline-none transition-all text-sm sm:text-base"
             />
           </div>
@@ -455,13 +458,13 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
               ) : products.length === 0 ? (
                 <div className="text-center py-16 sm:py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                   <div className="text-3xl sm:text-4xl mb-4">🔍</div>
-                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">Sonuç Bulunamadı</h3>
-                  <p className="text-sm sm:text-base text-steel-gray mt-1">Lütfen filtreleri temizleyin veya başka bir terim deneyin.</p>
+                  <h3 className="text-base sm:text-lg font-medium text-industrial-gray">{t('products.noResults')}</h3>
+                  <p className="text-sm sm:text-base text-steel-gray mt-1">{t('products.noResultsDesc')}</p>
                   <button
                     onClick={() => router.push('/products')}
                     className="mt-6 px-5 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm"
                   >
-                    Filtreleri Temizle
+                    {t('products.clearFilters')}
                   </button>
                 </div>
               ) : (

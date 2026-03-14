@@ -34,7 +34,6 @@ export const NAVIGATION_PRIMARY_ITEMS: NavigationItemConfig[] = [
     {
         id: 'products',
         labelKey: 'common.products',
-        href: '/products',
         minWidthClass: 'min-w-[100px]',
         showInCompact: true,
     },

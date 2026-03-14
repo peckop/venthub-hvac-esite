@@ -18,25 +18,25 @@ const solutions: SolutionItem[] = [
     id: 'parking', 
     href: '/category/fanlar/otopark-jet-fanlari', 
     image: '/images/bento/parking.jpg',
-    span: 'lg:col-span-2'
+    span: 'sm:col-span-2 lg:col-span-2'
   },
   { 
     id: 'kitchen', 
     href: '/category/fanlar/kanal-tipi-fanlar', 
     image: '/images/bento/kitchen.jpg',
-    span: 'lg:col-span-1'
+    span: 'sm:col-span-1 lg:col-span-1'
   },
   { 
     id: 'entrance', 
     href: '/category/fanlar/hava-perdeleri', 
     image: '/images/bento/entrance.jpg',
-    span: 'lg:col-span-1'
+    span: 'sm:col-span-1 lg:col-span-1'
   },
   { 
     id: 'comfort', 
     href: '/category/isi-geri-kazanim-cihazlari', 
     image: '/images/bento/comfort.jpg',
-    span: 'lg:col-span-2'
+    span: 'sm:col-span-2 lg:col-span-2'
   }
 ]
 
@@ -68,7 +68,7 @@ export const ApplicationSolutions: React.FC = () => {
       {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 translate-x-1/4" />
       
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div className="max-w-2xl">
             <motion.div 
@@ -105,13 +105,13 @@ export const ApplicationSolutions: React.FC = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {solutions.map((item) => (
             <motion.div
               key={item.id}
               variants={itemVariants}
-              className={`group relative overflow-hidden rounded-3xl bg-slate-100 aspect-[4/3] ${item.span}`}
+              className={`group relative overflow-hidden rounded-3xl bg-slate-100 h-[300px] sm:h-[400px] lg:h-[450px] ${item.span}`}
             >
               <Link href={item.href} className="block w-full h-full relative">
                 <Image

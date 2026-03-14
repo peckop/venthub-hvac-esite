@@ -22,7 +22,18 @@ function get(obj: Dict, path: string): string {
         break
       }
     }
-    return (current as string) ?? path
+    
+    // Safety check: React cannot render objects as children
+    if (typeof current === 'string') {
+      return current
+    }
+    
+    if (typeof current === 'number' || typeof current === 'boolean') {
+      return String(current)
+    }
+
+    // If it's an object or undefined, return the path itself to avoid "Objects are not valid as a React child"
+    return path
   } catch {
     return path
   }
