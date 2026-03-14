@@ -16,7 +16,7 @@ import {
     adminSelectStyle
 } from '../../utils/adminUi'
 import toast from 'react-hot-toast'
-import { Truck, CheckCircle2, RefreshCw } from 'lucide-react'
+import { Truck, CheckCircle2, RefreshCw } from 'lucide-center'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import { useRole } from '../../hooks/useRole'
@@ -293,4 +293,3 @@ export default function AdminLogisticsPage() {
         </div>
     )
 }
-

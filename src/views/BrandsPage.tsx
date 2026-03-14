@@ -1,212 +1,156 @@
 'use client'
 
 import React from 'react'
-import { HVAC_BRANDS } from '../lib/supabase'
+import { motion } from 'framer-motion'
+import { HVAC_BRANDS } from '../lib/brands'
 import { BrandIcon } from '../components/HVACIcons'
 import Link from 'next/link'
-import { Award, Globe, CheckCircle, ArrowRight, Star, Shield } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import Image from 'next/image'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 
 /**
  * BrandsPage - Premium "Markalar" sayfası
- * Featured brand (Vortice), grid, trust signals
+ * Modernized with i18n, A11y and Performance optimizations.
  */
 const BrandsPage: React.FC = () => {
   const { t } = useI18n()
-  const [heroRef, heroVisible] = useScrollAnimation<HTMLElement>()
-  const [gridRef, gridVisible] = useScrollAnimation<HTMLDivElement>()
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || ''}/brands`
-
-  // Vortice featured, others in grid
-  const featuredBrand = HVAC_BRANDS.find(b => b.slug === 'vortice')
-  const otherBrands = HVAC_BRANDS.filter(b => b.slug !== 'vortice')
-
-  const brandBenefits = [
-    { icon: CheckCircle, text: 'Orijinal ürün garantisi' },
-    { icon: Shield, text: 'Güvenilir satış platformu' },
-    { icon: Star, text: 'Profesyonel teknik destek' }
-  ]
+  const brands = HVAC_BRANDS
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Seo
         title={`${t('brands.pageTitle')} | VentHub`}
         description={t('brands.seoDesc')}
-        canonical={canonicalUrl}
       />
 
-      {/* Hero Section */}
-      <section
-        ref={heroRef}
-        className="relative py-12 sm:py-16 bg-gradient-to-br from-primary-navy to-industrial-gray text-white overflow-hidden"
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gold-accent rounded-full blur-3xl" />
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Breadcrumb */}
-          <div className="flex items-center text-sm text-white/60 mb-6">
-            <Link href="/" className="hover:text-white">{t('common.home')}</Link>
-            <span className="mx-2">/</span>
-            <span className="text-white font-medium">{t('common.brands')}</span>
-          </div>
-
-          <div className={`max-w-2xl ${scrollAnimationClasses.fadeUp(heroVisible)}`}>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-              Premium <span className="text-gold-accent">HVAC Markaları</span>
-            </h1>
-            <p className="text-lg text-white/70 mb-6">
-              Dünyanın lider havalandırma üreticilerinin ürünlerini,
-              güvenilir ve hızlı bir şekilde sizlere ulaştırıyoruz.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              {brandBenefits.map((benefit, index) => {
-                const Icon = benefit.icon
-                return (
-                  <div key={index} className="flex items-center gap-2 text-sm text-white/80">
-                    <Icon size={16} className="text-gold-accent" />
-                    <span>{benefit.text}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+      {/* Hero: Ultra Minimalist Apple Style */}
+      <section className="pt-32 pb-20 bg-slate-50/50 border-b border-slate-100">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8"
+          >
+            <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-600">
+              {t('brands.sectionTitle')}
+            </span>
+          </motion.div>
+          <h1 className="text-5xl lg:text-8xl font-extralight tracking-tighter text-slate-900 leading-[1.1] mb-10">
+            {t('brands.eyebrow').split(' ').map((word, i) => (
+              <React.Fragment key={i}>
+                {i === 2 ? <span className="font-medium text-slate-950 italic">{word} </span> : word + ' '}
+              </React.Fragment>
+            ))}
+          </h1>
+          <p className="max-w-2xl mx-auto text-xl text-slate-500 font-light leading-relaxed">
+            {t('brands.pageSubtitle')}
+          </p>
         </div>
       </section>
 
-      {/* Featured Brand: Vortice */}
-      {featuredBrand && (
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Award className="text-gold-accent" size={20} />
-              <span className="text-sm font-medium text-gold-accent">Öne Çıkan Marka</span>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Brand Info */}
-              <div>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-20 h-20 rounded-2xl bg-light-gray flex items-center justify-center">
-                    <BrandIcon brand={featuredBrand.name} className="w-16 h-16" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-industrial-gray">
-                      {featuredBrand.name}
-                    </h2>
-                    <div className="flex items-center gap-2 text-steel-gray">
-                      <Globe size={14} />
-                      <span className="text-sm">İtalya - 70+ Yıl Tecrübe</span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-steel-gray mb-6 leading-relaxed">
-                  Vortice, 1954'ten bu yana havalandırma sektörünün global lideridir.
-                  İtalyan tasarımı ve Alman mühendisliğini bir araya getiren Vortice,
-                  konut, ticari ve endüstriyel havalandırma çözümlerinde dünya standartlarını belirler.
-                </p>
-                <div className="flex flex-wrap gap-3 mb-6">
-                  <span className="px-3 py-1 rounded-full bg-air-blue text-primary-navy text-sm font-medium">
-                    Aspiratörler
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-air-blue text-primary-navy text-sm font-medium">
-                    Hava Perdeleri
-                  </span>
-                  <span className="px-3 py-1 rounded-full bg-air-blue text-primary-navy text-sm font-medium">
-                    Isı Geri Kazanım
-                  </span>
-                </div>
-                <Link
-                  href={`/brands/${featuredBrand.slug}`}
-                  className="inline-flex items-center gap-2 text-primary-navy font-semibold hover:gap-3 transition-all"
-                >
-                  Ürünleri İncele
-                  <ArrowRight size={16} />
-                </Link>
-              </div>
-
-              {/* Stats Card */}
-              <div className="bg-gradient-to-br from-primary-navy to-industrial-gray rounded-2xl p-8 text-white">
-                <h3 className="text-lg font-semibold mb-6">Vortice Rakamlarla</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-3xl font-bold text-gold-accent">70+</div>
-                    <div className="text-sm text-white/70">Yıl Deneyim</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-gold-accent">90+</div>
-                    <div className="text-sm text-white/70">Ülkede Satış</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-gold-accent">6</div>
-                    <div className="text-sm text-white/70">Üretim Tesisi</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold text-gold-accent">1000+</div>
-                    <div className="text-sm text-white/70">Ürün Çeşidi</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Other Brands Grid */}
-      <section className="py-12 sm:py-16 bg-light-gray">
-        <div ref={gridRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-industrial-gray text-center mb-4">
-            Diğer Markalarımız
-          </h2>
-          <p className="text-steel-gray text-center max-w-2xl mx-auto mb-12">
-            Avrupa'nın önde gelen HVAC üreticilerinin yetkili temsilcisiyiz
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
-            {otherBrands.map((brand, index) => (
-              <Link
+      {/* Brands Grid: Premium Showroom */}
+      <section className="py-24 sm:py-32">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {brands.map((brand, index) => (
+              <motion.div
                 key={brand.slug}
-                href={`/brands/${brand.slug}`}
-                className={`group bg-white rounded-2xl p-6 border border-light-gray hover:border-primary-navy/30 hover:shadow-hvac transition-all ${scrollAnimationClasses.fadeUp(gridVisible)}`}
-                style={{ transitionDelay: `${index * 50}ms` }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
               >
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-xl bg-light-gray flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <BrandIcon brand={brand.name} className="w-12 h-12" />
+                <Link
+                  href={`/brands/${brand.slug}`}
+                  aria-label={`${t('brands.aboutBrand')} ${brand.name}`}
+                  className="group block relative h-full rounded-[2.5rem] border border-slate-100 bg-white p-10 transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
+                >
+                  {/* Floating Logo Container */}
+                  <div className="aspect-[3/2] relative flex items-center justify-center mb-12 grayscale opacity-40 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
+                    <BrandIcon brand={brand.name} className="w-full h-full max-h-24" />
                   </div>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold text-industrial-gray group-hover:text-primary-navy transition-colors mb-1">
-                    {brand.name}
+
+                  {/* Info Layer */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
+                      <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {brand.country}
+                      </span>
+                    </div>
+                    
+                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-600/80">
+                      {brand.specialty}
+                    </div>
+                    
+                    <p className="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">
+                      {brand.description}
+                    </p>
                   </div>
-                  <div className="text-xs text-steel-gray flex items-center justify-center gap-1">
-                    <Globe size={12} />
-                    {brand.country}
+
+                  {/* Animated Reveal Arrow */}
+                  <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-cyan-600 transition-colors">
+                    <span>{t('brands.exploreBrand')}</span>
+                    <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-all duration-500" />
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            Marka Hakkında Bilgi Almak İster misiniz?
-          </h2>
-          <p className="text-steel-gray mb-6">
-            Teknik özellikler, fiyat listeleri ve bayilik koşulları için bizimle iletişime geçin.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all"
-          >
-            İletişime Geç
-          </Link>
+      {/* Trust & Network Section */}
+      <section className="py-24 bg-slate-950 text-white overflow-hidden">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div>
+              <div className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.5em] mb-8">
+                {t('brands.trust.eyebrow')}
+              </div>
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-8">
+                {t('brands.trust.title').split(' ').slice(0, 2).join(' ')} <br />
+                <span className="font-medium text-cyan-400 italic">
+                  {t('brands.trust.title').split(' ').slice(2).join(' ')}
+                </span>
+              </h2>
+              <p className="text-lg text-slate-400 font-light leading-relaxed mb-12 max-w-xl">
+                {t('brands.trust.description')}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-8">
+                <div className="border-l border-white/10 pl-6">
+                  <div className="text-3xl font-bold mb-1">100%</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    {t('brands.trust.original')}
+                  </div>
+                </div>
+                <div className="border-l border-white/10 pl-6">
+                  <div className="text-3xl font-bold mb-1">Global</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                    {t('brands.trust.standard')}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative aspect-square lg:aspect-video rounded-[3rem] overflow-hidden border border-white/5">
+              <Image 
+                src="/images/hvac_installation_close_up_premium_3.png" 
+                alt="Technical Network" 
+                fill 
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover brightness-50"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-24 h-24 rounded-full bg-cyan-500/20 blur-3xl animate-pulse" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -214,6 +158,3 @@ const BrandsPage: React.FC = () => {
 }
 
 export default BrandsPage
-
-
-
