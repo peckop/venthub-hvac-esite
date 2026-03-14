@@ -27,8 +27,11 @@ const TopicPage: React.FC = () => {
     )
   }
 
-  const steps = (t(`${base}.steps`) as unknown as string[]) || []
-  const pitfalls = (t(`${base}.pitfalls`) as unknown as string[]) || []
+  const steps = (t(`${base}.steps`, { returnObjects: true }) as unknown as string[]) || []
+  const pitfalls = (t(`${base}.pitfalls`, { returnObjects: true }) as unknown as string[]) || []
+
+  const stepsArray = Array.isArray(steps) ? steps : []
+  const pitfallsArray = Array.isArray(pitfalls) ? pitfalls : []
 
   return (
     <section className="py-10">
@@ -42,7 +45,7 @@ const TopicPage: React.FC = () => {
           <div className="rounded-xl border border-light-gray p-5">
             <h2 className="font-semibold text-industrial-gray mb-2">{t('knowledge.topic.stepsTitle')}</h2>
             <ol className="list-decimal list-inside text-sm text-steel-gray space-y-1">
-              {steps.map((s, i) => (
+              {stepsArray.map((s, i) => (
                 <li key={i}>{s}</li>
               ))}
             </ol>
@@ -50,7 +53,7 @@ const TopicPage: React.FC = () => {
           <div className="rounded-xl border border-light-gray p-5">
             <h2 className="font-semibold text-industrial-gray mb-2">{t('knowledge.topic.pitfallsTitle')}</h2>
             <ul className="list-disc list-inside text-sm text-steel-gray space-y-1">
-              {pitfalls.map((s, i) => (
+              {pitfallsArray.map((s, i) => (
                 <li key={i}>{s}</li>
               ))}
             </ul>

@@ -120,7 +120,7 @@ const ContactPage: React.FC = () => {
               
               <div className="space-y-6">
                 <a 
-                  href={whatsappLink}
+                  href={whatsappLink || undefined}
                   target="_blank"
                   className="inline-flex items-center gap-4 bg-white text-slate-950 px-10 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-400 transition-all active:scale-95 shadow-2xl shadow-cyan-500/20"
                 >
