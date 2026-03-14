@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { HVAC_BRANDS } from '../lib/brands'
 import { supabase, Product } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
-import { Globe, ArrowRight, Package, Award, Shield, ExternalLink } from 'lucide-react'
+import { ArrowRight, Package, ExternalLink, Globe, BookOpen } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
@@ -82,6 +82,7 @@ export interface BrandDetailPageProps {
 }
 
 const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
+  const { t, lang } = useI18n()
   const params = useParams()
   const slug = (initialBrandSlug || params?.slug) as string
   
@@ -92,7 +93,6 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   
   const detail = brand ? BRAND_DETAILS[brand.slug] : null
   
-  const { t } = useI18n()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -123,7 +123,13 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">{t('brands.notFound')}</h1>
-          <Link href="/brands" className="text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8">Tüm Markalara Dön</Link>
+          <Link 
+            href="/brands" 
+            aria-label={t('brands.backToAll')}
+            className="text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8"
+          >
+            {t('brands.backToAll')}
+          </Link>
         </div>
       </div>
     )
@@ -135,12 +141,12 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 
       {/* Brand Hero: Ultra Premium Cinema Look */}
       <section className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
-        {/* Cinematic Background Atmosphere */}
         <div className="absolute inset-0 z-0">
           <Image 
             src="/images/hvac_installation_close_up_premium_3.png" 
             alt={brand.name} 
             fill 
+            sizes="100vw"
             className="object-cover opacity-20 brightness-50" 
             priority
           />
@@ -176,11 +182,11 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           >
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
-              {brand.country} Origin
+              {brand.country} {t('brands.detail.originSuffix')}
             </div>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
-              EST. {brand.founded}
+              {t('brands.detail.estPrefix')} {brand.founded}
             </div>
             <div className="flex items-center gap-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
@@ -195,10 +201,14 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-[1fr,450px] gap-24 items-start">
             <div>
-              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">Engineering Heritage</div>
+              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">
+                {t('brands.detail.heritage')}
+              </div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-center lg:text-left text-slate-900">
-                Mühendisliğin <br />
-                <span className="font-medium text-slate-950 italic">Teknolojik Otoritesi</span>
+                {t('brands.detail.authorityTitle').split(' ').slice(0, 1).join(' ')} <br />
+                <span className="font-medium text-slate-950 italic">
+                  {t('brands.detail.authorityTitle').split(' ').slice(1).join(' ')}
+                </span>
               </h2>
               <p className="text-xl text-slate-500 font-light leading-relaxed mb-12 text-center lg:text-left max-w-3xl">
                 {detail?.story || brand.description}
@@ -206,15 +216,15 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               
               <div className="grid sm:grid-cols-2 gap-12">
                 <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Küresel Vizyon</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">
-                    {brand.name}, dünya çapındaki projelerde verimlilik ve sürdürülebilirlik standartlarını belirleyerek, geleceğin havalandırma teknolojilerini bugün inşa ediyor.
+                    {brand.name}, {t('brands.detail.globalVisionDesc')}
                   </p>
                 </div>
                 <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Teknik Mükemmeliyet</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.technicalExcellence')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">
-                    Her bir ürün, en zorlu endüstriyel koşullara dayanacak şekilde test edilmiş ve akustik performans açısından optimize edilmiştir.
+                    {t('brands.detail.technicalExcellenceDesc')}
                   </p>
                 </div>
               </div>
@@ -224,7 +234,9 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               <div className="rounded-[2.5rem] bg-slate-950 p-10 text-white overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl" />
                 <div className="relative z-10">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">Corporate Snapshot</div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">
+                    {t('brands.detail.corporateSnapshot')}
+                  </div>
                   
                   <div className="space-y-6">
                     {detail?.stats?.map((stat, i) => (
@@ -234,22 +246,37 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                       </div>
                     ))}
                     <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Headquarters</span>
+                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">
+                        {t('brands.detail.headquarters')}
+                      </span>
                       <span className="text-sm font-medium">{brand.headquarters}</span>
                     </div>
                     {brand.website && (
                       <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Web Authority</span>
-                        <a href={brand.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-cyan-400 hover:underline flex items-center gap-2">
-                          Official Site <ExternalLink size={12} />
+                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">
+                          {t('brands.detail.webAuthority')}
+                        </span>
+                        <a 
+                          href={brand.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          aria-label={t('brands.detail.officialSite')}
+                          className="text-sm font-medium text-cyan-400 hover:underline flex items-center gap-2"
+                        >
+                          {t('brands.detail.officialSite')} <ExternalLink size={12} />
                         </a>
                       </div>
                     )}
                   </div>
 
-                  <button className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 active:scale-95">
-                    Marka Kataloglarını İste
-                  </button>
+                  <Link href="/contact">
+                    <button 
+                      aria-label={t('brands.detail.requestCatalog')}
+                      className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 active:scale-95"
+                    >
+                      {t('brands.detail.requestCatalog')}
+                    </button>
+                  </Link>
                 </div>
               </div>
             </aside>
@@ -263,10 +290,16 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
             <div>
               <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-4">Curated Solutions</div>
-              <h2 className="text-4xl font-light tracking-tighter text-slate-950">Öne Çıkan <span className="font-medium">Sistemler</span></h2>
+              <h2 className="text-4xl font-light tracking-tighter text-slate-950">
+                {t('brands.detail.featuredSystems').split(' ').slice(0, 2).join(' ')} <span className="font-medium">{t('brands.detail.featuredSystems').split(' ').slice(2).join(' ')}</span>
+              </h2>
             </div>
-            <Link href={`/products?brand=${brand.name}`} className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center">
-              <span>Tüm Ürün Grupları</span>
+            <Link 
+              href={`/products?brand=${brand.name}`} 
+              aria-label={t('brands.detail.allProductGroups')}
+              className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center"
+            >
+              <span>{t('brands.detail.allProductGroups')}</span>
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -281,6 +314,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                 <Link 
                   key={product.id} 
                   href={`/products/${product.slug || product.id}`}
+                  aria-label={`${product.name} ${t('pdp.details')}`}
                   className="group block bg-white rounded-[2.5rem] p-8 border border-white transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
                 >
                   <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105">
@@ -294,7 +328,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           ) : (
             <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-200">
               <Package className="mx-auto text-slate-200 mb-4" size={48} />
-              <p className="text-slate-400 font-light italic">Bu markaya ait ürünler yakında eklenecektir.</p>
+              <p className="text-slate-400 font-light italic">{t('brands.detail.noProducts')}</p>
             </div>
           )}
         </div>
