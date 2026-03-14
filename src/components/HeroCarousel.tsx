@@ -155,7 +155,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 </h1>
 
                                 <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">
-                                    {String(meta.hero_description || cat.description || '')}
+                                    {meta.hero_description || cat.description}
                                 </p>
 
                                 {/* Features Grid */}
