@@ -1,29 +1,33 @@
-## Hedef
-Admin panelindeki "Siteyi G?r" / "Ma?azaya D?n" butonuna premium bir mikro-animasyon eklemek.
+# Beyin Fırtınası (Brainstorm)
+**Konu:** 72 Lighthouse Puanından 90+ Hedefine: Vite Mirasını Temizleme ve Next.js SSR Modernizasyonu
 
-## K?s?tlamalar
-- Tailwind CSS kullan?lmal?.
-- Mevcut i18n yap?s?na sad?k kal?nmal?.
-- Sabit (fixed) header yerle?imini bozmamal?.
-- T?m tema (Industrial, Light, Dark) modlar?yla uyumlu olmal?.
+## Goal
+Lighthouse Performans puanını 72'den **90+** seviyesine çıkarmak. LCP süresini 5.3s'den <2.5s'e, CLS puanını <0.1'e düşürmek.
 
-## Bilinen Ba?lam
-- Buton `src/views/admin/AdminLayout.tsx` i?inde yer al?yor.
-- ?? kademeli tema sistemimiz aktif.
+## Constraints
+- SEO 100 puanı korunmalı.
+- Supabase/PostgreSQL RPC'leri ana veri kaynağı kalmalı.
+- Mevcut i18n ve hesaplama mantığı bozulmamalı.
 
-## Riskler
-- Animasyon s?ras?nda headerda titreme (jitter) olu?mas?.
-- Farkl? temalarda kontrast sorunlar?.
+## Known context
+- Proje Vite'den Next.js'e taşınmış ancak `ssr: false` ve `window` bağımlılıkları nedeniyle hala SPA gibi çalışıyor.
+- PostgreSQL optimizasyonları yapıldı ama SSR olmadığı için frontend'e yansımıyor.
+- `ProductsPage.tsx` dosyası çok ağır bir Client Component.
 
-## Se?enekler
-1. **?kon Kayd?rma:** Hover durumunda ok ikonunun hafif?e sola/sa?a kaymas?.
-2. **?l?ekleme ve Parlama:** Butonun hafif?e b?y?mesi ve ince bir parlama efekti almas?.
-3. **Karma Animasyon:** Hem ikonun kaymas? hem de butonun %2 b?y?mesi.
+## Risks
+- Hydration Mismatch hataları.
+- URL parametreleri yönetiminde (window.location) yaşanabilecek kırılmalar.
+- Eski kütüphanelerin Server Components uyumsuzluğu.
 
-## ?neri
-**Se?enek 3:** Birle?ik efekt her zaman daha premium bir his verir. Butonu `scale-105` ile b?y?t?p, i?erisindeki ikonu `group-hover:-translate-x-1` ile sola kayd?rarak "geriye d?n??" hissini g??lendirebiliriz.
+## Options (2-4)
+1. **Incremental Refactor**: Mevcut `ProductsPage`i ufak yamalarla SSR uyumlu yapmaya çalışmak. (Düşük risk, orta kazanç).
+2. **App Router / Server Component Migration**: Sayfayı Next.js App Router standartlarına (RSC) tamamen taşımak. (Yüksek kazanç, 90+ garanti).
 
-## Kabul Kriterleri
-- Buton ?zerine gelindi?inde animasyon ak?c? bir ?ekilde ba?lar.
-- Header yerle?iminde kayma olmaz.
-- Industrial, G?nd?z ve Gece modlar?nda g?rsel olarak kusursuz g?r?n?r.
+## Recommendation
+**Seçenek 2**. PostgreSQL tarafındaki hızın tarayıcıya yansıması için verinin sunucuda (Server Component) çekilmesi ve streaming/suspense kullanılması şarttır.
+
+## Acceptance criteria
+- Lighthouse Performance Score > 90.
+- LCP < 2.5s.
+- CLS < 0.1.
+- Başarılı build ve `ssr: false` kullanımının kaldırılması.

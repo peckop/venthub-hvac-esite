@@ -49,13 +49,25 @@ venthub-hvac/
 | Config | camelCase.ts | `categoryRegistry.ts` |
 | Migration | `YYYYMMDD_description.sql` | `20260120_fix_rls.sql` |
 
-## Component Patterns
+## Performans ve Render Standartları (90+ Puan Hedefi)
 
-### Yeni Bileşen Oluştururken:
-1. İlgili alt klasöre koy (`components/products/`, `components/admin/`, vb.)
-2. Props için TypeScript interface tanımla
-3. `useI18n()` hook ile çevirileri al, hardcoded string KULLANMA
-4. Tailwind CSS tercih et (proje Tailwind kullanıyor)
+### 1. Server Components (RSC) Önceliği
+- Tüm ana sayfalar (`page.tsx`) varsayılan olarak **Server Component** olmalıdır.
+- Veri çekme işlemleri (Supabase RPC, getProducts vb.) doğrudan sunucu tarafında yapılmalıdır.
+- `'use client'` direktifi sadece etkileşimli (buton, input, modal) uç bileşenlerde kullanılmalıdır.
+
+### 2. SSR ve Streaming (Suspense)
+- Ana rotalarda (`products`, `brands`, `home` vb.) `ssr: false` kullanımı KESİNLİKLE yasaktır.
+- Ağır veri yüklemeleri için `React.lazy` yerine Next.js `dynamic` import ve mutlaka `Suspense` kullanılmalıdır.
+- Her `Suspense` alanı için görsel bir `Skeleton` (İskelet) bileşeni tanımlanmalıdır.
+
+### 3. Client-Side Bağımlılıkları (window/document)
+- `window`, `document`, `localStorage` gibi objeler `'use client'` bileşenlerinde bile sadece `useEffect` içinde veya dinamik kontrollerle (`typeof window !== 'undefined'`) kullanılmalıdır.
+- URL parametreleri yönetimi için `window.location` yerine `next/navigation` (`useSearchParams`, `usePathname`) kullanılmalıdır.
+
+### 4. Layout Shift (CLS) Koruması
+- Resimlere (`<Image />`) mutlaka `width` ve `height` (veya `aspect-ratio`) verilmelidir.
+- Dinamik yüklenen alanlar için `min-h-[value]` (minimum yükseklik) rezerve edilmelidir.
 
 ### Örnek Bileşen Yapısı:
 ```tsx
