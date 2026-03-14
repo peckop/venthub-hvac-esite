@@ -8,10 +8,18 @@ import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
  */
 export const getCategoryDisplayName = (category: Category | null | undefined): string => {
     if (!category) return ''
+    
+    // 1. Prioritize Static Metadata
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_title) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_title!
     }
-    return typeof category.name === 'string' ? category.name : ''
+
+    // 2. Database Name (Handle Json type strictly)
+    const name = category.name
+    if (typeof name === 'string') return name
+    
+    // Fallback for Json/Null/Other
+    return String(name || '')
 }
 
 /**
@@ -20,10 +28,18 @@ export const getCategoryDisplayName = (category: Category | null | undefined): s
  */
 export const getCategoryDescription = (category: Category | null | undefined): string => {
     if (!category) return ''
+
+    // 1. Prioritize Static Metadata
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_description) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_description!
     }
-    return typeof category.description === 'string' ? category.description : ''
+
+    // 2. Database Description (Handle Json type strictly)
+    const desc = category.description
+    if (typeof desc === 'string') return desc
+    
+    // Fallback for Json/Null/Other
+    return String(desc || '')
 }
 
 /**
