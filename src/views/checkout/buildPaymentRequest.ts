@@ -1,3 +1,4 @@
+import { safeNumber, safeString } from '../../utils/type-converters'
 import { UserAddress } from '../../lib/supabase'
 
 export interface CartItemInput {
@@ -48,7 +49,7 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
   const cartItems = items.map(it => ({
     product_id: it.product.id,
     quantity: it.quantity,
-    price: Number(it.product.price || 0),
+    price: safeNumber(it.product.price),
     product_name: it.product.name,
     product_image_url: it.product.image_url || null,
   }))
@@ -60,8 +61,8 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
     postalCode: addr?.postalCode || addr?.postal_code || '',
   })
 
-  const shippingAddress = normalizeAddress(shipping)
-  const billingAddress = sameAsShipping ? shippingAddress : normalizeAddress(billing)
+  const shippingAddress = { ...normalizeAddress(shipping), address_type: 'shipping' }
+  const billingAddress = sameAsShipping ? { ...shippingAddress, address_type: 'billing' } : { ...normalizeAddress(billing), address_type: 'billing' }
 
   const customerName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim()
 

@@ -24,7 +24,9 @@ import {
   VisibleCols
 } from '../../types/inventory'
 
+import { useRouter } from 'next/navigation'
 const AdminInventoryPage: React.FC = () => {
+  const router = useRouter()
   const { t } = useI18n()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('inventory')
@@ -479,7 +481,7 @@ const AdminInventoryPage: React.FC = () => {
         </div>
         {hasWriteAccess && (
           <button 
-            onClick={() => window.location.href = '/admin/inventory/settings'} 
+            onClick={() => router.push('/admin/inventory/settings')}
             className="group h-12 px-6 rounded-2xl glass border border-white/5 text-slate-400 hover:text-white transition-all flex items-center gap-3 hover:border-white/10"
           >
             <Settings2 size={16} className="text-slate-500 group-hover:text-cyan-400 transition-colors" />

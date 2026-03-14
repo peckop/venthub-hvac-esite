@@ -133,7 +133,7 @@ const AdminAuditLogPage: React.FC = () => {
               className={`${adminButtonSecondaryClass} !h-8 !px-3 font-black text-[10px] uppercase border-amber-500/20 text-amber-500 hover:bg-amber-500/10 transition-all`}
               onClick={() => { 
                 setBatch(''); 
-                const url = new URL(typeof window !== 'undefined' ? window.location.href : ''); 
+                const url = new URL(typeof window !== 'undefined' ? window.location.href : 'http://localhost');
                 url.searchParams.delete('batch'); 
                 router.push(url.pathname + (url.search ? '?' + url.searchParams.toString() : ''), { scroll: false }) 
               }}
