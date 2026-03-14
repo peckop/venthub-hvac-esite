@@ -38,7 +38,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                                 <Link
                                     href={`/category/${category.slug}`}
                                     onClick={() => handleLinkClick(0, category.slug)}
-                                    className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
+                                    className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus:shadow-[0_0_0_2px] focus:shadow-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer flex items-center gap-2"
                                 >
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
@@ -51,7 +51,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
 
                     return (
                         <NavigationMenu.Item key={category.id}>
-                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
+                            <NavigationMenu.Trigger className="group flex select-none items-center justify-between gap-[2px] rounded-[4px] px-3 py-2 text-[15px] font-medium leading-none text-slate-700 outline-none hover:bg-slate-50 focus:shadow-[0_0_0_2px] focus:shadow-slate-300 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-slate-100 cursor-pointer">
                                 <div className="flex items-center gap-2">
                                     <span className="text-primary-navy">
                                         {getCategoryIcon(category.slug, { size: 18 })}
@@ -65,25 +65,25 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                             </NavigationMenu.Trigger>
 
                             <NavigationMenu.Content className="absolute top-0 left-0 w-full sm:w-auto data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight">
-                                <div className="m-0 grid list-none gap-x-[10px] p-[22px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
+                                <div className="m-0 grid list-none gap-x-[30px] p-[32px] sm:w-[500px] sm:grid-cols-[0.75fr_1fr] md:w-[600px] lg:w-[700px]">
                                     {/* Category Header */}
                                     <div className="row-span-3">
-                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-gradient-to-br from-primary-navy to-secondary-blue p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-violet7 relative overflow-hidden">
+                                        <div className="flex h-full w-full select-none flex-col justify-end rounded-[6px] bg-slate-50/80 backdrop-blur-md border border-slate-100/50 shadow-inner p-[25px] no-underline outline-none focus:shadow-[0_0_0_2px] focus:shadow-slate-300 relative overflow-hidden rounded-xl">
                                             <MegaMenu3DBackground categorySlug={category.slug} />
                                             <div className="relative z-10">
-                                                <div className="text-white mb-4">
+                                                <div className="text-primary-navy mb-4">
                                                     {getCategoryIcon(category.slug, { size: 48 })}
                                                 </div>
-                                                <div className="mb-[7px] mt-4 text-[18px] font-medium leading-[1.2] text-white">
+                                                <div className="mb-[7px] mt-4 text-[20px] font-bold tracking-tight leading-[1.2] text-slate-900">
                                                     {getCategoryDisplayName(category)}
                                                 </div>
-                                                <p className="text-[14px] leading-[1.3] text-white/90">
+                                                <p className="text-[14px] leading-[1.5] text-slate-600">
                                                     {category.description || 'Yüksek kaliteli havalandırma çözümleri.'}
                                                 </p>
                                                 <Link
                                                     href={`/category/${category.slug}`}
                                                     onClick={() => handleLinkClick(0, category.slug)}
-                                                    className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white hover:text-white/80"
+                                                    className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary-blue hover:text-primary-navy"
                                                 >
                                                     Tümünü Gör <ExternalLink size={14} />
                                                 </Link>
@@ -93,16 +93,16 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
 
                                     {/* Subcategories Grid */}
                                     <div className="col-span-1">
-                                        <ul className="grid grid-cols-2 gap-2">
+                                        <ul className="grid grid-cols-2 gap-4">
                                             {subs.filter(sub => sub.slug !== category.slug).map((sub) => (
                                                 <li key={sub.id}>
                                                     <Link
                                                         href={`/category/${category.slug}/${sub.slug}`}
                                                         onClick={() => handleLinkClick(1, sub.slug, category.slug)}
-                                                        className="block select-none rounded-[6px] p-3 text-[15px] leading-none no-underline outline-none transition-colors hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
+                                                        className="block select-none rounded-[6px] p-4 text-[15px] leading-none no-underline outline-none transition-colors hover:bg-slate-50 focus:shadow-[0_0_0_2px] focus:shadow-slate-300"
                                                     >
                                                         <div className="mb-1 font-medium text-slate-900">{getCategoryDisplayName(sub)}</div>
-                                                        <p className="text-[13px] leading-[1.4] text-slate-500 line-clamp-2">
+                                                        <p className="mt-1.5 text-[13px] leading-[1.5] text-slate-500 line-clamp-2">
                                                             {sub.description || 'Ürünleri incele →'}
                                                         </p>
                                                     </Link>
@@ -116,16 +116,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
                     )
                 })}
 
-                {/* Quick Links */}
-                <NavigationMenu.Item>
-                    <Link
-                        href="/products"
-                        onClick={() => handleLinkClick(0, 'products')}
-                        className="block select-none rounded-[4px] px-3 py-2 text-[15px] font-bold leading-none text-secondary-blue outline-none hover:bg-slate-100 focus:shadow-[0_0_0_2px] focus:shadow-violet7"
-                    >
-                        Tüm Ürünler
-                    </Link>
-                </NavigationMenu.Item>
+
 
                 <NavigationMenu.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
                     <div className="relative top-[70%] h-[10px] w-[10px] rotate-[45deg] rounded-tl-[2px] bg-white" />
@@ -133,7 +124,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
             </NavigationMenu.List>
 
             <div className="absolute left-0 top-full flex w-full justify-center perspective-[2000px]">
-                <NavigationMenu.Viewport className="data-[state=open]:animate-scaleIn data-[state=closed]:animate-scaleOut relative mt-[10px] h-[var(--radix-navigation-menu-viewport-height)] w-[var(--radix-navigation-menu-viewport-width)] origin-[top_center] overflow-hidden rounded-[10px] bg-white transition-[width,_height] duration-300 shadow-[0_10px_38px_-10px_hsla(206,22%,7%,.35),0_10px_20px_-15px_hsla(206,22%,7%,.2)]" />
+                <NavigationMenu.Viewport className="data-[state=open]:animate-scaleIn data-[state=closed]:animate-scaleOut relative mt-[0px] translate-y-2 h-[var(--radix-navigation-menu-viewport-height)] w-[var(--radix-navigation-menu-viewport-width)] origin-[top_center] overflow-hidden rounded-[10px] bg-white/95 backdrop-blur-md transition-[width,_height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05),0_10px_30px_-10px_rgba(0,0,0,0.03)] border border-slate-100/50" />
             </div>
         </NavigationMenu.Root>
     )
@@ -236,12 +227,7 @@ export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose,
                     })}
                 </div>
 
-                {/* Footer Links */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50">
-                    <Link href="/products" onClick={onClose} className="block w-full py-3 px-4 bg-primary-navy text-white text-center font-bold rounded-lg shadow-lg shadow-primary-navy/20 active:scale-95 transition-all">
-                        Tüm Ürünler
-                    </Link>
-                </div>
+
             </div>
         </div>
     )

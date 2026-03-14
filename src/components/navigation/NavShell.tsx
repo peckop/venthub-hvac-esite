@@ -34,7 +34,7 @@ const NavShell: React.FC<NavShellProps> = ({
     return (
         <div
             className={cn(
-                'transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                'transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                 fixed ? 'fixed inset-x-0 top-0 z-50' : 'relative z-40',
                 isScrollingDown && !isAtTop ? '-translate-y-full' : 'translate-y-0'
             )}
@@ -53,10 +53,10 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Top Tier: The Corporate Bar */}
             <div
                 className={cn(
-                    'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
+                    'transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
                     // Hide the top tier if we are not at the top (unless we want it to stay when scrolling up?
                     // Usually we hide the top tier when scrolled, and only show bottom tier when scrolling up)
-                    !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-10 md:opacity-100 relative'
+                    !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-8 md:opacity-100 relative'
                 )}
             >
                 <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -69,7 +69,7 @@ const NavShell: React.FC<NavShellProps> = ({
             {/* Bottom Tier: The Action Bar */}
             <header
                 className={cn(
-                    'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
+                    'transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] border-b border-slate-200/50',
                     'bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/85 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.15)]',
                     showProgress && 'pt-1'
                 )}

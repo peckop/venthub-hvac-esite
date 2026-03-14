@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react'
 import { adminSelectClass, adminSelectStyle } from '../../utils/adminUi'
 import * as Switch from '@radix-ui/react-switch'

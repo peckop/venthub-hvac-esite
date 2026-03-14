@@ -25,10 +25,10 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
     return (
         <div
             onClick={onClick}
-            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/30"
+            className="group relative cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-sky-500/20"
         >
             {/* Background Layer - Absolute */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-navy to-secondary-blue rounded-2xl border border-white/0 group-hover:border-white/20 transition-colors -z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl group-hover:shadow-[0_0_40px_-10px_rgba(56,189,248,0.25)] group-hover:border-sky-500/50 group-hover:bg-slate-800/60 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] -z-10 pointer-events-none" />
 
             {/* 3D Canvas Area - Extended height and negative margin for Pop-out effect */}
             <div className="h-56 relative -mt-12 z-10 pointer-events-none">
@@ -37,8 +37,9 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
                     style={{ background: 'transparent' }}
                 >
                     {/* Lighting Setup for Menu Tiles */}
-                    <ambientLight intensity={1.5} />
-                    <pointLight position={[10, 10, 10]} intensity={2} />
+                    <Environment preset="city" />
+                    <ambientLight intensity={0.5} />
+                    <directionalLight position={[10, 10, 5]} intensity={1} />
                     <pointLight position={[-10, -10, -10]} intensity={1} color="#b0e0e6" />
 
                     <Suspense fallback={null}>
@@ -57,7 +58,7 @@ const CategoryCard3D: React.FC<CategoryCard3DProps> = ({
 
             {/* Text Content */}
             <div className="px-4 pb-4 relative z-20">
-                <h3 className="text-lg font-bold text-white mb-1 group-hover:text-secondary-blue transition-colors">
+                <h3 className="text-lg font-bold text-white mb-1 group-hover:text-sky-400 transition-colors">
                     {getCategoryDisplayName(category)}
                 </h3>
 
