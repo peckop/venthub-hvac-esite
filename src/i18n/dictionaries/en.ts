@@ -19,6 +19,10 @@ export const en = {
     quickSearch: "Quick search...",
     allCategories: "All Categories",
     priceRange: "Price Range",
+    systemPreparing: "System Preparing...",
+    adminPanel: "Admin Panel",
+    goToStore: "Go to Store",
+    backToSite: "Back to Site",
 
     // Existing
     discover: "Discover",
@@ -395,6 +399,27 @@ export const en = {
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
       cta: 'Explore',
+      hub: {
+        title: 'Knowledge is the Raw Material of Engineering',
+        subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
+        searchPlaceholder: 'Search for topic, technical term or product family...',
+        readStart: 'Start Reading',
+        calculatorsSoon: 'Calculators Soon',
+        calculatorsSoonDesc: 'Perform your HRV, air curtain and jet fan calculations in seconds.',
+        selectorSoon: 'Product Selector Soon',
+        selectorSoonDesc: 'Find the most suitable model for your needs with our smart algorithms.',
+        inDevelopment: 'In Development',
+        inPlanning: 'In Planning',
+        notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
+        notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
+        contactExpert: 'Talk to an Expert',
+        readTime: '{{count}} min read',
+        categories: {
+          comfort: 'Comfort',
+          safety: 'Safety',
+          efficiency: 'Efficiency'
+        }
+      },
       items: {
         guides: {
           eyebrow: 'Knowledge Hub',
@@ -1685,8 +1710,8 @@ export const en = {
       originSuffix: 'Origin',
       estPrefix: 'EST.'
     }
-    }
-    }
+  },
+  categories: {
 
     title: 'Product Categories',
     subtitle: 'Find professional ventilation solutions with our wide range covering all HVAC areas.',
