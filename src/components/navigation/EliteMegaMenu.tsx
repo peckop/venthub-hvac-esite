@@ -5,7 +5,8 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import type { Category } from '../../lib/supabase'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
-import MegaMenu3DBackground from './MegaMenu3DBackground'
+import dynamic from 'next/dynamic'
+const MegaMenu3DBackground = dynamic(() => import('./MegaMenu3DBackground'), { ssr: false })
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface EliteMegaMenuProps {
