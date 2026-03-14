@@ -40,11 +40,11 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
   // LIST VIEW LAYOUT
   if (isList) {
     return (
-      <Link href={`/products/${product.id}`} className="block w-full">
+      <Link href={`/products/${product.slug || product.id}`} className="block w-full">
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
-              src={product.image_url ? `product-images/${product.image_url}` : null}
+              src={product.image_url}
               alt={product.name}
               fallbackType="product"
               fill
@@ -90,7 +90,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
 
   // GRID VIEW
   return (
-    <Link href={`/products/${product.id}`} className="block h-full">
+    <Link href={`/products/${product.slug || product.id}`} className="block h-full">
       <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-all duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
         
         {/* Badges Overlay */}
@@ -108,7 +108,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(function Produ
         {/* Product Image */}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-light-gray/30 mb-4 group-hover:bg-light-gray/50 transition-colors">
           <VentImage
-            src={product.image_url ? `product-images/${product.image_url}` : null}
+            src={product.image_url}
             alt={product.name}
             fallbackType="product"
             fill

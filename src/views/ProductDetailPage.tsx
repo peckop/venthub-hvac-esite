@@ -50,7 +50,8 @@ export interface ProductDetailPageProps {
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
   const params = useParams()
-  const id = params?.id as string
+  // Clean potential 'cc' suffix from URL id for consistency with database IDs
+  const id = (params?.id as string)?.replace(/cc$/, '')
   const router = useRouter()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
@@ -88,11 +89,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       if (!id) return
       
       // If we already have the correct product (from initialProduct or previous fetch), don't fetch again
-      if (product && (product.id === id || product.sku === id)) {
+      if (product && (product.id === id || product.sku === id || product.slug === id)) {
         return
       }
 
-      if (initialProduct && (id === initialProduct.id || id === initialProduct.sku)) {
+      if (initialProduct && (id === initialProduct.id || id === initialProduct.sku || id === initialProduct.slug)) {
         setProduct(initialProduct)
         setLoading(false)
         return

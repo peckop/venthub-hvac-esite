@@ -57,6 +57,8 @@ const HowItWorks: React.FC = () => {
                         <VentImage src="/images/category/air-curtain-diagram.png"
                             alt="Hava Perdesi Çalışma Prensibi"
                             className="w-full h-auto"
+                            width={1200}
+                            height={800}
                             loading="lazy"
                          />
                     </div>

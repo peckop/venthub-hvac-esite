@@ -4,12 +4,14 @@ import { VentImage } from '@/components/ui/VentImage'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { HVAC_BRANDS, supabase, Product } from '../lib/supabase'
+import Image from 'next/image'
+import { HVAC_BRANDS } from '../lib/brands'
+import { supabase, Product } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
 import { Globe, ArrowRight, Package, Award, Shield, ExternalLink } from 'lucide-react'
-import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
+import { motion } from 'framer-motion'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -20,20 +22,20 @@ const BRAND_DETAILS: Record<string, {
 }> = {
   vortice: {
     founded: 1954,
-    headquarters: 'Tribino, İtalya',
+    headquarters: 'Tribiano, İtalya',
     website: 'https://www.vortice.com',
     story: 'Vortice, 1954 yılında İtalya\'da kurulmuş, dünya çapında tanınan bir havalandırma çözümleri üreticisidir. 70 yılı aşkın deneyimiyle konut, ticari ve endüstriyel havalandırma sistemlerinde lider konumdadır.',
     stats: [
       { label: 'Kuruluş', value: '1954' },
       { label: 'Ülke Sayısı', value: '90+' },
-      { label: 'Çalışan', value: '1500+' }
+      { label: 'Grup', value: 'Vortice Group' }
     ]
   },
   avens: {
     founded: 2010,
     headquarters: 'İstanbul, Türkiye',
     website: 'https://www.avens.com.tr',
-    story: 'AVenS, Türkiye\'nin önde gelen yerli HVAC markasıdır. Yüksek kaliteli havalandırma çözümleri ve rekabetçi fiyatlarıyla sektörde hızla büyümektedir.',
+    story: 'Avens, Türkiye\'nin önde gelen yerli HVAC markasıdır. Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleriyle modern mühendislik yaklaşımlarını birleştirir.',
     stats: [
       { label: 'Kuruluş', value: '2010' },
       { label: 'Üretim', value: 'Türkiye' },
@@ -41,19 +43,19 @@ const BRAND_DETAILS: Record<string, {
     ]
   },
   casals: {
-    founded: 1880,
-    headquarters: 'Barcelona, İspanya',
+    founded: 1881,
+    headquarters: 'Girona, İspanya',
     website: 'https://www.casals.com',
     story: 'Casals, 140 yılı aşkın geçmişiyle İspanya\'nın en köklü fan üreticilerinden biridir. Endüstriyel ve ticari havalandırma çözümlerinde Avrupa\'nın tercih edilen markasıdır.',
     stats: [
-      { label: 'Kuruluş', value: '1880' },
+      { label: 'Kuruluş', value: '1881' },
       { label: 'Deneyim', value: '140+ Yıl' },
       { label: 'Grup', value: 'Vortice' }
     ]
   },
   'nicotra-gebhardt': {
     founded: 1959,
-    headquarters: 'Almanya',
+    headquarters: 'Waldenburg, Almanya',
     website: 'https://www.nicotra-gebhardt.com',
     story: 'Nicotra Gebhardt, endüstriyel fan teknolojisinde dünya lideridir. Alman mühendisliği ve İtalyan tasarımını bir araya getirerek en zorlu havalandırma ihtiyaçlarına çözüm sunar.',
     stats: [
@@ -64,22 +66,13 @@ const BRAND_DETAILS: Record<string, {
   },
   flexiva: {
     founded: 2000,
-    headquarters: 'Avrupa',
-    story: 'Flexiva, esnek kanal sistemleri ve havalandırma aksesuarlarında uzmanlaşmış bir markadır. Kaliteli malzeme ve kolay montaj özellikleriyle öne çıkar.',
+    headquarters: 'İstanbul, Türkiye',
+    website: 'https://www.flexiva.com.tr',
+    story: 'Flexiva, esnek kanal sistemleri ve havalandırma aksesuarlarında uzmanlaşmış global bir markadır. Patentli sızdırmazlık teknolojileri ve kolay montaj özellikleriyle öne çıkar.',
     stats: [
       { label: 'Uzmanlık', value: 'Kanal Sistemleri' },
+      { label: 'Üretim', value: 'Türkiye' },
       { label: 'Kalite', value: 'CE Sertifikalı' }
-    ]
-  },
-  danfoss: {
-    founded: 1933,
-    headquarters: 'Nordborg, Danimarka',
-    website: 'https://www.danfoss.com',
-    story: 'Danfoss, enerji verimliliği ve iklim çözümlerinde dünya lideridir. HVAC kontrol sistemleri, frekans konvertörleri ve ısı pompalarında öncü teknolojiyi sunar.',
-    stats: [
-      { label: 'Kuruluş', value: '1933' },
-      { label: 'Çalışan', value: '40,000+' },
-      { label: 'Ülke', value: '100+' }
     ]
   }
 }
@@ -91,21 +84,17 @@ export interface BrandDetailPageProps {
 const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
   const params = useParams()
   const slug = (initialBrandSlug || params?.slug) as string
-  const brand = HVAC_BRANDS.find((b) => b.slug === slug)
-  const brandDetails = slug ? BRAND_DETAILS[slug] : null
+  
+  // Normalize slug for matching
+  const brand = HVAC_BRANDS.find((b) => 
+    b.slug === slug || (slug === 'nicotra' && b.slug === 'nicotra-gebhardt')
+  )
+  
+  const detail = brand ? BRAND_DETAILS[brand.slug] : null
+  
   const { t } = useI18n()
-  const [heroRef, heroVisible] = useScrollAnimation<HTMLElement>()
-  const [productsRef, productsVisible] = useScrollAnimation<HTMLDivElement>()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-
-  const [canonicalUrl, setCanonicalUrl] = useState('')
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setCanonicalUrl(`${window.location.origin}/brands/${slug || ''}`)
-    }
-  }, [slug])
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -117,199 +106,197 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           .select('*')
           .eq('brand', brand.name)
           .eq('status', 'active')
-          .limit(6)
+          .limit(8)
 
-        if (!error && data) {
-          setProducts(data as Product[])
-        }
+        if (!error && data) setProducts(data as Product[])
       } catch (e) {
         console.error('Error loading brand products:', e)
       } finally {
         setLoading(false)
       }
     }
-
-    if (brand) {
-      loadProducts()
-    }
+    loadProducts()
   }, [brand])
 
   if (!brand) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-industrial-gray mb-4">{t('brands.notFound')}</h1>
-          <Link href="/brands" className="text-primary-navy hover:text-secondary-blue">{t('brands.backToAll')}</Link>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">{t('brands.notFound')}</h1>
+          <Link href="/brands" className="text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8">Tüm Markalara Dön</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen">
-      <Seo title={`${brand.name} | VentHub`} description={brandDetails?.story || brand.description} canonical={canonicalUrl} />
+    <div className="min-h-screen bg-white">
+      <Seo title={`${brand.name} | VentHub`} description={brand.description} />
 
-      {/* Hero Section */}
-      <section
-        ref={heroRef}
-        className="relative py-12 sm:py-16 bg-gradient-to-br from-primary-navy to-industrial-gray text-white overflow-hidden"
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gold-accent rounded-full blur-3xl" />
+      {/* Brand Hero: Ultra Premium Cinema Look */}
+      <section className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+        {/* Cinematic Background Atmosphere */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src="/images/hvac_installation_close_up_premium_3.png" 
+            alt={brand.name} 
+            fill 
+            className="object-cover opacity-20 brightness-50" 
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.1),transparent_70%)]" />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Breadcrumb */}
-          <div className="flex items-center text-sm text-white/60 mb-6">
-            <Link href="/" className="hover:text-white">{t('common.home')}</Link>
-            <span className="mx-2">/</span>
-            <Link href="/brands" className="hover:text-white">{t('common.brands')}</Link>
-            <span className="mx-2">/</span>
-            <span className="text-white font-medium">{brand.name}</span>
-          </div>
 
-          <div className={`flex items-start gap-6 ${scrollAnimationClasses.fadeUp(heroVisible)}`}>
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white flex items-center justify-center flex-shrink-0">
-              <BrandIcon brand={brand.name} className="w-16 h-16 sm:w-20 sm:h-20" />
+        <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12 flex justify-center"
+          >
+            <div className="w-32 h-32 lg:w-48 lg:h-48 rounded-[3rem] bg-white p-8 shadow-[0_0_50px_rgba(255,255,255,0.1)] flex items-center justify-center overflow-hidden">
+              <BrandIcon brand={brand.name} className="w-full h-full" />
             </div>
+          </motion.div>
+
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-6xl lg:text-9xl font-extralight tracking-tighter leading-tight"
+          >
+            {brand.name}
+          </motion.h1>
+          
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="mt-8 flex flex-wrap justify-center gap-8 text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400"
+          >
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              {brand.country} Origin
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              EST. {brand.founded}
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]" />
+              {brand.specialty}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Brand Identity & Vision */}
+      <section className="py-24 lg:py-32">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-[1fr,450px] gap-24 items-start">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">{brand.name}</h1>
-              <div className="flex items-center gap-4 text-white/70 mb-4">
-                <div className="flex items-center gap-1">
-                  <Globe size={16} />
-                  <span>{brandDetails?.headquarters || brand.country}</span>
-                </div>
-                {brandDetails?.founded && (
-                  <span>Kuruluş: {brandDetails.founded}</span>
-                )}
-              </div>
-              {brandDetails?.website && (
-                <a
-                  href={brandDetails.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-secondary-blue hover:text-white transition-colors"
-                >
-                  <ExternalLink size={14} />
-                  Resmi Web Sitesi
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Brand Story */}
-      <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <h2 className="text-2xl font-bold text-industrial-gray mb-4">Marka Hakkında</h2>
-              <p className="text-steel-gray leading-relaxed mb-6">
-                {brandDetails?.story || brand.description}
+              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-8 text-center lg:text-left">Engineering Heritage</div>
+              <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-[1.1] mb-12 text-center lg:text-left text-slate-900">
+                Mühendisliğin <br />
+                <span className="font-medium text-slate-950 italic">Teknolojik Otoritesi</span>
+              </h2>
+              <p className="text-xl text-slate-500 font-light leading-relaxed mb-12 text-center lg:text-left max-w-3xl">
+                {detail?.story || brand.description}
               </p>
-              <div className="flex items-center gap-2 text-success-green">
-                <Shield size={18} />
-                <span className="font-medium">VentHub'da Satışta</span>
+              
+              <div className="grid sm:grid-cols-2 gap-12">
+                <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Küresel Vizyon</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed font-light">
+                    {brand.name}, dünya çapındaki projelerde verimlilik ve sürdürülebilirlik standartlarını belirleyerek, geleceğin havalandırma teknolojilerini bugün inşa ediyor.
+                  </p>
+                </div>
+                <div className="p-8 rounded-[2rem] bg-slate-50 border border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Teknik Mükemmeliyet</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed font-light">
+                    Her bir ürün, en zorlu endüstriyel koşullara dayanacak şekilde test edilmiş ve akustik performans açısından optimize edilmiştir.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Stats */}
-            {brandDetails?.stats && (
-              <div className="bg-light-gray rounded-2xl p-6">
-                <h3 className="font-semibold text-industrial-gray mb-4">{brand.name} Rakamlarla</h3>
-                <div className="space-y-4">
-                  {brandDetails.stats.map((stat, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span className="text-steel-gray">{stat.label}</span>
-                      <span className="font-semibold text-primary-navy">{stat.value}</span>
+            <aside className="sticky top-32 space-y-8">
+              <div className="rounded-[2.5rem] bg-slate-950 p-10 text-white overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl" />
+                <div className="relative z-10">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-400 mb-8">Corporate Snapshot</div>
+                  
+                  <div className="space-y-6">
+                    {detail?.stats?.map((stat, i) => (
+                      <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
+                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">{stat.label}</span>
+                        <span className="text-sm font-medium">{stat.value}</span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Headquarters</span>
+                      <span className="text-sm font-medium">{brand.headquarters}</span>
                     </div>
-                  ))}
+                    {brand.website && (
+                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Web Authority</span>
+                        <a href={brand.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-cyan-400 hover:underline flex items-center gap-2">
+                          Official Site <ExternalLink size={12} />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  <button className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-[10px] tracking-widest rounded-2xl transition-all hover:bg-cyan-400 active:scale-95">
+                    Marka Kataloglarını İste
+                  </button>
                 </div>
               </div>
-            )}
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className="py-12 sm:py-16 bg-light-gray">
-        <div ref={productsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-industrial-gray">
-              {brand.name} Ürünleri
-            </h2>
-            {products.length > 0 && (
-              <Link
-                href={`/products?brand=${brand.name}`}
-                className="text-primary-navy font-semibold hover:text-secondary-blue flex items-center gap-1"
-              >
-                Tümünü Gör
-                <ArrowRight size={16} />
-              </Link>
-            )}
+      {/* Featured Brand Products Grid */}
+      <section className="py-24 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 text-center md:text-left">
+            <div>
+              <div className="text-cyan-600 text-[10px] font-black uppercase tracking-[0.5em] mb-4">Curated Solutions</div>
+              <h2 className="text-4xl font-light tracking-tighter text-slate-950">Öne Çıkan <span className="font-medium">Sistemler</span></h2>
+            </div>
+            <Link href={`/products?brand=${brand.name}`} className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-cyan-600 transition-colors flex items-center gap-3 justify-center">
+              <span>Tüm Ürün Grupları</span>
+              <ArrowRight size={14} />
+            </Link>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
-                  <div className="w-full h-32 bg-gray-200 rounded-lg mb-3" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
-                </div>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map(i => <div key={i} className="aspect-square bg-slate-200 rounded-[2rem] animate-pulse" />)}
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-              {products.map((product, index) => (
-                <Link
-                  key={product.id}
-                  href={`/products/${product.id}`}
-                  className={`group bg-white rounded-xl p-4 border border-light-gray hover:border-primary-navy/30 hover:shadow-hvac transition-all ${scrollAnimationClasses.fadeUp(productsVisible)}`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {products.map((product) => (
+                <Link 
+                  key={product.id} 
+                  href={`/products/${product.slug || product.id}`}
+                  className="group block bg-white rounded-[2.5rem] p-8 border border-white transition-all duration-700 hover:border-cyan-500/20 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)]"
                 >
-                  <div className="aspect-square bg-light-gray rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                    {product.image_url ? (
-                      <VentImage src={product.image_url}
-                        alt={product.name}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-                       />
-                    ) : (
-                      <Package size={48} className="text-steel-gray" />
-                    )}
+                  <div className="aspect-square relative flex items-center justify-center mb-8 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105">
+                    <VentImage src={product.image_url} alt={product.name} className="w-full h-full object-contain" />
                   </div>
-                  <h3 className="font-semibold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-2 text-sm sm:text-base">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-steel-gray">{product.sku}</p>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight mb-2 line-clamp-2">{product.name}</h3>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{product.sku}</div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white rounded-xl">
-              <Package size={48} className="text-steel-gray mx-auto mb-3" />
-              <p className="text-steel-gray">Bu markaya ait ürün bulunamadı.</p>
+            <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-slate-200">
+              <Package className="mx-auto text-slate-200 mb-4" size={48} />
+              <p className="text-slate-400 font-light italic">Bu markaya ait ürünler yakında eklenecektir.</p>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Award className="text-gold-accent mx-auto mb-4" size={40} />
-          <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            {brand.name} Ürünleri Hakkında Bilgi Alın
-          </h2>
-          <p className="text-steel-gray mb-6">
-            Teknik özellikler, fiyat ve stok bilgisi için bizimle iletişime geçin.
-          </p>
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-xl bg-primary-navy text-white px-6 py-3 font-semibold shadow-lg hover:bg-secondary-blue transition-all"
-          >
-            İletişime Geç
-          </Link>
         </div>
       </section>
     </div>
@@ -317,6 +304,3 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
 }
 
 export default BrandDetailPage
-
-
-
