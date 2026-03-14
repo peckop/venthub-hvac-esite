@@ -8,11 +8,11 @@ import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
 
 const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ items, durationSec = 60 }) => {
-  const REPEAT = 6
+  const REPEAT = 2 // Reduced from 6 to 2 for better DOM performance
   const repeated = useMemo(() => Array.from({ length: REPEAT }).flatMap(() => items), [items])
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden min-h-[16rem]"> {/* Added min-height to prevent CLS */}
       <style>{`
         @keyframes brands-scroll-left { 
           from { transform: translate3d(0, 0, 0); } 

@@ -29,13 +29,20 @@ Kod içinde `t()` fonksiyonuna bağlanmamış, tırnak içinde direkt yazılan v
 - **Hedef:** JSON alanlarına Type Guard olmadan erişimi bulur.
 - **Kural:** `(specs as any)[key]` gibi yapılar yasaktır. Önce `isRecord` guard'ı veya `TypedRecord<T>` kullanılmalıdır.
 
-### 3. Performans Denetimi (Next.js Image)
-Next.js optimizasyonu yerine kullanılan düz HTML resim etiketlerini bulur.
-- **Regex:** `<img\b`
+### 3. Performans Denetimi (Next.js Image & SSR)
+Next.js optimizasyonu yerine kullanılan düz HTML resim etiketlerini ve SSR engelleyicileri bulur.
+- **Regex:** `<img\b` (Next.js Image yerine düz img kullanımı)
+- **Regex:** `ssr:\s*false` (SSR'ı kapatan dinamik importlar - LCP düşmanıdır)
+- **Regex:** `window\.(location|localStorage|sessionStorage|innerWidth)` (Sunucu tarafında patlayacak ve SSR'ı engelleyecek window kullanımları)
 
-### 4. Erişilebilirlik Denetimi (A11y)
-`aria-label` içermeyen buton ve linkleri raporlar (Yüksek öncelikli).
-- **Arama:** `<button(?![^>]*aria-label)[^>]*>`
+### 4. Vite & Migration Denetimi
+Vite projesinden kalma ve Next.js'e taşınması gereken yapıları bulur.
+- **Regex:** `import\s+.*from\s+['"]react-router-dom['"]` (Vite mirası router kullanımı)
+- **Regex:** `const\s+router\s+=\s+useRouter\(\)` (Eğer 'next/router'dan geliyorsa App Router uyumsuzdur, 'next/navigation' olmalı)
+
+### 6. Erişilebilirlik ve CLS (Layout Shift) Denetimi
+- **Arama:** `<button(?![^>]*aria-label)[^>]*>` (A11y eksikliği)
+- **Arama:** `className="[^"]*animate-pulse[^"]*"` (Skeleton var mı? Yoksa eklenecek yerleri belirler)
 
 ## Çalıştırma Talimatı
 Audit yapmak için şu komutu veya benzerini kullanın:

@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import ProductCard from '../components/ProductCard'
 import BrandsShowcase from '../components/BrandsShowcase'
@@ -179,27 +179,25 @@ const FilterSidebar = ({
   )
 }
 
-const ProductsPage: React.FC = () => {
+interface ProductsPageProps {
+  initialCategories?: Category[]
+  initialBrands?: string[]
+}
+
+const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], initialBrands = [] }) => {
   const pathname = usePathname()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { t } = useI18n()
   const [leadOpen, setLeadOpen] = useState(false)
 
-  // URL Params State - Wrapped in useMemo for safe SSR access
-  const [params, setParams] = useState<URLSearchParams | null>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setParams(new URLSearchParams(window.location.search))
-    }
-  }, [pathname])
-
-  const qParam = params?.get('q')?.trim() || ''
-  const catParam = params?.get('category') || null
-  const brandsParam = params?.get('brands')?.split(',').filter(Boolean) || []
-  const minPriceParam = params?.get('min_price') || ''
-  const maxPriceParam = params?.get('max_price') || ''
-  const isAll = params?.get('all') === '1'
+  // URL Params - Using Next.js searchParams hook (no more window.location)
+  const qParam = searchParams.get('q')?.trim() || ''
+  const catParam = searchParams.get('category') || null
+  const brandsParam = searchParams.get('brands')?.split(',').filter(Boolean) || []
+  const minPriceParam = searchParams.get('min_price') || ''
+  const maxPriceParam = searchParams.get('max_price') || ''
+  const isAll = searchParams.get('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -207,11 +205,11 @@ const ProductsPage: React.FC = () => {
 
   // Data State
   const [products, setProducts] = useState<Product[] | FtsProductResult[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [loading, setLoading] = useState(false)
 
   // Filter State
-  const [availableBrands, setAvailableBrands] = useState<string[]>([])
+  const [availableBrands, setAvailableBrands] = useState<string[]>(initialBrands)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   // Scroll Restoration
@@ -230,28 +228,36 @@ const ProductsPage: React.FC = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const appSectionRef = useRef<HTMLDivElement>(null)
 
-    // Global Lead Modal Trigger
-    ; ((window as unknown) as { openLeadModal?: () => void }).openLeadModal = () => setLeadOpen(true)
-
-  // 1. Initialize & Fetch Metadata (Cats, Brands)
+  // Global Lead Modal Trigger - Safely encapsulated in useEffect
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).openLeadModal = () => setLeadOpen(true)
+    }
+  }, [])
+
+  // 1. Initialize Metadata if not provided as props
+  useEffect(() => {
+    // If we already have data from SSR, skip client-side fetch
+    if (initialCategories.length > 0 && initialBrands.length > 0) return
+
     async function init() {
       try {
         const { getCategories, getAllProducts } = await import('../lib/supabase')
-        const cats = await getCategories()
-        setCategories(cats)
-
-        // Extract unique brands for filter
-        // Note: Ideally this comes from a 'brands' table or RPC, but distinct on products works for now
-        const allProds = await getAllProducts()
-        const brands = Array.from(new Set(allProds.map(p => p.brand).filter(Boolean))) as string[]
-        setAvailableBrands(brands.sort())
+        if (categories.length === 0) {
+          const cats = await getCategories()
+          setCategories(cats)
+        }
+        if (availableBrands.length === 0) {
+          const allProds = await getAllProducts()
+          const brands = Array.from(new Set(allProds.map(p => p.brand).filter(Boolean))) as string[]
+          setAvailableBrands(brands.sort())
+        }
       } catch (e) {
         console.error('Init error', e)
       }
     }
     init()
-  }, [])
+  }, [initialCategories, initialBrands, categories.length, availableBrands.length])
 
   // 2. Sync Input with URL
   useEffect(() => {
@@ -267,7 +273,6 @@ const ProductsPage: React.FC = () => {
       }
     }, 600)
     return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue, qParam])
 
   // 4. Main Data Fetcher
@@ -316,19 +321,17 @@ const ProductsPage: React.FC = () => {
 
     fetchData()
     return () => { active = false }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeQuery, catParam, brandsParam.join(','), minPriceParam, maxPriceParam, isAll, categories])
 
 
   // Helper: Update URL params
   const updateUrl = (patch: Record<string, string | null>) => {
-    if (typeof window === 'undefined') return
-    const next = new URLSearchParams(window.location.search)
+    const next = new URLSearchParams(searchParams.toString())
     Object.entries(patch).forEach(([k, v]) => {
       if (v === null || v === '') next.delete(k)
       else next.set(k, v)
     })
-    router.push(`?${next.toString()}`)
+    router.push(`${pathname}?${next.toString()}`)
   }
 
 
@@ -510,8 +513,3 @@ function SearchIcon({ size = 16, className = "" }: { size?: number, className?: 
 }
 
 export default ProductsPage
-
-
-
-
-

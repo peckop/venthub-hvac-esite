@@ -1,8 +1,0 @@
-﻿  origin/HEAD -> origin/master
-  origin/chore/i18n-sync-en-tr-13870391855158790401
-  origin/feat/advanced-fts-search
-  origin/fix-static-analysis-errors-17926846418318387248
-  origin/jules-4879508831171477288-ff5982a1
-  origin/jules-7905923236833492909-5f07663c
-  origin/jules-i18n-sync-en-tr-14923336260321246765
-  origin/master
