@@ -18,9 +18,14 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 - **Component Integrity:** Yeni bileşenler `src/components/` altında uygun kategoriye konulmalı ve `useI18n()` ile uluslararasılaştırılmalıdır.
 - **Supabase Services:** Tüm Supabase servisleri (`src/lib/supabase.ts`) asimetrik tip (input/output) güvenliğine sahip olmalıdır.
 
-## 4. Onay ve Planlama
-- **Plan Gate:** Küçük olmayan tüm değişiklikler için önce strateji belirlenmeli, beyin fırtınası yapılmalı ve kullanıcı onayı alınmalıdır.
-- **Validation Gate:** Her değişiklik `tsc`, `lint` ve ilgili testlerle doğrulanmalıdır. "Çalışıyor gibi görünüyor" bir kabul kriteri değildir; "Hatasız derleniyor ve testten geçiyor" esastır.
+## 5. Performans Muhafızlığı (90+ Lighthouse Guardrails)
+- **SSR-First Policy:** Tüm yeni rotalar ve ana sayfalar varsayılan olarak Server Component (`ssr: true`) olmalıdır. `ssr: false` kullanımı için mimari bir zorunluluk kanıtlanmalı ve kullanıcı onayı alınmalıdır.
+- **Window-Safety:** `window`, `document`, `localStorage` bağımlılıkları asla üst seviye bileşenlerde (top-level) kullanılmamalıdır. Sadece `useEffect` veya dinamik `typeof window` kontrolüyle kapsüllenmelidir.
+- **LCP & CLS Focus:** Her yeni görsel bileşen için `width/height` zorunludur. Her dinamik veri alanı için bir `Skeleton` (İskelet) bileşeni planlanmadan kod yazılamaz.
+- **Vite Legacy:** Proje içindeki `react-router-dom` veya `window.location` gibi Vite döneminden kalan yapılar görüldüğü an Next.js App Router standartlarına (`next/navigation`) modernize edilmelidir.
+
+## 6. Onay ve Planlama
+... (mevcut içerik)
 
 ---
 *Bu anayasa, projenin sürdürülebilirliğini ve güvenliğini korumak için mühürlenmiştir.*
