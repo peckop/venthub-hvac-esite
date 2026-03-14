@@ -5,46 +5,33 @@ import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
  * Returns the display name for a category.
  * Prioritizes the 'hero_title' from static metadata configuration (SSOT).
  * If not present, falls back to the database name.
+ * Uses the refined Category type from db-rows.ts which guarantees name is a string.
  */
 export const getCategoryDisplayName = (category: Category | null | undefined): string => {
     if (!category) return ''
     
-    // 1. Prioritize Static Metadata
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_title) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_title!
     }
 
-    // 2. Database Name (Handle Json type strictly)
-    const name = category.name
-    if (typeof name === 'string') return name
-    
-    // Fallback for Json/Null/Other
-    return String(name || '')
+    return category.name
 }
 
 /**
  * Returns the description for a category.
- * Prioritizes 'hero_description' from static metadata.
  */
 export const getCategoryDescription = (category: Category | null | undefined): string => {
     if (!category) return ''
 
-    // 1. Prioritize Static Metadata
     if (STATIC_CATEGORY_METADATA[category.slug]?.hero_description) {
         return STATIC_CATEGORY_METADATA[category.slug].hero_description!
     }
 
-    // 2. Database Description (Handle Json type strictly)
-    const desc = category.description
-    if (typeof desc === 'string') return desc
-    
-    // Fallback for Json/Null/Other
-    return String(desc || '')
+    return category.description || ''
 }
 
 /**
  * Safely parses a price string or number to a number.
- * Deprecated: Prices are now handled as numeric in the database layer.
  */
 export const parsePriceToNumber = (val: any): number => {
     if (typeof val === 'number') return val

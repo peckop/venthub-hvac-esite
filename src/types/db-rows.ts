@@ -6,7 +6,12 @@ export type Enums = PublicSchema['Enums'];
 
 // Common Table Row Aliases
 export type DbProduct = Tables['products']['Row'];
-export type DbCategory = Tables['categories']['Row'];
+
+// Override DbCategory to ensure 'name' and 'description' are strings (Supabase sometimes misinterprets them as Json)
+export interface DbCategory extends Omit<Tables['categories']['Row'], 'name' | 'description'> {
+  name: string;
+  description: string | null;
+}
 // brands table doesn't exist in types, it's likely a column in products
 export type DbUserAddress = Tables['user_addresses']['Row'];
 export type DbInvoiceProfile = Tables['user_invoice_profiles']['Row'];

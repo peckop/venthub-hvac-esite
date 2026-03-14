@@ -219,7 +219,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 <div className="flex items-center space-x-2 text-secondary-blue mb-4">
                                     <Activity size={20} />
                                     <span className="font-medium tracking-wide text-sm uppercase">
-                                        {String(category.metadata.technical_summary)}
+                                        {category.metadata.technical_summary}
                                     </span>
                                 </div>
                             )}
@@ -228,7 +228,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 {getCategoryDisplayName(category)}
                             </h1>
                             <p className="text-lg text-gray-300 mb-8 max-w-xl">
-                                {String(category.metadata?.hero_description || category.description || '')}
+                                {category.metadata?.hero_description || category.description}
                             </p>
 
                             {/* Dynamic Features Grid */}
