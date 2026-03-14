@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
-import ProductCard from '../components/ProductCard'
 import dynamic from 'next/dynamic'
+import ProductCard from '../components/ProductCard'
 
 // Lazy load heavy components
 const CategoryOrbitCarousel = dynamic(() => import('../components/products').then(mod => mod.CategoryOrbitCarousel), { 
