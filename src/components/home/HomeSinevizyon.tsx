@@ -126,6 +126,10 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
           80% { opacity: 0.2; }
           100% { transform: translateX(600px); opacity: 0; }
         }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(2deg); }
+        }
         .particle {
           position: absolute;
           height: 1px;
@@ -235,15 +239,44 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                   className={`absolute ${i === 0 ? 'z-20' : 'z-10 opacity-40 translate-x-32 translate-y-20 blur-[1px]'}`}
                 >
                   <Link href={p.link} className="relative block group">
-                    {/* Technical HUD Label */}
-                    <div className={`absolute ${i === 0 ? '-right-16 top-0' : '-left-16 bottom-0'} z-30 hidden lg:block`}>
-                      <div className="flex items-center gap-3">
-                        <div className="h-px w-12 bg-cyan-400/50" />
-                        <div className="rounded-lg border border-cyan-500/30 bg-slate-950/80 p-3 backdrop-blur-md">
-                          <div className="text-[14px] font-black text-white">{t(p.labelKey)}</div>
-                          <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-400">{t(p.subLabelKey)}</div>
+                    {/* Technical HUD Label - Redesigned for High-Tech Aesthetic */}
+                    <div className={`absolute ${i === 0 ? '-right-24 top-0' : '-left-24 bottom-0'} z-30 hidden lg:block`}>
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="relative"
+                      >
+                        {/* Connecting Line with Animated Dot */}
+                        <div className={`absolute ${i === 0 ? 'right-full' : 'left-full'} top-1/2 -translate-y-1/2 flex items-center`}>
+                          <div className="h-[1px] w-16 bg-gradient-to-r from-transparent via-cyan-500 to-cyan-400" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22D3EE] animate-pulse" />
                         </div>
-                      </div>
+
+                        <div className="relative group/hud overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/40 p-4 backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+                          {/* HUD Corner Accents */}
+                          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-400/60" />
+                          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/60" />
+                          
+                          {/* Animated Scan Line Inside HUD */}
+                          <motion.div 
+                            animate={{ top: ['-100%', '200%'] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="absolute left-0 right-0 h-px bg-cyan-400/10 pointer-events-none"
+                          />
+
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <div className="h-1 w-1 bg-cyan-400 rounded-full" />
+                              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400/80">System.Data.Live</div>
+                            </div>
+                            <div className="text-[15px] font-bold text-white tracking-tight leading-tight">{t(p.labelKey)}</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="text-[9px] font-medium uppercase tracking-widest text-slate-400">{t(p.subLabelKey)}</div>
+                              <div className="h-px flex-1 bg-white/5" />
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
                     </div>
 
                     <div

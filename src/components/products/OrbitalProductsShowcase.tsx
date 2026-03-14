@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
 import { Environment, Float, Sparkles, Html } from '@react-three/drei'

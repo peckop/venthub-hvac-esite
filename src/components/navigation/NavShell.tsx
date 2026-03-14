@@ -28,7 +28,7 @@ const NavShell: React.FC<NavShellProps> = ({
     onHoverEnd,
 }) => {
     // When scrolling down, we translate both headers UP by their total height so they hide.
-    // The top tier is ~40px (h-10), the bottom tier is ~64px (h-16).
+    // The top tier is ~32px (h-8), the bottom tier is ~64px (h-16).
     // Let's use Tailwind's -translate-y-full and group them inside a container.
 
     return (
@@ -56,7 +56,7 @@ const NavShell: React.FC<NavShellProps> = ({
                     'transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] bg-primary-navy text-white overflow-hidden',
                     // Hide the top tier if we are not at the top (unless we want it to stay when scrolling up?
                     // Usually we hide the top tier when scrolled, and only show bottom tier when scrolling up)
-                    !isAtTop ? 'h-0 opacity-0' : 'h-0 opacity-0 md:h-10 md:opacity-100 relative'
+                    !isAtTop ? 'h-0 opacity-0' : 'h-8 opacity-100 relative'
                 )}
             >
                 <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
