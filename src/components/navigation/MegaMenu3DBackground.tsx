@@ -1,7 +1,13 @@
+'use client'
+
+'use client'
+
 import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Category3DIcon from '../products/Category3DIcon'
+
+
 
 interface MegaMenu3DBackgroundProps {
     categorySlug: string
