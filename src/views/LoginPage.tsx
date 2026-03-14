@@ -1,3 +1,5 @@
+'use client'
+
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
