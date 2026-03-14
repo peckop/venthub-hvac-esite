@@ -316,7 +316,9 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
             const saveSelectionToDB = async (recommendedProducts: MatchedProduct[]) => {
                 try {
                     const { data: { user } } = await supabase.auth.getUser()
-                    const sessionId = typeof window !== 'undefined' ? (localStorage.getItem('wizard_session_id') || `sess_${Math.random().toString(36).substr(2, 9)}`) : ''
+                    const fallbackRnd = Math.random().toString(36).substr(2, 9)
+                    const newId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackRnd
+                    const sessionId = typeof window !== 'undefined' ? (localStorage.getItem('wizard_session_id') || `sess_${newId}`) : ''
                     if (typeof window !== 'undefined' && !localStorage.getItem('wizard_session_id')) {
                         localStorage.setItem('wizard_session_id', sessionId)
                     }

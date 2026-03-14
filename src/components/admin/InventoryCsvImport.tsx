@@ -159,7 +159,8 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                         return crypto.randomUUID()
                     }
                 } catch { }
-                return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+                // Fallback for extremely old environments (though crypto is widely supported)
+                return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`
             }
             const batchId = genBatchId()
 
