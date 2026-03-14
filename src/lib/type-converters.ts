@@ -1,4 +1,7 @@
+import type { Json } from '@/types/database.types';
 import { DbProduct, DbCategory } from '@/types/db-rows';
+
+type JsonObject = Record<string, Json | undefined>;
 
 /**
  * Ürün teknik özellikleri için iç yapı tanımı.
@@ -11,7 +14,7 @@ export interface ProductTechnicalSpecs {
   max_yukseklik?: number | string | null;
   maksimum_yukseklik?: number | string | null;
   montaj_yuksekligi?: number | string | null;
-  [key: string]: any;
+  [key: string]: Json | undefined;
 }
 
 /**
@@ -21,7 +24,7 @@ export interface CategoryMetadata {
   display_mode?: 'showcase' | 'series' | 'list';
   showcase_images?: { desktop: string; mobile: string }[];
   features?: { icon: string; title: string; description: string }[];
-  [key: string]: any;
+  [key: string]: Json | undefined;
 }
 
 /**
@@ -79,17 +82,24 @@ export interface DomainProduct {
 /**
  * Type Guard: Verilen değerin bir Record (object) olup olmadığını kontrol eder.
  */
-export function isRecord(value: unknown): value is Record<string, any> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**
  * Veritabanından gelen ham 'Json' verisini güvenli bir şekilde objeye dönüştürür.
  */
-export function parseJsonField<T>(data: unknown): T | null {
+export function parseJsonField<T extends JsonObject>(
+  data: unknown,
+  guard?: (value: JsonObject) => value is T,
+): T | null {
   if (!data) return null;
   if (isRecord(data)) {
-    return data as unknown as T;
+    const jsonObject = data as JsonObject;
+    if (guard && !guard(jsonObject)) {
+      return null;
+    }
+    return jsonObject as T;
   }
   return null;
 }

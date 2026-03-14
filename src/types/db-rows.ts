@@ -1,4 +1,4 @@
-import { Database } from './database.types';
+import type { Database, Json } from './database.types';
 
 export type PublicSchema = Database['public'];
 export type Tables = PublicSchema['Tables'];
@@ -14,9 +14,26 @@ export type DbShoppingCart = Tables['shopping_carts']['Row'];
 export type DbCartItem = Tables['cart_items']['Row'];
 export type DbOrder = Tables['venthub_orders']['Row'];
 export type DbOrderItem = Tables['venthub_order_items']['Row'];
-// user_projects and project_items are missing from types
-export type DbUserProject = any;
-export type DbProjectItem = any;
+// user_projects and project_items are missing from generated DB types
+export interface DbUserProject {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbProjectItem {
+  id: string;
+  project_id: string;
+  product_id: string;
+  quantity: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  product?: DbProduct | null;
+}
 
 // Common Table Insert Aliases
 export type DbProductInsert = Tables['products']['Insert'];
@@ -30,4 +47,4 @@ export type DbUserAddressUpdate = Tables['user_addresses']['Update'];
 export type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update'];
 
 // Helper for JSON fields
-export type Json = Database['public']['Tables']['products']['Row']['technical_specs'];
+export type DbJson = Json;
