@@ -7,7 +7,7 @@ import React from 'react'
 import { useI18n } from '../../i18n/I18nProvider'
 
 interface FinalCTAProps {
-  onQuoteClick: () => void
+  onQuoteClick?: () => void
 }
 
 const revealVariants: Variants = {
@@ -76,7 +76,10 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
           <div className="flex flex-wrap gap-6">
             <button
               type="button"
-              onClick={onQuoteClick}
+              onClick={() => {
+                if (onQuoteClick) onQuoteClick();
+                else if (typeof window !== "undefined") window.openLeadModal?.();
+              }}
               className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] active:scale-95"
             >
               <span className="relative z-10">{t('home.finalCta.primaryCta')}</span>

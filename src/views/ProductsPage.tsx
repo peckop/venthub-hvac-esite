@@ -1,26 +1,45 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import type { Product, Category, FtsProductResult } from '../lib/supabase'
 import dynamic from 'next/dynamic'
 import ProductCard from '../components/ProductCard'
 
-// Lazy load heavy components
+// Skeleton components for lazy-loaded components to prevent CLS
+const OrbitSkeleton = () => <div className="h-[400px] bg-slate-100 animate-pulse rounded-3xl" />
+const ApplicationSkeleton = () => <div className="h-[300px] bg-slate-50 animate-pulse rounded-xl" />
+const BrandsSkeleton = () => <div className="h-[150px] bg-white animate-pulse" />
+
+// Lazy load heavy components with proper skeletons
+// Lazy load heavy components with proper skeletons - Moved to ssr: false for Canvas/Motion heavy components to boost TBT
 const CategoryOrbitCarousel = dynamic(() => import('../components/products').then(mod => mod.CategoryOrbitCarousel), { 
-  ssr: true,
-  loading: () => <div className="h-[400px] bg-slate-900 animate-pulse rounded-3xl" />
+  ssr: false,
+  loading: () => <OrbitSkeleton />
 })
-const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { ssr: true })
-const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { ssr: true })
-const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: true })
-const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: true })
+const ApplicationCards = dynamic(() => import('../components/products').then(mod => mod.ApplicationCards), { 
+  ssr: false,
+  loading: () => <ApplicationSkeleton />
+})
+const BrandsShowcase = dynamic(() => import('../components/BrandsShowcase'), { 
+  ssr: false,
+  loading: () => <BrandsSkeleton />
+})
+const UndecidedUserCTA = dynamic(() => import('../components/UndecidedUserCTA').then(mod => mod.UndecidedUserCTA), { ssr: false })
+const TrustSection = dynamic(() => import('../components/TrustSection'), { ssr: false })
 const LeadModal = dynamic(() => import('../components/LeadModal'), { ssr: false })
 const Seo = dynamic(() => import('../components/Seo'), { ssr: true })
 
 import { useI18n } from '../i18n/I18nProvider'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
+
+// Define global window interface for type safety
+declare global {
+  interface Window {
+    openLeadModal?: () => void
+  }
+}
 
 
 // Helper: Get all descendant category IDs (including self)
@@ -210,10 +229,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   const qParam = getParam('q').trim()
   const catParam = getParam('category') || null
   const brandsParam = useMemo(() => {
-    const b = {}['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
-    const str = typeof b === 'string' ? b : (Array.isArray(b) ? b[0] : '')
-    return str ? str.split(',').filter(Boolean) : []
-  }, [{}, hookSearchParams])
+    const b = hookSearchParams ? hookSearchParams.get('brands') : null
+    return b ? b.split(',').filter(Boolean) : []
+  }, [hookSearchParams])
 
   const minPriceParam = getParam('min_price')
   const maxPriceParam = getParam('max_price')
@@ -228,8 +246,13 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [loading, setLoading] = useState(false)
 
+  // Hydration sync
+  const isInitialMount = useRef(true)
+
   useEffect(() => {
-    setProducts(serverProducts)
+    if (serverProducts.length > 0) {
+      setProducts(serverProducts)
+    }
   }, [serverProducts])
 
   // Filter State
@@ -252,7 +275,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      (window as any).openLeadModal = () => setLeadOpen(true)
+      window.openLeadModal = () => setLeadOpen(true)
+    }
+    return () => {
+      if (typeof window !== 'undefined') window.openLeadModal = undefined
     }
   }, [])
 
@@ -279,6 +305,12 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
     let active = true
 
     async function fetchData() {
+      // Skip if it's the first mount and we already have server-side data
+      if (isInitialMount.current && serverProducts.length > 0) {
+        isInitialMount.current = false
+        return
+      }
+
       setLoading(true)
       try {
         const { getProductsEnriched } = await import('../lib/supabase')
@@ -316,7 +348,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
     fetchData()
     return () => { active = false }
-  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories, brandsParam])
+  }, [activeQuery, catParam, joinedBrands, minPriceParam, maxPriceParam, isAll, categories])
 
 
   // Helper: Update URL params

@@ -72,7 +72,7 @@ export const VentImage: React.FC<VentImageProps> = ({
         src={finalSrc}
         alt={alt || 'VentHub HVAC'}
         className={`transition-all duration-500 ease-in-out ${
-          isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 blur-sm'
+          (isLoaded || props.priority) ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-95 blur-sm'
         } ${className || ''}`}
         onLoad={() => setIsLoaded(true)}
         onError={() => {
