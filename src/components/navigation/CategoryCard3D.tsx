@@ -2,7 +2,8 @@ import React, { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { ChevronRight } from 'lucide-react'
-import Category3DIcon from '../products/Category3DIcon'
+import dynamic from 'next/dynamic'
+const Category3DIcon = dynamic(() => import('../products/Category3DIcon'), { ssr: false, loading: () => <div className="w-full h-full animate-pulse bg-slate-800/20 rounded-xl" /> })
 import type { Category } from '../../lib/supabase'
 
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
