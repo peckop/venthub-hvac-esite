@@ -6,7 +6,9 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { hibpPwnedCount } from '../../utils/passwordSecurity'
 import { ShieldCheck, Lock, Key, Check, Loader2, Mail, Link as LinkIcon, Unlink, Chrome } from 'lucide-react'
 
+import { useRouter } from 'next/navigation'
 export default function AccountSecurityPage() {
+  const router = useRouter()
   const { user } = useAuth()
   const { t } = useI18n()
   const [current, setCurrent] = useState('')
@@ -241,7 +243,7 @@ export default function AccountSecurityPage() {
                           if (error) throw error
                           const url = (data as unknown as { url?: string })?.url
                           if (url) {
-                            window.location.href = url
+                            router.push(url)
                           } else {
                             toast.success('Google hesabı bağlama işlemi başlatıldı')
                             await refreshIdentities()

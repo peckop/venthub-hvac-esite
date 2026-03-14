@@ -261,6 +261,8 @@ export interface UserAddress {
 }
 
 export interface CreateAddressInput {
+  address_type?: string;
+  address_line?: string;
   label?: string
   full_name?: string
   phone?: string
@@ -291,14 +293,14 @@ export async function createAddress(payload: CreateAddressInput): Promise<UserAd
   if (!user) throw new Error('Not authenticated')
 
   const dbPayload: DbUserAddressInsert = {
+    address_type: payload.address_type || (payload.is_default_shipping ? 'shipping' : 'billing'),
+    address_line: payload.address_line || payload.full_address || '',
     user_id: user.id,
     label: payload.label || 'Adres',
     full_name: payload.full_name,
     phone: payload.phone,
     full_address: payload.full_address,
-    address_line: payload.full_address,
     street_address: payload.full_address,
-    address_type: payload.is_default_shipping ? 'shipping' : 'billing',
     city: payload.city,
     district: payload.district,
     postal_code: payload.postal_code,
@@ -381,6 +383,7 @@ export async function listInvoiceProfiles(): Promise<InvoiceProfile[]> {
 }
 
 export async function createInvoiceProfile(payload: Partial<InvoiceProfile>): Promise<InvoiceProfile> {
+  if (!payload.type) payload.type = 'individual';
   const { data: authData } = await supabase.auth.getUser()
   if (!authData?.user) throw new Error('Not authenticated')
 
