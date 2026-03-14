@@ -120,9 +120,6 @@ const FilterSidebar = ({
   onPriceChange: (type: 'min' | 'max', val: string) => void,
   t: (key: string) => string
 }) => {
-  // Prefix unused var with underscore
-  const _rootCats = categories.filter(c => c.level === 0)
-
   return (
     <aside className="w-full lg:w-64 flex-shrink-0 space-y-8">
       {/* Categories */}
@@ -182,22 +179,37 @@ const FilterSidebar = ({
 interface ProductsPageProps {
   initialCategories?: Category[]
   initialBrands?: string[]
+  serverSearchParams?: { [key: string]: string | string[] | undefined }
 }
 
-const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], initialBrands = [] }) => {
+const ProductsPage: React.FC<ProductsPageProps> = ({ 
+  initialCategories = [], 
+  initialBrands = [],
+  serverSearchParams = {}
+}) => {
   const pathname = usePathname()
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const hookSearchParams = useSearchParams()
   const { t } = useI18n()
   const [leadOpen, setLeadOpen] = useState(false)
 
-  // URL Params - Using Next.js searchParams hook (no more window.location)
-  const qParam = searchParams.get('q')?.trim() || ''
-  const catParam = searchParams.get('category') || null
-  const brandsParam = useMemo(() => searchParams.get('brands')?.split(',').filter(Boolean) || [], [searchParams])
-  const minPriceParam = searchParams.get('min_price') || ''
-  const maxPriceParam = searchParams.get('max_price') || ''
-  const isAll = searchParams.get('all') === '1'
+  // Use server params for initial paint, fallback to hook for dynamic updates
+  const getParam = (key: string): string => {
+    const val = serverSearchParams[key] || (hookSearchParams ? hookSearchParams.get(key) : null)
+    return typeof val === 'string' ? val : (Array.isArray(val) ? val[0] : '')
+  }
+
+  const qParam = getParam('q').trim()
+  const catParam = getParam('category') || null
+  const brandsParam = useMemo(() => {
+    const b = serverSearchParams['brands'] || (hookSearchParams ? hookSearchParams.get('brands') : null)
+    const str = typeof b === 'string' ? b : (Array.isArray(b) ? b[0] : '')
+    return str ? str.split(',').filter(Boolean) : []
+  }, [serverSearchParams, hookSearchParams])
+
+  const minPriceParam = getParam('min_price')
+  const maxPriceParam = getParam('max_price')
+  const isAll = getParam('all') === '1'
 
   // Internal State
   const [inputValue, setInputValue] = useState(qParam)
@@ -215,11 +227,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   // Scroll Restoration
   useManualScrollRestoration(loading)
 
-  // Create map of category ID -> hide_price for efficient lookup
-  const categoryHidePriceMap = React.useMemo(() => {
+  const categoryHidePriceMap = useMemo(() => {
     const map = new Map<string, boolean>()
     categories.forEach(c => {
-      // Check for strict boolean true to avoid accidental hiding
       if (c.metadata?.hide_price === true) map.set(c.id, true)
     })
     return map
@@ -228,58 +238,31 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   const searchInputRef = useRef<HTMLInputElement>(null)
   const appSectionRef = useRef<HTMLDivElement>(null)
 
-  // Global Lead Modal Trigger - Safely encapsulated in useEffect
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).openLeadModal = () => setLeadOpen(true)
     }
   }, [])
 
-  // 1. Initialize Metadata if not provided as props
-  useEffect(() => {
-    // If we already have data from SSR, skip client-side fetch
-    if (initialCategories.length > 0 && initialBrands.length > 0) return
-
-    async function init() {
-      try {
-        const { getCategories, getAllProducts } = await import('../lib/supabase')
-        if (categories.length === 0) {
-          const cats = await getCategories()
-          setCategories(cats)
-        }
-        if (availableBrands.length === 0) {
-          const allProds = await getAllProducts()
-          const brands = Array.from(new Set(allProds.map(p => p.brand).filter(Boolean))) as string[]
-          setAvailableBrands(brands.sort())
-        }
-      } catch (e) {
-        console.error('Init error', e)
-      }
-    }
-    init()
-  }, [initialCategories, initialBrands, categories.length, availableBrands.length])
-
-  // 2. Sync Input with URL
+  // Sync Input with URL
   useEffect(() => {
     setInputValue(qParam)
     setActiveQuery(qParam)
   }, [qParam])
 
-  // 3. Debounce Input -> URL Update
+  // Debounce Input -> URL Update
   useEffect(() => {
     const timer = setTimeout(() => {
       if (inputValue !== qParam) {
-        const next = new URLSearchParams(searchParams.toString())
-        next.set('q', inputValue)
-        router.push(`${pathname}?${next.toString()}`)
+        updateUrl({ q: inputValue })
       }
     }, 600)
     return () => clearTimeout(timer)
-  }, [inputValue, qParam, pathname, router, searchParams])
+  }, [inputValue, qParam, pathname, router])
 
   const joinedBrands = brandsParam.join(',')
 
-  // 4. Main Data Fetcher
+  // Main Data Fetcher
   useEffect(() => {
     let active = true
 
@@ -287,8 +270,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
       setLoading(true)
       try {
         const { getProductsEnriched } = await import('../lib/supabase')
-
-        // Mode A: Search or Filters active
         const hasFilters = catParam || brandsParam.length > 0 || minPriceParam || maxPriceParam
 
         if (activeQuery || hasFilters) {
@@ -297,7 +278,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
           const results = await getProductsEnriched({
             searchQuery: activeQuery || undefined,
             categoryIds,
-            brand: brandsParam[0], // Single brand support
+            brand: brandsParam[0],
             minPrice: minPriceParam ? Number(minPriceParam) : undefined,
             maxPrice: maxPriceParam ? Number(maxPriceParam) : undefined,
             limit: 50
@@ -307,12 +288,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
             setProducts(results)
           }
         }
-        // Mode B: All Products
         else if (isAll) {
           const all = await getProductsEnriched({ limit: 1000 })
           if (active) setProducts(all)
         }
-        // Mode C: Discovery (Empty)
         else {
           setProducts([])
         }
@@ -330,19 +309,18 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
 
   // Helper: Update URL params
   const updateUrl = (patch: Record<string, string | null>) => {
-    const next = new URLSearchParams(searchParams.toString())
+    const current = hookSearchParams ? new URLSearchParams(hookSearchParams.toString()) : new URLSearchParams()
     Object.entries(patch).forEach(([k, v]) => {
-      if (v === null || v === '') next.delete(k)
-      else next.set(k, v)
+      if (v === null || v === '') current.delete(k)
+      else current.set(k, v)
     })
-    router.push(`${pathname}?${next.toString()}`)
+    router.push(`${pathname}?${current.toString()}`)
   }
 
 
   // Handlers
   const handleCategorySelect = (id: string | null) => updateUrl({ category: id })
   const handleBrandToggle = (brand: string) => {
-    // Single brand mode for current SQL
     const current = brandsParam[0]
     updateUrl({ brands: current === brand ? null : brand })
   }
@@ -351,7 +329,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   const showSidebar = isAll || activeQuery || catParam || brandsParam.length > 0
   const isDiscovery = !showSidebar
 
-  // Breadcrumb
   const breadcrumbLabel = activeQuery ? `"${activeQuery}"` : (isAll ? t('common.allProducts') : t('common.discover'))
 
   return (
@@ -362,7 +339,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
         noindex={Boolean(activeQuery)}
       />
 
-      {/* Breadcrumb */}
       <div className="flex items-center text-sm text-steel-gray mb-4 sm:mb-6 overflow-x-auto whitespace-nowrap scrollbar-hide">
         <span className="text-industrial-gray font-medium">{
           activeQuery
@@ -376,7 +352,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
         }</span>
       </div>
 
-      {/* Search Header - Only in Search/Filter Mode */}
       {!isDiscovery && (
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="flex-1 relative">
@@ -408,7 +383,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
       )}
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-        {/* Sidebar */}
         {showSidebar && (
           <FilterSidebar
             categories={categories}
@@ -423,14 +397,11 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
           />
         )}
 
-        {/* Listenin Ana Gövdesi */}
         <div className="flex-1 w-full min-w-0">
-          {/* Discovery Content */}
           {isDiscovery && (
             <DiscoveryContent appSectionRef={appSectionRef} />
           )}
 
-          {/* Product Grid */}
           {!isDiscovery && (
             <div className="w-full">
               {loading ? (
@@ -462,8 +433,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
                       />
                     ))}
                   </div>
-
-                  {/* Undecided User CTA */}
                   <div className="mt-12 sm:mt-16">
                     <UndecidedUserCTA />
                   </div>
@@ -479,7 +448,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories = [], ini
   )
 }
 
-// Sub-component to keep main file clean
 const DiscoveryContent = ({
   appSectionRef
 }: {
@@ -487,16 +455,12 @@ const DiscoveryContent = ({
 }) => {
   return (
     <div className="space-y-12 sm:space-y-16">
-      {/* 3D Orbit Category Carousel - Now the hero */}
       <div className="-mx-4 sm:mx-0 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl shadow-primary-navy/10 border border-white/10 bg-[#020617]">
         <CategoryOrbitCarousel />
       </div>
-
-      {/* Application Areas */}
       <div ref={appSectionRef} className="px-1">
         <ApplicationCards />
       </div>
-
       <div className="space-y-12 sm:space-y-16">
         <BrandsShowcase />
         <TrustSection />
@@ -505,7 +469,6 @@ const DiscoveryContent = ({
   )
 }
 
-// Icons
 function GridIcon({ size = 16 }: { size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
 }
