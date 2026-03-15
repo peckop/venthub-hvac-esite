@@ -3,7 +3,8 @@ vi.mock('next/navigation', () => ({
     push: vi.fn(),
     replace: vi.fn(),
     prefetch: vi.fn()
-  })
+  }),
+  useSearchParams: () => new URLSearchParams()
 }))
 
 import React from 'react'
