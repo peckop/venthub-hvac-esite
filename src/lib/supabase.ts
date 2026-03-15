@@ -9,8 +9,18 @@ export type UserAddress = Database['public']['Tables']['user_addresses']['Row']
 export type InvoiceProfile = Database['public']['Tables']['user_invoice_profiles']['Row']
 export type InvoiceProfileType = 'individual' | 'corporate'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || (import.meta as any).env?.VITE_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || ''
+/**
+ * Next.js Environment Variables (Browser-accessible)
+ * IMPORTANT: In Next.js, env vars MUST start with NEXT_PUBLIC_ to be available in browser.
+ * Fallback to standard VITE keys if present, but process.env is the standard way.
+ */
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Safety check for development
+if (typeof window !== 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
+  console.warn('⚠️ Supabase configuration missing! Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your .env file.');
+}
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
