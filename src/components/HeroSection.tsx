@@ -6,25 +6,15 @@ import LazyInView from './LazyInView'
 
 const SpotlightHeroOverlay = React.lazy(() => import('./SpotlightHeroOverlay'))
 
-// Base hero image for next/image
-import heroImage from '../assets/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
-
-// Background image responsive variants (decorative)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgDefaultAvif from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=768&format=avif&quality=50'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgLargeAvif from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=1280&format=avif&quality=45'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import bgTiny from '../assets/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg?w=24&format=avif&quality=40'
+// Fixed image paths using public folder URLs instead of relative asset imports
+const heroImagePath = '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
+const bgImagePath = '/images/modern-industrial-HVAC-rooftop-blue-sky-facility.jpg'
 
 const HeroPicture: React.FC = () => {
   const sizes = '(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1200px'
   return (
     <Image
-      src={heroImage}
+      src={heroImagePath}
       alt="HVAC Equipment"
       width={1200}
       height={800}
@@ -49,75 +39,51 @@ export const HeroSection: React.FC = () => {
       return !rm && !coarse
     } catch { return false }
   })()
-  // Render desktop-only large hero image to avoid high-priority fetch on mobile
+  
   const [isDesktop, setIsDesktop] = useState(false)
   useEffect(() => {
     try {
       const mq = window.matchMedia('(min-width: 1024px)')
-      type MQLModern = { addEventListener(type: 'change', listener: (e: MediaQueryListEvent) => void): void; removeEventListener(type: 'change', listener: (e: MediaQueryListEvent) => void): void }
-      type MQLLegacy = { addListener(listener: (e: MediaQueryListEvent) => void): void; removeListener(listener: (e: MediaQueryListEvent) => void): void }
-      const mql = mq as MediaQueryList & Partial<MQLModern> & Partial<MQLLegacy>
-
-      const onChange = () => setIsDesktop(mql.matches)
+      const onChange = () => setIsDesktop(mq.matches)
       onChange()
-
-      if (typeof mql.addEventListener === 'function') {
-        mql.addEventListener('change', onChange)
-      } else if (typeof mql.addListener === 'function') {
-        mql.addListener(onChange)
-      }
-      return () => {
-        if (typeof mql.removeEventListener === 'function') {
-          mql.removeEventListener('change', onChange)
-        } else if (typeof mql.removeListener === 'function') {
-          mql.removeListener(onChange)
-        }
-      }
+      mq.addEventListener('change', onChange)
+      return () => mq.removeEventListener('change', onChange)
     } catch { setIsDesktop(false) }
   }, [])
-  // Lazy mount spotlight overlay only on fine pointer devices after idle
+
   const [showOverlay, setShowOverlay] = useState(false)
   useEffect(() => {
     try {
       const coarse = window.matchMedia('(pointer: coarse)').matches
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (coarse || rm) return
-      const win = window as unknown as { requestIdleCallback?: (cb: () => void) => number }
+      const win = window as any
       const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 800))
       idle(() => setShowOverlay(true))
     } catch { }
   }, [])
 
-  // Defer high-res background; show tiny blurred LQIP early (via CSS var + ::before)
   useEffect(() => {
     try {
       if (!bgRef.current) return
       const el = bgRef.current
 
-      const setPlaceholder = () => {
-        el.style.setProperty('--hero-bg-url', `url(${(bgTiny as unknown as string)})`)
-        el.style.setProperty('--hero-bg-filter', 'blur(12px)')
-        el.style.setProperty('--hero-bg-opacity', '0')
-      }
-
       const setHighResNow = () => {
-        const isLg = window.matchMedia('(min-width: 1024px)').matches
-        const url = (isLg ? (bgLargeAvif as unknown as string) : (bgDefaultAvif as unknown as string))
-        el.style.setProperty('--hero-bg-url', `url(${url})`)
+        el.style.setProperty('--hero-bg-url', `url(${bgImagePath})`)
         el.style.setProperty('--hero-bg-filter', 'blur(0)')
         el.style.setProperty('--hero-bg-opacity', '1')
       }
 
-      // Show tiny LQIP ASAP to avoid long blank paint
-      const raf = requestAnimationFrame(setPlaceholder)
+      const raf = requestAnimationFrame(() => {
+        el.style.setProperty('--hero-bg-url', `url(${bgImagePath})`)
+        el.style.setProperty('--hero-bg-filter', 'blur(12px)')
+        el.style.setProperty('--hero-bg-opacity', '0.1')
+      })
 
-      // Swap to high-res after full load + delay (longer on mobile) to avoid affecting LCP
       const onLoad = () => {
-        try {
-          const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
-          const delay = isMobile ? 5200 : 1200
-          setTimeout(setHighResNow, delay)
-        } catch { setTimeout(setHighResNow, 1500) }
+        const isMobile = window.matchMedia('(max-width: 1023px)').matches || window.matchMedia('(pointer: coarse)').matches
+        const delay = isMobile ? 5200 : 1200
+        setTimeout(setHighResNow, delay)
       }
       window.addEventListener('load', onLoad)
 
@@ -141,7 +107,6 @@ export const HeroSection: React.FC = () => {
       }}
       className="relative bg-gradient-to-br from-air-blue via-clean-white to-light-gray overflow-hidden"
     >
-      {/* Background (decorative) via pseudo-element to avoid being LCP */}
       <div
         ref={bgRef}
         className="hero-bg absolute inset-0 pointer-events-none opacity-15 md:opacity-20"
@@ -151,17 +116,14 @@ export const HeroSection: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-primary-navy/20 to-transparent" />
       </div>
 
-      {/* Spotlight Overlay */}
       {showOverlay && (
         <React.Suspense fallback={null}>
           <SpotlightHeroOverlay />
         </React.Suspense>
       )}
 
-      {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-industrial-gray leading-tight">
@@ -172,7 +134,6 @@ export const HeroSection: React.FC = () => {
               </p>
             </div>
 
-            {/* Features */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex items-center space-x-3">
                 <CheckIcon className="text-success-green flex-shrink-0" />
@@ -192,7 +153,6 @@ export const HeroSection: React.FC = () => {
               </div>
             </div>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/products"
@@ -211,9 +171,7 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Content - Featured Product/Stats */}
           <div className="space-y-6 order-1 lg:order-2">
-            {/* Stats Counters (in-view) */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {(() => {
                 type CounterProps = { label: string; to: number; suffix?: string }
@@ -230,10 +188,8 @@ export const HeroSection: React.FC = () => {
               })()}
             </div>
 
-            {/* Featured Image (render only on desktop to prevent mobile fetching) */}
             {isDesktop && (
               <div className="relative hidden lg:block">
-                {/* Optimized hero image with next/image */}
                 <HeroPicture />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/20 to-transparent rounded-xl" />
               </div>
@@ -242,7 +198,6 @@ export const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom Wave */}
       <div className="absolute bottom-0 left-0 right-0 pointer-events-none" aria-hidden="true">
         <svg viewBox="0 0 1200 120" fill="none" xmlns="https://www.w3.org/2000/svg">
           <path
@@ -255,7 +210,6 @@ export const HeroSection: React.FC = () => {
   )
 }
 
-// Minimal inline icons to avoid loading lucide-react on initial load
 function ArrowRightIcon({ className = '' }: { className?: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
