@@ -13,8 +13,8 @@ export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    window.openLeadModal = () => setLeadOpen(true)
-    return () => { window.openLeadModal = undefined }
+    (window as any).openLeadModal = () => setLeadOpen(true)
+    return () => { (window as any).openLeadModal = undefined }
   }, [])
 
   return (

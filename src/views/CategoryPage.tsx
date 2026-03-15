@@ -68,13 +68,13 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
 
           if (parentSlug && slug) {
             // Sub-category page
-            targetParentCategory = categories.find(c => c.slug === parentSlug && c.level === 0) || null
-            targetCategory = categories.find(c => c.slug === slug && c.level === 1) || null
+            targetParentCategory = categories.find(c => c.slug === parentSlug && !c.parent_id) || null
+            targetCategory = categories.find(c => c.slug === slug && !!c.parent_id) || null
           } else if (slug) {
             // Main category page
-            targetCategory = categories.find(c => c.slug === slug && c.level === 0) || null
+            targetCategory = categories.find(c => c.slug === slug && !c.parent_id) || null
           }
-        } else if (targetCategory.level === 0) {
+        } else if (!targetCategory.parent_id) {
           // Fetch categories to find subcategories even if targetCategory is from props
           categories = await getCategories()
         }
@@ -89,12 +89,12 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
 
         // Get subcategories if this is a main category
         let subs: Category[] = []
-        if (targetCategory.level === 0) {
+        if (!targetCategory.parent_id) {
           subs = categories
             .filter(c => c.parent_id === targetCategory.id)
             .sort((a, b) => {
-              const orderA = a.sort_order ?? 0
-              const orderB = b.sort_order ?? 0
+              const orderA = (a as any).sort_order ?? 0
+              const orderB = (b as any).sort_order ?? 0
               if (orderA !== orderB) return orderA - orderB
               return a.name.localeCompare(b.name)
             })
@@ -105,19 +105,17 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
         let productsData: Product[] = []
         const { getProductsEnriched } = await import('../lib/supabase')
 
-        if (targetCategory.level === 0 && subs.length > 0) {
+        if (!targetCategory.parent_id && subs.length > 0) {
           // Ana kategori ve alt kategorileri varsa: tümünü kapsayan liste
           const allCategoryIds = [targetCategory.id, ...subs.map(s => s.id)]
           productsData = await getProductsEnriched({
             categoryIds: allCategoryIds,
-            sortBy: 'featured',
             limit: 100
           })
         } else {
           // Alt kategori veya tekil kategori
           productsData = await getProductsEnriched({
             categoryIds: [targetCategory.id],
-            sortBy: 'featured',
             limit: 100
           })
         }
@@ -148,12 +146,11 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     .filter(product => {
       const term = catSearch.trim().toLowerCase()
       if (term) {
-        const modelCode = (product as unknown as { model_code?: string | null }).model_code || ''
+        const modelCode = product.model_code || ''
         const hay = [product.name, product.brand, modelCode, product.sku].map(v => String(v || '').toLowerCase())
         if (!hay.some(h => h.includes(term))) return false
       }
-      const rawPrice = (product as unknown as { price?: unknown }).price
-      const priceNum = typeof rawPrice === 'number' ? rawPrice : Number(rawPrice)
+      const priceNum = product.price
       // Fiyat sayıya çevrilemiyorsa (NaN), fiyat filtresini devre dışı bırak (ürünü eleme)
       const matchesPrice = Number.isFinite(priceNum)
         ? priceNum >= priceRange[0] && priceNum <= priceRange[1]
@@ -262,10 +259,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     return (
       <>
         <Seo
-          title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-          description={category.seo_desc || category.description || undefined}
+          title={(category as any).seo_title || `${getCategoryDisplayName(category)} | VentHub`}
+          description={(category as any).seo_desc || category.description || undefined}
           canonical={(canonicalUrl || undefined) as string | undefined}
-          image={categoryImageUrl || undefined}
+          ogImage={categoryImageUrl || undefined}
         />
         <CategoryShowcase category={enrichedCategory} subCategories={subCategories} parentCategory={parentCategory} />
       </>
@@ -277,10 +274,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     return (
       <>
         <Seo
-          title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-          description={category.seo_desc || category.description || undefined}
+          title={(category as any).seo_title || `${getCategoryDisplayName(category)} | VentHub`}
+          description={(category as any).seo_desc || category.description || undefined}
           canonical={(canonicalUrl || undefined) as string | undefined}
-          image={categoryImageUrl || undefined}
+          ogImage={categoryImageUrl || undefined}
         />
         <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} parentCategory={parentCategory} />
       </>
@@ -290,11 +287,11 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
   return (
     <div className="min-h-screen bg-light-gray">
       <Seo
-        title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-        description={category.seo_desc || category.description || undefined}
+        title={(category as any).seo_title || `${getCategoryDisplayName(category)} | VentHub`}
+        description={(category as any).seo_desc || category.description || undefined}
         canonical={(canonicalUrl || undefined) as string | undefined}
-        noindex={false}
-        image={categoryImageUrl || undefined} // Use category image for OG image if allowed by Seo component types
+        noIndex={false}
+        ogImage={categoryImageUrl || undefined} 
       />
       {/* JSON-LD: BreadcrumbList */}
       <script
@@ -795,7 +792,3 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
 }
 
 export default CategoryPage
-
-
-
-

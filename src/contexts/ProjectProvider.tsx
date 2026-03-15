@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { 
   listUserProjects, 
   createProject, 
@@ -8,82 +8,100 @@ import {
   addProductToProject, 
   removeProductFromProject, 
   listProjectItems,
-  UserProject
+  UserProject,
+  ProjectItem
 } from '../lib/supabase'
-import { ProjectContext } from './ProjectContext'
 import { useAuth } from '../hooks/useAuth'
 import toast from 'react-hot-toast'
 
-export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth()
-  const [projects, setProjects] = useState<UserProject[]>([])
-  const [loading, setLoading] = useState(false)
+interface ProjectContextType {
+  projects: UserProject[]
+  loading: boolean
+  refreshProjects: () => Promise<void>
+  addProject: (name: string, description?: string) => Promise<UserProject | null>
+  removeProject: (id: string) => Promise<void>
+  addItem: (projectId: string, productId: string, quantity?: number) => Promise<void>
+  removeItem: (projectId: string, productId: string) => Promise<void>
+  getProjectItems: (projectId: string) => Promise<ProjectItem[]>
+}
 
-  const refreshProjects = useCallback(async () => {
-    if (!user) {
-      setProjects([])
-      return
-    }
+const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
+
+export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [projects, setProjects] = useState<UserProject[]>([])
+  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+
+  const refreshProjects = React.useCallback(async () => {
+    if (!user) return
     setLoading(true)
     try {
       const data = await listUserProjects()
-      setProjects(data)
-    } catch (error) {
-      console.error('Error refreshing projects:', error)
+      setProjects(data as UserProject[])
+    } catch {
+      console.error('Error refreshing projects')
     } finally {
       setLoading(false)
     }
   }, [user])
 
   useEffect(() => {
-    refreshProjects()
-  }, [refreshProjects])
+    if (user) {
+      refreshProjects()
+    } else {
+      setProjects([])
+      setLoading(false)
+    }
+  }, [user, refreshProjects])
 
   const addProject = async (name: string, description?: string) => {
     try {
-      const newProject = await createProject(name, description)
+      const newProject = await createProject({ name, description, user_id: user?.id })
       setProjects(prev => [newProject, ...prev])
       toast.success('Proje başarıyla oluşturuldu.')
       return newProject
-    } catch (error) {
+    } catch {
       toast.error('Proje oluşturulamadı.')
-      throw error
+      return null
     }
   }
 
-  const removeProject = async (projectId: string) => {
+  const removeProject = async (id: string) => {
     try {
-      await deleteProject(projectId)
-      setProjects(prev => prev.filter(p => p.id !== projectId))
+      await deleteProject(id)
+      setProjects(prev => prev.filter(p => p.id !== id))
       toast.success('Proje silindi.')
-    } catch (error) {
+    } catch {
       toast.error('Proje silinemedi.')
-      throw error
     }
   }
 
-  const addItemToProject = async (projectId: string, productId: string, quantity = 1) => {
+  const addItem = async (projectId: string, productId: string, quantity: number = 1) => {
     try {
       await addProductToProject(projectId, productId, quantity)
       toast.success('Ürün projeye eklendi.')
-    } catch (error) {
+    } catch {
       toast.error('Ürün eklenemedi.')
-      throw error
     }
   }
 
-  const removeItemFromProject = async (projectId: string, productId: string) => {
+  const removeItem = async (projectId: string, productId: string) => {
     try {
       await removeProductFromProject(projectId, productId)
       toast.success('Ürün projeden çıkarıldı.')
-    } catch (error) {
+    } catch {
       toast.error('Ürün çıkarılamadı.')
-      throw error
     }
   }
 
-  const getProjectItems = async (projectId: string) => {
-    return await listProjectItems(projectId)
+  const getProjectItems = async (projectId: string): Promise<ProjectItem[]> => {
+    try {
+      const items = await listProjectItems(projectId)
+      return items as ProjectItem[]
+    } catch {
+      console.error('Error getting project items')
+      return []
+    }
   }
 
   return (
@@ -93,11 +111,19 @@ export const ProjectProvider: React.FC<{ children: ReactNode }> = ({ children })
       refreshProjects,
       addProject,
       removeProject,
-      addItemToProject,
-      removeItemFromProject,
+      addItem,
+      removeItem,
       getProjectItems
     }}>
       {children}
     </ProjectContext.Provider>
   )
+}
+
+export const useProjects = () => {
+  const context = useContext(ProjectContext)
+  if (context === undefined) {
+    throw new Error('useProjects must be used within a ProjectProvider')
+  }
+  return context
 }

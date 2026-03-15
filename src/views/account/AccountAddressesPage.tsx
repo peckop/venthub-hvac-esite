@@ -61,13 +61,13 @@ export default function AccountAddressesPage() {
       label: a.label || '',
       full_name: a.full_name || '',
       phone: a.phone || '',
-      full_address: a.full_address,
-      city: a.city,
-      district: a.district,
+      full_address: a.full_address || '',
+      city: a.city || '',
+      district: a.district || '',
       postal_code: a.postal_code || '',
       country: a.country || 'TR',
-      is_default_shipping: a.is_default_shipping,
-      is_default_billing: a.is_default_billing,
+      is_default_shipping: a.is_default_shipping ?? false,
+      is_default_billing: a.is_default_billing ?? false,
     })
     // Scroll to form on mobile
     window.scrollTo({ top: 0, behavior: 'smooth' })

@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { useI18n } from '../i18n/I18nProvider'
 import { 
   Award, Shield, Target, Globe, Zap, 
-  ArrowRight, CheckCircle2, Factory, Microscope, Users
+  Factory, Microscope
 } from 'lucide-react'
 import Seo from '../components/Seo'
 import { BrandIcon } from '../components/HVACIcons'
