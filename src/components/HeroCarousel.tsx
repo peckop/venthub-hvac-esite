@@ -74,10 +74,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     // Filter only main categories defined in registry
     const mainCategories = categories.filter(c =>
         Object.values(CATEGORY_REGISTRY).some(reg => reg.slug === c.slug)
-    ).sort((a, b) => {
-        // Custom sort order if needed, or rely on DB sort_order
-        return (a.sort_order || 99) - (b.sort_order || 99)
-    })
+    ).sort((a, b) => a.name.localeCompare(b.name))
 
     // Safe reset if categories change
     useEffect(() => {

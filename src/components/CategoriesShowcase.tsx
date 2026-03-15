@@ -11,9 +11,9 @@ interface CategoriesShowcaseProps {
 
 export const CategoriesShowcase: React.FC<CategoriesShowcaseProps> = ({ categories }) => {
   const { t } = useI18n()
-  // Get main categories only (level 0)
-  const mainCategories = categories.filter(cat => cat.level === 0)
-  const subCategories = categories.filter(cat => cat.level === 1)
+  // Get main categories only (no parent)
+  const mainCategories = categories.filter(cat => !cat.parent_id)
+  const subCategories = categories.filter(cat => !!cat.parent_id)
 
   const getSubCategoryCount = (parentId: string) => {
     return subCategories.filter(sub => sub.parent_id === parentId).length

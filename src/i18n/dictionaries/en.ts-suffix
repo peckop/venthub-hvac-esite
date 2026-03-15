@@ -1,0 +1,76 @@
+    categorySilentFan: {
+      problem: {
+        eyebrow: 'SOUND AND COMFORT',
+        title: 'End Noise That Disrupts Your Peace',
+        subtitle: 'Standard duct fans don\'t just move air; they move noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
+        painPoints: [
+          { title: 'Acoustic Pollution', description: 'The hum created by conventional fans makes it difficult to focus and reduces comfort.' },
+          { title: 'Low Efficiency', description: 'Noisy fans are often aerodynamically inefficient and consume more energy.' },
+          { title: 'Vibration Issues', description: 'Poorly isolated devices cause vibration and secondary noise on mounting surfaces.' },
+          { title: 'Disrupted Focus', description: 'Constant noise can reduce productivity in libraries and offices by 20%.' }
+        ],
+        visual: {
+          without: 'With Standard Fan',
+          with: 'With Lineo Quiet',
+          withoutPoints: ['High decibel levels', 'Mechanical vibration', 'Turbulent airflow', 'Energy loss'],
+          withPoints: ['Whisper quiet', '60% energy saving', 'Laminar airflow', 'Vibration-free operation']
+        }
+      },
+      howItWorks: {
+        eyebrow: 'TECHNOLOGY',
+        title: 'Engineering Behind Silent Power',
+        subtitle: 'Vortice Lineo Quiet offers whisper-level performance with its aerodynamically optimized housing and sound-absorbing layers.',
+        steps: [
+          { title: 'Sound-Absorbing Housing', description: 'Special composite outer body traps motor noise inside.' },
+          { title: 'Laminar Flow', description: 'Air guiding vanes reduce turbulence and cut noise at the source.' },
+          { title: 'Dynamic Balance', description: 'High-precision fan impeller ensures vibration-free and silent circulation.' }
+        ]
+      },
+      comparison: {
+        title: 'Why Lineo Quiet?',
+        standard: 'Standard Fans',
+        quiet: 'Vortice Lineo Quiet',
+        features: [
+          { label: 'Noise Level', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
+          { label: 'Energy Consumption', standard: 'High (AC Motor)', quiet: '60% Saving (ES/EC Motor)' },
+          { label: 'Air Quality', standard: 'Turbulent Flow', quiet: 'Laminar and Continuous' },
+          { label: 'Mounting', standard: 'Complex and Rigid', quiet: 'Fast and Vibration Isolated' }
+        ]
+      },
+      faq: {
+        title: 'Frequently Asked Questions',
+        items: [
+          { q: 'How quiet is it really?', a: 'Lineo Quiet is close to whisper sound (approx. 25 dB) at low speed. This is less than half of a normal conversation.' },
+          { q: 'Is it hard to install?', a: 'No, thanks to quick-mount clamps, you don\'t need to disconnect the device from the duct for maintenance or installation.' },
+          { q: 'Which areas is it suitable for?', a: 'Ideal for anywhere silence is critical, such as libraries, offices, bedrooms, and hotel rooms.' }
+        ]
+      },
+      brand: {
+        eyebrow: 'ENGINEERING HERITAGE',
+        title: 'Italian Silence: The Vortice Legend',
+        description: 'Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.',
+        badges: ['Authorized Distributor', '2 Year Warranty'],
+        stats: [
+          { label: 'Years Experience', value: '70+' },
+          { label: 'Countries', value: '90+' },
+          { label: "Compasso d'Oro", value: '3x' },
+          { label: 'Europe', value: '#1' }
+        ]
+      }
+    },
+    categories: {
+      title: 'Product Categories',
+      subtitle: 'Find professional ventilation solutions with our wide range covering all HVAC areas.',
+      subCount: '{{count}} subcategories',
+      allTitle: 'All Categories',
+      variantCount: '{{count}} types'
+    },
+    quickView: {
+      title: 'Quick View',
+      close: 'Close',
+      addToCart: 'Add to Cart',
+      viewProduct: 'View Product',
+      descFallback: 'Product description will be added soon.'
+    }
+  }
+};

@@ -34,7 +34,6 @@ const FlexDuctModel: React.FC = () => {
         }
         return new THREE.CatmullRomCurve3(points)
     }
-    const timeRef = useRef(0)
     useFrame((state) => {
         if (!meshRef.current || !spiralRef.current) return
         const time = state.clock.getElapsedTime()

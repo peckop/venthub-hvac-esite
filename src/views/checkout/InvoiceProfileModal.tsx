@@ -2,61 +2,82 @@
 
 import React from 'react'
 import { InvoiceProfile } from '../../lib/supabase'
+import { X, User, Building2, Landmark, CheckCircle } from 'lucide-react'
 
 interface InvoiceProfileModalProps {
-    title: string
-    profiles: InvoiceProfile[]
+    open: boolean
     onClose: () => void
-    onPick: (p: InvoiceProfile) => void
-    t: (key: string) => string
+    profiles: InvoiceProfile[]
+    onSelect: (p: InvoiceProfile) => void
 }
 
-const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({
-    title,
-    profiles,
-    onClose,
-    onPick,
-    t
-}) => (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
-        <div role="dialog" aria-modal="true" className="bg-white rounded-2xl shadow-2xl w-[92%] max-w-2xl max-h-[80vh] overflow-hidden">
-            <div className="px-5 py-4 border-b flex items-center justify-between">
-                <div className="text-industrial-gray font-semibold">{title}</div>
-                <button type="button" onClick={onClose} className="text-sm text-primary-navy hover:underline">{t('checkout.saved.close')}</button>
-            </div>
-            <div className="p-5 overflow-y-auto">
-                {profiles.length === 0 ? (
-                    <div className="text-sm text-steel-gray">—</div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {profiles.map((p) => (
-                            <div key={p.id} className="border rounded-lg p-3 bg-white hover:shadow-sm transition">
-                                <div className="text-sm text-industrial-gray font-medium">
-                                    {(p.title || (p.type === 'individual' ? t('account.invoices.individual') : t('account.invoices.corporate')))} {p.is_default && <span className="ml-1 text-xs text-primary-navy">({t('checkout.saved.default')})</span>}
+export const InvoiceProfileModal: React.FC<InvoiceProfileModalProps> = ({ open, onClose, profiles, onSelect }) => {
+    if (!open) return null
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
+            
+            <div className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+                <div className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-3">
+                        <Landmark size={20} className="text-primary-navy" />
+                        Kayıtlı Fatura Profilleri
+                    </h3>
+                    <button onClick={onClose} className="p-2 hover:bg-white rounded-xl transition-colors">
+                        <X size={20} className="text-slate-400" />
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                    {profiles.map((p) => (
+                        <button
+                            key={p.id}
+                            onClick={() => onSelect(p)}
+                            className="w-full text-left group bg-white border border-slate-200 hover:border-primary-navy/40 hover:shadow-md rounded-2xl p-5 transition-all relative overflow-hidden"
+                        >
+                            <div className="flex items-start gap-4">
+                                <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${p.profile_type === 'individual' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                                    {p.profile_type === 'individual' ? <User size={20} /> : <Building2 size={20} />}
                                 </div>
-                                <div className="text-xs text-steel-gray mt-1 whitespace-pre-line">
-                                    {p.type === 'individual' ? (
-                                        <div>TCKN: {p.tckn || '-'}</div>
-                                    ) : (
-                                        <div>
-                                            <div>{t('account.invoices.companyLabel')}: {p.company_name || '-'}</div>
-                                            <div>{t('account.invoices.vknLabel')}: {p.vkn || '-'}</div>
-                                            <div>{t('account.invoices.taxOfficeLabel')}: {p.tax_office || '-'}</div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="mt-2 flex justify-end">
-                                    <button type="button" className="text-xs px-3 py-1.5 rounded-full border hover:bg-gray-50" onClick={() => onPick(p)}>
-                                        {t('checkout.saved.use')}
-                                    </button>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <h4 className="font-bold text-slate-900 truncate">
+                                            {p.profile_type === 'individual' ? `${p.first_name} ${p.last_name}` : p.company_name}
+                                        </h4>
+                                        {p.is_default && (
+                                            <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                                                <CheckCircle size={8} /> Varsayılan
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+                                        {p.tax_office} / {p.tax_number}
+                                    </div>
+                                    <div className="text-xs text-slate-400 line-clamp-1">
+                                        {p.address_line} {p.district}/{p.city}
+                                    </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        </button>
+                    ))}
+
+                    {profiles.length === 0 && (
+                        <div className="py-12 text-center text-slate-400 italic">Henüz fatura profili eklenmemiş.</div>
+                    )}
+                </div>
+
+                <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <button 
+                        onClick={onClose}
+                        className="px-8 py-3 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-100 transition-colors"
+                    >
+                        Kapat
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-)
+    )
+}
 
 export default InvoiceProfileModal

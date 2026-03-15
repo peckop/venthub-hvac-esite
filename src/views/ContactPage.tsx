@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Phone, Mail, MapPin, Clock, Send, CheckCircle, ExternalLink, MessageCircle } from 'lucide-react'
+import { Phone, Mail, MapPin, Clock, CheckCircle } from 'lucide-react'
 import { useI18n } from '../i18n/I18nProvider'
 import Seo from '../components/Seo'
 import { WhatsAppIcon } from '../components/HVACIcons'

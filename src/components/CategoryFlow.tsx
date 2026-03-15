@@ -123,8 +123,8 @@ const CategoryFlow: React.FC<CategoryFlowProps> = ({
         async function fetchData() {
             try {
                 const data = await getCategories()
-                // Sadece ana kategorileri al (level 0)
-                const mainCategories = data.filter(c => c.level === 0)
+                // Sadece ana kategorileri al (parent_id null)
+                const mainCategories = data.filter(c => !c.parent_id)
                 if (!cancelled) {
                     setCategories(mainCategories)
                 }

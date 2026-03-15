@@ -9,7 +9,7 @@ import { BottomCTA } from './sections'
 import { Breadcrumb } from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface CategoryShowcaseProps {
@@ -24,7 +24,6 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     // Check if this is special showcase categories
     const isAirCurtain = category.slug === 'hava-perdeleri'
     const isQuietFan = category.slug === 'sessiz-kanal-tipi-fanlar'
-    const isSpecialCase = isAirCurtain || isQuietFan
 
     // Hero image logic
     const heroImage = category.metadata?.showcase_images?.[0]?.desktop ||
@@ -357,6 +356,3 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 }
 
 export default CategoryShowcase
-
-
-

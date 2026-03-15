@@ -33,8 +33,8 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     // Hover edilen (Sol tarafta 3D modeli gösterilecek) kategori
     const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
 
-    // Ana kategoriler (level 0)
-    const mainCategories = categories.filter(cat => cat.level === 0)
+    // Ana kategoriler (parent_id null)
+    const mainCategories = categories.filter(cat => !cat.parent_id)
 
     // Seçilen kategorinin alt kategorileri
     const subCategories = selectedParentCategory

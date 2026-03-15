@@ -116,8 +116,8 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
 
     // Alt kategorileri parent slugları ile birlikte hazırla
     const subcategoriesWithParent = useMemo(() => {
-        const mainCategories = categories.filter(c => c.level === 0)
-        const subCategories = categories.filter(c => c.level === 1)
+        const mainCategories = categories.filter(c => !c.parent_id)
+        const subCategories = categories.filter(c => !!c.parent_id)
 
         return subCategories.map(sub => {
             const parent = mainCategories.find(m => m.id === sub.parent_id)

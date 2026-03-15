@@ -1,4 +1,4 @@
-import { safeNumber, safeString } from '../../utils/type-converters'
+import { safeNumber } from '../../utils/type-converters'
 import { UserAddress } from '../../lib/supabase'
 
 export interface CartItemInput {
