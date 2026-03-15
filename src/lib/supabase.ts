@@ -9,7 +9,7 @@ export type UserAddress = Database['public']['Tables']['user_addresses']['Row']
 export type InvoiceProfile = Database['public']['Tables']['user_invoice_profiles']['Row']
 export type InvoiceProfileType = 'individual' | 'corporate'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
