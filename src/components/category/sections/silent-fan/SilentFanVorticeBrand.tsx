@@ -1,6 +1,6 @@
 ﻿import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
-import { Award, Globe, Clock, Shield, Star } from 'lucide-react'
+import { Award, Globe, Clock, Star } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
@@ -9,15 +9,7 @@ const SilentFanVorticeBrand: React.FC = () => {
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const tr = (key: string) => t(`categorySilentFan.brand.${key}`) as any
 
-    const iconMap: any = {
-        'Clock': Clock,
-        'Globe': Globe,
-        'Award': Award,
-        'Star': Star
-    }
-    
-    // We can't map strings to components easily if we don't know the exact string, 
-    // but we know the order or we can just use the icons array directly like before.
+    // We know the order or we can just use the icons array directly like before.
     const icons = [Clock, Globe, Award, Star]
     const stats = tr('stats') || []
 

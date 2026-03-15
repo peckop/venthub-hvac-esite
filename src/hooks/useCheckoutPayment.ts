@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { supabase, UserAddress, InvoiceProfile } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { validateServerCart } from '../lib/order'
 import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
 import { CartItem } from '../contexts/CartContext'

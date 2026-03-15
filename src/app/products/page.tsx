@@ -48,15 +48,11 @@ export default async function Page({ searchParams }: PageProps) {
     initialProducts = await getProductsEnriched({ limit: 1000 })
   }
 
-  // Get unique brands from categories/all products (or just let the client handle it based on categories)
-  const initialBrands = Array.from(new Set(initialProducts.map(p => p.brand).filter(Boolean))) as string[]
-
   return (
     <Suspense fallback={<ProductsSkeleton />}>
       <ProductsPage 
         initialCategories={categories} 
-        initialBrands={initialBrands.sort()}
-        serverProducts={initialProducts}
+        initialProducts={initialProducts}
       />
     </Suspense>
   )

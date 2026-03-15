@@ -1,4 +1,3 @@
-import { VentImage } from '@/components/ui/VentImage'
 import toast from 'react-hot-toast'
 
 interface QrLabelProps {

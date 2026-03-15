@@ -9,7 +9,6 @@ const TrustProofSection = dynamic(() => import('../components/home/TrustProofSec
 const FeaturedCommercialBlocks = dynamic(() => import('../components/home/FeaturedCommercialBlocks'), { ssr: false, loading: () => <div className="w-full h-[600px] bg-white animate-pulse" /> })
 const StrategicBrands = dynamic(() => import('../components/home/StrategicBrands'), { ssr: false, loading: () => <div className="w-full h-[300px] bg-white animate-pulse" /> })
 const KnowledgeBlock = dynamic(() => import('../components/home/KnowledgeBlock'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
-const FinalCTA = dynamic(() => import('../components/home/FinalCTA'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
 const RevealSection = dynamic(() => import('../components/home/RevealSection'), { ssr: false })
 import HomePageClientWrapper from '../components/home/HomePageClientWrapper'
 import { Category, Product } from '../lib/supabase'

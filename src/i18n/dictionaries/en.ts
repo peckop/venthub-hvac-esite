@@ -1685,9 +1685,8 @@ export const en = {
       originSuffix: 'Origin',
       estPrefix: 'EST.'
     }
-    }
-    }
-
+  },
+  categories: {
     title: 'Product Categories',
     subtitle: 'Find professional ventilation solutions with our wide range covering all HVAC areas.',
     subCount: '{{count}} subcategories',
