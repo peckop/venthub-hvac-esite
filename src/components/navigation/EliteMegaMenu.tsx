@@ -14,8 +14,8 @@ interface EliteMegaMenuProps {
 }
 
 export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavigate }) => {
-    const mainCategories = categories.filter(cat => cat.level === 0)
-    const subCategories = categories.filter(cat => cat.level === 1)
+    const mainCategories = categories.filter(cat => !cat.parent_id)
+    const subCategories = categories.filter(cat => !!cat.parent_id)
 
     const getSubCategories = (parentId: string) => {
         return subCategories.filter(sub => sub.parent_id === parentId)
@@ -139,8 +139,8 @@ interface MobileMegaMenuProps {
 
 export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose, categories }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
-    const mainCategories = categories.filter(cat => cat.level === 0)
-    const subCategories = categories.filter(cat => cat.level === 1)
+    const mainCategories = categories.filter(cat => !cat.parent_id)
+    const subCategories = categories.filter(cat => !!cat.parent_id)
 
     const getSubCategories = (parentId: string) => {
         return subCategories.filter(sub => sub.parent_id === parentId)

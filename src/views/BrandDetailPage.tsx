@@ -8,7 +8,7 @@ import Image from 'next/image'
 import { HVAC_BRANDS } from '../lib/brands'
 import { supabase, Product } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
-import { ArrowRight, Package, ExternalLink, Globe, BookOpen } from 'lucide-react'
+import { ArrowRight, Package, ExternalLink } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
@@ -82,7 +82,7 @@ export interface BrandDetailPageProps {
 }
 
 const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const params = useParams()
   const slug = (initialBrandSlug || params?.slug) as string
   

@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 // Admin Yapılandırması - Database Tabanlı Role Sistemi
 // Bu dosya artik database'deki user_profiles.role kolunu kullanır
 

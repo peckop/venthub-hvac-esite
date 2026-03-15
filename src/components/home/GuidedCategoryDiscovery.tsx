@@ -29,10 +29,10 @@ const normalizeImageUrl = (url: string | null | undefined): string => {
 export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ categories = [] }) => {
   const { t } = useI18n()
 
-  // Sadece ana kategorileri (level 0) filtrele ve sırala
+  // Sadece ana kategorileri (parent_id null) filtrele ve isme göre sırala
   const displayCategories = categories
-    .filter((c) => c.level === 0)
-    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    .filter((c) => !c.parent_id)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <section id="categories" className="bg-white py-24 sm:py-32">

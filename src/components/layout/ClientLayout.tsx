@@ -1,17 +1,16 @@
 'use client'
 
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useEffect, useState } from 'react'
 import { CartProvider } from '../../contexts/CartProvider'
 import { AuthProvider } from '../../contexts/AuthContext'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 import StickyHeader from '../StickyHeader'
 import ScrollToTop from '../ScrollToTop'
 import LanguageSwitcher from '../LanguageSwitcher'
 import PaymentWatcher from '../PaymentWatcher'
 import BackToTopButton from '../BackToTopButton'
-import LoadingSpinner from '../LoadingSpinner'
 import Footer from '../Footer'
 
 const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
@@ -35,116 +34,61 @@ export function Providers({ children }: { children: React.ReactNode }) {
     )
 }
 
-export function ClientLayout({ children }: { children: React.ReactNode }) {
+/**
+ * useSearchParams() kullanan navigasyon takip mantığı.
+ * Ayrı bir bileşen olarak Suspense içinde tutulmalıdır.
+ */
+function NavigationTracker() {
     const pathname = usePathname()
-    const isAdmin = pathname?.startsWith('/admin')
-    const isScrolled = useScrollThrottle({ showAt: 100, hideBelow: 60, throttleMs: 16, initialDelayMs: 180, syncKey: pathname || '' })
+    const searchParams = useSearchParams()
 
-    const [enableToaster, setEnableToaster] = React.useState(false)
-    React.useEffect(() => {
-        if (enableToaster) return
-        const enable = () => {
-            setEnableToaster(true)
-            window.removeEventListener('pointerdown', enable)
-            window.removeEventListener('keydown', enable)
-            window.removeEventListener('touchstart', enable)
-        }
-        window.addEventListener('pointerdown', enable, { once: true })
-        window.addEventListener('keydown', enable, { once: true })
-        window.addEventListener('touchstart', enable, { once: true })
-        return () => {
-            window.removeEventListener('pointerdown', enable)
-            window.removeEventListener('keydown', enable)
-            window.removeEventListener('touchstart', enable)
-        }
-    }, [enableToaster])
+    useEffect(() => {
+        if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') return
 
-    const [enableWhatsApp, setEnableWhatsApp] = React.useState(false)
-    React.useEffect(() => {
-        if (enableWhatsApp) return
-        const enable = () => {
-            setEnableWhatsApp(true)
-            window.removeEventListener('scroll', enable)
-            window.removeEventListener('pointerdown', enable)
-            window.removeEventListener('touchstart', enable)
-        }
-        // Load WhatsApp icon after first interaction or scroll to save initial bundle size
-        window.addEventListener('scroll', enable, { once: true, passive: true })
-        window.addEventListener('pointerdown', enable, { once: true })
-        window.addEventListener('touchstart', enable, { once: true })
-        return () => {
-            window.removeEventListener('scroll', enable)
-            window.removeEventListener('pointerdown', enable)
-            window.removeEventListener('touchstart', enable)
-        }
-    }, [enableWhatsApp])
-
-    // --- Navigation History Tracker (VH Smart Nav Stack Logic) ---
-    React.useEffect(() => {
-        if (typeof window === 'undefined') return
-
-        // 1. Native Tarayıcı Geri/İleri buton dinleyicisi
-        const handlePopState = () => {
-            sessionStorage.setItem('vh_is_pop', 'true')
-        }
+        const handlePopState = () => sessionStorage.setItem('vh_is_pop', 'true')
         window.addEventListener('popstate', handlePopState)
 
-        // 2. State temizliği (Gelecek PUSH navigasyonlarını etkilememesi için)
-        // Herhangi bir tıklama/tuş basma eylemi (ör. Linke tıklama) PUSH kabul edilir.
-        // Tıklama anında bayrağı silerek stale state (asılı kalma) sorununu engelliyoruz.
-        const handleInteraction = () => {
-            sessionStorage.setItem('vh_is_pop', 'false')
-        }
-        // Capture modunda dinle ki onClick'lerden önce çalışsın
+        const handleInteraction = () => sessionStorage.setItem('vh_is_pop', 'false')
         document.addEventListener('mousedown', handleInteraction, { capture: true })
         document.addEventListener('keydown', handleInteraction, { capture: true })
 
-        // 3. Geçmiş Güncelleyici (Pathname veya Hash değiştiğinde tetiklenir)
         const updateStack = () => {
-            // pathname + search + hash bilgisini tam olarak al
-            const currentFullPath = window.location.pathname + window.location.search + window.location.hash
+            if (!pathname) return
+            const search = searchParams?.toString() || ''
+            const hash = window.location.hash || ''
+            const currentFullPath = pathname + (search ? '?' + search : '') + hash
 
-            // ANA SAYFAYA dönüldüyse geçmişi temizle (Çapraz bulaşma/Cross-contamination önleyici)
-            if (window.location.pathname === '/' && !window.location.hash) {
+            if (pathname === '/' && !hash) {
                 sessionStorage.setItem('vh_nav_stack', JSON.stringify(['/']))
                 return
             }
 
-            // Ürün sayfaları "durak" sayfası sayılmaz, hiyerarşiyi bozmamak için diziye eklenmezler.
-            if (currentFullPath.includes('/products/')) return
+            if (pathname.includes('/products/')) return
 
-            let stack: string[] = [];
+            let stack: string[] = []
             try {
-                stack = JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]');
-            } catch { stack = []; }
+                stack = JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]')
+            } catch { stack = [] }
 
             const lastItem = stack[stack.length - 1]
             const secondLastItem = stack[stack.length - 2]
 
-            // SADECE pathname değiştiğinde veya yeni bir hash eklendiğinde işlem yap
             if (currentFullPath === lastItem) return
 
             if (currentFullPath === secondLastItem) {
-                // Geri gelmişiz (Hiyerarşide bir üst basamak), mevcut durağı temizle
                 stack.pop()
             } else {
-                // Yeni bir durak veya mevcut durağın hash güncellemesi
-                // Eğer sadece hash değiştiyse (aynı pathname), son elemanı güncelle
-                if (lastItem && lastItem.split('#')[0] === currentFullPath.split('#')[0]) {
+                if (lastItem && lastItem.split('?')[0].split('#')[0] === pathname) {
                     stack[stack.length - 1] = currentFullPath
                 } else {
-                    // Tamamen yeni bir sayfa, stack'e ekle
                     stack.push(currentFullPath)
                 }
                 if (stack.length > 10) stack.shift()
             }
-
             sessionStorage.setItem('vh_nav_stack', JSON.stringify(stack))
         }
 
         updateStack()
-
-        // Hash değişikliklerini de dinle
         window.addEventListener('hashchange', updateStack)
 
         return () => {
@@ -153,7 +97,39 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             document.removeEventListener('mousedown', handleInteraction, { capture: true })
             document.removeEventListener('keydown', handleInteraction, { capture: true })
         }
-    }, [pathname])
+    }, [pathname, searchParams])
+
+    return null
+}
+
+function ClientLayoutInner({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname()
+    const isAdmin = pathname?.startsWith('/admin')
+    const isScrolled = useScrollThrottle({ 
+        showAt: 100, 
+        hideBelow: 60, 
+        throttleMs: 16, 
+        initialDelayMs: 180, 
+        syncKey: pathname || '' 
+    })
+
+    const [enableToaster, setEnableToaster] = useState(false)
+    useEffect(() => {
+        const enable = () => setEnableToaster(true)
+        window.addEventListener('pointerdown', enable, { once: true })
+        window.addEventListener('keydown', enable, { once: true })
+        return () => {
+            window.removeEventListener('pointerdown', enable)
+            window.removeEventListener('keydown', enable)
+        }
+    }, [])
+
+    const [enableWhatsApp, setEnableWhatsApp] = useState(false)
+    useEffect(() => {
+        const enable = () => setEnableWhatsApp(true)
+        window.addEventListener('scroll', enable, { once: true, passive: true })
+        return () => window.removeEventListener('scroll', enable)
+    }, [])
 
     return (
         <div className={`min-h-screen bg-white ${isAdmin ? 'overflow-hidden' : ''}`}>
@@ -162,16 +138,16 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
 
             <main id="main-content" className={!isAdmin && isScrolled ? 'pt-16' : ''}>
                 {!isAdmin && <BackToTopButton />}
-                {(() => {
-                    try { return typeof window !== 'undefined' && localStorage.getItem('vh_pending_order') ? <PaymentWatcher /> : null } catch { return null }
-                })()}
+                {typeof window !== 'undefined' && localStorage.getItem('vh_pending_order') && <PaymentWatcher />}
                 {!isAdmin && <LanguageSwitcher />}
-                <Suspense fallback={<LoadingSpinner />}>
-                    {children}
-                </Suspense>
+                {children}
             </main>
 
             {!isAdmin && <Footer />}
+
+            <Suspense fallback={null}>
+                <NavigationTracker />
+            </Suspense>
 
             {enableWhatsApp && !isAdmin && (
                 <Suspense fallback={null}>
@@ -197,5 +173,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     )
 }
 
-
-
+export function ClientLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white" />}>
+            <ClientLayoutInner>
+                {children}
+            </ClientLayoutInner>
+        </Suspense>
+    )
+}
