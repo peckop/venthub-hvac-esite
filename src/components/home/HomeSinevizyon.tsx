@@ -290,7 +290,8 @@ export const HomeSinevizyon: React.FC<HomeSinevizyonProps> = ({ onQuoteClick }) 
                         src={p.url} 
                         alt="Technical Product" 
                         fill 
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        priority={currentSlide === 0}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                         className="object-contain" 
                       />
                     </div>
