@@ -1,13 +1,16 @@
 import path from "path"
 import { readFileSync, writeFileSync } from 'fs'
+// @ts-ignore
 import react from "@vitejs/plugin-react"
+// @ts-ignore
 import { defineConfig } from "vite"
+// @ts-ignore
 import { imagetools } from 'vite-imagetools'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import Critters from 'critters'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: { mode: string }) => {
   const isProduction = mode === 'production'
   // Minimal Critters integration to inline critical CSS after build
   const criticalCssPlugin = (() => {

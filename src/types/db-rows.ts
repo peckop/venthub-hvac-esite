@@ -4,6 +4,37 @@ export type PublicSchema = Database['public'];
 export type Tables = PublicSchema['Tables'];
 export type Enums = PublicSchema['Enums'];
 
+export interface AuthorityContent {
+  brand?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    badges?: string[];
+    stats?: Array<{ label: string; value: string }>;
+  };
+  technical?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    points?: Array<{ title: string; desc: string }>;
+  };
+  problem?: {
+    title?: string;
+    subtitle?: string;
+    painPoints?: Array<{ title: string; description: string }>;
+    visual?: {
+      difference: string;
+      without: string;
+      withoutVal: string;
+      withoutPoints: string[];
+      with: string;
+      withVal: string;
+      withPoints: string[];
+      note?: string;
+    };
+  };
+}
+
 // Metadata structure for categories
 export interface CategoryMetadata {
   hero_title?: string;
@@ -11,6 +42,7 @@ export interface CategoryMetadata {
   technical_summary?: string;
   hide_price?: boolean;
   model_type?: string;
+  authority_content?: AuthorityContent;
   features?: Array<{
     icon: string;
     title: string;

@@ -30,11 +30,8 @@ Bu belge, proje geçmişindeki tüm planları, yol haritalarını ve kod durumun
 
 > **DİKKAT:** Aşağıdaki özellikler için kod yazılmış AMA henüz ana uygulamaya entegre edilmemiş!
 
-### 1. Smart Routing (Akıllı Yönlendirme)
-- *Dosya:* `src/components/SmartRouting.tsx` → **MEVCUT**
-- *HomePage.tsx'e eklenmiş mi?* → **HAYIR** ❌
-- *i18n çevirileri (`routing.learn` vb.)?* → **YOK** ❌
-- *Aksiyon:* Bileşen HomePage'e import edilmeli, i18n anahtarları eklenmeli.
+### 1. Smart Routing (Akıllı Yönlendirme) - İPTAL EDİLDİ 🗑️
+- *Karar:* `ApplicationSolutions` bileşeni ile çakıştığı ve ana sayfada kalabalık yarattığı için proje dışı bırakıldı. Dosya silindi.
 
 ### 2. VisualShowcase
 - *Dosya:* `src/components/VisualShowcase.tsx` → **BİLİNMİYOR**
@@ -60,13 +57,7 @@ Bu belge, proje geçmişindeki tüm planları, yol haritalarını ve kod durumun
 | Before/After Slider | legacy_homepage | [ ] |
 | Bento Grid (hover video) | legacy_homepage | [ ] |
 
-### C. Smart Routing Tamamlama (Arşivden taşınan)
-| Görev | Durum |
-|-------|-------|
-| HomePage.tsx'e SmartRouting ekle | [ ] |
-| i18n: `routing.learn`, `routing.explore`, `routing.price` | [ ] |
-| Hover/İkon animasyonları | [ ] |
-| Analytics tracking | [ ] |
+### C. Smart Routing - İPTAL EDİLDİ
 
 ### D. Admin Geliştirmeleri
 | Görev | Durum |
@@ -92,7 +83,7 @@ Bu belge, proje geçmişindeki tüm planları, yol haritalarını ve kod durumun
 
 ## 📋 ÖNERİLER
 
-1. **SmartRouting Entegrasyonu:** Kod hazır, sadece HomePage'e eklenmeli. ~30 dk iş.
+1. **Gereksiz Kod Temizliği:** `SmartRouting.tsx` gibi çakışan veya kullanılmayan dosyalar temizlendi. ✅
 2. **Kullanılmayan Bileşenler:** `VisualShowcase.tsx` gibi dosyalar ya entegre edilmeli ya temizlenmeli.
 3. **Düzenli Doküman Güncellemesi:** Her sprint sonunda bu dosya güncellensin.
 
