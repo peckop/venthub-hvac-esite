@@ -1,0 +1,705 @@
+{
+  "urun_kodu": "17160",
+  "model": "LINEO 100 QUIET",
+  "marka": "Vortice",
+  "distributor": "Avensair",
+  "site": "venthub",
+  "kategori": "Havalandırma Sistemleri",
+  "alt_kategori": "Kanal Tipi Karışık Akışlı Fanlar",
+  "seri": "LINEO QUIET",
+  "nominal_cap": "100 mm",
+  
+  "varyantlar": [
+    {
+      "model": "LINEO 100 QUIET",
+      "kod": "17160",
+      "ozellik": "Standart Model - 3 Hızlı AC Motor",
+      "timer": false
+    },
+    {
+      "model": "LINEO 100 T QUIET",
+      "kod": "17190",
+      "ozellik": "Timer'lı Model - 3-20 dakika ayarlanabilir zamanlayıcı",
+      "timer": true
+    }
+  ],
+  
+  "teknik_ozellikler": {
+    "elektriksel": {
+      "voltaj": "220-240 V",
+      "frekans": "50-60 Hz",
+      "izolasyon_sinifi": "F",
+      "ip_koruma": "IP45",
+      "guc_tuketimi": {
+        "min_hiz_50hz": "11 W",
+        "orta_hiz_50hz": "24 W",
+        "max_hiz_50hz": "27 W",
+        "min_hiz_60hz": "13 W",
+        "orta_hiz_60hz": "23 W",
+        "max_hiz_60hz": "27 W"
+      },
+      "akim": {
+        "min_hiz_50hz": "0.09 A",
+        "orta_hiz_50hz": "0.11 A",
+        "max_hiz_50hz": "0.13 A",
+        "min_hiz_60hz": "0.10 A",
+        "orta_hiz_60hz": "0.11 A",
+        "max_hiz_60hz": "0.13 A"
+      }
+    },
+    
+    "performans_50hz": {
+      "min_hiz": {
+        "rpm": 1455,
+        "debi_m3_h": 150,
+        "debi_l_s": 41.7,
+        "max_basinc_mmh2o": 9,
+        "max_basinc_pa": 88.3
+      },
+      "orta_hiz": {
+        "rpm": 1880,
+        "debi_m3_h": 200,
+        "debi_l_s": 55.6,
+        "max_basinc_mmh2o": 11.5,
+        "max_basinc_pa": 112.8
+      },
+      "max_hiz": {
+        "rpm": 2260,
+        "debi_m3_h": 260,
+        "debi_l_s": 72.2,
+        "max_basinc_mmh2o": 15,
+        "max_basinc_pa": 147.1
+      }
+    },
+    
+    "performans_60hz": {
+      "min_hiz": {
+        "debi_m3_h": 155,
+        "debi_l_s": 43.1,
+        "max_basinc_mmh2o": 7.6,
+        "max_basinc_pa": 74.5
+      },
+      "orta_hiz": {
+        "debi_m3_h": 190,
+        "debi_l_s": 52.8,
+        "max_basinc_mmh2o": 11.2,
+        "max_basinc_pa": 109.8
+      },
+      "max_hiz": {
+        "debi_m3_h": 230,
+        "debi_l_s": 63.9,
+        "max_basinc_mmh2o": 14.4,
+        "max_basinc_pa": 141.2
+      }
+    },
+    
+    "ses_seviyeleri_50hz": {
+      "ses_gucu_lw_dba": {
+        "emme": {
+          "min_hiz": 62.2,
+          "orta_hiz": 70.5,
+          "max_hiz": 74.6
+        },
+        "basma": {
+          "min_hiz": 62.3,
+          "orta_hiz": 68.7,
+          "max_hiz": 74.4
+        },
+        "isinimi": {
+          "min_hiz": 36.2,
+          "orta_hiz": 41.8,
+          "max_hiz": 46.6
+        }
+      },
+      "ses_basinci_lp_dba_3m": {
+        "emme": {
+          "min_hiz": 44.6,
+          "orta_hiz": 52.9,
+          "max_hiz": 57.1
+        },
+        "basma": {
+          "min_hiz": 44.8,
+          "orta_hiz": 51.2,
+          "max_hiz": 56.9
+        },
+        "isinimi": {
+          "min_hiz": 15.7,
+          "orta_hiz": 21.3,
+          "max_hiz": 26.1
+        }
+      },
+      "not": "Ses seviyeleri serbest alan koşullarında 3 metre mesafede hesaplanmıştır"
+    },
+    
+    "ses_seviyeleri_60hz": {
+      "ses_gucu_lw_dba": {
+        "emme_max": 72.6,
+        "basma_min": 62.1,
+        "isinimi_min": 38.5,
+        "isinimi_max": 45.0
+      }
+    },
+    
+    "boyutlar_mm": {
+      "A": 210,
+      "B": 294.6,
+      "C": 639,
+      "cap_D": 97,
+      "E": 130,
+      "F": 235,
+      "G": 135,
+      "H": 120,
+      "L": 675,
+      "montaj_deligi_M": 5.5,
+      "N": 320,
+      "versiyon": "VERSION A",
+      "aciklama": "A: Yükseklik (ana gövde), B: Toplam yükseklik, C: Toplam uzunluk, D: Bağlantı çapı, E: Ön panel yüksekliği, F: Ön panel genişliği, G: Terminal kutusu konumu, H: Montaj ayak genişliği, L: Terminal kutusu mesafesi, M: Montaj deliği çapı, N: Montaj delikleri arası mesafe"
+    },
+    
+    "agirlik": "3.8 kg",
+    
+    "malzeme": {
+      "govde": "Technopolymer (teknik polimer)",
+      "pervane": "Yüksek mukavemetli polimer",
+      "ses_yalitim_kabuğu": "Ko-kalıplama ses emici malzeme"
+    },
+    
+    "motor": {
+      "tip": "AC İndüksiyon Motor",
+      "hiz_sayisi": 3,
+      "montaj": "Rulman üzerine monte edilmiş mil",
+      "garantili_omur": "30.000+ saat",
+      "omur_kosullari": "Maksimum hız ve maksimum ortam sıcaklığında sürekli çalışma"
+    },
+    
+    "fan_tipi": "Mixed Flow (Karışık Akış)",
+    
+    "calisma_kosullari": {
+      "max_ortam_sicakligi_50hz": "45°C",
+      "max_ortam_sicakligi_60hz": "45°C",
+      "montaj_pozisyonu": "Yatay veya dikey kanal içi",
+      "kanal_tipi": "Dairesel kanal 100 mm"
+    },
+    
+    "guvenlik": {
+      "yangin_guvenlik_sinifi": "E2 (EN ISO 11925-2:2010)",
+      "su_gecirmezlik": "IPX5 (ürün doğru monte edildiğinde geçerli)",
+      "ip_koruma": "IP45"
+    },
+    
+    "diger": {
+      "ses_yalitimi": "Var - Entegre ses emici kaplama",
+      "donus_ozelligi": "360° döner gövde",
+      "bakim_kolayligi": "Takılıp-çıkarılabilir parçalar",
+      "helmholtz_rezonator": "Pasif ses sönümleyici",
+      "akis_dogrultucu": "Pervane ile entegre tasarım"
+    }
+  },
+  
+  "teknik_tablolar": [
+    {
+      "tablo_adi": "Elektriksel Özellikler - 50Hz",
+      "sutunlar": ["Özellik", "Min. Hız", "Orta Hız", "Max. Hız"],
+      "satirlar": [
+        ["Güç (W)", "11", "24", "27"],
+        ["Akım (A)", "0.09", "0.11", "0.13"],
+        ["RPM", "1455", "1880", "2260"]
+      ]
+    },
+    {
+      "tablo_adi": "Performans Özellikleri - 50Hz",
+      "sutunlar": ["Özellik", "Min. Hız", "Orta Hız", "Max. Hız"],
+      "satirlar": [
+        ["Debi (m³/h)", "150", "200", "260"],
+        ["Debi (l/s)", "41.7", "55.6", "72.2"],
+        ["Max. Basınç (mmH₂O)", "9", "11.5", "15"],
+        ["Max. Basınç (Pa)", "88.3", "112.8", "147.1"]
+      ]
+    },
+    {
+      "tablo_adi": "Ses Seviyeleri - Işınımlı Ses (3m mesafede)",
+      "sutunlar": ["Ölçüm Tipi", "Min. Hız (dB)", "Orta Hız (dB)", "Max. Hız (dB)"],
+      "satirlar": [
+        ["Ses Gücü Lw (A)", "36.2", "41.8", "46.6"],
+        ["Ses Basıncı Lp (A)", "15.7", "21.3", "26.1"]
+      ]
+    },
+    {
+      "tablo_adi": "Boyutlar (mm)",
+      "sutunlar": ["Kod", "Değer (mm)", "Açıklama"],
+      "satirlar": [
+        ["A", "210", "Yükseklik (ana gövde)"],
+        ["B", "294.6", "Toplam yükseklik"],
+        ["C", "639", "Toplam uzunluk"],
+        ["ØD", "97", "Bağlantı çapı"],
+        ["E", "130", "Ön panel yüksekliği"],
+        ["F", "235", "Ön panel genişliği"],
+        ["G", "135", "Terminal kutusu konumu"],
+        ["H", "120", "Montaj ayak genişliği"],
+        ["L", "675", "Terminal kutusu mesafesi"],
+        ["ØM", "5.5", "Montaj deliği çapı"],
+        ["N", "320", "Montaj delikleri arası mesafe"]
+      ]
+    }
+  ],
+  
+  "kullanim_alanlari": [
+    {
+      "alan": "Konut Banyoları",
+      "aciklama": "Nem kontrolü ve kokulu hava tahliyesi için ideal. Sessiz çalışması sayesinde gece kullanımlarında rahatsızlık vermez."
+    },
+    {
+      "alan": "Mutfaklar",
+      "aciklama": "Buhar ve koku tahliyesi. Aspiratör destekli sistemlerde kullanılabilir."
+    },
+    {
+      "alan": "Küçük Ofisler",
+      "aciklama": "Sürekli havalandırma. Sessiz çalışması çalışma ortamını bozmaz."
+    },
+    {
+      "alan": "Yatak Odaları",
+      "aciklama": "Sessiz gece havalandırması. 36.2 dB minimum ses seviyesi ile uyku kalitesini etkilemez."
+    },
+    {
+      "alan": "Tuvalet/WC",
+      "aciklama": "Hızlı hava değişimi ve koku kontrolü."
+    },
+    {
+      "alan": "Gardıroplar",
+      "aciklama": "Nem ve koku kontrolü. Kıyafetlerin uzun ömürlü olmasını sağlar."
+    },
+    {
+      "alan": "Küçük Depolar",
+      "aciklama": "Hava sirkülasyonu ve nem kontrolü."
+    },
+    {
+      "alan": "Ticari Mekanlar",
+      "aciklama": "Restoranlar, kafeler, mağazalar için sessiz ve verimli havalandırma çözümü."
+    }
+  ],
+  
+  "avantajlar": [
+    {
+      "baslik": "Sessiz Çalışma",
+      "aciklama": "Minimum hızda sadece 36.2 dB(A) ışınımlı ses seviyesi - kütüphane sessizliği. Maksimum hızda bile 46.6 dB(A) ile fısıltıdan sadece biraz yüksek."
+    },
+    {
+      "baslik": "Enerji Verimliliği",
+      "aciklama": "ERP 2022 standartlarını karşılar. Minimum hızda sadece 11W güç tüketimi - bir LED ampulden bile az enerji harcar."
+    },
+    {
+      "baslik": "Kolay Montaj",
+      "aciklama": "Yatay veya dikey kanal montajı. 360° döner gövde tasarımı küçük alanlarda kablo bağlantısını kolaylaştırır. Ortalama montaj süresi 30 dakika altında."
+    },
+    {
+      "baslik": "Kolay Bakım",
+      "aciklama": "Parçalar çevredeki boru sistemini değiştirmeden kolayca çıkarılabilir. Ko-kalıplama ses kabuğu bakımdan sonra kolayca takılır ve orijinal performansı korur."
+    },
+    {
+      "baslik": "Uzun Ömür",
+      "aciklama": "Minimum 30.000 saat garantili motor ömrü. Günde 8 saat kullanımda 10 yıldan fazla kesintisiz çalışma."
+    },
+    {
+      "baslik": "Yüksek Performans",
+      "aciklama": "260 m³/h maksimum debi, 15 mmH₂O basınç kapasitesi. Mixed flow teknolojisi ile helisel fanların yüksek debisi ve santrifüj fanların yüksek basıncı bir arada."
+    },
+    {
+      "baslik": "Güvenlik Sertifikaları",
+      "aciklama": "CE, IMQ, UKCA onaylı. E2 yangın güvenlik sınıfı, IPX5 su koruması. Avrupa standartlarında kalite ve güvenlik."
+    },
+    {
+      "baslik": "Su Direnci",
+      "aciklama": "IPX5 koruma derecesi. Nemli ortamlarda güvenle kullanılabilir."
+    },
+    {
+      "baslik": "Çok Yönlülük",
+      "aciklama": "3 hız seçeneği, isteğe bağlı timer modeli. Sensörler ve zamanlayıcılar ile tam otomasyon mümkün."
+    },
+    {
+      "baslik": "Geniş Aksesuar Desteği",
+      "aciklama": "Nem sensörü, hareket sensörü, hava kalitesi sensörü, çeşitli hız kontrolörleri ile özelleştirilebilir sistem."
+    },
+    {
+      "baslik": "İtalyan Kalitesi",
+      "aciklama": "Vortice markası ile 70+ yıllık havalandırma teknolojisi deneyimi ve İtalyan tasarım kalitesi."
+    },
+    {
+      "baslik": "Ses Yalıtım Teknolojisi",
+      "aciklama": "Entegre ses yalıtım kaplaması ve Helmholtz rezonatör grubu ile pasif ses sönümleme."
+    }
+  ],
+  
+  "uyarilar": [
+    {
+      "tip": "Kurulum",
+      "metin": "Ürün sadece kalifiye elektrik teknisyenleri tarafından kurulmalıdır. Elektrik bağlantıları yerel elektrik kodlarına uygun olmalıdır."
+    },
+    {
+      "tip": "Ortam Koşulları",
+      "metin": "Maksimum ortam sıcaklığı 45°C'dir. Bu sıcaklığın üzerindeki ortamlarda kullanılmamalıdır."
+    },
+    {
+      "tip": "Su Koruması",
+      "metin": "IPX5 koruması sadece ürün doğru monte edildiğinde geçerlidir. Terminal kutusu su ile doğrudan temas etmemelidir."
+    },
+    {
+      "tip": "Bakım",
+      "metin": "Herhangi bir bakım veya temizlik işleminden önce elektrik beslemesi kesilmelidir."
+    },
+    {
+      "tip": "Kanal Bağlantısı",
+      "metin": "Optimal performans için esnek kanal bağlantıları kullanılmalıdır. Sert bağlantılar vibrasyon ve gürültüye neden olabilir."
+    },
+    {
+      "tip": "Havalandırma",
+      "metin": "Motor soğutma için yeterli hava sirkülasyonu sağlanmalıdır. Ürün kapalı kutularda veya hava akışını engelleyen yerlerde kullanılmamalıdır."
+    },
+    {
+      "tip": "Yedek Parça",
+      "metin": "Sadece orijinal Vortice yedek parçaları kullanılmalıdır. Uyumsuz parça kullanımı garantiyi geçersiz kılar."
+    }
+  ],
+  
+  "sertifikalar": [
+    {
+      "sertifika": "CE",
+      "aciklama": "Avrupa Birliği CE işareti - Tüm geçerli AB direktiflerine uygunluk",
+      "standart_tipi": "Genel"
+    },
+    {
+      "sertifika": "IMQ",
+      "aciklama": "İtalyan Kalite ve Güvenlik Enstitüsü sertifikası",
+      "standart_tipi": "Güvenlik ve Elektromanyetik Uyumluluk"
+    },
+    {
+      "sertifika": "IMQ Performance",
+      "aciklama": "Performans ve verimlilik sertifikası",
+      "standart_tipi": "Performans"
+    },
+    {
+      "sertifika": "UKCA",
+      "aciklama": "Birleşik Krallık Uygunluk Değerlendirmesi işareti",
+      "standart_tipi": "Genel"
+    }
+  ],
+  
+  "standartlar": {
+    "direktifler": [
+      {
+        "kod": "2006/42/CE",
+        "isim": "Makine Direktifi"
+      },
+      {
+        "kod": "2014/35/EU",
+        "isim": "Alçak Gerilim Direktifi"
+      },
+      {
+        "kod": "2014/30/EU",
+        "isim": "Elektromanyetik Uyumluluk Direktifi"
+      },
+      {
+        "kod": "2009/125/EC",
+        "isim": "Ecodesign Direktifi"
+      },
+      {
+        "kod": "2011/65/EU",
+        "isim": "RoHS Direktifi"
+      },
+      {
+        "kod": "2012/19/EU",
+        "isim": "WEEE Direktifi"
+      }
+    ],
+    "regulasyonlar": [
+      {
+        "kod": "327/2011/EU",
+        "isim": "ERP Regülasyonu"
+      },
+      {
+        "kod": "1253/2014/EU",
+        "isim": "ERP Regülasyonu (Güncelleme)"
+      }
+    ],
+    "elektrik_guvenligi": [
+      "EN 60335-1",
+      "EN 60335-2-80",
+      "EN 62233",
+      "EN 60529"
+    ],
+    "makine_standartlari": [
+      "EN 60204-1",
+      "EN 12100",
+      "EN 12499",
+      "EN 13857"
+    ],
+    "elektromanyetik_uyumluluk": [
+      "EN 55014-1",
+      "EN 55014-2",
+      "EN 61000-3-2",
+      "EN 61000-3-3"
+    ],
+    "yangin_guvenligi": [
+      "EN ISO 11925-2:2010"
+    ]
+  },
+  
+  "uyumluluk": {
+    "uyumlu_aksesuarlar": [
+      {
+        "kod": "12987",
+        "isim": "C5 0.5",
+        "tip": "5 Hız Kontrolörü (0.5 A)",
+        "uyumlu": true
+      },
+      {
+        "kod": "12966",
+        "isim": "C 1.5",
+        "tip": "Elektronik Hız Kontrolörü (1.5 A)",
+        "uyumlu": true
+      },
+      {
+        "kod": "12967",
+        "isim": "C 2.5",
+        "tip": "Elektronik Hız Kontrolörü (2.5 A)",
+        "uyumlu": false,
+        "not": "Daha büyük modeller için önerilir"
+      },
+      {
+        "kod": "12891",
+        "isim": "TRIO",
+        "tip": "Potansiyometre",
+        "uyumlu": true,
+        "not": "T modelleri için de uyumlu"
+      },
+      {
+        "kod": "12992",
+        "isim": "C TEMP",
+        "tip": "Termostat Anahtarı",
+        "uyumlu": true
+      },
+      {
+        "kod": "12993",
+        "isim": "C SMOKE",
+        "tip": "Hava Kalitesi Sensörü",
+        "uyumlu": true
+      },
+      {
+        "kod": "12994",
+        "isim": "C HCS",
+        "tip": "Nem Sensörü (Humidistat)",
+        "uyumlu": true
+      },
+      {
+        "kod": "12998",
+        "isim": "C PIR",
+        "tip": "Pasif Kızılötesi Sensör",
+        "uyumlu": true
+      },
+      {
+        "kod": "12999",
+        "isim": "C TIMER",
+        "tip": "Zamanlayıcı",
+        "uyumlu": true
+      },
+      {
+        "kod": "22483",
+        "isim": "KIT SCBS",
+        "tip": "Gömme Montaj Kiti",
+        "uyumlu": true,
+        "not": "12987, 12966, 12967 kontrolörleri için"
+      },
+      {
+        "kod": "22481",
+        "isim": "KIT SCB",
+        "tip": "Gömme Kontrolör Adaptörü",
+        "uyumlu": true,
+        "not": "12987, 12966, 12967 kontrolörleri için"
+      }
+    ],
+    "kanal_sistemi": {
+      "tip": "Dairesel kanal",
+      "cap": "100 mm",
+      "montaj": "Yatay veya dikey",
+      "baglanti_tipi": "Doğrudan kanal bağlantısı veya esnek kanal adaptörü ile"
+    }
+  },
+  
+  "gorseller": [
+    {
+      "dosya_adi": "lineo-quiet.jpg",
+      "tip": "Ürün Fotoğrafı",
+      "aciklama": "LINEO QUIET serisi fan - tek ürün görünümü, koyu gri gövde, kırmızı iç pervane koruması",
+      "onerilen_kullanim": "Ürün sayfası ana görseli, katalog, e-ticaret",
+      "alt_text": "Vortice LINEO 100 QUIET ses yalıtımlı kanal tipi havalandırma fanı",
+      "seo_dosya_adi": "vortice-lineo-100-quiet-ses-yalitimli-kanal-fani.jpg"
+    },
+    {
+      "dosya_adi": "lineo-quite-1.png",
+      "tip": "Karşılaştırma Görseli",
+      "aciklama": "İki farklı LINEO ürünü, siyah arka plan, yeşil ve kırmızı iç renkler",
+      "onerilen_kullanim": "Model karşılaştırması, seri tanıtımı",
+      "alt_text": "Vortice LINEO serisi fan çeşitleri",
+      "seo_dosya_adi": "vortice-lineo-serisi-kanal-fanlari-karsilastirma.png"
+    },
+    {
+      "dosya_adi": "LINEO QUIET ES.jpg",
+      "tip": "Ürün Fotoğrafı",
+      "aciklama": "LINEO QUIET ES serisi (EC motor versiyonu)",
+      "onerilen_kullanim": "EC motor serisi tanıtımı",
+      "alt_text": "Vortice LINEO QUIET ES EC motorlu kanal fanı",
+      "seo_dosya_adi": "vortice-lineo-quiet-es-ec-motor-kanal-fani.jpg"
+    },
+    {
+      "dosya_adi": "teknik_cizim_version_a.png",
+      "tip": "Teknik Çizim",
+      "aciklama": "VERSION A boyut çizimleri - ön, yan ve üst görünüm",
+      "onerilen_kullanim": "Teknik döküman, proje çizimleri, mimari çalışmalar",
+      "alt_text": "LINEO 100 QUIET teknik boyut çizimi",
+      "seo_dosya_adi": "lineo-100-quiet-teknik-boyutlar-cizim.png"
+    },
+    {
+      "dosya_adi": "performans_egrisi.png",
+      "tip": "Performans Grafiği",
+      "aciklama": "Debi-basınç ve güç tüketimi eğrileri",
+      "onerilen_kullanim": "Teknik döküman, sistem tasarımı",
+      "alt_text": "LINEO 100 QUIET performans ve güç tüketimi eğrileri",
+      "seo_dosya_adi": "lineo-100-quiet-performans-egrileri.png"
+    }
+  ],
+  
+  "seo_anahtarlar": {
+    "primer": [
+      "ses yalıtımlı kanal fanı",
+      "sessiz havalandırma fanı",
+      "kanal tipi fan 100mm",
+      "mixed flow fan",
+      "lineo quiet",
+      "vortice kanal fanı",
+      "banyo havalandırma fanı sessiz"
+    ],
+    "sekonder": [
+      "düşük gürültülü havalandırma",
+      "enerji verimli fan",
+      "3 hızlı kanal fanı",
+      "ac motor kanal fanı",
+      "kanal tipi aspiratör",
+      "sessiz banyo fanı",
+      "konut havalandırma sistemi",
+      "ticari havalandırma fanı",
+      "260 m3/h kanal fanı",
+      "ipx5 su geçirmez fan"
+    ],
+    "uzun_kuyruk": [
+      "100mm çap ses yalıtımlı kanal fanı",
+      "260 m3/h debi sessiz havalandırma",
+      "vortice lineo quiet 100 fiyat",
+      "kanal tipi fan 36 db gürültü",
+      "enerji verimli banyo fanı ac motor",
+      "ses yalıtımlı havalandırma sistemi konut"
+    ]
+  },
+  
+  "meta_veriler": {
+    "meta_title": "Vortice LINEO 100 QUIET Ses Yalıtımlı Kanal Fanı",
+    "meta_description": "LINEO 100 QUIET ses yalıtımlı kanal tipi fan. 260 m³/h debi, 36 dB sessiz çalışma, ERP 2022 uyumlu. Konut ve ticari alanlar için ideal. ✓ CE ✓ IMQ",
+    "og_title": "Vortice LINEO 100 QUIET - Sessiz ve Verimli Kanal Fanı",
+    "og_description": "Minimum hızda sadece 36 dB gürültü seviyesi. 260 m³/h hava debisi, 11-27W enerji tüketimi. İtalyan kalitesi ile uzun ömürlü havalandırma çözümü.",
+    "keywords_combined": "vortice, lineo, quiet, ses yalıtımlı, kanal fanı, sessiz havalandırma, 100mm, mixed flow, banyo fanı, enerji verimli"
+  },
+  
+  "urun_baslik_onerileri": {
+    "ana_baslik": "Vortice LINEO 100 QUIET Ses Yalıtımlı Kanal Tipi Fan 260 m³/h",
+    "alternatif_1": "LINEO 100 QUIET Sessiz Havalandırma Fanı AC Motor 3 Hızlı",
+    "alternatif_2": "Vortice LINEO 100 QUIET Mix Flow Fan Ses Yalıtımlı 100mm",
+    "alternatif_3": "LINEO 100 QUIET Kanal Fanı 260 m³/h Düşük Gürültü ERP 2022"
+  },
+  
+  "kisa_aciklama_madde": [
+    "✓ **Ses Yalıtımlı Tasarım:** Maksimum hızda bile sadece 46.6 dB(A) - kütüphane sessizliği",
+    "✓ **Yüksek Performans:** 260 m³/h hava debisi, 15 mmH₂O basınç - orta boy banyolar için ideal",
+    "✓ **Enerji Tasarrufu:** Minimum hızda sadece 11W - ERP 2022 standartları",
+    "✓ **Kolay Kurulum:** 360° döner gövde, montaj süresi 30 dakika altında",
+    "✓ **Uzun Ömür:** 30.000 saat garantili motor ömrü - 10+ yıl sorunsuz kullanım",
+    "✓ **Çok Yönlü Kontrol:** 3 hız seçeneği, sensör ve zamanlayıcı desteği",
+    "✓ **Güvenlik:** CE, IMQ, UKCA onaylı, E2 yangın güvenlik, IPX5 su koruması",
+    "✓ **Geniş Kullanım:** Banyo, mutfak, ofis, yatak odası - konut ve ticari projeler"
+  ],
+  
+  "onerilen_alan_m2": "6-10 m²",
+  "onerilen_alan_hesaplama": "Saatte 6-8 hava değişimi standardına göre, 2.5-3m tavan yüksekliğinde",
+  
+  "pozisyonlama": {
+    "segment": "Orta-Üst Segment",
+    "hedef_kitle": [
+      "Kalite odaklı konut projeleri",
+      "Butik oteller ve apart oteller",
+      "Küçük ofisler ve co-working alanları",
+      "Sessizlik gerektiren sağlık mekanları",
+      "Tasarım odaklı restoranlar ve kafeler"
+    ],
+    "rekabet_avantajlari": [
+      "Ses yalıtım performansı (36.2 dB minimum)",
+      "Vortice marka güvencesi ve IMQ sertifikası",
+      "Kolay bakım yapılabilir tasarım",
+      "Geniş aksesuar ve otomasyon desteği"
+    ],
+    "zayif_noktalar": [
+      "EC motorlu versiyona göre daha yüksek enerji tüketimi",
+      "Sabit 3 hızlı yapı (ES versiyonunda ayarlanabilir)",
+      "Maksimum ortam sıcaklığı 45°C (bazı endüstriyel uygulamalar için düşük)"
+    ]
+  },
+  
+  "karsilastirma_tablosu": {
+    "lineo_100_modelleri": [
+      {
+        "model": "LINEO 100",
+        "motor": "AC 3 hız",
+        "ses_yalitimi": false,
+        "max_debi_m3_h": 290,
+        "max_guc_w": 30,
+        "isinimi_ses_max_db": 52,
+        "segment": "Ekonomik"
+      },
+      {
+        "model": "LINEO 100 QUIET",
+        "motor": "AC 3 hız",
+        "ses_yalitimi": true,
+        "max_debi_m3_h": 260,
+        "max_guc_w": 27,
+        "isinimi_ses_max_db": 46.6,
+        "segment": "Orta-Üst"
+      },
+      {
+        "model": "LINEO 100 QUIET ES",
+        "motor": "EC Brushless 4 kademe",
+        "ses_yalitimi": true,
+        "max_debi_m3_h": 300,
+        "max_guc_w": 23,
+        "isinimi_ses_max_db": 47.9,
+        "segment": "Premium"
+      }
+    ]
+  },
+  
+  "enerji_verimlilik": {
+    "erp_uyumluluk": "ERP 2022",
+    "yillik_tuketim_tahmini_kwh": {
+      "8_saat_gun_min_hiz": "32.12 kWh/yıl",
+      "8_saat_gun_orta_hiz": "70.08 kWh/yıl",
+      "8_saat_gun_max_hiz": "78.84 kWh/yıl"
+    },
+    "not": "Yıllık tüketim hesaplaması 365 gün üzerinden yapılmıştır. Gerçek tüketim kullanım şekline göre değişebilir."
+  },
+  
+  "garanti_not": "Belirtilmemiş - kullanıcıdan teyit gerekli",
+  "fiyat_not": "PDF'lerde fiyat bilgisi bulunmamaktadır - kullanıcıdan teyit gerekli",
+  "stok_not": "Stok durumu bilinmemektedir - kullanıcıdan teyit gerekli",
+  
+  "versiyon": "1.0",
+  "olusturma_tarihi": "2025-12-02",
+  "kaynak_dokumanlar": [
+    "Ticari_LINEO QUITE KATALOG.pdf",
+    "20052112511660a65b44856f8_17160 LINEO 100 QUITE.pdf"
+  ]
+}

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Hood Visualization</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: sans-serif;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+    <!-- Import Three.js from CDN -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="info">Industrial Kitchen Hood with Grease Filter (Wall-Mounted Box Type)</div>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene Setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        scene.fog = new THREE.Fog(0x1a1a1a, 5, 20);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(2.5, 1.5, 3.5); // Good angle to see inside
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.target.set(0, 0.5, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(5, 5, 5);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+
+        const fillLight = new THREE.PointLight(0xffaa00, 0.5);
+        fillLight.position.set(-2, 0, 2);
+        scene.add(fillLight);
+
+        // Materials
+        const steelMaterial = new THREE.MeshStandardMaterial({
+            color: 0x999999,
+            metalness: 0.8,
+            roughness: 0.3,
+            side: THREE.DoubleSide
+        });
+
+        const filterMaterial = new THREE.MeshStandardMaterial({
+            color: 0xbbbbbb,
+            metalness: 0.7,
+            roughness: 0.4
+        });
+
+        // --- Realistic Wall-Mounted Box Hood ---
+        const hoodGroup = new THREE.Group();
+        scene.add(hoodGroup);
+
+        // Dimensions (in meters)
+        const width = 2.0;  // 2 meters wide
+        const depth = 1.1;  // 1.1 meters deep
+        const height = 0.6; // 60cm tall box
+        const thickness = 0.02; // Steel thickness visual
+
+        // 1. Outer Shell (Box with open bottom and hollow inside)
+        // We build it from 5 planes: Top, Front, Left, Right, Back
+
+        // Top Panel
+        const topGeo = new THREE.BoxGeometry(width, thickness, depth);
+        const topPanel = new THREE.Mesh(topGeo, steelMaterial);
+        topPanel.position.y = height;
+        topPanel.castShadow = true;
+        topPanel.receiveShadow = true;
+        hoodGroup.add(topPanel);
+
+        // Back Panel (Wall side)
+        const backGeo = new THREE.BoxGeometry(width, height, thickness);
+        const backPanel = new THREE.Mesh(backGeo, steelMaterial);
+        backPanel.position.set(0, height / 2, -depth / 2 + thickness / 2);
+        backPanel.castShadow = true;
+        hoodGroup.add(backPanel);
+
+        // Front Panel (Short overhang)
+        const frontGeo = new THREE.BoxGeometry(width, height, thickness);
+        const frontPanel = new THREE.Mesh(frontGeo, steelMaterial);
+        frontPanel.position.set(0, height / 2, depth / 2 - thickness / 2);
+        frontPanel.castShadow = true;
+        hoodGroup.add(frontPanel);
+
+        // Left Side
+        const sideGeo = new THREE.BoxGeometry(thickness, height, depth - 2 * thickness);
+        const leftPanel = new THREE.Mesh(sideGeo, steelMaterial);
+        leftPanel.position.set(-width / 2 + thickness / 2, height / 2, 0);
+        leftPanel.castShadow = true;
+        hoodGroup.add(leftPanel);
+
+        // Right Side
+        const rightPanel = new THREE.Mesh(sideGeo, steelMaterial);
+        rightPanel.position.set(width / 2 - thickness / 2, height / 2, 0);
+        rightPanel.castShadow = true;
+        hoodGroup.add(rightPanel);
+
+        hoodGroup.add(gutter);
+
+        // 6. Lights (Recessed in front overhang)
+        const lightBarGeo = new THREE.BoxGeometry(width - 0.2, 0.02, 0.1);
+        const lightBar = new THREE.Mesh(lightBarGeo, steelMaterial);
+        lightBar.position.set(0, height - 0.05, depth / 2 - 0.2);
+        hoodGroup.add(lightBar);
+
+        // Add actual point lights
+        const l1 = new THREE.PointLight(0xffffee, 0.5, 2);
+        l1.position.set(-0.5, height - 0.1, depth / 2 - 0.2);
+        hoodGroup.add(l1);
+
+        const l2 = new THREE.PointLight(0xffffee, 0.5, 2);
+        l2.position.set(0.5, height - 0.1, depth / 2 - 0.2);
+        hoodGroup.add(l2);
+
+
+        // Floor
+        const floorGeo = new THREE.PlaneGeometry(10, 10);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.8, metalness: 0.2 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -1.5;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Gentle rotation
+            hoodGroup.rotation.y = Math.sin(Date.now() * 0.0005) * 0.2;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Handle Resize
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

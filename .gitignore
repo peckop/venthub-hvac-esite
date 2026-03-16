@@ -1,89 +1,42 @@
 # Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+.pnpm-store/
+.npm/
 
 # Build outputs
+.next/
 dist/
 build/
-.vite/
-.cache/
+out/
+*.tsbuildinfo
 
-# Environment variables (CRITICAL - API keys korunuyor)
+# Environmental variables
 .env
 .env.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Desktop.ini
-Thumbs.db
-
-# Logs
-logs/
-*.log
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
+# Testing
+.reports/
 coverage/
 
-# TypeScript
-*.tsbuildinfo
+# IDEs
+.vscode/
+.idea/
 
-# Supabase
-.supabase/
+# OS files
+.DS_Store
+Thumbs.db
 
-# Temporary folders
-tmp/
-temp/
-
-# Local development
-.vite-temp/
-
-# API Keys ve Secrets (Güvenlik için önemli!)
-**/config/secrets.*
-**/keys/
-**/*.pem
-**/*.key
-**/secrets.*
-
-# İyzico API Keys - ASLA commit edilmemeli!
-iyzico-config.json
-iyzico-keys.*
-
-# Next.js Build
-.next/
-out/
-build/
-.swc/
-
-# Lint & Build çıktı dosyaları (büyük dosya koruması)
-lint-output.json
-lint-final.txt
-lint_results.txt
-src_lint_utf8.txt
-build_error.txt
-out.txt
-# Out of scope integrations
-avens-integration/
-
+# VentHub Registry Reports & Temp
+*.txt
+*.log
+/tmp/
+.snapshots/
+registry_backup/
+tsc_errors.txt
+test_output.txt
+test_failures.txt

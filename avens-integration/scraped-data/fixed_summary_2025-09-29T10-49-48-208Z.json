@@ -1,0 +1,74 @@
+{
+  "Konut Tipi Fanlar": {
+    "count": 38,
+    "url": "/konut-tipi-fanlar"
+  },
+  "Kanal Tipi Fanlar": {
+    "count": 29,
+    "url": "/kanal-tipi-fanlar"
+  },
+  "Çatı Tipi Fanlar": {
+    "count": 23,
+    "url": "/cati-tipi-fanlar"
+  },
+  "Santrifüj Fanlar": {
+    "count": 50,
+    "url": "/santrifuj-fanlar"
+  },
+  "Duvar Tipi Fanlar": {
+    "count": 1,
+    "url": "/duvar-tipi-fanlar"
+  },
+  "Sessiz Fanlar": {
+    "count": 1,
+    "url": "/sessiz-fanlar"
+  },
+  "Endüstriyel Fanlar": {
+    "count": 1,
+    "url": "/endustriyel-fanlar"
+  },
+  "Ex-Proof Fanlar": {
+    "count": 1,
+    "url": "/ex-proof-fanlar"
+  },
+  "Duman Egzoz Fanları": {
+    "count": 1,
+    "url": "/duman-egzoz-fanlari"
+  },
+  "Jet Fanlar": {
+    "count": 1,
+    "url": "/jet-fanlar"
+  },
+  "Basınçlandırma Fanları": {
+    "count": 1,
+    "url": "/basinclandirma-fanlari"
+  },
+  "Sığınak Fanları": {
+    "count": 1,
+    "url": "/siginak-fanlari"
+  },
+  "Nicotra Gebhardt": {
+    "count": 1,
+    "url": "/nicotra-gebhardt"
+  },
+  "Vortice": {
+    "count": 0,
+    "url": "/vortice"
+  },
+  "Plug Fanlar": {
+    "count": 6,
+    "url": "/plug-fanlar"
+  },
+  "Hava Perdeleri": {
+    "count": 4,
+    "url": "/hava-perdeleri"
+  },
+  "Flexible Kanallar": {
+    "count": 1,
+    "url": "/flexible-kanallar"
+  },
+  "Aksesuarlar": {
+    "count": 8,
+    "url": "/aksesuarlar"
+  }
+}
