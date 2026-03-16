@@ -1,4 +1,4 @@
-﻿# 🛰️ VENTHUB MISSION CONTROL (PULSE)
+# 🛰️ VENTHUB MISSION CONTROL (PULSE)
 > **Güncelleme:** 16.03.2026 14:44 | **Sistem:** `OPERATIONAL` | **Sürüm:** `v7.0 (Pure Hiyerarşi)` 
 
 ## 📊 GLOBAL PROJE ÖZETİ
@@ -21,6 +21,12 @@
 | `996`  | Metadata Sync Test                            | ⚡ MED        | 🏗️ RUN       | `0%`       |
 | `997`  | Final Snapshot Test                           | ⚡ MED        | 🏗️ RUN       | `0%`       |
 | `998`  | Test Dogrulama                                | ⚡ MED        | 🏗️ RUN       | `0%`       |
+
+### ⏳ Backlog
+| ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
+|:---|:---|:---|
+| `030`  | Gelişmiş Arama UX & Backend Optimizasyonu     | 🔥 HIGH       |
+| `031`  | SEO & Core Web Vitals (Performance) Audit     | 🔥 HIGH       |
 
 ### ✅ Tamamlananlar
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |

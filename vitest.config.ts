@@ -10,8 +10,9 @@ export default defineConfig({
     },
   },
   test: {
+    globals: true,
     environment: "jsdom",
-    setupFiles: ['vitest.setup.ts'],
+    setupFiles: ['vitest.setup.ts', 'vitest-setup.tsx'],
     css: true,
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',

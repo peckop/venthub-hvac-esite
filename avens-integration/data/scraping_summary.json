@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-09-27T16:38:56.457Z",
+  "total_products": 0,
+  "categories_processed": 3,
+  "products_by_category": {
+    "Fanlar": {
+      "total": 0,
+      "subcategories": {
+        "Konut Tipi Fanlar": 0,
+        "Kanal Tipi Fanlar": 0,
+        "Çatı Tipi Fanlar": 0,
+        "Ex-Proof Fanlar": 0,
+        "Duvar Tipi Kompakt Aksiyal Fanlar": 0,
+        "Santrifüj Fanlar": 0,
+        "Duman Egzoz Fanları": 0,
+        "Basınçlandırma Fanları": 0,
+        "Otopark Jet Fanları": 0,
+        "Sığınak Havalandırma Fanları": 0,
+        "Nicotra Gebhardt Fanlar": 0,
+        "Sessiz Kanal Tipi Fanlar": 0
+      }
+    },
+    "Isı Geri Kazanım Cihazları": {
+      "total": 0,
+      "subcategories": {
+        "Konut Tipi": 0,
+        "Ticari Tip": 0
+      }
+    },
+    "Nem Alma Cihazları": {
+      "total": 0,
+      "subcategories": {}
+    }
+  }
+}
