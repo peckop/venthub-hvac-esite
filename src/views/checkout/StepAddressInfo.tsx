@@ -364,7 +364,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/kvkk" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank" rel="noopener noreferrer">{t('legalLinks.kvkk')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                     </label>
                     <label className="flex items-start gap-3">
@@ -375,7 +375,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/mesafeli-satis-sozlesmesi" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank" rel="noopener noreferrer">{t('legalLinks.distanceSales')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                     </label>
                     <label className="flex items-start gap-3">
@@ -386,7 +386,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             className="mt-1 rounded border-light-gray text-primary-navy focus:ring-primary-navy"
                         />
                         <span className="text-sm text-steel-gray">
-                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
+                            {t('checkout.consents.readAcceptPrefix')} <Link href="/legal/on-bilgilendirme-formu" className="text-primary-navy hover:text-secondary-blue font-medium" target="_blank" rel="noopener noreferrer">{t('legalLinks.preInformation')}</Link>{t('checkout.consents.readAcceptSuffix')}
                         </span>
                     </label>
                     <label className="flex items-start gap-3">

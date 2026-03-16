@@ -114,3 +114,10 @@ export type DbUserAddressUpdate = Tables['user_addresses']['Update'];
 export type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update'];
 
 export type DbJson = Json;
+
+export interface AuthorityContent {
+  author?: string;
+  reviewed_by?: string;
+  last_review_date?: string;
+  citations?: Array<{ text: string; url?: string }>;
+}

@@ -172,6 +172,7 @@ export const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ onQuoteClick }) 
             <Link
               href="https://wa.me/905442450205"
               target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-4 h-16 px-10 rounded-2xl border border-white/10 bg-white/5 text-white font-bold uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
