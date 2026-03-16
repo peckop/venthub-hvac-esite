@@ -11,6 +11,13 @@ import type { Database } from '../../../types/database.types'
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
 type Json = Database['public']['Tables']['categories']['Insert']['metadata']
+
+interface CategoryMetadata {
+    metric1?: { value?: string | null; label?: string | null };
+    metric2?: { value?: string | null; label?: string | null };
+    [key: string]: Json | undefined;
+}
+
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
@@ -67,6 +74,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             if (error) throw error
             setInitialData(data as Category)
 
+            const meta = data.metadata as CategoryMetadata | undefined | null;
             reset({
                 name: data.name,
                 slug: data.slug,
@@ -77,10 +85,10 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured ?? false,
                 sort_order: data.sort_order ?? 0,
                 image_url: data.image_url,
-                metric1_value: (data.metadata as any)?.metric1?.value || '',
-                metric1_label: (data.metadata as any)?.metric1?.label || '',
-                metric2_value: (data.metadata as any)?.metric2?.value || '',
-                metric2_label: (data.metadata as any)?.metric2?.label || ''
+                metric1_value: meta?.metric1?.value || '',
+                metric1_label: meta?.metric1?.label || '',
+                metric2_value: meta?.metric2?.value || '',
+                metric2_label: meta?.metric2?.label || ''
             })
 
             if (data.image_url) {
@@ -152,6 +160,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
+            const initialMeta = (initialData?.metadata as CategoryMetadata) || {};
             const payload = {
                 name: data.name,
                 slug: data.slug,
@@ -163,11 +172,11 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 sort_order: data.sort_order,
                 image_url: imgPath,
                 metadata: {
-                    ...(initialData?.metadata || {}),
-                    metric1: { value: data.metric1_value, label: data.metric1_label },
-                    metric2: { value: data.metric2_value, label: data.metric2_label }
-                }
-            } as any
+                    ...initialMeta,
+                    metric1: { value: data.metric1_value || null, label: data.metric1_label || null },
+                    metric2: { value: data.metric2_value || null, label: data.metric2_label || null }
+                } as Json
+            };
 
             let currentId = categoryId
 
