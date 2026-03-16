@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINEO 125 QUIET - E-Ticaret Görsel İçerik Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .showcase-header {
+            background: linear-gradient(135deg, #2d5016 0%, #5ca72a 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .showcase-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .showcase-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #2d5016;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #5ca72a;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        /* Ürün Kartı Tasarımı */
+        .product-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(92, 167, 42, 0.2);
+            border-color: #5ca72a;
+        }
+
+        .product-image-placeholder {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            min-height: 300px;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-size: 1.8em;
+            color: #2d5016;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .product-subtitle {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .product-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .product-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-features li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+        }
+
+        .product-price {
+            font-size: 2em;
+            color: #dc3545;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .product-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2d5016 0%, #5ca72a 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(92, 167, 42, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2d5016;
+            border: 2px solid #5ca72a;
+        }
+
+        .btn-secondary:hover {
+            background: #5ca72a;
+            color: white;
+        }
+
+        /* Özellik Kartları */
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #5ca72a;
+            box-shadow: 0 8px 25px rgba(92, 167, 42, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .feature-card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card-title {
+            font-size: 1.3em;
+            color: #2d5016;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .feature-card-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* Karşılaştırma Tablosu */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #2d5016 0%, #5ca72a 100%);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover {
+            background: #e9f5e0;
+        }
+
+        .highlight-column {
+            background: #fff3cd !important;
+            font-weight: 600;
+        }
+
+        .check-mark {
+            color: #28a745;
+            font-size: 1.5em;
+        }
+
+        .cross-mark {
+            color: #dc3545;
+            font-size: 1.5em;
+        }
+
+        /* Teknik Özellikler Accordion */
+        .accordion-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #f8f9fa;
+            padding: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: #e9ecef;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-body {
+            padding: 20px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-card {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .showcase-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .product-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-container">
+        <!-- Header -->
+        <div class="showcase-header">
+            <h1>🎨 LINEO 125 QUIET</h1>
+            <p>E-Ticaret Görsel İçerik Showcase - Profesyonel Web Tasarımı</p>
+        </div>
+
+        <!-- Ürün Kartı Örneği -->
+        <div class="section">
+            <h2 class="section-title">🛒 Ürün Kartı Tasarımı</h2>
+            <p class="section-subtitle">E-ticaret sayfasında kullanılabilecek modern ürün kartı örneği</p>
+            
+            <div class="product-card">
+                <div class="product-image-placeholder">
+                    📸<br><small style="font-size: 0.3em;">Ürün Görseli</small>
+                </div>
+                
+                <div class="product-info">
+                    <div>
+                        <h3 class="product-title">LINEO 125 QUIET</h3>
+                        <p class="product-subtitle">Ses Yalıtımlı Kanal Tipi Havalandırma Fanı - 125mm</p>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <span class="badge badge-success">✅ ERP 2022 Uyumlu</span>
+                            <span class="badge badge-info">🇮🇹 İtalyan Kalitesi</span>
+                            <span class="badge badge-warning">⚡ Düşük Tüketim</span>
+                            <span class="badge badge-success">🔇 36-45 dB(A)</span>
+                        </div>
+                        
+                        <ul class="product-features">
+                            <li><span class="feature-icon">🔇</span> <strong>Sessiz Çalışma:</strong> 36-45 dB(A)</li>
+                            <li><span class="feature-icon">⚡</span> <strong>Debi:</strong> 190-320 m³/h (3 hız)</li>
+                            <li><span class="feature-icon">💡</span> <strong>Güç:</strong> 11-27W</li>
+                            <li><span class="feature-icon">✅</span> <strong>Sertifikalar:</strong> CE, IMQ, UKCA</li>
+                            <li><span class="feature-icon">🛡️</span> <strong>Garanti:</strong> 2 yıl + 30.000+ saat motor</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <div class="product-price">₺ [FİYAT]</div>
+                        <div class="product-buttons">
+                            <button class="btn btn-primary">🛒 Sepete Ekle</button>
+                            <button class="btn btn-secondary">💚 Favorilere Ekle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Özellik Kartları -->
+        <div class="section">
+            <h2 class="section-title">✨ Özellik Kartları</h2>
+            <p class="section-subtitle">Her önemli özellik için görsel kartlar - Hızlı bilgi aktarımı</p>
+            
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-card-icon">🔇</div>
+                    <h3 class="feature-card-title">Sessiz Çalışma</h3>
+                    <p class="feature-card-desc">Ko-kalıplama ses yalıtım kabuğu ve Helmholtz rezonatör teknolojisi ile sadece 36 dB(A) ses seviyesi.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">⚡</div>
+                    <h3 class="feature-card-title">Enerji Verimliliği</h3>
+                    <p class="feature-card-desc">ERP 2022 uyumlu. Minimum hızda sadece 11W güç tüketimi. Yılda 32 kWh elektrik.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🔧</div>
+                    <h3 class="feature-card-title">Kolay Montaj</h3>
+                    <p class="feature-card-desc">360° döner gövde tasarımı ile 15-20 dakikada kurulum. Tek kişi monte edebilir.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🛠️</div>
+                    <h3 class="feature-card-title">Kolay Bakım</h3>
+                    <p class="feature-card-desc">Takılıp-çıkarılabilir parçalar. 10 dakikada bakım. Boru sistemine müdahale gerekmez.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🕐</div>
+                    <h3 class="feature-card-title">Uzun Ömür</h3>
+                    <p class="feature-card-desc">30.000+ saat garantili motor ömrü. Technopolymer gövde. 10-20 yıl kullanım.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🚀</div>
+                    <h3 class="feature-card-title">Yüksek Performans</h3>
+                    <p class="feature-card-desc">Mixed flow teknolojisi. 320 m³/h debi, 137 Pa basınç. Uzun kanal mesafeleri için.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">💧</div>
+                    <h3 class="feature-card-title">Su Direnci</h3>
+                    <p class="feature-card-desc">IPX5 koruma sınıfı. Duş ve banyolarda güvenle kullanılır. Su sıçramasına dayanıklı.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-card-icon">🇮🇹</div>
+                    <h3 class="feature-card-title">İtalyan Kalitesi</h3>
+                    <p class="feature-card-desc">Vortice 70+ yıllık deneyim. İtalya tasarım. CE, IMQ, UKCA sertifikalı.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Karşılaştırma Tablosu -->
+        <div class="section">
+            <h2 class="section-title">📊 Model Karşılaştırma Tablosu</h2>
+            <p class="section-subtitle">LINEO QUIET serisi modelleri arasında karşılaştırma</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Özellik</th>
+                        <th>LINEO 100</th>
+                        <th class="highlight-column">LINEO 125 ⭐</th>
+                        <th>LINEO 150</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ürün Kodu</strong></td>
+                        <td>17160</td>
+                        <td class="highlight-column">17161</td>
+                        <td>17162</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nominal Çap</strong></td>
+                        <td>100 mm</td>
+                        <td class="highlight-column">125 mm</td>
+                        <td>150 mm</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Debi (Max)</strong></td>
+                        <td>260 m³/h</td>
+                        <td class="highlight-column"><strong>320 m³/h</strong></td>
+                        <td>510 m³/h</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Güç (Max)</strong></td>
+                        <td>27 W</td>
+                        <td class="highlight-column"><strong>27 W</strong></td>
+                        <td>50 W</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ses (Min)</strong></td>
+                        <td>36.2 dB(A)</td>
+                        <td class="highlight-column"><strong>36.2 dB(A)</strong></td>
+                        <td>38.2 dB(A)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ağırlık</strong></td>
+                        <td>3.8 kg</td>
+                        <td class="highlight-column"><strong>3.6 kg</strong></td>
+                        <td>5.4 kg</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Önerilen Alan</strong></td>
+                        <td>2-4 m²</td>
+                        <td class="highlight-column"><strong>4-20 m²</strong></td>
+                        <td>6-30 m²</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Timer Versiyonu</strong></td>
+                        <td><span class="check-mark">✓</span> 17190</td>
+                        <td class="highlight-column"><span class="check-mark">✓</span> 17191</td>
+                        <td><span class="check-mark">✓</span> 17192</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fiyat/Performans</strong></td>
+                        <td>⭐⭐⭐</td>
+                        <td class="highlight-column"><strong>⭐⭐⭐⭐⭐</strong></td>
+                        <td>⭐⭐⭐⭐</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Teknik Özellikler Accordion -->
+        <div class="section">
+            <h2 class="section-title">📋 Teknik Özellikler Accordion</h2>
+            <p class="section-subtitle">Açılır-kapanır bölümler ile düzenli bilgi sunumu</p>
+            
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>🔧 Genel Özellikler</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p><strong>Ürün Kodu:</strong> 17161 (Standart), 17191 (Timer'lı)</p>
+                        <p><strong>Marka:</strong> Vortice (İtalyan menşei, 1954'ten beri)</p>
+                        <p><strong>Seri:</strong> LINEO QUIET (Ses yalıtımlı seri)</p>
+                        <p><strong>Nominal Çap:</strong> 125 mm (5 inch)</p>
+                        <p><strong>Fan Tipi:</strong> Mixed Flow (Karışık Akış)</p>
+                        <p><strong>Motor Tipi:</strong> AC İndüksiyon Motor, 3 hızlı</p>
+                        <p><strong>Voltaj:</strong> 220-240 V, 50-60 Hz</p>
+                        <p><strong>Ağırlık:</strong> 3.6 kg</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>📊 Performans Verileri (50Hz)</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p><strong>Min Hız:</strong> 190 m³/h debi, 78.5 Pa basınç, 11W güç, 36.2 dB(A) ses</p>
+                        <p><strong>Orta Hız:</strong> 250 m³/h debi, 98.1 Pa basınç, 24W güç, 41.8 dB(A) ses</p>
+                        <p><strong>Max Hız:</strong> 320 m³/h debi, 137.3 Pa basınç, 27W güç, 45.5 dB(A) ses</p>
+                        <p><strong>Not:</strong> Ses seviyeleri ışınımlı ölçüm, 3 metre mesafede</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>📐 Boyutlar</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p><strong>A (Genişlik):</strong> 210 mm</p>
+                        <p><strong>B (Yükseklik):</strong> 294.6 mm</p>
+                        <p><strong>C (Uzunluk):</strong> 504.5 mm</p>
+                        <p><strong>D (Boru Çapı):</strong> Ø 122 mm (125mm spiral boru için)</p>
+                        <p><strong>L (Toplam Montaj):</strong> 675 mm</p>
+                        <p><strong>Versiyon:</strong> A</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>✅ Sertifikalar ve Güvenlik</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p><strong>Sertifikalar:</strong> CE, IMQ, IMQ Performance, UKCA</p>
+                        <p><strong>Yangın Güvenliği:</strong> E2 Sınıfı (EN ISO 11925-2:2010)</p>
+                        <p><strong>Su Geçirmezlik:</strong> IPX5 (Doğru montajda)</p>
+                        <p><strong>ERP Uyumluluğu:</strong> ERP 2022 (327/2011/EU, 1253/2014/EU)</p>
+                        <p><strong>Elektrik Güvenliği:</strong> EN 60335-1, EN 60335-2-80</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>🧩 Uyumlu Aksesuarlar</span>
+                    <span class="accordion-icon">▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <p><strong>Hız Kontrolörleri:</strong> C5 0.5 (12987), C 1.5 (12966), TRIO (12891)</p>
+                        <p><strong>Sensörler:</strong> C TEMP (12992), C SMOKE (12993), C HCS (12994), C PIR (12998)</p>
+                        <p><strong>Zamanlayıcı:</strong> C TIMER (12999) - Standart model için (T modelde dahili)</p>
+                        <p><strong>Not:</strong> Tüm Vortice aksesuarları tam uyumludur</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="section" style="text-align: center; background: linear-gradient(135deg, #2d5016 0%, #5ca72a 100%); color: white;">
+            <h2 style="color: white; border-bottom: none; padding-bottom: 0;">🎯 Hemen Sipariş Verin!</h2>
+            <p style="font-size: 1.2em; margin: 20px 0; opacity: 0.95;">LINEO 125 QUIET ile sessiz konfor ve temiz hava garantisi</p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+                <button class="btn btn-primary" style="background: white; color: #2d5016; font-size: 1.1em; padding: 18px 40px;">
+                    🛒 Sepete Ekle
+                </button>
+                <button class="btn btn-secondary" style="border-color: white; color: white; font-size: 1.1em; padding: 18px 40px;">
+                    📞 Fiyat Teklifi Al
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const allItems = document.querySelectorAll('.accordion-item');
+            
+            // Close all other items
+            allItems.forEach(i => {
+                if (i !== item) {
+                    i.classList.remove('active');
+                }
+            });
+            
+            // Toggle current item
+            item.classList.toggle('active');
+        }
+
+        // Copy CSS functionality
+        function copyCSSToClipboard(sectionClass) {
+            const styles = document.querySelector('style').innerHTML;
+            navigator.clipboard.writeText(styles).then(() => {
+                alert('CSS kopyalandı! Web sitenizde kullanabilirsiniz.');
+            });
+        }
+    </script>
+</body>
+</html>

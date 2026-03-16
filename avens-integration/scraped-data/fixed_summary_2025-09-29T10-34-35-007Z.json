@@ -1,0 +1,14 @@
+{
+  "Konut Tipi Fanlar": {
+    "count": 18,
+    "url": "/konut-tipi-fanlar"
+  },
+  "Kanal Tipi Fanlar": {
+    "count": 18,
+    "url": "/kanal-tipi-fanlar"
+  },
+  "Çatı Tipi Fanlar": {
+    "count": 18,
+    "url": "/cati-tipi-fanlar"
+  }
+}

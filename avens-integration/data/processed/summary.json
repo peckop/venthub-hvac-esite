@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-27T16:51:31.929Z",
+  "total_products": 6,
+  "total_categories": 1,
+  "total_brands": 3,
+  "categories": [
+    "Diğer"
+  ],
+  "brands": [
+    "AVenS",
+    "Vortice",
+    "Casals"
+  ],
+  "products_by_category": {
+    "Diğer": 6
+  },
+  "products_by_brand": {
+    "AVenS": 3,
+    "Vortice": 2,
+    "Casals": 1
+  }
+}

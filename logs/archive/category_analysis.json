@@ -1,0 +1,378 @@
+{
+  "categories": [
+    {
+      "id": "f257940f-1105-4f03-b0ba-0862b50ebe26",
+      "category_name": "Aksesuarlar",
+      "slug": "aksesuarlar",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "28"
+    },
+    {
+      "id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "category_name": "Fanlar",
+      "slug": "fanlar",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "122"
+    },
+    {
+      "id": "c3265c8a-d668-4cab-82a4-54e1235fdbdb",
+      "category_name": "Flexible Hava Kanalları",
+      "slug": "flexible-hava-kanallari",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "4"
+    },
+    {
+      "id": "70ead5c0-b93e-40f0-82ae-951aa45861f5",
+      "category_name": "Hava Perdeleri",
+      "slug": "hava-perdeleri",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "0"
+    },
+    {
+      "id": "d15a676b-d683-4dc5-a694-b28c804593c6",
+      "category_name": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "slug": "hava-temizleyiciler-anti-viral-urunler",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "0"
+    },
+    {
+      "id": "46ba23cb-aa09-415d-b331-333879ae0e06",
+      "category_name": "Hız Kontrolü Cihazları",
+      "slug": "hiz-kontrolu-cihazlari",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "5"
+    },
+    {
+      "id": "8f7ab981-f26b-48a8-b397-e22cdd6e6b1e",
+      "category_name": "Isı Geri Kazanım Cihazları",
+      "slug": "isi-geri-kazanim-cihazlari",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "2"
+    },
+    {
+      "id": "6c289ebd-5d79-4f32-919d-e0219ca16884",
+      "category_name": "Nem Alma Cihazları",
+      "slug": "nem-alma-cihazlari",
+      "parent_id": null,
+      "parent_name": null,
+      "parent_slug": null,
+      "product_count": "3"
+    },
+    {
+      "id": "591c0ea4-5e24-4214-b9fb-ed32d741cdd7",
+      "category_name": "Alüminyum Folyo Bantlar",
+      "slug": "aluminyum-folyo-bantlar",
+      "parent_id": "f257940f-1105-4f03-b0ba-0862b50ebe26",
+      "parent_name": "Aksesuarlar",
+      "parent_slug": "aksesuarlar",
+      "product_count": "0"
+    },
+    {
+      "id": "bce93862-5402-4850-96ae-1f4fdd5656e3",
+      "category_name": "Bağlantı Konnektörü",
+      "slug": "baglanti-konnektoru",
+      "parent_id": "f257940f-1105-4f03-b0ba-0862b50ebe26",
+      "parent_name": "Aksesuarlar",
+      "parent_slug": "aksesuarlar",
+      "product_count": "0"
+    },
+    {
+      "id": "44f69169-0075-4c29-ac05-d76f55f935a8",
+      "category_name": "Gemici Anemostadı",
+      "slug": "gemici-anemostadi",
+      "parent_id": "f257940f-1105-4f03-b0ba-0862b50ebe26",
+      "parent_name": "Aksesuarlar",
+      "parent_slug": "aksesuarlar",
+      "product_count": "0"
+    },
+    {
+      "id": "8195387b-2bf5-4576-935a-0293ea0b0f34",
+      "category_name": "Plastik Kelepçeler",
+      "slug": "plastik-kelepçeler",
+      "parent_id": "f257940f-1105-4f03-b0ba-0862b50ebe26",
+      "parent_name": "Aksesuarlar",
+      "parent_slug": "aksesuarlar",
+      "product_count": "0"
+    },
+    {
+      "id": "4a801860-24f3-4d02-8a1b-7e547f2be73e",
+      "category_name": "Ex-Proof Fanlar (Patlama Karşı ATEX Fanlar)",
+      "slug": "ex-proof-fanlar-patlama-karsi-atex-fanlar",
+      "parent_id": "db965633-c967-4193-8617-e1a7651997ec",
+      "parent_name": "Endüstriyel Fanlar",
+      "parent_slug": "endustriyel-fanlar",
+      "product_count": "0"
+    },
+    {
+      "id": "f1023011-4390-42d3-bcc4-53510a43c93f",
+      "category_name": "Basınçlandırma Fanları",
+      "slug": "basinclandirma-fanlari",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "0"
+    },
+    {
+      "id": "b7642434-3cbb-4b6c-97e3-66f45ff077f3",
+      "category_name": "Çatı Tipi Fanlar",
+      "slug": "cati-tipi-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "10"
+    },
+    {
+      "id": "505b490a-8454-4f56-b9b0-29127ff877ab",
+      "category_name": "Duman Egzoz Fanları",
+      "slug": "duman-egzoz-fanlari",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "8"
+    },
+    {
+      "id": "36f701a5-eb64-4c2b-a9da-a6f525c22e81",
+      "category_name": "Duvar Tipi Kompakt Aksiyal Fanlar",
+      "slug": "duvar-tipi-kompakt-aksiyal-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "24"
+    },
+    {
+      "id": "fb6b9f24-67a4-4d90-a1da-39a10e793e96",
+      "category_name": "EC Motor Fanlar",
+      "slug": "ec-motor-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "55"
+    },
+    {
+      "id": "db965633-c967-4193-8617-e1a7651997ec",
+      "category_name": "Endüstriyel Fanlar",
+      "slug": "endustriyel-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "16"
+    },
+    {
+      "id": "512ae175-7a2f-4b4d-8dd6-9dbe4ef96261",
+      "category_name": "Kanal Tipi Fanlar",
+      "slug": "kanal-tipi-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "14"
+    },
+    {
+      "id": "f3a75c19-256a-44bb-a816-9379881f1346",
+      "category_name": "Konut Tipi Fanlar",
+      "slug": "konut-tipi-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "0"
+    },
+    {
+      "id": "29d5dc81-b8bd-4b0f-ba23-29795b3d62e9",
+      "category_name": "Otopark Jet Fanları",
+      "slug": "otopark-jet-fanlari",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "2"
+    },
+    {
+      "id": "ff1bcb1f-9df2-443a-afe6-e8d261098d88",
+      "category_name": "Plug Fanlar",
+      "slug": "plug-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "0"
+    },
+    {
+      "id": "29af592c-b745-440a-80a1-1badec6ca91b",
+      "category_name": "Santrifüj Fanlar",
+      "slug": "santrifuj-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "0"
+    },
+    {
+      "id": "807cc1ed-6e08-47da-bc94-d4be0d2b4c0c",
+      "category_name": "Sessiz Kanal Tipi Fanlar",
+      "slug": "sessiz-kanal-tipi-fanlar",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "6"
+    },
+    {
+      "id": "b11257b6-55e2-4561-81f0-93ad9a02f7e7",
+      "category_name": "Sığınak Havalandırma Fanları",
+      "slug": "siginak-havalandirma-fanlari",
+      "parent_id": "4bc54533-7323-4eac-a02d-4498ffde00eb",
+      "parent_name": "Fanlar",
+      "parent_slug": "fanlar",
+      "product_count": "3"
+    },
+    {
+      "id": "71688089-4e64-4996-ae25-68c76abe23cd",
+      "category_name": "Elektrikli Isıtıcılı",
+      "slug": "elektrikli-isitici",
+      "parent_id": "70ead5c0-b93e-40f0-82ae-951aa45861f5",
+      "parent_name": "Hava Perdeleri",
+      "parent_slug": "hava-perdeleri",
+      "product_count": "4"
+    },
+    {
+      "id": "9db7b3c8-db21-422a-9647-9b47a137f719",
+      "category_name": "Ortam Havalı",
+      "slug": "ortam-havali",
+      "parent_id": "70ead5c0-b93e-40f0-82ae-951aa45861f5",
+      "parent_name": "Hava Perdeleri",
+      "parent_slug": "hava-perdeleri",
+      "product_count": "4"
+    },
+    {
+      "id": "ca83b3d1-9958-461b-acbb-4196cdeda9b0",
+      "category_name": "Depuro Pro",
+      "slug": "depuro-pro",
+      "parent_id": "d15a676b-d683-4dc5-a694-b28c804593c6",
+      "parent_name": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "parent_slug": "hava-temizleyiciler-anti-viral-urunler",
+      "product_count": "0"
+    },
+    {
+      "id": "79e6a033-cfc2-4417-b5a6-20224e64b6fe",
+      "category_name": "S&G Dispenser",
+      "slug": "sg-dispenser",
+      "parent_id": "d15a676b-d683-4dc5-a694-b28c804593c6",
+      "parent_name": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "parent_slug": "hava-temizleyiciler-anti-viral-urunler",
+      "product_count": "0"
+    },
+    {
+      "id": "515c15b9-e7a4-4a1c-b704-e2c3928c1be5",
+      "category_name": "Uv Logika",
+      "slug": "uv-logika",
+      "parent_id": "d15a676b-d683-4dc5-a694-b28c804593c6",
+      "parent_name": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "parent_slug": "hava-temizleyiciler-anti-viral-urunler",
+      "product_count": "0"
+    },
+    {
+      "id": "626113e0-927f-4d25-9678-5f259fc3f49c",
+      "category_name": "Vort Super Dry",
+      "slug": "vort-super-dry",
+      "parent_id": "d15a676b-d683-4dc5-a694-b28c804593c6",
+      "parent_name": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "parent_slug": "hava-temizleyiciler-anti-viral-urunler",
+      "product_count": "0"
+    },
+    {
+      "id": "16798e32-cd31-4c8f-b68a-d6097fd47e33",
+      "category_name": "Frekans Konvertörler",
+      "slug": "frekans-konvertorler",
+      "parent_id": "46ba23cb-aa09-415d-b331-333879ae0e06",
+      "parent_name": "Hız Kontrolü Cihazları",
+      "parent_slug": "hiz-kontrolu-cihazlari",
+      "product_count": "17"
+    },
+    {
+      "id": "882982be-e355-4ccb-aea9-b5480b0fadf3",
+      "category_name": "Hız Anahtarı",
+      "slug": "hiz-anahtari",
+      "parent_id": "46ba23cb-aa09-415d-b331-333879ae0e06",
+      "parent_name": "Hız Kontrolü Cihazları",
+      "parent_slug": "hiz-kontrolu-cihazlari",
+      "product_count": "0"
+    },
+    {
+      "id": "475621b8-503e-4acd-9a79-0c9c434eb696",
+      "category_name": "Konut Tipi",
+      "slug": "konut-tipi-isi-geri-kazanim",
+      "parent_id": "8f7ab981-f26b-48a8-b397-e22cdd6e6b1e",
+      "parent_name": "Isı Geri Kazanım Cihazları",
+      "parent_slug": "isi-geri-kazanim-cihazlari",
+      "product_count": "7"
+    },
+    {
+      "id": "0dd451bd-a4b7-4bab-9de6-338d7085e86b",
+      "category_name": "Ticari Tip",
+      "slug": "ticari-tip-isi-geri-kazanim",
+      "parent_id": "8f7ab981-f26b-48a8-b397-e22cdd6e6b1e",
+      "parent_name": "Isı Geri Kazanım Cihazları",
+      "parent_slug": "isi-geri-kazanim-cihazlari",
+      "product_count": "0"
+    }
+  ],
+  "summary": [
+    {
+      "ana_kategori": "Fanlar",
+      "slug": "fanlar",
+      "alt_kategori_sayisi": "13",
+      "toplam_urun": "138"
+    },
+    {
+      "ana_kategori": "Hız Kontrolü Cihazları",
+      "slug": "hiz-kontrolu-cihazlari",
+      "alt_kategori_sayisi": "2",
+      "toplam_urun": "17"
+    },
+    {
+      "ana_kategori": "Hava Perdeleri",
+      "slug": "hava-perdeleri",
+      "alt_kategori_sayisi": "2",
+      "toplam_urun": "8"
+    },
+    {
+      "ana_kategori": "Isı Geri Kazanım Cihazları",
+      "slug": "isi-geri-kazanim-cihazlari",
+      "alt_kategori_sayisi": "2",
+      "toplam_urun": "7"
+    },
+    {
+      "ana_kategori": "Nem Alma Cihazları",
+      "slug": "nem-alma-cihazlari",
+      "alt_kategori_sayisi": "0",
+      "toplam_urun": "0"
+    },
+    {
+      "ana_kategori": "Flexible Hava Kanalları",
+      "slug": "flexible-hava-kanallari",
+      "alt_kategori_sayisi": "0",
+      "toplam_urun": "0"
+    },
+    {
+      "ana_kategori": "Hava Temizleyiciler Anti-Viral Ürünler",
+      "slug": "hava-temizleyiciler-anti-viral-urunler",
+      "alt_kategori_sayisi": "4",
+      "toplam_urun": "0"
+    },
+    {
+      "ana_kategori": "Aksesuarlar",
+      "slug": "aksesuarlar",
+      "alt_kategori_sayisi": "4",
+      "toplam_urun": "0"
+    }
+  ]
+}
