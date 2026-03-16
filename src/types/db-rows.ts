@@ -114,3 +114,4 @@ export type DbUserAddressUpdate = Tables['user_addresses']['Update'];
 export type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update'];
 
 export type DbJson = Json;
+export type AuthorityContent = any;

@@ -8,6 +8,10 @@ import { z } from 'zod'
 import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
 import { supabase, Category } from '../../../lib/supabase'
 import type { Database } from '../../../types/database.types'
+import { useI18n } from '../../../i18n/I18nProvider'
+import { adminButtonPrimaryClass } from '../../../utils/adminUi'
+import { compressImage } from '../../../utils/imageUtils'
+
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
 type Json = Database['public']['Tables']['categories']['Insert']['metadata']
@@ -17,10 +21,6 @@ export interface CategoryMetadata {
     metric2?: { value?: string | null; label?: string | null };
     [key: string]: Json | undefined;
 }
-
-import { useI18n } from '../../../i18n/I18nProvider'
-import { adminButtonPrimaryClass } from '../../../utils/adminUi'
-import { compressImage } from '../../../utils/imageUtils'
 
 // --- Zod Schema ---
 const categorySchema = z.object({
