@@ -1,7 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '../types/database.types'
 import { mapDatabaseProductToDomain } from './type-converters'
-import { DbProduct, AuthorityContent } from '../types/db-rows'
+import { DbProduct } from '../types/db-rows'
+
+export interface AuthorityContent {
+  author_name?: string;
+  author_title?: string;
+  reviewed_by?: string;
+  reviewed_date?: string;
+  content_score?: number;
+  sources?: string[];
+  [key: string]: any;
+}
 
 // Import types for aliasing and internal use
 export type { Database } from '../types/database.types'
