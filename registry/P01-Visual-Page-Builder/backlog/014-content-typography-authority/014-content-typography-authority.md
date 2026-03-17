@@ -1,5 +1,5 @@
 ---
-updated_at: "2026-03-16 14:44:57"
+updated_at: "2026-03-17 07:34:24"
 id: 014
 title: "İçerik ve Tipografi Otoritesi"
 status: "Pending"

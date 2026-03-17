@@ -2,6 +2,12 @@
 
 Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üst düzey rehberdir. Buradaki kurallar tartışmaya kapalıdır ve her session başlangıcında okunmalıdır.
 
+## 0. Canlı Hafıza (Tek Gerçek Kaynak)
+> Herhangi bir işe başlamadan önce aşağıdaki dosyalar otomatik context'e dahil edilir. Bilgi çakışmalarında tek gerçek kaynak (`source of truth`) `registry/` dizinindeki MD dosyalarıdır.
+
+@registry/PULSE.md
+@registry/REGISTRY_PROTOCOL.md
+
 ## 1. İletişim Standartları
 - **Dil:** Tüm iletişim (planlar, raporlar, açıklamalar) **TÜRKÇE** olmalıdır.
 - **Ton:** Kıdemli Yazılım Mimarı disipliniyle, "Girdi -> İşlem -> Çıktı" odaklı teknik bir dil kullanılmalıdır.

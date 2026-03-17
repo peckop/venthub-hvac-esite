@@ -10,8 +10,9 @@ Bu protokol, projenin "Hafızası" (Registry) ve "Motoru" (Superpowers) arasınd
 
 ## 2. Dosya Rolleri ve İsimlendirme
 - **Ana Görev Dosyası (`ID-gorev-adi.md`):** Sadece YAML metadata, kısa hedef ve ilerleme (checkbox) takibini içerir.
-- **Brainstorm (`brainstorm.md`):** Görevin neden yapıldığı, teknik stratejiler ve riskler burada durur.
-- **Plan (`plan.md`):** Operasyonel uygulama adımları burada durur.
+- **Brainstorm (`brainstorm.md`):** Görevin neden yapıldığı, teknik stratejiler ve riskler burada durur. `/superpowers-brainstorm` çıktısı buraya kaydedilir.
+- **Plan (`plan.md`):** Operasyonel uygulama adımları burada durur. `/superpowers-write-plan` çıktısı buraya kaydedilir.
+- **Review (`review.md`):** Kod incelemesi çıktısı burada durur. `/superpowers-review` çıktısı buraya kaydedilir. PR açılmadan önce doldurulması zorunludur.
 
 ## 3. Atomic Progress (Otomatik İlerleme)
 - İlerleme yüzdesi, ana görev dosyasındaki `- [x]` (tamamlanan) vs `- [ ]` (bekleyen) checkbox oranına göre `registry_sync.py` tarafından otomatik hesaplanır.
