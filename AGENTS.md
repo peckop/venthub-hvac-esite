@@ -11,12 +11,12 @@ This file defines the strict architectural rules, boundaries, and best practices
 - **Language**: TypeScript (Strict mode enabled)
 - **i18n**: Custom dictionary-based i18n (`src/i18n/dictionaries/tr.ts` as primary)
 
-## 2. Code Standards & Hard Rules
-🚨 **NEVER ignore these rules:**
-- **No Hardcoded Strings**: All user-facing text MUST go through the `useI18n()` hook. Do not hardcode Turkish or English strings into TSX files.
-- **Strict TypeScript**: Do NOT use `any`. Define proper interfaces/types for all props, states, and DB models.
-- **No Unapproved Packages**: Do NOT add new npm packages (`pnpm install`) unless explicitly requested by the user.
-- **Tailwind Only**: Component styles must be built using standard Tailwind utility classes.
+## 🚨 HARD RULES (KIRILMAZ KURALLAR)
+1. **Registry-First Disiplini:** Herhangi bir koda (src/) dokunmadan önce MUTLAKA `registry/` klasöründeki ilgili `.md` dosyasını `view_file` ile oku. Okumadan başlanan her iş "kör aksiyon" sayılır.
+2. **Semantic Integrity Guard:** Bir görev dosyasında `## 🎯 Hedef` ve `## ✅ Alt Görevler` kısımları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz. `...` gibi placeholder kullanımı yasaktır ve `manage_registry.py` tarafından engellenir.
+3. **Atomic Registry Sync:** Kodda yaptığın her başarılı değişiklikten sonra `registry/` dosyasını veya `PULSE.md`yi güncelle.
+4. **Registry Guard Kilit Sistemi:** Projede `registry_guard.py` (Commit engelleyici) ve `manage_registry.py` (Statü engelleyici) aktif denetim yapmaktadır.
+5. **No-Hardcore Strings:** Kullanıcıya dönük hiçbir metni TSX içine gömme. `useI18n()` kullan.
 
 ## 3. Component Architecture
 - Place components in their respective structural domains inside `src/components/`:
@@ -46,9 +46,9 @@ Before suggesting or opening a Pull Request, you MUST ensure that the following 
 
 If any of these fail, you MUST fix the errors before finalizing your task.
 
-## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli
-🚨 **JULES (AI Agent) için Kesin Kurallar:**
-1. **ZORUNLU MASTER SYNC:** Herhangi bir koda dokunmadan veya yeni bir PR açmadan ÖNCE, ortamı mutlaka `master` dalının **en güncel** haliyle eşitlemelisin. (`git fetch origin master` ve `git checkout -b <görev-dali> origin/master`). Eski bir daldan veya senkronize olmayan yerel bir kopyadan ASLA işleme başlama.
-2. **Dalga (Wave) Kapsamı:** Sana verilen bir görevde hedef dizin (örn. `Dalga 1: src/views/admin/`) belirtilecek. Belirtilen bu dizin DIŞINDAKİ hiçbir dosyaya müdahale EDEMEZSİN.
-3. **PR Boyut Limiti:** Tek bir PR devasa olmamalı. Çoklu dosyalarda çalışıyorsan ve diff çok büyüyorsa (100+ satır), görevi parçalara ayırarak sıralı PR'lar aç.
-4. **Dosya Silme Yasağı:** Projeden ASLA `.ts`, `.tsx`, `.css` vb. dosyaları tamamen SİLME (özel olarak emredilmedikçe). Sadece dosya içi temizlik/düzenleme yapabilirsin.
+## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli (Antigravity Entegrasyonu)
+🚨 **AI Ajanları İçin Kesin Kurallar:**
+1. **ZORUNLU MASTER SYNC:** Herhangi bir koda dokunmadan önce master güncel tutulmalı.
+2. **Superpowers Discipline:** Antigravity dahil tüm ajanlar, karmaşık görevlerde `superpowers-workflow` skill'ini (Brainstorm -> Plan -> Implement -> Review -> Finish) tam kapasiteyle kullanmalıdır.
+3. **PR Boyut Limiti:** Tek bir PR 100+ satırı geçmemeli, görevler parçalanmalı.
+4. **Dosya Silme Yasağı:** Özel emir yoksa dosya SİLME, düzenleme yap.

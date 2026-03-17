@@ -1,5 +1,5 @@
 ---
-updated_at: "2026-03-16 16:30:00"
+updated_at: "2026-03-17 07:34:24"
 id: 030
 title: "Gelişmiş Arama UX & Backend Optimizasyonu"
 status: "Backlog"
@@ -7,8 +7,8 @@ progress: "0%"
 priority: "High"
 depends_on: null
 artifacts:
-  brainstorm: null
-  plan: null
+  brainstorm: "registry/P00-Standalone/backlog/030-advanced-search-ux/brainstorm.md"
+  plan: "registry/P00-Standalone/backlog/030-advanced-search-ux/plan.md"
   review: null
 ---
 

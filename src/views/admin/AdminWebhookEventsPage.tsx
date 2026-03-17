@@ -44,7 +44,7 @@ interface EmailEventRow {
 }
 
 const AdminWebhookEventsPage: React.FC = () => {
-  const { lang, t } = useI18n()
+  const { lang, t: _t } = useI18n()
   const dragScrollRef1 = useDragScroll<HTMLDivElement>()
   const dragScrollRef2 = useDragScroll<HTMLDivElement>()
   const [tab, setTab] = React.useState<'returns' | 'shipping'>('returns')
@@ -78,7 +78,7 @@ const AdminWebhookEventsPage: React.FC = () => {
     try {
       if (tab === 'returns') {
         const { data, error } = await supabase
-          .from('returns_webhook_events')
+          .from('returns_webhook_events' as any)
           .select('id,event_id,return_id,order_id,carrier,tracking_number,status_raw,status_mapped,received_at,processed_at')
           .order('received_at', { ascending: false })
           .limit(200)
@@ -87,7 +87,7 @@ const AdminWebhookEventsPage: React.FC = () => {
         setReturnsRows(list)
       } else {
         const { data, error } = await supabase
-          .from('shipping_email_events')
+          .from('shipping_email_events' as any)
           .select('order_id,email_to,subject,provider,provider_message_id,carrier,tracking_number,created_at')
           .order('created_at', { ascending: false })
           .limit(200)
@@ -132,8 +132,8 @@ const AdminWebhookEventsPage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-1">
-          <h1 className={adminSectionTitleClass}>{t('admin.webhooks.title')}</h1>
-          <p className={adminSubtitleClass}>Sistemler arası veri akışını ve otomatik bildirimleri izleyin.</p>
+          <h1 className={adminSectionTitleClass}>{_t('admin.webhooks.title')}</h1>
+          <p className={adminSubtitleClass}>{_t('admin.webhooks.subtitle') || 'Sistemler arası veri akışını ve otomatik bildirimleri izleyin.'}</p>
         </div>
         
         <div className="flex items-center gap-3 glass p-1.5 rounded-2xl border border-white/5 shadow-xl">
@@ -142,14 +142,14 @@ const AdminWebhookEventsPage: React.FC = () => {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${tab === 'returns' ? 'bg-cyan-400 text-[#0A0F1E] shadow-lg shadow-cyan-400/20' : 'text-slate-400 hover:text-white'}`}
           >
             <Activity size={14} />
-            {t('admin.webhooks.tabs.returns')}
+            {_t('admin.webhooks.tabs.returns')}
           </button>
           <button 
             onClick={() => setTab('shipping')} 
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${tab === 'shipping' ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/20' : 'text-slate-400 hover:text-white'}`}
           >
             <Send size={14} />
-            {t('admin.webhooks.tabs.shipping')}
+            {_t('admin.webhooks.tabs.shipping')}
           </button>
           <div className="w-px h-6 bg-white/10 mx-1" />
           <button 
@@ -162,7 +162,7 @@ const AdminWebhookEventsPage: React.FC = () => {
             ) : (
               <span className="flex items-center gap-2">
                 <RefreshCcw size={16} />
-                <span className="hidden sm:inline">{t('admin.ui.refresh')}</span>
+                <span className="hidden sm:inline">{_t('admin.ui.refresh')}</span>
               </span>
             )}
           </button>
@@ -175,7 +175,7 @@ const AdminWebhookEventsPage: React.FC = () => {
           search={{ 
             value: q, 
             onChange: setQ, 
-            placeholder: tab === 'returns' ? t('admin.webhooks.search.returns') : t('admin.webhooks.search.shipping'), 
+            placeholder: tab === 'returns' ? _t('admin.webhooks.search.returns') : _t('admin.webhooks.search.shipping'), 
             focusShortcut: '/' 
           }}
           rightExtra={null}
@@ -187,18 +187,18 @@ const AdminWebhookEventsPage: React.FC = () => {
             <div className="space-y-4">
               <div className="px-4 py-2 rounded-xl bg-cyan-400/5 border border-cyan-400/10 flex items-center gap-3">
                 <Terminal size={14} className="text-cyan-400" />
-                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">{t('admin.webhooks.tip.rowAction')}</span>
+                <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">{_t('admin.webhooks.tip.rowAction') || 'Olay kayıtlarını incelemek için satıra odaklanın.'}</span>
               </div>
               
               <div ref={dragScrollRef1} className="overflow-x-auto rounded-2xl border border-white/5 bg-[#0A0F1E]/40">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="glass-strong">
-                      {colsRet.event && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.returnsTable.eventId')}</th>)}
-                      {colsRet.order && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.returnsTable.order')}</th>)}
-                      {colsRet.carrier && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.returnsTable.carrier')}</th>)}
-                      {colsRet.status && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.returnsTable.statusMapped')}</th>)}
-                      {colsRet.received && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.returnsTable.received')}</th>)}
+                      {colsRet.event && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.returnsTable.eventId')}</th>)}
+                      {colsRet.order && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.returnsTable.order')}</th>)}
+                      {colsRet.carrier && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.returnsTable.carrier')}</th>)}
+                      {colsRet.status && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.returnsTable.statusMapped')}</th>)}
+                      {colsRet.received && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.returnsTable.received')}</th>)}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -213,8 +213,8 @@ const AdminWebhookEventsPage: React.FC = () => {
                         <td colSpan={5} className="p-12">
                           <AdminEmptyState
                             icon={RefreshCcw}
-                            title="İade Etkinliği Bulunamadı"
-                            description="Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor."
+                            title={_t('admin.webhooks.noReturns') || 'İade Etkinliği Bulunamadı'}
+                            description={_t('admin.webhooks.noReturnsDesc') || 'Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor.'}
                           />
                         </td>
                       </tr>
@@ -245,11 +245,11 @@ const AdminWebhookEventsPage: React.FC = () => {
                 <table className="min-w-full text-left">
                   <thead>
                     <tr className="glass-strong">
-                      {colsMail.order && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.emailsTable.order')}</th>)}
-                      {colsMail.to && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.emailsTable.to')}</th>)}
-                      {colsMail.subject && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.emailsTable.subject')}</th>)}
-                      {colsMail.provider && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.emailsTable.provider')}</th>)}
-                      {colsMail.created && (<th className={adminTableHeadCellClass}>{t('admin.webhooks.emailsTable.date')}</th>)}
+                      {colsMail.order && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.emailsTable.order')}</th>)}
+                      {colsMail.to && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.emailsTable.to')}</th>)}
+                      {colsMail.subject && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.emailsTable.subject')}</th>)}
+                      {colsMail.provider && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.emailsTable.provider')}</th>)}
+                      {colsMail.created && (<th className={adminTableHeadCellClass}>{_t('admin.webhooks.emailsTable.date')}</th>)}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -264,8 +264,8 @@ const AdminWebhookEventsPage: React.FC = () => {
                         <td colSpan={5} className="p-12">
                           <AdminEmptyState
                             icon={MailX}
-                            title="E-Posta Etkinliği Bulunamadı"
-                            description="Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor."
+                            title={_t('admin.webhooks.noEmails') || 'E-Posta Etkinliği Bulunamadı'}
+                            description={_t('admin.webhooks.noEmailsDesc') || 'Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor.'}
                           />
                         </td>
                       </tr>

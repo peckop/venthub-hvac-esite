@@ -64,6 +64,19 @@ export const tr = {
     next: "Sonraki",
     remove: "Kaldır",
     more: "Daha Fazla",
+    save: "Kaydet",
+    saving: "Kaydediliyor...",
+    edit: "Düzenle",
+    delete: "Sil",
+    actions: "İşlemler",
+    status: "Durum",
+    date: "Tarih",
+    amount: "Tutar",
+    id: "ID",
+    all: "Tümü",
+    none: "Yok",
+    yes: "Evet",
+    no: "Hayır"
   },
   search: {
     recentSearches: "Son Aramalar",
@@ -313,7 +326,7 @@ export const tr = {
       eyebrow: 'Senaryo Odaklı Çözümler',
       title: 'Üründen değil, kullanım senaryosundan da başlayabilirsiniz.',
       subtitle: 'Otoparktan giriş konforuna, mutfaktan ticari alan konforuna kadar farklı HVAC ihtiyaçlarını çözüm mantığıyla sunuyoruz.',
-      viewAll: 'Tümünü Gör',
+      viewAll: 'Tümü Gör',
       items: {
         parking: {
           eyebrow: 'Otopark Senaryosu',
@@ -530,6 +543,55 @@ export const tr = {
     terms: 'Kullanım Koşulları'
   },
   admin: {
+    common: {
+      saveChanges: "Değişiklikleri Kaydet",
+      cancel: "İptal",
+      delete: "Sil",
+      edit: "Düzenle",
+      search: "Ara...",
+      filter: "Filtrele",
+      noResults: "Sonuç bulunamadı",
+      loading: "Yükleniyor...",
+      success: "İşlem başarılı",
+      error: "Bir hata oluştu",
+      ready: "Hazır",
+      actions: "İşlemler",
+      status: "Durum",
+      active: "Aktif",
+      passive: "Pasif",
+      all: "Tümü"
+    },
+    users: {
+      subtitle: 'Sistem kullanıcılarını ve rollerini yönetin.',
+      searchPlaceholder: 'E-posta, isim, şirket veya VKN ile ara...',
+      table: {
+        user: 'Kullanıcı',
+        created: 'Kayıt',
+        actions: 'İşlem'
+      },
+      info: {
+        subtitle: 'Sistem güvenliği için rollerin yetki seviyelerini kontrol edin.'
+      },
+      roles: {
+        superadmin: 'Tüm sistem ayarlarına ve rol yönetimine tam erişim.',
+        admin: 'Ürün, sipariş ve içerik yönetimi için yetki.',
+        warehouse: 'Stok yönetimi ve envanter hareketleri yetkisi.',
+        sales: 'Sipariş, kargo, iade ve kupon yönetimi yetkisi.',
+        viewer: 'Tüm modülleri salt-okunur (view-only) yetkisi.'
+      },
+      permissionsError: 'Kullanıcı rolleri değiştirme yetkiniz yok.'
+    },
+    inventory: {
+      subtitle: 'Ürün stok seviyelerini ve depo hareketlerini izleyin.',
+      summary: 'Stok Özeti',
+      movements: 'Hareket Defteri',
+      stockAlarms: 'Stok Alarmları',
+      criticalLevel: 'Kritik Seviye',
+      warehouseLocation: 'Depo Konumu',
+      supplier: 'Tedarikçi',
+      editStock: 'Stok Düzenle',
+      adjustStock: 'Stok Ayarla'
+    },
     dashboard: {
       subtitle: 'Hızlı bakış ve son hareketler',
       rangeToday: 'Bugün',
@@ -608,6 +670,86 @@ export const tr = {
       categories: 'Kategoriler',
       coupons: 'Kuponlar',
       settings: 'Admin Ayarları'
+    },
+    webhooks: {
+      subtitle: 'Sistemler arası veri akışını ve otomatik bildirimleri izleyin.',
+      noReturns: 'İade Etkinliği Bulunamadı',
+      noReturnsDesc: 'Şu an için kaydedilmiş herhangi bir iade webhook etkinliği bulunmuyor.',
+      noEmails: 'E-Posta Etkinliği Bulunamadı',
+      noEmailsDesc: 'Şu an için kaydedilmiş herhangi bir sevkiyat/kargo e-posta etkinliği bulunmuyor.'
+    },
+    a11y: {
+      close: "Kapat",
+      delete: "Sil",
+      edit: "Düzenle",
+      save: "Kaydet",
+      search: "Ara",
+      filter: "Filtrele",
+      menu: "Menü",
+      settings: "Ayarlar",
+      refresh: "Yenile",
+      export: "Dışa Aktar",
+      import: "İçe Aktar",
+      expand: "Genişlet",
+      collapse: "Daralt",
+      next: "Sonraki",
+      prev: "Önceki",
+      copy: "Kopyala",
+      upload: "Dosya Yükle",
+      download: "İndir"
+    },
+    returns: {
+      total: 'Toplam: {{count}} iade talebi yönetiliyor.',
+      searchPlaceholder: 'Sipariş no, müşteri ismi, e-posta veya sebep ile ara',
+      export: {
+        csvLabel: 'CSV (Görünen filtrelerle)',
+        xlsLabel: 'Excel (.xls — HTML tablo)',
+        headers: { order: 'Sipariş', customer: 'Müşteri', email: 'E-posta', reason: 'Sebep', status: 'Durum', date: 'Tarih', amount: 'Tutar' }
+      },
+      table: { order: 'Sipariş', customer: 'Müşteri', reason: 'Sebep', status: 'Durum', date: 'Tarih', actions: 'İşlemler' },
+      empty: { filtered: 'Filtrelerle eşleşen iade talebi bulunamadı.', none: 'Henüz iade talebi bulunmuyor.' },
+      actions: { markAs: '{{status}} olarak işaretle' },
+      toasts: {
+        returnsLoadFailed: 'İade talepleri yüklenemedi',
+        statusUpdated: 'İade durumu "{{status}}" olarak güncellendi',
+        emailNotifySent: 'Müşteri bilgilendirme e-postası gönderildi',
+        emailNotifyFailed: 'E-posta gönderilemedi ancak durum güncellendi',
+        statusUpdateFailed: 'İade durumu güncellenemedi'
+      },
+      statusLabels: {
+        requested: 'Talep Edildi',
+        approved: 'Onaylandı',
+        rejected: 'Reddedildi',
+        in_transit: 'Yolda',
+        received: 'Teslim Alındı',
+        refunded: 'İade Edildi',
+        cancelled: 'İptal Edildi'
+      }
+    },
+    logistics: {
+      title: "Toplu Kargo Panosu",
+      subtitle: "Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.",
+      searchPlaceholder: "Sipariş no veya müşteri ara...",
+      applyToAll: "Tümüne Uygula",
+      shipOrders: "Kargoya Ver",
+      updating: "Güncelleniyor...",
+      noCarrierSelected: "Lütfen bir kargo firması seçin.",
+      table: {
+        order: "Sipariş",
+        customer: "Müşteri",
+        date: "Tarih",
+        carrier: "Kargo Firması",
+        tracking: "Takip Numarası",
+        status: "Durum"
+      },
+      toasts: {
+        loadFailed: "Bekleyen siparişler yüklenemedi",
+        appliedToAll: "Seçili kargo firması tüm satırlara uygulandı.",
+        noNewTracking: "Kaydedilecek yeni kargo bilgisi bulunamadı.",
+        bulkUpdateFailed: "{{count}} siparişte kargo güncellemesi başarısız oldu.",
+        bulkUpdateSuccess: "{{count}} sipariş başarıyla Kargoda durumuna alındı!",
+        criticalError: "Toplu güncelleme sırasında kritik bir hata oluştu."
+      }
     }
   },
   brands: {
@@ -650,4 +792,3 @@ export const tr = {
     }
   }
 }
-

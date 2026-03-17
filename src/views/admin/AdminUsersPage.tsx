@@ -93,7 +93,7 @@ export default function AdminUsersPage() {
         setAdminUsers(enrichedAdmins as AdminUser[])
       } catch (error) {
         console.error('Admin users load error:', error)
-        toast.error(_t('admin.users.toasts.adminsLoadFailed') as string)
+        toast.error(_t('admin.users.toasts.adminsLoadFailed') || 'Admin kullanıcıları yüklenemedi.')
       } finally {
         setIsLoading(false)
       }
@@ -122,7 +122,7 @@ export default function AdminUsersPage() {
         setAllUsers(profiles as AllUser[])
       } catch (error) {
         console.error('All users load error:', error)
-        toast.error(_t('admin.users.toasts.allLoadFailed') as string)
+        toast.error(_t('admin.users.toasts.allLoadFailed') || 'Kullanıcı listesi yüklenemedi.')
         setAllUsers([])
       } finally {
         setIsLoading(false)
@@ -134,7 +134,7 @@ export default function AdminUsersPage() {
 
   const handleRoleChange = async (userId: string, newRole: 'user' | 'admin' | 'super_admin' | 'warehouse' | 'sales' | 'viewer') => {
     if (!hasWriteAccess) {
-      toast.error('Kullanıcı rolleri değiştirme yetkiniz yok.')
+      toast.error(_t('admin.users.permissionsError') || 'Kullanıcı rolleri değiştirme yetkiniz yok.')
       return
     }
 
@@ -157,7 +157,7 @@ export default function AdminUsersPage() {
           })
         } catch { }
 
-        toast.success(_t('admin.users.toasts.roleUpdated', { role: newRole }) as string)
+        toast.success(_t('admin.users.toasts.roleUpdated', { role: _t(`roles.${newRole}`) }) || 'Rol başarıyla güncellendi.')
 
         // Local state güncelle
         setAllUsers(prev => prev.map(u =>
@@ -168,11 +168,11 @@ export default function AdminUsersPage() {
         const data = await listAdminUsers()
         setAdminUsers(data as AdminUser[])
       } else {
-        toast.error(_t('admin.users.toasts.roleNotUpdated') as string)
+        toast.error(_t('admin.users.toasts.roleNotUpdated') || 'Rol güncellenemedi.')
       }
     } catch (error) {
       console.error('Role update error:', error)
-      toast.error(_t('admin.users.toasts.roleUpdateError') as string)
+      toast.error(_t('admin.users.toasts.roleUpdateError') || 'Rol güncelleme sırasında hata oluştu.')
     } finally {
       setUpdatingRole(null)
     }
@@ -234,8 +234,8 @@ export default function AdminUsersPage() {
           <AlertCircle className="text-red-500" size={48} />
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight">{_t('admin.ui.accessDeniedTitle')}</h2>
-          <p className="text-slate-500 mt-2 max-w-sm font-medium">{_t('admin.ui.accessDeniedDesc')}</p>
+          <h2 className="text-2xl font-black text-white uppercase tracking-tight">{_t('admin.ui.accessDeniedTitle') || 'Erişim Engellendi'}</h2>
+          <p className="text-slate-500 mt-2 max-w-sm font-medium">{_t('admin.ui.accessDeniedDesc') || 'Bu sayfayı görüntülemek için yetkiniz bulunmuyor.'}</p>
         </div>
       </div>
     )
@@ -266,7 +266,7 @@ export default function AdminUsersPage() {
               : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
           >
-            {_t('admin.users.tabs.admins', { count: adminUsers.length })}
+            {_t('admin.users.tabs.admins', { count: adminUsers.length }) || `Adminler (${adminUsers.length})`}
           </button>
           <button
             onClick={() => setActiveTab('all')}
@@ -275,7 +275,7 @@ export default function AdminUsersPage() {
               : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
           >
-            {_t('admin.users.tabs.all', { count: allUsers.length })}
+            {_t('admin.users.tabs.all', { count: allUsers.length }) || `Tüm Kullanıcılar (${allUsers.length})`}
           </button>
         </div>
       </div>
@@ -295,7 +295,7 @@ export default function AdminUsersPage() {
               { key: 'user', label: _t('admin.users.table.user') || 'Kullanıcı', checked: visibleCols.user, onChange: (v) => setVisibleCols(s => ({ ...s, user: v })) },
               { key: 'role', label: _t('admin.users.table.role') || 'Rol', checked: visibleCols.role, onChange: (v) => setVisibleCols(s => ({ ...s, role: v })) },
               { key: 'created', label: _t('admin.users.table.created') || 'Kayıt', checked: visibleCols.created, onChange: (v) => setVisibleCols(s => ({ ...s, created: v })) },
-              { key: 'actions', label: _t('admin.users.table.actions') || 'Aksiyonlar', checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }
+              { key: 'actions', label: _t('admin.users.table.actions') || 'İşlemler', checked: visibleCols.actions, onChange: (v: boolean) => setVisibleCols(s => ({ ...s, actions: v })) }
             ]}
             density={density}
             onDensityChange={setDensity}
@@ -326,9 +326,9 @@ export default function AdminUsersPage() {
                   <td colSpan={5} className="p-0">
                     <AdminEmptyState
                       icon={SearchX}
-                      title="Sonuç bulunamadı"
-                      description={searchQuery ? `"${searchQuery}" araması için hiçbir kullanıcı eşleşmedi.` : "Bu listede henüz herhangi bir kayıt bulunmuyor."}
-                      action={searchQuery ? { label: 'Aramayı sıfırla', onClick: () => setSearchQuery('') } : undefined}
+                      title={_t('admin.common.noResults') || 'Sonuç bulunamadı'}
+                      description={searchQuery ? `${_t('admin.users.searchNoResults', { query: searchQuery }) || `"${searchQuery}" araması için hiçbir kullanıcı eşleşmedi.`}` : (_t('admin.common.emptyList') || "Bu listede henüz herhangi bir kayıt bulunmuyor.")}
+                      action={searchQuery ? { label: _t('admin.common.clearSearch') || 'Aramayı sıfırla', onClick: () => setSearchQuery('') } : undefined}
                     />
                   </td>
                 </tr>
@@ -353,7 +353,7 @@ export default function AdminUsersPage() {
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl glass border border-white/5 text-[10px] font-black uppercase tracking-widest shadow-lg group-hover:border-cyan-400/30 transition-all duration-500">
                           {getRoleIcon(userItem.role || 'user')}
-                          <span className="text-slate-300 group-hover:text-cyan-400 transition-colors">{_t(`roles.${userItem.role || 'user'}`)}</span>
+                          <span className="text-slate-300 group-hover:text-cyan-400 transition-colors">{_t(`roles.${userItem.role || 'user'}`) || userItem.role}</span>
                         </div>
                       </td>
                     )}
@@ -364,7 +364,7 @@ export default function AdminUsersPage() {
                           <span className="text-slate-200 font-black text-xs tabular-nums tracking-tight">
                             {formatDate(userItem.created_at, lang)}
                           </span>
-                          <span className="text-[9px] text-slate-600 uppercase font-black tracking-widest mt-0.5">Katılım</span>
+                          <span className="text-[9px] text-slate-600 uppercase font-black tracking-widest mt-0.5">{_t('admin.users.table.createdLabel') || 'Katılım'}</span>
                         </div>
                       </td>
                     )}
@@ -377,7 +377,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'super_admin')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/50 transition-all active:scale-95"
-                              title={_t('roles.super_admin') || "Süperadmin yap"}
+                              title={_t('roles.super_admin_action') || "Süperadmin yap"}
                             >
                               <Crown size={14} />
                             </button>
@@ -387,7 +387,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'admin')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-indigo-400 hover:bg-indigo-400/10 hover:border-indigo-400/50 transition-all active:scale-95"
-                              title={_t('roles.admin') || "Admin yap"}
+                              title={_t('roles.admin_action') || "Admin yap"}
                             >
                               <Shield size={14} />
                             </button>
@@ -397,7 +397,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'warehouse')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-orange-400 hover:bg-orange-400/10 hover:border-orange-400/50 transition-all active:scale-95"
-                              title={_t('roles.warehouse') || "Depo yetkisi ver"}
+                              title={_t('roles.warehouse_action') || "Depo yetkisi ver"}
                             >
                               <Package size={14} />
                             </button>
@@ -407,7 +407,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'sales')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/50 transition-all active:scale-95"
-                              title={_t('roles.sales') || "Satış yetkisi ver"}
+                              title={_t('roles.sales_action') || "Satış yetkisi ver"}
                             >
                               <Tag size={14} />
                             </button>
@@ -417,7 +417,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'viewer')}
                               disabled={updatingRole === userItem.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/50 transition-all active:scale-95"
-                              title={_t('roles.viewer') || "İzleyici yetkisi ver"}
+                              title={_t('roles.viewer_action') || "İzleyici yetkisi ver"}
                             >
                               <Eye size={14} />
                             </button>
@@ -427,7 +427,7 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleChange(userItem.id, 'user')}
                               disabled={updatingRole === userItem.id || userItem.id === user?.id || !hasWriteAccess || (userItem.role === 'super_admin' && role !== 'super_admin')}
                               className="w-8 h-8 rounded-xl glass border border-white/5 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:border-white/20 transition-all active:scale-95"
-                              title={_t('roles.user') || "Normal kullanıcı yap"}
+                              title={_t('roles.user_action') || "Normal kullanıcı yap"}
                             >
                               <Users size={14} />
                             </button>
@@ -458,37 +458,37 @@ export default function AdminUsersPage() {
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-[2rem] hover:border-cyan-400/30 transition-all duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform"><Crown size={16} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Süperadmin</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{_t('roles.superadmin') || 'Süperadmin'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">Tüm sistem ayarlarına ve rol yönetimine tam erişim.</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.superadmin') || 'Tüm sistem ayarlarına ve rol yönetimine tam erişim.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-[2rem] hover:border-cyan-400/30 transition-all duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-indigo-400 group-hover/item:scale-110 transition-transform"><Shield size={16} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Admin</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{_t('roles.admin') || 'Admin'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">Ürün, sipariş ve içerik yönetimi için yetki.</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.admin') || 'Ürün, sipariş ve içerik yönetimi için yetki.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-[2rem] hover:border-cyan-400/30 transition-all duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-orange-400 group-hover/item:scale-110 transition-transform"><Package size={16} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Depo</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{_t('roles.warehouse') || 'Depo'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">Stok yönetimi ve envanter hareketleri yetkisi.</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.warehouse') || 'Stok yönetimi ve envanter hareketleri yetkisi.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-[2rem] hover:border-cyan-400/30 transition-all duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-blue-400 group-hover/item:scale-110 transition-transform"><Tag size={16} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Satış</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{_t('roles.sales') || 'Satış'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">Sipariş, kargo, iade ve kupon yönetimi yetkisi.</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.sales') || 'Sipariş, kargo, iade ve kupon yönetimi yetkisi.'}</p>
               </div>
               <div className="glass bg-white/5 border border-white/5 p-5 rounded-[2rem] hover:border-cyan-400/30 transition-all duration-500 group/item">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-xl glass border border-white/10 flex items-center justify-center text-emerald-400 group-hover/item:scale-110 transition-transform"><Eye size={16} /></div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">İzleyici</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">{_t('roles.viewer') || 'İzleyici'}</span>
                 </div>
-                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">Tüm modülleri salt-okunur (view-only) yetkisi.</p>
+                <p className="text-[10px] text-slate-500 font-bold leading-relaxed uppercase tracking-wide">{_t('admin.users.roles.viewer') || 'Tüm modülleri salt-okunur (view-only) yetkisi.'}</p>
               </div>
             </div>
           </div>
@@ -498,7 +498,3 @@ export default function AdminUsersPage() {
 
   )
 }
-
-
-
-
