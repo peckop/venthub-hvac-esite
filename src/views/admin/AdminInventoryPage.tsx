@@ -25,9 +25,10 @@ import {
 } from '../../types/inventory'
 
 import { useRouter } from 'next/navigation'
+
 const AdminInventoryPage: React.FC = () => {
   const router = useRouter()
-  const { t } = useI18n()
+  const { t: _t } = useI18n()
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('inventory')
 
@@ -84,21 +85,21 @@ const AdminInventoryPage: React.FC = () => {
   React.useEffect(() => {
     if (typeof window === 'undefined') return
     try {
-      const c = localStorage.getItem(`${STORAGE_KEY}: cols`);
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
       if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
-      const d = localStorage.getItem(`${STORAGE_KEY}: density`);
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
       if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
     } catch { }
   }, [])
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}: cols`, JSON.stringify(visibleCols)) } catch { }
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
   }, [visibleCols])
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}: density`, density) } catch { }
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
   }, [density])
 
   // ESC ile çekmeceyi kapat
@@ -138,13 +139,13 @@ const AdminInventoryPage: React.FC = () => {
     const last = movements[0]
     if (!last) return
     if (String((last as { reason?: string } | null)?.reason || '').startsWith('undo')) {
-      toast.error('Undo hareketi geri alınamaz')
+      toast.error(_t('admin.inventory.toasts.undoNotAllowed') || 'Undo hareketi geri alınamaz')
       return
     }
     const tenMinMs = 10 * 60 * 1000
     const age = Date.now() - new Date(last.created_at).getTime()
     if (age > tenMinMs) {
-      toast.error('Geri alma süresi geçti (10 dk)')
+      toast.error(_t('admin.inventory.toasts.undoTimePassed') || 'Geri alma süresi geçti (10 dk)')
       return
     }
     try {
@@ -152,10 +153,10 @@ const AdminInventoryPage: React.FC = () => {
       const inverse = -Number(last.delta || 0)
       if (inverse === 0) return
       const shortId = String(last.id).slice(0, 8)
-      const reason = `undo:${shortId} `
+      const reason = `undo:${shortId}`
       const { error } = await supabase.rpc('adjust_stock', { p_product_id: selected.product_id, p_delta: inverse, p_reason: reason })
       if (error) throw error
-      toast.success('Hareket geri alındı')
+      toast.success(_t('admin.inventory.toasts.undoSuccess') || 'Hareket geri alındı')
       // reload movements and update local stocks
       await loadMovements(selected.product_id)
       setRows(prev => prev.map(r => r.product_id === selected.product_id ? ({
@@ -165,11 +166,11 @@ const AdminInventoryPage: React.FC = () => {
       }) : r))
       setSelectedStock(s => (s == null ? null : Math.max(0, s + inverse)))
     } catch {
-      toast.error('Geri alma başarısız')
+      toast.error(_t('admin.inventory.toasts.undoFailed') || 'Geri alma başarısız')
     } finally {
       setUndoing(false)
     }
-  }, [movements, selected, loadMovements])
+  }, [movements, selected, loadMovements, _t])
 
   const load = React.useCallback(async () => {
     try {
@@ -178,15 +179,15 @@ const AdminInventoryPage: React.FC = () => {
       await ensureSessionFresh()
 
       const [invRes, velRes, settingsRes, catRes] = await Promise.all([
-        supabase.from('inventory_summary').select('*'),
-        supabase.from('inventory_velocity').select('product_id, daily_velocity, days_until_empty, abc_class'),
+        supabase.from('inventory_summary' as any).select('*'),
+        supabase.from('inventory_velocity' as any).select('product_id, daily_velocity, days_until_empty, abc_class'),
         supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
         supabase.from('categories').select('id,name').order('name', { ascending: true })
       ])
       if (invRes.error) throw invRes.error
 
-      const vMap = new Map((velRes.data || []).map((v: { product_id: string; daily_velocity: number | null; days_until_empty: number | null; abc_class: 'A' | 'B' | 'C' | null }) => [v.product_id, v]))
-      const invRows = (invRes.data || []).map((r: Record<string, unknown>) => ({
+      const vMap = new Map((velRes.data || []).map((v: any) => [v.product_id, v]))
+      const invRows = (invRes.data || []).map((r: any) => ({
         ...r,
         daily_velocity: vMap.get(r.product_id as string)?.daily_velocity,
         days_until_empty: vMap.get(r.product_id as string)?.days_until_empty,
@@ -209,7 +210,7 @@ const AdminInventoryPage: React.FC = () => {
         const tmap: Record<string, number | null> = {}
         const omap: Record<string, boolean> = {}
         const cmap: Record<string, string | null> = {}
-          ; (prodData as { id: string; low_stock_threshold: number | null; low_stock_override?: boolean; category_id?: string | null }[] | null | undefined)?.forEach((p) => {
+          ; (prodData as any[] | null | undefined)?.forEach((p) => {
             tmap[p.id] = p.low_stock_threshold
             omap[p.id] = !!p.low_stock_override
             cmap[p.id] = p.category_id ?? null
@@ -218,14 +219,15 @@ const AdminInventoryPage: React.FC = () => {
         setOverrideMap(omap)
         setProductCategoryMap(cmap)
       }
-    } catch {
-      setError('Yükleme hatası')
+    } catch (e) {
+      console.error('Inventory load error:', e)
+      setError(_t('admin.inventory.toasts.loadFailed') || 'Yükleme hatası')
       setRows([])
       setLoading(LoadState.Error)
       return
     }
     setLoading(LoadState.Idle)
-  }, [])
+  }, [_t])
 
   const pathname = usePathname()
   React.useEffect(() => { load() }, [load, pathname])
@@ -290,9 +292,9 @@ const AdminInventoryPage: React.FC = () => {
   }, [effectiveThreshold])
 
   const filteredRows = React.useMemo(() => {
-    const t = q.trim().toLowerCase()
+    const tStr = q.trim().toLowerCase()
     let base = rows
-    if (t) base = base.filter(r => r.name.toLowerCase().includes(t))
+    if (tStr) base = base.filter(r => r.name.toLowerCase().includes(tStr))
     // kategori filtresi
     if (selectedCategory) {
       base = base.filter(r => (productCategoryMap[r.product_id] || '') === selectedCategory)
@@ -340,10 +342,10 @@ const AdminInventoryPage: React.FC = () => {
   }, [filteredRows, sortKey, sortDir, effectiveThreshold, statusRank])
 
   const getCategoryName = React.useCallback((cid: string | null | undefined): string => {
-    if (!cid) return 'Kategorisiz'
+    if (!cid) return _t('common.none') || 'Kategorisiz'
     const c = categories.find(x => x.id === cid)
-    return c?.name || 'Kategorisiz'
-  }, [categories])
+    return c?.name || (_t('common.none') || 'Kategorisiz')
+  }, [categories, _t])
 
   const groupedRows = React.useMemo(() => {
     if (!groupByCategory) return [] as { cid: string | null; name: string; items: Row[] }[]
@@ -376,29 +378,29 @@ const AdminInventoryPage: React.FC = () => {
   const updateLocation = async (productId: string, val: string) => {
     const r = rows.find(x => x.product_id === productId)
     if (!r || r.warehouse_location === val) return
-    const { error } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', productId)
-    if (error) throw error
+    const { error: err } = await supabase.from('products').update({ warehouse_location: val || null } as any).eq('id', productId)
+    if (err) throw err
     setRows(prev => prev.map(row => row.product_id === productId ? { ...row, warehouse_location: val || null } : row))
-    toast.success('Raf konumu güncellendi')
+    toast.success(_t('admin.inventory.toasts.locationUpdated') || 'Raf konumu güncellendi')
   }
 
   const updateSupplier = async (productId: string, val: string) => {
     const r = rows.find(x => x.product_id === productId)
     if (!r || r.supplier_name === val) return
-    const { error } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', productId)
-    if (error) throw error
+    const { error: err } = await supabase.from('products').update({ supplier_name: val || null } as any).eq('id', productId)
+    if (err) throw err
     setRows(prev => prev.map(row => row.product_id === productId ? { ...row, supplier_name: val || null } : row))
-    toast.success('Tedarikçi güncellendi')
+    toast.success(_t('admin.inventory.toasts.supplierUpdated') || 'Tedarikçi güncellendi')
   }
 
   const loadReserved = React.useCallback(async (productId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('reserved_orders')
+      const { data, error: err } = await supabase
+        .from('reserved_orders' as any)
         .select('order_id, created_at, status, payment_status, quantity')
         .eq('product_id', productId)
         .order('created_at', { ascending: false })
-      if (error) throw error
+      if (err) throw err
       setReservedOrders((data || []) as ReservedRow[])
     } catch {
       setReservedOrders([])
@@ -410,31 +412,35 @@ const AdminInventoryPage: React.FC = () => {
     try {
       setSaving(true)
       const isDefault = selectedThreshold === ''
-      const payload: Record<string, unknown> = {
+      const payload: any = {
         low_stock_threshold: (isDefault ? null : Number(selectedThreshold)),
         low_stock_override: !isDefault
       }
       const before = { low_stock_threshold: thresholdMap[productId] ?? null, low_stock_override: !!overrideMap[productId] }
-      const { error } = await supabase
+      const { error: err } = await supabase
         .from('products')
         .update(payload)
         .eq('id', productId)
-      if (error) throw error
+      if (err) throw err
       // Audit log
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, {
-        table_name: 'products',
-        row_pk: productId,
-        action: 'UPDATE',
-        before,
-        after: payload,
-        comment: 'update low_stock_threshold'
-      })
+      try {
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, {
+          table_name: 'products',
+          row_pk: productId,
+          action: 'UPDATE',
+          before,
+          after: payload,
+          comment: 'update low_stock_threshold'
+        })
+      } catch { }
       // tablo gösterimini güncelle
       setThresholdMap(prev => ({ ...prev, [productId]: (isDefault ? null : Number(selectedThreshold)) }))
-      setOverrideMap(prev => ({ ...prev, [productId]: !isDefault }))
+      overrideMap[productId] = !isDefault
+      setOverrideMap({ ...overrideMap })
+      toast.success(_t('admin.common.success') || 'İşlem başarılı')
     } catch {
-      // no-op
+      toast.error(_t('admin.common.error') || 'Hata oluştu')
     } finally {
       setSaving(false)
     }
@@ -445,18 +451,20 @@ const AdminInventoryPage: React.FC = () => {
   async function adjustStock(productId: string, delta: number, reason: string) {
     try {
       setMoving(true)
-      const { error } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: reason })
-      if (error) throw error
+      const { error: err } = await supabase.rpc('adjust_stock', { p_product_id: productId, p_delta: delta, p_reason: reason })
+      if (err) throw err
       // Audit log
-      const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, {
-        table_name: 'inventory_movements',
-        row_pk: productId,
-        action: 'INSERT',
-        before: null,
-        after: { delta, reason },
-        comment: 'adjust_stock RPC'
-      })
+      try {
+        const { logAdminAction } = await import('../../lib/audit')
+        await logAdminAction(supabase, {
+          table_name: 'inventory_movements',
+          row_pk: productId,
+          action: 'INSERT',
+          before: null,
+          after: { delta, reason },
+          comment: 'adjust_stock RPC'
+        })
+      } catch { }
       // Lokal satırı güncelle
       setRows(prev => prev.map(r => r.product_id === productId ? ({
         ...r,
@@ -464,8 +472,9 @@ const AdminInventoryPage: React.FC = () => {
         available_stock: Math.max(0, (r.physical_stock + delta) - r.reserved_stock)
       }) : r))
       setSelectedStock((s) => (s == null ? null : Math.max(0, s + delta)))
+      toast.success(_t('admin.inventory.toasts.stockAdjusted') || 'Stok güncellendi')
     } catch {
-      // no-op
+      toast.error(_t('admin.common.error') || 'Hata oluştu')
     } finally {
       setMoving(false)
     }
@@ -476,8 +485,8 @@ const AdminInventoryPage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex flex-col gap-1">
-          <h1 className={adminSectionTitleClass}>{t('admin.titles.inventory') ?? 'Envanter Merkezi'}</h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400">Gerçek Zamanlı Stok Takibi</p>
+          <h1 className={adminSectionTitleClass}>{_t('admin.titles.inventory')}</h1>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400">{_t('admin.inventory.subtitle') || 'Gerçek Zamanlı Stok Takibi'}</p>
         </div>
         {hasWriteAccess && (
           <button 
@@ -485,7 +494,7 @@ const AdminInventoryPage: React.FC = () => {
             className="group h-12 px-6 rounded-2xl glass border border-white/5 text-slate-400 hover:text-white transition-all flex items-center gap-3 hover:border-white/10"
           >
             <Settings2 size={16} className="text-slate-500 group-hover:text-cyan-400 transition-colors" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Global Ayarlar</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">{_t('admin.titles.settings') || 'Global Ayarlar'}</span>
           </button>
         )}
       </div>
@@ -493,21 +502,21 @@ const AdminInventoryPage: React.FC = () => {
       <AdminToolbar
         storageKey="toolbar:inventory"
         sticky
-        search={{ value: q, onChange: setQ, placeholder: 'Parça adı, kod veya SKU ara...', focusShortcut: '/' }}
+        search={{ value: q, onChange: setQ, placeholder: _t('admin.common.search') || 'Ara...', focusShortcut: '/' }}
         select={{
           value: selectedCategory,
           onChange: setSelectedCategory,
           options: [
-            { value: '', label: t('admin.inventory.allCategories') || 'TÜM KATEGORİLER' },
+            { value: '', label: _t('admin.inventory.allCategories') || 'TÜM KATEGORİLER' },
             ...categories.map(c => ({ value: c.id, label: c.name.toUpperCase() }))
           ]
         }}
         chips={[
-          { key: 'out', label: t('admin.inventory.status.outOfStock') || 'Stok Yok', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })) },
-          { key: 'critical', label: t('admin.inventory.status.criticalLevel') || 'Kritik Seviye', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })) },
-          { key: 'reserved', label: t('admin.inventory.status.reserved') || 'Rezerve Edilmiş', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })) },
-          { key: 'ok', label: t('admin.inventory.status.normal') || 'Normal Durum', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })) },
-          { key: 'group', label: t('admin.inventory.groupByCategory') || 'Kategorize Et', active: groupByCategory, onToggle: () => setGroupByCategory(!groupByCategory) },
+          { key: 'out', label: _t('admin.inventory.status.outOfStock') || 'Stok Yok', active: statusFilter.out, onToggle: () => setStatusFilter(s => ({ ...s, out: !s.out })) },
+          { key: 'critical', label: _t('admin.inventory.status.criticalLevel') || 'Kritik Seviye', active: statusFilter.critical, onToggle: () => setStatusFilter(s => ({ ...s, critical: !s.critical })) },
+          { key: 'reserved', label: _t('admin.inventory.status.reserved') || 'Rezerve Edilmiş', active: statusFilter.reserved, onToggle: () => setStatusFilter(s => ({ ...s, reserved: !s.reserved })) },
+          { key: 'ok', label: _t('admin.inventory.status.normal') || 'Normal Durum', active: statusFilter.ok, onToggle: () => setStatusFilter(s => ({ ...s, ok: !s.ok })) },
+          { key: 'group', label: _t('admin.inventory.groupByCategory') || 'Kategorize Et', active: groupByCategory, onToggle: () => setGroupByCategory(!groupByCategory) },
         ]}
         onClear={() => { setQ(''); setSelectedCategory(''); setStatusFilter({ out: false, critical: false, reserved: false, ok: false }) }}
         recordCount={filteredRows.length}
@@ -519,12 +528,12 @@ const AdminInventoryPage: React.FC = () => {
                 className="h-12 px-6 rounded-2xl bg-cyan-400 text-[#0A0F1E] text-[10px] font-black uppercase tracking-widest hover:bg-cyan-300 transition-all flex items-center gap-2 shadow-[0_10px_30px_rgba(34,211,238,0.2)]"
               >
                 <FileUp size={16} />
-                CSV Yükle
+                {_t('admin.inventory.csvLoad') || 'CSV Yükle'}
               </button>
             )}
             <ExportMenu items={[
               {
-                key: 'csv', label: 'Sayfa Verilerini İndir (.csv)', onSelect: () => {
+                key: 'csv', label: _t('admin.inventory.export.csv') || 'Sayfa Verilerini İndir (.csv)', onSelect: () => {
                   const head = ['SKU', 'Ürün', 'Fiziksel', 'Rezerve', 'Müsait', 'Durum']
                   const lines = filteredRows.map(r => [r.product_id, `"${r.name.replace(/"/g, '""')}"`, r.physical_stock, r.reserved_stock, r.available_stock, (r.available_stock <= 0 ? 'YOK' : (r.available_stock <= (thresholdMap[r.product_id] ?? (defaultThreshold || 10)) ? 'KRİTİK' : 'OK'))])
                   const csv = '\ufeff' + [head.join(','), ...lines.map(l => l.join(','))].join('\n')
@@ -534,7 +543,7 @@ const AdminInventoryPage: React.FC = () => {
                 }
               },
               {
-                key: 'template', label: 'Örnek CSV Şablonu (sku,qty)', onSelect: () => {
+                key: 'template', label: _t('admin.inventory.export.template') || 'Örnek CSV Şablonu (sku,qty)', onSelect: () => {
                   const header = ['sku', 'qty']
                   const csv = '\ufeff' + header.join(',') + '\n' + ['"PRD001"', '10'].join(',') + '\n'
                   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -545,16 +554,16 @@ const AdminInventoryPage: React.FC = () => {
             ]} />
             <ColumnsMenu
               columns={[
-                { key: 'name', label: 'Ürün Bilgisi', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
-                { key: 'physical', label: 'Fiziksel Stok', checked: visibleCols.physical, onChange: (v) => setVisibleCols(s => ({ ...s, physical: v })) },
-                { key: 'reserved', label: 'Rezerve Stok', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
-                { key: 'available', label: 'Satılabilir Stok', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
-                { key: 'threshold', label: 'Uyarı Eşiği', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
-                { key: 'location', label: 'Raf Konumu', checked: visibleCols.location, onChange: (v) => setVisibleCols(s => ({ ...s, location: v })) },
-                { key: 'supplier', label: 'Tedarikçi', checked: visibleCols.supplier, onChange: (v) => setVisibleCols(s => ({ ...s, supplier: v })) },
-                { key: 'abc', label: 'ABC Analizi', checked: visibleCols.abc, onChange: (v) => setVisibleCols(s => ({ ...s, abc: v })) },
-                { key: 'days', label: 'Tükenme Tahmini', checked: visibleCols.days, onChange: (v) => setVisibleCols(s => ({ ...s, days: v })) },
-                { key: 'status', label: 'Durum İndikatörü', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
+                { key: 'name', label: _t('admin.inventory.table.productInfo') || 'Ürün Bilgisi', checked: visibleCols.name, onChange: (v) => setVisibleCols(s => ({ ...s, name: v })) },
+                { key: 'physical', label: _t('admin.inventory.table.physical') || 'Fiziksel Stok', checked: visibleCols.physical, onChange: (v) => setVisibleCols(s => ({ ...s, physical: v })) },
+                { key: 'reserved', label: _t('admin.inventory.table.reserved') || 'Rezerve Stok', checked: visibleCols.reserved, onChange: (v) => setVisibleCols(s => ({ ...s, reserved: v })) },
+                { key: 'available', label: _t('admin.inventory.table.available') || 'Satılabilir Stok', checked: visibleCols.available, onChange: (v) => setVisibleCols(s => ({ ...s, available: v })) },
+                { key: 'threshold', label: _t('admin.inventory.table.threshold') || 'Uyarı Eşiği', checked: visibleCols.threshold, onChange: (v) => setVisibleCols(s => ({ ...s, threshold: v })) },
+                { key: 'location', label: _t('admin.inventory.table.location') || 'Raf Konumu', checked: visibleCols.location, onChange: (v) => setVisibleCols(s => ({ ...s, location: v })) },
+                { key: 'supplier', label: _t('admin.inventory.table.supplier') || 'Tedarikçi', checked: visibleCols.supplier, onChange: (v) => setVisibleCols(s => ({ ...s, supplier: v })) },
+                { key: 'abc', label: _t('admin.inventory.table.abc') || 'ABC Analizi', checked: visibleCols.abc, onChange: (v) => setVisibleCols(s => ({ ...s, abc: v })) },
+                { key: 'days', label: _t('admin.inventory.table.daysUntilEmpty') || 'Tükenme Tahmini', checked: visibleCols.days, onChange: (v) => setVisibleCols(s => ({ ...s, days: v })) },
+                { key: 'status', label: _t('admin.inventory.table.statusIndicator') || 'Durum İndikatörü', checked: visibleCols.status, onChange: (v) => setVisibleCols(s => ({ ...s, status: v })) },
               ]}
               density={density}
               onDensityChange={setDensity}
@@ -594,7 +603,7 @@ const AdminInventoryPage: React.FC = () => {
         {loading === LoadState.Loading && rows.length > 0 && (
           <div className="absolute bottom-0 left-0 right-0 h-10 glass-strong backdrop-blur-xl flex items-center justify-center gap-3 border-t border-white/5 animate-in slide-in-from-bottom-full duration-300">
             <Loader2 size={14} className="text-cyan-400 animate-spin" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">Veriler Arka Planda Güncelleniyor</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">{_t('admin.common.loadingBackground') || 'Veriler Arka Planda Güncelleniyor'}</span>
           </div>
         )}
       </div>
@@ -619,7 +628,7 @@ const AdminInventoryPage: React.FC = () => {
         movements={movements}
         undoLastMovement={undoLastMovement}
         undoing={undoing}
-        t={t}
+        t={_t}
       />
 
       <InventoryCsvImport

@@ -1,7 +1,7 @@
 # NEXT_STEPS — Kısa Vadeli Görevler (Güncel)
 
 **📍 Durum:** Bu belge ROADMAP.md ile senkronize edilmiş detaylı görev listesidir.
-**🎯 Ana kaynak:** `docs/ROADMAP.md` (genel yol haritası)
+**🎯 Ana kaynak:** registry/PULSE.md (canlı proje hafızası)
 **🔧 Bu belge:** Kısa vadeli teknik detaylar ve komut örnekleri
 
 ## Current state (TL;DR)

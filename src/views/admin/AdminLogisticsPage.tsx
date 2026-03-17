@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
+import { useI18n } from '../../i18n/I18nProvider'
 import { 
     adminSectionTitleClass, 
     adminSubtitleClass,
@@ -34,6 +35,7 @@ interface LogisticsRow {
 }
 
 export default function AdminLogisticsPage() {
+    const { t } = useI18n()
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('logistics')
     const dragScrollRef = useDragScroll<HTMLDivElement>()
@@ -60,18 +62,18 @@ export default function AdminLogisticsPage() {
             setRows((data as Record<string, unknown>[]).map(r => ({
                 id: r.id as string,
                 order_number: (r.order_number as string) || (r.id as string).substring(0, 8),
-                customer_name: (r.customer_name as string) || 'İsimsiz',
+                customer_name: (r.customer_name as string) || t('common.none'),
                 created_at: r.created_at as string,
                 carrier: (r.carrier as string) || 'Yurtiçi',
                 tracking_number: (r.tracking_number as string) || '',
                 saved: false
             })))
         } catch (err: unknown) {
-            toast.error('Bekleyen siparişler yüklenemedi: ' + (err instanceof Error ? err.message : 'Bilinmeyen hata'))
+            toast.error(t('admin.logistics.toasts.loadFailed') + ': ' + (err instanceof Error ? err.message : t('admin.common.error')))
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [t])
 
     const pathname = usePathname()
     useEffect(() => {
@@ -84,7 +86,7 @@ export default function AdminLogisticsPage() {
 
     const applyGlobalCarrier = () => {
         setRows(prev => prev.map(r => r.saved ? r : { ...r, carrier: globalCarrier }))
-        toast.success('Seçili kargo firması tüm satırlara uygulandı.')
+        toast.success(t('admin.logistics.toasts.appliedToAll'))
     }
 
     const generateTrackingUrl = (carrier: string, tracking: string) => {
@@ -99,7 +101,7 @@ export default function AdminLogisticsPage() {
     const handleBulkSubmit = async () => {
         const targets = rows.filter(r => r.tracking_number.trim() !== '' && !r.saved)
         if (targets.length === 0) {
-            toast.error('Kaydedilecek yeni kargo bilgisi bulunamadı.')
+            toast.error(t('admin.logistics.toasts.noNewTracking'))
             return
         }
 
@@ -130,12 +132,12 @@ export default function AdminLogisticsPage() {
             }))
 
             if (errCount > 0) {
-                toast.error(`${errCount} siparişte kargo güncellemesi başarısız oldu.`)
+                toast.error(t('admin.logistics.toasts.bulkUpdateFailed', { count: errCount }))
             } else {
-                toast.success(`${targets.length} sipariş başarıyla Kargoda durumuna alındı!`)
+                toast.success(t('admin.logistics.toasts.bulkUpdateSuccess', { count: targets.length }))
             }
         } catch {
-            toast.error('Toplu güncelleme sırasında kritik bir hata oluştu.')
+            toast.error(t('admin.logistics.toasts.criticalError'))
         } finally {
             setSaving(false)
         }
@@ -145,8 +147,8 @@ export default function AdminLogisticsPage() {
         <div className="space-y-8 max-w-[1400px] animate-in fade-in duration-700">
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="space-y-1">
-                    <h1 className={adminSectionTitleClass}>Toplu Kargo Panosu</h1>
-                    <p className={adminSubtitleClass}>Hazırlanıyor durumundaki siparişlere hızlıca kargo takip no girin.</p>
+                    <h1 className={adminSectionTitleClass}>{t('admin.logistics.title')}</h1>
+                    <p className={adminSubtitleClass}>{t('admin.logistics.subtitle')}</p>
                 </div>
                 <button 
                     onClick={fetchPendingOrders} 
@@ -154,7 +156,7 @@ export default function AdminLogisticsPage() {
                     className={adminButtonSecondaryClass}
                 >
                     <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-                    {loading ? 'Güncelleniyor...' : 'Verileri Yenile'}
+                    {loading ? t('admin.logistics.updating') : t('admin.ui.refresh')}
                 </button>
             </header>
 
@@ -162,7 +164,7 @@ export default function AdminLogisticsPage() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32 transition-colors group-hover:bg-cyan-500/10" />
                 
                 <div className="flex-1 space-y-3 relative z-10">
-                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Varsayılan Kargo Firması</label>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.carrierLabel')}</label>
                     <div className="relative max-w-xs">
                         <select
                             value={globalCarrier}
@@ -170,10 +172,11 @@ export default function AdminLogisticsPage() {
                             className={adminSelectClass}
                             style={adminSelectStyle}
                         >
-                            <option value="Yurtiçi">Yurtiçi Kargo</option>
-                            <option value="Aras">Aras Kargo</option>
-                            <option value="MNG">MNG Kargo</option>
-                            <option value="PTT">PTT Kargo</option>
+                            <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+                            <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+                            <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+                            <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+                            <option value="UPS">{t('admin.orders.modals.shipping.carriers.ups')}</option>
                         </select>
                     </div>
                 </div>
@@ -182,7 +185,7 @@ export default function AdminLogisticsPage() {
                         onClick={applyGlobalCarrier} 
                         className="h-12 px-8 rounded-2xl bg-white/5 border border-white/10 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 relative z-10"
                     >
-                        Tüm Satırlara Uygula
+                        {t('admin.logistics.applyToAll')}
                     </button>
                 )}
             </div>
@@ -196,8 +199,8 @@ export default function AdminLogisticsPage() {
                     <div className="py-20 bg-[#0A0F1E]/20">
                         <AdminEmptyState
                             icon={CheckCircle2}
-                            title="Bekleyen Kargo Yok"
-                            description="Tüm siparişlerin kargo işlemi tamamlanmış görünüyor."
+                            title={t('admin.orders.states.noRecords')}
+                            description={t('admin.common.noResults')}
                         />
                     </div>
                 ) : (
@@ -205,11 +208,11 @@ export default function AdminLogisticsPage() {
                         <table className="w-full text-sm border-collapse">
                             <thead className="glass-strong">
                                 <tr>
-                                    <th className={adminTableHeadCellClass}>SİPARİŞ NO</th>
-                                    <th className={adminTableHeadCellClass}>MÜŞTERİ</th>
-                                    <th className={adminTableHeadCellClass}>KARGO FİRMASI</th>
-                                    <th className={adminTableHeadCellClass}>TAKİP NUMARASI</th>
-                                    <th className={`${adminTableHeadCellClass} text-center`}>DURUM</th>
+                                    <th className={adminTableHeadCellClass}>{t('admin.logistics.table.order')}</th>
+                                    <th className={adminTableHeadCellClass}>{t('admin.logistics.table.customer')}</th>
+                                    <th className={adminTableHeadCellClass}>{t('admin.logistics.table.carrier')}</th>
+                                    <th className={adminTableHeadCellClass}>{t('admin.logistics.table.tracking')}</th>
+                                    <th className={`${adminTableHeadCellClass} text-center`}>{t('admin.logistics.table.status')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -238,10 +241,11 @@ export default function AdminLogisticsPage() {
                                                     className={`${adminSelectClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 disabled:opacity-40`}
                                                     style={adminSelectStyle}
                                                 >
-                                                    <option value="Yurtiçi">Yurtiçi</option>
-                                                    <option value="Aras">Aras</option>
-                                                    <option value="MNG">MNG</option>
-                                                    <option value="PTT">PTT</option>
+                                                    <option value="Yurtiçi">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+                                                    <option value="Aras">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+                                                    <option value="MNG">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+                                                    <option value="PTT">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
+                                                    <option value="UPS">{t('admin.orders.modals.shipping.carriers.ups')}</option>
                                                 </select>
                                             </div>
                                         </td>
@@ -251,14 +255,14 @@ export default function AdminLogisticsPage() {
                                                 disabled={!hasWriteAccess || row.saved || saving}
                                                 value={row.tracking_number}
                                                 onChange={e => updateRow(row.id, 'tracking_number', e.target.value)}
-                                                placeholder="Takip no girin..."
+                                                placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')}
                                                 className={`${adminInputClass} !py-2 !text-xs !rounded-xl !bg-[#0A0F1E]/60 !font-mono focus:!bg-white/[0.03] disabled:opacity-40`}
                                             />
                                         </td>
                                         <td className={`${adminTableCellClass} text-center`}>
                                             {row.saved ? (
                                                 <span className="inline-flex items-center gap-1.5 text-[9px] font-black text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-3 py-1 rounded-full uppercase tracking-widest animate-in zoom-in duration-300">
-                                                    <CheckCircle2 size={10} /> Kaydedildi
+                                                    <CheckCircle2 size={10} /> {t('admin.common.success')}
                                                 </span>
                                             ) : (
                                                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest opacity-40">Ready</span>
@@ -274,7 +278,7 @@ export default function AdminLogisticsPage() {
                 {rows.length > 0 && (
                     <div className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
                         <div className="text-[13px] font-bold text-slate-400">
-                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} Sipariş Hazır
+                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready' /* I should add ready to common or ui */ || 'Ready')}
                         </div>
                         {hasWriteAccess && (
                             <button
@@ -284,7 +288,7 @@ export default function AdminLogisticsPage() {
                             >
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/submit:translate-y-0 transition-transform duration-300" />
                                 <Truck size={18} className="relative z-10 group-hover/submit:animate-bounce" />
-                                <span className="relative z-10">{saving ? 'İşleniyor...' : 'Kargo Bilgilerini Sisteme İşle'}</span>
+                                <span className="relative z-10">{saving ? t('admin.common.loading') : t('admin.logistics.shipOrders')}</span>
                             </button>
                         )}
                     </div>
