@@ -151,6 +151,70 @@ def check_dependencies(task_md_path: str) -> Tuple[bool, List[str]]:
             
     return len(missing) == 0, missing
 
+def validate_task_content(file_path: str, target_state: str) -> Tuple[bool, str]:
+    """Görevin içeriğini semantik olarak kontrol eder. Boş veya placeholder içerikleri reddeder."""
+    if not os.path.exists(file_path):
+        return False, "Görev dosyası bulunamadı."
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # Placeholder kontrolü (Hedef kısmı)
+    if '## 🎯 Hedef' in content:
+        match = re.search(r'## 🎯 Hedef\s*\r?\n(.*?)(?=\r?\n##|$)', content, re.DOTALL)
+        if match:
+            hedef_text = match.group(1).strip()
+            if hedef_text == '...' or not hedef_text:
+                return False, "HEDEF EKSİK: Görev hedefini yazmadan işleme devam edemezsiniz."
+
+    # Alt görev kontrolü
+    if '## ✅ Alt Görevler' in content:
+        match = re.search(r'## ✅ Alt Görevler\s*\r?\n(.*?)(?=\r?\n##|$)', content, re.DOTALL)
+        if match:
+            tasks_text = match.group(1).strip()
+            if tasks_text == '- [ ] ...' or not tasks_text:
+                return False, "PLAN EKSİK: Alt görevleri (checklist) planlamadan işleme devam edemezsiniz."
+            
+            # Tamamlanma kontrolü
+            if target_state == "completed" and '- [x]' not in tasks_text:
+                return False, "İLERLEME EKSİK: En az bir alt görevi bitirmeden (...) dosyayı 'completed' yapamazsınız."
+
+    # Superpowers Brainstorm & Plan Kontrolü (Sadece Aktivasyon ve Completion için)
+    if target_state in ["active", "completed"]:
+        task_dir = os.path.dirname(file_path)
+        brainstorm_file = os.path.join(task_dir, "brainstorm.md")
+        plan_file = os.path.join(task_dir, "plan.md")
+
+        if os.path.exists(brainstorm_file):
+            with open(brainstorm_file, 'r', encoding='utf-8') as bf:
+                bf_content = bf.read()
+                if '...' in bf_content or len(bf_content) < 100:
+                    return False, "SUPERPOWERS BRAINSTORM EKSİK: Lütfen /superpowers-brainstorm çalıştırın veya içeriği doldurun."
+        else:
+            return False, "BRAINSTORM DOSYASI YOK: Registry protokolü gereği brainstorm.md zorunludur."
+
+        if os.path.exists(plan_file):
+            with open(plan_file, 'r', encoding='utf-8') as pf:
+                pf_content = pf.read()
+                if '...' in pf_content or len(pf_content) < 100:
+                    return False, "SUPERPOWERS PLAN EKSİK: Lütfen /superpowers-write-plan çalıştırın veya içeriği doldurun."
+        else:
+            return False, "PLAN DOSYASI YOK: Registry protokolü gereği plan.md zorunludur."
+
+    # 'completed' için özel Review kontrolü
+    if target_state == "completed":
+        task_dir = os.path.dirname(file_path)
+        review_file = os.path.join(task_dir, "review.md")
+        if os.path.exists(review_file):
+            with open(review_file, 'r', encoding='utf-8') as rf:
+                rf_content = rf.read()
+                if '...' in rf_content or len(rf_content) < 50:
+                    return False, "REVIEW EKSİK: Görevi bitirmeden (completed) önce lütfen /superpowers-review yapın."
+        else:
+            return False, "REVIEW DOSYASI YOK: Görevi bitirmeden (completed) önce review.md doldurulmalıdır."
+
+    return True, ""
+
 def repair_project(project_path: str) -> None:
     """Bir projenin hiyerarşik yapısını kontrol eder ve eksikleri tamamlar."""
     project_name = os.path.basename(project_path)
@@ -182,11 +246,16 @@ def repair_project(project_path: str) -> None:
         for task_folder in os.listdir(path):
             task_path = os.path.join(path, task_folder)
             if os.path.isdir(task_path) and sd in ["active", "backlog"]:
-                for doc in ["brainstorm.md", "plan.md"]:
+                for doc in ["brainstorm.md", "plan.md", "review.md"]:
                     doc_path = os.path.join(task_path, doc)
                     if not os.path.exists(doc_path):
                         with open(doc_path, 'w', encoding='utf-8') as f:
-                            f.write(f"# {doc.split('.')[0].capitalize()}: {task_folder}\n")
+                            if doc == "brainstorm.md":
+                                f.write(f"# Brainstorm: {task_folder}\n\n## 🎯 Goal\n...\n\n## 🛡️ Constraints & Risks\n...\n\n## 💡 Options & Recommendation\n...\n\n## ✅ Acceptance Criteria\n...\n")
+                            elif doc == "review.md":
+                                f.write(f"# Review: {task_folder}\n\n## 🔍 Checklist\n- [ ] Correctness\n- [ ] Edge cases\n- [ ] Security\n- [ ] Performance\n\n## 📝 Findings\n- Blocker: ...\n- Minor: ...\n")
+                            else:
+                                f.write(f"# Plan: {task_folder}\n\n## 🎯 Goal\n...\n\n## 🏗️ Steps\n1. Step 1\n   - Files: ...\n   - Change: ...\n   - Verify: ...\n")
                         print(f"    [⛑️ OTONOM ONARIM] Eksik şablon oluşturuldu: {doc} ({task_folder})")
                 
                 # Artifact yollarını senkronize et
@@ -283,7 +352,6 @@ artifacts:
         f.write(template)
     
     print(f"[*] Yeni görev oluşturuldu: {task_folder_name}")
-    # repair_project çağırarak eksik brainstorm/plan dosyalarını da otomatik tamamlatıyoruz
     repair_project(os.path.join(REGISTRY_DIR, project_folder))
 
 def sync_artifacts(task_md_path: str) -> None:
@@ -292,14 +360,13 @@ def sync_artifacts(task_md_path: str) -> None:
         return
 
     task_dir = os.path.dirname(task_md_path)
-    task_folder = os.path.basename(task_dir)
     
     with open(task_md_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Beyin fırtınası ve plan dosyalarının varlığını kontrol et
     brainstorm_file = os.path.join(task_dir, "brainstorm.md")
     plan_file = os.path.join(task_dir, "plan.md")
+    review_file = os.path.join(task_dir, "review.md")
 
     updates = {}
     if os.path.exists(brainstorm_file):
@@ -312,15 +379,17 @@ def sync_artifacts(task_md_path: str) -> None:
     else:
         updates['plan'] = 'null'
 
-    # Metadata güncelleme (Regex ile)
+    if os.path.exists(review_file):
+        updates['review'] = os.path.relpath(review_file, PROJECT_ROOT).replace('\\', '/')
+    else:
+        updates['review'] = 'null'
+
+    # Metadata güncelleme
     for art, path in updates.items():
+        pattern = rf'({art}:\s*)(".*?"|null)'
         if path != 'null':
-            # artifacts altındaki anahtarı bul ve değerini güncelle
-            # Not: Bu regex sadece 'artifacts:' bloğu altındaki brainstorm/plan'ı hedefler
-            pattern = rf'({art}:\s*)(".*?"|null)'
             content = re.sub(pattern, rf'\1"{path}"', content)
         else:
-            pattern = rf'({art}:\s*)(".*?"|null)'
             content = re.sub(pattern, r'\1null', content)
 
     # updated_at güncelle
@@ -365,18 +434,21 @@ def activate_task(project_id: str, task_id: str) -> None:
     task_file_name = f"{task_folder}.md"
     src_file = os.path.join(src_dir, task_file_name)
 
-    # 🛡️ GATEKEEPER: Bağımlılık Kontrolü
+    # 🛡️ GATEKEEPER 1: Bağımlılık Kontrolü
     ok, missing = check_dependencies(src_file)
     if not ok:
         print(f"  [❌ GATEKEEPER] Aktivasyon reddedildi! Eksik bağımlılıklar: {', '.join(missing)}")
-        print(f"  [!] Lütfen önce bu görevleri 'completed' durumuna getirin.")
         return
 
-    # 🔄 ÖNCE METADATA GÜNCELLE (Backlogda iken yolları set et)
+    # 🛡️ GATEKEEPER 2: İçerik Kalite Kontrolü
+    valid, error_msg = validate_task_content(src_file, "active")
+    if not valid:
+        print(f"  [❌ GATEKEEPER] Aktivasyon reddedildi! {error_msg}")
+        return
+
     print(f"[*] Görev verileri senkronize ediliyor...")
     sync_artifacts(src_file)
 
-    # 📸 SNAPSHOT: Aktivasyon Öncesi
     if project_folder and task_folder:
         create_snapshot(str(project_folder), str(task_folder), "backlog")
 
@@ -384,21 +456,17 @@ def activate_task(project_id: str, task_id: str) -> None:
     dst_dir = os.path.join(active_dir, str(task_folder))
     os.rename(src_dir, dst_dir)
     
-    # Statü Güncelle
     active_task_file = os.path.join(dst_dir, task_file_name)
     if os.path.exists(active_task_file):
         with open(active_task_file, 'r', encoding='utf-8') as f:
             content = f.read()
         content = re.sub(r'status:\s*".*?"', 'status: "Executing"', content)
-        
-        # started_at set et (eğer null ise)
         if 'started_at: null' in content:
             content = content.replace('started_at: null', f'started_at: "{get_now()}"')
         
         with open(active_task_file, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        # Yeni lokasyona göre yolları tekrar güncelle
         sync_artifacts(active_task_file)
         print(f"    [+] Meta veri ve lokasyon bilgileri güncellendi.")
 
@@ -433,10 +501,16 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
         print(f"  [!] Hata: Görev bulunamadı!")
         return
 
-    # 📸 SNAPSHOT: Taşıma Öncesi
-    create_snapshot(str(src_proj), str(task_folder), str(src_state))
-
     src_path = os.path.join(REGISTRY_DIR, str(src_proj), str(src_state), str(task_folder))
+    task_file = os.path.join(src_path, f"{task_folder}.md")
+
+    # 🛡️ GATEKEEPER: İçerik Kalite Kontrolü
+    valid, error_msg = validate_task_content(task_file, target_state)
+    if not valid:
+        print(f"  [❌ GATEKEEPER] Taşıma reddedildi! {error_msg}")
+        return
+
+    create_snapshot(str(src_proj), str(task_folder), str(src_state))
     dst_path = os.path.join(REGISTRY_DIR, str(dst_proj), target_state, str(task_folder))
 
     print(f"[*] Görev taşınıyor: {src_proj}/{src_state} -> {dst_proj}/{target_state}")
@@ -446,9 +520,9 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
     
     os.rename(src_path, dst_path)
 
-    task_file = os.path.join(dst_path, f"{task_folder}.md")
-    if os.path.exists(task_file):
-        with open(task_file, 'r', encoding='utf-8') as f:
+    task_file_new = os.path.join(dst_path, f"{task_folder}.md")
+    if os.path.exists(task_file_new):
+        with open(task_file_new, 'r', encoding='utf-8') as f:
             content = f.read()
 
         if target_state == "completed":
@@ -457,10 +531,10 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
             if 'completed_at: null' in content:
                 content = content.replace('completed_at: null', f'completed_at: "{get_now()}"')
         
-        with open(task_file, 'w', encoding='utf-8') as f:
+        with open(task_file_new, 'w', encoding='utf-8') as f:
             f.write(content)
         
-        sync_artifacts(task_file)
+        sync_artifacts(task_file_new)
         print(f"    [+] Meta veriler ve zaman damgaları güncellendi.")
 
 if __name__ == "__main__":
@@ -492,7 +566,6 @@ if __name__ == "__main__":
             add_task(args.id, args.task, args.target_id, priority)
         else:
             print("  [!] Hata: Proje ID, Görev ID ve Görev İsmi gereklidir.")
-            print("  Örnek: python registry/manage_registry.py task 00 023 'Yeni Gorv'")
     elif args.action == "move":
         if args.id and args.task and args.target_id and args.target_state:
             move_task(args.id, args.task, args.target_id, args.target_state)

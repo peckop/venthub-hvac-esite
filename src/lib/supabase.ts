@@ -5,13 +5,27 @@ import type { DbProduct, AuthorityContent } from '../types/db-rows'
 
 // Import types for aliasing and internal use
 export type { Database } from '../types/database.types'
-export type UserAddress = Database['public']['Tables']['user_addresses']['Row']
-export type InvoiceProfile = Database['public']['Tables']['user_invoice_profiles']['Row']
+
+/**
+ * DATABASE TYPES HELPERS
+ */
+export type Tables<T extends keyof Database['public']['Tables'] | keyof Database['public']['Views']> = 
+  T extends keyof Database['public']['Tables'] 
+    ? Database['public']['Tables'][T]['Row'] 
+    : T extends keyof Database['public']['Views']
+      ? Database['public']['Views'][T]['Row']
+      : never
+
+export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
+
+export type UserAddress = Tables<'user_addresses'>
+export type InvoiceProfile = Tables<'user_invoice_profiles'>
 export type InvoiceProfileType = 'individual' | 'corporate'
 
 /**
  * Next.js Environment Variables (Browser-accessible)
- * IMPORTANT: In Next.js, env vars MUST start with NEXT_PUBLIC_ to be available in browser.
  */
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
@@ -23,6 +37,9 @@ if ((!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
+/**
+ * DOMAIN MODELS (Synchronized with Database Types)
+ */
 export type Product = {
   id: string
   name: string
@@ -35,7 +52,7 @@ export type Product = {
   subcategory_id: string | null
   status: string
   is_featured: boolean
-  technical_specs: any
+  technical_specs: any // JSON field handling remains flexible or use Database['public']['Tables']['products']['Row']['technical_specs']
   stock_qty: number | null
   slug: string | null
   airflow_capacity: number | null
@@ -73,21 +90,9 @@ export interface SearchSuggestion {
   metadata?: any
 }
 
-export type UserProject = {
-  id: string
-  user_id: string
-  name: string
-  description: string | null
-  created_at: string
-  updated_at: string
-}
+export type UserProject = Tables<'projects'>
 
-export type ProjectItem = {
-  id: string
-  project_id: string
-  product_id: string
-  quantity: number
-  created_at: string
+export type ProjectItem = Tables<'project_items'> & {
   products?: Product
 }
 
@@ -102,7 +107,7 @@ export async function getCategories(): Promise<Category[]> {
     .order('name')
 
   if (error) throw error
-  return data as Category[]
+  return (data || []) as unknown as Category[]
 }
 
 export async function getProducts(limit: number = 100): Promise<Product[]> {
@@ -135,7 +140,7 @@ export async function getProductBySlugOrId(identifier: string): Promise<Product 
     .from('products')
     .select('*')
     .eq(isUuid ? 'id' : 'slug', identifier)
-    .single()
+    .maybeSingle()
 
   const { data, error } = await query
   if (error || !data) return null
@@ -174,7 +179,7 @@ export interface GetProductsParams {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
-  const { data, error } = await (supabase.rpc as any)('get_products_enriched', {
+  const { data, error } = await supabase.rpc('get_products_enriched', {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
@@ -198,8 +203,8 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
 }
 
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {
-  const { data, error } = await (supabase.rpc as any)('get_search_suggestions', {
-    p_query: q,
+  const { data, error } = await supabase.rpc('get_search_suggestions', {
+    p_q: q,
     p_limit: limit
   })
 
@@ -208,12 +213,12 @@ export async function getSearchSuggestions(q: string, limit: number = 6): Promis
     return []
   }
 
-  return data as SearchSuggestion[]
+  return data as unknown as SearchSuggestion[]
 }
 
 export async function ftsSearchProducts(term: string, limit: number = 20): Promise<FtsProductResult[]> {
-  const { data, error } = await (supabase.rpc as any)('fts_search_products', {
-    p_term: term,
+  const { data, error } = await supabase.rpc('fts_search_products', {
+    p_q: term,
     p_limit: limit
   })
 
@@ -230,22 +235,22 @@ export async function ftsSearchProducts(term: string, limit: number = 20): Promi
 // -----------------------------------------------------------------------------
 
 export async function getOrCreateShoppingCart(userId: string) {
-  const { data: existing } = await (supabase as any).from('shopping_carts').select('id').eq('user_id', userId).maybeSingle()
+  const { data: existing } = await supabase.from('shopping_carts').select('id').eq('user_id', userId).maybeSingle()
   if (existing) return existing
   
-  const { data: created, error: createErr } = await (supabase as any).from('shopping_carts').insert({ user_id: userId }).select('id').single()
+  const { data: created, error: createErr } = await supabase.from('shopping_carts').insert({ user_id: userId }).select('id').single()
   if (createErr) throw createErr
   return created
 }
 
 export async function listCartItemsWithProducts(cartId: string): Promise<any[]> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('cart_items')
     .select('*, products(*)')
     .eq('cart_id', cartId)
   
   if (error) throw error
-  return data || []
+  return (data || []) as any[]
 }
 
 export interface UpsertCartItemParams {
@@ -257,7 +262,7 @@ export interface UpsertCartItemParams {
 }
 
 export async function upsertCartItem(params: UpsertCartItemParams) {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('cart_items')
     .upsert({ 
       cart_id: params.cartId, 
@@ -265,8 +270,6 @@ export async function upsertCartItem(params: UpsertCartItemParams) {
       quantity: params.quantity,
       unit_price: params.unitPrice,
       price_list_id: params.priceListId
-    }, { 
-      onConflict: 'cart_id,product_id' 
     })
     .select()
     .single()
@@ -276,7 +279,7 @@ export async function upsertCartItem(params: UpsertCartItemParams) {
 }
 
 export async function removeCartItem(cartId: string, productId: string) {
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('cart_items')
     .delete()
     .match({ cart_id: cartId, product_id: productId })
@@ -284,16 +287,16 @@ export async function removeCartItem(cartId: string, productId: string) {
 }
 
 export async function clearCartItems(cartId: string) {
-  const { error } = await (supabase as any).from('cart_items').delete().eq('cart_id', cartId)
+  const { error } = await supabase.from('cart_items').delete().eq('cart_id', cartId)
   if (error) throw error
 }
 
 export async function getEffectivePriceInfo(productId: string) {
-  const { data, error } = await (supabase.rpc as any)('get_effective_price', { p_product_id: productId })
+  const { data, error } = await supabase.rpc('get_effective_price', { p_product_id: productId })
   if (error) return { unitPrice: 0, priceListId: null }
   return {
-    unitPrice: data.unit_price || 0,
-    priceListId: data.price_list_id || null
+    unitPrice: data as unknown as number || 0,
+    priceListId: null // Adjusted based on current RPC return type in types
   }
 }
 
@@ -301,19 +304,19 @@ export async function getEffectivePriceInfo(productId: string) {
 // ADDRESS & PROFILE MANAGEMENT
 // -----------------------------------------------------------------------------
 
-export async function listAddresses() {
-  const { data, error } = await supabase.from('user_addresses').select('*').order('is_default', { ascending: false })
+export async function listAddresses(): Promise<UserAddress[]> {
+  const { data, error } = await supabase.from('user_addresses').select('*').order('is_default_shipping', { ascending: false })
   if (error) throw error
-  return data as any[]
+  return data || []
 }
 
-export async function createAddress(address: any) {
+export async function createAddress(address: TablesInsert<'user_addresses'>) {
   const { data, error } = await supabase.from('user_addresses').insert(address).select().single()
   if (error) throw error
   return data
 }
 
-export async function updateAddress(id: string, address: any) {
+export async function updateAddress(id: string, address: TablesUpdate<'user_addresses'>) {
   const { data, error } = await supabase.from('user_addresses').update(address).eq('id', id).select().single()
   if (error) throw error
   return data
@@ -326,24 +329,24 @@ export async function deleteAddress(id: string) {
 
 export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string) {
   const field = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
-  await (supabase as any).from('user_addresses').update({ [field]: false }).neq('id', id)
-  const { error } = await (supabase as any).from('user_addresses').update({ [field]: true }).eq('id', id)
+  await supabase.from('user_addresses').update({ [field]: false } as any).neq('id', id)
+  const { error } = await supabase.from('user_addresses').update({ [field]: true } as any).eq('id', id)
   if (error) throw error
 }
 
-export async function listInvoiceProfiles() {
+export async function listInvoiceProfiles(): Promise<InvoiceProfile[]> {
   const { data, error } = await supabase.from('user_invoice_profiles').select('*').order('is_default', { ascending: false })
   if (error) throw error
-  return data as any[]
+  return data || []
 }
 
-export async function createInvoiceProfile(profile: any) {
+export async function createInvoiceProfile(profile: TablesInsert<'user_invoice_profiles'>) {
   const { data, error } = await supabase.from('user_invoice_profiles').insert(profile).select().single()
   if (error) throw error
   return data
 }
 
-export async function updateInvoiceProfile(id: string, profile: any) {
+export async function updateInvoiceProfile(id: string, profile: TablesUpdate<'user_invoice_profiles'>) {
   const { data, error } = await supabase.from('user_invoice_profiles').update(profile).eq('id', id).select().single()
   if (error) throw error
   return data
@@ -365,35 +368,35 @@ export async function setDefaultInvoiceProfile(id: string) {
 // -----------------------------------------------------------------------------
 
 export async function listUserProjects(): Promise<UserProject[]> {
-  const { data, error } = await (supabase as any).from('projects').select('*').order('updated_at', { ascending: false })
+  const { data, error } = await supabase.from('projects').select('*').order('updated_at', { ascending: false })
   if (error) throw error
-  return data as UserProject[]
+  return data || []
 }
 
-export async function createProject(project: any): Promise<UserProject> {
-  const { data, error } = await (supabase as any).from('projects').insert(project).select().single()
+export async function createProject(project: TablesInsert<'projects'>): Promise<UserProject> {
+  const { data, error } = await supabase.from('projects').insert(project).select().single()
   if (error) throw error
-  return data as UserProject
+  return data
 }
 
 export async function deleteProject(id: string) {
-  const { error } = await (supabase as any).from('projects').delete().eq('id', id)
+  const { error } = await supabase.from('projects').delete().eq('id', id)
   if (error) throw error
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1) {
-  const { data, error } = await (supabase as any).from('project_items').insert({ project_id: projectId, product_id: productId, quantity }).select().single()
+  const { data, error } = await supabase.from('project_items').insert({ project_id: projectId, product_id: productId, quantity }).select().single()
   if (error) throw error
   return data
 }
 
 export async function removeProductFromProject(projectId: string, productId: string) {
-  const { error } = await (supabase as any).from('project_items').delete().match({ project_id: projectId, product_id: productId })
+  const { error } = await supabase.from('project_items').delete().match({ project_id: projectId, product_id: productId })
   if (error) throw error
 }
 
 export async function listProjectItems(projectId: string): Promise<any[]> {
-  const { data, error } = await (supabase as any).from('project_items').select('*, products(*)').eq('project_id', projectId)
+  const { data, error } = await supabase.from('project_items').select('*, products(*)').eq('project_id', projectId)
   if (error) throw error
   return data || []
 }

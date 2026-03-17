@@ -16,7 +16,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useSettings } from '../../hooks/useSettings'
 
 const AdminSettingsPage: React.FC = () => {
-  const { t } = useI18n()
+  const { t: _t } = useI18n()
   const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'admins' | 'system'>('general')
   const { settings, loading, updateSettings } = useSettings()
   const [saving, setSaving] = useState(false)
@@ -61,19 +61,19 @@ const AdminSettingsPage: React.FC = () => {
     const { success, error } = await updateSettings(key, value)
 
     if (success) {
-      setSaveStatus({ type: 'success', message: t('admin.settings.saveSuccess') })
+      setSaveStatus({ type: 'success', message: _t('admin.settings.toasts.saveSuccess') || 'Ayarlar başarıyla kaydedildi.' })
       setTimeout(() => setSaveStatus(null), 3000)
     } else {
-      setSaveStatus({ type: 'error', message: error || t('admin.settings.saveError') })
+      setSaveStatus({ type: 'error', message: error || _t('admin.settings.toasts.saveError') || 'Ayarlar kaydedilirken hata oluştu.' })
     }
     setSaving(false)
   }
 
   const tabs = [
-    { id: 'general', label: t('admin.settings.generalTab'), icon: Globe },
-    { id: 'payment', label: t('admin.settings.paymentTab'), icon: CreditCard },
-    { id: 'admins', label: t('admin.settings.adminsTab'), icon: ShieldCheck },
-    { id: 'system', label: t('admin.settings.systemTab'), icon: Activity },
+    { id: 'general', label: _t('admin.settings.tabs.general') || 'Genel', icon: Globe },
+    { id: 'payment', label: _t('admin.settings.tabs.payment') || 'Ödeme', icon: CreditCard },
+    { id: 'admins', label: _t('admin.settings.tabs.admins') || 'Yöneticiler', icon: ShieldCheck },
+    { id: 'system', label: _t('admin.settings.tabs.system') || 'Sistem Durumu', icon: Activity },
   ]
 
   return (
@@ -83,10 +83,10 @@ const AdminSettingsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs tracking-[0.2em] uppercase mb-2">
             <span className="w-8 h-[2px] bg-cyan-400/30"></span>
-            {t('admin.menu.groupSystem')}
+            {_t('admin.menu.groupSystem')}
           </div>
           <h2 className="text-4xl font-black text-white tracking-tight">
-            {t('admin.titles.settings')}
+            {_t('admin.titles.settings')}
           </h2>
         </div>
         
@@ -97,7 +97,7 @@ const AdminSettingsPage: React.FC = () => {
             className="group relative flex items-center justify-center gap-2 px-8 py-3 bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-700 text-[#0A0F1E] rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_rgba(34,211,238,0.2)]"
           >
             {saving ? <Activity className="animate-spin" size={18} /> : <Save size={18} />}
-            <span>{saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}</span>
+            <span>{saving ? (_t('common.saving') || 'Kaydediliyor...') : (_t('common.saveChanges') || 'Değişiklikleri Kaydet')}</span>
           </button>
         </div>
       </div>
@@ -135,8 +135,8 @@ const AdminSettingsPage: React.FC = () => {
         {activeTab === 'general' && (
           <div className="glass rounded-3xl overflow-hidden border border-white/5">
             <div className="px-8 py-6 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
-              <h3 className="text-lg font-bold text-white tracking-tight">{t('admin.settings.platformIdentity')}</h3>
-              <p className="text-slate-500 text-xs mt-1 font-medium">{t('admin.settings.platformIdentityDesc')}</p>
+              <h3 className="text-lg font-bold text-white tracking-tight">{_t('admin.settings.platformIdentity') || 'Platform Kimliği'}</h3>
+              <p className="text-slate-500 text-xs mt-1 font-medium">{_t('admin.settings.platformIdentityDesc') || 'Mağaza adı, iletişim bilgileri ve kurumsal detaylar.'}</p>
             </div>
             
             <div className="p-8">
@@ -144,7 +144,7 @@ const AdminSettingsPage: React.FC = () => {
                 <div className="relative group shrink-0">
                   <div className="w-44 h-44 rounded-3xl bg-white/5 border-2 border-dashed border-white/10 flex flex-col items-center justify-center transition-all group-hover:border-cyan-400/50 group-hover:bg-cyan-400/5 cursor-pointer overflow-hidden">
                     <Upload className="text-slate-600 group-hover:text-cyan-400 mb-2 transition-colors" size={32} />
-                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{t('admin.settings.logo')}</span>
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{_t('admin.settings.logo') || 'Logo'}</span>
                     <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" />
                   </div>
                   <div className="absolute -bottom-2 -right-2 bg-cyan-400 p-2 rounded-xl shadow-lg shadow-cyan-400/30 text-[#0A0F1E]">
@@ -155,7 +155,7 @@ const AdminSettingsPage: React.FC = () => {
                 <div className="flex-1 w-full space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.siteName')}</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.siteName') || 'Site Adı'}</label>
                       <input 
                         type="text" 
                         className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium" 
@@ -164,7 +164,7 @@ const AdminSettingsPage: React.FC = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.tagline')}</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.tagline') || 'Slogan'}</label>
                       <input 
                         type="text" 
                         className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium" 
@@ -175,7 +175,7 @@ const AdminSettingsPage: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.contactEmail')}</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.contactEmail') || 'İletişim E-Posta'}</label>
                       <input 
                         type="email" 
                         className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium" 
@@ -184,7 +184,7 @@ const AdminSettingsPage: React.FC = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.supportPhone')}</label>
+                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.supportPhone') || 'Destek Telefonu'}</label>
                       <input 
                         type="text" 
                         className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium" 
@@ -194,7 +194,7 @@ const AdminSettingsPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.headquarters')}</label>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.headquarters') || 'Genel Merkez Adresi'}</label>
                     <textarea 
                       rows={3} 
                       className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium resize-none" 
@@ -211,8 +211,8 @@ const AdminSettingsPage: React.FC = () => {
         {activeTab === 'payment' && (
           <div className="glass rounded-3xl overflow-hidden border border-white/5">
             <div className="px-8 py-6 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
-              <h3 className="text-lg font-bold text-white tracking-tight">{t('admin.settings.paymentTitle')}</h3>
-              <p className="text-slate-500 text-xs mt-1 font-medium">Ödeme ağ geçidi parametrelerini ve güvenlik ayarlarını yönetin.</p>
+              <h3 className="text-lg font-bold text-white tracking-tight">{_t('admin.settings.paymentTitle') || 'Ödeme Entegrasyonları'}</h3>
+              <p className="text-slate-500 text-xs mt-1 font-medium">{_t('admin.settings.paymentDesc') || 'Ödeme ağ geçidi parametrelerini ve güvenlik ayarlarını yönetin.'}</p>
             </div>
             
             <div className="p-8 space-y-10">
@@ -220,9 +220,9 @@ const AdminSettingsPage: React.FC = () => {
                 <div>
                   <h4 className="font-bold text-white mb-1 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></div>
-                    iyzico Entegrasyonu
+                    {_t('admin.settings.iyzicoIntegration') || 'iyzico Entegrasyonu'}
                   </h4>
-                  <p className="text-[11px] text-slate-500 font-medium">Güvenli ödemeleri iyzico API'si üzerinden gerçekleştirin.</p>
+                  <p className="text-[11px] text-slate-500 font-medium">{_t('admin.settings.iyzicoDesc') || 'Güvenli ödemeleri iyzico API\'si üzerinden gerçekleştirin.'}</p>
                 </div>
                 <div className="flex p-1 bg-[#0A0F1E] border border-white/5 rounded-xl">
                   <button 
@@ -242,7 +242,7 @@ const AdminSettingsPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.iyzicoApiKey')}</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.iyzicoApiKey') || 'iyzico API Anahtarı'}</label>
                   <input 
                     type="password" 
                     className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium tracking-wider" 
@@ -252,7 +252,7 @@ const AdminSettingsPage: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{t('admin.settings.iyzicoSecretKey')}</label>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{_t('admin.settings.iyzicoSecretKey') || 'iyzico Secret Anahtarı'}</label>
                   <input 
                     type="password" 
                     className="w-full px-5 py-3.5 input-glass rounded-2xl text-sm font-medium tracking-wider" 
@@ -274,17 +274,17 @@ const AdminSettingsPage: React.FC = () => {
 }
 
 const AdminsManagementSection: React.FC = () => {
-  const { t } = useI18n()
+  const { t: _t } = useI18n()
   
   return (
     <div className="glass rounded-3xl overflow-hidden border border-white/5">
       <div className="px-8 py-6 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-          <h3 className="text-lg font-bold text-white tracking-tight">{t('admin.settings.adminsTitle')}</h3>
-          <p className="text-slate-500 text-xs mt-1 font-medium">{t('admin.settings.adminsDesc')}</p>
+          <h3 className="text-lg font-bold text-white tracking-tight">{_t('admin.settings.adminsTitle') || 'Yönetici Erişimi'}</h3>
+          <p className="text-slate-500 text-xs mt-1 font-medium">{_t('admin.settings.adminsDesc') || 'Sistem yöneticilerini ve yetki seviyelerini görüntüleyin.'}</p>
         </div>
         <button className="px-6 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-bold transition-all text-white">
-          {t('admin.settings.addAdmin')}
+          {_t('admin.settings.addAdmin') || 'Yeni Yönetici Ekle'}
         </button>
       </div>
       
@@ -292,16 +292,16 @@ const AdminsManagementSection: React.FC = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-white/5 bg-white/[0.02]">
-              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kullanıcı</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rol</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Durum</th>
-              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Aktivite</th>
+              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{_t('common.user') || 'Kullanıcı'}</th>
+              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{_t('common.role') || 'Rol'}</th>
+              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{_t('common.status') || 'Durum'}</th>
+              <th className="px-8 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">{_t('admin.settings.table.activity') || 'Aktivite'}</th>
             </tr>
           </thead>
           <tbody>
             {[
-              { name: 'Alize Vent', email: 'alize@venthub.com', role: 'Super Admin', status: 'Aktif', activity: '2 dk önce' },
-              { name: 'Sistem Yöneticisi', email: 'admin@venthub.com', role: 'Admin', status: 'Aktif', activity: '1 saat önce' }
+              { name: 'Alize Vent', email: 'alize@venthub.com', role: 'super_admin', status: 'active', activity: '2 dk önce' },
+              { name: 'Sistem Yöneticisi', email: 'admin@venthub.com', role: 'admin', status: 'active', activity: '1 saat önce' }
             ].map((admin, idx) => (
               <tr key={idx} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
                 <td className="px-8 py-5">
@@ -316,14 +316,14 @@ const AdminsManagementSection: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-8 py-5">
-                  <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase ${admin.role === 'Super Admin' ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-800/50 text-slate-400'}`}>
-                    {admin.role}
+                  <span className={`px-3 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase ${admin.role === 'super_admin' ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-800/50 text-slate-400'}`}>
+                    {_t(`roles.${admin.role}`) || admin.role}
                   </span>
                 </td>
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                    <span className="text-[11px] text-slate-300 font-bold">{admin.status}</span>
+                    <span className="text-[11px] text-slate-300 font-bold">{_t(`admin.common.${admin.status}`) || admin.status}</span>
                   </div>
                 </td>
                 <td className="px-8 py-5">
@@ -339,15 +339,15 @@ const AdminsManagementSection: React.FC = () => {
 }
 
 const SystemStatusSection: React.FC = () => {
-  const { t } = useI18n()
+  const { t: _t } = useI18n()
   
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: t('admin.settings.dbStatus'), value: 'Online', status: 'ok', icon: Activity, color: 'cyan' },
-          { label: 'Payment API', value: 'Ready', status: 'ok', icon: CreditCard, color: 'emerald' },
-          { label: 'Latency', value: '38ms', status: 'ok', icon: Globe, color: 'blue' }
+          { label: _t('admin.settings.dbStatus') || 'Veritabanı', value: 'Online', status: 'ok', icon: Activity, color: 'cyan' },
+          { label: _t('admin.settings.paymentApi') || 'Ödeme API', value: 'Ready', status: 'ok', icon: CreditCard, color: 'emerald' },
+          { label: _t('admin.settings.latency') || 'Gecikme', value: '38ms', status: 'ok', icon: Globe, color: 'blue' }
         ].map((stat, idx) => (
           <div key={idx} className="glass p-6 rounded-3xl flex items-center gap-4 relative overflow-hidden group">
             <div className={`p-4 rounded-2xl bg-cyan-400/5 text-cyan-400 border border-cyan-400/10 group-hover:scale-110 transition-transform duration-500`}>
@@ -364,8 +364,8 @@ const SystemStatusSection: React.FC = () => {
 
       <div className="glass rounded-3xl overflow-hidden border border-white/5">
         <div className="px-8 py-6 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
-          <h3 className="text-lg font-bold text-white tracking-tight">{t('admin.settings.systemLogs')}</h3>
-          <p className="text-slate-500 text-xs mt-1 font-medium">Son kritik sistem olayları ve yapılandırma değişiklikleri.</p>
+          <h3 className="text-lg font-bold text-white tracking-tight">{_t('admin.settings.systemLogs') || 'Sistem Kayıtları'}</h3>
+          <p className="text-slate-500 text-xs mt-1 font-medium">{_t('admin.settings.systemLogsDesc') || 'Son kritik sistem olayları ve yapılandırma değişiklikleri.'}</p>
         </div>
         <div className="p-8">
           <div className="space-y-8">

@@ -421,7 +421,7 @@ export default function AdminReturnsPage() {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div className="space-y-1">
           <h1 className={adminSectionTitleClass}>{_t('admin.titles.returns')}</h1>
-          <p className={adminSubtitleClass}>{_t('admin.returns.total', { count: returns.length })} iade talebi yönetiliyor.</p>
+          <p className={adminSubtitleClass}>{_t('admin.returns.total', { count: returns.length })}</p>
         </div>
         <button
           onClick={loadReturns}
@@ -429,7 +429,7 @@ export default function AdminReturnsPage() {
           className={adminButtonSecondaryClass}
         >
           <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
-          {isLoading ? 'Güncelleniyor...' : _t('admin.ui.refresh')}
+          {isLoading ? _t('admin.common.loading') : _t('admin.ui.refresh')}
         </button>
       </header>
 
@@ -474,7 +474,7 @@ export default function AdminReturnsPage() {
           <AdminEmptyState
             icon={Undo2}
             title={searchQuery || !Object.values(statusFilter).every(Boolean) ? _t('admin.returns.empty.filtered')! : _t('admin.returns.empty.none')!}
-            description="Şu anda aktif bir iade veya değişim talebi bulunmuyor."
+            description={_t('admin.returns.empty.none')!}
           />
         </div>
       ) : (
