@@ -20,7 +20,8 @@ import {
     Box,
     Filter,
     ArrowRight,
-    ThermometerSun
+    ThermometerSun,
+    LucideIcon
 } from 'lucide-react'
 import ProductCard from '../ProductCard'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -53,7 +54,7 @@ interface CategoryLandingProps {
     parentCategory?: Category | null
 }
 
-const ICON_MAP: Record<string, React.ElementType> = {
+const ICON_MAP: Record<string, LucideIcon> = {
     'wind': Wind,
     'zap': Zap,
     'activity': Activity,

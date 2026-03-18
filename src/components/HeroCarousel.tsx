@@ -1,7 +1,7 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize, LucideIcon } from 'lucide-react'
 import { Category } from '../lib/supabase'
 import { CATEGORY_REGISTRY } from '../config/categoryRegistry'
 import { useI18n } from '../i18n/I18nProvider'
@@ -49,7 +49,7 @@ const FALLBACK_METADATA: Record<string, CategoryMetadata> = {
 }
 
 // Icon mapper
-const IconMap: Record<string, React.ElementType> = {
+const IconMap: Record<string, LucideIcon> = {
     wind: Wind,
     shield: Shield,
     activity: Activity,

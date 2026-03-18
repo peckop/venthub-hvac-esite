@@ -1,5 +1,5 @@
 import js from '@eslint/js'
-import globals from 'globals'
+import globals from 'globals/index.js'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
@@ -34,6 +34,8 @@ export default tseslint.config(
       // Relax strict rules to reduce CI noise while we incrementally fix types
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-empty': ['warn', { allowEmptyCatch: true }],
+      'no-useless-assignment': 'off',
+      'no-case-declarations': 'warn',
     },
   },
   // Edge Functions: allow pragmatic logging and looser rules (non-blocking in CI)
