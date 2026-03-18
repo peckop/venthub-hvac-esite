@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface UseScrollAnimationOptions {
     threshold?: number
@@ -12,7 +12,7 @@ interface UseScrollAnimationOptions {
  */
 export function useScrollAnimation<T extends HTMLElement = HTMLDivElement>(
     options: UseScrollAnimationOptions = {}
-): [React.RefObject<T>, boolean] {
+): [React.RefObject<T | null>, boolean] {
     const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options
     const ref = useRef<T>(null)
     const [isVisible, setIsVisible] = useState(false)

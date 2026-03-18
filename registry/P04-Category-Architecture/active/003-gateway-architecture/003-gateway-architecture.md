@@ -30,6 +30,7 @@ artifacts:
 
 
 
+
 # 003 - Gateway Mimarisi (CategoryPage Parçalama)
 
 ## 🎯 Hedef

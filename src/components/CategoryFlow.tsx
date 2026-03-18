@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { getCategories, Category } from '../lib/supabase'
 import {
     Wind, Fan, Droplet, Thermometer,
-    AirVent, Settings, Package, Wrench
+    AirVent, Settings, Package, Wrench, LucideIcon
 } from 'lucide-react'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 // Kategori ikonları - slug bazlı eşleme
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
     'hava-perdeleri': Wind,
     'fanlar': Fan,
     'nem-alma-cihazlari': Droplet,

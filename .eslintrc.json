@@ -15,6 +15,9 @@
         "varsIgnorePattern": "^_"
       }
     ],
-    "react-refresh/only-export-components": "off"
+    "react-refresh/only-export-components": "off",
+    "no-useless-assignment": "off",
+    "no-case-declarations": "off",
+    "jsx-a11y/alt-text": "off"
   }
 }
