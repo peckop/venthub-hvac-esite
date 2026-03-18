@@ -16,12 +16,12 @@ export async function generateStaticParams() {
     })
 
     if (paths.length === 0) {
-      return [{ id: 'generic' }]
+      return []
     }
     return paths
   } catch (e) {
     console.error('generateStaticParams error for products:', e)
-    return [{ id: 'generic' }]
+    return []
   }
 }
 

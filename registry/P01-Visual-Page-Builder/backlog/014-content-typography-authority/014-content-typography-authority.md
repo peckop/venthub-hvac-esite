@@ -27,6 +27,7 @@ artifacts:
 
 
 
+
 # 014 - İçerik ve Tipografi Otoritesi
 
 ## 🎯 Hedef
