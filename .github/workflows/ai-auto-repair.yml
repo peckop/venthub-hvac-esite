@@ -21,13 +21,24 @@ jobs:
         uses: 'actions/checkout@v4'
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
 
       - name: 'Download CI Logs'
         uses: 'actions/download-artifact@v4'
         with:
           name: 'ci-logs'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
         continue-on-error: true
+
+      - name: 'Check for Logs'
+        run: |
+          if [ -f "build-error.log" ]; then
+            echo "✅ Hata logu bulundu."
+            cat build-error.log | head -n 50
+          else
+            echo "❌ Hata logu bulunamadı! CI loglarını doğrudan okumaya çalışacağım."
+          fi
 
       - name: 'Invoke Gemini Repair Agent'
         uses: 'google-github-actions/run-gemini-cli@v0'
@@ -37,10 +48,9 @@ jobs:
         with:
           prompt: |
             CI/Build sürecimiz az önce BAŞARISIZ oldu. 
-            Görevin: Hata loglarını analiz et, hatayı veren dosyayı bul ve kodu build edilebilir hale getir.
+            Görevin: Hatayı analiz et ve `src/components/SearchOverlay.tsx` dosyasındaki Build engelini kaldır.
             
-            1. `pnpm run build` veya `pnpm run lint` komutlarının çıktılarını oku.
-            2. Hatayı (Type error, Lint error, Import error) tespit et.
-            3. Dosyayı düzelt ve "🤖 AI: Auto-repaired CI failure" mesajıyla commit at.
+            HATA KAYNAĞI: `NON_EXISTENT_AI_VARIABLE_ERROR` değişkeni tanımlı olmadığı için build patlıyor.
+            ÇÖZÜM: Bu değişkeni içeren satırı sil veya yorum satırı yap.
             
-            ⚠️ Sadece hatayı düzelt, mimariyi değiştirme!
+            Düzeltmeyi yaptıktan sonra commit at ve gönder.
