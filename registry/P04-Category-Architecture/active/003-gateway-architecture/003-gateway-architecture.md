@@ -1,19 +1,24 @@
 ---
 id: 003
 title: "Aşama 3: Gateway Mimarisi (CategoryPage Parçalama)"
-status: "Pending"
 progress: "0%"
 priority: "High"
 created_at: "2026-03-17 15:53:57"
-updated_at: "2026-03-17 19:15:27"
-started_at: null
 completed_at: null
 depends_on: [002]
+status: Planning
+started_at: "2026-03-18 11:16:29"
+updated_at: "2026-03-18 11:16:29"
 artifacts:
-  brainstorm: "registry/P04-Category-Architecture/backlog/003-gateway-architecture/brainstorm.md"
-  plan: "registry/P04-Category-Architecture/backlog/003-gateway-architecture/plan.md"
-  review: "registry/P04-Category-Architecture/backlog/003-gateway-architecture/review.md"
+  brainstorm: "registry/P04-Category-Architecture/active/003-gateway-architecture/brainstorm.md"
+  plan: "registry/P04-Category-Architecture/active/003-gateway-architecture/plan.md"
+  review: "registry/P04-Category-Architecture/active/003-gateway-architecture/review.md"
 ---
+
+
+
+
+
 
 
 
