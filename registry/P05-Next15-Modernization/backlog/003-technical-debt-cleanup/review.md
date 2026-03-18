@@ -1,0 +1,13 @@
+# Review: Technical Debt Cleanup & Type Safety
+
+## 🔍 Checklist
+- [ ] **Correctness**: Tüm `as any` kullanımları anlamlı tiplerle mi değiştirildi?
+- [ ] **Edge cases**: Opsiyonel zincirleme (`?.`) ve null kontrolleri (`??`) korundu mu?
+- [ ] **Security**: Tip güvenliği artışı ile veri sızıntısı riski azaldı mı?
+- [ ] **Performance**: Tip tanımlarının build süresine etkisi (tsc hızı) kontrol edildi mi?
+
+## 📝 Findings
+- Blocker: ...
+- Major: ...
+- Minor: ...
+- Nit: ...

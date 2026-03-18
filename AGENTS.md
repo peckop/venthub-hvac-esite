@@ -4,12 +4,13 @@ This file defines the strict architectural rules, boundaries, and best practices
 
 ## 1. Project Identity & Stack
 - **Project**: VentHub (HVAC E-commerce Platform)
-- **Framework**: Next.js (React)
+- **Framework**: Next.js 15 (React 19)
 - **Styling**: Tailwind CSS (Strictly Tailwind, NO plain CSS files unless core globals)
 - **Backend/DB**: Supabase (PostgreSQL, Edge Functions)
 - **Testing**: Vitest, Playwright
 - **Language**: TypeScript (Strict mode enabled)
 - **i18n**: Custom dictionary-based i18n (`src/i18n/dictionaries/tr.ts` as primary)
+- **Rules**: Next.js 15 Async Params must be awaited in all dynamic routes.
 
 ## 2. 🚨 HARD RULES (KIRILMAZ KURALLAR) - PLANI OLMAYANIN KODU OLMAZ
 1. **Registry-First Disiplini:** Herhangi bir koda (src/) dokunmadan önce MUTLAKA `registry/` klasöründeki ilgili `.md` dosyasını `view_file` ile oku. Okumadan başlanan her iş "kör aksiyon" sayılır.
@@ -37,12 +38,13 @@ This file defines the strict architectural rules, boundaries, and best practices
 - **Performance**: Wrap `auth.uid()` calls with `(SELECT auth.uid())` to enable initplan optimization.
 - **No Destructive Operations**: Do NOT write migrations that `DROP` tables or `DROP` critical columns without explicit user consent.
 
-## 5. CI/CD Requirements
+## 5. CI/CD & Build Requirements
 Before suggesting or opening a Pull Request, you MUST ensure that the following commands pass successfully:
-1. `pnpm run lint` or `pnpm run lint:ci`
+1. `pnpm run lint` or `pnpm run lint:ci` (Uses ESLint 9 Flat Config)
 2. `pnpm exec tsc -b tsconfig.build.json` (Type check)
 3. `pnpm test -- --run` (Unit tests)
-4. `pnpm run build:ci` (Production build)
+4. `pnpm run build` (Production build - Must pass without prerender errors)
+5. **Next.js 15 Guard:** Dynamic `params` and `searchParams` MUST be awaited.
 
 ## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli
 🚨 **AI Ajanları İçin Kesin Kurallar:**
