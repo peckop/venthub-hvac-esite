@@ -50,7 +50,7 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
           pauseOnFocus: false,
         },
       }}
-      extensions={{ AutoScroll }}
+      extensions={{ AutoScroll: AutoScroll as any }}
       aria-label="Product ticker lane"
     >
       {items.map((item, i) => (

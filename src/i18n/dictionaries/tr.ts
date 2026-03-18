@@ -490,6 +490,26 @@ export const tr = {
       fastTitle: "Hızlı Teslimat",
       fastText: "Türkiye genelinde hızlı ve güvenli teslimat.",
     },
+    whyVentHub: {
+      title: "Neden",
+      subtitle: "Türkiye'nin güvenilir HVAC e-ticaret platformu",
+      features: {
+        brands: { title: "Premium Markalar", description: "Vortice, Casals ve sektörün lider markalarının ürünleri" },
+        support: { title: "Uzman Desteği", description: "Profesyonel teknik danışmanlık hizmeti" },
+        delivery: { title: "Hızlı Teslimat", description: "Türkiye geneli 2-5 iş günü içinde kapınızda" }
+      },
+      badges: {
+        premium: "Premium Markalar",
+        ce: "CE Sertifikalı",
+        warranty: "2 Yıl Garanti",
+        shipping: "Aynı Gün Kargo"
+      },
+      authorizedDealer: {
+        prefix: "VentHub,",
+        brand: "Vortice",
+        suffix: "ürünlerinin Türkiye yetkili satıcısıdır."
+      }
+    },
     stats: {
       premiumBrands: "Premium Marka",
       productTypes: "Ürün Çeşidi",
