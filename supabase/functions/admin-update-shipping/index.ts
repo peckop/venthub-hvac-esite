@@ -70,6 +70,18 @@ serve(async (req) => {
     if (!supabaseUrl || !serviceKey) {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
+    // Authenticate and authorize admin
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) return new Response(JSON.stringify({ error: 'unauthenticated' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    const uRes = await fetch(`${supabaseUrl}/auth/v1/user`, { headers: { Authorization: authHeader } });
+    if (!uRes.ok) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { ...cors, 'Content-Type': 'application/json' } });
+    const uDat = await uRes.json();
+    const rRes = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${uDat.id}&select=role`, { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } });
+    const rDat = await rRes.json().catch(() => []);
+    if (!rDat?.[0] || !['admin', 'superadmin'].includes(rDat[0].role)) {
+      return new Response(JSON.stringify({ error: 'forbidden' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
 
     // Read current order status to allow implicit cancel (if already shipped and no carrier/tracking provided)
     let isCurrentlyShipped = false
