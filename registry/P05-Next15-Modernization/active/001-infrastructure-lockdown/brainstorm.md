@@ -1,0 +1,13 @@
+# Brainstorm: 001-infrastructure-lockdown
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...
