@@ -6,7 +6,7 @@ import * as THREE from 'three'
 import { FanRenderer } from './3d/FanRenderer'
 import { useFanMaterials } from './3d/materials/useFanMaterials'
 import { AxialFanModel } from './3d/types/AxialFanModel'
-import { getModelPlacement, ModelContext } from '../../utils/3dModelOffsets'
+import { getModelPlacement } from '../../utils/3dModelOffsets'
 import { SmartCenterScale } from './3d/SmartCenterScale'
 
 

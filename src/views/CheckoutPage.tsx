@@ -15,7 +15,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import ReviewSummary from './checkout/ReviewSummary'
 import CheckoutProgress from './checkout/CheckoutProgress'
 import StepCustomerInfo from './checkout/StepCustomerInfo'
-import StepAddressInfo from './checkout/StepAddressInfo'
+import StepAddressInfo, { type Address, type InvoiceInfo, type LegalConsents } from './checkout/StepAddressInfo'
 import OrderSummarySidebar from './checkout/OrderSummarySidebar'
 import PaymentIframeContainer from './checkout/PaymentIframeContainer'
 import SecurePaymentOverlay from './checkout/SecurePaymentOverlay'
@@ -29,13 +29,6 @@ interface CustomerInfo {
   email: string
   phone: string
   identityNumber?: string
-}
-
-interface Address {
-  fullAddress: string
-  city: string
-  district: string
-  postalCode: string
 }
 
 export const CheckoutPage: React.FC = () => {
@@ -57,8 +50,14 @@ export const CheckoutPage: React.FC = () => {
   })
 
   const [invoiceType, setInvoiceType] = useState<'individual' | 'corporate'>('individual')
-  const [invoiceInfo, setInvoiceInfo] = useState<any>({ type: 'individual', tckn: '' })
-  const [legalConsents, setLegalConsents] = useState<any>({ kvkk: false, distanceSales: false, preInfo: false, orderConfirm: false, marketing: false })
+  const [invoiceInfo, setInvoiceInfo] = useState<InvoiceInfo>({ type: 'individual', tckn: '' })
+  const [legalConsents, setLegalConsents] = useState<LegalConsents>({ 
+    kvkk: false, 
+    distanceSales: false, 
+    preInfo: false, 
+    orderConfirm: false, 
+    marketing: false 
+  })
   const [sameAsShipping, setSameAsShipping] = useState(true)
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard')
   const [showHelp, setShowHelp] = useState(false)

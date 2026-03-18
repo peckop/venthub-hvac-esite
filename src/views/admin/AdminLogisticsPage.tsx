@@ -59,13 +59,13 @@ export default function AdminLogisticsPage() {
 
             if (error) throw error
 
-            setRows((data as Record<string, unknown>[]).map(r => ({
-                id: r.id as string,
-                order_number: (r.order_number as string) || (r.id as string).substring(0, 8),
-                customer_name: (r.customer_name as string) || t('common.none'),
-                created_at: r.created_at as string,
-                carrier: (r.carrier as string) || 'Yurtiçi',
-                tracking_number: (r.tracking_number as string) || '',
+            setRows((data || []).map(r => ({
+                id: String(r.id),
+                order_number: String(r.order_number || (r.id as string).substring(0, 8)),
+                customer_name: String(r.customer_name || t('common.none')),
+                created_at: String(r.created_at),
+                carrier: String(r.carrier || 'Yurtiçi'),
+                tracking_number: String(r.tracking_number || ''),
                 saved: false
             })))
         } catch (err: unknown) {

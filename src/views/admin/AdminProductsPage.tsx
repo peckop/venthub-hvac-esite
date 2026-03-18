@@ -1,7 +1,6 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { supabase, adminSearchProducts, type DbAdminSearchResult } from '../../lib/supabase'
-import type { DbProduct } from '../../types/db-rows'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
