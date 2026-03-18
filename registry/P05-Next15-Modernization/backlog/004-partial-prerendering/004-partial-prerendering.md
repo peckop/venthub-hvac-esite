@@ -21,6 +21,7 @@ artifacts:
 
 
 
+
 # 004 - Partial Prerendering (PPR) Entegrasyonu
 
 ## 🎯 Hedef

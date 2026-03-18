@@ -19,6 +19,7 @@ artifacts:
 
 
 
+
 # 003: Technical Debt Cleanup & Type Safety
 
 Next.js 15 ve React 19 geçişi sırasında uygulanan geçici çözümlerin (Any casting) temizlenmesi ve tip güvenliğinin restore edilmesi.
