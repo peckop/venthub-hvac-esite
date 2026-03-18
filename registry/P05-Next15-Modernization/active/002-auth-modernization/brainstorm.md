@@ -1,0 +1,13 @@
+# Brainstorm: 002-auth-modernization
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...

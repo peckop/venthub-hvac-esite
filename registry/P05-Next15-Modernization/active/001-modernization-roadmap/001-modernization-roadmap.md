@@ -1,0 +1,16 @@
+# P05-Next15-Modernization Roadmap
+
+Bu dosya, Next.js 15 ve React 19 modernizasyon sürecinin ana orkestratörüdür.
+
+## 🗺️ Görev Ağacı (Task Tree)
+
+### ⚡ Aktif Görevler (Executing/Completed)
+- [x] **001-infrastructure-lockdown**: Altyapı ve Güvenlik Kilidi (%100) ✅ [Detay](active/001-infrastructure-lockdown/001-infrastructure-lockdown.md)
+- [x] **002-auth-modernization**: React 19 Form & Auth Modernizasyonu (%100) ✅ [Detay](active/002-auth-modernization/002-auth-modernization.md)
+
+### ⏳ Gelecek Görevler (Backlog)
+- [ ] **003-after-api**: Ağır İşlem Yönetimi (after API) (%0) ⏳ [Detay](../backlog/003-after-api/003-after-api.md)
+- [ ] **004-partial-prerendering**: Performans Optimizasyonu (PPR) (%0) ⏳ [Detay](../backlog/004-partial-prerendering/004-partial-prerendering.md)
+
+---
+*Son Güncelleme: 2026-03-18 16:05*
