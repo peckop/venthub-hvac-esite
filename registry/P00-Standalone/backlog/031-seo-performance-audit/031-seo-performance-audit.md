@@ -35,6 +35,7 @@ artifacts:
 
 
 
+
 # 031 - SEO & Core Web Vitals (Performance) Audit
 
 ## 🎯 Hedef
