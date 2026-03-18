@@ -30,6 +30,8 @@ artifacts:
 
 
 
+
+
 # 009 - Gelişmiş Fiyatlandırma Motoru
 
 ## 🎯 Hedef

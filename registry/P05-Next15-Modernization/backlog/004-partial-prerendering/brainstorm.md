@@ -1,0 +1,13 @@
+# Brainstorm: 004-partial-prerendering
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...
