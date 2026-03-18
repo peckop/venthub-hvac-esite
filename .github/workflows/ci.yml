@@ -48,10 +48,23 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
+      - name: 🤖 Check for Secret Presence
+        run: |
+          if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+            echo "✅ GEMINI_API_KEY is available in the workflow."
+          else
+            echo "❌ GEMINI_API_KEY IS MISSING OR EMPTY!"
+            exit 1
+          fi
+
       - name: 🤖 AI Auto-Repair on Failure
         if: failure()
         uses: google-github-actions/run-gemini-cli@v0
+        env:
+          # BU EN ÖNEMLİSİ: CLI'ın doğrudan okuduğu ENV
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
+          # Eklentiye girdi olarak da veriyoruz
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
@@ -61,5 +74,5 @@ jobs:
             
             GÖREV:
             1. `src/components/SearchOverlay.tsx` dosyasını aç.
-            2. O bozuk satırı (NON_EXISTENT_AI_VARIABLE_ERROR içeren satır) SİL.
+            2. O bozuk satırı bul ve SİL.
             3. Değişikliği "🤖 AI: Self-healed build failure" mesajıyla commit et ve pushla.
