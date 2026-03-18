@@ -13,7 +13,7 @@ import {
     adminButtonPrimaryClass,
     adminInputClass
 } from '../../utils/adminUi'
-import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown } from 'lucide-react'
+import { Clock, CheckCircle2, Package, Truck, XCircle, RotateCcw, GripVertical, X, MessageSquare, Mail, ChevronRight, ChevronLeft, ChevronDown, LucideIcon } from 'lucide-react'
 import { useRole } from '../../hooks/useRole'
 
 // --- Types ---
@@ -36,7 +36,7 @@ interface ColumnDef {
     id: ColumnId
     title: string
     statuses: string[]
-    icon: React.ElementType
+    icon: LucideIcon
     colorClass: string
     bgClass: string
     /** UI'dan DB'ye gönderilecek hedef statü */
@@ -49,7 +49,7 @@ interface ColumnDef {
     id: ColumnId
     title: string
     statuses: string[]
-    icon: React.ElementType
+    icon: LucideIcon
     colorClass: string
     bgClass: string
     /** UI'dan DB'ye gönderilecek hedef statü */
