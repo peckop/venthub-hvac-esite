@@ -91,13 +91,13 @@ jobs:
       - name: 🤖 AI Auto-Repair on Failure
         if: failure()
         uses: google-github-actions/run-gemini-cli@v0
-        # Şifreyi hem INPUT hem de ENV olarak veriyoruz, hiçbir kaçışı kalmıyor.
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # YENİ VE GÜÇLÜ ANAHTAR:
+          github_token: ${{ secrets.AGENTS_GITHUB_TOKEN }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.AGENTS_GITHUB_TOKEN }}
           PROMPT: |
             CI Build fail oldu!
             Dosya: `src/components/SearchOverlay.tsx`
