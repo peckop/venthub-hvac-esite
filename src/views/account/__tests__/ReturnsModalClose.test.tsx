@@ -10,10 +10,6 @@ const mockReplace = vi.fn()
 const mockUser = { id: 'u1' }
 const mockAuth = { user: mockUser, loading: false }
 const mockI18n = { t: (k: string) => k, lang: 'tr' }
-const mockSearchParamsObj = {
-  get: vi.fn().mockImplementation((key: string) => key === 'new' ? 'ord1' : null)
-}
-
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockNavigate,
@@ -21,7 +17,7 @@ vi.mock('next/navigation', () => ({
     prefetch: vi.fn()
   }),
   usePathname: () => '/account/returns',
-  useSearchParams: () => mockSearchParamsObj
+  useSearchParams: () => new URLSearchParams('new=ord1')
 }))
 
 vi.mock('../../../hooks/useAuth', () => ({
@@ -56,8 +52,8 @@ describe('AccountReturnsPage modal', () => {
   it('?new= parametresiyle açılır ve dışına tıklayınca kapanır', async () => {
     const { container } = render(<AccountReturnsPage />)
 
-    // Modal başlığı (heading) görünmeli
-    const modalHeading = await screen.findByRole('heading', { name: /returns\.new/i })
+    // Modalın açılmasını bekle. Başlık h3 olduğu için findByText ile de bulabiliriz.
+    const modalHeading = await screen.findByText(/returns\.new/i, { selector: 'h3' })
     expect(modalHeading).toBeInTheDocument()
 
     // Overlay'i seç ve tıkla. Modal dışı alan backdrop-blur-sm içeren div'dir.
@@ -66,8 +62,8 @@ describe('AccountReturnsPage modal', () => {
     fireEvent.click(overlay)
 
     await waitFor(() => {
-      // Modal başlığının (heading) gitmesini bekliyoruz, tetikleyici butonun değil.
-      expect(screen.queryByRole('heading', { name: /returns\.new/i })).not.toBeInTheDocument()
+      // Modalın (h3 başlığının) gitmesini bekliyoruz
+      expect(screen.queryByText(/returns\.new/i, { selector: 'h3' })).not.toBeInTheDocument()
     })
   })
 })

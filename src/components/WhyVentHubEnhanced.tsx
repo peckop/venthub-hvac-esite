@@ -1,6 +1,7 @@
 import React from 'react'
 import { Award, Shield, Truck, Clock, CheckCircle, Star } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAnimation'
+import { useI18n } from '../i18n/I18nProvider'
 
 /**
  * WhyVentHubEnhanced - Neden VentHub + Güven Sinyalleri
@@ -8,36 +9,37 @@ import { useScrollAnimation, scrollAnimationClasses } from '../hooks/useScrollAn
  */
 const WhyVentHubEnhanced: React.FC = () => {
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
+    const { t } = useI18n()
 
     const features = [
         {
             icon: Star,
-            title: 'Premium Markalar',
-            description: 'Vortice, Casals ve sektörün lider markalarının ürünleri',
+            title: t('home.whyVentHub.features.brands.title'),
+            description: t('home.whyVentHub.features.brands.description'),
             color: 'text-gold-accent',
             bgColor: 'bg-warning-orange/10'
         },
         {
             icon: Shield,
-            title: 'Uzman Desteği',
-            description: 'Profesyonel teknik danışmanlık hizmeti',
+            title: t('home.whyVentHub.features.support.title'),
+            description: t('home.whyVentHub.features.support.description'),
             color: 'text-success-green',
             bgColor: 'bg-success-green/10'
         },
         {
             icon: Truck,
-            title: 'Hızlı Teslimat',
-            description: 'Türkiye geneli 2-5 iş günü içinde kapınızda',
+            title: t('home.whyVentHub.features.delivery.title'),
+            description: t('home.whyVentHub.features.delivery.description'),
             color: 'text-primary-navy',
             bgColor: 'bg-primary-navy/10'
         }
     ]
 
     const trustBadges = [
-        { icon: Award, label: 'Premium Markalar', color: 'text-gold-accent' },
-        { icon: Shield, label: 'CE Sertifikalı', color: 'text-success-green' },
-        { icon: CheckCircle, label: '2 Yıl Garanti', color: 'text-primary-navy' },
-        { icon: Clock, label: 'Aynı Gün Kargo', color: 'text-secondary-blue' }
+        { icon: Award, label: t('home.whyVentHub.badges.premium'), color: 'text-gold-accent' },
+        { icon: Shield, label: t('home.whyVentHub.badges.ce'), color: 'text-success-green' },
+        { icon: CheckCircle, label: t('home.whyVentHub.badges.warranty'), color: 'text-primary-navy' },
+        { icon: Clock, label: t('home.whyVentHub.badges.shipping'), color: 'text-secondary-blue' }
     ]
 
     return (
@@ -47,10 +49,10 @@ const WhyVentHubEnhanced: React.FC = () => {
                 {/* Header */}
                 <div className={`text-center mb-10 sm:mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-                        Neden <span className="text-secondary-blue">VentHub</span>?
+                        {t('home.whyVentHub.title')} <span className="text-secondary-blue">VentHub</span>?
                     </h2>
                     <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
-                        Türkiye'nin güvenilir HVAC e-ticaret platformu
+                        {t('home.whyVentHub.subtitle')}
                     </p>
                 </div>
 
@@ -95,7 +97,11 @@ const WhyVentHubEnhanced: React.FC = () => {
                 {/* Vortice Authorized Dealer Highlight */}
                 <div className={`mt-8 text-center ${scrollAnimationClasses.fadeIn(isVisible)}`} style={{ transitionDelay: '400ms' }}>
                     <p className="text-sm text-gray-400">
-                        VentHub, <strong className="text-gold-accent">Vortice</strong> ürünlerinin Türkiye yetkili satıcısıdır.
+                        {t('home.whyVentHub.authorizedDealer.prefix')}{' '}
+                        <strong className="text-gold-accent">
+                            {t('home.whyVentHub.authorizedDealer.brand')}
+                        </strong>{' '}
+                        {t('home.whyVentHub.authorizedDealer.suffix')}
                     </p>
                 </div>
             </div>
@@ -104,6 +110,3 @@ const WhyVentHubEnhanced: React.FC = () => {
 }
 
 export default WhyVentHubEnhanced
-
-
-
