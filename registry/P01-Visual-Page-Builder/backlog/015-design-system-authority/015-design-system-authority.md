@@ -27,6 +27,7 @@ artifacts:
 
 
 
+
 # 015 - Tasarım Sistemi Otoritesi
 
 ## 🎯 Hedef

@@ -16,12 +16,12 @@ export async function generateStaticParams() {
     }))
 
     if (paths.length === 0) {
-      return [{ categorySlug: 'generic' }]
+      return []
     }
     return paths
   } catch (e) {
     console.error('generateStaticParams error for all categories:', e)
-    return [{ categorySlug: 'generic' }]
+    return []
   }
 }
 
