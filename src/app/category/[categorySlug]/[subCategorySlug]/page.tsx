@@ -12,7 +12,7 @@ export async function generateStaticParams() {
       .eq('is_active', true)
 
     if (!allCategories || allCategories.length === 0) {
-      return [{ categorySlug: 'generic', subCategorySlug: 'generic' }]
+      return []
     }
 
     // ID'leri slug'lara eşle
@@ -27,16 +27,18 @@ export async function generateStaticParams() {
       }))
 
     if (paths.length === 0) {
-      return [{ categorySlug: 'generic', subCategorySlug: 'generic' }]
+      return []
     }
     return paths
   } catch (e) {
     console.error('generateStaticParams error for subcategories:', e)
-    return [{ categorySlug: 'generic', subCategorySlug: 'generic' }]
+    return []
   }
 }
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ categorySlug: string, subCategorySlug: string }> }) {
+  await params // Ensure params are awaited even if not directly used here yet
+  
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
