@@ -48,9 +48,18 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
-      - name: Upload Logs on Failure
+      - name: 🤖 AI Auto-Repair on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: google-github-actions/run-gemini-cli@v0
         with:
-          name: ci-logs
-          path: build-error.log
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            CI Build fail oldu!
+            Dosya: `src/components/SearchOverlay.tsx`
+            Hata: `NON_EXISTENT_AI_VARIABLE_ERROR` değişkeni yüzünden build patlıyor.
+            
+            GÖREV:
+            1. `src/components/SearchOverlay.tsx` dosyasını aç.
+            2. O bozuk satırı (NON_EXISTENT_AI_VARIABLE_ERROR içeren satır) SİL.
+            3. Değişikliği "🤖 AI: Self-healed build failure" mesajıyla commit et ve pushla.
