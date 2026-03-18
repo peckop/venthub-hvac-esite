@@ -592,6 +592,168 @@ export const tr = {
       editStock: 'Stok Düzenle',
       adjustStock: 'Stok Ayarla'
     },
+    orders: {
+      view_list: 'Liste Görünümü',
+      view_board: 'Pano Görünümü',
+      statusLabels: {
+        all: 'Tümü',
+        pending: 'Bekliyor',
+        paid: 'Ödendi',
+        confirmed: 'Onaylandı',
+        shipped: 'Kargoda',
+        delivered: 'Teslim Edildi',
+        cancelled: 'İptal Edildi',
+        refunded: 'İade Edildi',
+        partialRefunded: 'Kısmi İade'
+      },
+      table: {
+        orderId: 'Sipariş No',
+        status: 'Durum',
+        conversationId: 'İşlem ID',
+        amount: 'Tutar',
+        created: 'Tarih',
+        actions: 'İşlemler'
+      },
+      filters: {
+        status: 'Durum',
+        pendingShipments: 'Bekleyen Kargolar',
+        startDate: 'Başlangıç',
+        endDate: 'Bitiş'
+      },
+      bulk: {
+        selected: 'Seçili: {{count}}',
+        shipSelected: 'Seçilileri Kargola',
+        cancelShipping: 'Kargoyu İptal Et',
+        clearSelection: 'Seçimi Temizle',
+        noShippableSelected: 'İptal edilecek kargo seçilmedi',
+        confirmCancelShipping: '{{count}} siparişin kargosunu iptal etmek istediğinize emin misiniz?',
+        cancelSuccess: '{{count}} sipariş kargosu iptal edildi',
+        cancelPartialFail: 'Bazı iptaller başarısız oldu: {{failed}}',
+        cancelFailed: 'Toplu iptal başarısız oldu'
+      },
+      export: {
+        csvLabel: 'CSV (Excel uyumlu UTF-8)',
+        xlsLabel: 'Excel (.xls — HTML tablo)',
+        headers: {
+          orderId: 'Sipariş No',
+          status: 'Durum',
+          conversationId: 'İşlem ID',
+          amount: 'Tutar',
+          created: 'Tarih'
+        }
+      },
+      columns: {
+        orderId: 'Sipariş No',
+        status: 'Durum',
+        conversationId: 'İşlem ID',
+        amount: 'Tutar',
+        created: 'Tarih'
+      },
+      actions: {
+        shipping: 'Kargo',
+        logs: 'Kayıtlar',
+        notes: 'Notlar',
+        cancel: 'İptal'
+      },
+      modals: {
+        shipping: {
+          title: 'Kargo / Takip No',
+          bulkTitle: 'Toplu Kargo İşlemi',
+          carrierLabel: 'Kargo Firması',
+          carrierSelect: 'Seçiniz...',
+          trackingLabel: 'Takip Numarası',
+          trackingPlaceholder: 'Kargo Takip No',
+          sendEmailLabel: 'Müşteriye e-posta bildirimi gönder',
+          advancedLabel: 'Gelişmiş: Sipariş bazlı kargo',
+          advancedTable: {
+            orderId: 'Sipariş',
+            carrier: 'Kargo',
+            tracking: 'Takip No'
+          },
+          carriers: {
+            yurtici: 'Yurtiçi',
+            aras: 'Aras',
+            mng: 'MNG',
+            ptt: 'PTT',
+            ups: 'UPS',
+            fedex: 'FedEx',
+            dhl: 'DHL',
+            other: 'Diğer'
+          },
+          otherPlaceholder: 'Diğer (elle girin)',
+          cancel: 'İptal',
+          save: 'Kaydet',
+          saving: 'Kaydediliyor...'
+        },
+        logs: {
+          title: 'E-posta Kayıtları',
+          orderLabel: 'Sipariş:',
+          table: {
+            date: 'Tarih',
+            to: 'Alıcı',
+            subject: 'Konu',
+            carrier: 'Kargo',
+            tracking: 'Takip No',
+            messageId: 'Mesaj ID'
+          },
+          noRecords: 'Kayıt bulunamadı',
+          close: 'Kapat'
+        },
+        notes: {
+          title: 'Sipariş Notları',
+          inputPlaceholder: 'Yeni bir not yazın...',
+          add: 'Ekle',
+          adding: 'Ekleniyor...',
+          delete: 'Sil',
+          noRecords: 'Not bulunmuyor',
+          close: 'Kapat'
+        }
+      },
+      toasts: {
+        loadError: 'Siparişler yüklenemedi',
+        emailLogsFailed: 'E-posta kayıtları yüklenemedi',
+        notesFailed: 'Notlar yüklenemedi',
+        noteAddFailed: 'Not eklenemedi',
+        noteDeleteSuccess: 'Not silindi',
+        noteDeleteFailed: 'Not silinemedi',
+        shippingCancelConfirm: 'Kargoyu iptal etmek üzeresiniz. Durum "Onaylandı"ya dönecek ve takip no silinecek.',
+        shippingCancelSuccess: 'Kargo iptal edildi',
+        shippingCancelFailed: 'Kargo iptal edilemedi',
+        shippingUpdateSuccess: 'Kargo bilgisi güncellendi',
+        shippingCreateSuccess: 'Sipariş kargoya verildi',
+        shippingUpdateFailed: 'Kargo bilgisi güncellenemedi',
+        bulkShippingSuccess: '{{count}} sipariş kargoya verildi',
+        bulkShippingFailed: 'Toplu kargo güncellemesi başarısız',
+        missingFields: 'Kargo firması ve takip no zorunludur',
+        missingAdvancedFields: 'Eksik alanlar: {{count}} satır'
+      },
+      states: {
+        loading: 'Yükleniyor...',
+        noRecords: 'Kayıt bulunamadı'
+      },
+      board: {
+        columns: {
+          new: "Yeni / Bekliyor",
+          prep: "Hazırlanıyor",
+          shipped: "Kargoda",
+          done: "Teslim Edildi",
+          cancel: "İptal",
+          refund: "İade"
+        },
+        stepper: {
+          received: "Alındı",
+          paid: "Ödendi",
+          prep: "Hazırlanıyor",
+          shipped: "Kargoda",
+          delivered: "Teslim"
+        },
+        messages: {
+          cancelledOrRefunded: "Sipariş iptal veya iade edilmiş.",
+          updateSuccess: "Sipariş durumu başarıyla güncellendi.",
+          updateError: "Durum güncellenirken hata oluştu."
+        }
+      }
+    },
     dashboard: {
       subtitle: 'Hızlı bakış ve son hareketler',
       rangeToday: 'Bugün',
@@ -614,7 +776,11 @@ export const tr = {
         carrierDist: 'Kargo Dağılımı',
         returnStatus: 'İade Durum Kırılımı',
         pendingShipmentAge: 'Bekleyen Kargo (Yaş)',
-        weeklyReturns: 'İadeler - Haftalık Trend'
+        weeklyReturns: 'İadeler - Haftalık Trend',
+        systemHealth: "Sistem Sağlığı",
+        recentOrders: "Son Siparişler",
+        orderFlow: "Sipariş Akışı",
+        salesTrend: "Satış Trendi"
       },
       trend: 'Son {{days}} gün sipariş trendi',
       recent: { title: 'Son Siparişler' },
@@ -750,6 +916,64 @@ export const tr = {
         bulkUpdateSuccess: "{{count}} sipariş başarıyla Kargoda durumuna alındı!",
         criticalError: "Toplu güncelleme sırasında kritik bir hata oluştu."
       }
+    }
+  },
+  auth: {
+    back: 'Geri',
+    loginTitle: 'Giriş Yap',
+    loginSubtitle: 'VentHub hesabınıza giriş yapın',
+    email: 'E-posta Adresi',
+    password: 'Şifre',
+    forgotPassword: 'Şifremi Unuttum',
+    resetSubtitle: 'Şifrenizi sıfırlamak için e-posta adresinizi girin. Size bir bağlantı göndereceğiz.',
+    sendResetLink: 'Sıfırlama Bağlantısı Gönder',
+    loggingIn: 'Giriş yapılıyor...',
+    submitting: 'Gönderiliyor...',
+    login: 'Giriş Yap',
+    rememberMe: 'Beni hatırla',
+    noAccount: 'Hesabınız yok mu?',
+    register: 'Kayıt Ol',
+    validEmailPassRequired: 'E-posta ve şifre gereklidir',
+    required: 'gereklidir',
+    emailInvalid: 'Geçersiz e-posta adresi',
+    invalidCreds: 'E-posta veya şifre hatalı',
+    emailNotConfirmed: 'E-posta adresinizi onaylamanız gerekiyor',
+    genericLoginError: 'Giriş sırasında bir hata oluştu',
+    unexpectedError: 'Beklenmeyen bir hata oluştu',
+    userNotFound: 'Bu e-posta ile kayıtlı kullanıcı bulunamadı',
+    resetError: 'Sıfırlama isteği gönderilemedi',
+    resetEmailSent: 'Şifre sıfırlama e-postası gönderildi',
+    registerTitle: 'Kayıt Ol',
+    registerSubtitle: 'VentHub\'a katılın ve ayrıcalıklardan yararlanın',
+    name: 'Ad Soyad',
+    confirmPassword: 'Şifreyi Onayla',
+    passwordMin: 'Şifre en az 8 karakter olmalıdır',
+    passwordsDontMatch: 'Şifreler eşleşmiyor',
+    passwordPwned: 'Bu şifre daha önce veri sızıntılarında görülmüş. Lütfen daha güçlü bir şifre seçin.',
+    registrationEmailSent: 'E-posta adresinize bir doğrulama bağlantısı gönderildi. Lütfen hesabınızı doğrulayın.',
+    registering: 'Kayıt yapılıyor...',
+    alreadyHave: 'Zaten hesabınız var mı?',
+    emailAlready: 'Bu e-posta adresi zaten kullanımda',
+    goToLogin: 'Giriş Sayfasına Git',
+    registrationComplete: 'Kayıt Tamamlandı!',
+    backHome: 'Ana Sayfaya Dön',
+    emailSentTitle: 'E-posta Gönderildi!',
+    emailSentDesc: '{{email}} adresine bir şifre sıfırlama bağlantısı gönderildi. Lütfen e-postanızı kontrol edin.',
+    backToLogin: 'Giriş Sayfasına Dön',
+    tryAnotherEmail: 'Başka Bir E-posta Dene',
+    registrationCompleteTitle: 'Kayıt Tamamlandı!',
+    registrationCompleteDesc: 'E-postanıza bir doğrulama bağlantısı gönderildi. Kaydı tamamlamak için lütfen doğrulayın.',
+    or: 'veya',
+    googleSignIn: 'Google ile giriş',
+    googleSignInFail: 'Google ile giriş başlatılamadı',
+    googleSignInError: 'Google ile giriş sırasında beklenmeyen hata',
+    features: {
+      secure: 'Güvenli',
+      fast: 'Hızlı',
+      mobile: 'Mobil Uyumlu'
+    },
+    errors: {
+      nameRequired: 'Ad soyad gereklidir'
     }
   },
   brands: {

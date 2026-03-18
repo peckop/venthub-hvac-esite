@@ -194,7 +194,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const heroImagePath = category.image_url ? `category-images/${category.image_url}` : null
 
-    const features = category.metadata?.features || []
+    const features = (category.metadata as any)?.features || []
 
     // Build breadcrumb items
     const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.home'))
@@ -215,11 +215,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             {/* Technical Summary / Badge */}
-                            {category.metadata?.technical_summary && (
+                            {((category.metadata as any)?.technical_summary) && (
                                 <div className="flex items-center space-x-2 text-secondary-blue mb-4">
                                     <Activity size={20} />
                                     <span className="font-medium tracking-wide text-sm uppercase">
-                                        {category.metadata.technical_summary}
+                                        {(category.metadata as any).technical_summary}
                                     </span>
                                 </div>
                             )}
@@ -228,7 +228,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 {getCategoryDisplayName(category)}
                             </h1>
                             <p className="text-lg text-gray-300 mb-8 max-w-xl">
-                                {category.metadata?.hero_description || category.description}
+                                {((category.metadata as any)?.hero_description) || category.description}
                             </p>
 
                             {/* Dynamic Features Grid */}
@@ -376,7 +376,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                                         key={product.id}
                                                         product={product}
                                                         layout="grid"
-                                                        hidePrice={!!category.metadata?.hide_price}
+                                                        hidePrice={!!(category.metadata as any)?.hide_price}
                                                     />
                                                 ))}
                                             </div>
@@ -482,7 +482,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                     key={product.id}
                                     product={product}
                                     layout="grid"
-                                    hidePrice={!!category.metadata?.hide_price}
+                                    hidePrice={!!(category.metadata as any)?.hide_price}
                                 />
                             ))}
                         </div>

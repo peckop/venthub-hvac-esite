@@ -4,6 +4,7 @@
  */
 
 import { Product } from '../lib/supabase';
+import { isRecord } from './type-converters';
 
 export interface EngineeringInference {
   labelKey: string;
@@ -119,7 +120,7 @@ export const getMotorInference = (motorType?: string): EngineeringInference | nu
  */
 export const generateEngineeringSummary = (product: Product): EngineeringInference[] => {
   const inferences: EngineeringInference[] = [];
-  const specs = product.technical_specs || {};
+  const specs = isRecord(product.technical_specs) ? (product.technical_specs as Record<string, any>) : {};
 
   // 1. Ses Analizi
   if (product.noise_level) {

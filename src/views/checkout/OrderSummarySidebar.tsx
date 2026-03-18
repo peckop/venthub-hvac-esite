@@ -5,8 +5,19 @@ import { Lock } from 'lucide-react'
 import { formatCurrency } from '../../i18n/format'
 import { Lang } from '../../i18n/I18nContext'
 
+export interface OrderSummaryItem {
+    id: string
+    product: {
+        name: string
+        image_url?: string | null
+        price: number
+    }
+    quantity: number
+    unitPrice?: number | string
+}
+
 export interface OrderSummarySidebarProps {
-    items: { id: string; product: { name: string; image_url?: string | null; price: number | string }; quantity: number; price: number; unitPrice?: number | string }[]
+    items: OrderSummaryItem[]
     totalAmount: number
     vatAmount: number
     finalAmount: number

@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase, Product } from '../../lib/supabase'
+import type { Tables } from '../../types/database.types'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
 import { formatDateTime } from '../../i18n/datetime'
@@ -87,8 +88,8 @@ export default function OrderDetailPage() {
         setLoading(true)
 
         // 1. Sipariş ana verilerini çek
-        const { data: orderData, error: orderError } = await supabase
-          .from('venthub_orders')
+        const { data: orderData, error: orderError } = await (supabase
+          .from('venthub_orders'))
           .select(`
             id, total_amount, status, payment_status, created_at, 
             customer_name, customer_email, shipping_address, order_number, 
@@ -104,8 +105,8 @@ export default function OrderDetailPage() {
 
         // 2. Sipariş kalemlerini (items) çek
         // Not: RLS politikası user_id bazlı koruma sağladığı için doğrudan çekiyoruz
-        const { data: itemsData, error: itemsError } = await supabase
-          .from('venthub_order_items')
+        const { data: itemsData, error: itemsError } = await (supabase
+          .from('venthub_order_items'))
           .select('id, product_id, product_name, quantity, price_at_time, product_image_url')
           .eq('order_id', id)
 
@@ -127,32 +128,33 @@ export default function OrderDetailPage() {
           }
         })
 
-        const mappedOrder: Order = {
-          id: orderData.id,
-          total_amount: Number(orderData.total_amount) || 0,
-          status: orderData.status || 'pending',
-          payment_status: orderData.payment_status || undefined,
-          created_at: orderData.created_at,
-          customer_name: orderData.customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
-          customer_email: orderData.customer_email || (user?.email || '-'),
-          shipping_address: orderData.shipping_address,
-          order_items: mappedItems,
-          order_number: orderData.order_number || undefined,
-          is_demo: false,
-          payment_data: undefined,
-          conversation_id: orderData.conversation_id || undefined,
-          carrier: orderData.carrier || undefined,
-          tracking_number: orderData.tracking_number || undefined,
-          tracking_url: orderData.tracking_url || undefined,
-          shipped_at: orderData.shipped_at || undefined,
-          delivered_at: orderData.delivered_at || undefined,
-          shipping_method: (orderData.shipping_method || undefined) as string | undefined,
-          invoice_type: orderData.invoice_type || undefined,
-          invoice_info: orderData.invoice_info || undefined,
-          legal_consents: orderData.legal_consents || undefined,
+        if (orderData) {
+          const mappedOrder: Order = {
+            id: orderData.id,
+            total_amount: Number(orderData.total_amount) || 0,
+            status: orderData.status || 'pending',
+            payment_status: orderData.payment_status || undefined,
+            created_at: orderData.created_at,
+            customer_name: (orderData).customer_name || (user?.user_metadata?.full_name || user?.email || 'Kullanıcı'),
+            customer_email: (orderData).customer_email || (user?.email || '-'),
+            shipping_address: orderData.shipping_address,
+            order_items: mappedItems,
+            order_number: (orderData).order_number || undefined,
+            is_demo: false,
+            payment_data: undefined,
+            conversation_id: (orderData).conversation_id || undefined,
+            carrier: (orderData).carrier || undefined,
+            tracking_number: (orderData).tracking_number || undefined,
+            tracking_url: (orderData).tracking_url || undefined,
+            shipped_at: (orderData).shipped_at || undefined,
+            delivered_at: (orderData).delivered_at || undefined,
+            shipping_method: ((orderData).shipping_method || undefined) as string | undefined,
+            invoice_type: (orderData).invoice_type || undefined,
+            invoice_info: (orderData).invoice_info || undefined,
+            legal_consents: (orderData).legal_consents || undefined,
+          }
+          setOrder(mappedOrder)
         }
-
-        setOrder(mappedOrder)
       } catch (e) {
         console.error('Order load error:', e)
         toast.error(t('orders.unexpectedError'))

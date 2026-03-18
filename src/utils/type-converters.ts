@@ -13,3 +13,7 @@ export function safeString(val: any, fallback: string = ''): string {
   if (val == null) return fallback;
   return fallback;
 }
+
+export function isRecord(val: unknown): val is Record<string, any> {
+  return typeof val === 'object' && val !== null && !Array.isArray(val);
+}

@@ -88,7 +88,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setLang = React.useCallback((l: Lang) => setLangState(l), [])
 
   const t = useMemo(() => {
-    return (key: string, paramsOrAlt?: Record<string, any> | string) => {
+    return (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
       const translation = get(DICTS[lang], key)
       const hasTranslation = translation !== key
       if (!hasTranslation && typeof paramsOrAlt === 'string') return paramsOrAlt
@@ -114,7 +114,7 @@ export function useI18n() {
     return {
       lang: 'tr' as Lang,
       setLang: () => { },
-      t: (key: string, paramsOrAlt?: Record<string, any> | string) => {
+      t: (key: string, paramsOrAlt?: Record<string, unknown> | string) => {
         return typeof paramsOrAlt === 'string' ? paramsOrAlt : key
       }
     }

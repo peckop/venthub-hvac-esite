@@ -1,12 +1,24 @@
 ---
-updated_at: "2026-03-17 07:34:24"
+completed_at: null
+started_at: null
+created_at: "2026-03-17 15:50:57"
+updated_at: "2026-03-17 19:15:27"
 id: 017
 title: "Görsel Sayfa Oluşturucu (Visual Page Builder)"
 status: "Pending"
 progress: "0%"
 priority: "Critical"
 depends_on: [006, 014, 015, 016]
+artifacts:
+  brainstorm: "registry/P01-Visual-Page-Builder/backlog/017-visual-page-builder/brainstorm.md"
+  plan: "registry/P01-Visual-Page-Builder/backlog/017-visual-page-builder/plan.md"
+  review: "registry/P01-Visual-Page-Builder/backlog/017-visual-page-builder/review.md"
 ---
+
+
+
+
+
 
 # 017 - Görsel Sayfa Oluşturucu (Visual Page Builder)
 

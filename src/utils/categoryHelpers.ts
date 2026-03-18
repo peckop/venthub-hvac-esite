@@ -1,17 +1,16 @@
 import type { Category } from '../lib/supabase'
-import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 
 /**
  * Returns the display name for a category.
- * Prioritizes the 'hero_title' from static metadata configuration (SSOT).
+ * Prioritizes the 'hero_title' from database metadata (SSOT).
  * If not present, falls back to the database name.
- * Uses the refined Category type from db-rows.ts which guarantees name is a string.
  */
 export const getCategoryDisplayName = (category: Category | null | undefined): string => {
     if (!category) return ''
     
-    if (STATIC_CATEGORY_METADATA[category.slug]?.hero_title) {
-        return STATIC_CATEGORY_METADATA[category.slug].hero_title!
+    const meta = category.metadata as any
+    if (meta?.hero_title) {
+        return meta.hero_title
     }
 
     return category.name
@@ -23,8 +22,9 @@ export const getCategoryDisplayName = (category: Category | null | undefined): s
 export const getCategoryDescription = (category: Category | null | undefined): string => {
     if (!category) return ''
 
-    if (STATIC_CATEGORY_METADATA[category.slug]?.hero_description) {
-        return STATIC_CATEGORY_METADATA[category.slug].hero_description!
+    const meta = category.metadata as any
+    if (meta?.hero_description) {
+        return meta.hero_description
     }
 
     return category.description || ''

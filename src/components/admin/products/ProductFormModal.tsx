@@ -6,11 +6,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Upload, Trash2, Plus, Save, Loader2 } from 'lucide-react'
-import { supabase, Product } from '../../../lib/supabase'
-import type { Database } from '../../../types/database.types'
+import { supabase } from '../../../lib/supabase'
+import type { DbProduct } from '../../../types/db-rows'
+import type { Database, Json } from '../../../types/database.types'
 type ProductUpdate = Database['public']['Tables']['products']['Update']
 type ProductInsert = Database['public']['Tables']['products']['Insert']
-type Json = Database['public']['Tables']['products']['Insert']['technical_specs']
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 
@@ -57,7 +57,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
     // Technical Specs State (Key-Value pairs for UI)
     const [specs, setSpecs] = useState<{ key: string; value: string }[]>([])
-    const [initialData, setInitialData] = useState<Product | null>(null)
+    const [initialData, setInitialData] = useState<DbProduct | null>(null)
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
@@ -74,7 +74,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             // Fetch product
             const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(product as Product)
+            setInitialData(product as unknown as DbProduct)
 
             // Fetch images
             const { data: imgs, error: imgError } = await supabase
