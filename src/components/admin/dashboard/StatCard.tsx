@@ -119,7 +119,7 @@ const StatCard: React.FC<StatCardProps> = ({
             </div>
             {icon && (
                 <div className={`flex shrink-0 w-14 h-14 rounded-2xl ${currentAccent.iconBg} items-center justify-center border border-white/5 shadow-2xl ml-auto transition-all duration-700 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_30px_rgba(0,0,0,0.5)]`}>
-                    {React.cloneElement(icon as React.ReactElement, { size: 24, strokeWidth: 2.5 })}
+                    {React.cloneElement(icon as React.ReactElement<any>, { size: 24, strokeWidth: 2.5 })}
                 </div>
             )}
         </div>
