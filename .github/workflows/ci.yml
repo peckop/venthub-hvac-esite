@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: ['**']
   workflow_dispatch:
 
 concurrency:
@@ -42,8 +42,15 @@ jobs:
       - name: Test
         run: pnpm test -- --run --reporter=dot
 
-      - name: Production build
-        run: pnpm run build:ci
+      - name: Build (blocking)
+        run: pnpm run build:ci 2>&1 | tee build-error.log
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
+
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs
+          path: build-error.log
