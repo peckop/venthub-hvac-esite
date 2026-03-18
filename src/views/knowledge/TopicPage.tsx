@@ -10,10 +10,14 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { getCategoryUrlFromTopic } from '../../utils/applicationLinks'
 import Seo from '../../components/Seo'
 
-const TopicPage: React.FC = () => {
+interface TopicPageProps {
+  slug?: string
+}
+
+const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
   const { t } = useI18n()
   const params = useParams()
-  const slug = params?.slug as string
+  const slug = propSlug || (params?.slug as string)
   const base = slug ? `knowledge.topics.${slug}` : ''
 
   const title = t(`${base}.title`)
@@ -107,7 +111,7 @@ const TopicPage: React.FC = () => {
                 {t('knowledge.topic.stepsTitle')}
               </h2>
               <div className="space-y-6">
-                {steps.map((s, i) => (
+                {steps.map((s: any, i: number) => (
                   <div key={i} className="flex gap-4 group">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0 group-hover:scale-150 transition-transform" />
                     <p className="text-slate-600 font-light leading-relaxed">{s}</p>
@@ -123,7 +127,7 @@ const TopicPage: React.FC = () => {
                 {t('knowledge.topic.pitfallsTitle')}
               </h2>
               <div className="space-y-6">
-                {pitfalls.map((s, i) => (
+                {pitfalls.map((s: any, i: number) => (
                   <div key={i} className="flex gap-4">
                     <CheckCircle2 size={18} className="text-amber-500 shrink-0 mt-1" />
                     <p className="text-slate-600 font-light leading-relaxed">{s}</p>

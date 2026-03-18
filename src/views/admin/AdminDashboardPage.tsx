@@ -6,7 +6,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import StatCard from '../../components/admin/dashboard/StatCard'
 import SalesChart from '../../components/admin/dashboard/SalesChart'
 import RecentOrdersTable from '../../components/admin/dashboard/RecentOrdersTable'
-
+import type { DbOrder, DbProduct } from '../../types/db-rows'
 import { 
   TrendingUp, 
   ShoppingBag,
@@ -17,6 +17,12 @@ import {
   Database
 } from 'lucide-react'
 
+interface DashboardChartData {
+  date: string
+  orders: number
+  returns: number
+}
+
 const AdminDashboardPage: React.FC = () => {
   const { t } = useI18n()
 
@@ -26,8 +32,8 @@ const AdminDashboardPage: React.FC = () => {
   const [pendingShipments, setPendingShipments] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
-  const [recentOrders, setRecentOrders] = useState<any[]>([])
-  const [chartData, setChartData] = useState<any[]>([])
+  const [recentOrders, setRecentOrders] = useState<DbOrder[]>([])
+  const [chartData, setChartData] = useState<DashboardChartData[]>([])
 
   const [tiedCapital, setTiedCapital] = useState<number | null>(null)
   const [alarmCount, setAlarmCount] = useState<number | null>(null)
@@ -48,7 +54,7 @@ const AdminDashboardPage: React.FC = () => {
 
       setOrdersCount(oCount)
       setSalesTotal(ordersData?.reduce((acc, curr) => acc + (curr.total_amount || 0), 0) || 0)
-      setRecentOrders(ordersData?.slice(0, 5) || [])
+      setRecentOrders((ordersData as DbOrder[] | null)?.slice(0, 5) || [])
       
       // Dummy chart data for now to pass build
       setChartData([
@@ -69,13 +75,14 @@ const AdminDashboardPage: React.FC = () => {
       setPendingShipments(shipRes.count)
 
       if (productsRes.data) {
-        const capital = (productsRes.data as any[]).reduce((acc, p) => acc + ((p.purchase_price || 0) * (p.stock_qty || 0)), 0)
+        const products = productsRes.data as Partial<DbProduct>[]
+        const capital = products.reduce((acc, p) => acc + ((p.purchase_price || 0) * (p.stock_qty || 0)), 0)
         setTiedCapital(capital)
-        setAlarmCount((productsRes.data as any[]).filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length)
+        setAlarmCount(products.filter(p => (p.stock_qty || 0) <= (p.low_stock_threshold || 5)).length)
       }
 
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err))
     } finally {
       setLoading(false)
     }

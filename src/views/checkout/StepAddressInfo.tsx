@@ -5,14 +5,14 @@ import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { UserAddress } from '../../lib/supabase'
 
-interface Address {
+export interface Address {
     fullAddress: string
     city: string
     district: string
     postalCode: string
 }
 
-interface InvoiceInfo {
+export interface InvoiceInfo {
     type?: 'individual' | 'corporate'
     tckn?: string
     companyName?: string
@@ -21,7 +21,7 @@ interface InvoiceInfo {
     eInvoice?: boolean
 }
 
-interface LegalConsents {
+export interface LegalConsents {
     kvkk: boolean
     distanceSales: boolean
     preInfo: boolean

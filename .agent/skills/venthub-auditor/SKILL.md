@@ -1,52 +1,58 @@
 ---
 name: venthub-auditor
-description: Proje genelinde Teknik Borç (Technical Debt) analizi yapar. i18n ihlalleri, 'any' tipi kullanımı, performans düşüren <img> etiketleri ve erişilebilirlik (A11y) eksiklerini tespit eder.
+description: Next.js 15, React 19 ve Edge Runtime standartlarına göre projeyi denetler. Teknik borç, tip güvenliği, i18n ihlalleri ve performans engellerini raporlar.
 ---
 
-# VentHub Auditor Skill
+# VentHub Auditor Skill (Modernized v8.0)
 
-Bu yetenek, VentHub projesinin kalite standartlarını korumak için tasarlanmıştır.
+Bu yetenek, VentHub projesinin Next.js 15 ve Edge Native mimarisine tam uyumunu denetlemek için tasarlanmıştır.
 
 ## Kullanım Senaryoları
-- Bir sayfa veya bileşen bittiğinde kalite kontrolü yapmak.
-- Mevcut teknik borçları listelemek.
-- CI/CD öncesi son denetim.
+- **Commit Öncesi:** Yeni yazılan kodun anayasaya uygunluğunu denetlemek.
+- **Modernizasyon Audit:** Eski (Vite/Next 14) kalıntılarını temizlemek.
+- **Edge Deployment Kontrolü:** Kodun Cloudflare Pages üzerinde çalışabilirliğini teyit etmek.
 
-## Teftiş Kriterleri ve Komutlar
+## Teftiş Kriterleri (Audit Matrix)
 
-### 1. i18n Denetimi (Hardcoded Metin Bulma)
-Kod içinde `t()` fonksiyonuna bağlanmamış, tırnak içinde direkt yazılan ve Türkçe karakter içeren metinleri bulur.
-- **Regex:** `(['"])(?:(?!\bt\().)*?[şğüöçıŞĞÜÖÇİ].*?\1`
-- **Hedef:** `.tsx`, `.ts` dosyaları.
+### 1. Next.js 15 & React 19 Denetimi
+Next.js 15 ile gelen asenkron yapıları ve React 19 hook'larını denetler.
+- **Kritik:** `page.tsx` veya `layout.tsx` içinde `params` veya `searchParams` nesnelerinin `await` edilmeden kullanılması yasaktır.
+  - *Regex:* `const\s+\{.*\}\s+=\s+params` (Await yoksa hata ver!)
+- **Yeni:** `useFormState` yerine `useActionState` kullanımı zorunludur.
+  - *Regex:* `useFormState` (Gördüğünde `useActionState` öner!)
 
-### 2. TypeScript Denetimi (Tip Güvenliği)
-- **Regex:** `\bas any\b`, `\bas unknown\b`, `\b: any\b`, `\b: unknown\b`
-- **Hedef:** Kodda tip güvenliğini bozan dökümleri (cast) ve belirsiz tip atamalarını bulur.
-- **Kural:** Herhangi bir `as any` kullanımı teknik borçtur. Bunun yerine `src/types/db-rows.ts` içindeki modeller kullanılmalıdır.
+### 2. Edge Runtime & Cloudflare Uyumluluğu
+Proje Edge Runtime üzerinde çalıştığı için Node.js'e özgü kütüphanelerin kullanımı denetlenmelidir.
+- **Yasaklılar:** `fs`, `path`, `crypto` (node: modülleri), `Buffer` (doğrudan kullanım).
+- **SSR-First:** `ssr: false` kullanımı mimari bir zorunluluk olmadıkça yasaktır.
+  - *Regex:* `ssr:\s*false`
 
-### 5. JSON ve Record Denetimi
-- **Regex:** `\.technical_specs\[`, `\.specs\[`
-- **Hedef:** JSON alanlarına Type Guard olmadan erişimi bulur.
-- **Kural:** `(specs as any)[key]` gibi yapılar yasaktır. Önce `isRecord` guard'ı veya `TypedRecord<T>` kullanılmalıdır.
+### 3. Supabase & Veri Katmanı (Strict Typing)
+`as any` ile susturulmuş veritabanı çağrılarını bulur.
+- **Kritik:** `supabase.rpc as any` kullanımı yasaktır.
+  - *Doğru Kullanım:* `supabase.rpc<"function_name">(...)`
+- **Model Uyumu:** Veritabanı satırları için her zaman `src/types/db-rows.ts` içindeki aliaslar (`DbProduct`, `DbOrder` vb.) kullanılmalıdır.
 
-### 3. Performans Denetimi (Next.js Image & SSR)
-Next.js optimizasyonu yerine kullanılan düz HTML resim etiketlerini ve SSR engelleyicileri bulur.
-- **Regex:** `<img\b` (Next.js Image yerine düz img kullanımı)
-- **Regex:** `ssr:\s*false` (SSR'ı kapatan dinamik importlar - LCP düşmanıdır)
-- **Regex:** `window\.(location|localStorage|sessionStorage|innerWidth)` (Sunucu tarafında patlayacak ve SSR'ı engelleyecek window kullanımları)
+### 4. i18n ve Hardcoded Metin Denetimi
+- **Kural:** Tüm kullanıcıya görünen metinler `t()` fonksiyonu içinde olmalıdır.
+- **İstisna:** Teknik loglar ve veritabanı ID'leri hariçtir.
+- **Tespit:** Türkçe karakter (`şğüöçıŞĞÜÖÇİ`) içeren ve `t(` sarmalı olmayan tırnaklı metinleri raporlar.
 
-### 4. Vite & Migration Denetimi
-Vite projesinden kalma ve Next.js'e taşınması gereken yapıları bulur.
-- **Regex:** `import\s+.*from\s+['"]react-router-dom['"]` (Vite mirası router kullanımı)
-- **Regex:** `const\s+router\s+=\s+useRouter\(\)` (Eğer 'next/router'dan geliyorsa App Router uyumsuzdur, 'next/navigation' olmalı)
+### 5. Performans ve CLS (LCP Focus)
+- **Skeleton-First:** Her dinamik veri yükleyen bileşen için bir `Skeleton` muadili tanımlanmalıdır.
+- **Image:** Tüm `<img` etiketleri Next.js `Image` (veya `VentImage`) ile değiştirilmelidir.
+- **Window Safety:** `typeof window !== 'undefined'` kontrolü olmadan yapılan `window` veya `localStorage` erişimleri yasaktır.
 
-### 6. Erişilebilirlik ve CLS (Layout Shift) Denetimi
-- **Arama:** `<button(?![^>]*aria-label)[^>]*>` (A11y eksikliği)
-- **Arama:** `className="[^"]*animate-pulse[^"]*"` (Skeleton var mı? Yoksa eklenecek yerleri belirler)
+## Denetim Komutları
 
-## Çalıştırma Talimatı
-Audit yapmak için şu komutu veya benzerini kullanın:
-`grep_search --pattern "[REGEX]" --include_pattern "src/**"`
+### Genel Teknik Borç Taraması
+`grep_search --pattern "\bas any\b|ssr:\s*false|useFormState" --include_pattern "src/**"`
 
-Veya otomatik scripti çalıştırın:
-`python .agent/skills/venthub-auditor/scripts/run_audit.py`
+### Next.js 15 Params Taraması
+`grep_search --pattern "params:" --include_pattern "src/app/**/page.tsx"`
+
+### Supabase RPC Taraması
+`grep_search --pattern "\.rpc as any" --include_pattern "src/lib/supabase.ts"`
+
+## İyileştirme Talimatı
+Audit sonucunda bulunan hatalar için **"Surgical Update" (Cerrahi Güncelleme)** yapılmalıdır. Tüm dosya yerine sadece sorunlu satır `replace` aracıyla düzeltilmelidir.

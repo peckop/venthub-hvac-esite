@@ -1,4 +1,4 @@
-# Plan: 004-products-page-integration
+# Plan: P05-ROADMAP
 
 ## 🎯 Goal
 ...

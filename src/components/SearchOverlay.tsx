@@ -7,6 +7,7 @@ import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
 import { highlightMatch } from '../utils/searchHighlight'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import type { DbCategory } from '../types/db-rows'
 
 interface SearchOverlayProps {
   open: boolean
@@ -30,7 +31,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
-  const [popularCategories, setPopularCategories] = React.useState<Record<string, unknown>[]>([])
+  const [popularCategories, setPopularCategories] = React.useState<Partial<DbCategory>[]>([])
 
   const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -48,7 +49,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       try {
         const { supabase } = await import('../lib/supabase')
         const { data } = await supabase.from('categories').select('id, name, slug').eq('level', 1).limit(5)
-        if (data) setPopularCategories(data)
+        if (data) setPopularCategories(data as Partial<DbCategory>[])
       } catch { }
     }
     fetchPopularCats()
@@ -399,8 +400,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm" onClick={handleClose}>
       <div className="animate-in fade-in duration-300 w-full h-full flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
-        <div
-          className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-300 flex flex-col max-h-full"
+        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-300 flex flex-col max-h-full"
           onClick={e => e.stopPropagation()}
         >
           {/* Header / Input */}
