@@ -38,6 +38,7 @@ artifacts:
 
 
 
+
 # 012 - Medya Otoritesi (Media Authority)
 
 ## 🎯 Hedef
