@@ -174,14 +174,14 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
   // Derived Display Mode logic
   const displayMode = useMemo(() => {
     if (!category) return 'grid'
-    const meta = (category.metadata as any) || {}
+    const meta = (category.metadata as Record<string, unknown>) || {}
     
     // Inheritance
     if (meta.hide_price === undefined && parentCategory?.metadata) {
-      meta.hide_price = (parentCategory.metadata as any).hide_price
+      meta.hide_price = (parentCategory.metadata as Record<string, unknown>).hide_price
     }
 
-    return meta.display_mode || (parentCategory ? 'series' : (subCategories.length > 0 ? 'showcase' : 'grid'))
+    return (meta.display_mode as string) || (parentCategory ? 'series' : (subCategories.length > 0 ? 'showcase' : 'grid'))
   }, [category, parentCategory, subCategories])
 
   return {
