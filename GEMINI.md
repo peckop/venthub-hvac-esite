@@ -41,11 +41,12 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 - **Component Integrity:** Yeni bileşenler `src/components/` altında uygun kategoriye konulmalı ve `useI18n()` ile uluslararasılaştırılmalıdır.
 - **Supabase Services:** Tüm Supabase servisleri (`src/lib/supabase.ts`) asimetrik tip (input/output) güvenliğine sahip olmalıdır.
 
-## 5. Performans Muhafızlığı (90+ Lighthouse Guardrails)
+## 5. Performans ve Modernizasyon (Next.js 15 & React 19)
+- **Async Params Policy:** Next.js 15 ile gelen asenkron `params` ve `searchParams` yapısı zorunludur. Tüm dinamik rotalarda (`[id]`, `[slug]` vb.) bu nesneler `await` edilmeden kullanılamaz.
 - **SSR-First Policy:** Tüm yeni rotalar ve ana sayfalar varsayılan olarak Server Component (`ssr: true`) olmalıdır. `ssr: false` kullanımı için mimari bir zorunluluk kanıtlanmalı ve kullanıcı onayı alınmalıdır.
 - **Window-Safety:** `window`, `document`, `localStorage` bağımlılıkları asla üst seviye bileşenlerde (top-level) kullanılmamalıdır. Sadece `useEffect` veya dinamik `typeof window` kontrolüyle kapsüllenmelidir.
 - **LCP & CLS Focus:** Her yeni görsel bileşen için `width/height` zorunludur. Her dinamik veri alanı için bir `Skeleton` (İskelet) bileşeni planlanmadan kod yazılamaz.
-- **Vite Legacy:** Proje içindeki `react-router-dom` veya `window.location` gibi Vite döneminden kalan yapılar görüldüğü an Next.js App Router standartlarına (`next/navigation`) modernize edilmelidir.
+- **Vite Legacy & ESLint:** Proje içindeki `react-router-dom` gibi Vite yapıları yasaktır. ESLint 9 Flat Config (`eslint.config.mjs`) standarttır.
 
 ## 6. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
