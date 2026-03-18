@@ -7,6 +7,7 @@ import type { FtsProductResult, SearchSuggestion } from '../lib/supabase'
 import { useI18n } from '../i18n/I18nProvider'
 import { highlightMatch } from '../utils/searchHighlight'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
+import type { DbCategory } from '../types/db-rows'
 
 interface SearchOverlayProps {
   open: boolean
@@ -30,7 +31,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
-  const [popularCategories, setPopularCategories] = React.useState<Record<string, unknown>[]>([])
+  const [popularCategories, setPopularCategories] = React.useState<Partial<DbCategory>[]>([])
 
   const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -48,7 +49,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       try {
         const { supabase } = await import('../lib/supabase')
         const { data } = await supabase.from('categories').select('id, name, slug').eq('level', 1).limit(5)
-        if (data) setPopularCategories(data)
+        if (data) setPopularCategories(data as Partial<DbCategory>[])
       } catch { }
     }
     fetchPopularCats()
@@ -404,8 +405,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         >
           {/* Header / Input */}
           <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-white relative z-10">
-            {/* BILEREK HATA: Var olmayan bir değişkeni çağıralım */}
-            <span className="hidden">{NON_EXISTENT_AI_VARIABLE_ERROR}</span>
             <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35" />
             </svg>
