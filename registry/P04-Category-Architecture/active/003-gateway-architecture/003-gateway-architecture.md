@@ -34,10 +34,11 @@ artifacts:
 
 
 
+
 # 003 - Gateway Mimarisi (CategoryPage Parçalama)
 
 ## 🎯 Hedef
-800 satırlı `CategoryPage.tsx` dosyasında bulunan veri çekme ve tasarımsal yönlendirme mantıklarını Gateway Pattern eşliğinde ayırmak. `showcase_images`, `hero_description` gibi alanları farklı görünümlerde kod tekrarı olmadan (DRY prensibi) kullanmak.
+800 satırlı `CategoryPage.tsx` dosyasında bulunan veri çekme ve tasarımsal yönlendirme mantıklarını Gateway Pattern eşliğinde ayırmak. `showcase_images`, `hero_description` gibi alanları farklı- [ ] **P05-Next15-Modernization**: Next.js 15/React 19 Yeni Nesil Özelliklerin Entegrasyonu (PPR, After, Actions)
 
 ## ✅ Alt Görevler
 - [ ] `src/views/category/` dizini altında `CategoryGridView.tsx` oluştur (eski CategoryShowcase parçası).
