@@ -906,7 +906,7 @@ export async function listUserProjects(): Promise<UserProject[]> {
 
 export async function createProject(project: Partial<UserProject>): Promise<UserProject> {
   const { data, error } = await (supabase.from as any)('user_projects')
-    .insert(project as any)
+    .insert(project as unknown as Record<string, unknown>)
     .select()
     .single()
 
@@ -925,7 +925,7 @@ export async function deleteProject(id: string) {
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1) {
   const { data, error } = await (supabase.from as any)('project_items')
-    .insert({ project_id: projectId, product_id: productId, quantity } as any)
+    .insert({ project_id: projectId, product_id: productId, quantity } as unknown as Record<string, unknown>)
     .select()
     .single()
 
@@ -936,7 +936,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 export async function removeProductFromProject(projectId: string, productId: string) {
   const { error } = await (supabase.from as any)('project_items')
     .delete()
-    .match({ project_id: projectId, product_id: productId } as any)
+    .match({ project_id: projectId, product_id: productId } as unknown as Record<string, unknown>)
 
   if (error) throw error
   return true
@@ -950,9 +950,9 @@ export async function listProjectItems(projectId: string): Promise<ProjectItem[]
   if (error) throw error
   
   // Map internal product to unified Product type
-  const items = (data || []) as any[]
+  const items = (data || []) as unknown as any[]
   return items.map(item => ({
     ...item,
-    product: item.product ? mapDatabaseProductToDomain(item.product as DbProduct) : undefined
-  })) as ProjectItem[]
+    product: item.product ? mapDatabaseProductToDomain(item.product as unknown as DbProduct) : undefined
+  })) as unknown as ProjectItem[]
 }

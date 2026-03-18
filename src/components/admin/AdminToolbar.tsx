@@ -135,7 +135,7 @@ export const AdminToolbar: React.FC<AdminToolbarProps> = ({
   }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, chips, toggles])
 
   // Kalıcılık: kaydetme
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   useEffect(() => {
     if (!storageKey || !hydratedRef.current) return
     try {

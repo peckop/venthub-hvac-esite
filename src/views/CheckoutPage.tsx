@@ -128,7 +128,7 @@ export const CheckoutPage: React.FC = () => {
       } catch { }
     }
     loadAddresses()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user, sameAsShipping])
 
   // Validation functions
