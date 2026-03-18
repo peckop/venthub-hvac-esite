@@ -173,7 +173,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           addToRecent(s.label || '')
           handleClose()
         } else if (viewState === 'RESULTS') {
-          router.push(`/products/${(results[activeIndex] as any).id}`)
+          router.push(`/products/${results[activeIndex].id}`)
           handleClose()
         }
       } else {
@@ -354,7 +354,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           </div>
         )}
         <ul className="divide-y">
-          {results.map((r: any, idx) => {
+          {results.map((r, idx) => {
             const isActive = idx === activeIndex
             return (
               <li key={r.id}>
@@ -413,7 +413,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholder') || "Ürün, kategori veya marka ara..."}
+              placeholder={t('search.placeholder_ai') || t('search.placeholder') || "Ürün, kategori veya AI destekli arama..."}
               className="flex-1 text-lg placeholder:text-gray-400 focus:outline-none text-industrial-gray bg-transparent font-medium"
             />
             {loading && (
