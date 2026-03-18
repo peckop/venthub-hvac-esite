@@ -25,8 +25,9 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const cleanId = params.id?.replace(/cc$/, '')
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const cleanId = id?.replace(/cc$/, '')
   try {
     const product = await getProductBySlugOrId(cleanId)
 
@@ -46,8 +47,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   }
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const cleanId = params.id?.replace(/cc$/, '')
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const cleanId = id?.replace(/cc$/, '')
   let productData: Product | null = null
   
   try {

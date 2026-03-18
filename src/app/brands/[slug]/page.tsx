@@ -18,8 +18,9 @@ export async function generateStaticParams() {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const brand = HVAC_BRANDS.find(b => b.slug === params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const brand = HVAC_BRANDS.find(b => b.slug === slug)
   
   if (!brand) {
     return {
@@ -31,20 +32,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title: `${brand.name} Ürünleri ve Çözümleri | VentHub`,
     description: `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`,
     alternates: {
-      canonical: `https://venthub-hvac.com/brands/${params.slug}`,
+      canonical: `https://venthub-hvac.com/brands/${slug}`,
     },
   }
 }
 
-export default function Page({ params }: { params: { slug: string } }) {
-  const brand = HVAC_BRANDS.find(b => b.slug === params.slug)
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const brand = HVAC_BRANDS.find(b => b.slug === slug)
   
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Brand",
-    "name": brand?.name || params.slug,
-    "description": brand?.description || `${brand?.name || params.slug} marka ürünler`,
-    "url": `https://venthub-hvac.com/brands/${params.slug}`
+    "name": brand?.name || slug,
+    "description": brand?.description || `${brand?.name || slug} marka ürünler`,
+    "url": `https://venthub-hvac.com/brands/${slug}`
   }
 
   return (
@@ -53,7 +55,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PageComponent initialBrandSlug={params.slug} />
+      <PageComponent initialBrandSlug={slug} />
     </>
   )
 }
