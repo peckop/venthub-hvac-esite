@@ -48,26 +48,29 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
-      - name: 🤖 Check for Secret Presence
+      - name: 🔐 Safe Secret Diagnostics
         run: |
-          if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
-            echo "✅ GEMINI_API_KEY is available in the workflow."
-          else
-            echo "❌ GEMINI_API_KEY IS MISSING OR EMPTY!"
+          if [ -z "${{ secrets.GEMINI_API_KEY }}" ]; then
+            echo "❌ HATA: GEMINI_API_KEY tamamen boş!"
             exit 1
+          else
+            SECRET_VALUE="${{ secrets.GEMINI_API_KEY }}"
+            echo "✅ Şifre bulundu."
+            echo "📏 Uzunluk: ${#SECRET_VALUE} karakter."
+            echo "🔍 İlk 4 karakter: ${SECRET_VALUE:0:4}..."
           fi
 
       - name: 🤖 AI Auto-Repair on Failure
         if: failure()
         uses: google-github-actions/run-gemini-cli@v0
-        env:
-          # BU EN ÖNEMLİSİ: CLI'ın doğrudan okuduğu ENV
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        # Şifreyi hem INPUT hem de ENV olarak veriyoruz, hiçbir kaçışı kalmıyor.
         with:
-          # Eklentiye girdi olarak da veriyoruz
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          prompt: |
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROMPT: |
             CI Build fail oldu!
             Dosya: `src/components/SearchOverlay.tsx`
             Hata: `NON_EXISTENT_AI_VARIABLE_ERROR` değişkeni yüzünden build patlıyor.
