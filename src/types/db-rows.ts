@@ -62,10 +62,11 @@ export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
 };
 
 // Refine DbCategory to ensure 'name' and 'description' are strings, and metadata is typed
-export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description' | 'metadata'> & {
+export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description' | 'metadata' | 'authority_content'> & {
   name: string;
   description: string | null;
   metadata: CategoryMetadata | null;
+  authority_content: Json | null;
 };
 
 export type DbUserAddress = Tables['user_addresses']['Row'];
@@ -75,7 +76,7 @@ export type DbCartItem = Tables['cart_items']['Row'];
 export type DbOrder = Tables['venthub_orders']['Row'];
 export type DbOrderItem = Tables['venthub_order_items']['Row'];
 
-// Missing tables from database.types.ts
+// Manual Interface Definitions for Tables missing from database.types.ts
 export interface DbUserProject {
   id: string;
   user_id: string;
@@ -90,9 +91,7 @@ export interface DbProjectItem {
   project_id: string;
   product_id: string;
   quantity: number;
-  notes: string | null;
   created_at: string;
-  updated_at: string;
   product?: DbProduct | null;
 }
 
@@ -115,7 +114,7 @@ export interface DbProductEnrichedRow {
   stock_qty: number;
   low_stock_threshold: number;
   low_stock_override: boolean;
-  technical_specs: Record<string, any>;
+  technical_specs: Record<string, Json>;
   airflow_capacity: number;
   noise_level: number;
   pressure_rating: number;

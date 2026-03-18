@@ -34,13 +34,14 @@ export const PaymentSuccessPage: React.FC = () => {
     async function fetchOrderDetails(oid?: string) {
       try {
         if (!oid) return
-        const { data, error } = await supabase
-          .from('venthub_orders')
+        const { data, error } = await (supabase
+          .from('venthub_orders'))
           .select('total_amount, created_at, venthub_order_items(quantity)')
           .eq('id', oid)
           .maybeSingle()
         if (!error && data) {
-          const count = Array.isArray(data.venthub_order_items) ? data.venthub_order_items.reduce((s: number, it: { quantity?: number }) => s + (Number(it?.quantity) || 0), 0) : undefined
+          const items = data.venthub_order_items;
+          const count = Array.isArray(items) ? (items).reduce((s: number, it) => s + (Number(it?.quantity) || 0), 0) : undefined
           setOrderSummary({ amount: Number(data.total_amount) || undefined, createdAt: data.created_at, items: count })
         }
       } catch { }
@@ -110,8 +111,8 @@ export const PaymentSuccessPage: React.FC = () => {
             await supabase.functions.invoke('iyzico-callback', { body: { orderId, conversationId } })
           } catch { }
 
-          const { data, error } = await supabase
-            .from('venthub_orders')
+          const { data, error } = await (supabase
+            .from('venthub_orders'))
             .select('status')
             .eq('id', orderId)
             .maybeSingle()
@@ -124,7 +125,7 @@ export const PaymentSuccessPage: React.FC = () => {
             return
           }
 
-          if (data?.status === 'paid' || data?.status === 'confirmed') {
+          if (data && (data.status === 'paid' || data.status === 'confirmed')) {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId, token })
             clearCart({ silent: true })

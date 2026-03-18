@@ -1,8 +1,6 @@
 name: Jules - Test Coverage
 
 on:
-  schedule:
-    - cron: '0 3 * * 3' # Every Wednesday at 03:00 UTC
   workflow_dispatch:
 
 jobs:

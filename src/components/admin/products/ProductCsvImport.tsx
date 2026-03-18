@@ -70,12 +70,13 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             const p: Database['public']['Tables']['products']['Insert'] = {
                 sku: r['sku'].trim(),
                 name: r['name'].trim(),
-                brand: r['brand']?.trim() || 'Generic' // Default for required field
+                slug: r['name'].trim().toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+                brand: r['brand']?.trim() || 'Generic' 
             }
             if (r['model_code']) p.model_code = r['model_code'].trim()
             else if (r['model']) p.model_code = r['model'].trim()
             if (r['brand']) p.brand = r['brand'].trim()
-            if (r['status']) p.status = r['status'].trim()
+            if (r['status']) p.status = (r['status'].trim() as Database['public']['Tables']['products']['Insert']['status'])
             if (r['price']) p.price = Number(r['price'])
             if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
             if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
@@ -95,7 +96,7 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
             let ok = 0, fail = 0
             for (let i = 0; i < payloads.length; i += 100) {
                 const chunk = payloads.slice(i, i + 100)
-                const { error } = await supabase.from('products').upsert(chunk, { onConflict: 'sku' })
+                const { error } = await (supabase.from('products')).upsert(chunk, { onConflict: 'sku' })
                 if (error) {
                     console.warn('import upsert error', error)
                     fail += chunk.length

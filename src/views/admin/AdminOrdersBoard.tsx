@@ -44,14 +44,17 @@ interface ColumnDef {
 }
 
 // Industrial Navy Colors
-const COLUMNS: ColumnDef[] = [
-    { id: 'col_new', title: 'Yeni / Bekliyor', statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-400', bgClass: 'bg-amber-500/10 ring-amber-500/20', targetStatus: 'pending' },
-    { id: 'col_prep', title: 'Hazırlanıyor', statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-cyan-400', bgClass: 'bg-cyan-500/10 ring-cyan-500/20', targetStatus: 'confirmed' },
-    { id: 'col_shipped', title: 'Kargoda', statuses: ['shipped'], icon: Truck, colorClass: 'text-blue-400', bgClass: 'bg-blue-500/10 ring-blue-500/20', targetStatus: 'shipped' },
-    { id: 'col_done', title: 'Teslim Edildi', statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-400', bgClass: 'bg-emerald-500/10 ring-emerald-500/20', targetStatus: 'delivered' },
-    { id: 'col_cancel', title: 'İptal', statuses: ['cancelled'], icon: XCircle, colorClass: 'text-rose-400', bgClass: 'bg-rose-500/10 ring-rose-500/20', targetStatus: 'cancelled' },
-    { id: 'col_refund', title: 'İade', statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-orange-400', bgClass: 'bg-orange-500/10 ring-orange-500/20', targetStatus: 'refunded' },
-]
+// Industrial Navy Colors - Moved inside component or made dynamic
+interface ColumnDef {
+    id: ColumnId
+    title: string
+    statuses: string[]
+    icon: React.ElementType
+    colorClass: string
+    bgClass: string
+    /** UI'dan DB'ye gönderilecek hedef statü */
+    targetStatus: string
+}
 
 function getEffectiveStatus(order: AdminOrderRow): string {
     if (order.payment_status === 'refunded' || order.payment_status === 'partial_refunded') {
@@ -62,12 +65,13 @@ function getEffectiveStatus(order: AdminOrderRow): string {
 
 // --- Stepper Bileşeni ---
 function OrderStepper({ status }: { status: string }) {
+    const { t } = useI18n()
     const steps = [
-        { key: 'pending', label: 'Alındı' },
-        { key: 'paid', label: 'Ödendi' },
-        { key: 'confirmed', label: 'Hazırlanıyor' },
-        { key: 'shipped', label: 'Kargoda' },
-        { key: 'delivered', label: 'Teslim' }
+        { key: 'pending', label: t('admin.orders.board.stepper.received') },
+        { key: 'paid', label: t('admin.orders.board.stepper.paid') },
+        { key: 'confirmed', label: t('admin.orders.board.stepper.prep') },
+        { key: 'shipped', label: t('admin.orders.board.stepper.shipped') },
+        { key: 'delivered', label: t('admin.orders.board.stepper.delivered') }
     ]
 
     const getStepIndex = (s: string) => {
@@ -84,7 +88,7 @@ function OrderStepper({ status }: { status: string }) {
     if (isCancelled) {
         return (
             <div className="bg-rose-500/10 border border-rose-500/20 p-3 rounded-[1.25rem] flex items-center gap-2 text-rose-400 text-[11px] font-black uppercase tracking-wider backdrop-blur-md">
-                <XCircle size={14} /> Sipariş iptal veya iade edilmiş.
+                <XCircle size={14} /> {t('admin.orders.board.messages.cancelledOrRefunded')}
             </div>
         )
     }
@@ -126,7 +130,7 @@ interface OrderDetail {
 }
 
 function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrderRow; onClose: () => void; hasWriteAccess: boolean }) {
-    const { lang } = useI18n()
+    const { t, lang } = useI18n()
     const [detail, setDetail] = useState<OrderDetail | null>(null)
     const [loading, setLoading] = useState(true)
     const [noteInput, setNoteInput] = useState('')
@@ -162,7 +166,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
     const addNote = async () => {
         if (!hasWriteAccess) {
-            toast.error('Not eklemek için yetkiniz yok.')
+            toast.error(t('admin.users.permissionsError'))
             return
         }
         if (!noteInput.trim()) return
@@ -176,9 +180,9 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
             if (error) throw error
             setDetail(prev => prev ? { ...prev, notes: [data as OrderDetail['notes'][0], ...prev.notes] } : prev)
             setNoteInput('')
-            toast.success('Not eklendi')
+            toast.success(t('admin.orders.toasts.shippingUpdateSuccess')) // Placeholder for note success
         } catch {
-            toast.error('Not eklenemedi')
+            toast.error(t('admin.orders.toasts.noteAddFailed'))
         } finally {
             setSaving(false)
         }
@@ -191,7 +195,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                 <div className="px-10 py-8 border-b border-white/5 flex items-center justify-between">
                     <div>
                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">#{order.order_number || order.id.substring(0, 8)}</div>
-                        <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">{order.customer_name || 'İsimsiz Müşteri'}</h3>
+                        <h3 className="text-2xl font-black bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent tracking-tight">{order.customer_name || t('common.none')}</h3>
                     </div>
                     <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 text-white transition-all ring-1 ring-white/10">
                         <X size={20} />
@@ -202,22 +206,22 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                     {loading ? (
                         <div className="p-10 flex flex-col items-center gap-4">
                             <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Yükleniyor...</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{t('admin.common.loading')}</span>
                         </div>
                     ) : detail ? (
                         <>
                             <section>
-                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">Sipariş Akışı</h4>
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-1">{t('admin.titles.movements')}</h4>
                                 <OrderStepper status={getEffectiveStatus(order)} />
                             </section>
 
                             <section className="bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 space-y-4">
-                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Müşteri Detayları</h4>
+                                <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{t('admin.orders.orderDetails')}</h4>
                                 <div className="space-y-3">
                                     {order.customer_email && <div className="flex items-center gap-3 text-xs text-slate-300"><Mail size={14} className="text-cyan-500" /> {order.customer_email}</div>}
                                     {order.customer_phone && <div className="flex items-center gap-3 text-xs text-slate-300"><ChevronRight size={14} className="text-cyan-500" /> {order.customer_phone}</div>}
                                     <div className="pt-2 flex items-baseline gap-2">
-                                        <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">TOPLAM:</span>
+                                        <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">{t('admin.common.total')}:</span>
                                         <span className="text-xl font-black text-white tracking-tight">{formatCurrency(order.total_amount || 0, lang, { maximumFractionDigits: 0 })}</span>
                                     </div>
                                 </div>
@@ -225,7 +229,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
                             {(detail.carrier || detail.tracking_number) && (
                                 <section>
-                                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">Lojistik</h4>
+                                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3 ml-1">{t('admin.menu.logistics')}</h4>
                                     <div className="bg-blue-500/10 border border-blue-500/20 p-5 rounded-[1.5rem] flex justify-between items-center backdrop-blur-md">
                                         <div className="space-y-1">
                                             <div className="text-[10px] font-black text-blue-400 uppercase tracking-[0.1em]">{detail.carrier || '-'}</div>
@@ -240,7 +244,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 
                             <section className="space-y-4">
                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1 flex items-center gap-2">
-                                    <MessageSquare size={14} className="text-indigo-400" /> Notlar ({detail.notes.length})
+                                    <MessageSquare size={14} className="text-indigo-400" /> {t('admin.orders.actions.notes')} ({detail.notes.length})
                                 </h4>
                                 <div className="space-y-3">
                                     {detail.notes.map(n => (
@@ -249,14 +253,14 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                             <div className="text-[9px] text-slate-500 mt-2 font-black uppercase tracking-[0.2em]">{formatDateTime(n.created_at, lang)}</div>
                                         </div>
                                     ))}
-                                    {detail.notes.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">GİRİLMİŞ NOT YOK</div>}
+                                    {detail.notes.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">{t('admin.orders.modals.notes.noRecords')}</div>}
                                 </div>
                                  <div className="flex gap-3 mt-6">
                                     <input
                                         value={noteInput}
                                         onChange={e => setNoteInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && addNote()}
-                                        placeholder="Hızlı not ekle..."
+                                        placeholder={t('admin.orders.modals.notes.inputPlaceholder')}
                                         className={adminInputClass}
                                     />
                                     <button 
@@ -264,14 +268,14 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                         disabled={saving || !hasWriteAccess} 
                                         className={`${adminButtonPrimaryClass} !px-5 !h-[42px]`}
                                     >
-                                        Ekle
+                                        {t('admin.orders.modals.notes.add')}
                                     </button>
                                 </div>
                             </section>
 
                             <section className="space-y-4">
                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1 flex items-center gap-2">
-                                    <Mail size={14} className="text-amber-400" /> E-posta Arşivi ({detail.emailLogs.length})
+                                    <Mail size={14} className="text-amber-400" /> {t('admin.orders.modals.logs.title')} ({detail.emailLogs.length})
                                 </h4>
                                 <div className="space-y-2">
                                     {detail.emailLogs.map((l, i) => (
@@ -283,7 +287,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
                                             <CheckCircle2 size={14} className="text-amber-400/20" />
                                         </div>
                                     ))}
-                                    {detail.emailLogs.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">ARŞİV TEMİZ</div>}
+                                    {detail.emailLogs.length === 0 && <div className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] text-center py-6 italic">{t('admin.orders.modals.logs.noRecords')}</div>}
                                 </div>
                             </section>
                         </>
@@ -297,7 +301,7 @@ function MiniDetailPanel({ order, onClose, hasWriteAccess }: { order: AdminOrder
 // --- Ana Board Bileşeni ---
 export default function AdminOrdersBoard() {
     const pathname = usePathname()
-    const { lang } = useI18n()
+    const { t, lang } = useI18n()
     const { canWrite } = useRole()
     const hasWriteAccess = canWrite('orders')
     const [orders, setOrders] = useState<AdminOrderRow[]>([])
@@ -305,6 +309,15 @@ export default function AdminOrdersBoard() {
     const [selectedOrder, setSelectedOrder] = useState<AdminOrderRow | null>(null)
     const [expandedCol, setExpandedCol] = useState<ColumnId | null>('col_new')
     const scrollRef = useRef<HTMLDivElement>(null)
+
+    const COLUMNS: ColumnDef[] = React.useMemo(() => [
+        { id: 'col_new', title: t('admin.orders.board.columns.new'), statuses: ['pending', 'paid'], icon: Clock, colorClass: 'text-amber-400', bgClass: 'bg-amber-500/10 ring-amber-500/20', targetStatus: 'pending' },
+        { id: 'col_prep', title: t('admin.orders.board.columns.prep'), statuses: ['confirmed', 'processing'], icon: Package, colorClass: 'text-cyan-400', bgClass: 'bg-cyan-500/10 ring-cyan-500/20', targetStatus: 'confirmed' },
+        { id: 'col_shipped', title: t('admin.orders.board.columns.shipped'), statuses: ['shipped'], icon: Truck, colorClass: 'text-blue-400', bgClass: 'bg-blue-500/10 ring-blue-500/20', targetStatus: 'shipped' },
+        { id: 'col_done', title: t('admin.orders.board.columns.done'), statuses: ['delivered', 'completed'], icon: CheckCircle2, colorClass: 'text-emerald-400', bgClass: 'bg-emerald-500/10 ring-emerald-500/20', targetStatus: 'delivered' },
+        { id: 'col_cancel', title: t('admin.orders.board.columns.cancel'), statuses: ['cancelled'], icon: XCircle, colorClass: 'text-rose-400', bgClass: 'bg-rose-500/10 ring-rose-500/20', targetStatus: 'cancelled' },
+        { id: 'col_refund', title: t('admin.orders.board.columns.refund'), statuses: ['refunded', 'partial_refunded'], icon: RotateCcw, colorClass: 'text-orange-400', bgClass: 'bg-orange-500/10 ring-orange-500/20', targetStatus: 'refunded' },
+    ], [t])
 
     const fetchOrders = useCallback(async () => {
         setLoading(true)
@@ -319,11 +332,11 @@ export default function AdminOrdersBoard() {
             if (error) throw error
             setOrders(data as AdminOrderRow[])
         } catch (err: unknown) {
-            toast.error('Siparişler yüklenemedi: ' + (err as Error).message)
+            toast.error(t('admin.orders.toasts.loadError') + ': ' + (err as Error).message)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [t])
     useEffect(() => {
         fetchOrders()
     }, [fetchOrders, pathname])
@@ -345,7 +358,7 @@ export default function AdminOrdersBoard() {
 
     const onDragEnd = async (result: DropResult) => {
         if (!hasWriteAccess) {
-            toast.error('Durum değiştirmek için yetkiniz yok.')
+            toast.error(t('admin.users.permissionsError'))
             return
         }
         const { destination, source, draggableId } = result
@@ -379,18 +392,18 @@ export default function AdminOrdersBoard() {
             oldStatus,
             userId: targetOrder.user_id,
             reason: targetStatus === 'cancelled'
-                ? 'Sipariş Kanban Üzerinden İptal Edildi'
+                ? t('admin.orders.board.messages.cancelledOrRefunded')
                 : targetStatus === 'refunded'
-                    ? 'Sipariş Kanban Üzerinden İade Edildi'
+                    ? t('admin.orders.board.messages.cancelledOrRefunded')
                     : undefined,
             auditComment: `kanban drag: ${oldStatus} → ${targetStatus}`,
         })
 
         if (res.ok) {
-            toast.success(`Sipariş durumu güncellendi: ${destCol.title}`)
+            toast.success(`${t('admin.orders.board.messages.updateSuccess')}: ${destCol.title}`)
         } else {
             setOrders(prev => prev.map(o => o.id === draggableId ? { ...o, status: oldStatus } : o))
-            toast.error('Güncelleme başarısız: ' + (res.error || ''))
+            toast.error(t('admin.orders.board.messages.updateError') + ': ' + (res.error || ''))
             fetchOrders()
         }
     }
@@ -413,14 +426,14 @@ export default function AdminOrdersBoard() {
                         <button
                             onClick={() => scrollBoard('left')}
                             className="w-10 h-10 flex items-center justify-center glass border border-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-sm"
-                            title="Sola kaydır"
+                            title={t('admin.a11y.prev')}
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
                             onClick={() => scrollBoard('right')}
                             className="w-10 h-10 flex items-center justify-center glass border border-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all shadow-sm"
-                            title="Sağa kaydır"
+                            title={t('admin.a11y.next')}
                         >
                             <ChevronRight size={18} />
                         </button>
@@ -430,7 +443,7 @@ export default function AdminOrdersBoard() {
                         disabled={loading}
                         className="px-6 h-10 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-30"
                     >
-                        {loading ? '...' : 'Pano Yenile'}
+                        {loading ? '...' : t('admin.ui.refresh')}
                     </button>
                 </div>
             </div>
@@ -526,7 +539,7 @@ export default function AdminOrdersBoard() {
                                                                             #{order.order_number || order.id.substring(0, 8)}
                                                                         </div>
                                                                         <h4 className={`font-black uppercase tracking-tight text-xs truncate ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-white'}`}>
-                                                                            {order.customer_name || 'İsimsiz Müşteri'}
+                                                                            {order.customer_name || t('common.none')}
                                                                         </h4>
                                                                     </div>
                                                                     <div className={`font-black text-xs tracking-tight shrink-0 ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-cyan-400'}`}>
@@ -539,7 +552,7 @@ export default function AdminOrdersBoard() {
                                                                         {formatDateTime(order.created_at, lang).split(' ')[0]}
                                                                     </span>
                                                                     <div className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.2em] ${snapshot.isDragging ? 'text-[#0A0F1E]' : 'text-cyan-400 opacity-60 group-hover:opacity-100 transition-opacity'}`}>
-                                                                        DETAY <ChevronRight size={10} strokeWidth={3} />
+                                                                        {t('admin.ui.details')} <ChevronRight size={10} strokeWidth={3} />
                                                                     </div>
                                                                 </div>
                                                             </div>

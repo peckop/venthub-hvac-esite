@@ -650,15 +650,15 @@ const AdminOrdersPage: React.FC = () => {
                     style={adminSelectStyle}
                   >
                     <option value="" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carrierSelect')}</option>
-                    <option value="Yurtiçi" className="bg-[#0A0F1E]">Yurtiçi</option>
-                    <option value="Aras" className="bg-[#0A0F1E]">Aras</option>
-                    <option value="MNG" className="bg-[#0A0F1E]">MNG</option>
-                    <option value="PTT" className="bg-[#0A0F1E]">PTT</option>
+                    <option value="Yurtiçi" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.yurtici')}</option>
+                    <option value="Aras" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.aras')}</option>
+                    <option value="MNG" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.mng')}</option>
+                    <option value="PTT" className="bg-[#0A0F1E]">{t('admin.orders.modals.shipping.carriers.ptt')}</option>
                   </select>
                 </div>
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('admin.orders.modals.shipping.trackingLabel')}</label>
-                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-slate-600" placeholder="Kargo Takip No" />
+                  <input value={tracking} onChange={e => setTracking(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-xs font-black uppercase tracking-widest text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-slate-600" placeholder={t('admin.orders.modals.shipping.trackingPlaceholder')} />
                 </div>
               </div>
             </div>
@@ -690,14 +690,14 @@ const AdminOrdersPage: React.FC = () => {
                 {logsLoading ? (
                   <div className="p-20 text-center flex flex-col items-center gap-4">
                     <div className="animate-spin w-10 h-10 border-2 border-cyan-500/20 border-t-cyan-500 rounded-full" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">Veriler İşleniyor...</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">{t('admin.common.loading')}</span>
                   </div>
                 ) : (
                   <div className="overflow-x-auto w-full">
                     <table className="min-w-full text-sm divide-y divide-white/5">
                       <thead className="bg-white/5 sticky top-0 backdrop-blur-xl">
                         <tr>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.dateLabel') || 'Tarih'}</th>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.table.date')}</th>
                           <th className="px-8 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('admin.orders.modals.logs.subjectLabel') || 'Konu'}</th>
                         </tr>
                       </thead>

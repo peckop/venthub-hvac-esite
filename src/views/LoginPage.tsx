@@ -66,11 +66,11 @@ export const LoginPage: React.FC = () => {
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } })
       if (error) {
         console.error('Google sign-in error:', error)
-        toast.error('Google ile giriş başlatılamadı')
+        toast.error(t('auth.googleSignInFail'))
       }
     } catch (e) {
       console.error('Google sign-in exception:', e)
-      toast.error('Google ile giriş sırasında beklenmeyen hata')
+      toast.error(t('auth.googleSignInError'))
     } finally {
       setLoading(false)
     }
@@ -122,7 +122,7 @@ export const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-navy focus:border-transparent"
-                  placeholder="ornek@email.com"
+                  placeholder="name@email.com"
                   required
                 />
               </div>
@@ -191,7 +191,7 @@ export const LoginPage: React.FC = () => {
           {/* Or divider */}
           <div className="my-4 flex items-center">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="px-3 text-xs text-steel-gray">veya</span>
+            <span className="px-3 text-xs text-steel-gray uppercase font-medium tracking-wider">{t('auth.or')}</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -201,10 +201,9 @@ export const LoginPage: React.FC = () => {
             onClick={handleGoogleSignIn}
             disabled={loading}
             className="w-full bg-white border border-light-gray text-industrial-gray font-semibold py-3 px-6 rounded-lg transition-colors hover:border-primary-navy disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Google ile giriş"
+            aria-label={t('auth.googleSignIn')}
           >
             <span className="inline-flex items-center justify-center gap-2">
-              {/* Google logo (data URI) */}
               <VentImage src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath fill='%234285F4' d='M17.64 9.2045c0-.6381-.0573-1.2518-.1637-1.8364H9v3.4745h4.8445c-.2086 1.125-.842 2.0781-1.796 2.7146v2.2568h2.908C16.98 14.36 17.64 11.955 17.64 9.2045z'/%3E%3Cpath fill='%2334A853' d='M9 18c2.43 0 4.4684-.8055 5.9573-2.191l-2.908-2.2568c-.8085.54-1.8427.8578-3.0493.8578-2.3445 0-4.329-1.5838-5.0358-3.7106H.957v2.33C2.438 15.943 5.482 18 9 18z'/%3E%3Cpath fill='%23FBBC05' d='M3.9642 10.6995C3.7785 10.1595 3.6705 9.582 3.6705 9s.108-1.1595.2937-1.6995v-2.33H.957C.347 6.4065 0 7.6665 0 9s.347 2.5935.957 4.029l3.0072-2.3295z'/%3E%3Cpath fill='%23EA4335' d='M9 3.5455c1.319 0 2.508.4536 3.4413 1.3436l2.581-2.581C13.465.909 11.43 0 9 0 5.482 0 2.438 2.057.957 4.971l3.0072 2.3295C4.671 5.1737 6.6555 3.5455 9 3.5455z'/%3E%3C/svg%3E"
                 width={18}
                 height={18}
@@ -212,7 +211,7 @@ export const LoginPage: React.FC = () => {
                 aria-hidden="true"
                 style={{ display: 'block' }}
                />
-              <span>Google ile giriş</span>
+              <span>{t('auth.googleSignIn')}</span>
             </span>
           </button>
 
@@ -235,15 +234,15 @@ export const LoginPage: React.FC = () => {
           <div className="grid grid-cols-3 gap-4 text-sm text-steel-gray">
             <div>
               <div className="text-primary-navy font-medium mb-1">🔒</div>
-              <div>Güvenli</div>
+              <div>{t('auth.features.secure')}</div>
             </div>
             <div>
               <div className="text-primary-navy font-medium mb-1">⚡</div>
-              <div>Hızlı</div>
+              <div>{t('auth.features.fast')}</div>
             </div>
             <div>
               <div className="text-primary-navy font-medium mb-1">📱</div>
-              <div>Mobil Uyumlu</div>
+              <div>{t('auth.features.mobile')}</div>
             </div>
           </div>
         </div>
@@ -253,8 +252,3 @@ export const LoginPage: React.FC = () => {
 }
 
 export default LoginPage
-
-
-
-
-

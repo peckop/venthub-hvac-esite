@@ -4,7 +4,8 @@ import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getCategories, Product, Category } from '../lib/supabase'
+import { getCategories, Product } from '../lib/supabase'
+import { mapDatabaseCategoryToDomain, toUICategoryList, DomainCategory } from '../lib/type-converters'
 import ProductCard from '../components/ProductCard'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import { 
@@ -16,12 +17,12 @@ import { useI18n } from '../i18n/I18nProvider'
 import { formatCurrency } from '../i18n/format'
 import CategoryShowcase from '../components/category/CategoryShowcase'
 import CategoryLanding from '../components/category/CategoryLanding'
-import { STATIC_CATEGORY_METADATA } from '../config/categoryMetadata'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { UndecidedUserCTA } from '../components/UndecidedUserCTA'
+import type { DbCategory } from '../types/db-rows'
 
 export interface CategoryPageProps {
-  initialCategory?: Category | null
+  initialCategory?: DbCategory | null
 }
 
 export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) => {
@@ -29,9 +30,9 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
   const navigate = useRouter()
-  const [category, setCategory] = useState<Category | null>(initialCategory || null)
-  const [parentCategory, setParentCategory] = useState<Category | null>(null)
-  const [subCategories, setSubCategories] = useState<Category[]>([])
+  const [category, setCategory] = useState<DomainCategory | null>(initialCategory ? mapDatabaseCategoryToDomain(initialCategory) : null)
+  const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
+  const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialCategory)
   const [sortBy, setSortBy] = useState('name')
@@ -58,56 +59,58 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     async function fetchData() {
       try {
         // Hydration check: if initialCategory matches current slug, we can skip initial category fetch
-        let targetCategory: Category | null = initialCategory || null
-        let targetParentCategory: Category | null = null
-        let categories: Category[] = []
+        let targetCategoryRow: DbCategory | null = initialCategory || null
+        let targetParentCategoryRow: DbCategory | null = null
+        let categories: DbCategory[] = []
 
-        if (!targetCategory || targetCategory.slug !== slug) {
+        if (!targetCategoryRow || targetCategoryRow.slug !== slug) {
           setLoading(true)
-          categories = await getCategories()
+          const rawCats = await getCategories()
+          categories = rawCats as unknown as DbCategory[]
 
           if (parentSlug && slug) {
             // Sub-category page
-            targetParentCategory = categories.find(c => c.slug === parentSlug && !c.parent_id) || null
-            targetCategory = categories.find(c => c.slug === slug && !!c.parent_id) || null
+            targetParentCategoryRow = categories.find(c => c.slug === parentSlug && !c.parent_id) || null
+            targetCategoryRow = categories.find(c => c.slug === slug && !!c.parent_id) || null
           } else if (slug) {
             // Main category page
-            targetCategory = categories.find(c => c.slug === slug && !c.parent_id) || null
+            targetCategoryRow = categories.find(c => c.slug === slug && !c.parent_id) || null
           }
-        } else if (!targetCategory.parent_id) {
-          // Fetch categories to find subcategories even if targetCategory is from props
-          categories = await getCategories()
+        } else if (!targetCategoryRow.parent_id) {
+          // Fetch categories to find subcategories even if targetCategoryRow is from props
+          const rawCats = await getCategories()
+          categories = rawCats as unknown as DbCategory[]
         }
 
-        if (!targetCategory) {
+        if (!targetCategoryRow) {
           setLoading(false)
           return
         }
 
-        setCategory(targetCategory)
-        setParentCategory(targetParentCategory)
+        setCategory(mapDatabaseCategoryToDomain(targetCategoryRow))
+        setParentCategory(targetParentCategoryRow ? mapDatabaseCategoryToDomain(targetParentCategoryRow) : null)
 
         // Get subcategories if this is a main category
-        let subs: Category[] = []
-        if (!targetCategory.parent_id) {
+        let subs: DbCategory[] = []
+        if (!targetCategoryRow.parent_id) {
           subs = categories
-            .filter(c => c.parent_id === targetCategory.id)
+            .filter(c => c.parent_id === targetCategoryRow.id)
             .sort((a, b) => {
               const orderA = (a as any).sort_order ?? 0
               const orderB = (b as any).sort_order ?? 0
               if (orderA !== orderB) return orderA - orderB
               return a.name.localeCompare(b.name)
             })
-          setSubCategories(subs)
+          setSubCategories(toUICategoryList(subs))
         }
 
         // Fetch products via enriched RPC
         let productsData: Product[] = []
         const { getProductsEnriched } = await import('../lib/supabase')
 
-        if (!targetCategory.parent_id && subs.length > 0) {
+        if (!targetCategoryRow.parent_id && subs.length > 0) {
           // Ana kategori ve alt kategorileri varsa: tümünü kapsayan liste
-          const allCategoryIds = [targetCategory.id, ...subs.map(s => s.id)]
+          const allCategoryIds = [targetCategoryRow.id, ...subs.map(s => s.id)]
           productsData = await getProductsEnriched({
             categoryIds: allCategoryIds,
             limit: 100
@@ -115,7 +118,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
         } else {
           // Alt kategori veya tekil kategori
           productsData = await getProductsEnriched({
-            categoryIds: [targetCategory.id],
+            categoryIds: [targetCategoryRow.id],
             limit: 100
           })
         }
@@ -151,11 +154,10 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
         if (!hay.some(h => h.includes(term))) return false
       }
       const priceNum = product.price
-      // Fiyat sayıya çevrilemiyorsa (NaN), fiyat filtresini devre dışı bırak (ürünü eleme)
       const matchesPrice = Number.isFinite(priceNum)
         ? priceNum >= priceRange[0] && priceNum <= priceRange[1]
         : true
-      const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand)
+      const matchesBrand = selectedBrands.length === 0 || (product.brand ? selectedBrands.includes(product.brand) : false)
 
       // Teknik filtreler
       const af = product.airflow_capacity ?? null
@@ -181,7 +183,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     })
 
   // Get unique brands
-  const availableBrands = Array.from(new Set(products.map(p => p.brand)))
+  const availableBrands = Array.from(new Set(products.map(p => p.brand).filter((b): b is string => !!b)))
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands(prev =>
@@ -235,19 +237,15 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     : null
 
   // --- Display Mode Handling ---
-  // Merge DB metadata with Static fallback
-  // Parent metadata is inherited for properties like hide_price
+  // Pure DB metadata approach (P04-002)
+  const mergedMetadata = (category.metadata as any) || {}
 
-  const parentStaticMeta = parentCategory ? STATIC_CATEGORY_METADATA[parentCategory.slug] || {} : {}
-  const currentStaticMeta = STATIC_CATEGORY_METADATA[slug || ''] || {}
-
-  const mergedMetadata = {
-    // Parent metadata first (for inheritance of hide_price etc.)
-    ...(parentStaticMeta.hide_price ? { hide_price: parentStaticMeta.hide_price } : {}),
-    // Then current category static metadata
-    ...currentStaticMeta,
-    // Finally DB metadata (highest priority)
-    ...(category.metadata || {})
+  // Inheritance for hide_price from parent if not set on current
+  if (mergedMetadata.hide_price === undefined && parentCategory?.metadata) {
+    const pMeta = parentCategory.metadata as any
+    if (pMeta.hide_price !== undefined) {
+      mergedMetadata.hide_price = pMeta.hide_price
+    }
   }
 
   const displayMode = mergedMetadata.display_mode
@@ -586,7 +584,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
                       highlightFeatured={false}
                       layout={viewMode}
                       priority={i === 0}
-                      hidePrice={!!category.metadata?.hide_price}
+                      hidePrice={!!(category.metadata as any)?.hide_price}
                     />
                   ))}
                 </div>
@@ -731,24 +729,22 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
               </div>
 
               {/* Brands */}
-              {availableBrands.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-industrial-gray mb-3">{t('category.brands')}</h4>
-                  <div className="space-y-2">
-                    {availableBrands.map((brand) => (
-                      <label key={brand} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedBrands.includes(brand)}
-                          onChange={() => toggleBrand(brand)}
-                          className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
-                        />
-                        <span className="text-sm text-steel-gray">{brand}</span>
-                      </label>
-                    ))}
-                  </div>
+              <div>
+                <h4 className="font-medium text-industrial-gray mb-3">{t('category.brands')}</h4>
+                <div className="space-y-2">
+                  {availableBrands.map((brand) => (
+                    <label key={brand} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedBrands.includes(brand)}
+                        onChange={() => toggleBrand(brand)}
+                        className="rounded border-light-gray text-primary-navy focus:ring-primary-navy"
+                      />
+                      <span className="text-sm text-steel-gray">{brand}</span>
+                    </label>
+                  ))}
                 </div>
-              )}
+              </div>
 
               {/* Teknik Filtreler */}
               <div>

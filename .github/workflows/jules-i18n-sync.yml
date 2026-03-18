@@ -1,9 +1,6 @@
 name: Jules - i18n Sync
 
 on:
-  push:
-    paths:
-      - 'src/i18n/dictionaries/tr.ts'
   workflow_dispatch:
 
 jobs:

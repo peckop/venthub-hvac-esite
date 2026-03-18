@@ -118,7 +118,7 @@ export const CheckoutPage: React.FC = () => {
         const defShip = rows.find(r => r.is_default_shipping)
         if (defShip) {
           const addr = {
-            fullAddress: defShip.full_address || '',
+            fullAddress: defShip.address_line || '',
             city: defShip.city || '',
             district: defShip.district || '',
             postalCode: defShip.postal_code || ''
@@ -187,7 +187,7 @@ export const CheckoutPage: React.FC = () => {
           addresses={savedAddresses}
           onClose={() => setShowAddressModal(false)}
           onPick={(a) => {
-            const addr = { fullAddress: a.full_address || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' }
+            const addr = { fullAddress: a.address_line || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' }
             if (addressPickTarget === 'shipping') setShippingAddress(addr)
             else setBillingAddress(addr)
             setShowAddressModal(false)

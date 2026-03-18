@@ -11,11 +11,11 @@ This file defines the strict architectural rules, boundaries, and best practices
 - **Language**: TypeScript (Strict mode enabled)
 - **i18n**: Custom dictionary-based i18n (`src/i18n/dictionaries/tr.ts` as primary)
 
-## 🚨 HARD RULES (KIRILMAZ KURALLAR)
+## 2. 🚨 HARD RULES (KIRILMAZ KURALLAR) - PLANI OLMAYANIN KODU OLMAZ
 1. **Registry-First Disiplini:** Herhangi bir koda (src/) dokunmadan önce MUTLAKA `registry/` klasöründeki ilgili `.md` dosyasını `view_file` ile oku. Okumadan başlanan her iş "kör aksiyon" sayılır.
-2. **Semantic Integrity Guard:** Bir görev dosyasında `## 🎯 Hedef` ve `## ✅ Alt Görevler` kısımları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz. `...` gibi placeholder kullanımı yasaktır ve `manage_registry.py` tarafından engellenir.
-3. **Atomic Registry Sync:** Kodda yaptığın her başarılı değişiklikten sonra `registry/` dosyasını veya `PULSE.md`yi güncelle.
-4. **Registry Guard Kilit Sistemi:** Projede `registry_guard.py` (Commit engelleyici) ve `manage_registry.py` (Statü engelleyici) aktif denetim yapmaktadır.
+2. **NO-PLAN-NO-CODE (Plansız Kod Yazma Yasağı):** Eğer `plan.md` dosyası boşsa, placeholder (`...`) içeriyorsa veya her adımın bir `Verify:` maddesi yoksa, KOD YAZILAMAZ. `Planning` statüsündeyken `src/` içinde dosya üretmek veya değiştirmek "Mühendislik Suçu"dur.
+3. **Semantic Integrity Guard:** Bir görev dosyasında `## 🎯 Hedef` ve `## ✅ Alt Görevler` kısımları somut verilerle doldurulmadan `status` ASLA `Executing` veya `Completed` yapılamaz.
+4. **Atomic Registry Sync:** Kodda yaptığın her başarılı değişiklikten sonra `registry/` dosyasını veya `PULSE.md`yi güncelle.
 5. **No-Hardcore Strings:** Kullanıcıya dönük hiçbir metni TSX içine gömme. `useI18n()` kullan.
 
 ## 3. Component Architecture
@@ -44,9 +44,7 @@ Before suggesting or opening a Pull Request, you MUST ensure that the following 
 3. `pnpm test -- --run` (Unit tests)
 4. `pnpm run build:ci` (Production build)
 
-If any of these fail, you MUST fix the errors before finalizing your task.
-
-## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli (Antigravity Entegrasyonu)
+## 6. JULES Çalışma Prensipleri & Dalga (Wave) Modeli
 🚨 **AI Ajanları İçin Kesin Kurallar:**
 1. **ZORUNLU MASTER SYNC:** Herhangi bir koda dokunmadan önce master güncel tutulmalı.
 2. **Superpowers Discipline:** Antigravity dahil tüm ajanlar, karmaşık görevlerde `superpowers-workflow` skill'ini (Brainstorm -> Plan -> Implement -> Review -> Finish) tam kapasiteyle kullanmalıdır.

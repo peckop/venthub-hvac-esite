@@ -276,9 +276,9 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 <div className="py-20 text-center text-slate-400 animate-pulse font-black uppercase tracking-widest text-[10px]">Modeller Analiz Ediliyor...</div>
                             ) : (
                                 <div className="grid md:grid-cols-3 gap-6">
-                                    {matchedProducts.map((p) => (
-                                        <Link 
-                                            key={p.id} 
+                                    {matchedProducts.map((p: any) => (
+                                        <Link
+                                            key={p.id}
                                             href={`/products/${p.slug || p.id}`}
                                             className="group block p-6 rounded-[2.5rem] bg-white border border-slate-100 hover:border-cyan-500/20 hover:shadow-2xl transition-all duration-500"
                                         >
