@@ -34,6 +34,7 @@ artifacts:
 
 
 
+
 # 030 - Gelişmiş Arama UX & Backend Optimizasyonu
 
 ## 🎯 Hedef
