@@ -36,8 +36,9 @@ async function getCategoryData(slug: string) {
   return mapDatabaseCategoryToDomain(data as unknown as DbCategory)
 }
 
-export async function generateMetadata({ params }: { params: { categorySlug: string } }) {
-  const category = await getCategoryData(params.categorySlug)
+export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string }> }) {
+  const { categorySlug } = await params
+  const category = await getCategoryData(categorySlug)
   
   if (!category) {
     return {
@@ -49,20 +50,21 @@ export async function generateMetadata({ params }: { params: { categorySlug: str
     title: `${category.name} | VentHub`,
     description: `${category.name} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`,
     alternates: {
-      canonical: `https://venthub-hvac.com/category/${params.categorySlug}`,
+      canonical: `https://venthub-hvac.com/category/${categorySlug}`,
     },
   }
 }
 
-export default async function Page({ params }: { params: { categorySlug: string } }) {
-  const category = await getCategoryData(params.categorySlug)
+export default async function Page({ params }: { params: Promise<{ categorySlug: string }> }) {
+  const { categorySlug } = await params
+  const category = await getCategoryData(categorySlug)
   
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": category?.name || params.categorySlug,
-    "description": `${category?.name || params.categorySlug} kategorisindeki ürünler`,
-    "url": `https://venthub-hvac.com/category/${params.categorySlug}`
+    "name": category?.name || categorySlug,
+    "description": `${category?.name || categorySlug} kategorisindeki ürünler`,
+    "url": `https://venthub-hvac.com/category/${categorySlug}`
   }
 
   return (
