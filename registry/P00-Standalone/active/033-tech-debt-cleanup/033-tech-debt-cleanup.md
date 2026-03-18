@@ -26,6 +26,8 @@ artifacts:
 
 
 
+
+
   # 🏗️ 033: 033: Teknik Borç Temizliği (any & Type Safety)
   Bu görev, projedeki geçici tiplemeleri (`any`), tip cast işlemlerini (`as any`) temizlemeyi ve veritabanı tiplerini modernize etmeyi hedefler.
 
