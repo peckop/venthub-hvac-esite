@@ -112,3 +112,7 @@ Notlar:
 - pnpm lint
 - pnpm test
 - pnpm run build:ci
+
+---
+**Infrastructure Test (2026-03-18):** GitHub Actions & API Secrets verification push.
+
