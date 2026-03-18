@@ -133,6 +133,7 @@ export async function getCategories() {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase.rpc as any)('get_products_enriched', {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
@@ -157,7 +158,7 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
 }
 
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {
-  const { data, error } = await (supabase.rpc as any)('get_search_suggestions', {
+  const { data, error } = await supabase.rpc('get_search_suggestions', {
     p_q: q,
     p_limit: limit
   })
@@ -172,8 +173,8 @@ export async function getSearchSuggestions(q: string, limit: number = 6): Promis
 
 // Full‑text search (Turkish) via RPC; returns lightweight fields + rank
 export async function ftsSearchProducts(q: string, limit = 20, filters?: { category_id?: string }): Promise<FtsProductResult[]> {
-  const payload = { p_q: q, p_limit: limit, p_filters: (filters || {}) as any }
-  const { data, error } = await (supabase.rpc as any)('fts_search_products', payload as any)
+  const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
+  const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
   return (data || []) as FtsProductResult[]
 }
