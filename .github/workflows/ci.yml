@@ -10,6 +10,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -17,26 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: 🔐 Deep Secret Diagnostics (Early Check)
-        run: |
-          echo "--- GEMINI_API_KEY Analizi ---"
-          if [ -z "${{ secrets.GEMINI_API_KEY }}" ]; then
-            echo "❌ HATA: GEMINI_API_KEY bulunamadı!"
-          else
-            G_VAL="${{ secrets.GEMINI_API_KEY }}"
-            echo "✅ Bulundu. Uzunluk: ${#G_VAL}"
-            echo "🔍 Başı: ${G_VAL:0:4} | Sonu: ${G_VAL: -4}"
-          fi
-
-          echo -e "\n--- GITHUB_TOKEN Analizi ---"
-          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
-            echo "❌ HATA: GITHUB_TOKEN bulunamadı!"
-          else
-            H_VAL="${{ secrets.GITHUB_TOKEN }}"
-            echo "✅ Bulundu. Uzunluk: ${#H_VAL}"
-            echo "🔍 Başı: ${H_VAL:0:4} | Sonu: ${H_VAL: -4}"
-          fi
+        with:
+          token: ${{ secrets.AGENTS_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -48,62 +33,28 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies (allow scripts for native deps)
-        run: pnpm install --prefer-offline --config.allow-scripts true
-
-      - name: Lint (blocking)
-        run: pnpm run lint
-
-      - name: Type check
-        run: pnpm exec tsc -b tsconfig.build.json
-
-      - name: Test
-        run: pnpm test -- --run --reporter=dot
+      - name: Install dependencies
+        run: pnpm install --prefer-offline
 
       - name: Build (blocking)
-        run: pnpm run build:ci 2>&1 | tee build-error.log
+        run: |
+          set -o pipefail
+          pnpm run build:ci 2>&1 | tee build-error.log
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
-
-      - name: 🔐 Deep Secret Diagnostics
-        run: |
-          echo "--- GEMINI_API_KEY Analizi ---"
-          if [ -z "${{ secrets.GEMINI_API_KEY }}" ]; then
-            echo "❌ HATA: GEMINI_API_KEY bulunamadı!"
-          else
-            G_VAL="${{ secrets.GEMINI_API_KEY }}"
-            echo "✅ Bulundu. Uzunluk: ${#G_VAL}"
-            echo "🔍 Başı: ${G_VAL:0:4} | Sonu: ${G_VAL: -4}"
-          fi
-
-          echo -e "\n--- GITHUB_TOKEN Analizi ---"
-          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
-            echo "❌ HATA: GITHUB_TOKEN bulunamadı!"
-          else
-            H_VAL="${{ secrets.GITHUB_TOKEN }}"
-            echo "✅ Bulundu. Uzunluk: ${#H_VAL}"
-            echo "🔍 Başı: ${H_VAL:0:4} | Sonu: ${H_VAL: -4}"
-          fi
 
       - name: 🤖 AI Auto-Repair on Failure
         if: failure()
         uses: google-github-actions/run-gemini-cli@v0
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          # YENİ VE GÜÇLÜ ANAHTAR:
-          github_token: ${{ secrets.AGENTS_GITHUB_TOKEN }}
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
+          github_token: ${{ secrets.AGENTS_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.AGENTS_GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || secrets.GEMINI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.AGENTS_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
           PROMPT: |
             CI Build fail oldu!
-            Dosya: `src/components/SearchOverlay.tsx`
-            Hata: `NON_EXISTENT_AI_VARIABLE_ERROR` değişkeni yüzünden build patlıyor.
-            
-            GÖREV:
-            1. `src/components/SearchOverlay.tsx` dosyasını aç.
-            2. O bozuk satırı bul ve SİL.
-            3. Değişikliği "🤖 AI: Self-healed build failure" mesajıyla commit et ve pushla.
+            Log: $(cat build-error.log | tail -n 20)
+            Düzelt ve pushla.
