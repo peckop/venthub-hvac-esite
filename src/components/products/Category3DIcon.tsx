@@ -9,13 +9,6 @@ import { AxialFanModel } from './3d/types/AxialFanModel'
 import { getModelPlacement, ModelContext } from '../../utils/3dModelOffsets'
 import { SmartCenterScale } from './3d/SmartCenterScale'
 
-interface Category3DIconProps {
-    categorySlug: string
-    color?: string
-    scale?: number
-    modelPosition?: [number, number, number]
-    offsetContext?: ModelContext // 'centered' | 'orbital' | 'grounded'
-}
 
 const FlexDuctModel: React.FC = () => {
     const meshRef = useRef<THREE.Mesh>(null)

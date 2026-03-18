@@ -169,11 +169,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       if (activeIndex > -1) {
         if (viewState === 'SUGGESTING') {
           const s = suggestions[activeIndex]
-          router.push(s.url)
-          addToRecent(s.label)
+          router.push(s.url || '#')
+          addToRecent(s.label || '')
           handleClose()
         } else if (viewState === 'RESULTS') {
-          router.push(`/products/${results[activeIndex].id}`)
+          router.push(`/products/${(results[activeIndex] as any).id}`)
           handleClose()
         }
       } else {
@@ -189,7 +189,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     const icon = s.type === 'product' ? (
       (s.metadata as Record<string, string>)?.image_url ? (
         <div className="w-8 h-8 relative rounded-md overflow-hidden bg-white border border-gray-100 flex-shrink-0">
-          <Image src={(s.metadata as Record<string, string>).image_url} alt={s.label} fill className="object-cover" />
+          <Image src={(s.metadata as Record<string, string>).image_url || ''} alt={s.label || ''} fill className="object-cover" />
         </div>
       ) : (
         <svg className="w-5 h-5 text-steel-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
@@ -207,7 +207,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
         key={`${s.type}-${Math.random()}`} // Avoid strict index mapping issues
         onMouseEnter={() => setActiveIndex(idx)}
         onClick={() => {
-          router.push(s.url)
+          router.push(s.url || '#')
           addToRecent(q)
           handleClose()
         }}
@@ -217,7 +217,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           {icon}
         </div>
         <div className="flex-1">
-          <div className="text-sm font-medium text-industrial-gray">{highlightMatch(label, debounced)}</div>
+          <div className="text-sm font-medium text-industrial-gray">{highlightMatch(label || '', debounced)}</div>
           {s.type === 'product' && (s.metadata as Record<string, string>)?.sku && (
             <div className="text-xs text-steel-gray mt-0.5">
               {(s.metadata as Record<string, string>).brand && <span className="font-semibold">{highlightMatch((s.metadata as Record<string, string>).brand, debounced)}</span>}
@@ -350,7 +350,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           </div>
         )}
         <ul className="divide-y">
-          {results.map((r, idx) => {
+          {results.map((r: any, idx) => {
             const isActive = idx === activeIndex
             return (
               <li key={r.id}>

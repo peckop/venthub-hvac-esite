@@ -22,11 +22,13 @@ def get_status_dot(status):
     dots = {
         "Completed":     "✅ DONE",
         "Executing":     "🏗️ RUN ",
+        "Active":        "🏗️ RUN ",
+        "RUN":           "🏗️ RUN ",
+        "START":         "🏗️ RUN ",
         "Planning":      "📝 PLAN",
         "Reviewing":     "🔍 REVW",
         "Brainstorming": "💡 IDEA",
         "Pending":       "⏳ WAIT",
-        "Active":        "🏗️ RUN ", # Support legacy or variant
     }
     return dots.get(status, "⏳ WAIT")
 

@@ -1,7 +1,7 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React, { lazy, Suspense } from 'react'
 import { usePathname } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
+import { supabase, Category } from '../../lib/supabase'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
@@ -31,20 +31,9 @@ const ExportMenu = lazy(() => import('../../components/admin/ExportMenu'))
 
 import type { Density } from '../../components/admin/ColumnsMenu'
 
-interface CategoryRow {
-  id: string
-  name: string
-  slug: string
-  parent_id: string | null
-  description?: string | null
-  image_url?: string | null
-  is_featured?: boolean
-  sort_order?: number
-}
-
 const AdminCategoriesPage: React.FC = () => {
   const { t } = useI18n()
-  const [rows, setRows] = React.useState<CategoryRow[]>([])
+  const [rows, setRows] = React.useState<Category[]>([])
   const [q, setQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -101,7 +90,7 @@ const AdminCategoriesPage: React.FC = () => {
         .order('name', { ascending: true })
 
       if (error) throw error
-      setRows((data || []) as CategoryRow[])
+      setRows((data || []) as Category[])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
       setRows([])
@@ -124,7 +113,7 @@ const AdminCategoriesPage: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleEdit = (r: CategoryRow) => {
+  const handleEdit = (r: Category) => {
     setEditingId(r.id)
     setIsModalOpen(true)
   }
@@ -136,7 +125,7 @@ const AdminCategoriesPage: React.FC = () => {
       const { error } = await supabase.from('categories').delete().eq('id', id)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'categories', row_pk: id, action: 'DELETE', before, after: null, comment: 'delete category' })
+      await logAdminAction(supabase, { table_name: 'categories', row_pk: id, action: 'DELETE', before: before as any, after: null, comment: 'delete category' })
       await load()
     } catch (e) {
       alert('Silinemedi: ' + ((e as Error).message || e))

@@ -122,10 +122,10 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
         return subCategories.map(sub => {
             const parent = mainCategories.find(m => m.id === sub.parent_id)
             return {
-                ...sub,
+                subcategory: sub,
                 parentSlug: parent?.slug || ''
             }
-        }).filter(s => s.parentSlug && s.slug !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
+        }).filter(s => s.parentSlug && s.subcategory.slug !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
     }, [categories])
 
     // İki lane için alt kategorileri böl
@@ -192,14 +192,14 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
 
                     <div className="space-y-3">
                         <ScrollingLane
-                            subcategories={lane1.map(s => ({ ...s }))}
+                            subcategories={lane1.map(s => s.subcategory)}
                             parentSlug={lane1[0]?.parentSlug || ''}
                             direction="right"
                             speed={28}
                         />
                         {lane2.length > 0 && (
                             <ScrollingLane
-                                subcategories={lane2.map(s => ({ ...s }))}
+                                subcategories={lane2.map(s => s.subcategory)}
                                 parentSlug={lane2[0]?.parentSlug || ''}
                                 direction="left"
                                 speed={32}

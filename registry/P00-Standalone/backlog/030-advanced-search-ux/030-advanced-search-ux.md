@@ -1,5 +1,8 @@
 ---
-updated_at: "2026-03-17 07:34:24"
+completed_at: null
+started_at: null
+created_at: "2026-03-17 15:50:57"
+updated_at: "2026-03-17 19:15:27"
 id: 030
 title: "Gelişmiş Arama UX & Backend Optimizasyonu"
 status: "Backlog"
@@ -9,8 +12,22 @@ depends_on: null
 artifacts:
   brainstorm: "registry/P00-Standalone/backlog/030-advanced-search-ux/brainstorm.md"
   plan: "registry/P00-Standalone/backlog/030-advanced-search-ux/plan.md"
-  review: null
+  review: "registry/P00-Standalone/backlog/030-advanced-search-ux/review.md"
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 030 - Gelişmiş Arama UX & Backend Optimizasyonu
 

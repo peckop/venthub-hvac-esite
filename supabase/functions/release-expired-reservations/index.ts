@@ -1,93 +1,137 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
-serve(async (_req) => {
-    // Sistem yetkilerine sahip client oluşturuyoruz (RLS atlar)
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+    // Handle CORS
+    if (req.method === 'OPTIONS') {
+        return new Response('ok', { headers: corsHeaders })
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
     if (!supabaseUrl || !supabaseKey) {
-        return new Response(JSON.stringify({ error: 'Missing Supabase Config' }), { status: 500 })
+        return new Response(JSON.stringify({ error: 'Missing Supabase Config' }), { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        })
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     try {
-        // 1. Gecikme süresi ayarını (saat) tablodan al, yoksa 24 saat
-        const { data: settings } = await supabase.from('inventory_settings').select('reservation_timeout_hours').single()
+        // 1. Ayarları al (saat cinsinden timeout)
+        const { data: settings } = await supabase
+            .from('inventory_settings')
+            .select('reservation_timeout_hours')
+            .maybeSingle()
+        
         const hours = settings?.reservation_timeout_hours || 24
 
-        // 2. Süresi dolmuş, ödemesi gelmemiş siparişleri bul
+        // 2. Zaman eşiğini hesapla
         const timeoutDate = new Date()
         timeoutDate.setHours(timeoutDate.getHours() - hours)
 
-        console.log(`Checking for orders created before ${timeoutDate.toISOString()} with timeout: ${hours}h`)
+        console.log(`[JOB] Checking for orders before: ${timeoutDate.toISOString()} (Timeout: ${hours}h)`)
 
+        // 3. Süresi dolmuş "pending" siparişleri bul
         const { data: expiredOrders, error: findErr } = await supabase
             .from('venthub_orders')
-            .select('id')
+            .select('id, order_number')
             .eq('status', 'pending')
             .eq('payment_status', 'pending')
             .lt('created_at', timeoutDate.toISOString())
+            .limit(100) // Aşırı yüklenmeyi önlemek için limitliyoruz
 
         if (findErr) throw findErr
 
         if (!expiredOrders || expiredOrders.length === 0) {
-            return new Response(JSON.stringify({ message: 'No expired reservations found.' }), {
-                headers: { 'Content-Type': 'application/json' }
+            return new Response(JSON.stringify({ message: 'No expired reservations found.', released: 0 }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             })
         }
 
+        console.log(`[JOB] Found ${expiredOrders.length} expired orders. Processing...`)
         let releasedCount = 0
 
-        // 3. Her sipariş için iptal ve restorasyon
         for (const order of expiredOrders) {
-            // a. İptal olarak işaretle
-            await supabase.from('venthub_orders').update({
-                status: 'cancelled',
-                payment_status: 'failed'
-            }).eq('id', order.id)
+            try {
+                // a. Siparişi iptal et
+                const { error: updateErr } = await supabase
+                    .from('venthub_orders')
+                    .update({
+                        status: 'cancelled',
+                        payment_status: 'failed',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', order.id)
+                
+                if (updateErr) throw updateErr
 
-            // b. Log yaz
-            await supabase.from('order_notes').insert({
-                order_id: order.id,
-                note: `Sistem Otomasyonu: ${hours} saatlik rezervasyon/ödeme süresi dolduğu için sipariş iptal edildi ve stok boşa çıkarıldı.`
-            })
+                // b. Log/Not ekle
+                await supabase.from('order_notes').insert({
+                    order_id: order.id,
+                    note: `Sistem Otomasyonu: ${hours} saatlik rezervasyon/ödeme süresi dolduğu için sipariş iptal edildi ve stok boşa çıkarıldı.`,
+                    is_internal: true
+                })
 
-            // c. Stok değerlerini geri ver 
-            const { data: items } = await supabase.from('venthub_order_items').select('product_id, quantity').eq('order_id', order.id)
-            if (items && items.length > 0) {
-                for (const item of items) {
-                    // Mewcut stoğu oku
-                    const { data: prod } = await supabase.from('products').select('stock_qty').eq('id', item.product_id).single()
-                    if (prod) {
-                        const newStock = (prod.stock_qty || 0) + item.quantity
+                // c. Ürünleri ve stokları iade et
+                const { data: items } = await supabase
+                    .from('venthub_order_items')
+                    .select('product_id, quantity')
+                    .eq('order_id', order.id)
+                
+                if (items && items.length > 0) {
+                    for (const item of items) {
+                        // ATOMİK STOK ARTIŞI (adjust_stock_v2 RPC kullanıyoruz)
+                        const { error: rpcErr } = await supabase.rpc('adjust_stock_v2', {
+                            p_product_id: item.product_id,
+                            p_delta: item.quantity
+                        })
 
-                        // Stok güncelle
-                        await supabase.from('products').update({ stock_qty: newStock }).eq('id', item.product_id)
+                        if (rpcErr) {
+                            console.error(`[ERROR] Could not adjust stock for product ${item.product_id}:`, rpcErr)
+                            continue
+                        }
 
-                        // Hareket olarak kaydet
+                        // Hareket kaydı
                         await supabase.from('inventory_movements').insert({
                             product_id: item.product_id,
                             delta: item.quantity,
                             reason: 'return', // Rezervasyon iptali
                             order_id: order.id
                         })
+                        
+                        console.log(`[SUCCESS] Returned ${item.quantity} units to product ${item.product_id} from order ${order.order_number || order.id}`)
                     }
                 }
+                
+                releasedCount++
+            } catch (orderErr) {
+                console.error(`[CRITICAL] Failed to release order ${order.id}:`, orderErr)
+                // Bir siparişte hata olsa bile diğerlerine devam et
             }
-            releasedCount++
         }
 
         return new Response(JSON.stringify({
             success: true,
             released_count: releasedCount,
-            message: `Released ${releasedCount} expired orders and their stock reservations.`
-        }), { headers: { 'Content-Type': 'application/json' } })
+            message: `Successfully released ${releasedCount} expired orders and restored their stock.`
+        }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        })
 
     } catch (error: unknown) {
-        console.error('Edge Function Error:', error)
+        console.error('[FATAL] Edge Function Error:', error)
         const msg = error instanceof Error ? error.message : String(error)
-        return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+        return new Response(JSON.stringify({ error: msg }), { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        })
     }
 })

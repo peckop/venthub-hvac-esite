@@ -40,3 +40,6 @@ registry_backup/
 tsc_errors.txt
 test_output.txt
 test_failures.txt
+
+.gemini/
+gha-creds-*.json

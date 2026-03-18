@@ -16,7 +16,8 @@
     "type-check": "tsc -b tsconfig.build.json",
     "analyze": "ANALYZE=true next build",
     "clean": "rimraf .next out",
-    "postinstall": "pnpm run type-check"
+    "postinstall": "pnpm run type-check",
+    "supabase:gen": "npx supabase@latest gen types typescript --project-id tnofewwkwlyjsqgwjjga > src/types/database.types.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "6.12.0",
@@ -49,7 +50,6 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
-    "@tally-xyz/tally-js": "^1.0.0",
     "@tanstack/react-query": "^5.62.2",
     "@tanstack/react-table": "^8.20.5",
     "autoprefixer": "^10.4.20",
@@ -85,6 +85,7 @@
     "eslint": "^9.16.0",
     "eslint-config-next": "15.1.0",
     "rimraf": "^6.0.1",
+    "supabase": "^2.80.0",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },

@@ -1,3 +1,6 @@
+import { Category } from '../lib/supabase'
+export type { Category }
+
 export type InventoryRow = {
     product_id: string;
     name: string;
@@ -13,7 +16,6 @@ export type InventoryRow = {
 
 export type SortKey = 'name' | 'physical' | 'reserved' | 'available' | 'threshold' | 'status' | 'location' | 'supplier' | 'days_empty' | 'abc'
 
-export type Category = { id: string; name: string }
 
 export type ReservedRow = {
     order_id: string;

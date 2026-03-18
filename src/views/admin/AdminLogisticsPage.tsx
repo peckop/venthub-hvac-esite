@@ -278,7 +278,7 @@ export default function AdminLogisticsPage() {
                 {rows.length > 0 && (
                     <div className="p-6 bg-white/[0.02] border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-0 z-10 backdrop-blur-xl">
                         <div className="text-[13px] font-bold text-slate-400">
-                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready' /* I should add ready to common or ui */ || 'Ready')}
+                            <span className="text-cyan-400 font-black text-base">{rows.filter(r => r.tracking_number).length}</span> / {rows.length} {t('admin.titles.orders')} {t('admin.ui.ready') || 'Ready'}
                         </div>
                         {hasWriteAccess && (
                             <button

@@ -658,7 +658,11 @@ export const en = {
         carrierDist: 'Carrier Distribution',
         returnStatus: 'Return Status Breakdown',
         pendingShipmentAge: 'Pending Shipment (Age)',
-        weeklyReturns: 'Returns - Weekly Trend'
+        weeklyReturns: 'Returns - Weekly Trend',
+        systemHealth: "System Health",
+        recentOrders: "Recent Orders",
+        orderFlow: "Order Flow",
+        salesTrend: "Sales Trend"
       },
       trend: 'Order trend for last {{days}} days',
       recent: { title: 'Recent Orders' },
@@ -1045,6 +1049,28 @@ export const en = {
       states: {
         loading: 'Loading...',
         noRecords: 'No records found'
+      },
+      board: {
+        columns: {
+          new: "New / Pending",
+          prep: "Processing",
+          shipped: "Shipped",
+          done: "Delivered",
+          cancel: "Cancelled",
+          refund: "Refunded"
+        },
+        stepper: {
+          received: "Received",
+          paid: "Paid",
+          prep: "Preparing",
+          shipped: "Shipped",
+          delivered: "Delivered"
+        },
+        messages: {
+          cancelledOrRefunded: "Order is cancelled or refunded.",
+          updateSuccess: "Order status updated successfully.",
+          updateError: "Error occurred while updating status."
+        }
       }
     },
     webhooks: {
@@ -1511,6 +1537,15 @@ export const en = {
     tryAnotherEmail: 'Try Another Email',
     registrationCompleteTitle: 'Registration Complete!',
     registrationCompleteDesc: 'A verification link has been sent to your email. Please verify your account to complete registration.',
+    or: 'or',
+    googleSignIn: 'Sign in with Google',
+    googleSignInFail: 'Could not start Google sign-in',
+    googleSignInError: 'Unexpected error during Google sign-in',
+    features: {
+      secure: 'Secure',
+      fast: 'Fast',
+      mobile: 'Mobile Friendly'
+    },
     errors: {
       nameRequired: 'Full name is required'
     }

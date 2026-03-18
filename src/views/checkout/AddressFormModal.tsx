@@ -22,7 +22,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
         label: address?.label || '',
         full_name: address?.full_name || '',
         phone: address?.phone || '',
-        full_address: address?.full_address || '',
+        address_line: address?.address_line || '',
         city: address?.city || '',
         district: address?.district || '',
         postal_code: address?.postal_code || '',
@@ -40,7 +40,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
                 label: form.label,
                 full_name: form.full_name,
                 phone: form.phone,
-                full_address: form.full_address,
+                address_line: form.address_line,
                 city: form.city,
                 district: form.district,
                 postal_code: form.postal_code,
@@ -72,7 +72,7 @@ const AddressFormModal: React.FC<AddressFormModalProps> = ({
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-steel-gray mb-1">{t('checkout.shipping.addressLabel')}</label>
-                        <textarea value={form.full_address} onChange={(e) => setForm({ ...form, full_address: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm min-h-20" />
+                        <textarea value={form.address_line} onChange={(e) => setForm({ ...form, address_line: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm min-h-20" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>

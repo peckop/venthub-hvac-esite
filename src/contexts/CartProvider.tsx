@@ -193,8 +193,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const priceInfoList = await Promise.all(
           merged.map(async (it) => {
             try {
-              const info = await getEffectivePriceInfo(it.product.id)
-              await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+              const info = await getEffectivePriceInfo(it.product)
+              await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
               return { productId: it.product.id, unitPrice: info.unitPrice }
             } catch (e) {
               console.error('cart upsert error', e)
@@ -284,9 +284,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (CART_SERVER_SYNC && user && serverCartId) {
       // compute effective price and upsert optimistically, also reflect locally
       import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
-        getEffectivePriceInfo(product.id)
+        getEffectivePriceInfo(product)
           .then(info => {
-            upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+            upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
               .catch(err => console.error('server addToCart error', err))
             // Update local snapshot unit price
             setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
@@ -339,9 +339,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const product = items.find(i => i.product.id === productId)?.product
       if (product) {
         import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
-          getEffectivePriceInfo(product.id)
+          getEffectivePriceInfo(product)
             .then(info => {
-              upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId })
+              upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
                 .catch(err => console.error('server updateQuantity error', err))
               // Ensure local snapshot unit price is present
               setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))

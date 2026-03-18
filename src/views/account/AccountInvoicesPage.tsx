@@ -7,13 +7,16 @@ import {
   listInvoiceProfiles, 
   setDefaultInvoiceProfile, 
   updateInvoiceProfile, 
-  type InvoiceProfile, 
-  type InvoiceProfileType 
+  type InvoiceProfile
 } from '../../lib/supabase'
+import { useAuth } from '../../hooks/useAuth'
 import toast from 'react-hot-toast'
 import { FileText, Plus, Trash2, Edit2, CheckCircle, User, Building2, Landmark, Loader2 } from 'lucide-react'
 
+type InvoiceProfileType = 'individual' | 'corporate'
+
 export default function AccountInvoicesPage() {
+  const { user } = useAuth()
   const [items, setItems] = useState<InvoiceProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -84,7 +87,9 @@ export default function AccountInvoicesPage() {
 
     setSaving(true)
     try {
+      if (!user) throw new Error('User not found')
       const payload = {
+        user_id: user.id,
         profile_type: profileType,
         first_name: profileType === 'individual' ? firstName : null,
         last_name: profileType === 'individual' ? lastName : null,

@@ -111,7 +111,9 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   // Unique Brands for filtering
   const availableBrands = useMemo(() => {
     const b = new Set<string>()
-    initialProducts.forEach(p => b.add(p.brand))
+    initialProducts.forEach(p => {
+      if (p.brand) b.add(p.brand)
+    })
     return Array.from(b).sort()
   }, [initialProducts])
 
