@@ -35,6 +35,7 @@ artifacts:
 
 
 
+
 # 008 - B2B Hiyerarşisi ve Yetkilendirme
 
 ## 🎯 Hedef
