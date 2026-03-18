@@ -24,7 +24,6 @@ const ApplicationCards = dynamic(() => import('../components/products').then(mod
 })
 
 import type { Product, Category } from '../lib/supabase'
-import type { DbCategory } from '../types/db-rows'
 
 interface ProductsPageProps {
   initialProducts?: Product[]
@@ -36,7 +35,6 @@ interface ProductsPageProps {
  * Tek bir mantık (hook) üzerinden tüm ürün havuzunu yönetir.
  */
 const ProductsPage: React.FC<ProductsPageProps> = ({ 
-  initialProducts = [],
   initialCategories = []
 }) => {
   const { t } = useI18n()
@@ -48,8 +46,6 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
 
   // GATEWAY: Tüm ürünleri listelemek için null category ile çağırıyoruz
   const {
-    category,
-    subCategories,
     filteredProducts,
     availableBrands,
     loading,
@@ -57,7 +53,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
     updateFilters
   } = useCategoryGateway(null)
 
-  // Products sayfası için "Sanal" bir kategori nesnesi oluşturuyoruz (Hero ve Filters için)
+  // Products sayfası için "Sanal" bir kategori nesnesi oluşturuyoruz
   const virtualCategory = {
     id: 'root-products',
     name: t('common.products') || 'Tüm Ürünler',
@@ -67,7 +63,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
     parent_id: null,
     level: 0,
     metadata: {}
-  } as any
+  } as unknown as Category
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -83,7 +79,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           <div className="grid lg:grid-cols-[1fr,450px] gap-12 items-center">
             <div className="space-y-8">
               <CategoryHero 
-                category={virtualCategory}
+                category={virtualCategory as any}
                 productCount={filteredProducts.length}
               />
             </div>
@@ -97,7 +93,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
       {/* Unified Grid Layer */}
       <div className="flex-1">
         <CategoryGridView 
-          category={virtualCategory}
+          category={virtualCategory as any}
           subCategories={initialCategories as any[]} // Üst kategorileri filtre olarak sunmak için
           availableBrands={availableBrands}
           products={filteredProducts}
