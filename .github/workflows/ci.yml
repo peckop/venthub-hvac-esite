@@ -18,6 +18,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: 🔐 Deep Secret Diagnostics (Early Check)
+        run: |
+          echo "--- GEMINI_API_KEY Analizi ---"
+          if [ -z "${{ secrets.GEMINI_API_KEY }}" ]; then
+            echo "❌ HATA: GEMINI_API_KEY bulunamadı!"
+          else
+            G_VAL="${{ secrets.GEMINI_API_KEY }}"
+            echo "✅ Bulundu. Uzunluk: ${#G_VAL}"
+            echo "🔍 Başı: ${G_VAL:0:4} | Sonu: ${G_VAL: -4}"
+          fi
+
+          echo -e "\n--- GITHUB_TOKEN Analizi ---"
+          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
+            echo "❌ HATA: GITHUB_TOKEN bulunamadı!"
+          else
+            H_VAL="${{ secrets.GITHUB_TOKEN }}"
+            echo "✅ Bulundu. Uzunluk: ${#H_VAL}"
+            echo "🔍 Başı: ${H_VAL:0:4} | Sonu: ${H_VAL: -4}"
+          fi
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
