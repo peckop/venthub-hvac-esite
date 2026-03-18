@@ -1,20 +1,24 @@
 # Brainstorm: 003-gateway-architecture
 
-## 🎯 Goal
+## 🎯 Hedef
 800 satırlık `CategoryPage.tsx` monolitini parçalayarak; veri yönetimi (Gateway) ve görselleştirme (View) katmanlarını birbirinden ayırmak.
 
-## 🛡️ Constraints & Risks
-- **Risk:** Props drilling. Gateway'den alt View bileşenlerine çok fazla veri (products, loading, filters vb.) geçmesi gerekecek.
-- **Risk:** Client-side state senkronizasyonu. Filtrelerin tüm View'larda (Grid, Showcase, Landing) aynı şekilde çalışması lazım.
-- **Kısıt:** SEO (JSON-LD) ve Breadcrumb mantığı bozulmamalı, Server Component uyumu gözetilmeli.
+## 🛡️ Risk Analizi & Teknik Bariyerler
+- **Next.js 15 Async Params:** Sayfa parametreleri artık Promise. Gateway katmanında bu parametrelerin `await` edilerek çözülmesi ve alt bileşenlere (sub-views) senkron olarak aktarılması kritik.
+- **LCP (Largest Contentful Paint):** Sayfa parçalandığında, ana görselin (Hero) geç yüklenmemesi için `CategoryHero` bileşeninin Server Component dostu tutulması gerekiyor.
+- **Props Drilling vs Context:** Filtreler (airflow, pressure vb.) çok fazla state içeriyor. Sub-view'lara prop geçmek yerine, sadece kategori bazlı bir `CategoryProvider` düşünülmeli mi? Şimdilik mimariyi temiz tutmak için "Component Composition" denenecek.
+- **Edge Runtime:** Cloudflare üzerinde koşacak bu yeni yapının Node.js bağımlılığı içermemesi gerekiyor.
 
-## 💡 Options & Recommendation
-- **Option 1: Component Composition (Önerilen).** `CategoryPage` bir Gateway gibi davranır, veriyi çeker ve `children` veya seçili `View` bileşenine `initialData` olarak paslar.
-- **Option 2: Context API.** Kategori verilerini bir Context içinde tutup alt bileşenlerin oradan okumasını sağlamak. (Filtreler için daha temiz olabilir).
-- **Öneri:** `useCategoryGateway` isimli bir custom hook oluşturup veri çekme ve filtreleme mantığını oraya taşımak. UI tarafını ise `CategoryViewDispatcher` gibi bir yapı ile `display_mode`'a göre yönlendirmek.
+## 💡 Mimari Seçenekler
+- **Option 1: Custom Hook (Gateway):** `useCategoryGateway` oluşturulur. Veri çekme ve filtreleme burada toplanır. `CategoryPage.tsx` sadece bu hook'u çağırıp doğru View'a (`GridView`, `ShowcaseView` vb.) yönlendirme yapar.
+- **Option 2: Server Component Gateway:** Next.js 15'in gücünü kullanıp veriyi sunucuda çekmek. Ancak mevcut filtreleme mantığı (fiyat aralığı, teknik spec'ler) yoğun "Client-side" etkileşim gerektiriyor.
 
-## ✅ Acceptance Criteria
-- [ ] `CategoryPage.tsx` < 150 satır.
-- [ ] View bileşenleri (`GridView`, `ShowcaseView`, `LandingView`) bağımsız dosyalar olarak `src/views/category/` altında mevcut.
-- [ ] Filtreleme mantığı (`filteredProducts`) tüm görünümlerde tutarlı çalışıyor.
-- [ ] Build hatası yok.
+## 🏆 Karar: Gateway + Sub-Views (Composition)
+- **Gateway:** `src/views/CategoryPage.tsx` bir "Dispatcher" olacak.
+- **Logic:** `src/hooks/useCategoryGateway.ts` tüm veri ve filtreleme işini üstlenecek.
+- **Views:** `src/views/category/` altında 3 ana görünüm (Grid, Showcase, Landing) modüler hale getirilecek.
+
+## ✅ Başarı Kriterleri
+- `CategoryPage.tsx` dosyası 150 satırın altına inmeli.
+- Kategori bazlı SEO (JSON-LD) tüm görünümlerde sorunsuz çalışmalı.
+- Filtreleme hızı ve LCP performansı %20 iyileşmeli.
