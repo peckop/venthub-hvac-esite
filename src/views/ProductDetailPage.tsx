@@ -334,7 +334,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 images={images}
                 productName={product.name}
                 slug={product.slug || product.name}
-                modelType={mainCategory?.metadata?.model_type}
+                modelType={(mainCategory?.metadata as any)?.model_type}
               />
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-6 left-6 z-20 pointer-events-none">
@@ -397,13 +397,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
-                      {mainCategory?.metadata?.hide_price ? (
+                      {(mainCategory?.metadata as any)?.hide_price ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('common.requestQuote') || 'Teklif İste'}</span>
                       ) : (
                         formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                       )}
                     </div>
-                    {!mainCategory?.metadata?.hide_price && (
+                    {!(mainCategory?.metadata as any)?.hide_price && (
                       <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
                         {t('pdp.vatIncluded')}
                       </span>
@@ -435,7 +435,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                 {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
-                  {mainCategory?.metadata?.hide_price ? (
+                  {(mainCategory?.metadata as any)?.hide_price ? (
                     <button
                       onClick={() => setLeadOpen(true)}
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group"
@@ -583,7 +583,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="flex flex-col items-end mr-2">
                 <span className="text-[10px] font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
                 <span className="text-[10px] text-primary-navy font-black tracking-widest">
-                  {mainCategory?.metadata?.hide_price ? 'TEKLİF AL' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                  {(mainCategory?.metadata as any)?.hide_price ? 'TEKLİF AL' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
               
@@ -655,7 +655,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em]">Listing Price</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {mainCategory?.metadata?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                                {(mainCategory?.metadata as any)?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -688,7 +688,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
                       {product.technical_specs ? (
                         <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
+                          {Object.entries(groupTechnicalSpecs(product.technical_specs as any) || {}).map(([groupKey, group]) => {
                             const isOpen = openSpecSections.includes(groupKey);
                             const Icon = group.icon;
                             return (

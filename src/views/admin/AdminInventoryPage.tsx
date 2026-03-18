@@ -179,19 +179,25 @@ const AdminInventoryPage: React.FC = () => {
       await ensureSessionFresh()
 
       const [invRes, velRes, settingsRes, catRes] = await Promise.all([
-        supabase.from('inventory_summary' as any).select('*'),
-        supabase.from('inventory_velocity' as any).select('product_id, daily_velocity, days_until_empty, abc_class'),
+        supabase.from('inventory_summary').select('*'),
+        supabase.from('inventory_velocity').select('product_id, daily_velocity, days_until_empty, abc_class'),
         supabase.from('inventory_settings').select('default_low_stock_threshold').maybeSingle(),
         supabase.from('categories').select('id,name').order('name', { ascending: true })
       ])
       if (invRes.error) throw invRes.error
 
-      const vMap = new Map((velRes.data || []).map((v: any) => [v.product_id, v]))
-      const invRows = (invRes.data || []).map((r: any) => ({
-        ...r,
-        daily_velocity: vMap.get(r.product_id as string)?.daily_velocity,
-        days_until_empty: vMap.get(r.product_id as string)?.days_until_empty,
-        abc_class: vMap.get(r.product_id as string)?.abc_class
+      const vMap = new Map((velRes.data || []).map(v => [v.product_id, v]))
+      const invRows = (invRes.data || []).map(r => ({
+        product_id: r.product_id || '',
+        name: r.name || 'Bilinmeyen Ürün',
+        physical_stock: r.physical_stock || 0,
+        reserved_stock: r.reserved_stock || 0,
+        available_stock: r.available_stock || 0,
+        warehouse_location: r.warehouse_location,
+        supplier_name: r.supplier_name,
+        daily_velocity: vMap.get(r.product_id || '')?.daily_velocity ?? undefined,
+        days_until_empty: vMap.get(r.product_id || '')?.days_until_empty ?? undefined,
+        abc_class: (vMap.get(r.product_id || '')?.abc_class as 'A' | 'B' | 'C' | null) ?? undefined
       })) as Row[]
       setRows(invRows)
       if (!settingsRes.error) {
@@ -210,11 +216,11 @@ const AdminInventoryPage: React.FC = () => {
         const tmap: Record<string, number | null> = {}
         const omap: Record<string, boolean> = {}
         const cmap: Record<string, string | null> = {}
-          ; (prodData as any[] | null | undefined)?.forEach((p) => {
-            tmap[p.id] = p.low_stock_threshold
-            omap[p.id] = !!p.low_stock_override
-            cmap[p.id] = p.category_id ?? null
-          })
+        prodData?.forEach((p) => {
+          tmap[p.id] = p.low_stock_threshold ?? null
+          omap[p.id] = !!p.low_stock_override
+          cmap[p.id] = p.category_id ?? null
+        })
         setThresholdMap(tmap)
         setOverrideMap(omap)
         setProductCategoryMap(cmap)
@@ -378,7 +384,7 @@ const AdminInventoryPage: React.FC = () => {
   const updateLocation = async (productId: string, val: string) => {
     const r = rows.find(x => x.product_id === productId)
     if (!r || r.warehouse_location === val) return
-    const { error: err } = await supabase.from('products').update({ warehouse_location: val || null } as any).eq('id', productId)
+    const { error: err } = await supabase.from('products').update({ warehouse_location: val || null }).eq('id', productId)
     if (err) throw err
     setRows(prev => prev.map(row => row.product_id === productId ? { ...row, warehouse_location: val || null } : row))
     toast.success(_t('admin.inventory.toasts.locationUpdated') || 'Raf konumu güncellendi')
@@ -387,7 +393,7 @@ const AdminInventoryPage: React.FC = () => {
   const updateSupplier = async (productId: string, val: string) => {
     const r = rows.find(x => x.product_id === productId)
     if (!r || r.supplier_name === val) return
-    const { error: err } = await supabase.from('products').update({ supplier_name: val || null } as any).eq('id', productId)
+    const { error: err } = await supabase.from('products').update({ supplier_name: val || null }).eq('id', productId)
     if (err) throw err
     setRows(prev => prev.map(row => row.product_id === productId ? { ...row, supplier_name: val || null } : row))
     toast.success(_t('admin.inventory.toasts.supplierUpdated') || 'Tedarikçi güncellendi')
@@ -396,12 +402,18 @@ const AdminInventoryPage: React.FC = () => {
   const loadReserved = React.useCallback(async (productId: string) => {
     try {
       const { data, error: err } = await supabase
-        .from('reserved_orders' as any)
+        .from('reserved_orders')
         .select('order_id, created_at, status, payment_status, quantity')
         .eq('product_id', productId)
         .order('created_at', { ascending: false })
       if (err) throw err
-      setReservedOrders((data || []) as ReservedRow[])
+      setReservedOrders((data || []).map(r => ({
+        order_id: r.order_id || 'Bilinmeyen',
+        created_at: r.created_at || new Date().toISOString(),
+        status: r.status || 'pending',
+        payment_status: r.payment_status || null,
+        quantity: r.quantity || 0
+      })))
     } catch {
       setReservedOrders([])
     }
@@ -412,7 +424,7 @@ const AdminInventoryPage: React.FC = () => {
     try {
       setSaving(true)
       const isDefault = selectedThreshold === ''
-      const payload: any = {
+      const payload = {
         low_stock_threshold: (isDefault ? null : Number(selectedThreshold)),
         low_stock_override: !isDefault
       }

@@ -1,6 +1,7 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
-import { supabase, adminSearchProducts } from '../../lib/supabase'
+import { supabase, adminSearchProducts, type DbAdminSearchResult } from '../../lib/supabase'
+import type { DbProduct } from '../../types/db-rows'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import { useSearchParams, usePathname } from 'next/navigation'
 import AdminToolbar from '../../components/admin/AdminToolbar'
@@ -165,7 +166,7 @@ const AdminProductsPage: React.FC = () => {
         )
 
         // RPC sonuçlarını client-side status/featured filtrelerine uygula
-        let filtered = results as ProductRow & { rank: number; total_count: number }[] extends never ? typeof results : typeof results
+        let filtered: DbAdminSearchResult[] = results as DbAdminSearchResult[]
         const anyStatus = statusFilter.active || statusFilter.inactive || statusFilter.out_of_stock
         if (anyStatus) {
           const statuses: string[] = []

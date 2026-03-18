@@ -1,0 +1,13 @@
+# Brainstorm: 003-gateway-architecture
+
+## 🎯 Goal
+...
+
+## 🛡️ Constraints & Risks
+...
+
+## 💡 Options & Recommendation
+...
+
+## ✅ Acceptance Criteria
+...

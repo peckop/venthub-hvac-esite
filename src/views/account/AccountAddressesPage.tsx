@@ -4,25 +4,27 @@ import toast from 'react-hot-toast'
 import { useI18n } from '../../i18n/I18nProvider'
 import { MapPin, Plus, Trash2, Edit2, CheckCircle, Truck, CreditCard, Loader2 } from 'lucide-react'
 
+import { useAuth } from '../../hooks/useAuth'
+
 interface FormState {
   id?: string
-  label?: string
-  full_name?: string
-  phone?: string
-  full_address: string
+  label?: string | null
+  full_name?: string | null
+  phone?: string | null
+  address_line: string
   city: string
   district: string
-  postal_code?: string
+  postal_code?: string | null
   country?: string
-  is_default_shipping?: boolean
-  is_default_billing?: boolean
+  is_default_shipping?: boolean | null
+  is_default_billing?: boolean | null
 }
 
 const emptyForm: FormState = {
   label: '',
   full_name: '',
   phone: '',
-  full_address: '',
+  address_line: '',
   city: '',
   district: '',
   postal_code: '',
@@ -33,6 +35,7 @@ const emptyForm: FormState = {
 
 export default function AccountAddressesPage() {
   const { t } = useI18n()
+  const { user } = useAuth()
   const [items, setItems] = useState<UserAddress[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -61,7 +64,7 @@ export default function AccountAddressesPage() {
       label: a.label || '',
       full_name: a.full_name || '',
       phone: a.phone || '',
-      full_address: a.full_address || '',
+      address_line: a.address_line || '',
       city: a.city || '',
       district: a.district || '',
       postal_code: a.postal_code || '',
@@ -79,19 +82,20 @@ export default function AccountAddressesPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.full_address || !form.city || !form.district) {
+    if (!form.address_line || !form.city || !form.district) {
       toast.error(t('account.addresses.toasts.requiredFields') || 'Adres, İl ve İlçe zorunludur')
       return
     }
 
     try {
+      if (!user) throw new Error('Not authenticated')
       setSaving(true)
       if (isEditing && form.id) {
         await updateAddress(form.id, {
           label: form.label,
           full_name: form.full_name,
           phone: form.phone,
-          full_address: form.full_address,
+          address_line: form.address_line,
           city: form.city,
           district: form.district,
           postal_code: form.postal_code,
@@ -105,7 +109,7 @@ export default function AccountAddressesPage() {
           label: form.label,
           full_name: form.full_name,
           phone: form.phone,
-          full_address: form.full_address,
+          address_line: form.address_line,
           city: form.city,
           district: form.district,
           postal_code: form.postal_code,
@@ -179,7 +183,7 @@ export default function AccountAddressesPage() {
 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 px-1">Açık Adres</label>
-              <textarea value={form.full_address} onChange={(e) => setForm(f => ({ ...f, full_address: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-[100px] resize-y transition-all" required />
+              <textarea value={form.address_line} onChange={(e) => setForm(f => ({ ...f, address_line: e.target.value }))} placeholder="Mahalle, sokak, bina ve daire no..." className="w-full px-3 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy min-h-[100px] resize-y transition-all" required />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -282,7 +286,7 @@ export default function AccountAddressesPage() {
                   <div className="bg-slate-50/80 rounded-xl p-4 mb-5 flex-1 border border-slate-100">
                     {a.full_name && <div className="text-sm font-bold text-slate-900 mb-1.5">{a.full_name}</div>}
                     <div className="text-sm text-slate-600 font-medium leading-relaxed min-h-[40px] break-words whitespace-pre-line">
-                      {a.full_address}
+                      {a.address_line}
                     </div>
                     <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-3 flex items-center gap-1.5 pt-3 border-t border-slate-200/60">
                       {a.district}, {a.city} {a.postal_code || ''}
