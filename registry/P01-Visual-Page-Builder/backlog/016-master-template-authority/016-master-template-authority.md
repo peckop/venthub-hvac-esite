@@ -29,6 +29,18 @@ artifacts:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 # 016 - Master Şablon (Master Template)
 
 ## 🎯 Hedef
