@@ -399,13 +399,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm" onClick={handleClose}>
       <div className="animate-in fade-in duration-300 w-full h-full flex items-start justify-center pt-4 sm:pt-16 pb-4 px-2">
-        {/* KASTİ HYDRATION HATASI (TEST): Sunucu ve İstemci farkı yaratıyoruz */}
-        <div className="hidden" data-test-hydration={Math.random()}></div>
         <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-300 flex flex-col max-h-full"
           onClick={e => e.stopPropagation()}
         >
           {/* Header / Input */}
           <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-white relative z-10">
+            {/* BILEREK HATA: Var olmayan bir değişkeni çağıralım */}
+            <span className="hidden">{NON_EXISTENT_AI_VARIABLE_ERROR}</span>
             <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35" />
             </svg>
