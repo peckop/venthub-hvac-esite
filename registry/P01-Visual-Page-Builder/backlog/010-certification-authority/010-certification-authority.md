@@ -32,6 +32,8 @@ artifacts:
 
 
 
+
+
 # 010 - Sertifikasyon Otoritesi
 
 ## 🎯 Hedef
