@@ -564,6 +564,32 @@ export const tr = {
     privacy: 'Gizlilik Politikası',
     terms: 'Kullanım Koşulları'
   },
+  footer: {
+    quickLinks: 'Hızlı Linkler',
+    categories: 'Kategoriler',
+    contact: 'İletişim',
+    workingHours: 'Çalışma Saatleri',
+    weekdays: 'Hafta İçi',
+    saturday: 'Cumartesi',
+    rights: 'Tüm hakları saklıdır.',
+    address: 'Teknokent Mah. Teknopark Blv.\nNo: 1/4A 34906 Pendik/İstanbul',
+    phone: '+90 (216) 123-45-67',
+    email: 'info@venthub.com.tr',
+    social: {
+      facebook: 'Facebook',
+      twitter: 'Twitter',
+      linkedin: 'LinkedIn',
+      instagram: 'Instagram'
+    }
+  },
+  support: {
+    links: {
+      faq: 'Sıkça Sorulan Sorular',
+      returns: 'İade ve Değişim',
+      shipping: 'Teslimat ve Kargo',
+      warranty: 'Garanti ve Servis'
+    }
+  },
   admin: {
     common: {
       saveChanges: "Değişiklikleri Kaydet",
