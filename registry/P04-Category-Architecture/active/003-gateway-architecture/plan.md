@@ -1,30 +1,34 @@
 # Plan: 003-gateway-architecture
 
 ## 🎯 Goal
-`CategoryPage.tsx` monolitini parçalayıp Gateway Mimarisine dönüştürmek.
+`CategoryPage.tsx` monolitini parçalayarak modüler, yüksek performanslı ve tip-güvenli bir Gateway mimarisine geçiş.
 
-## 🚧 Steps
+## 🏗️ Steps
 
-1. **Görünüm Bileşenlerini (Views) Oluşturma:**
-   - Files: `src/views/category/CategoryGridView.tsx`, `src/views/category/CategoryShowcaseView.tsx`, `src/views/category/CategoryLandingView.tsx`
-   - Change: `CategoryPage.tsx` içindeki farklı `displayMode` render bloklarını bağımsız dosyalara taşı.
-   - Verify: Bileşenlerin `initialProducts` ve `category` verilerini props olarak aldığını doğrula.
+### 1. Hooks ve Logic Katmanı Ayrımı
+- **Action:** `src/hooks/useCategoryGateway.ts` dosyasını oluştur. `CategoryPage.tsx` içindeki tüm `fetchData`, `filter` ve `sort` mantığını (ve ilgili state'leri) buraya taşı.
+- **Next.js 15 Fix:** Hook içinde `params` çözümlemesini Next.js 15 standartlarına göre ayarla.
+- **Verify:** `tsc --noEmit` çalıştırıldığında hook'un tip-güvenli olduğu onaylanmalı.
 
-2. **Ortak Bileşenlerin (Components) Ayrıştırılması:**
-   - Files: `src/components/category/CategoryHero.tsx`, `src/components/category/CategoryFilters.tsx`, `src/components/category/CompareBar.tsx`
-   - Change: `CategoryPage.tsx` içindeki devasa TSX bloklarını (Breadcrumb, Filter Sidebar vb.) bağımsız bileşenlere dönüştür.
-   - Verify: Her bileşenin kendi içinde `useI18n()` kullanarak dil uyumlu olduğunu denetle.
+### 2. Alt Görünümlerin Oluşturulması (Sub-Views)
+- **Action:** `src/views/category/` dizini altında şu dosyaları oluştur:
+  - `CategoryGridView.tsx`: Standart filtreli liste.
+  - `CategoryShowcaseView.tsx`: Marka/Ana kategori tanıtımı.
+  - `CategoryLandingView.tsx`: Seri/Ürün grubu sayfası.
+- **Verify:** Her view bileşeni, `CategoryPage.tsx`'ten izole edildiğinde tek başına render edilebilmeli.
 
-3. **Filtreleme Mantığının (Logic) Soyutlanması:**
-   - File: `src/hooks/useCategoryFilter.ts`
-   - Change: `filteredProducts` hesaplama ve state yönetimini (priceRange, selectedBrands vb.) custom hook'a taşı.
-   - Verify: Hook'un `filteredProducts` listesini ve setter fonksiyonlarını doğru döndürdüğünü test et.
+### 3. Ortak Bileşenlerin (Shared Components) Rafinasyonu
+- **Action:** Mevcut devasa JSX bloklarından `CategoryHero`, `CategoryFilters` ve `CategoryBreadcrumbs` yapılarını `src/components/category/` altına (eğer yoksa) taşı veya güncelle.
+- **Verify:** Filtreleme state'i View'lar arasında prop-drilling olmadan doğru şekilde akmalı.
 
-4. **Gateway Refactor (CategoryPage.tsx):**
-   - File: `src/views/CategoryPage.tsx`
-   - Change: Dosyayı sadece veri çeken (fetch) ve `display_mode`'a göre doğru `View` bileşenini çağıran bir "Gateway" haline getir.
-   - Verify: Toplam satır sayısının 150'nin altına indiğini kontrol et.
+### 4. Gateway Dispatcher (Refactor)
+- **Action:** `src/views/CategoryPage.tsx` dosyasını baştan yaz. 
+  - `useCategoryGateway` hook'unu çağır.
+  - `displayMode`'a göre ilgili Sub-View'ı render et.
+  - SEO ve Breadcrumb verilerini merkezi olarak yönet.
+- **Cleanup:** Dosyadaki tüm `as any` kullanımlarını ve Vite `react-router-dom` kalıntılarını temizle.
+- **Verify:** Ana kategori sayfası boyutu 800 satırdan < 150 satıra düşmeli.
 
-5. **Lighthouse & Tip Kontrolü:**
-   - Action: `pnpm run lint:ci` && `pnpm tsc --noEmit`
-   - Verify: Hiçbir tip hatası veya performans kaybı olmadığını doğrula.
+### 5. Final Validasyon ve Sync
+- **Action:** `pnpm run lint:ci` ve `pnpm build` komutlarını çalıştır.
+- **Verify:** Build sürecinde kategori sayfaları için sıfır hata raporlanmalı.
