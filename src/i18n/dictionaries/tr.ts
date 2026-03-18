@@ -90,6 +90,8 @@ export const tr = {
     placeholder: "Ürün, kategori veya marka ara...",
     noResultsAdvice: "Farklı anahtar kelimeler deneyin",
     detailedSearchCta: "Detaylı arama için tıklayın",
+    brandPrefix: "Marka: ",
+    fuzzyMatchNotice: "Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor."
   },
   resources: {
     title: 'Kaynaklar ve Kılavuzlar',
