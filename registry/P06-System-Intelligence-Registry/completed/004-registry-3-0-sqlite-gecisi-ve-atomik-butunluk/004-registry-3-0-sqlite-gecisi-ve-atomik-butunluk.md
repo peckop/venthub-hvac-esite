@@ -6,7 +6,7 @@ status: "Completed"
 progress: 10%
 project: "P06-System-Intelligence-Registry"
 created_at: "2026-03-19 10:30:00"
-updated_at: "2026-03-19 12:50:44"
+updated_at: "2026-03-19 13:00:04"
 artifacts:
   brainstorm: "registry/P06-System-Intelligence-Registry/completed/004-registry-3-0-sqlite-gecisi-ve-atomik-butunluk/brainstorm.md"
   plan: "registry/P06-System-Intelligence-Registry/completed/004-registry-3-0-sqlite-gecisi-ve-atomik-butunluk/plan.md"

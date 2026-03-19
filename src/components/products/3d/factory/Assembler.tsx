@@ -55,14 +55,14 @@ export const Assembler: React.FC<AssemblerProps> = ({
                         scale={part.scale || [1, 1, 1]}
                     >
                         <Suspense fallback={null}>
-                            {React.createElement(Component as React.ComponentType<any>, {
+                            {React.createElement(Component as React.ComponentType<Record<string, unknown>>, {
                                 ...(part.props || {}),
                                 explode: explode,
                                 isSelected: selectedPart === part.name,
                                 isIsolated: isolatedPart === part.name || isolatedPart === null,
                                 isHidden: hiddenParts.includes(part.name),
                                 onClick: () => onPartClick?.(part.name)
-                            } as any)}
+                            } as Record<string, unknown>)}
                         </Suspense>
                     </group>
                 )

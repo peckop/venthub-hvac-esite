@@ -21,8 +21,7 @@ const AdminWebhookEventsPage: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error: fetchErr } = await (supabase as unknown as { from: (t: string) => { select: (c: string) => { order: (c: string, o: any) => { limit: (l: number) => Promise<{data: unknown[], error: unknown}> } } } })
-          .from('webhook_events')
+        const { data, error: fetchErr } = await (supabase.from('webhook_events') as unknown as { select: (c: string) => { order: (c: string, o: { ascending: boolean }) => { limit: (l: number) => Promise<{data: Record<string, unknown>[], error: unknown}> } } } )
           .select('*')
           .order('created_at', { ascending: false })
           .limit(100)
