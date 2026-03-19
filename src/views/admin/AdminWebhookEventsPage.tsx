@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n/I18nProvider'
 import { 
   adminSectionTitleClass, 
@@ -12,7 +10,7 @@ import {
   adminTableCellClass, 
   adminTableContainerClass 
 } from '../../utils/adminUi'
-import { Clock, Database } from 'lucide-react'
+import { Clock, Database as DbIcon } from 'lucide-react'
 
 const AdminWebhookEventsPage: React.FC = () => {
   const { t: _t } = useI18n()
@@ -23,13 +21,13 @@ const AdminWebhookEventsPage: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error: fetchErr } = await (supabase as unknown as SupabaseClient<Database>)
+        const { data, error: fetchErr } = await (supabase as unknown as { from: (t: string) => { select: (c: string) => { order: (c: string, o: any) => { limit: (l: number) => Promise<{data: unknown[], error: unknown}> } } } })
           .from('webhook_events')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(100)
 
-        if (fetchErr) throw fetchErr
+        if (fetchErr) throw (fetchErr as Error)
         setEvents(data || [])
       } catch (err) {
         console.error('Webhook load error:', err)
@@ -118,7 +116,7 @@ const AdminWebhookEventsPage: React.FC = () => {
         <div className="fixed inset-0 bg-[#0A0F1E]/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
           <div className="bg-[#12192C] border border-white/10 rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-              <h3 className="font-bold text-white flex items-center gap-2"><Database size={18} className="text-cyan-400" /> Detay</h3>
+              <h3 className="font-bold text-white flex items-center gap-2"><DbIcon size={18} className="text-cyan-400" /> Detay</h3>
               <button onClick={() => setSelectedEvent(null)} className="text-slate-400 hover:text-white font-bold">Kapat</button>
             </div>
             <pre className="p-6 overflow-auto text-[11px] font-mono text-cyan-100 bg-[#0A0F1E]/50 custom-scrollbar leading-relaxed">

@@ -178,16 +178,16 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
                                 {/* Alt: Stat'lar */}
                                 <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[40px]">
-                                    {((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric1 && (
+                                    {(((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric1 as Record<string, unknown>) && (
                                         <div>
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1?.value || '')}</p>
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1?.label || '')}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String((((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1 as Record<string, unknown>)?.value || '')}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String((((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1 as Record<string, unknown>)?.label || '')}</p>
                                         </div>
                                     )}
-                                    {((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric2 && (
+                                    {(((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric2 as Record<string, unknown>) && (
                                         <div>
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2?.value || '')}</p>
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2?.label || '')}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String((((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2 as Record<string, unknown>)?.value || '')}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String((((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2 as Record<string, unknown>)?.label || '')}</p>
                                         </div>
                                     )}
                                 </div>

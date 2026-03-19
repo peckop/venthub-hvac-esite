@@ -85,9 +85,10 @@ const ProductCard: React.FC<{
             imageRef.current.scale.y = THREE.MathUtils.lerp(imageRef.current.scale.y, targetScale, 0.15)
             
             // Pulse effect when hovered
-            if (hovered) {
-                imageRef.current.material.emissiveIntensity = THREE.MathUtils.lerp(
-                    imageRef.current.material.emissiveIntensity, 
+            if (hovered && imageRef.current.material) {
+                const mat = imageRef.current.material as THREE.MeshStandardMaterial
+                mat.emissiveIntensity = THREE.MathUtils.lerp(
+                    mat.emissiveIntensity || 0, 
                     0.5 + Math.sin(state.clock.getElapsedTime() * 4) * 0.2, 
                     0.1
                 )
