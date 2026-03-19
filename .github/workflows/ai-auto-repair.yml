@@ -30,6 +30,7 @@ jobs:
         continue-on-error: true
 
       - name: 'Invoke Gemini Repair Agent'
+        continue-on-error: true
         uses: 'google-github-actions/run-gemini-cli@v0'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
