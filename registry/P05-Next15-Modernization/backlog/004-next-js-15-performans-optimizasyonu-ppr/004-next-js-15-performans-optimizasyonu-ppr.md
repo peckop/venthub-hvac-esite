@@ -93,6 +93,8 @@ Kritik sayfalarda (Ürün Detay, Kategori) statik kabuk ve dinamik veri ayrımı
 
 
 
+
+
 ## ✅ Alt Görevler
 - [ ] "Slow 3G" network profilinde statik kabuğun anında geldiği test edilecek.
 - [ ] `next build` sırasında PPR logları kontrol edilecek.

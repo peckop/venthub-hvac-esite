@@ -12,7 +12,7 @@ started_at: "2026-03-19 02:36:06"
 status: Completed
 progress: 100%
 completed_at: "2026-03-19 02:37:13"
-updated_at: "2026-03-19 23:10:25"
+updated_at: "2026-03-19 23:21:19"
 ---
 
 
@@ -22,6 +22,8 @@ updated_at: "2026-03-19 23:10:25"
 
 ## 🎯 Hedef
 Registry'deki görevlerin `depends_on` alanlarını tarayarak, hangi görevin hangisini beklediğini gösteren görsel bir tablo (veya ASCII graph) üretmek. Bu, projenin kritik yolunu (critical path) görmemizi sağlar.
+
+
 
 
 

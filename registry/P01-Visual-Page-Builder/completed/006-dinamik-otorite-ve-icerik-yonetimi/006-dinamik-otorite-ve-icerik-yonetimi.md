@@ -72,6 +72,8 @@ artifacts:
 
 
 
+
+
 ## ✅ Alt Görevler
 - [ ] Supabase SQL Editor üzerinden `categories` tablosuna `authority_content` kolonunu ekleyen migration'ı çalıştır.
 - [ ] SQL: `ALTER TABLE categories ADD COLUMN IF NOT EXISTS authority_content JSONB DEFAULT NULL;`

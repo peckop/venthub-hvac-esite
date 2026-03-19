@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:10:24"
+updated_at: "2026-03-19 23:21:15"
 id: 016
 title: "Master Şablon (Master Template)"
 status: "Executing"
@@ -54,6 +54,8 @@ artifacts:
 
 ## 🎯 Hedef
 Page Builder'ın kalbi olan, tüm dinamik veriyi alıp sayfa düzenini (Layout) oluşturan ana şablonun (Master Template) teslim edilmesi.
+
+
 
 
 
