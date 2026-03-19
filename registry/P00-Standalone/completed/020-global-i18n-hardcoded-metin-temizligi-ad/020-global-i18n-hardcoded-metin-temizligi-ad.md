@@ -1,5 +1,5 @@
 ---
-updated_at: "2026-03-19 13:22:02"
+updated_at: "2026-03-19 23:10:24"
 id: 020
 title: "Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)"
 status: "Completed"
@@ -14,14 +14,72 @@ artifacts:
 
 # 020 - Global i18n & Hardcoded Metin Temizliği
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [x] Admin panelindeki (`src/views/admin/*`) metin envanteri.
-- [x] Admin: LogisticsPage (Kargo Panosu) tam i18n dönüşümü.
-- [x] Admin: ReturnsPage kalıntı temizliği ve i18n tamamlanması.
-- [x] Admin: OrdersBoard (Kanban) tam i18n dönüşümü.
-- [x] Admin: Dashboard KPI ve Grafik başlıklarının i18n dönüşümü.
-- [x] Hesaplayıcılar: AirCurtain, JetFan i18n dönüşümü.
-- [x] Yeni metinlerin tr.ts ve en.ts dosyalarına eklenmesi.
-- [x] Eksik İngilizce çevirilerin tamamlanması.
-- [x] Final lint ve build doğrulaması.
-- [x] TR/EN modları arası görsel kontrol.
+- [x] `src/views/admin/` dizinindeki tüm metinlerin envanterini çıkar.
+- [x] `src/views/calculators/` dizinindeki hesaplayıcı metinlerini listele.
+- [x] Eksik anahtarları `tr.ts` ve `en.ts` dosyalarına ekle.
+- [x] `AdminLogisticsPage.tsx` tam i18n dönüşümü (Kargo Panosu).
+- [x] `AdminReturnsPage.tsx` kalıntı temizliği.
+- [x] `AdminOrdersPage.tsx` ve `AdminOrdersBoard.tsx` (Kanban) tam i18n dönüşümü.
+- [x] `AdminDashboardPage.tsx` KPI ve grafik başlıkları düzeltmesi.
+- [x] `YeniAdmin.tsx` (gereksiz test dosyası) silindi.
+- [x] `AirCurtainCalcPage.tsx` i18n dönüşümü.
+- [x] `JetFanCalcPage.tsx` i18n dönüşümü.
+- [x] Tüm sayfaların hem TR hem EN modunda metinlerinin doğru yüklendiğini kontrol et.
+- [x] `npm run lint` ve `tsc` (lint passed, tsc has legacy errors) kontrollerini yap.

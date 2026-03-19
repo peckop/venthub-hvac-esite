@@ -6,35 +6,85 @@ import datetime
 import shutil
 import sqlite3
 import json
+import hashlib
 from typing import List, Dict, Any, Optional
 
-# VENTHUB REGISTRY 3.5 (V7 PERFECT SEALER)
-# Bu sürüm, mükerrer ID'leri temizler, Türkçe karakterleri ASCII'ye çevirir 
-# ve leaf-folder yapısını fiziksel olarak doğrular.
-
+# VENTHUB REGISTRY 4.1 (SYNC ENGINE PRO)
 REGISTRY_DIR: str = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT: str = os.path.abspath(os.path.join(REGISTRY_DIR, '..'))
 DB_FILE: str = os.path.join(REGISTRY_DIR, "registry.db")
 INDEX_JSON: str = os.path.join(REGISTRY_DIR, "index.json")
+SENTINEL_FILE: str = os.path.join(REGISTRY_DIR, ".sentinel")
+SHARED_MEMORY: str = os.path.abspath(os.path.join(PROJECT_ROOT, ".gemini", "memory", "shared_state.json"))
+LOCKS_FILE: str = os.path.abspath(os.path.join(PROJECT_ROOT, ".gemini", "memory", "task_locks.json"))
 
 def get_now() -> str:
     return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-def turkish_slug(text: str) -> str:
-    """İsimden tüm ID ve kirli karakterleri temizleyip saf ASCII slug üretir."""
-    # 1. Başlıktaki tüm ID varyasyonlarını temizle (033:, 033-, 033_, 033 )
-    text = re.sub(r'^\d{3}[:\-_\s]*', '', text)
-    # 2. Eğer hala ID kalmışsa (mükerrer ID durumu) bir kez daha temizle
-    text = re.sub(r'^\d{3}[:\-_\s]*', '', text)
+def acquire_lock(task_id: str, agent_id: str = "Terminal"):
+    locks = {}
+    if os.path.exists(LOCKS_FILE):
+        with open(LOCKS_FILE, 'r', encoding='utf-8') as f:
+            try: locks = json.load(f)
+            except: locks = {}
     
-    # 3. Türkçe karakter eşleme
+    if task_id in locks and locks[task_id]['agent'] != agent_id:
+        print(f"🚨 ERİŞİM REDDEDİLDİ: Görev {task_id}, {locks[task_id]['timestamp']} tarihinde {locks[task_id]['agent']} tarafından kilitlenmiş!")
+        sys.exit(1)
+        
+    locks[task_id] = {"agent": agent_id, "timestamp": get_now()}
+    with open(LOCKS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(locks, f, indent=2, ensure_ascii=False)
+    print(f"🔒 GÖREV KİLİTLENDİ: {task_id} ({agent_id} adına)")
+
+def release_lock(task_id: str, agent_id: str = "Terminal"):
+    locks = {}
+    if os.path.exists(LOCKS_FILE):
+        with open(LOCKS_FILE, 'r', encoding='utf-8') as f:
+            try: locks = json.load(f)
+            except: locks = {}
+            
+    if task_id in locks:
+        del locks[task_id]
+        with open(LOCKS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(locks, f, indent=2, ensure_ascii=False)
+        print(f"🔓 GÖREV KİLİDİ AÇILDI: {task_id}")
+    else:
+        print(f"ℹ️ Görev {task_id} için aktif bir kilit bulunamadı.")
+
+def remember(fact: str):
+    data = {}
+    if os.path.exists(SHARED_MEMORY):
+        with open(SHARED_MEMORY, 'r', encoding='utf-8') as f:
+            try: data = json.load(f)
+            except: data = {}
+    
+    entry = {"timestamp": get_now(), "fact": fact}
+    if "history" not in data: data["history"] = []
+    data["history"].append(entry)
+    data["last_update"] = get_now()
+    
+    with open(SHARED_MEMORY, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    print(f"🧠 Orion Hatırladı: {fact}")
+
+def recall():
+    if not os.path.exists(SHARED_MEMORY):
+        print("📭 Orion Hafızası Boş.")
+        return
+    with open(SHARED_MEMORY, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        print(f"\n🧠 ORION SHARED MEMORY (Son Güncelleme: {data.get('last_update', '???')})")
+        for item in data.get("history", [])[-5:]: # Son 5 kayıt
+            print(f"  [{item['timestamp']}] {item['fact']}")
+
+def turkish_slug(text: str) -> str:
     mapping = str.maketrans("çğışıöüÇĞİŞIÖÜ", "cgisiouCGISIOU")
     text = text.translate(mapping).lower()
-    
-    # 4. Saf ASCII slug
+    text = re.sub(r'^\d{3}[:\-_\s]*', '', text)
     text = re.sub(r'[^a-z0-9-]', '-', text)
     text = re.sub(r'-+', '-', text).strip('-')
-    return text[:40] # Çok uzun isimleri kısıtla
+    return text[:40]
 
 def parse_metadata(content: str) -> Dict[str, Any]:
     meta: Dict[str, Any] = {}
@@ -47,135 +97,125 @@ def parse_metadata(content: str) -> Dict[str, Any]:
             meta[key] = val
     return meta
 
-def update_file_internal_links(file_path: str, new_proj: str, new_state: str, slug: str):
-    """Metadata ve artifact yollarını fiziksel konuma mühürler."""
-    if not os.path.exists(file_path): return
-    with open(file_path, 'r', encoding='utf-8') as f: content = f.read()
+def calculate_integrity_hash():
+    structure = []
+    for root, dirs, files in os.walk(REGISTRY_DIR):
+        if any(x in root for x in [".snapshots", "__pycache__", ".git"]): continue
+        rel_path = os.path.relpath(root, REGISTRY_DIR).replace('\\', '/')
+        structure.append(f"{rel_path}:{sorted(dirs)}:{sorted(files)}")
+    full_str = "\n".join(sorted(structure))
+    return hashlib.sha256(full_str.encode('utf-8')).hexdigest()
 
-    new_status = "Executing" if new_state == "active" else "Completed" if new_state == "completed" else "Planning"
-    content = re.sub(r'status:\s*".*?"', f'status: "{new_status}"', content)
-    content = re.sub(r'project:\s*".*?"', f'project: "{new_proj}"', content)
-    
-    def fix_path(match):
-        prefix = match.group(1)
-        filename = match.group(2).split('/')[-1]
-        new_path = f"registry/{new_proj}/{new_state}/{slug}/{filename}"
-        return f'{prefix}"{new_path}"'
+def check_sentinel():
+    if not os.path.exists(SENTINEL_FILE): return True
+    with open(SENTINEL_FILE, 'r') as f: saved_hash = f.read().strip()
+    return saved_hash == calculate_integrity_hash()
 
-    content = re.sub(r'(\w+:\s*)"(registry/.*?)"', fix_path, content)
-    content = re.sub(r'updated_at:\s*".*?"', f'updated_at: "{get_now()}"', content)
+def update_sentinel():
+    with open(SENTINEL_FILE, 'w') as f: f.write(calculate_integrity_hash())
 
-    with open(file_path, 'w', encoding='utf-8') as f: f.write(content)
+def create_project(proj_id: str, name: str):
+    slug = turkish_slug(name)
+    proj_dir = os.path.join(REGISTRY_DIR, f"{proj_id}-{slug}")
+    for s in ["active", "backlog", "completed"]:
+        path = os.path.join(proj_dir, s); os.makedirs(path, exist_ok=True)
+        with open(os.path.join(path, ".gitkeep"), 'w') as f: pass
+    print(f"🚀 Proje Otonom Başlatıldı: {proj_id}-{slug}")
+    update_sentinel()
 
-class RegistryDB:
-    def __init__(self, db_path: str = DB_FILE):
-        self.db_path = db_path
-        self.init_db()
+def create_task(proj_id: str, task_id: str, title: str):
+    proj_dir = next((d for d in os.listdir(REGISTRY_DIR) if d.startswith(proj_id)), None)
+    slug = f"{task_id.zfill(3)}-{turkish_slug(title)}"
+    task_path = os.path.join(REGISTRY_DIR, proj_dir, "backlog", slug); os.makedirs(task_path, exist_ok=True)
+    main_md = os.path.join(task_path, f"{slug}.md")
+    template = f"---\nid: {task_id.zfill(3)}\ntitle: \"{title}\"\npriority: \"MED\"\nstatus: \"Planning\"\nproject: \"{proj_dir}\"\ncreated_at: \"{get_now()}\"\nupdated_at: \"{get_now()}\"\nartifacts:\n  brainstorm: \"registry/{proj_dir}/backlog/{slug}/brainstorm.md\"\n  plan: \"registry/{proj_dir}/backlog/{slug}/plan.md\"\n  review: \"registry/{proj_dir}/backlog/{slug}/review.md\"\n---\n# 🏗️ {task_id.zfill(3)}: {title}\nGörev içeriği buraya gelecek.\n"
+    with open(main_md, 'w', encoding='utf-8') as f: f.write(template)
+    for art in ["brainstorm.md", "plan.md", "review.md"]:
+        with open(os.path.join(task_path, art), 'w', encoding='utf-8') as f:
+            f.write(f"# {art.split('.')[0].capitalize()}: {title}\nBu dosya otonom olarak mühürlenmiştir.\n")
+    print(f"📄 Görev Otonom Yaratıldı: {slug}")
+    update_sentinel()
 
-    def get_conn(self): return sqlite3.connect(self.db_path)
-
-    def init_db(self):
-        with self.get_conn() as conn:
-            cursor = conn.cursor()
-            cursor.execute('CREATE TABLE IF NOT EXISTS tasks (id TEXT, title TEXT, project_id TEXT, state TEXT, status TEXT, path TEXT, PRIMARY KEY (id, project_id))')
-            conn.commit()
-        self.sync()
-
-    def sync(self):
-        projects = sorted([d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))])
-        index_data: Dict[str, Any] = {"generated_at": get_now(), "tasks": {}}
-        with self.get_conn() as conn:
-            cursor = conn.cursor()
-            cursor.execute('DELETE FROM tasks')
-            for p in projects:
-                for s in ["backlog", "active", "completed"]:
-                    s_path = os.path.join(REGISTRY_DIR, p, s)
-                    if os.path.exists(s_path):
-                        for slug in os.listdir(s_path):
-                            if os.path.isdir(os.path.join(s_path, slug)):
-                                md_file = os.path.join(s_path, slug, f"{slug}.md")
-                                if os.path.exists(md_file):
-                                    tid = slug.split("-")[0].zfill(3)
-                                    rel_path = os.path.relpath(md_file, PROJECT_ROOT).replace('\\', '/')
-                                    index_data["tasks"][f"{p}/{tid}"] = {"id": tid, "project": p, "state": s, "path": rel_path}
-            conn.commit()
-        with open(INDEX_JSON, 'w', encoding='utf-8') as jf: json.dump(index_data, jf, indent=2, ensure_ascii=False)
-
-def normalize_registry(db: RegistryDB):
-    """V7 Pure Hierarchy - Deep Sealer (Cleanup IDs and Typos)"""
-    print("\n🛠️ Registry V7 Derin Onarım ve Mühürleme Başlatıldı...")
-    protocol_keywords = ["brainstorm", "plan", "review", "strategy"]
-    
+def normalize_registry():
     projects = [d for d in os.listdir(REGISTRY_DIR) if re.match(r'^P\d{2}', d) and os.path.isdir(os.path.join(REGISTRY_DIR, d))]
-    
     for p_dir in projects:
         p_path = os.path.join(REGISTRY_DIR, p_dir)
         for state in ['active', 'backlog', 'completed']:
             state_path = os.path.join(p_path, state)
-            if not os.path.exists(state_path): os.makedirs(state_path, exist_ok=True); continue
-            
-            # 1. Sızıntıları (Loose Files) ve Mükerrerleri Onar
+            if not os.path.exists(state_path): continue
             for item in os.listdir(state_path):
                 i_path = os.path.join(state_path, item)
-                if item.startswith('.') or item == ".gitkeep": continue
-                
-                # Metadata üzerinden Source of Truth bul
-                tid = "000"; title = item
-                if os.path.isfile(i_path) and item.endswith('.md'):
-                    with open(i_path, 'r', encoding='utf-8') as f: meta = parse_metadata(f.read())
-                    tid = str(meta.get('id', '000')).zfill(3)
-                    title = meta.get('title', item.replace('.md', ''))
-                elif os.path.isdir(i_path):
-                    md_files = [f for f in os.listdir(i_path) if f.endswith('.md')]
-                    if md_files:
-                        main_md_name = next((f for f in md_files if not any(k in f.lower() for k in protocol_keywords)), md_files[0])
-                        with open(os.path.join(i_path, main_md_name), 'r', encoding='utf-8') as f: meta = parse_metadata(f.read())
-                        tid = str(meta.get('id', '000')).zfill(3)
-                        title = meta.get('title', item)
+                if item.startswith('.') or item == ".gitkeep" or not os.path.isdir(i_path): continue
+                md_files = [f for f in os.listdir(i_path) if f.endswith('.md')]
+                if md_files:
+                    main_md_name = next((f for f in md_files if f.startswith(item[:3])), md_files[0])
+                    main_md_path = os.path.join(i_path, main_md_name)
+                    
+                    with open(main_md_path, 'r', encoding='utf-8') as f: m_content = f.read()
+                    
+                    # --- CONTENT SYNC ENGINE (Plan -> Main) ---
+                    plan_path = os.path.join(i_path, "plan.md")
+                    if os.path.exists(plan_path):
+                        with open(plan_path, 'r', encoding='utf-8') as pf: p_content = pf.read()
+                        tasks = re.findall(r'- \[[ x]\] .*', p_content)
+                        if tasks:
+                            new_block = "\n\n## ✅ Alt Görevler\n" + "\n".join(tasks)
+                            if "## ✅ Alt Görevler" in m_content:
+                                m_content = re.sub(r'## ✅ Alt Görevler.*', new_block, m_content, flags=re.DOTALL)
+                            else:
+                                m_content += new_block
+                            with open(main_md_path, 'w', encoding='utf-8') as mf: mf.write(m_content)
+                            print(f"  🔄 İçerik Senkronize Edildi: {item}")
 
-                # TEMİZ VE TEKİL SLUG OLUŞTUR
-                final_slug = f"{tid}-{turkish_slug(title)}"
-                target_dir = os.path.join(state_path, final_slug)
-                
-                if i_path != target_dir:
-                    os.makedirs(target_dir, exist_ok=True)
-                    if os.path.isfile(i_path):
-                        shutil.move(i_path, os.path.join(target_dir, f"{final_slug}.md"))
-                    elif os.path.isdir(i_path):
-                        for f in os.listdir(i_path):
-                            src_f = os.path.join(i_path, f); dst_f = os.path.join(target_dir, f)
-                            if not os.path.exists(dst_f): shutil.move(src_f, dst_f)
-                        shutil.rmtree(i_path)
-                    i_path = target_dir; item = final_slug
-                    print(f"  ✅ Onarıldı: {final_slug}")
+                    # --- METADATA MÜHÜRLEME ---
+                    for f_name in os.listdir(i_path):
+                        if f_name.endswith('.md'):
+                            f_path = os.path.join(i_path, f_name)
+                            with open(f_path, 'r', encoding='utf-8') as f: content = f.read()
+                            if content.startswith('---'):
+                                new_status = "Executing" if state == "active" else "Completed" if state == "completed" else "Planning"
+                                content = re.sub(r'status:\s*".*?"', f'status: "{new_status}"', content)
+                                content = re.sub(r'project:\s*".*?"', f'project: "{p_dir}"', content)
+                                content = re.sub(r'updated_at:\s*".*?"', f'updated_at: "{get_now()}"', content)
+                                def fix_p(match):
+                                    pfx = match.group(1); fn = match.group(2).split('/')[-1]
+                                    return f'{pfx}"registry/{p_dir}/{state}/{item}/{fn}"'
+                                content = re.sub(r'(\w+:\s*)"(registry/.*?)"', fix_p, content)
+                                with open(f_path, 'w', encoding='utf-8') as f: f.write(content)
+    update_sentinel()
 
-                # 2. İÇERİK MÜHÜRLEME (Folder Name == File Name)
-                main_md = f"{item}.md"
-                main_md_path = os.path.join(i_path, main_md)
-                
-                # Ana dosyayı fiziksel olarak düzelt (Overkill Protection)
-                for f in os.listdir(i_path):
-                    f_path = os.path.join(i_path, f)
-                    if f.endswith('.md') and f != main_md and not any(k in f.lower() for k in protocol_keywords):
-                        if not os.path.exists(main_md_path):
-                            os.rename(f_path, main_md_path)
-                        else:
-                            os.remove(f_path) # Gereksiz mükerrer dosyayı temizle
-                
-                # Metadata Linklerini Mühürle
-                if os.path.exists(main_md_path):
-                    update_file_internal_links(main_md_path, p_dir, state, item)
-                    for art in os.listdir(i_path):
-                        if art.endswith('.md'): update_file_internal_links(os.path.join(i_path, art), p_dir, state, item)
-    db.sync()
-    print("🚀 Registry V7 Saf Hiyerarşi Kusursuz Olarak Mühürlendi.")
+def move_task(proj_id: str, task_id: str, target_state: str):
+    proj_dir = next((d for d in os.listdir(REGISTRY_DIR) if d.startswith(proj_id)), None)
+    tid_prefix = f"{task_id.zfill(3)}-"
+    for s in ["backlog", "active", "completed"]:
+        s_path = os.path.join(REGISTRY_DIR, proj_dir, s)
+        if os.path.exists(s_path):
+            folder = next((d for d in os.listdir(s_path) if d.startswith(tid_prefix)), None)
+            if folder:
+                src = os.path.join(s_path, folder)
+                dest = os.path.join(REGISTRY_DIR, proj_dir, target_state, folder)
+                if os.path.exists(dest): shutil.rmtree(dest)
+                shutil.move(src, dest)
+                print(f"🚚 Görev Otonom Taşındı: {task_id} -> {target_state}")
+                normalize_registry()
+                break
 
 if __name__ == "__main__":
-    db = RegistryDB()
-    parser = argparse.ArgumentParser(description="VentHub Registry 3.5 Perfect Sealer")
-    parser.add_argument("action", choices=["repair", "reindex", "normalize"])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", choices=["repair", "reindex", "normalize", "activate", "task", "create-project", "create-task", "remember", "recall", "lock", "unlock"])
+    parser.add_argument("proj", nargs="?"); parser.add_argument("task", nargs="?"); parser.add_argument("title", nargs="?")
     args = parser.parse_args()
+    if args.action == "repair": normalize_registry(); print("🛡️ Mühür Tazelendi."); sys.exit(0)
+    if args.action == "recall": recall(); sys.exit(0)
+    if args.action == "remember": remember(args.proj); sys.exit(0)
+    if args.action == "lock": acquire_lock(args.proj, args.task or "Terminal"); sys.exit(0)
+    if args.action == "unlock": release_lock(args.proj, args.task or "Terminal"); sys.exit(0)
+    if not check_sentinel(): print("\n[🚨 SENTINEL] İHLAL! Repair çalıştırın."); sys.exit(1)
     try:
-        if args.action in ["normalize", "repair"]: normalize_registry(db)
-        elif args.action == "reindex": db.sync()
-    except Exception as e: print(f"\n[🚨 KAZA] {e}")
+        if args.action == "create-project": create_project(args.proj, args.task)
+        elif args.action == "create-task": create_task(args.proj, args.task, args.title)
+        elif args.action == "normalize": normalize_registry()
+        elif args.action == "activate": move_task(args.proj, args.task, "active")
+        elif args.action == "task": move_task(args.proj, args.task, args.title)
+        elif args.action == "reindex": RegistryDB().sync(); update_sentinel(); print("🔄 İndeks Güncellendi.")
+    except Exception as e: print(f"[🚨 KAZA] {e}")
