@@ -10,6 +10,7 @@ import {
   CheckCircle2, 
   AlertCircle 
 } from 'lucide-react'
+import { useI18n } from '../../i18n/I18nProvider'
 import { useSettings, type AppSettings } from '../../hooks/useSettings'
 
 const AdminSettingsPage: React.FC = () => {

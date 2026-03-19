@@ -217,17 +217,17 @@ export const CheckoutPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={setCustomerInfo} t={t} />}
+              {step === 1 && <StepCustomerInfo customerInfo={customerInfo as unknown as Record<string, unknown>} setCustomerInfo={setCustomerInfo as unknown as (v: any) => void} t={t} />}
               
               {step === 2 && (
                 <StepAddressInfo
-                  shippingAddress={shippingAddress} setShippingAddress={setShippingAddress}
-                  billingAddress={billingAddress} setBillingAddress={setBillingAddress}
+                  shippingAddress={shippingAddress as unknown as Record<string, unknown>} setShippingAddress={setShippingAddress as unknown as (v: any) => void}
+                  billingAddress={billingAddress as unknown as Record<string, unknown>} setBillingAddress={setBillingAddress as unknown as (v: any) => void}
                   sameAsShipping={sameAsShipping} setSameAsShipping={setSameAsShipping}
                   shippingMethod={shippingMethod} setShippingMethod={setShippingMethod}
                   invoiceType={invoiceType} setInvoiceType={setInvoiceType}
-                  invoiceInfo={invoiceInfo} setInvoiceInfo={setInvoiceInfo}
-                  legalConsents={legalConsents} setLegalConsents={setLegalConsents}
+                  invoiceInfo={invoiceInfo as unknown as Record<string, unknown>} setInvoiceInfo={setInvoiceInfo as unknown as (v: any) => void}
+                  legalConsents={legalConsents as unknown as Record<string, unknown>} setLegalConsents={setLegalConsents as unknown as (v: any) => void}
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
@@ -239,8 +239,8 @@ export const CheckoutPage: React.FC = () => {
 
               {step === 3 && (
                 <ReviewSummary
-                  customer={customerInfo} shipping={shippingAddress} billing={billingAddress}
-                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo}
+                  customer={customerInfo as unknown as Record<string, unknown>} shipping={shippingAddress as unknown as Record<string, unknown>} billing={billingAddress as unknown as Record<string, unknown>}
+                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo as unknown as Record<string, unknown>}
                   onEditPersonal={() => setStep(1)} 
                   onEditShipping={() => setStep(2)}
                   onEditBilling={() => setStep(2)}
