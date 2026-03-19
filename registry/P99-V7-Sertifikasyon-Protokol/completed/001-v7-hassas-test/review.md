@@ -1,0 +1,1 @@
+V7 Sertifikasyon testi başarıyla sonuçlandı. Dosya içi metadata senkronizasyonu ve klasör derinliği artık otonom sistemin ayrılmaz bir parçasıdır. Sistem kirlilikten arındırıldı ve kararlı hale getirildi.
