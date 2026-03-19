@@ -35,7 +35,6 @@ const TickerCardLane: React.FC<Props> = ({ items, speed = 1.4, gap = 12, width =
           pauseOnFocus: false,
         },
       }}
-      // @ts-expect-error - AutoScroll is a valid Splide extension but type definitions may vary
       extensions={{ AutoScroll }}
       aria-label="Product cards ticker"
     >

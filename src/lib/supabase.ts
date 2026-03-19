@@ -24,6 +24,8 @@ import type {
 } from '../types/db-rows'
 
 export type { DbAdminSearchResult, DbFtsSearchResult }
+export type UserAddress = DbUserAddress
+export type InvoiceProfile = DbInvoiceProfile
 
 // Define SUPABASE config from process.env for Next.js
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -838,7 +840,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_projects')
     .select('*')
     .order('updated_at', { ascending: false })
@@ -848,7 +850,7 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_projects')
     .insert(project)
     .select()
@@ -859,7 +861,7 @@ export async function createProject(project: Partial<DbUserProject>): Promise<Db
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('user_projects')
     .delete()
     .eq('id', id)
@@ -869,7 +871,7 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('project_items')
     .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
@@ -880,7 +882,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('project_items')
     .delete()
     .match({ project_id: projectId, product_id: productId })
@@ -890,7 +892,7 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)
