@@ -56,8 +56,7 @@ const ProductCard: React.FC<{
     onHover: (hovering: boolean) => void
 }> = ({ item, index, total, gap, scrollOffset, isPaused, onHover }) => {
     const groupRef = useRef<THREE.Group>(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const imageRef = useRef<any>(null)
+    const imageRef = useRef<THREE.Mesh>(null)
     const router = useRouter()
     const [hovered, setHover] = useState(false)
 

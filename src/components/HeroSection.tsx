@@ -61,8 +61,7 @@ export const HeroSection: React.FC = () => {
       
       const idle = (cb: () => void) => {
         if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (window as any).requestIdleCallback(cb)
+          (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(cb)
         } else {
           setTimeout(cb, 800)
         }

@@ -10,20 +10,17 @@ import {
   CheckCircle2, 
   AlertCircle 
 } from 'lucide-react'
-import { useSettings } from '../../hooks/useSettings'
-import { useI18n } from '../../i18n/I18nProvider'
+import { useSettings, type AppSettings } from '../../hooks/useSettings'
 
 const AdminSettingsPage: React.FC = () => {
   const { t: _t } = useI18n()
   const [activeTab, setActiveTab] = useState<'general' | 'payment' | 'admins' | 'system'>('general')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { settings, loading } = useSettings() as any
+  const { settings, loading } = useSettings()
   const [saving] = useState(false)
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
 
   // Form States (Local copies for editing)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [formData, setFormData] = useState<any>(null)
+  const [formData, setFormData] = useState<AppSettings | null>(null)
 
   React.useEffect(() => {
     if (settings && !formData) {

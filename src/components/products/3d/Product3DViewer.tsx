@@ -135,8 +135,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const [showStyleMenu, setShowStyleMenu] = useState(false)
     const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('orbit')
     const [enableTooltip, setEnableTooltip] = useState(false)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const controlsRef = useRef<any>(null)
+    const controlsRef = useRef<import('three-stdlib').OrbitControls | null>(null)
     const modelGroupRef = useRef<THREE.Group | null>(null)
 
     // Responsive toolbar sizing
@@ -415,8 +414,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                                     <button
                                         key={v.key}
                                         onClick={() => {
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            handleViewChange(v.key as any)
+                                            handleViewChange(v.key as 'front' | 'top' | 'right' | 'back' | 'bottom' | 'left' | 'iso')
                                         }}
                                         className="w-full text-left px-3 py-2 text-xs font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-2.5 transition-colors"
                                     >
@@ -505,8 +503,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                                     <button
                                         key={s.key}
                                         onClick={() => {
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            setDisplayStyle(s.key as any);
+                                            setDisplayStyle(s.key as 'shaded' | 'shadedEdges' | 'wireframe' | 'hiddenLines');
                                             setShowStyleMenu(false);
                                         }}
                                         className={`w-full text-left px-3 py-2 flex items-center gap-2.5 transition-colors ${displayStyle === s.key ? 'bg-blue-50 text-blue-600' : 'text-gray-700 hover:bg-gray-50'}`}
