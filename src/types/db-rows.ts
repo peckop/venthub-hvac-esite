@@ -100,6 +100,25 @@ export interface DbProjectItem {
   product?: DbProduct | null;
 }
 
+export interface DbAppSettings {
+  id: string;
+  key: string;
+  value: Json;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DbWebhookEvent {
+  id: string;
+  service: string;
+  status: string;
+  payload: Json;
+  request_body?: Json;
+  response_body?: Json;
+  error_message?: string;
+  created_at: string;
+}
+
 // RPC Return Types
 export interface DbProductEnrichedRow {
   id: string;

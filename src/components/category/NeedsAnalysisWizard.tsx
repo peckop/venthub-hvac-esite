@@ -17,17 +17,17 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
     const [isOpen, setIsOpen] = useState(false)
 
     const handleSelection = (key: string, value: string | number) => {
-        const newSelections = { ...selections, [key]: value }
+        const valStr = String(value)
+        const newSelections = { ...selections, [key]: valStr }
         setSelections(newSelections)
 
-        // Auto advance or finish
         if (key === 'maxHeight') setStep(2)
         if (key === 'heating') setStep(3)
         if (key === 'type') {
             onFilterChange({
-                maxHeight: newSelections.maxHeight,
-                heating: newSelections.heating === 'none' ? undefined : newSelections.heating,
-                type: value
+                maxHeight: selections.maxHeight ? parseInt(String(selections.maxHeight)) : undefined,
+                heating: selections.heating === 'none' ? undefined : selections.heating,
+                type: valStr
             })
             setIsOpen(false)
             setStep(1) // Reset for next time
