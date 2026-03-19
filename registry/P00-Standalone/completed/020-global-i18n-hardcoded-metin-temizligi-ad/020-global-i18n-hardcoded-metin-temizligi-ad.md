@@ -1,5 +1,5 @@
 ---
-updated_at: "2026-03-19 23:10:24"
+updated_at: "2026-03-19 23:21:15"
 id: 020
 title: "Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)"
 status: "Completed"
@@ -13,6 +13,8 @@ artifacts:
 ---
 
 # 020 - Global i18n & Hardcoded Metin Temizliği
+
+
 
 
 

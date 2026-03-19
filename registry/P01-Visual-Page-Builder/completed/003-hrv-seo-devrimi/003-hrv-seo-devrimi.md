@@ -72,6 +72,8 @@ Isı Geri Kazanım Cihazları (HRV) kategorisini, VentHub'ın mühendislik otori
 
 
 
+
+
 ## ✅ Alt Görevler
 - [ ] HRV için marka mirası metinlerini hazırla (Avens & Vortice vurgulu).
 - [ ] "Isı Transferi", "İç Hava Kalitesi" ve "EC Fan" teknik noktalarını detaylandır.
