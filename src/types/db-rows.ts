@@ -42,7 +42,7 @@ export interface CategoryMetadata {
   technical_summary?: string;
   hide_price?: boolean;
   model_type?: string;
-  authority_content?: AuthorityContent;
+  authority_content?: AuthorityContent | Json;
   features?: Array<{
     icon: string;
     title: string;
@@ -53,7 +53,7 @@ export interface CategoryMetadata {
     mobile?: string;
   }>;
   display_mode?: string;
-  [key: string]: Json | undefined; // Allow other fields safely
+  [key: string]: Json | undefined; 
 }
 
 // Common Table Row Aliases

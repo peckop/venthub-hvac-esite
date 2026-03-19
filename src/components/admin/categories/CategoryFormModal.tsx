@@ -69,7 +69,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             const cat = data as unknown as DbCategory
             setInitialData(cat)
 
-            const metadata = cat.metadata as CategoryMetadata | null
+            const metadata = cat.metadata as unknown as CategoryMetadata | null
 
             reset({
                 name: cat.name,
@@ -81,10 +81,10 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: cat.is_featured ?? false,
                 sort_order: cat.sort_order ?? 0,
                 image_url: cat.image_url,
-                metric1_value: (metadata?.metric1 as { value?: string })?.value || '',
-                metric1_label: (metadata?.metric1 as { label?: string })?.label || '',
-                metric2_value: (metadata?.metric2 as { value?: string })?.value || '',
-                metric2_label: (metadata?.metric2 as { label?: string })?.label || ''
+                metric1_value: ((metadata?.metric1 as any)?.value) || '',
+                metric1_label: ((metadata?.metric1 as any)?.label) || '',
+                metric2_value: ((metadata?.metric2 as any)?.value) || '',
+                metric2_label: ((metadata?.metric2 as any)?.label) || ''
             })
 
             if (data.image_url) {
