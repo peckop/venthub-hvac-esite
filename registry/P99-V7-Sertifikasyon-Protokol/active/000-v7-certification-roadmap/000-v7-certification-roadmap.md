@@ -1,17 +1,13 @@
 ---
 id: 000
 title: "V7 Certification Roadmap"
+priority: "CRIT"
 status: "Executing"
-priority: "Urgent"
-owner: "Antigravity"
-updated: "2026-03-20 10:00"
+progress: 33%
+project: "P99-V7-Sertifikasyon-Protokol"
+created_at: "2026-03-19 00:00:00"
+updated_at: "2026-03-19 13:22:04"
 ---
 
-# 🎯 V7 Certification Roadmap
-
-P99 projesinin ana roadmap dosyası. V7 sertifikasyon süreci ve hiyerarşi denetimi bu görev üzerinden takip edilecektir.
-
-## ✅ Alt Görevler
-- [x] Proje Klasör Yapısı (Registry 3.0)
-- [ ] V7 Uyumluluk Testleri
-- [ ] Sertifika Onayı
+# 🎯 000: V7 Certification Roadmap
+V7 sertifikasyon süreci ve hiyerarşi denetimi bu görev üzerinden takip edilecektir.

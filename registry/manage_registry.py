@@ -4,202 +4,178 @@ import argparse
 import re
 import datetime
 import shutil
+import sqlite3
 import json
 from typing import List, Dict, Any, Optional
 
-# Konfigürasyon
+# VENTHUB REGISTRY 3.5 (V7 PERFECT SEALER)
+# Bu sürüm, mükerrer ID'leri temizler, Türkçe karakterleri ASCII'ye çevirir 
+# ve leaf-folder yapısını fiziksel olarak doğrular.
+
 REGISTRY_DIR: str = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT: str = os.path.abspath(os.path.join(REGISTRY_DIR, '..'))
-INDEX_FILE: str = os.path.join(REGISTRY_DIR, "index.json")
-CHANGELOG_FILE: str = os.path.join(PROJECT_ROOT, "docs", "CHANGELOG.md")
-
-# In-memory Cache (Watchdog Simulation)
-_INDEX_CACHE: Optional[Dict[str, Any]] = None
+DB_FILE: str = os.path.join(REGISTRY_DIR, "registry.db")
+INDEX_JSON: str = os.path.join(REGISTRY_DIR, "index.json")
 
 def get_now() -> str:
     return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-def parse_metadata(content: str) -> Dict[str, str]:
-    """Strictly typed YAML metadata parser."""
-    meta: Dict[str, str] = {}
+def turkish_slug(text: str) -> str:
+    """İsimden tüm ID ve kirli karakterleri temizleyip saf ASCII slug üretir."""
+    # 1. Başlıktaki tüm ID varyasyonlarını temizle (033:, 033-, 033_, 033 )
+    text = re.sub(r'^\d{3}[:\-_\s]*', '', text)
+    # 2. Eğer hala ID kalmışsa (mükerrer ID durumu) bir kez daha temizle
+    text = re.sub(r'^\d{3}[:\-_\s]*', '', text)
+    
+    # 3. Türkçe karakter eşleme
+    mapping = str.maketrans("çğışıöüÇĞİŞIÖÜ", "cgisiouCGISIOU")
+    text = text.translate(mapping).lower()
+    
+    # 4. Saf ASCII slug
+    text = re.sub(r'[^a-z0-9-]', '-', text)
+    text = re.sub(r'-+', '-', text).strip('-')
+    return text[:40] # Çok uzun isimleri kısıtla
+
+def parse_metadata(content: str) -> Dict[str, Any]:
+    meta: Dict[str, Any] = {}
     match = re.search(r'^---\s*\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
     if not match: return meta
     for line in match.group(1).split('\n'):
         if ':' in line:
             parts = line.split(':', 1)
-            key = parts[0].strip()
-            val = parts[1].strip().strip('"').strip("'")
+            key = parts[0].strip(); val = parts[1].strip().strip('"').strip("'")
             meta[key] = val
     return meta
 
-def load_index(force_refresh: bool = False) -> Dict[str, Any]:
-    """Loads index from JSON with in-memory caching."""
-    global _INDEX_CACHE
-    if _INDEX_CACHE is None or force_refresh:
-        if not os.path.exists(INDEX_FILE) or force_refresh:
-            reindex()
-        with open(INDEX_FILE, 'r', encoding='utf-8') as f:
-            _INDEX_CACHE = json.load(f)
-    return _INDEX_CACHE or {"tasks": {}}
+def update_file_internal_links(file_path: str, new_proj: str, new_state: str, slug: str):
+    """Metadata ve artifact yollarını fiziksel konuma mühürler."""
+    if not os.path.exists(file_path): return
+    with open(file_path, 'r', encoding='utf-8') as f: content = f.read()
 
-def reindex() -> None:
-    """Rebuilds the entire index from filesystem (I/O Heavy - Run only on repair/init)."""
-    print("🔄 Veritabanı (Index) yeniden inşa ediliyor...")
-    tasks: Dict[str, Any] = {}
-    projects = [d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))]
+    new_status = "Executing" if new_state == "active" else "Completed" if new_state == "completed" else "Planning"
+    content = re.sub(r'status:\s*".*?"', f'status: "{new_status}"', content)
+    content = re.sub(r'project:\s*".*?"', f'project: "{new_proj}"', content)
     
-    for p in projects:
-        for s in ["backlog", "active", "completed"]:
-            path = os.path.join(REGISTRY_DIR, p, s)
-            if os.path.exists(path):
-                for f in os.listdir(path):
-                    d_path = os.path.join(path, f)
-                    if os.path.isdir(d_path):
-                        md = os.path.join(d_path, f"{f}.md")
-                        if os.path.exists(md):
-                            with open(md, 'r', encoding='utf-8') as fle:
-                                raw = fle.read()
-                                meta = parse_metadata(raw)
-                                tid = f.split("-")[0]
-                                tasks[tid] = {
-                                    "id": tid,
-                                    "title": meta.get("title", f),
-                                    "project": p,
-                                    "state": s,
-                                    "status": meta.get("status", "TODO"),
-                                    "priority": meta.get("priority", "MED"),
-                                    "progress": meta.get("progress", "0%"),
-                                    "depends_on": meta.get("depends_on", "[]"),
-                                    "path": os.path.relpath(md, PROJECT_ROOT),
-                                    "updated_at": meta.get("updated_at", get_now())
-                                }
-    
-    with open(INDEX_FILE, 'w', encoding='utf-8') as f:
-        json.dump({"generated_at": get_now(), "tasks": tasks}, f, indent=2, ensure_ascii=False)
-    print(f"✅ {len(tasks)} görev indekse işlendi.")
+    def fix_path(match):
+        prefix = match.group(1)
+        filename = match.group(2).split('/')[-1]
+        new_path = f"registry/{new_proj}/{new_state}/{slug}/{filename}"
+        return f'{prefix}"{new_path}"'
 
-def sync_pulse() -> None:
-    """Regenerates PULSE.md using ONLY index.json (High Performance)."""
-    data = load_index()
-    tasks = data.get("tasks", {})
+    content = re.sub(r'(\w+:\s*)"(registry/.*?)"', fix_path, content)
+    content = re.sub(r'updated_at:\s*".*?"', f'updated_at: "{get_now()}"', content)
+
+    with open(file_path, 'w', encoding='utf-8') as f: f.write(content)
+
+class RegistryDB:
+    def __init__(self, db_path: str = DB_FILE):
+        self.db_path = db_path
+        self.init_db()
+
+    def get_conn(self): return sqlite3.connect(self.db_path)
+
+    def init_db(self):
+        with self.get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute('CREATE TABLE IF NOT EXISTS tasks (id TEXT, title TEXT, project_id TEXT, state TEXT, status TEXT, path TEXT, PRIMARY KEY (id, project_id))')
+            conn.commit()
+        self.sync()
+
+    def sync(self):
+        projects = sorted([d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))])
+        index_data: Dict[str, Any] = {"generated_at": get_now(), "tasks": {}}
+        with self.get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM tasks')
+            for p in projects:
+                for s in ["backlog", "active", "completed"]:
+                    s_path = os.path.join(REGISTRY_DIR, p, s)
+                    if os.path.exists(s_path):
+                        for slug in os.listdir(s_path):
+                            if os.path.isdir(os.path.join(s_path, slug)):
+                                md_file = os.path.join(s_path, slug, f"{slug}.md")
+                                if os.path.exists(md_file):
+                                    tid = slug.split("-")[0].zfill(3)
+                                    rel_path = os.path.relpath(md_file, PROJECT_ROOT).replace('\\', '/')
+                                    index_data["tasks"][f"{p}/{tid}"] = {"id": tid, "project": p, "state": s, "path": rel_path}
+            conn.commit()
+        with open(INDEX_JSON, 'w', encoding='utf-8') as jf: json.dump(index_data, jf, indent=2, ensure_ascii=False)
+
+def normalize_registry(db: RegistryDB):
+    """V7 Pure Hierarchy - Deep Sealer (Cleanup IDs and Typos)"""
+    print("\n🛠️ Registry V7 Derin Onarım ve Mühürleme Başlatıldı...")
+    protocol_keywords = ["brainstorm", "plan", "review", "strategy"]
     
-    projects_stats: Dict[str, Dict[str, int]] = {}
-    total_comp = 0
-    total_all = len(tasks)
+    projects = [d for d in os.listdir(REGISTRY_DIR) if re.match(r'^P\d{2}', d) and os.path.isdir(os.path.join(REGISTRY_DIR, d))]
     
-    for tid, t in tasks.items():
-        proj = t["project"]
-        state = t["state"]
-        if proj not in projects_stats:
-            projects_stats[proj] = {"active": 0, "backlog": 0, "completed": 0}
-        projects_stats[proj][state] += 1
-        if state == "completed":
-            total_comp += 1
+    for p_dir in projects:
+        p_path = os.path.join(REGISTRY_DIR, p_dir)
+        for state in ['active', 'backlog', 'completed']:
+            state_path = os.path.join(p_path, state)
+            if not os.path.exists(state_path): os.makedirs(state_path, exist_ok=True); continue
             
-    pct = int((total_comp / total_all * 100)) if total_all > 0 else 0
-    content = f"# 🛰️ PULSE | %{pct}\n> Updated: {get_now()} (Index-driven)\n\n"
-    
-    for p in sorted(projects_stats.keys()):
-        st = projects_stats[p]
-        content += f"### {p}\n- A: {st['active']} | B: {st['backlog']} | D: {st['completed']}\n"
-    
-    with open(os.path.join(REGISTRY_DIR, "PULSE.md"), 'w', encoding='utf-8') as f:
-        f.write(content)
+            # 1. Sızıntıları (Loose Files) ve Mükerrerleri Onar
+            for item in os.listdir(state_path):
+                i_path = os.path.join(state_path, item)
+                if item.startswith('.') or item == ".gitkeep": continue
+                
+                # Metadata üzerinden Source of Truth bul
+                tid = "000"; title = item
+                if os.path.isfile(i_path) and item.endswith('.md'):
+                    with open(i_path, 'r', encoding='utf-8') as f: meta = parse_metadata(f.read())
+                    tid = str(meta.get('id', '000')).zfill(3)
+                    title = meta.get('title', item.replace('.md', ''))
+                elif os.path.isdir(i_path):
+                    md_files = [f for f in os.listdir(i_path) if f.endswith('.md')]
+                    if md_files:
+                        main_md_name = next((f for f in md_files if not any(k in f.lower() for k in protocol_keywords)), md_files[0])
+                        with open(os.path.join(i_path, main_md_name), 'r', encoding='utf-8') as f: meta = parse_metadata(f.read())
+                        tid = str(meta.get('id', '000')).zfill(3)
+                        title = meta.get('title', item)
 
-def search_tasks(query: str) -> None:
-    """Search engine using in-memory index."""
-    data = load_index()
-    query = query.lower()
-    results = [t for tid, t in data["tasks"].items() if query in tid.lower() or query in t["title"].lower()]
-    
-    if not results:
-        print(f"❌ '{query}' bulunamadı.")
-        return
-        
-    print(f"🔍 '{query}' için {len(results)} sonuç (Index):")
-    for r in results:
-        icon = "✅" if r["state"] == "completed" else "⚡" if r["state"] == "active" else "📝"
-        print(f"{icon} [{r['id']}] {r['title']} ({r['project']})")
+                # TEMİZ VE TEKİL SLUG OLUŞTUR
+                final_slug = f"{tid}-{turkish_slug(title)}"
+                target_dir = os.path.join(state_path, final_slug)
+                
+                if i_path != target_dir:
+                    os.makedirs(target_dir, exist_ok=True)
+                    if os.path.isfile(i_path):
+                        shutil.move(i_path, os.path.join(target_dir, f"{final_slug}.md"))
+                    elif os.path.isdir(i_path):
+                        for f in os.listdir(i_path):
+                            src_f = os.path.join(i_path, f); dst_f = os.path.join(target_dir, f)
+                            if not os.path.exists(dst_f): shutil.move(src_f, dst_f)
+                        shutil.rmtree(i_path)
+                    i_path = target_dir; item = final_slug
+                    print(f"  ✅ Onarıldı: {final_slug}")
 
-def generate_graph() -> None:
-    """Generates Mermaid.js graph using ONLY index.json (High Performance)."""
-    print("🕸️ Bağımlılık Haritası Üretiliyor (Index-driven)...")
-    data = load_index()
-    tasks = data.get("tasks", {})
-    
-    mermaid = ["graph TD"]
-    styles = []
-    
-    for tid, t in tasks.items():
-        # Node definition
-        mermaid.append(f"    T{tid}[{tid}: {t['title']}]")
-        
-        # Dependencies
-        deps_raw = t["depends_on"]
-        deps = str(deps_raw).strip("[]").replace("'", "").replace('"', "").split(",")
-        for d in deps:
-            d = d.strip()
-            if d and d in tasks:
-                mermaid.append(f"    T{d} --> T{tid}")
-        
-        # Styling
-        if t["state"] == "completed":
-            styles.append(f"    style T{tid} fill:#d4edda,stroke:#155724")
-        elif t["state"] == "active":
-            styles.append(f"    style T{tid} fill:#fff3cd,stroke:#856404")
-            
-    output = "\n".join(mermaid + styles)
-    with open(os.path.join(REGISTRY_DIR, "DEPENDENCIES.md"), 'w', encoding='utf-8') as f:
-        f.write(f"# 🕸️ Bağımlılık Haritası\n\n```mermaid\n{output}\n```\n")
-
-def move_task(sp: str, tid: str, tp: str, ts: str) -> None:
-    """Moves a task and triggers Atomic Index Update."""
-    clean_tid = str(tid).zfill(3)
-    data = load_index()
-    task_info = data["tasks"].get(clean_tid)
-    
-    if not task_info:
-        print(f"❌ Görev {tid} bulunamadı.")
-        return
-
-    # Physical move
-    src_folder = os.path.dirname(os.path.join(PROJECT_ROOT, task_info["path"]))
-    folder_name = os.path.basename(src_folder)
-    dst_dir = os.path.join(REGISTRY_DIR, tp, ts, folder_name)
-    
-    os.makedirs(os.path.dirname(dst_dir), exist_ok=True)
-    shutil.move(src_folder, dst_dir)
-    
-    # Atomic Sync: Rebuild index after physical move
-    print(f"⚡ Atomic Sync: {tid} güncelleniyor...")
-    reindex()
-    sync_pulse()
-    generate_graph()
-    print(f"✅ Görev {tid} başarıyla {ts} statüsüne taşındı.")
-
-def repair_all() -> None:
-    """Full system repair: Disk Scan + Index Rebuild + Report Sync."""
-    print("🛠️ Sistem Geniş Kapsamlı Onarılıyor...")
-    # Ensure state folders exist for each project
-    for p in [d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))]:
-        for s in ["active", "backlog", "completed"]:
-            os.makedirs(os.path.join(REGISTRY_DIR, p, s), exist_ok=True)
-    
-    reindex() # Disk scan
-    sync_pulse() # Index-driven
-    generate_graph() # Index-driven
-    print("✨ Tüm sistem senkronize edildi.")
+                # 2. İÇERİK MÜHÜRLEME (Folder Name == File Name)
+                main_md = f"{item}.md"
+                main_md_path = os.path.join(i_path, main_md)
+                
+                # Ana dosyayı fiziksel olarak düzelt (Overkill Protection)
+                for f in os.listdir(i_path):
+                    f_path = os.path.join(i_path, f)
+                    if f.endswith('.md') and f != main_md and not any(k in f.lower() for k in protocol_keywords):
+                        if not os.path.exists(main_md_path):
+                            os.rename(f_path, main_md_path)
+                        else:
+                            os.remove(f_path) # Gereksiz mükerrer dosyayı temizle
+                
+                # Metadata Linklerini Mühürle
+                if os.path.exists(main_md_path):
+                    update_file_internal_links(main_md_path, p_dir, state, item)
+                    for art in os.listdir(i_path):
+                        if art.endswith('.md'): update_file_internal_links(os.path.join(i_path, art), p_dir, state, item)
+    db.sync()
+    print("🚀 Registry V7 Saf Hiyerarşi Kusursuz Olarak Mühürlendi.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="VentHub Registry Engine 2.0")
-    parser.add_argument("action", choices=["repair", "activate", "move", "search", "graph", "reindex"])
-    parser.add_argument("id", nargs="?"); parser.add_argument("task", nargs="?")
-    parser.add_argument("target_id", nargs="?"); parser.add_argument("target_state", nargs="?")
-    
+    db = RegistryDB()
+    parser = argparse.ArgumentParser(description="VentHub Registry 3.5 Perfect Sealer")
+    parser.add_argument("action", choices=["repair", "reindex", "normalize"])
     args = parser.parse_args()
-    if args.action == "repair": repair_all()
-    elif args.action == "reindex": reindex()
-    elif args.action == "graph": generate_graph()
-    elif args.action == "search": search_tasks(args.id or "")
-    elif args.action == "move": move_task(args.id or "", args.task or "", args.target_id or "", args.target_state or "")
-    elif args.action == "activate": move_task(args.id or "", args.task or "", args.id or "", "active")
+    try:
+        if args.action in ["normalize", "repair"]: normalize_registry(db)
+        elif args.action == "reindex": db.sync()
+    except Exception as e: print(f"\n[🚨 KAZA] {e}")
