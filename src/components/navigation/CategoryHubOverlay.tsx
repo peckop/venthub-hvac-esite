@@ -178,20 +178,16 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
                                 {/* Alt: Stat'lar */}
                                 <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[40px]">
-                                    {(hoveredCategory?.metadata as CategoryMetadata | null)?.metric1 && (
+                                    {((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric1 && (
                                         <div>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String((hoveredCategory?.metadata as any)?.metric1?.value || '')}</p>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String((hoveredCategory?.metadata as any)?.metric1?.label || '')}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1?.value || '')}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric1?.label || '')}</p>
                                         </div>
                                     )}
-                                    {(hoveredCategory?.metadata as CategoryMetadata | null)?.metric2 && (
+                                    {((hoveredCategory?.metadata as unknown) as CategoryMetadata | null)?.metric2 && (
                                         <div>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String((hoveredCategory?.metadata as any)?.metric2?.value || '')}</p>
-                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String((hoveredCategory?.metadata as any)?.metric2?.label || '')}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2?.value || '')}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{String(((hoveredCategory?.metadata as unknown) as CategoryMetadata)?.metric2?.label || '')}</p>
                                         </div>
                                     )}
                                 </div>

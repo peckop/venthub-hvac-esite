@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../types/database.types'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
 import { 
@@ -156,8 +156,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.rpc('get_products_enriched' as any, {
+  const { data, error } = await supabase.rpc('get_products_enriched', {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
@@ -841,8 +840,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('user_projects')
     .select('*')
     .order('updated_at', { ascending: false })
@@ -852,8 +850,7 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('user_projects')
     .insert(project)
     .select()
@@ -864,8 +861,7 @@ export async function createProject(project: Partial<DbUserProject>): Promise<Db
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('user_projects')
     .delete()
     .eq('id', id)
@@ -875,8 +871,7 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('project_items')
     .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
@@ -887,8 +882,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('project_items')
     .delete()
     .match({ project_id: projectId, product_id: productId })
@@ -898,8 +892,7 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
+  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
     .from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)
