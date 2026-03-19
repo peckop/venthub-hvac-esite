@@ -2,7 +2,7 @@
 completed_at: "2026-03-19 22:45:00"
 started_at: "2026-03-19 22:35:00"
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:10:25"
+updated_at: "2026-03-19 23:21:16"
 id: 015
 title: "Tasarım Sistemi Otoritesi"
 status: "Completed"
@@ -19,6 +19,8 @@ artifacts:
 
 ## 🎯 Hedef
 Page Builder içinde kullanılacak olan tüm görsel blokların merkezi bir tasarım sistemine (Design System) bağlanması.
+
+
 
 
 

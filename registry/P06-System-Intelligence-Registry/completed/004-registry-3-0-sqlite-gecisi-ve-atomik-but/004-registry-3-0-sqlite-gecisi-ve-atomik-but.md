@@ -6,7 +6,7 @@ status: "Completed"
 progress: 10%
 project: "P06-System-Intelligence-Registry"
 created_at: "2026-03-19 10:30:00"
-updated_at: "2026-03-19 23:10:25"
+updated_at: "2026-03-19 23:21:19"
 artifacts:
   brainstorm: "registry/P06-System-Intelligence-Registry/completed/004-registry-3-0-sqlite-gecisi-ve-atomik-but/brainstorm.md"
   plan: "registry/P06-System-Intelligence-Registry/completed/004-registry-3-0-sqlite-gecisi-ve-atomik-but/plan.md"
@@ -20,6 +20,8 @@ JSON tabanlı indeksi, ACID uyumlu SQLite veritabanına taşıyarak veri kaybın
 - [ ] SQLite şema tasarımı ve veritabanı kurulumu.
 - [ ] Mevcut JSON verilerinin SQLite'a otonom migrasyonu.
 - [ ] manage_registry.py orkestratörünün SQL motoruna geçişi.
+
+
 
 
 
