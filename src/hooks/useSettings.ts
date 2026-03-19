@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../types/database.types'
 
 export interface AppSettings {
   id: string
@@ -29,7 +31,7 @@ export function useSettings() {
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const { data, error: fetchError } = await (supabase as any)
+        const { data, error: fetchError } = await (supabase as unknown as SupabaseClient<Database>)
           .from('app_settings')
           .select('*')
           .single()

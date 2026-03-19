@@ -81,14 +81,10 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: cat.is_featured ?? false,
                 sort_order: cat.sort_order ?? 0,
                 image_url: cat.image_url,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                metric1_value: ((metadata?.metric1 as any)?.value) || '',
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                metric1_label: ((metadata?.metric1 as any)?.label) || '',
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                metric2_value: ((metadata?.metric2 as any)?.value) || '',
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                metric2_label: ((metadata?.metric2 as any)?.label) || ''
+                metric1_value: ((metadata?.metric1 as unknown as Record<string, string>)?.value) || '',
+                metric1_label: ((metadata?.metric1 as unknown as Record<string, string>)?.label) || '',
+                metric2_value: ((metadata?.metric2 as unknown as Record<string, string>)?.value) || '',
+                metric2_label: ((metadata?.metric2 as unknown as Record<string, string>)?.label) || ''
             })
 
             if (data.image_url) {
@@ -161,7 +157,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             }
 
             const metadata: CategoryMetadata = {
-                ...(initialData?.metadata as any || {}),
+                ...(initialData?.metadata as unknown as Record<string, unknown> || {}),
                 metric1: { value: data.metric1_value || '', label: data.metric1_label || '' },
                 metric2: { value: data.metric2_value || '', label: data.metric2_label || '' }
             } as unknown as CategoryMetadata
@@ -176,7 +172,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured,
                 sort_order: data.sort_order,
                 image_url: imgPath,
-                metadata: metadata as any
+                metadata: metadata as unknown as Json
             }
 
             let currentId = categoryId
