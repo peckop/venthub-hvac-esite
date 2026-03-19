@@ -1,205 +1,305 @@
 {
-  "generated_at": "2026-03-19 07:53:03",
+  "generated_at": "2026-03-19 09:30:15",
   "tasks": {
     "030": {
       "id": "030",
       "title": "Gelişmiş Arama UX & Backend Optimizasyonu",
       "project": "P00-Standalone",
       "state": "backlog",
+      "status": "Backlog",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 030 title: \"Gelişmiş Arama UX & Backend Optimizasyonu\" status: \"Backlog\" progress: \"0%\" "
+      "depends_on": "null",
+      "path": "registry\\P00-Standalone\\backlog\\030-advanced-search-ux\\030-advanced-search-ux.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "031": {
       "id": "031",
       "title": "SEO & Core Web Vitals (Performance) Audit",
       "project": "P00-Standalone",
       "state": "backlog",
+      "status": "Backlog",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 031 title: \"SEO & Core Web Vitals (Performance) Audit\" status: \"Backlog\" progress: \"0%\" "
+      "depends_on": "null",
+      "path": "registry\\P00-Standalone\\backlog\\031-seo-performance-audit\\031-seo-performance-audit.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "032": {
       "id": "032",
       "title": "032-search-architecture",
       "project": "P00-Standalone",
       "state": "backlog",
+      "status": "TODO",
+      "priority": "MED",
       "progress": "0%",
-      "content_summary": "# Kurumsal Seviye Arama Mimarisi  **Durum:** Bu belge `NEXT_STEPS.md` arşivlendiği için oradaki \"Arama Mimarisini Kurumsal Seviyeye Taşıma\" görevlerinden oluşturulmuştur.  ### 1) Back‑end / DB - [ ] P"
+      "depends_on": "[]",
+      "path": "registry\\P00-Standalone\\backlog\\032-search-architecture\\032-search-architecture.md",
+      "updated_at": "2026-03-19 09:30:15"
     },
     "033": {
       "id": "033",
       "title": "033: Teknik Borç Temizliği ve Edge Görevleri",
       "project": "P00-Standalone",
       "state": "active",
+      "status": "Planning",
+      "priority": "HIGH",
       "progress": "0%",
-      "content_summary": "--- id: 033 title: \"033: Teknik Borç Temizliği ve Edge Görevleri\" priority: \"HIGH\" status: \"Planning\" progress: 0% project: \"P00-Standalone\" created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 2"
+      "depends_on": "[]",
+      "path": "registry\\P00-Standalone\\active\\033-tech-debt-cleanup\\033-tech-debt-cleanup.md",
+      "updated_at": "2026-03-17 21:55:00"
     },
     "001": {
       "id": "001",
-      "title": "Aşama 1: Otomatik CHANGELOG Jeneratörü",
-      "project": "P06-System-Intelligence-Registry",
-      "state": "completed",
-      "progress": "100%",
-      "content_summary": "--- id: 001 title: \"Aşama 1: Otomatik CHANGELOG Jeneratörü\" priority: \"Medium\" created_at: \"2026-03-19 02:26:00\" depends_on: [] artifacts:   brainstorm: \"registry/P06-System-Intelligence-Registry/back"
+      "title": "Skills Factory: Otonom Yetenek Havuzu Altyapısı",
+      "project": "P07-Autonomous-Skills-Factory",
+      "state": "backlog",
+      "status": "TODO",
+      "priority": "HIGH",
+      "progress": "0%",
+      "depends_on": "[]",
+      "path": "registry\\P07-Autonomous-Skills-Factory\\backlog\\001-skills-factory-infrastructure\\001-skills-factory-infrastructure.md",
+      "updated_at": "2026-03-19 10:30:00"
     },
     "004": {
       "id": "004",
-      "title": "Next.js 15: Performans Optimizasyonu (PPR)",
-      "project": "P05-Next15-Modernization",
-      "state": "backlog",
-      "progress": "0%",
-      "content_summary": "--- id: 004 title: \"Next.js 15: Performans Optimizasyonu (PPR)\" progress: \"0%\" priority: \"High\" created_at: \"2026-03-18 16:00:00\" completed_at: null depends_on: [003] status: Planning artifacts:   bra"
+      "title": "Registry 3.0: SQLite Geçişi ve Atomik Bütünlük",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "active",
+      "status": "Executing",
+      "priority": "CRITICAL",
+      "progress": "10%",
+      "depends_on": "[]",
+      "path": "registry\\P06-System-Intelligence-Registry\\active\\004-registry-3-sqlite-migration\\004-registry-3-sqlite-migration.md",
+      "updated_at": "2026-03-19 10:30:00"
     },
     "005": {
       "id": "005",
       "title": "Aşama 5: PDP Gateway Mimarisi (ProductDetailPage Parçalama)",
       "project": "P04-Category-Architecture",
       "state": "active",
+      "status": "Planning",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- id: 005 title: \"Aşama 5: PDP Gateway Mimarisi (ProductDetailPage Parçalama)\" progress: \"0%\" priority: \"High\" created_at: \"2026-03-19 02:18:00\" depends_on: [004] status: Planning started_at: \"2026-"
+      "depends_on": "[004]",
+      "path": "registry\\P04-Category-Architecture\\active\\005-pdp-gateway-architecture\\005-pdp-gateway-architecture.md",
+      "updated_at": "2026-03-19 02:18:03"
     },
     "007": {
       "id": "007",
       "title": "Technical Intelligence Layer Enhancement",
       "project": "P01-Visual-Page-Builder",
       "state": "completed",
+      "status": "Completed",
+      "priority": "High",
       "progress": "100%",
-      "content_summary": "--- id: 007 title: \"Technical Intelligence Layer Enhancement\" status: \"Completed\" progress: \"100%\" priority: \"High\" ---  # Task: Technical Intelligence Layer Enhancement (ProductSmartInference)  - **I"
+      "depends_on": "[]",
+      "path": "registry\\P01-Visual-Page-Builder\\completed\\007-technical-intelligence\\007-technical-intelligence.md",
+      "updated_at": "2026-03-19 09:30:15"
     },
     "008": {
       "id": "008",
       "title": "B2B Hiyerarşisi ve Yetkilendirme",
       "project": "P01-Visual-Page-Builder",
       "state": "active",
+      "status": "Planning",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 008 title: \"B2B Hiyerarşisi ve Yetkilendirme\" status: \"Planning\" progress: \"0%\" priority"
+      "depends_on": "[006]",
+      "path": "registry\\P01-Visual-Page-Builder\\active\\008-b2b-hierarchy\\008-b2b-hierarchy.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "009": {
       "id": "009",
       "title": "Gelişmiş Fiyatlandırma Motoru",
       "project": "P01-Visual-Page-Builder",
       "state": "active",
+      "status": "Planning",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 009 title: \"Gelişmiş Fiyatlandırma Motoru\" status: \"Planning\" progress: \"0%\" priority: \""
+      "depends_on": "[006, 008]",
+      "path": "registry\\P01-Visual-Page-Builder\\active\\009-pricing-engine\\009-pricing-engine.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "020": {
       "id": "020",
       "title": "Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)",
       "project": "P00-Standalone",
       "state": "completed",
+      "status": "Completed",
+      "priority": "Critical",
       "progress": "100%",
-      "content_summary": "--- updated_at: \"2026-03-17 09:48:00\" id: 020 title: \"Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)\" status: \"Completed\" progress: \"100%\" priority: \"Critical\" depends_on: null artifact"
+      "depends_on": "null",
+      "path": "registry\\P00-Standalone\\completed\\020-i18n-refactor\\020-i18n-refactor.md",
+      "updated_at": "2026-03-17 09:48:00"
     },
     "021": {
       "id": "021",
       "title": "Codebase Audit & Technical Debt Cleanup",
       "project": "P00-Standalone",
       "state": "completed",
+      "status": "Completed",
+      "priority": "High",
       "progress": "100%",
-      "content_summary": "--- updated_at: \"2026-03-17 11:45:00\" id: 021 title: \"Codebase Audit & Technical Debt Cleanup\" status: \"Completed\" progress: \"100%\" priority: \"High\" depends_on: [\"020\"] artifacts:   - \"src/lib/supabas"
+      "depends_on": "[\"020\"]",
+      "path": "registry\\P00-Standalone\\completed\\021-codebase-audit-cleanup\\021-codebase-audit-cleanup.md",
+      "updated_at": "2026-03-17 11:45:00"
     },
     "022": {
       "id": "022",
       "title": "022-registry-evolution",
       "project": "P00-Standalone",
       "state": "completed",
+      "status": "TODO",
+      "priority": "MED",
       "progress": "0%",
-      "content_summary": "﻿--- updated_at: \"2026-03-16 14:42:06\" id: 022 title: \"Registry Evrimi: Otonom Kapı Muhafızı ve Snapshots\" status: \"Completed\" progress: \"100%\" priority: \"High\" depends_on: [] artifacts:   brainstorm:"
+      "depends_on": "[]",
+      "path": "registry\\P00-Standalone\\completed\\022-registry-evolution\\022-registry-evolution.md",
+      "updated_at": "2026-03-19 09:30:15"
     },
     "010": {
       "id": "010",
       "title": "Sertifikasyon Otoritesi",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "Medium",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 010 title: \"Sertifikasyon Otoritesi\" status: \"Pending\" progress: \"0%\" priority: \"Medium\""
+      "depends_on": "[006]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\010-certification-authority\\010-certification-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "011": {
       "id": "011",
       "title": "Mühendislik Motoru (Engineering Engine)",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 011 title: \"Mühendislik Motoru (Engineering Engine)\" status: \"Pending\" progress: \"0%\" pr"
+      "depends_on": "[007]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\011-engineering-engine\\011-engineering-engine.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "012": {
       "id": "012",
       "title": "Medya Otoritesi (Media Authority)",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "Medium",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 012 title: \"Medya Otoritesi (Media Authority)\" status: \"Pending\" progress: \"0%\" priority"
+      "depends_on": "[006]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\012-media-authority\\012-media-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "013": {
       "id": "013",
       "title": "State Hydration (Durum Yönetimi)",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 013 title: \"State Hydration (Durum Yönetimi)\" status: \"Pending\" progress: \"0%\" priority:"
+      "depends_on": "[006]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\013-state-hydration-authority\\013-state-hydration-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "014": {
       "id": "014",
       "title": "İçerik ve Tipografi Otoritesi",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 014 title: \"İçerik ve Tipografi Otoritesi\" status: \"Pending\" progress: \"0%\" priority: \"H"
+      "depends_on": "[006]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\014-content-typography-authority\\014-content-typography-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "015": {
       "id": "015",
       "title": "Tasarım Sistemi Otoritesi",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "High",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 015 title: \"Tasarım Sistemi Otoritesi\" status: \"Pending\" progress: \"0%\" priority: \"High\""
+      "depends_on": "[014]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\015-design-system-authority\\015-design-system-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "016": {
       "id": "016",
       "title": "Master Şablon (Master Template)",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "Critical",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 016 title: \"Master Şablon (Master Template)\" status: \"Pending\" progress: \"0%\" priority: "
+      "depends_on": "[015]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\016-master-template-authority\\016-master-template-authority.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "017": {
       "id": "017",
       "title": "Görsel Sayfa Oluşturucu (Visual Page Builder)",
       "project": "P01-Visual-Page-Builder",
       "state": "backlog",
+      "status": "Pending",
+      "priority": "Critical",
       "progress": "0%",
-      "content_summary": "--- completed_at: null started_at: null created_at: \"2026-03-17 15:50:57\" updated_at: \"2026-03-17 19:15:27\" id: 017 title: \"Görsel Sayfa Oluşturucu (Visual Page Builder)\" status: \"Pending\" progress: \""
+      "depends_on": "[006, 014, 015, 016]",
+      "path": "registry\\P01-Visual-Page-Builder\\backlog\\017-visual-page-builder\\017-visual-page-builder.md",
+      "updated_at": "2026-03-17 19:15:27"
     },
     "003": {
       "id": "003",
       "title": "Aşama 3: Registry İndeksleme Sistemi (Indexing Engine)",
       "project": "P06-System-Intelligence-Registry",
       "state": "completed",
+      "status": "Completed",
+      "priority": "MEDIUM",
       "progress": "100%",
-      "content_summary": "--- id: 003 title: \"Aşama 3: Registry İndeksleme Sistemi (Indexing Engine)\" priority: \"MEDIUM\" project: \"P06-System-Intelligence-Registry\" created_at: \"2026-03-19 03:15:00\" depends_on: [\"001\", \"002\"] "
+      "depends_on": "[\"001\", \"002\"]",
+      "path": "registry\\P06-System-Intelligence-Registry\\completed\\003-registry-indexing-system\\003-registry-indexing-system.md",
+      "updated_at": "2026-03-19 03:11:29"
     },
     "006": {
       "id": "006",
       "title": "Dinamik Otorite ve İçerik Yönetimi",
       "project": "P01-Visual-Page-Builder",
       "state": "completed",
+      "status": "Completed",
+      "priority": "High",
       "progress": "100%",
-      "content_summary": "--- id: 006 title: \"Dinamik Otorite ve İçerik Yönetimi\" status: \"Completed\" progress: \"100%\" priority: \"High\" depends_on: null artifacts:   brainstorm: \"registry/P01-Visual-Page-Builder/active/006-dyn"
+      "depends_on": "null",
+      "path": "registry\\P01-Visual-Page-Builder\\completed\\006-dynamic-authority-system\\006-dynamic-authority-system.md",
+      "updated_at": "2026-03-19 09:30:15"
     },
     "002": {
       "id": "002",
       "title": "Aşama 2: Registry Bağımlılık Görselleştirici (Graph Motor)",
       "project": "P06-System-Intelligence-Registry",
       "state": "completed",
+      "status": "Completed",
+      "priority": "High",
       "progress": "100%",
-      "content_summary": "--- id: 002 title: \"Aşama 2: Registry Bağımlılık Görselleştirici (Graph Motor)\" priority: \"High\" created_at: \"2026-03-19 02:40:00\" depends_on: [001] artifacts:   brainstorm: \"registry/P06-System-Intel"
+      "depends_on": "[001]",
+      "path": "registry\\P06-System-Intelligence-Registry\\completed\\002-dependency-visualizer\\002-dependency-visualizer.md",
+      "updated_at": "2026-03-19 02:37:13"
     },
     "P05": {
       "id": "P05",
       "title": "P05-ROADMAP",
       "project": "P05-Next15-Modernization",
       "state": "active",
+      "status": "TODO",
+      "priority": "MED",
       "progress": "0%",
-      "content_summary": "# P05-Next15-Modernization Roadmap  Bu dosya, Next.js 15 ve React 19 modernizasyon sürecinin ana orkestratörüdür.  ## 🗺️ Görev Ağacı (Task Tree)  ### ⚡ Aktif Görevler (Executing/Completed) - [x] **001"
+      "depends_on": "[]",
+      "path": "registry\\P05-Next15-Modernization\\active\\P05-ROADMAP\\P05-ROADMAP.md",
+      "updated_at": "2026-03-19 09:30:15"
     }
   }
 }

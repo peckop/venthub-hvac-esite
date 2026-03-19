@@ -5,131 +5,201 @@ import re
 import datetime
 import shutil
 import json
-from typing import List, Tuple, Dict, Any, Optional, Union, cast
+from typing import List, Dict, Any, Optional
 
 # Konfigürasyon
 REGISTRY_DIR: str = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT: str = os.path.abspath(os.path.join(REGISTRY_DIR, '..'))
-SNAPSHOT_DIR: str = os.path.join(REGISTRY_DIR, ".snapshots")
 INDEX_FILE: str = os.path.join(REGISTRY_DIR, "index.json")
+CHANGELOG_FILE: str = os.path.join(PROJECT_ROOT, "docs", "CHANGELOG.md")
+
+# In-memory Cache (Watchdog Simulation)
+_INDEX_CACHE: Optional[Dict[str, Any]] = None
 
 def get_now() -> str:
     return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-def safe_truncate(text: str, length: int) -> str:
-    """Type-safe string truncation using regex (No slicing)."""
-    if not text: return ""
-    st: str = str(text).replace('\n', ' ')
-    match = re.match(rf'^(.{{0,{length}}})', st)
-    if match: return str(match.group(1))
-    return str(st)
-
-def parse_metadata(content: Optional[str]) -> Dict[str, str]:
+def parse_metadata(content: str) -> Dict[str, str]:
     """Strictly typed YAML metadata parser."""
     meta: Dict[str, str] = {}
-    if not content: return meta
-    match = re.search(r'^---\s*\n(.*?)\n---', str(content), re.DOTALL | re.MULTILINE)
+    match = re.search(r'^---\s*\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
     if not match: return meta
-    for line in str(match.group(1)).split('\n'):
+    for line in match.group(1).split('\n'):
         if ':' in line:
             parts = line.split(':', 1)
-            meta[str(parts[0]).strip()] = str(parts[1]).strip().strip('"').strip("'")
+            key = parts[0].strip()
+            val = parts[1].strip().strip('"').strip("'")
+            meta[key] = val
     return meta
 
-def safe_calc_percent(comp: int, total: int) -> int:
-    """Type-safe percentage calculation."""
-    c, t = int(comp), int(total)
-    if t <= 0: return 0
-    return int((float(c) / float(t)) * 100.0)
+def load_index(force_refresh: bool = False) -> Dict[str, Any]:
+    """Loads index from JSON with in-memory caching."""
+    global _INDEX_CACHE
+    if _INDEX_CACHE is None or force_refresh:
+        if not os.path.exists(INDEX_FILE) or force_refresh:
+            reindex()
+        with open(INDEX_FILE, 'r', encoding='utf-8') as f:
+            _INDEX_CACHE = json.load(f)
+    return _INDEX_CACHE or {"tasks": {}}
 
 def reindex() -> None:
-    """Rebuild the search index with strict path safety."""
+    """Rebuilds the entire index from filesystem (I/O Heavy - Run only on repair/init)."""
+    print("🔄 Veritabanı (Index) yeniden inşa ediliyor...")
     tasks: Dict[str, Any] = {}
-    projects = [d for d in os.listdir(REGISTRY_DIR) if str(d).startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))]
+    projects = [d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))]
+    
     for p in projects:
         for s in ["backlog", "active", "completed"]:
-            # Path Guard: Ensure everything is string
-            path = os.path.join(REGISTRY_DIR, str(p), str(s))
+            path = os.path.join(REGISTRY_DIR, p, s)
             if os.path.exists(path):
                 for f in os.listdir(path):
                     d_path = os.path.join(path, f)
                     if os.path.isdir(d_path):
-                        tf_str = str(f)
-                        md = os.path.join(d_path, f"{tf_str}.md")
+                        md = os.path.join(d_path, f"{f}.md")
                         if os.path.exists(md):
                             with open(md, 'r', encoding='utf-8') as fle:
                                 raw = fle.read()
                                 meta = parse_metadata(raw)
-                                tid = tf_str.split("-")[0]
-                                tasks[tid] = {"id": tid, "title": str(meta.get("title", f)), "project": str(p), "state": str(s), "progress": str(meta.get("progress", "0%")), "content_summary": safe_truncate(raw, 200)}
+                                tid = f.split("-")[0]
+                                tasks[tid] = {
+                                    "id": tid,
+                                    "title": meta.get("title", f),
+                                    "project": p,
+                                    "state": s,
+                                    "status": meta.get("status", "TODO"),
+                                    "priority": meta.get("priority", "MED"),
+                                    "progress": meta.get("progress", "0%"),
+                                    "depends_on": meta.get("depends_on", "[]"),
+                                    "path": os.path.relpath(md, PROJECT_ROOT),
+                                    "updated_at": meta.get("updated_at", get_now())
+                                }
+    
     with open(INDEX_FILE, 'w', encoding='utf-8') as f:
         json.dump({"generated_at": get_now(), "tasks": tasks}, f, indent=2, ensure_ascii=False)
+    print(f"✅ {len(tasks)} görev indekse işlendi.")
 
 def sync_pulse() -> None:
-    """Regenerates PULSE.md securely."""
-    t_comp: int = 0
-    t_all: int = 0
-    data: Dict[str, Any] = {}
-    for p in os.listdir(REGISTRY_DIR):
-        if str(p).startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, p)):
-            data[p] = {"active": [], "backlog": [], "completed": []}
-            for s in ["active", "backlog", "completed"]:
-                spath = os.path.join(REGISTRY_DIR, str(p), str(s))
-                if os.path.exists(spath):
-                    for tf in os.listdir(spath):
-                        if os.path.isdir(os.path.join(spath, tf)):
-                            tid = str(tf).split("-")[0]
-                            cast(Dict[str, List[str]], data[p])[str(s)].append(tid)
-                            t_all += 1
-                            if str(s) == "completed": t_comp += 1
-    pct = safe_calc_percent(t_comp, t_all)
-    content = f"# 🛰️ PULSE | %{pct}\n> Updated: {get_now()}\n\n"
-    for p, st in sorted(data.items()):
-        content += f"### {p}\n- A: {len(st['active'])} | B: {len(st['backlog'])} | D: {len(st['completed'])}\n"
+    """Regenerates PULSE.md using ONLY index.json (High Performance)."""
+    data = load_index()
+    tasks = data.get("tasks", {})
+    
+    projects_stats: Dict[str, Dict[str, int]] = {}
+    total_comp = 0
+    total_all = len(tasks)
+    
+    for tid, t in tasks.items():
+        proj = t["project"]
+        state = t["state"]
+        if proj not in projects_stats:
+            projects_stats[proj] = {"active": 0, "backlog": 0, "completed": 0}
+        projects_stats[proj][state] += 1
+        if state == "completed":
+            total_comp += 1
+            
+    pct = int((total_comp / total_all * 100)) if total_all > 0 else 0
+    content = f"# 🛰️ PULSE | %{pct}\n> Updated: {get_now()} (Index-driven)\n\n"
+    
+    for p in sorted(projects_stats.keys()):
+        st = projects_stats[p]
+        content += f"### {p}\n- A: {st['active']} | B: {st['backlog']} | D: {st['completed']}\n"
+    
     with open(os.path.join(REGISTRY_DIR, "PULSE.md"), 'w', encoding='utf-8') as f:
         f.write(content)
 
-def move_task(sp: str, tid: str, tp: str, ts: str) -> None:
-    """Moves a task while neutralizing Optional[str] path issues."""
-    f_folder: Optional[str] = None
-    f_state: Optional[str] = None
-    clean_tid = str(tid).zfill(3)
+def search_tasks(query: str) -> None:
+    """Search engine using in-memory index."""
+    data = load_index()
+    query = query.lower()
+    results = [t for tid, t in data["tasks"].items() if query in tid.lower() or query in t["title"].lower()]
     
-    for s in ["active", "backlog", "completed"]:
-        path = os.path.join(REGISTRY_DIR, str(sp), str(s))
-        if os.path.exists(path):
-            cands = [f for f in os.listdir(path) if str(f).startswith(f"{clean_tid}-")]
-            if cands:
-                f_folder, f_state = str(cands[0]), str(s)
-                break
-                
-    # Final Guard: pyre narrow path to str only
-    if f_folder and f_state:
-        # Narrowing by casting to str inside join to kill str|None error in pyre
-        src = os.path.join(REGISTRY_DIR, str(sp), str(f_state), str(f_folder))
-        dst = os.path.join(REGISTRY_DIR, str(tp), str(ts), str(f_folder))
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.move(src, dst)
-        reindex()
-        sync_pulse()
+    if not results:
+        print(f"❌ '{query}' bulunamadı.")
+        return
+        
+    print(f"🔍 '{query}' için {len(results)} sonuç (Index):")
+    for r in results:
+        icon = "✅" if r["state"] == "completed" else "⚡" if r["state"] == "active" else "📝"
+        print(f"{icon} [{r['id']}] {r['title']} ({r['project']})")
 
-def repair_all() -> None:
-    """Repairs registry state directories."""
-    for p in os.listdir(REGISTRY_DIR):
-        p_str = str(p)
-        if p_str.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, p_str)):
-            for sd in ["active", "backlog", "completed"]:
-                os.makedirs(os.path.join(REGISTRY_DIR, p_str, str(sd)), exist_ok=True)
+def generate_graph() -> None:
+    """Generates Mermaid.js graph using ONLY index.json (High Performance)."""
+    print("🕸️ Bağımlılık Haritası Üretiliyor (Index-driven)...")
+    data = load_index()
+    tasks = data.get("tasks", {})
+    
+    mermaid = ["graph TD"]
+    styles = []
+    
+    for tid, t in tasks.items():
+        # Node definition
+        mermaid.append(f"    T{tid}[{tid}: {t['title']}]")
+        
+        # Dependencies
+        deps_raw = t["depends_on"]
+        deps = str(deps_raw).strip("[]").replace("'", "").replace('"', "").split(",")
+        for d in deps:
+            d = d.strip()
+            if d and d in tasks:
+                mermaid.append(f"    T{d} --> T{tid}")
+        
+        # Styling
+        if t["state"] == "completed":
+            styles.append(f"    style T{tid} fill:#d4edda,stroke:#155724")
+        elif t["state"] == "active":
+            styles.append(f"    style T{tid} fill:#fff3cd,stroke:#856404")
+            
+    output = "\n".join(mermaid + styles)
+    with open(os.path.join(REGISTRY_DIR, "DEPENDENCIES.md"), 'w', encoding='utf-8') as f:
+        f.write(f"# 🕸️ Bağımlılık Haritası\n\n```mermaid\n{output}\n```\n")
+
+def move_task(sp: str, tid: str, tp: str, ts: str) -> None:
+    """Moves a task and triggers Atomic Index Update."""
+    clean_tid = str(tid).zfill(3)
+    data = load_index()
+    task_info = data["tasks"].get(clean_tid)
+    
+    if not task_info:
+        print(f"❌ Görev {tid} bulunamadı.")
+        return
+
+    # Physical move
+    src_folder = os.path.dirname(os.path.join(PROJECT_ROOT, task_info["path"]))
+    folder_name = os.path.basename(src_folder)
+    dst_dir = os.path.join(REGISTRY_DIR, tp, ts, folder_name)
+    
+    os.makedirs(os.path.dirname(dst_dir), exist_ok=True)
+    shutil.move(src_folder, dst_dir)
+    
+    # Atomic Sync: Rebuild index after physical move
+    print(f"⚡ Atomic Sync: {tid} güncelleniyor...")
     reindex()
     sync_pulse()
+    generate_graph()
+    print(f"✅ Görev {tid} başarıyla {ts} statüsüne taşındı.")
+
+def repair_all() -> None:
+    """Full system repair: Disk Scan + Index Rebuild + Report Sync."""
+    print("🛠️ Sistem Geniş Kapsamlı Onarılıyor...")
+    # Ensure state folders exist for each project
+    for p in [d for d in os.listdir(REGISTRY_DIR) if d.startswith("P") and os.path.isdir(os.path.join(REGISTRY_DIR, d))]:
+        for s in ["active", "backlog", "completed"]:
+            os.makedirs(os.path.join(REGISTRY_DIR, p, s), exist_ok=True)
+    
+    reindex() # Disk scan
+    sync_pulse() # Index-driven
+    generate_graph() # Index-driven
+    print("✨ Tüm sistem senkronize edildi.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="VentHub Registry Manager")
-    parser.add_argument("action", choices=["repair", "activate", "move", "search"])
+    parser = argparse.ArgumentParser(description="VentHub Registry Engine 2.0")
+    parser.add_argument("action", choices=["repair", "activate", "move", "search", "graph", "reindex"])
     parser.add_argument("id", nargs="?"); parser.add_argument("task", nargs="?")
     parser.add_argument("target_id", nargs="?"); parser.add_argument("target_state", nargs="?")
+    
     args = parser.parse_args()
-    a_id, t_id, tar_id, tar_st = str(args.id or ""), str(args.task or ""), str(args.target_id or ""), str(args.target_state or "")
     if args.action == "repair": repair_all()
-    elif args.action == "move": move_task(a_id, t_id, tar_id, tar_st)
-    elif args.action == "activate": move_task(a_id, t_id, a_id, "active")
+    elif args.action == "reindex": reindex()
+    elif args.action == "graph": generate_graph()
+    elif args.action == "search": search_tasks(args.id or "")
+    elif args.action == "move": move_task(args.id or "", args.task or "", args.target_id or "", args.target_state or "")
+    elif args.action == "activate": move_task(args.id or "", args.task or "", args.id or "", "active")
