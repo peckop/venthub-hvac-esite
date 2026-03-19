@@ -50,7 +50,6 @@ export const TickerLane: React.FC<TickerLaneProps> = ({
           pauseOnFocus: false,
         },
       }}
-      // @ts-expect-error - AutoScroll is a valid extension but types may vary
       extensions={{ AutoScroll }}
       aria-label="Product ticker lane"
     >

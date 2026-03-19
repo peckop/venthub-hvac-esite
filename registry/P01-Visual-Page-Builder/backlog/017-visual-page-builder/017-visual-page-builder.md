@@ -47,6 +47,7 @@ artifacts:
 
 
 
+
 # 017 - Görsel Sayfa Oluşturucu (Visual Page Builder)
 
 ## 🎯 Hedef
