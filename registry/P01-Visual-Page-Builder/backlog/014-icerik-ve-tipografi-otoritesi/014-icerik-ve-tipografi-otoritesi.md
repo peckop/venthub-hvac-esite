@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 13:00:03"
+updated_at: "2026-03-19 13:22:03"
 id: 014
 title: "İçerik ve Tipografi Otoritesi"
 status: "Planning"
