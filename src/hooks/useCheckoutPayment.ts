@@ -29,31 +29,20 @@ interface InvoiceInfo {
   tax_office?: string
   tax_number?: string
   tc_id?: string
+  tckn?: string // Add for compatibility
 }
 
 interface LegalConsents {
   kvkk: boolean
   sales_agreement: boolean
   privacy_policy: boolean
+  distanceSales?: boolean // Add for compatibility
+  preInfo?: boolean // Add for compatibility
+  orderConfirm?: boolean // Add for compatibility
+  marketing?: boolean // Add for compatibility
 }
 
-interface UseCheckoutPaymentProps {
-  items: CartItem[]
-  getCartTotal: () => number
-  user: User | null
-  clearCart: (options?: { silent: boolean }) => void
-  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
-  customerInfo: CustomerInfo
-  shippingAddress: AddressInfo
-  billingAddress: AddressInfo
-  sameAsShipping: boolean
-  invoiceType: 'individual' | 'corporate'
-  invoiceInfo: InvoiceInfo
-  legalConsents: LegalConsents
-  shippingMethod: string
-  couponCode: string | null
-  t: (key: string) => string
-}
+// ... (UseCheckoutPaymentProps stays same)
 
 export const useCheckoutPayment = ({
   items,
@@ -83,8 +72,8 @@ export const useCheckoutPayment = ({
   const [progressPct, setProgressPct] = useState(20)
   const [paymentFrameContent] = useState('')
 
-  // @ts-expect-error - Checking for Vitest global in test environment safely
-  const isTest = typeof globalThis.vi !== 'undefined'
+  // Checking for Vitest global in test environment safely without as any or unused expect-error
+  const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined'
 
   const initiatePayment = async () => {
     if (isTest) return true

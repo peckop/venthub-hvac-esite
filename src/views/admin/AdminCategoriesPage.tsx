@@ -1,5 +1,5 @@
 import { VentImage } from '@/components/ui/VentImage'
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import type { DbCategory, DbJson } from '../../types/db-rows'
@@ -30,38 +30,65 @@ import { useDragScroll } from '../../hooks/useDragScroll'
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))
 const ExportMenu = lazy(() => import('../../components/admin/ExportMenu'))
 
+import type { Density } from '../../components/admin/ColumnsMenu'
+
 const AdminCategoriesPage: React.FC = () => {
   const { t } = useI18n()
-  const [rows, setRows] = React.useState<DbCategory[]>([])
-  const [q, setQ] = React.useState('')
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState<string | null>(null)
+  const [rows, setRows] = useState<DbCategory[]>([])
+  const [q, setQ] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const { canWrite } = useRole()
   const hasWriteAccess = canWrite('categories')
   const dragScrollRef = useDragScroll<HTMLDivElement>()
 
-  // ... (visibleCols and density useEffects stay same)
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+
+  // Columns & density
+  const STORAGE_KEY = 'toolbar:categories'
+  const [visibleCols, setVisibleCols] = useState<{ image: boolean; name: boolean; sortOrder: boolean; slug: boolean; parent: boolean; description: boolean; actions: boolean }>({
+    image: true, name: true, sortOrder: true, slug: true, parent: true, description: false, actions: true
+  })
+  const [density, setDensity] = useState<Density>('comfortable')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
+      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
+      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
+      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
+    } catch { }
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
+  }, [visibleCols])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
+  }, [density])
 
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
 
-  const load = React.useCallback(async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      setLoading(true)
-      setError(null)
-      // Proaktif oturum kontrolü
       await ensureSessionFresh()
-
-      const { data, error } = await supabase
+      const { data, error: fetchErr } = await supabase
         .from('categories')
         .select('*')
-        .order('sort_order', { ascending: true }) // Sort by order first
+        .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
 
-      if (error) throw error
+      if (fetchErr) throw fetchErr
       setRows((data || []) as unknown as DbCategory[])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
@@ -72,9 +99,9 @@ const AdminCategoriesPage: React.FC = () => {
   }, [])
 
   const pathname = usePathname()
-  React.useEffect(() => { load() }, [load, pathname])
+  useEffect(() => { load() }, [load, pathname])
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     const term = q.trim().toLowerCase()
     if (!term) return rows
     return rows.filter(r => r.name.toLowerCase().includes(term) || r.slug.toLowerCase().includes(term))
@@ -94,8 +121,9 @@ const AdminCategoriesPage: React.FC = () => {
     if (!confirm('Bu kategoriyi silmek istiyor musunuz? Alt kategorileri varsa silinemeyebilir.')) return
     try {
       const before = rows.find(r => r.id === id) || null
-      const { error } = await supabase.from('categories').delete().eq('id', id)
-      if (error) throw error
+      const { error: delErr } = await supabase.from('categories').delete().eq('id', id)
+      if (delErr) throw delErr
+      
       const { logAdminAction } = await import('../../lib/audit')
       await logAdminAction(supabase, { 
         table_name: 'categories', 
@@ -241,8 +269,8 @@ const AdminCategoriesPage: React.FC = () => {
                                 className={`group-hover:text-cyan-400 transition-colors uppercase tracking-wider font-black ${r.parent_id ? 'text-slate-400 text-[11px]' : 'text-white text-xs'}`}
                                 onSave={async (val) => {
                                   if (!val || r.name === val) return
-                                  const { error } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
-                                  if (error) throw error
+                                  const { error: upErr } = await supabase.from('categories').update({ name: val }).eq('id', r.id)
+                                  if (upErr) throw upErr
                                   setRows(prev => prev.map(row => row.id === r.id ? { ...row, name: val } : row))
                                   toast.success('Kategori adı güncellendi')
                                 }}
@@ -274,8 +302,8 @@ const AdminCategoriesPage: React.FC = () => {
                                   const num = parseInt(val || '0', 10)
                                   if (isNaN(num)) return
                                   if (r.sort_order === num) return
-                                  const { error } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
-                                  if (error) throw error
+                                  const { error: upErr } = await supabase.from('categories').update({ sort_order: num }).eq('id', r.id)
+                                  if (upErr) throw upErr
                                   setRows(prev => prev.map(row => row.id === r.id ? { ...row, sort_order: num } : row))
                                   toast.success('Sıra güncellendi')
                                   load()

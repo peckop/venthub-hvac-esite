@@ -80,10 +80,10 @@ const SilentFanProblem: React.FC = () => {
                                 <div className="text-left bg-black/20 backdrop-blur-md rounded-xl p-6 border border-white/10">
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">âœ•</div>
-                                        <h3 className="text-lg font-bold text-white">{tr('visual.without')}</h3>
+                                        <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {(tr('visual.withoutPoints') || []).map((p: string, i: number) => (
+                                        {Array.isArray(tr('visual.withoutPoints')) && (tr('visual.withoutPoints') as string[]).map((p: string, i: number) => (
                                             <li key={i} className="text-red-200 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-red-400 rounded-full" /> {p}
                                             </li>
@@ -95,10 +95,10 @@ const SilentFanProblem: React.FC = () => {
                                 <div className="text-left bg-blue-500/20 backdrop-blur-md rounded-xl p-6 border border-blue-400/30">
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">âœ“</div>
-                                        <h3 className="text-lg font-bold text-white">{tr('visual.with')}</h3>
+                                        <h3 className="text-lg font-bold text-white">{String(tr('visual.with'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {(tr('visual.withPoints') || []).map((p: string, i: number) => (
+                                        {Array.isArray(tr('visual.withPoints')) && (tr('visual.withPoints') as string[]).map((p: string, i: number) => (
                                             <li key={i} className="text-blue-100 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {p}
                                             </li>

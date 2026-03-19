@@ -26,6 +26,8 @@ import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
 
 interface CustomerInfo {
   name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
   identityNumber?: string
@@ -40,13 +42,13 @@ export const CheckoutPage: React.FC = () => {
 
   // Form states
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
-    name: '', email: '', phone: '', identityNumber: ''
+    name: '', firstName: '', lastName: '', email: '', phone: '', identityNumber: ''
   })
-  const [shippingAddress, setShippingAddress] = useState<Address>({
-    fullAddress: '', city: '', district: '', postalCode: ''
+  const [shippingAddress, setShippingAddress] = useState<Address & { full_name: string, phone: string, full_address: string }>({
+    fullAddress: '', city: '', district: '', postalCode: '', full_name: '', phone: '', full_address: ''
   })
-  const [billingAddress, setBillingAddress] = useState<Address>({
-    fullAddress: '', city: '', district: '', postalCode: ''
+  const [billingAddress, setBillingAddress] = useState<Address & { full_name: string, phone: string, full_address: string }>({
+    fullAddress: '', city: '', district: '', postalCode: '', full_name: '', phone: '', full_address: ''
   })
 
   const [invoiceType, setInvoiceType] = useState<'individual' | 'corporate'>('individual')
@@ -93,8 +95,12 @@ export const CheckoutPage: React.FC = () => {
   // Pre-fill customer info
   useEffect(() => {
     if (user) {
+      const fullName = user.user_metadata?.full_name || ''
+      const parts = fullName.split(' ')
       setCustomerInfo({
-        name: user.user_metadata?.full_name || '',
+        name: fullName,
+        firstName: parts[0] || '',
+        lastName: parts.slice(1).join(' ') || '',
         email: user.email || '',
         phone: user.user_metadata?.phone || '',
         identityNumber: ''
@@ -118,9 +124,12 @@ export const CheckoutPage: React.FC = () => {
         if (defShip) {
           const addr = {
             fullAddress: defShip.address_line || '',
+            full_address: defShip.address_line || '',
             city: defShip.city || '',
             district: defShip.district || '',
-            postalCode: defShip.postal_code || ''
+            postalCode: defShip.postal_code || '',
+            full_name: defShip.full_name || '',
+            phone: defShip.phone || ''
           }
           setShippingAddress(addr)
           if (sameAsShipping) setBillingAddress(addr)
@@ -186,7 +195,15 @@ export const CheckoutPage: React.FC = () => {
           addresses={savedAddresses}
           onClose={() => setShowAddressModal(false)}
           onPick={(a) => {
-            const addr = { fullAddress: a.address_line || '', city: a.city || '', district: a.district || '', postalCode: a.postal_code || '' }
+            const addr = { 
+              fullAddress: a.address_line || '', 
+              full_address: a.address_line || '', 
+              city: a.city || '', 
+              district: a.district || '', 
+              postalCode: a.postal_code || '',
+              full_name: a.full_name || '',
+              phone: a.phone || ''
+            }
             if (addressPickTarget === 'shipping') setShippingAddress(addr)
             else setBillingAddress(addr)
             setShowAddressModal(false)
