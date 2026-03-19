@@ -68,8 +68,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
 
         // 1. ÖNCELİK: Veritabanı model_type
         if (modelType && modelType in MODEL_COMPONENTS) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as any
+            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as React.ElementType
 
             // Hava perdesi için dinamik proplar
             const extraProps: { isHeated?: boolean; showMixed?: boolean } = {}
