@@ -87,6 +87,8 @@ Transform raw technical specifications into readable engineering insights for us
 
 
 
+
+
 ## ✅ Alt Görevler
 - [ ] `src/utils/engineeringIntelligence.ts` yardımcısını oluştur.
 - [ ] Fonksiyon: `getNoiseInference(db: number)` -> "Kütüphane sessizliği", "Ofis konforu" vb.

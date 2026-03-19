@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:10:24"
+updated_at: "2026-03-19 23:21:15"
 id: 008
 title: "B2B Hiyerarşisi ve Yetkilendirme"
 status: "Executing"
@@ -54,6 +54,8 @@ artifacts:
 
 ## 🎯 Hedef
 Bayi, proje ve son kullanıcı bazlı farklı içerik ve fiyat gösterimi için dinamik hiyerarşiyi kurmak.
+
+
 
 
 

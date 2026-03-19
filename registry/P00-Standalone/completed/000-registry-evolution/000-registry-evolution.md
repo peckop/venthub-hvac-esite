@@ -73,6 +73,8 @@ manage_registry.py sistemine bağımlılık kontrolü (Dependency Gatekeeper) ve
 
 
 
+
+
 ## ✅ Alt Görevler
 - [ ] `manage_registry.py` içindeki `import` ve global değişkenleri (`PROJECT_ROOT`, `REGISTRY_DIR`) standartlaştır.
 - [ ] Pyre2 lint hatalarını (join işlemleri) `os.path.normpath` veya tip casting ile gider.

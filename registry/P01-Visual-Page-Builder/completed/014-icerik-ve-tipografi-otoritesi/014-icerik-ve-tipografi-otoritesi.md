@@ -2,7 +2,7 @@
 completed_at: "2026-03-19 22:30:00"
 started_at: "2026-03-19 22:12:00"
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:10:25"
+updated_at: "2026-03-19 23:21:16"
 id: 014
 title: "İçerik ve Tipografi Otoritesi"
 status: "Completed"
@@ -19,6 +19,8 @@ artifacts:
 
 ## 🎯 Hedef
 Otorite sayfalarındaki mühendislik metinlerinin hiyerarşisini, font ağırlıklarını ve okunabilirliğini (Readability) standartlaştıran tasarım kurallarını mühürlemek.
+
+
 
 
 
