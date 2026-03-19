@@ -7,40 +7,13 @@ import { getPriceHashLocal, getPriceHashServer } from '../utils/checkoutHelpers'
 import { CartItem } from '../contexts/CartContext'
 import type { User } from '@supabase/supabase-js'
 
-export interface CustomerInfo {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-}
-
-interface AddressInfo {
-  id?: string
-  full_name: string
-  phone: string
-  city: string
-  district: string
-  full_address: string
-}
-
-interface InvoiceInfo {
-  type: 'individual' | 'corporate'
-  company_name?: string
-  tax_office?: string
-  tax_number?: string
-  tc_id?: string
-  tckn?: string // Add for compatibility
-}
-
-interface LegalConsents {
-  kvkk: boolean
-  sales_agreement: boolean
-  privacy_policy: boolean
-  distanceSales?: boolean // Add for compatibility
-  preInfo?: boolean // Add for compatibility
-  orderConfirm?: boolean // Add for compatibility
-  marketing?: boolean // Add for compatibility
-}
+import { 
+  DbOrder, 
+  CheckoutCustomerInfo, 
+  CheckoutAddressInfo, 
+  CheckoutInvoiceInfo, 
+  CheckoutLegalConsents 
+} from '../types/db-rows'
 
 interface UseCheckoutPaymentProps {
   items: CartItem[]
@@ -48,13 +21,13 @@ interface UseCheckoutPaymentProps {
   user: User | null
   clearCart: (options?: { silent: boolean }) => void
   applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
-  customerInfo: CustomerInfo
-  shippingAddress: AddressInfo
-  billingAddress: AddressInfo
+  customerInfo: CheckoutCustomerInfo
+  shippingAddress: CheckoutAddressInfo
+  billingAddress: CheckoutAddressInfo
   sameAsShipping: boolean
   invoiceType: 'individual' | 'corporate'
-  invoiceInfo: InvoiceInfo
-  legalConsents: LegalConsents
+  invoiceInfo: CheckoutInvoiceInfo
+  legalConsents: CheckoutLegalConsents
   shippingMethod: string
   couponCode: string | null
   t: (key: string) => string
