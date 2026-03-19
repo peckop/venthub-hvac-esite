@@ -1,305 +1,281 @@
 {
-  "generated_at": "2026-03-19 09:30:15",
+  "generated_at": "2026-03-19 13:14:40",
   "tasks": {
-    "030": {
+    "P00-Standalone/000": {
+      "id": "000",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/000-registry-evolution/000-registry-evolution.md"
+    },
+    "P00-Standalone/030": {
       "id": "030",
-      "title": "Gelişmiş Arama UX & Backend Optimizasyonu",
       "project": "P00-Standalone",
       "state": "backlog",
-      "status": "Backlog",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "null",
-      "path": "registry\\P00-Standalone\\backlog\\030-advanced-search-ux\\030-advanced-search-ux.md",
-      "updated_at": "2026-03-17 19:15:27"
+      "path": "registry/P00-Standalone/backlog/030-gelismis-arama-ux-backend-optimizasyonu/030-gelismis-arama-ux-backend-optimizasyonu.md"
     },
-    "031": {
+    "P00-Standalone/031": {
       "id": "031",
-      "title": "SEO & Core Web Vitals (Performance) Audit",
       "project": "P00-Standalone",
       "state": "backlog",
-      "status": "Backlog",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "null",
-      "path": "registry\\P00-Standalone\\backlog\\031-seo-performance-audit\\031-seo-performance-audit.md",
-      "updated_at": "2026-03-17 19:15:27"
+      "path": "registry/P00-Standalone/backlog/031-seo-core-web-vitals-performance-audit/031-seo-core-web-vitals-performance-audit.md"
     },
-    "032": {
-      "id": "032",
-      "title": "032-search-architecture",
-      "project": "P00-Standalone",
-      "state": "backlog",
-      "status": "TODO",
-      "priority": "MED",
-      "progress": "0%",
-      "depends_on": "[]",
-      "path": "registry\\P00-Standalone\\backlog\\032-search-architecture\\032-search-architecture.md",
-      "updated_at": "2026-03-19 09:30:15"
-    },
-    "033": {
+    "P00-Standalone/033": {
       "id": "033",
-      "title": "033: Teknik Borç Temizliği ve Edge Görevleri",
       "project": "P00-Standalone",
       "state": "active",
-      "status": "Planning",
-      "priority": "HIGH",
-      "progress": "0%",
-      "depends_on": "[]",
-      "path": "registry\\P00-Standalone\\active\\033-tech-debt-cleanup\\033-tech-debt-cleanup.md",
-      "updated_at": "2026-03-17 21:55:00"
+      "path": "registry/P00-Standalone/active/033-teknik-borc-temizligi-ve-edge-gorevleri/033-teknik-borc-temizligi-ve-edge-gorevleri.md"
     },
-    "001": {
-      "id": "001",
-      "title": "Skills Factory: Otonom Yetenek Havuzu Altyapısı",
-      "project": "P07-Autonomous-Skills-Factory",
-      "state": "backlog",
-      "status": "TODO",
-      "priority": "HIGH",
-      "progress": "0%",
-      "depends_on": "[]",
-      "path": "registry\\P07-Autonomous-Skills-Factory\\backlog\\001-skills-factory-infrastructure\\001-skills-factory-infrastructure.md",
-      "updated_at": "2026-03-19 10:30:00"
-    },
-    "004": {
+    "P00-Standalone/004": {
       "id": "004",
-      "title": "Registry 3.0: SQLite Geçişi ve Atomik Bütünlük",
-      "project": "P06-System-Intelligence-Registry",
-      "state": "active",
-      "status": "Executing",
-      "priority": "CRITICAL",
-      "progress": "10%",
-      "depends_on": "[]",
-      "path": "registry\\P06-System-Intelligence-Registry\\active\\004-registry-3-sqlite-migration\\004-registry-3-sqlite-migration.md",
-      "updated_at": "2026-03-19 10:30:00"
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/004-test-altyapisinin-yeniden-kurulmasi/004-test-altyapisinin-yeniden-kurulmasi.md"
     },
-    "005": {
+    "P00-Standalone/005": {
       "id": "005",
-      "title": "Aşama 5: PDP Gateway Mimarisi (ProductDetailPage Parçalama)",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/005-next-js-edge-native-mimariye-tam-gecis/005-next-js-edge-native-mimariye-tam-gecis.md"
+    },
+    "P00-Standalone/007": {
+      "id": "007",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/007-registry-v3-superpowers-sinerjisi/007-registry-v3-superpowers-sinerjisi.md"
+    },
+    "P00-Standalone/008": {
+      "id": "008",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/008-registry-v3-1-proaktif-butunluk-pulse-da/008-registry-v3-1-proaktif-butunluk-pulse-da.md"
+    },
+    "P00-Standalone/009": {
+      "id": "009",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/009-registry-v4-unified-dashboard-atomic-pro/009-registry-v4-unified-dashboard-atomic-pro.md"
+    },
+    "P00-Standalone/020": {
+      "id": "020",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/020-global-i18n-hardcoded-metin-temizligi-ad/020-global-i18n-hardcoded-metin-temizligi-ad.md"
+    },
+    "P00-Standalone/021": {
+      "id": "021",
+      "project": "P00-Standalone",
+      "state": "completed",
+      "path": "registry/P00-Standalone/completed/021-codebase-audit-technical-debt-cleanup/021-codebase-audit-technical-debt-cleanup.md"
+    },
+    "P01-Visual-Page-Builder/010": {
+      "id": "010",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/010-sertifikasyon-otoritesi/010-sertifikasyon-otoritesi.md"
+    },
+    "P01-Visual-Page-Builder/011": {
+      "id": "011",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/011-muhendislik-motoru-engineering-engine/011-muhendislik-motoru-engineering-engine.md"
+    },
+    "P01-Visual-Page-Builder/012": {
+      "id": "012",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/012-medya-otoritesi-media-authority/012-medya-otoritesi-media-authority.md"
+    },
+    "P01-Visual-Page-Builder/013": {
+      "id": "013",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/013-state-hydration-durum-yonetimi/013-state-hydration-durum-yonetimi.md"
+    },
+    "P01-Visual-Page-Builder/014": {
+      "id": "014",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/014-icerik-ve-tipografi-otoritesi/014-icerik-ve-tipografi-otoritesi.md"
+    },
+    "P01-Visual-Page-Builder/015": {
+      "id": "015",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/015-tasarim-sistemi-otoritesi/015-tasarim-sistemi-otoritesi.md"
+    },
+    "P01-Visual-Page-Builder/016": {
+      "id": "016",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/016-master-sablon-master-template/016-master-sablon-master-template.md"
+    },
+    "P01-Visual-Page-Builder/017": {
+      "id": "017",
+      "project": "P01-Visual-Page-Builder",
+      "state": "backlog",
+      "path": "registry/P01-Visual-Page-Builder/backlog/017-gorsel-sayfa-olusturucu-visual-page-buil/017-gorsel-sayfa-olusturucu-visual-page-buil.md"
+    },
+    "P01-Visual-Page-Builder/008": {
+      "id": "008",
+      "project": "P01-Visual-Page-Builder",
+      "state": "active",
+      "path": "registry/P01-Visual-Page-Builder/active/008-b2b-hiyerarsisi-ve-yetkilendirme/008-b2b-hiyerarsisi-ve-yetkilendirme.md"
+    },
+    "P01-Visual-Page-Builder/009": {
+      "id": "009",
+      "project": "P01-Visual-Page-Builder",
+      "state": "active",
+      "path": "registry/P01-Visual-Page-Builder/active/009-gelismis-fiyatlandirma-motoru/009-gelismis-fiyatlandirma-motoru.md"
+    },
+    "P01-Visual-Page-Builder/003": {
+      "id": "003",
+      "project": "P01-Visual-Page-Builder",
+      "state": "completed",
+      "path": "registry/P01-Visual-Page-Builder/completed/003-hrv-seo-devrimi/003-hrv-seo-devrimi.md"
+    },
+    "P01-Visual-Page-Builder/006": {
+      "id": "006",
+      "project": "P01-Visual-Page-Builder",
+      "state": "completed",
+      "path": "registry/P01-Visual-Page-Builder/completed/006-dinamik-otorite-ve-icerik-yonetimi/006-dinamik-otorite-ve-icerik-yonetimi.md"
+    },
+    "P01-Visual-Page-Builder/007": {
+      "id": "007",
+      "project": "P01-Visual-Page-Builder",
+      "state": "completed",
+      "path": "registry/P01-Visual-Page-Builder/completed/007-technical-intelligence-layer-enhancement/007-technical-intelligence-layer-enhancement.md"
+    },
+    "P02-Core-Quality-Guardians/001": {
+      "id": "001",
+      "project": "P02-Core-Quality-Guardians",
+      "state": "completed",
+      "path": "registry/P02-Core-Quality-Guardians/completed/001-database-type-safety-rpc-normalization/001-database-type-safety-rpc-normalization.md"
+    },
+    "P02-Core-Quality-Guardians/002": {
+      "id": "002",
+      "project": "P02-Core-Quality-Guardians",
+      "state": "completed",
+      "path": "registry/P02-Core-Quality-Guardians/completed/002-global-i18n-admin-panel-text-migration/002-global-i18n-admin-panel-text-migration.md"
+    },
+    "P02-Core-Quality-Guardians/003": {
+      "id": "003",
+      "project": "P02-Core-Quality-Guardians",
+      "state": "completed",
+      "path": "registry/P02-Core-Quality-Guardians/completed/003-a11y-aria-label-standardization/003-a11y-aria-label-standardization.md"
+    },
+    "P03-NextGen-3D-Experience/001": {
+      "id": "001",
+      "project": "P03-NextGen-3D-Experience",
+      "state": "backlog",
+      "path": "registry/P03-NextGen-3D-Experience/backlog/001-3d-infrastructure-and-research/001-3d-infrastructure-and-research.md"
+    },
+    "P04-Category-Architecture/005": {
+      "id": "005",
       "project": "P04-Category-Architecture",
       "state": "active",
-      "status": "Planning",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[004]",
-      "path": "registry\\P04-Category-Architecture\\active\\005-pdp-gateway-architecture\\005-pdp-gateway-architecture.md",
-      "updated_at": "2026-03-19 02:18:03"
+      "path": "registry/P04-Category-Architecture/active/005-asama-5-pdp-gateway-mimarisi-productdeta/005-asama-5-pdp-gateway-mimarisi-productdeta.md"
     },
-    "007": {
-      "id": "007",
-      "title": "Technical Intelligence Layer Enhancement",
-      "project": "P01-Visual-Page-Builder",
+    "P04-Category-Architecture/001": {
+      "id": "001",
+      "project": "P04-Category-Architecture",
       "state": "completed",
-      "status": "Completed",
-      "priority": "High",
-      "progress": "100%",
-      "depends_on": "[]",
-      "path": "registry\\P01-Visual-Page-Builder\\completed\\007-technical-intelligence\\007-technical-intelligence.md",
-      "updated_at": "2026-03-19 09:30:15"
+      "path": "registry/P04-Category-Architecture/completed/001-asama-1-tip-birlestirme-category-domainc/001-asama-1-tip-birlestirme-category-domainc.md"
     },
-    "008": {
-      "id": "008",
-      "title": "B2B Hiyerarşisi ve Yetkilendirme",
-      "project": "P01-Visual-Page-Builder",
-      "state": "active",
-      "status": "Planning",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[006]",
-      "path": "registry\\P01-Visual-Page-Builder\\active\\008-b2b-hierarchy\\008-b2b-hierarchy.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "009": {
-      "id": "009",
-      "title": "Gelişmiş Fiyatlandırma Motoru",
-      "project": "P01-Visual-Page-Builder",
-      "state": "active",
-      "status": "Planning",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[006, 008]",
-      "path": "registry\\P01-Visual-Page-Builder\\active\\009-pricing-engine\\009-pricing-engine.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "020": {
-      "id": "020",
-      "title": "Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)",
-      "project": "P00-Standalone",
-      "state": "completed",
-      "status": "Completed",
-      "priority": "Critical",
-      "progress": "100%",
-      "depends_on": "null",
-      "path": "registry\\P00-Standalone\\completed\\020-i18n-refactor\\020-i18n-refactor.md",
-      "updated_at": "2026-03-17 09:48:00"
-    },
-    "021": {
-      "id": "021",
-      "title": "Codebase Audit & Technical Debt Cleanup",
-      "project": "P00-Standalone",
-      "state": "completed",
-      "status": "Completed",
-      "priority": "High",
-      "progress": "100%",
-      "depends_on": "[\"020\"]",
-      "path": "registry\\P00-Standalone\\completed\\021-codebase-audit-cleanup\\021-codebase-audit-cleanup.md",
-      "updated_at": "2026-03-17 11:45:00"
-    },
-    "022": {
-      "id": "022",
-      "title": "022-registry-evolution",
-      "project": "P00-Standalone",
-      "state": "completed",
-      "status": "TODO",
-      "priority": "MED",
-      "progress": "0%",
-      "depends_on": "[]",
-      "path": "registry\\P00-Standalone\\completed\\022-registry-evolution\\022-registry-evolution.md",
-      "updated_at": "2026-03-19 09:30:15"
-    },
-    "010": {
-      "id": "010",
-      "title": "Sertifikasyon Otoritesi",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "Medium",
-      "progress": "0%",
-      "depends_on": "[006]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\010-certification-authority\\010-certification-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "011": {
-      "id": "011",
-      "title": "Mühendislik Motoru (Engineering Engine)",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[007]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\011-engineering-engine\\011-engineering-engine.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "012": {
-      "id": "012",
-      "title": "Medya Otoritesi (Media Authority)",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "Medium",
-      "progress": "0%",
-      "depends_on": "[006]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\012-media-authority\\012-media-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "013": {
-      "id": "013",
-      "title": "State Hydration (Durum Yönetimi)",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[006]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\013-state-hydration-authority\\013-state-hydration-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "014": {
-      "id": "014",
-      "title": "İçerik ve Tipografi Otoritesi",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[006]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\014-content-typography-authority\\014-content-typography-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "015": {
-      "id": "015",
-      "title": "Tasarım Sistemi Otoritesi",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "High",
-      "progress": "0%",
-      "depends_on": "[014]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\015-design-system-authority\\015-design-system-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "016": {
-      "id": "016",
-      "title": "Master Şablon (Master Template)",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "Critical",
-      "progress": "0%",
-      "depends_on": "[015]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\016-master-template-authority\\016-master-template-authority.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "017": {
-      "id": "017",
-      "title": "Görsel Sayfa Oluşturucu (Visual Page Builder)",
-      "project": "P01-Visual-Page-Builder",
-      "state": "backlog",
-      "status": "Pending",
-      "priority": "Critical",
-      "progress": "0%",
-      "depends_on": "[006, 014, 015, 016]",
-      "path": "registry\\P01-Visual-Page-Builder\\backlog\\017-visual-page-builder\\017-visual-page-builder.md",
-      "updated_at": "2026-03-17 19:15:27"
-    },
-    "003": {
-      "id": "003",
-      "title": "Aşama 3: Registry İndeksleme Sistemi (Indexing Engine)",
-      "project": "P06-System-Intelligence-Registry",
-      "state": "completed",
-      "status": "Completed",
-      "priority": "MEDIUM",
-      "progress": "100%",
-      "depends_on": "[\"001\", \"002\"]",
-      "path": "registry\\P06-System-Intelligence-Registry\\completed\\003-registry-indexing-system\\003-registry-indexing-system.md",
-      "updated_at": "2026-03-19 03:11:29"
-    },
-    "006": {
-      "id": "006",
-      "title": "Dinamik Otorite ve İçerik Yönetimi",
-      "project": "P01-Visual-Page-Builder",
-      "state": "completed",
-      "status": "Completed",
-      "priority": "High",
-      "progress": "100%",
-      "depends_on": "null",
-      "path": "registry\\P01-Visual-Page-Builder\\completed\\006-dynamic-authority-system\\006-dynamic-authority-system.md",
-      "updated_at": "2026-03-19 09:30:15"
-    },
-    "002": {
+    "P04-Category-Architecture/002": {
       "id": "002",
-      "title": "Aşama 2: Registry Bağımlılık Görselleştirici (Graph Motor)",
-      "project": "P06-System-Intelligence-Registry",
+      "project": "P04-Category-Architecture",
       "state": "completed",
-      "status": "Completed",
-      "priority": "High",
-      "progress": "100%",
-      "depends_on": "[001]",
-      "path": "registry\\P06-System-Intelligence-Registry\\completed\\002-dependency-visualizer\\002-dependency-visualizer.md",
-      "updated_at": "2026-03-19 02:37:13"
+      "path": "registry/P04-Category-Architecture/completed/002-asama-2-db-migration-categorymetadata-ts/002-asama-2-db-migration-categorymetadata-ts.md"
     },
-    "P05": {
-      "id": "P05",
-      "title": "P05-ROADMAP",
+    "P04-Category-Architecture/003": {
+      "id": "003",
+      "project": "P04-Category-Architecture",
+      "state": "completed",
+      "path": "registry/P04-Category-Architecture/completed/003-asama-3-gateway-mimarisi-categorypage-pa/003-asama-3-gateway-mimarisi-categorypage-pa.md"
+    },
+    "P04-Category-Architecture/004": {
+      "id": "004",
+      "project": "P04-Category-Architecture",
+      "state": "completed",
+      "path": "registry/P04-Category-Architecture/completed/004-asama-4-productspage-birlestirme/004-asama-4-productspage-birlestirme.md"
+    },
+    "P05-Next15-Modernization/003": {
+      "id": "003",
+      "project": "P05-Next15-Modernization",
+      "state": "backlog",
+      "path": "registry/P05-Next15-Modernization/backlog/003-technical-debt-cleanup-type-safety/003-technical-debt-cleanup-type-safety.md"
+    },
+    "P05-Next15-Modernization/004": {
+      "id": "004",
+      "project": "P05-Next15-Modernization",
+      "state": "backlog",
+      "path": "registry/P05-Next15-Modernization/backlog/004-next-js-15-performans-optimizasyonu-ppr/004-next-js-15-performans-optimizasyonu-ppr.md"
+    },
+    "P05-Next15-Modernization/000": {
+      "id": "000",
       "project": "P05-Next15-Modernization",
       "state": "active",
-      "status": "TODO",
-      "priority": "MED",
-      "progress": "0%",
-      "depends_on": "[]",
-      "path": "registry\\P05-Next15-Modernization\\active\\P05-ROADMAP\\P05-ROADMAP.md",
-      "updated_at": "2026-03-19 09:30:15"
+      "path": "registry/P05-Next15-Modernization/active/000-roadmap/000-roadmap.md"
+    },
+    "P05-Next15-Modernization/001": {
+      "id": "001",
+      "project": "P05-Next15-Modernization",
+      "state": "completed",
+      "path": "registry/P05-Next15-Modernization/completed/001-next-js-15-altyapi-ve-guvenlik-kilidi-in/001-next-js-15-altyapi-ve-guvenlik-kilidi-in.md"
+    },
+    "P05-Next15-Modernization/002": {
+      "id": "002",
+      "project": "P05-Next15-Modernization",
+      "state": "completed",
+      "path": "registry/P05-Next15-Modernization/completed/002-react-19-auth-modernizasyonu-server-acti/002-react-19-auth-modernizasyonu-server-acti.md"
+    },
+    "P06-System-Intelligence-Registry/001": {
+      "id": "001",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "completed",
+      "path": "registry/P06-System-Intelligence-Registry/completed/001-asama-1-otomatik-changelog-jeneratoru/001-asama-1-otomatik-changelog-jeneratoru.md"
+    },
+    "P06-System-Intelligence-Registry/002": {
+      "id": "002",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "completed",
+      "path": "registry/P06-System-Intelligence-Registry/completed/002-asama-2-registry-bagimlilik-gorsellestir/002-asama-2-registry-bagimlilik-gorsellestir.md"
+    },
+    "P06-System-Intelligence-Registry/003": {
+      "id": "003",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "completed",
+      "path": "registry/P06-System-Intelligence-Registry/completed/003-asama-3-registry-indeksleme-sistemi-inde/003-asama-3-registry-indeksleme-sistemi-inde.md"
+    },
+    "P06-System-Intelligence-Registry/004": {
+      "id": "004",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "completed",
+      "path": "registry/P06-System-Intelligence-Registry/completed/004-registry-3-0-sqlite-gecisi-ve-atomik-but/004-registry-3-0-sqlite-gecisi-ve-atomik-but.md"
+    },
+    "P06-System-Intelligence-Registry/005": {
+      "id": "005",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "completed",
+      "path": "registry/P06-System-Intelligence-Registry/completed/005-registry-v7-atomik-butunluk-ve-indeks-on/005-registry-v7-atomik-butunluk-ve-indeks-on.md"
+    },
+    "P07-Autonomous-Skills-Factory/001": {
+      "id": "001",
+      "project": "P07-Autonomous-Skills-Factory",
+      "state": "active",
+      "path": "registry/P07-Autonomous-Skills-Factory/active/001-skills-factory-otonom-yetenek-havuzu-alt/001-skills-factory-otonom-yetenek-havuzu-alt.md"
+    },
+    "P99-V7-Sertifikasyon-Protokol/000": {
+      "id": "000",
+      "project": "P99-V7-Sertifikasyon-Protokol",
+      "state": "active",
+      "path": "registry/P99-V7-Sertifikasyon-Protokol/active/000-v7-certification-roadmap/000-v7-certification-roadmap.md"
+    },
+    "P99-V7-Sertifikasyon-Protokol/001": {
+      "id": "001",
+      "project": "P99-V7-Sertifikasyon-Protokol",
+      "state": "completed",
+      "path": "registry/P99-V7-Sertifikasyon-Protokol/completed/001-v7-hassas-test/001-v7-hassas-test.md"
     }
   }
 }

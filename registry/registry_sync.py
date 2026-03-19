@@ -21,6 +21,7 @@ def get_priority_label(priority):
 def get_status_dot(status):
     dots = {
         "Completed":     "✅ DONE",
+        "Done":          "✅ DONE",
         "Executing":     "🏗️ RUN ",
         "Active":        "🏗️ RUN ",
         "RUN":           "🏗️ RUN ",

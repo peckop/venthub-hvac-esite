@@ -21,7 +21,8 @@ const AdminWebhookEventsPage: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error: fetchErr } = await (supabase.from('webhook_events') as unknown as { select: (c: string) => { order: (c: string, o: { ascending: boolean }) => { limit: (l: number) => Promise<{data: Record<string, unknown>[], error: unknown}> } } } )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error: fetchErr } = await supabase.from('webhook_events' as any)
           .select('*')
           .order('created_at', { ascending: false })
           .limit(100)
