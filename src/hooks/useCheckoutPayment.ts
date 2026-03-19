@@ -42,7 +42,23 @@ interface LegalConsents {
   marketing?: boolean // Add for compatibility
 }
 
-// ... (UseCheckoutPaymentProps stays same)
+interface UseCheckoutPaymentProps {
+  items: CartItem[]
+  getCartTotal: () => number
+  user: User | null
+  clearCart: (options?: { silent: boolean }) => void
+  applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
+  customerInfo: CustomerInfo
+  shippingAddress: AddressInfo
+  billingAddress: AddressInfo
+  sameAsShipping: boolean
+  invoiceType: 'individual' | 'corporate'
+  invoiceInfo: InvoiceInfo
+  legalConsents: LegalConsents
+  shippingMethod: string
+  couponCode: string | null
+  t: (key: string) => string
+}
 
 export const useCheckoutPayment = ({
   items,

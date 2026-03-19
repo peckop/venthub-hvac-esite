@@ -83,7 +83,7 @@ const SilentFanProblem: React.FC = () => {
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {Array.isArray(tr('visual.withoutPoints')) && (tr('visual.withoutPoints') as string[]).map((p: string, i: number) => (
+                                        {Array.isArray(tr('visual.withoutPoints')) && (tr('visual.withoutPoints') as unknown as string[]).map((p: string, i: number) => (
                                             <li key={i} className="text-red-200 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-red-400 rounded-full" /> {p}
                                             </li>
@@ -98,7 +98,7 @@ const SilentFanProblem: React.FC = () => {
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.with'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
-                                        {Array.isArray(tr('visual.withPoints')) && (tr('visual.withPoints') as string[]).map((p: string, i: number) => (
+                                        {Array.isArray(tr('visual.withPoints')) && (tr('visual.withPoints') as unknown as string[]).map((p: string, i: number) => (
                                             <li key={i} className="text-blue-100 text-sm flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 bg-blue-400 rounded-full" /> {p}
                                             </li>
