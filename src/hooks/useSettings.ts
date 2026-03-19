@@ -29,13 +29,13 @@ export function useSettings() {
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const { data, error: fetchError } = await supabase
+        const { data, error: fetchError } = await (supabase as any)
           .from('app_settings')
           .select('*')
           .single()
 
         if (fetchError) throw fetchError
-        setSettings(data as AppSettings)
+        setSettings(data as unknown as AppSettings)
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : String(err))
       } finally {
