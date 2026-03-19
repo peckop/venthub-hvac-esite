@@ -9,13 +9,19 @@ import {
   listAddresses, 
   UserAddress 
 } from '../lib/supabase'
+import { 
+  CheckoutCustomerInfo, 
+  CheckoutAddressInfo, 
+  CheckoutInvoiceInfo, 
+  CheckoutLegalConsents 
+} from '../types/db-rows'
 import { ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import ReviewSummary from './checkout/ReviewSummary'
 import CheckoutProgress from './checkout/CheckoutProgress'
 import StepCustomerInfo from './checkout/StepCustomerInfo'
-import StepAddressInfo, { type Address, type InvoiceInfo, type LegalConsents } from './checkout/StepAddressInfo'
+import StepAddressInfo, { type Address } from './checkout/StepAddressInfo'
 import OrderSummarySidebar from './checkout/OrderSummarySidebar'
 import PaymentIframeContainer from './checkout/PaymentIframeContainer'
 import SecurePaymentOverlay from './checkout/SecurePaymentOverlay'
@@ -23,15 +29,6 @@ import AddressSelectModal from './checkout/AddressSelectModal'
 import { getTranslationWithFallback } from '../utils/checkoutHelpers'
 import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
-
-interface CustomerInfo {
-  name: string
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  identityNumber?: string
-}
 
 export const CheckoutPage: React.FC = () => {
   const { items, getCartTotal, clearCart, applyServerPricing } = useCart()
@@ -41,20 +38,22 @@ export const CheckoutPage: React.FC = () => {
   const [step, setStep] = useState(1) // 1: Info, 2: Address, 3: Review, 4: Payment
 
   // Form states
-  const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
+  const [customerInfo, setCustomerInfo] = useState<CheckoutCustomerInfo>({
     name: '', firstName: '', lastName: '', email: '', phone: '', identityNumber: ''
   })
-  const [shippingAddress, setShippingAddress] = useState<Address & { full_name: string, phone: string, full_address: string }>({
-    fullAddress: '', city: '', district: '', postalCode: '', full_name: '', phone: '', full_address: ''
+  const [shippingAddress, setShippingAddress] = useState<CheckoutAddressInfo>({
+    full_name: '', phone: '', full_address: '', city: '', district: '', postalCode: ''
   })
-  const [billingAddress, setBillingAddress] = useState<Address & { full_name: string, phone: string, full_address: string }>({
-    fullAddress: '', city: '', district: '', postalCode: '', full_name: '', phone: '', full_address: ''
+  const [billingAddress, setBillingAddress] = useState<CheckoutAddressInfo>({
+    full_name: '', phone: '', full_address: '', city: '', district: '', postalCode: ''
   })
 
   const [invoiceType, setInvoiceType] = useState<'individual' | 'corporate'>('individual')
-  const [invoiceInfo, setInvoiceInfo] = useState<InvoiceInfo>({ type: 'individual', tckn: '' })
-  const [legalConsents, setLegalConsents] = useState<LegalConsents>({ 
+  const [invoiceInfo, setInvoiceInfo] = useState<CheckoutInvoiceInfo>({ type: 'individual', tckn: '' })
+  const [legalConsents, setLegalConsents] = useState<CheckoutLegalConsents>({ 
     kvkk: false, 
+    sales_agreement: false, 
+    privacy_policy: false,
     distanceSales: false, 
     preInfo: false, 
     orderConfirm: false, 
@@ -122,8 +121,7 @@ export const CheckoutPage: React.FC = () => {
         setSavedAddresses(rows)
         const defShip = rows.find(r => r.is_default_shipping)
         if (defShip) {
-          const addr = {
-            fullAddress: defShip.address_line || '',
+          const addr: CheckoutAddressInfo = {
             full_address: defShip.address_line || '',
             city: defShip.city || '',
             district: defShip.district || '',
@@ -148,8 +146,8 @@ export const CheckoutPage: React.FC = () => {
     return true
   }
 
-  const validateAddress = (address: Address) => {
-    if (!address.fullAddress.trim()) return !!toast.error(t('checkout.errors.addressRequired'))
+  const validateAddress = (address: CheckoutAddressInfo) => {
+    if (!address.full_address.trim()) return !!toast.error(t('checkout.errors.addressRequired'))
     if (!address.city.trim() || !address.district.trim()) return !!toast.error(t('checkout.errors.locationRequired'))
     return true
   }
@@ -195,8 +193,7 @@ export const CheckoutPage: React.FC = () => {
           addresses={savedAddresses}
           onClose={() => setShowAddressModal(false)}
           onPick={(a) => {
-            const addr = { 
-              fullAddress: a.address_line || '', 
+            const addr: CheckoutAddressInfo = { 
               full_address: a.address_line || '', 
               city: a.city || '', 
               district: a.district || '', 
@@ -220,21 +217,21 @@ export const CheckoutPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={(info) => setCustomerInfo(info)} t={t} />}
+              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={(info) => setCustomerInfo(info as any)} t={t} />}
               
               {step === 2 && (
                 <StepAddressInfo
-                  shippingAddress={shippingAddress} setShippingAddress={(a) => setShippingAddress(a as any)}
-                  billingAddress={billingAddress} setBillingAddress={(a) => setBillingAddress(a as any)}
+                  shippingAddress={shippingAddress as any} setShippingAddress={(a) => setShippingAddress(a as any)}
+                  billingAddress={billingAddress as any} setBillingAddress={(a) => setBillingAddress(a as any)}
                   sameAsShipping={sameAsShipping} setSameAsShipping={setSameAsShipping}
                   shippingMethod={shippingMethod} setShippingMethod={setShippingMethod}
                   invoiceType={invoiceType} setInvoiceType={setInvoiceType}
-                  invoiceInfo={invoiceInfo} setInvoiceInfo={(info) => setInvoiceInfo(info as any)}
-                  legalConsents={legalConsents} setLegalConsents={setLegalConsents}
+                  invoiceInfo={invoiceInfo as any} setInvoiceInfo={(info) => setInvoiceInfo(info as any)}
+                  legalConsents={legalConsents as any} setLegalConsents={(c) => setLegalConsents(c as any)}
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
-                    // Logic for opening invoice modal (redirect or generic modal)
+                    // Logic for opening invoice modal
                   }}
                   t={t} tf={(key, fallback) => getTranslationWithFallback(t, key, fallback)}
                 />
@@ -242,8 +239,8 @@ export const CheckoutPage: React.FC = () => {
 
               {step === 3 && (
                 <ReviewSummary
-                  customer={customerInfo} shipping={shippingAddress} billing={billingAddress}
-                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo}
+                  customer={customerInfo as any} shipping={shippingAddress as any} billing={billingAddress as any}
+                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo as any}
                   onEditPersonal={() => setStep(1)} 
                   onEditShipping={() => setStep(2)}
                   onEditBilling={() => setStep(2)}
