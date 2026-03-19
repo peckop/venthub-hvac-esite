@@ -176,10 +176,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         // Fetch server items (will be empty if we just cleared)
         const serverRows = await listCartItemsWithProducts(cart.id)
-        const serverItems: CartItem[] = serverRows.map((row: any) => ({ 
-          id: row.product_id, 
-          product: row.products, 
-          quantity: row.quantity 
+        const serverItems: CartItem[] = serverRows.map((row) => ({ 
+          id: row.item.product_id, 
+          product: row.product, 
+          quantity: row.item.quantity 
         }))
 
         // Decide merge strategy

@@ -8,7 +8,6 @@ import { CartItem } from '../contexts/CartContext'
 import type { User } from '@supabase/supabase-js'
 
 import { 
-  DbOrder, 
   CheckoutCustomerInfo, 
   CheckoutAddressInfo, 
   CheckoutInvoiceInfo, 
