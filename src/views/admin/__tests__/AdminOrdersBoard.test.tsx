@@ -3,11 +3,12 @@ import { describe, it, expect } from 'vitest';
 // AdminOrdersBoard içerisinde export edilmediği için mantığını test edilebilir şekilde simüle ediyoruz.
 // Gerçek testte dosyadan import etmek idealdir ancak bu işlev private (export edilmemiş) olabilir.
 // Dosya içeriğine göre getEffectiveStatus fonksiyonunun yapısı:
-function getEffectiveStatus(order: any) {
-    if (order.payment_status === 'refunded' || order.payment_status === 'partial_refunded') {
-        return order.payment_status
+function getEffectiveStatus(order: unknown) {
+    const o = order as Record<string, unknown>
+    if (o.payment_status === 'refunded' || o.payment_status === 'partial_refunded') {
+        return o.payment_status
     }
-    return order.status || 'pending'
+    return o.status || 'pending'
 }
 
 describe('AdminOrdersBoard logic', () => {

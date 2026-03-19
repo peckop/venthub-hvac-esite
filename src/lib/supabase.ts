@@ -156,6 +156,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase.rpc('get_products_enriched' as any, {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
@@ -840,6 +841,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('user_projects')
     .select('*')
@@ -850,6 +852,7 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('user_projects')
     .insert(project)
@@ -861,6 +864,7 @@ export async function createProject(project: Partial<DbUserProject>): Promise<Db
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from('user_projects')
     .delete()
@@ -871,6 +875,7 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('project_items')
     .insert({ project_id: projectId, product_id: productId, quantity })
@@ -882,6 +887,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any)
     .from('project_items')
     .delete()
@@ -892,6 +898,7 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from('project_items')
     .select('*, product:products(*)')
