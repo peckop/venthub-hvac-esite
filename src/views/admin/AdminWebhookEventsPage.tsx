@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '../../types/database.types'
 import { useI18n } from '../../i18n/I18nProvider'
 import { 
   adminSectionTitleClass, 
@@ -21,7 +23,7 @@ const AdminWebhookEventsPage: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error: fetchErr } = await (supabase as any)
+        const { data, error: fetchErr } = await (supabase as unknown as SupabaseClient<Database>)
           .from('webhook_events')
           .select('*')
           .order('created_at', { ascending: false })
@@ -65,23 +67,22 @@ const AdminWebhookEventsPage: React.FC = () => {
               ) : events.length === 0 ? (
                 <tr><td colSpan={5} className="p-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
               ) : (
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                events.map((event: any, idx) => (
+                (events as unknown as Record<string, unknown>[]).map((event, idx) => (
                   <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
                     <td className={adminTableCellClass}>
                       <div className="flex items-center gap-2 text-slate-400">
                         <Clock size={14} />
-                        <span className="text-xs">{new Date(event.created_at).toLocaleString()}</span>
+                        <span className="text-xs">{new Date(event.created_at as string).toLocaleString()}</span>
                       </div>
                     </td>
                     <td className={adminTableCellClass}>
                       <span className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-bold rounded uppercase tracking-wider">
-                        {event.service || 'iyzico'}
+                        {(event.service as string) || 'iyzico'}
                       </span>
                     </td>
                     <td className={adminTableCellClass}>
                       <span className={`w-2 h-2 rounded-full inline-block mr-2 ${event.status === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                      <span className="text-xs font-medium uppercase">{event.status}</span>
+                      <span className="text-xs font-medium uppercase">{event.status as string}</span>
                     </td>
                     <td className={adminTableCellClass}>
                       <button
