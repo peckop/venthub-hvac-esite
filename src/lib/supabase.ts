@@ -840,27 +840,31 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
-  const { data, error } = await (supabase.from('user_projects') as unknown as { select: (c?: string) => { order: (c: string, o: { ascending: boolean }) => Promise<{data: DbUserProject[], error: unknown}> } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from('user_projects' as any)
     .select('*')
     .order('updated_at', { ascending: false })
 
   if (error) throw (error as Error)
-  return data || []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any) || []
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
-  const { data, error } = await (supabase.from('user_projects') as unknown as { insert: (v: Partial<DbUserProject>) => { select: () => { single: () => Promise<{data: DbUserProject, error: unknown}> } } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from('user_projects' as any)
     .insert(project)
     .select()
     .single()
 
   if (error) throw (error as Error)
-  return data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data as any
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  const { error } = await (supabase as unknown as { from: (t: string) => { delete: () => { eq: (c: string, v: string) => Promise<{error: unknown}> } } })
-    .from('user_projects')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await supabase.from('user_projects' as any)
     .delete()
     .eq('id', id)
 
@@ -869,17 +873,20 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
-  const { data, error } = await (supabase.from('project_items') as unknown as { insert: (v: Record<string, unknown>) => { select: () => { single: () => Promise<{data: DbProjectItem, error: unknown}> } } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from('project_items' as any)
     .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
     .single()
 
   if (error) throw (error as Error)
-  return data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data as any
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
-  const { error } = await (supabase.from('project_items') as unknown as { delete: () => { match: (v: Record<string, unknown>) => Promise<{error: unknown}> } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await supabase.from('project_items' as any)
     .delete()
     .match({ project_id: projectId, product_id: productId })
 
@@ -888,13 +895,15 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  const { data, error } = await (supabase.from('project_items') as unknown as { select: (c: string) => { eq: (k: string, v: string) => Promise<{data: (DbProjectItem & { product: DbProduct | null })[], error: unknown}> } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await supabase.from('project_items' as any)
     .select('*, product:products(*)')
     .eq('project_id', projectId)
 
   if (error) throw (error as Error)
   
-  const items = (data as (DbProjectItem & { product: DbProduct | null })[]) || []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const items = (data as any) || []
   return items.map(item => ({
     ...item,
     product: item.product ? mapDatabaseProductToDomain(item.product) : undefined

@@ -135,7 +135,8 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const [showStyleMenu, setShowStyleMenu] = useState(false)
     const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('orbit')
     const [enableTooltip, setEnableTooltip] = useState(false)
-    const controlsRef = useRef<unknown>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controlsRef = useRef<any>(null)
     const modelGroupRef = useRef<THREE.Group | null>(null)
 
     // Responsive toolbar sizing
