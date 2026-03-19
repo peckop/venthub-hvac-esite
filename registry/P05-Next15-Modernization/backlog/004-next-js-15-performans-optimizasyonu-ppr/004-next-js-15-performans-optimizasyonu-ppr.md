@@ -37,6 +37,62 @@ artifacts:
 ## 🎯 Hedef
 Kritik sayfalarda (Ürün Detay, Kategori) statik kabuk ve dinamik veri ayrımını (PPR) devreye alarak LCP/TTFB değerlerini iyileştirmek.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [ ] Next.js yapılandırmasında PPR'ı deneysel olarak aç.
-- [ ] Ürün detay sayfasında iskelet (skeleton) yapılarını kurgula.
+- [ ] "Slow 3G" network profilinde statik kabuğun anında geldiği test edilecek.
+- [ ] `next build` sırasında PPR logları kontrol edilecek.

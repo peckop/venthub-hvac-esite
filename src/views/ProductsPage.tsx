@@ -24,6 +24,7 @@ const ApplicationCards = dynamic(() => import('../components/products').then(mod
 })
 
 import type { DbProduct, DbCategory } from '../types/db-rows'
+import { toUICategoryList, mapDatabaseCategoryToDomain } from '../lib/type-converters'
 
 interface ProductsPageProps {
   initialProducts?: DbProduct[]
@@ -54,7 +55,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
   } = useCategoryGateway(null)
 
   // Products sayfası için "Sanal" bir kategori nesnesi oluşturuyoruz
-  const virtualCategory: DbCategory = {
+  // DomainCategory olarak oluşturup tip uyumsuzluğunu gideriyoruz
+  const virtualCategory = mapDatabaseCategoryToDomain({
     id: 'root-products',
     name: t('common.products') || 'Tüm Ürünler',
     slug: 'products',
@@ -71,7 +73,10 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
     seo_title: null,
     sort_order: 0,
     authority_content: null
-  }
+  })
+
+  // initialCategories'i DomainCategory listesine dönüştürüyoruz
+  const domainCategories = toUICategoryList(initialCategories)
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -102,7 +107,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
       <div className="flex-1">
         <CategoryGridView 
           category={virtualCategory}
-          subCategories={initialCategories} // Üst kategorileri filtre olarak sunmak için
+          subCategories={domainCategories} // Üst kategorileri filtre olarak sunmak için
           availableBrands={availableBrands}
           products={filteredProducts}
           filters={filters}

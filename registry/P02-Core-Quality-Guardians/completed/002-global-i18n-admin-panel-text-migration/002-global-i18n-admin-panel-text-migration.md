@@ -5,7 +5,7 @@ status: "Completed"
 progress: "100%"
 priority: "CRIT"
 created_at: "2026-03-16 23:38:27"
-updated_at: "2026-03-19 13:22:03"
+updated_at: "2026-03-19 23:10:25"
 started_at: "2026-03-16 23:46:59"
 completed_at: "2026-03-17 07:38:20"
 depends_on: ["001"]
@@ -20,14 +20,74 @@ artifacts:
 ## 🎯 Hedef
 VentHub Admin Paneli üzerindeki tüm "hardcoded" (elle yazılmış) Türkçe metinleri `useI18n` sistemine taşımak, `tr.ts` sözlüğünü standardize etmek ve bu süreçte karşılaşılan tip hatalarını (TSC) temizleyerek "Tek Doğruluk Kaynağı" prensibini tüm yönetim ekranlarına yaymak.
 
-## ✅ Alt Görevler
-- [x] Admin sözlük yapısının `src/i18n/dictionaries/tr.ts` içerisinde kurulması ve genişletilmesi.
-- [x] `AdminUsersPage` üzerindeki tüm metinlerin sözlüğe taşınması ve refactor edilmesi.
-- [x] `AdminInventoryPage` modernizasyonu (i18n, Tip Güvenliği ve CSV işlemleri tamamlandı).
-- [🚧] `AdminSettingsPage` ve `AdminWebhookEventsPage` modernizasyonu (Sıradaki adım).
-- [ ] Tüm Admin ekranlarında A11y (Erişilebilirlik) etiketlerinin standart hale getirilmesi.
 
-## 📝 Notlar
-- `AdminInventoryPage` üzerindeki devasa Türkçe metin blokları temizlendi ve `tr.ts` sözlüğüne bağlandı.
-- TSC hataları üzerinde çalışmaya devam ediliyor, Admin sayfalarındaki `any` kullanımı minimize edildi.
-- A11y düzenlemeleri son dalga olarak tüm sayfalara toplu uygulanacak.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## ✅ Alt Görevler
+- [ ] `src/lib/i18n/locales/tr.ts` içine `admin` anahtarı ekle.
+- [ ] Mevcut `AdminUsersPage` metinlerini buraya taşı.
+- [ ] `useI18n()` import et ve bileşene dahil et.
+- [ ] Tüm hardcoded metinleri `t('admin.users...')` ile değiştir.
+- [ ] Fallback metinleri ekle (Anayasa kuralı).
+- [x] `InventoryRow` ve `ReservedRow` tiplerinin standardize edilmesi.
+- [x] `low_stock_threshold` dökümlerindeki `as any` risklerinin temizlenmesi.
+- [ ] Tablo sütun başlıklarının (Fiziksel Stok, Satılabilir vb.) i18n'e taşınması.
+- [ ] Dışa aktarma (Export) menüsü metinlerinin standardize edilmesi.
+- [ ] `AdminUsersPage` metinlerini sözlüğe taşı.
+- [ ] `AdminSettingsPage` güncellemeleri.
+- [ ] Diğer sayfalar için benzer refactoring süreçleri.
+- [ ] `pnpm run lint` ve `pnpm run build` kontrolleri.
+- [ ] Tarayıcıda dil değişimi testi (TR <-> EN).

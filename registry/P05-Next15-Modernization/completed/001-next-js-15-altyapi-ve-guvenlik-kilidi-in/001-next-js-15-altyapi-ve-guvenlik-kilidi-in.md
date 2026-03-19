@@ -11,7 +11,7 @@ artifacts:
 status: Completed
 progress: 100%
 completed_at: "2026-03-18 19:14:32"
-updated_at: "2026-03-19 13:22:03"
+updated_at: "2026-03-19 23:10:25"
 ---
 
 
@@ -21,7 +21,62 @@ updated_at: "2026-03-19 13:22:03"
 ## 🎯 Hedef
 Next.js 15 geçişi için temel altyapı hazırlıklarını yapmak, güvenliği `server-only` ile pekiştirmek ve dinamik rotalarda async params yapısına geçmek.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [x] `src/lib/supabase.ts` dosyasına `server-only` ekle.
-- [x] `destek/konular/[slug]/page.tsx` asenkron parametre geçişini tamamla.
-- [x] Build stabilitesini doğrula.
+- [x] `pnpm run build` komutuyla `server-only` ihlali olup olmadığı kontrol edildi.
+- [x] `[slug]` rotası üzerinde parametrenin doğru alındığı manuel olarak doğrulandı.

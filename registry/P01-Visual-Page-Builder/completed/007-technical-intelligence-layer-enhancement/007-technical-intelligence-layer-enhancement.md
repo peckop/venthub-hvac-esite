@@ -29,3 +29,73 @@ Transform raw technical specifications into readable engineering insights for us
 - [x] Motor types (EC/AC) correctly identified and described.
 - [x] Visual design feels premium, darkmode-ready, and uses proper typography.
 - [x] i18n support is functional for the main labels.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## ✅ Alt Görevler
+- [ ] `src/utils/engineeringIntelligence.ts` yardımcısını oluştur.
+- [ ] Fonksiyon: `getNoiseInference(db: number)` -> "Kütüphane sessizliği", "Ofis konforu" vb.
+- [ ] Fonksiyon: `getEfficiencyInference(percentage: number)` -> "Yüksek Enerji Tasarrufu".
+- [ ] Fonksiyon: `generateTechnicalSummary(product: Product)` -> Tüm verileri birleştirip 3 cümlelik özet üret.
+- [ ] `src/components/product/ProductSmartInference.tsx` bileşenini oluştur.
+- [ ] Bu bileşeni `ProductDetailPage.tsx` içinde "Fiyat" ve "Sepet" alanının hemen altına yerleştir.
+- [ ] Görselleştirme: "Mühendislik Notu" ikonu ve animasyonlu giriş efekti.
+- [ ] `src/utils/seoHelpers.ts` (veya ilgili dosya) içinde, teknik analiz sonuçlarını SEO title'ına enjekte eden mantığı kur.
+- [ ] Örnek: "Vortice Lineo 100 - [Ultra Sessiz] Kanal Tipi Fan".
+- [ ] Farklı teknik özelliklere sahip 3 ürün (Sessiz, Güçlü, Verimli) seçerek üretilen metinlerin doğruluğunu manuel kontrol et.
+- [ ] Lighthouse CLS skorunu kontrol et (Dinamik metinlerin sayfa düzenini kaydırmadığından emin ol).

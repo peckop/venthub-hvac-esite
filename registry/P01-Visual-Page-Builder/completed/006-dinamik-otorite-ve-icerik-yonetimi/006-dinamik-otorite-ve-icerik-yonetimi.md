@@ -16,10 +16,69 @@ artifacts:
 ## 🎯 Hedef
 İçerikleri statik dosyalardan kurtarıp DB'ye taşıyarak Page Builder'ın (017) veri motorunu kurmak.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [x] **Beyin Fırtınası:** Teknik mimari ve JSON şeması belirlendi.
-- [x] **Planlama:** Uygulama adımları hazırlandı.
-- [x] **Şema Tasarımı:** Supabase `categories` tablosuna `authority_content` (JSONB) kolonu eklendi.
-- [x] **Migration:** Sessiz Fanlar ve HRV içerikleri DB'ye mühürlendi.
-- [x] **Bileşen Modernizasyonu:** `CategoryAuthoritySection` bileşeni Generic yapıya dönüştürüldü.
-- [ ] **i18n Cleanup:** `tr.ts` temizliği yapılacak (Opsiyonel/Backlog).
+- [ ] Supabase SQL Editor üzerinden `categories` tablosuna `authority_content` kolonunu ekleyen migration'ı çalıştır.
+- [ ] SQL: `ALTER TABLE categories ADD COLUMN IF NOT EXISTS authority_content JSONB DEFAULT NULL;`
+- [ ] `src/i18n/dictionaries/tr.ts` içindeki `categorySilentFan` objesini oku.
+- [ ] Bu objeyi yeni JSON şemasına (brainstorm belgesindeki yapı) dönüştür.
+- [ ] SQL UPDATE sorgusu ile `sessiz-kanal-tipi-fanlar` slug'ına sahip kategoriye bu veriyi işle.
+- [ ] `src/types/database.types.ts` (veya ilgili alias dosyası) içinde `authority_content` alanını tanımla.
+- [ ] `src/components/category/CategoryAuthoritySection.tsx` bileşenini refactor et:
+- [ ] `tr.ts` içindeki eski `categorySilentFan` bloğunu sil (Yedek alındıktan sonra).
+- [ ] Sayfanın DB'den gelen veriyle sorunsuz render edildiğini test et.

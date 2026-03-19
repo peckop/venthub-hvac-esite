@@ -66,11 +66,11 @@ const CategoryHero: React.FC<CategoryHeroProps> = ({ category, parentCategory, p
           </div>
           
           <div className="flex-1">
-            <h1 className="text-4xl sm:text-5xl font-extralight tracking-tight text-slate-900 mb-4">
+            <h1 className="vh-h1 mb-4">
               {getCategoryDisplayName(category)}
             </h1>
             {category.description && (
-              <p className="text-lg text-slate-500 font-light max-w-3xl leading-relaxed mb-4">
+              <p className="vh-body-lg max-w-3xl mb-4">
                 {category.description}
               </p>
             )}
