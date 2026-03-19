@@ -28,19 +28,16 @@ def get_next_id(project_folder: str, is_test: bool = False) -> str:
         state_path = os.path.join(project_path, state)
         if os.path.exists(state_path):
             for item in os.listdir(state_path):
-                # item'ın bir string olduğundan eminiz (os.listdir)
                 folder_str = str(item)
                 match = re.match(r'^(\d{3})-', folder_str)
                 if match:
                     ids.append(int(match.group(1)))
     
     if is_test:
-        # Test ID'leri 900'den başlar
         test_ids = [i for i in ids if i >= 900]
         next_id = max(test_ids) + 1 if test_ids else 900
-        if next_id > 999: next_id = 900 # Başa dön
+        if next_id > 999: next_id = 900
     else:
-        # Normal ID'ler 1'den başlar, 899'a kadar
         normal_ids = [i for i in ids if i < 900]
         next_id = max(normal_ids) + 1 if normal_ids else 1
         if next_id > 899:
@@ -58,7 +55,6 @@ def create_gitkeep(path: str) -> None:
 
 def create_snapshot(project_folder: str, task_folder: str, state: str) -> None:
     """Görevin o anki durumunun klasör olarak tam bir yedeğini alır."""
-    # Güvenlik Kontrolleri
     if not project_folder or not task_folder or not state:
         return
 
@@ -76,16 +72,14 @@ def create_snapshot(project_folder: str, task_folder: str, state: str) -> None:
         snapshot_proj_dir = os.path.join(SNAPSHOT_DIR, project_folder)
         
         folder_parts = task_folder.split('-')
-        task_id_part = folder_parts[0] if folder_parts else "unknown"
+        task_id_part = folder_parts[0] if len(folder_parts) > 0 else "unknown"
         
-        # Snapshot artık bir KLASÖR
         snapshot_task_root = os.path.join(snapshot_proj_dir, task_id_part)
         snapshot_target_dir = os.path.join(snapshot_task_root, f"{timestamp}_{state}")
         
         if not os.path.exists(snapshot_task_root):
             os.makedirs(snapshot_task_root, exist_ok=True)
 
-        # Tüm klasörü kopyala
         if os.path.exists(snapshot_target_dir):
             shutil.rmtree(snapshot_target_dir)
             
@@ -99,10 +93,8 @@ def parse_metadata(content: Optional[str]) -> Dict[str, Any]:
     if not content:
         return {}
         
-    # CRLF uyumlu regex
     match = re.search(r'^---\s*\r?\n(.*?)\r?\n---', content, re.DOTALL | re.MULTILINE)
     if not match:
-        # Fallback for plain \n
         match = re.search(r'^---\s*\n(.*?)\n---', content, re.DOTALL | re.MULTILINE)
     if not match:
         return {}
@@ -118,8 +110,10 @@ def parse_metadata(content: Optional[str]) -> Dict[str, Any]:
                 val = parts[1].strip().strip('"').strip("'")
                 if val.lower() == 'null' or val == '':
                     metadata[key] = None
-                elif val.startswith('[') and val.endswith(']'):
-                    metadata[key] = [v.strip().strip('"').strip("'") for v in val[1:-1].split(',') if v.strip()]
+                elif val.startswith('[') and val.endswith(']') and len(val) >= 2:
+                    # Slicing Fix: Ensure val is str and indexable
+                    slice_val = str(val)[1:-1]
+                    metadata[key] = [v.strip().strip('"').strip("'") for v in slice_val.split(',') if v.strip()]
                 else:
                     metadata[key] = val
     return metadata
@@ -179,7 +173,6 @@ def validate_task_content(file_path: str, target_state: str) -> Tuple[bool, str]
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    # Placeholder kontrolü (Hedef kısmı)
     if '## 🎯 Hedef' in content:
         match = re.search(r'## 🎯 Hedef(ler)?\s*\r?\n(.*?)(?=\r?\n##|$)', content, re.DOTALL)
         if match:
@@ -187,7 +180,6 @@ def validate_task_content(file_path: str, target_state: str) -> Tuple[bool, str]
             if hedef_text == '...' or not hedef_text:
                 return False, "HEDEF EKSİK: Görev hedefini (🎯 Hedef) yazmadan işleme devam edemezsiniz."
 
-    # Alt görev kontrolü
     if '## ✅ Alt Görevler' in content:
         match = re.search(r'## ✅ Alt Görevler\s*\r?\n(.*?)(?=\r?\n##|$)', content, re.DOTALL)
         if match:
@@ -195,11 +187,9 @@ def validate_task_content(file_path: str, target_state: str) -> Tuple[bool, str]
             if tasks_text == '- [ ] ...' or not tasks_text:
                 return False, "PLAN EKSİK: Alt görevleri (checklist) planlamadan işleme devam edemezsiniz."
             
-            # Tamamlanma kontrolü
             if target_state == "completed" and '- [x]' not in tasks_text:
                 return False, "İLERLEME EKSİK: En az bir alt görevi bitirmeden (...) dosyayı 'completed' yapamazsınız."
 
-    # Superpowers Brainstorm & Plan Kontrolü (Sadece Aktivasyon ve Completion için)
     if target_state in ["active", "completed"]:
         task_dir = os.path.dirname(file_path)
         brainstorm_file = os.path.join(task_dir, "brainstorm.md")
@@ -221,7 +211,6 @@ def validate_task_content(file_path: str, target_state: str) -> Tuple[bool, str]
         else:
             return False, "PLAN DOSYASI YOK: Registry protokolü gereği plan.md zorunludur."
 
-    # 'completed' için özel Review kontrolü
     if target_state == "completed":
         task_dir = os.path.dirname(file_path)
         review_file = os.path.join(task_dir, "review.md")
@@ -262,18 +251,18 @@ def reindex() -> None:
                     content = f.read()
                     meta = parse_metadata(content)
                     tid_parts = task_folder.split("-")
-                    tid = tid_parts[0] if tid_parts else "unknown"
+                    tid = tid_parts[0] if len(tid_parts) > 0 else "unknown"
                     
-                    # İçerik taraması (Search için)
                     full_content: str = str(content)
                     for doc in ["brainstorm.md", "plan.md", "review.md"]:
                         doc_path = os.path.join(task_dir, doc)
                         if os.path.exists(doc_path):
                             with open(doc_path, 'r', encoding='utf-8') as df:
                                 doc_text: str = str(df.read())
-                                full_content = str(full_content) + "\n" + doc_text
+                                full_content = full_content + "\n" + doc_text
                     
-                    summary_text: str = str(full_content[:500]) if full_content else ""
+                    # Slicing Fix: Ensure full_content exists
+                    summary_text: str = str(full_content[:500]) if len(full_content) > 0 else ""
                     
                     task_info: dict = {
                         "id": tid,
@@ -303,7 +292,7 @@ def repair_project(project_path: str) -> None:
         for item in os.listdir(backlog_path):
             if os.path.isdir(os.path.join(backlog_path, item)) and "-" in item:
                 parts = item.split("-")
-                if parts:
+                if len(parts) > 0:
                     backlog_ids[parts[0]] = item
 
     subdirs = ["active", "backlog", "completed"]
@@ -313,12 +302,11 @@ def repair_project(project_path: str) -> None:
             os.makedirs(path, exist_ok=True)
             print(f"    [+] Eksik dizin oluşturuldu: {path}")
         
-        # 🛡️ SENTINEL: Active vs Backlog Çakışma Kontrolü
         if sd == "active":
             for item in os.listdir(path):
                 if os.path.isdir(os.path.join(path, item)) and "-" in item:
                     parts = item.split("-")
-                    if parts:
+                    if len(parts) > 0:
                         aid = parts[0]
                         if aid in backlog_ids:
                             print(f"    [🚨 SENTINEL] Illegal görev tespiti: {aid} ID'si zaten backlogda!")
@@ -329,7 +317,6 @@ def repair_project(project_path: str) -> None:
         for item in os.listdir(path):
             item_path = os.path.join(path, item)
             if os.path.isfile(item_path) and item.endswith(".md") and item != ".gitkeep":
-                # Orphaned file found
                 task_name = item.replace(".md", "")
                 create_snapshot(project_name, task_name, sd) 
                 
@@ -344,7 +331,6 @@ def repair_project(project_path: str) -> None:
                 except Exception as e:
                     print(f"    [!] Taşıma hatası: {str(e)}")
 
-        # Task klasörlerini tara ve eksik md dosyalarını tamamla
         for task_folder in os.listdir(path):
             task_path = os.path.join(path, task_folder)
             if os.path.isdir(task_path) and sd in ["active", "backlog"]:
@@ -360,13 +346,11 @@ def repair_project(project_path: str) -> None:
                                 f.write(f"# Plan: {task_folder}\n\n## 🎯 Goal\n...\n\n## 🏗️ Steps\n1. Step 1\n   - Files: ...\n   - Change: ...\n   - Verify: ...\n")
                         print(f"    [⛑️ OTONOM ONARIM] Eksik şablon oluşturuldu: {doc} ({task_folder})")
                 
-                # 🛡️ SKILL ENFORCEMENT SENTINEL: Brainstorm & Plan Kalite Kontrolü
                 task_md = os.path.join(task_path, f"{task_folder}.md")
                 if sd == "active" and os.path.exists(task_md):
                     with open(task_md, 'r', encoding='utf-8') as f:
                         task_content = f.read()
                     
-                    # Eğer statü Executing ise ama plan/brainstorm boşsa statüyü Planning'e çek
                     if 'status: "Executing"' in task_content or 'status: "RUN"' in task_content:
                         missing_planning = False
                         for doc in ["brainstorm.md", "plan.md"]:
@@ -385,7 +369,6 @@ def repair_project(project_path: str) -> None:
                             with open(task_md, 'w', encoding='utf-8') as f_out:
                                 f_out.write(task_content)
                 
-                # Artifact yollarını senkronize et
                 if os.path.exists(task_md):
                     sync_artifacts(task_md)
 
@@ -427,26 +410,22 @@ def sync_artifacts(task_md_path: str) -> None:
     else:
         updates['review'] = 'null'
 
-    # Metadata güncelleme
     parts = content.split('---', 2)
     if len(parts) >= 3:
         frontmatter = parts[1]
         body = parts[2]
         
-        # Artifacts bloğunu temizle
         frontmatter = re.sub(r'artifacts:\s*\n(\s+.*\n?)*', '', frontmatter)
         
-        # Yeni artifacts bloğunu ekle
         art_block = "artifacts:\n"
         for art, path in updates.items():
             path_val = f'"{path}"' if path != 'null' else 'null'
             art_block += f"  {art}: {path_val}\n"
         
         frontmatter = frontmatter.strip() + f"\n{art_block}"
-        content = f'---\n{frontmatter.strip()}\n---\n{body}'
-    
-    with open(task_md_path, 'w', encoding='utf-8') as f:
-        f.write(content)
+        new_content = f'---\n{frontmatter.strip()}\n---\n{body}'
+        with open(task_md_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
 
 def update_metadata(task_md_path: str, metadata: Dict[str, str]) -> None:
     """Görevin metadata bilgilerini (YAML frontmatter) günceller."""
@@ -500,7 +479,7 @@ def sync_pulse() -> None:
                                 progress = str(meta.get('progress', '0%'))
                             
                             tid_parts = task_folder.split("-")
-                            tid = tid_parts[0] if tid_parts else "unknown"
+                            tid = tid_parts[0] if len(tid_parts) > 0 else "unknown"
                             
                             projects_data[item][state].append({
                                 "id": tid,
@@ -512,13 +491,13 @@ def sync_pulse() -> None:
                             if state == "completed": 
                                 total_completed = cast(int, total_completed) + 1
 
-    # Yüzde hesaplama
     t_tasks = cast(int, total_tasks)
     t_comp = cast(int, total_completed)
     if t_tasks > 0:
         progress_pct: int = int((float(t_comp) / float(t_tasks)) * 100.0)
     else:
         progress_pct: int = 0
+        
     content = f"# 🛰️ VENTHUB MISSION CONTROL (PULSE)\n"
     content += f"> **Güncelleme:** {now} | **Sistem:** `OPERATIONAL` | **Sürüm:** `v8.1 (Auth Safe)` \n\n"
     content += f"## 📊 GLOBAL PROJE ÖZETİ\n| İSTATİSTİK | DEĞER |\n| :--- | :--- |\n| 🎯 Global İlerleme | **%{progress_pct}** |\n| 📂 Toplam Proje | **{len(projects_data)}** |\n| ✅ Tamamlanan Görev | **{total_completed}** |\n| 🏗️ Aktif Operasyon | **{sum(len(p['active']) for p in projects_data.values())}** |\n\n"
@@ -550,7 +529,10 @@ def activate_task(project_id: str, task_id: str) -> None:
         project_folder = project_id
     else:
         pid_base = project_id.upper().replace("P", "")
-        clean_pid = pid_base.split("-")[0].split(" ")[0].zfill(2)
+        # Slicing Fix: Ensure parts exist
+        p_parts = pid_base.split("-")
+        pid_clean_base = p_parts[0] if len(p_parts) > 0 else "00"
+        clean_pid = pid_clean_base.split(" ")[0].zfill(2)
         target_pattern = f"P{clean_pid}-"
         for item in os.listdir(REGISTRY_DIR):
             if item.upper().startswith(target_pattern) and os.path.isdir(os.path.join(REGISTRY_DIR, item)):
@@ -606,11 +588,9 @@ def update_changelog(task_path: str, project_id: str, task_folder: str) -> None:
         with open(review_path, 'r', encoding='utf-8') as f:
             review_content = f.read()
 
-        # Özet kısmını yakala
         summary_match = re.search(r'## 📊 Özet\s*\r?\n(.*?)(?=\r?\n##|$)', review_content, re.DOTALL)
         summary = summary_match.group(1).strip() if summary_match else "Detay belirtilmedi."
         
-        # Mimar Notlarını yakala
         notes_match = re.search(r'## 📝 Mimar Notları\s*\r?\n(.*?)(?=\r?\n##|$)', review_content, re.DOTALL)
         notes = notes_match.group(1).strip() if notes_match else ""
 
@@ -623,7 +603,6 @@ def update_changelog(task_path: str, project_id: str, task_folder: str) -> None:
             new_entry += f"**Notlar:** {notes}\n"
         new_entry += "---\n"
 
-        # Dosyayı oku ve en başa ekle
         if os.path.exists(changelog_path):
             with open(changelog_path, 'r', encoding='utf-8') as f:
                 current_content = f.read()
@@ -651,7 +630,7 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
         if not pid: return None
         if os.path.isdir(os.path.join(REGISTRY_DIR, pid)): return pid
         parts = pid.upper().replace("P", "").split("-")
-        clean_p = parts[0].zfill(2) if parts else "00"
+        clean_p = parts[0].zfill(2) if len(parts) > 0 else "00"
         return next((i for i in os.listdir(REGISTRY_DIR) if i.upper().startswith(f"P{clean_p}-") and os.path.isdir(os.path.join(REGISTRY_DIR, i))), None)
 
     src_proj, dst_proj = get_proj_folder(source_proj_id), get_proj_folder(target_proj_id)
@@ -662,7 +641,8 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
     clean_tid = task_id.zfill(3)
     task_folder, src_state = None, None
     for state in ["active", "backlog", "completed"]:
-        state_path = os.path.join(REGISTRY_DIR, src_proj, state)
+        # Path Join Fix: Guard against src_proj being None (already checked above)
+        state_path = os.path.join(REGISTRY_DIR, str(src_proj), state)
         if os.path.exists(state_path):
             task_folder = next((i for i in os.listdir(state_path) if i.startswith(f"{clean_tid}-")), None)
             if task_folder:
@@ -673,24 +653,32 @@ def move_task(source_proj_id: str, task_id: str, target_proj_id: str, target_sta
         print(f"  [!] Hata: Görev bulunamadı!")
         return
 
-    src_path = os.path.join(REGISTRY_DIR, src_proj, src_state, task_folder)
-    valid, error_msg = validate_task_content(os.path.join(src_path, f"{task_folder}.md"), target_state)
+    # Slicing & Join fixes
+    src_proj_str = str(src_proj)
+    src_state_str = str(src_state)
+    task_folder_str = str(task_folder)
+    target_proj_id_str = str(target_proj_id)
+
+    src_path = os.path.join(REGISTRY_DIR, src_proj_str, src_state_str, task_folder_str)
+    task_md_path = os.path.join(src_path, f"{task_folder_str}.md")
+    
+    valid, error_msg = validate_task_content(task_md_path, target_state)
     if not valid:
         print(f"  [❌ GATEKEEPER] Taşıma reddedildi! {error_msg}")
         return
 
-    create_snapshot(src_proj, task_folder, src_state)
-    dst_dir = os.path.join(REGISTRY_DIR, dst_proj, target_state)
+    create_snapshot(src_proj_str, task_folder_str, src_state_str)
+    dst_dir = os.path.join(REGISTRY_DIR, str(dst_proj), target_state)
     if not os.path.exists(dst_dir): os.makedirs(dst_dir, exist_ok=True)
     
-    target_path = os.path.join(dst_dir, task_folder)
+    target_path = os.path.join(dst_dir, task_folder_str)
     if os.path.exists(target_path): shutil.rmtree(target_path)
     
     shutil.move(src_path, target_path)
     
     if target_state == "completed":
-        update_metadata(os.path.join(target_path, f"{task_folder}.md"), {"status": "Completed", "progress": "100%", "completed_at": f'"{get_now()}"'})
-        update_changelog(target_path, target_proj_id, task_folder)
+        update_metadata(os.path.join(target_path, f"{task_folder_str}.md"), {"status": "Completed", "progress": "100%", "completed_at": f'"{get_now()}"'})
+        update_changelog(target_path, target_proj_id_str, task_folder_str)
     
     reindex()
     sync_pulse()
@@ -718,25 +706,23 @@ def search_task(query: str) -> None:
         data = json.load(f)
     
     tasks = data.get("tasks", {})
-    query = query.lower()
+    query_lower = query.lower()
     results = []
 
-    print(f"[*] Arama yapılıyor: '{query}'")
+    print(f"[*] Arama yapılıyor: '{query_lower}'")
     
-    # ID araması (Tam eşleşme)
-    if query in tasks:
-        results.append(tasks[query])
+    if query_lower in tasks:
+        results.append(tasks[query_lower])
     
-    # Kelime araması (Başlık, Proje, Klasör veya İçerik Özeti)
     for tid, tdata in tasks.items():
-        if tid == query: continue # Zaten eklendi
+        if tid == query_lower: continue
         
         searchable_text = f"{tdata['title']} {tdata['project']} {tdata['content_summary']}".lower()
-        if query in searchable_text:
+        if query_lower in searchable_text:
             results.append(tdata)
 
     if not results:
-        print(f"    [!] '{query}' ile eşleşen görev bulunamadı.")
+        print(f"    [!] '{query_lower}' ile eşleşen görev bulunamadı.")
     else:
         print(f"\n| ID     | PROJE   | GÖREV BAŞLIĞI | DURUM | İLERLEME |")
         print(f"|:---|:---|:---|:---|:---|")
@@ -785,7 +771,7 @@ def build_graph() -> Dict[str, Dict[str, Any]]:
                     content = f.read()
                     meta = parse_metadata(content)
                     tid_parts = task_folder.split("-")
-                    tid = tid_parts[0] if tid_parts else "unknown"
+                    tid = tid_parts[0] if len(tid_parts) > 0 else "unknown"
                     
                     graph[tid] = {
                         "id": tid,
@@ -840,11 +826,11 @@ if __name__ == "__main__":
 
     try:
         if args.action == "repair": repair_all()
-        elif args.action == "search": search_task(args.id)
+        elif args.action == "search": search_task(cast(str, args.id))
         elif args.action == "list": list_registry()
         elif args.action == "graph": print_graph_viz()
-        elif args.action == "activate": activate_task(args.id, args.task)
-        elif args.action == "move": move_task(args.id, args.task, args.target_id, args.target_state)
+        elif args.action == "activate": activate_task(cast(str, args.id), cast(str, args.task))
+        elif args.action == "move": move_task(cast(str, args.id), cast(str, args.task), cast(str, args.target_id), cast(str, args.target_state))
     except Exception as e:
         print(f"[!] Kritik hata: {str(e)}")
         sys.exit(1)

@@ -150,3 +150,46 @@ export type DbUserAddressUpdate = Tables['user_addresses']['Update'];
 export type DbInvoiceProfileUpdate = Tables['user_invoice_profiles']['Update'];
 
 export type DbJson = Json;
+
+// Unified Checkout & Payment Types
+export interface CheckoutCustomerInfo {
+  name: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  identityNumber?: string;
+  [key: string]: Json | undefined;
+}
+
+export interface CheckoutAddressInfo {
+  id?: string;
+  full_name: string;
+  phone: string;
+  city: string;
+  district: string;
+  full_address: string;
+  postalCode?: string;
+  [key: string]: Json | undefined;
+}
+
+export interface CheckoutInvoiceInfo {
+  type: 'individual' | 'corporate';
+  company_name?: string;
+  tax_office?: string;
+  tax_number?: string;
+  tc_id?: string;
+  tckn?: string;
+  [key: string]: Json | undefined;
+}
+
+export interface CheckoutLegalConsents {
+  kvkk: boolean;
+  sales_agreement: boolean;
+  privacy_policy: boolean;
+  distanceSales?: boolean;
+  preInfo?: boolean;
+  orderConfirm?: boolean;
+  marketing?: boolean;
+  [key: string]: Json | undefined;
+}
