@@ -1,9 +1,29 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../types/database.types'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
-import type { DbCategory, DbProduct, DbAdminSearchResult, DbFtsSearchResult } from '../types/db-rows'
+import { 
+  toUICategoryList, 
+  toUIProductList, 
+  mapDatabaseProductToDomain 
+} from './type-converters'
+import type { 
+  DbCategory, 
+  DbProduct, 
+  DbAdminSearchResult, 
+  DbFtsSearchResult,
+  DbUserProject,
+  DbProjectItem,
+  DbUserAddress,
+  DbUserAddressInsert,
+  DbUserAddressUpdate,
+  DbInvoiceProfile,
+  DbInvoiceProfileInsert,
+  DbInvoiceProfileUpdate,
+  DbShoppingCart,
+  DbCartItem
+} from '../types/db-rows'
+
 export type { DbAdminSearchResult, DbFtsSearchResult }
-import { toUICategoryList, toUIProductList, mapDatabaseProductToDomain } from './type-converters'
 
 // Define SUPABASE config from process.env for Next.js
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -14,7 +34,10 @@ const missingEnv = !SUPABASE_URL || !SUPABASE_ANON_KEY
 if (missingEnv) {
   console.error('CRITICAL: Supabase config missing. App will strictly fail on data fetch but should render UI.')
   if (typeof window !== 'undefined') {
-    (window as unknown as { __SUPABASE_CONFIG_ERROR__?: boolean }).__SUPABASE_CONFIG_ERROR__ = true
+    interface VentHubWindow extends Window {
+      __SUPABASE_CONFIG_ERROR__?: boolean
+    }
+    (window as VentHubWindow & typeof globalThis).__SUPABASE_CONFIG_ERROR__ = true
   }
 }
 
@@ -34,8 +57,6 @@ export const supabase = createClient<Database>(
 // Database types
 export type Category = DomainCategory
 export type Product = DomainProduct
-
-import type { DbUserProject, DbProjectItem } from '../types/db-rows'
 export type UserProject = DbUserProject
 export type ProjectItem = DbProjectItem & { product?: Product }
 
@@ -120,7 +141,7 @@ export const HVAC_BRANDS: HVACBrand[] = [
 ]
 
 // API functions
-export async function getCategories() {
+export async function getCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from('categories')
     .select('*')
@@ -129,12 +150,11 @@ export async function getCategories() {
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUICategoryList(data as unknown as DbCategory[])
+  return toUICategoryList((data as DbCategory[]) || [])
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('get_products_enriched', {
+  const { data, error } = await supabase.rpc('get_products_enriched', {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
@@ -151,10 +171,10 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
       .select('*')
       .limit(params.limit || 50)
     
-    return toUIProductList(fallbackData as unknown as DbProduct[] || [])
+    return toUIProductList((fallbackData as DbProduct[]) || [])
   }
 
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
 export async function getSearchSuggestions(q: string, limit: number = 6): Promise<SearchSuggestion[]> {
@@ -168,7 +188,7 @@ export async function getSearchSuggestions(q: string, limit: number = 6): Promis
     return []
   }
 
-  return data as unknown as SearchSuggestion[]
+  return (data as SearchSuggestion[]) || []
 }
 
 // Full‑text search (Turkish) via RPC; returns lightweight fields + rank
@@ -176,10 +196,10 @@ export async function ftsSearchProducts(q: string, limit = 20, filters?: { categ
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
   const { data, error } = await supabase.rpc('fts_search_products', payload)
   if (error) throw error
-  return (data || []) as FtsProductResult[]
+  return (data as FtsProductResult[]) || []
 }
 
-export async function getProducts(limit?: number) {
+export async function getProducts(limit?: number): Promise<Product[]> {
   let query = supabase
     .from('products')
     .select('*')
@@ -193,11 +213,11 @@ export async function getProducts(limit?: number) {
 
   const { data, error } = await query
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
 // Get all products without limit
-export async function getAllProducts() {
+export async function getAllProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -206,23 +226,23 @@ export async function getAllProducts() {
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductsByCategory(categoryId: string) {
+export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId} `)
+    .or(`category_id.eq.${categoryId}, subcategory_id.eq.${categoryId}`)
     .eq('status', 'active')
     .order('is_featured', { ascending: false })
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductsBySubcategory(subcategoryId: string) {
+export async function getProductsBySubcategory(subcategoryId: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -232,10 +252,10 @@ export async function getProductsBySubcategory(subcategoryId: string) {
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -243,7 +263,7 @@ export async function getProductById(id: string) {
     .maybeSingle()
 
   if (error) throw error
-  return data ? mapDatabaseProductToDomain(data as unknown as DbProduct) : null
+  return data ? mapDatabaseProductToDomain(data as DbProduct) : null
 }
 
 export async function getProductBySlugOrId(identifier: string): Promise<Product | null> {
@@ -260,7 +280,7 @@ export async function getProductBySlugOrId(identifier: string): Promise<Product 
   return mapDatabaseProductToDomain(data as DbProduct)
 }
 
-export async function getFeaturedProducts() {
+export async function getFeaturedProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -269,91 +289,39 @@ export async function getFeaturedProducts() {
     .limit(6)
 
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
-export async function searchProducts(query: string) {
+export async function searchProducts(query: string): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .or(`name.ilike.% ${query}%, brand.ilike.% ${query}%, sku.ilike.% ${query}%, model_code.ilike.% ${query}%, description.ilike.% ${query}% `)
+    .or(`name.ilike.%${query}%, brand.ilike.%${query}%, sku.ilike.%${query}%, model_code.ilike.%${query}%, description.ilike.%${query}%`)
     .eq('status', 'active')
     .limit(20)
 
   if (error) throw error
-  return toUIProductList(data as unknown as DbProduct[])
-}
-
-
-// Admin panel FTS search — returns ALL statuses, supports pagination
-export interface AdminSearchResult {
-  id: string
-  name: string
-  sku: string
-  model_code: string | null
-  brand: string | null
-  status: string | null
-  category_id: string | null
-  price: number | null
-  purchase_price: number | null
-  stock_qty: number | null
-  low_stock_threshold: number | null
-  is_featured: boolean | null
-  slug: string | null
-  rank: number
-  total_count: number
+  return toUIProductList((data as DbProduct[]) || [])
 }
 
 export async function adminSearchProducts(
   q: string, limit = 50, offset = 0, categoryId?: string
-): Promise<AdminSearchResult[]> {
-  const payload: Record<string, unknown> = { p_q: q, p_limit: limit, p_offset: offset }
+): Promise<DbAdminSearchResult[]> {
+  const payload: { p_q: string; p_limit: number; p_offset: number; p_category_id?: string } = { 
+    p_q: q, 
+    p_limit: limit, 
+    p_offset: offset 
+  }
   if (categoryId) payload.p_category_id = categoryId
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase.rpc as any)('admin_search_products', payload)
+  
+  const { data, error } = await supabase.rpc('admin_search_products', payload)
   if (error) throw error
-  return (data || []) as AdminSearchResult[]
+  return (data as DbAdminSearchResult[]) || []
 }
-
 
 // ========== Account: Address Book ==========
-export interface UserAddress {
-  id: string
-  user_id: string
-  label: string | null
-  full_name: string | null
-  phone: string | null
-  address_line: string
-  city: string
-  district: string
-  postal_code: string | null
-  country: string
-  is_default_shipping: boolean | null
-  is_default_billing: boolean | null
-  created_at: string
-  updated_at: string
-  // Legacy or Helper aliases (optional for UI compatibility)
-  full_address?: string | null
-  street_address?: string | null
-}
 
-export interface CreateAddressInput {
-  label?: string | null
-  full_name?: string | null
-  phone?: string | null
-  address_line: string
-  city: string
-  district: string
-  postal_code?: string | null
-  country?: string
-  is_default_shipping?: boolean | null
-  is_default_billing?: boolean | null
-  address_type?: string
-}
-
-export type UpdateAddressInput = Partial<CreateAddressInput>
-
-export async function listAddresses() {
+export async function listAddresses(): Promise<DbUserAddress[]> {
   const { data, error } = await supabase
     .from('user_addresses')
     .select('*')
@@ -361,25 +329,25 @@ export async function listAddresses() {
     .order('created_at', { ascending: false })
 
   if (error) throw error
-  return data as UserAddress[]
+  return (data as DbUserAddress[]) || []
 }
 
-export async function createAddress(payload: CreateAddressInput) {
+export async function createAddress(payload: DbUserAddressInsert): Promise<DbUserAddress> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const dbPayload = {
+  const dbPayload: DbUserAddressInsert = {
+    ...payload,
     user_id: user.id,
-    street_address: payload.address_line,
-    address_type: payload.address_type || (payload.is_default_shipping ? 'shipping' : 'billing'),
-    ...payload
+    street_address: payload.street_address || payload.address_line,
+    address_type: payload.address_type || (payload.is_default_shipping ? 'shipping' : 'billing')
   }
 
   const { data, error } = await supabase
     .from('user_addresses')
-    .insert(dbPayload as any)
+    .insert(dbPayload)
     .select('*')
     .single()
 
@@ -388,11 +356,11 @@ export async function createAddress(payload: CreateAddressInput) {
   if (payload.is_default_shipping) await setDefaultAddress('shipping', data.id)
   if (payload.is_default_billing) await setDefaultAddress('billing', data.id)
 
-  return (data as unknown) as UserAddress
+  return data as DbUserAddress
 }
 
-export async function updateAddress(id: string, payload: UpdateAddressInput) {
-  const updatePatch = { ...payload } as Record<string, unknown>
+export async function updateAddress(id: string, payload: DbUserAddressUpdate): Promise<DbUserAddress> {
+  const updatePatch: DbUserAddressUpdate = { ...payload }
   if (payload.address_line) {
     updatePatch.street_address = payload.address_line
   }
@@ -409,10 +377,10 @@ export async function updateAddress(id: string, payload: UpdateAddressInput) {
   if (payload.is_default_shipping) await setDefaultAddress('shipping', id)
   if (payload.is_default_billing) await setDefaultAddress('billing', id)
 
-  return data as UserAddress
+  return data as DbUserAddress
 }
 
-export async function deleteAddress(id: string) {
+export async function deleteAddress(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_addresses')
     .delete()
@@ -422,7 +390,7 @@ export async function deleteAddress(id: string) {
   return true
 }
 
-export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string) {
+export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string): Promise<DbUserAddress> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -431,7 +399,7 @@ export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string
   const flag: 'is_default_shipping' | 'is_default_billing' = kind === 'shipping' ? 'is_default_shipping' : 'is_default_billing'
 
   // Clear others
-  const clearPatch = { [flag]: false } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const clearPatch: DbUserAddressUpdate = { [flag]: false }
   const clear = await supabase
     .from('user_addresses')
     .update(clearPatch)
@@ -439,7 +407,7 @@ export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string
 
   if (clear.error) throw clear.error
 
-  const setPatch = { [flag]: true } as Pick<UserAddress, 'is_default_shipping' | 'is_default_billing'>
+  const setPatch: DbUserAddressUpdate = { [flag]: true }
   const { data, error } = await supabase
     .from('user_addresses')
     .update(setPatch)
@@ -448,95 +416,63 @@ export async function setDefaultAddress(kind: 'shipping' | 'billing', id: string
     .single()
 
   if (error) throw error
-  return data as UserAddress
+  return data as DbUserAddress
 }
 
 // ========== Account: Invoice Profiles ==========
-export type InvoiceProfileType = 'individual' | 'corporate'
-export interface InvoiceProfile {
-  id: string
-  user_id: string
-  profile_type: string
-  first_name?: string | null
-  last_name?: string | null
-  company_name?: string | null
-  tax_number?: string | null
-  tax_office?: string | null
-  address_line: string
-  city: string
-  district: string
-  postal_code?: string | null
-  country: string
-  is_default: boolean
-  created_at: string
-  updated_at: string
-}
 
-export interface CreateInvoiceProfileInput {
-  profile_type: InvoiceProfileType
-  first_name?: string | null
-  last_name?: string | null
-  company_name?: string | null
-  tax_number: string
-  tax_office?: string | null
-  address_line: string
-  city: string
-  district: string
-  postal_code?: string | null
-  country?: string
-  is_default?: boolean
-}
-export type UpdateInvoiceProfileInput = Partial<CreateInvoiceProfileInput>
-
-export async function listInvoiceProfiles() {
+export async function listInvoiceProfiles(): Promise<DbInvoiceProfile[]> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
     .order('is_default', { ascending: false })
     .order('created_at', { ascending: false })
+  
   if (error) {
-    const e = error as unknown as { code?: string; message?: string }
+    interface PostgrestErrorExtended { code?: string; message?: string }
+    const e = error as PostgrestErrorExtended
     if (e?.code === 'PGRST205' || (e?.message || '').includes("Could not find the table 'public.user_invoice_profiles'")) {
-      // Table not yet migrated on the target — return empty list gracefully
-      return [] as InvoiceProfile[]
+      return []
     }
     throw error
   }
-  return (data as unknown) as InvoiceProfile[]
+  return (data as DbInvoiceProfile[]) || []
 }
 
-export async function createInvoiceProfile(payload: CreateInvoiceProfileInput) {
+export async function createInvoiceProfile(payload: DbInvoiceProfileInsert): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
   if (!user) throw new Error('Not authenticated')
 
-  const dbPayload = {
-    user_id: user.id,
-    ...payload
+  const dbPayload: DbInvoiceProfileInsert = {
+    ...payload,
+    user_id: user.id
   }
 
   const { data, error } = await supabase
     .from('user_invoice_profiles')
-    .insert(dbPayload as any)
+    .insert(dbPayload)
     .select('*')
     .single()
+  
   if (error) throw error
-  return (data as unknown) as InvoiceProfile
+  return data as DbInvoiceProfile
 }
 
-export async function updateInvoiceProfile(id: string, payload: UpdateInvoiceProfileInput) {
+export async function updateInvoiceProfile(id: string, payload: DbInvoiceProfileUpdate): Promise<DbInvoiceProfile> {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
-    .update(payload as any)
+    .update(payload)
     .eq('id', id)
     .select('*')
     .single()
+  
   if (error) throw error
-  return (data as unknown) as InvoiceProfile
+  return data as DbInvoiceProfile
 }
 
-export async function deleteInvoiceProfile(id: string) {
+export async function deleteInvoiceProfile(id: string): Promise<boolean> {
   const { error } = await supabase
     .from('user_invoice_profiles')
     .delete()
@@ -545,7 +481,7 @@ export async function deleteInvoiceProfile(id: string) {
   return true
 }
 
-export async function setDefaultInvoiceProfile(id: string) {
+export async function setDefaultInvoiceProfile(id: string): Promise<DbInvoiceProfile> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -565,12 +501,12 @@ export async function setDefaultInvoiceProfile(id: string) {
     .eq('id', id)
     .select('*')
     .single()
+  
   if (error) throw error
-  const mapped = { ...data, type: (data as any).profile_type || (data as any).type }
-  return (mapped as unknown) as InvoiceProfile
+  return data as DbInvoiceProfile
 }
 
-export async function fetchDefaultInvoiceProfile() {
+export async function fetchDefaultInvoiceProfile(): Promise<DbInvoiceProfile | null> {
   const { data: authData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const user = authData?.user
@@ -579,39 +515,24 @@ export async function fetchDefaultInvoiceProfile() {
   const { data, error } = await supabase
     .from('user_invoice_profiles')
     .select('*')
-    .eq('user_id', user.id) // Filter by user_id
+    .eq('user_id', user.id)
     .eq('is_default', true)
     .order('updated_at', { ascending: false })
     .limit(1)
+  
   if (error) {
-    const e = error as unknown as { code?: string; message?: string }
+    interface PostgrestErrorExtended { code?: string; message?: string }
+    const e = error as PostgrestErrorExtended
     if (e?.code === 'PGRST205' || (e?.message || '').includes("Could not find the table 'public.user_invoice_profiles'")) {
       return null
     }
     throw error
   }
-  const row = Array.isArray(data) && data.length > 0 ? ((data[0] as unknown) as InvoiceProfile) : null
-  return row
+  
+  return (data && data.length > 0) ? (data[0] as DbInvoiceProfile) : null
 }
 
 // ========== Shopping Cart (Server-side sync) ==========
-export interface ShoppingCart {
-  id: string
-  user_id: string
-  created_at?: string
-  updated_at?: string
-}
-
-export interface CartDbItem {
-  id: string
-  cart_id: string
-  product_id: string
-  quantity: number
-  unit_price?: number | null
-  price_list_id?: string | null
-  created_at?: string
-  updated_at?: string
-}
 
 async function ensureUserProfile(userId: string): Promise<boolean> {
   try {
@@ -620,12 +541,14 @@ async function ensureUserProfile(userId: string): Promise<boolean> {
       .select('id')
       .eq('id', userId)
       .maybeSingle()
+    
     if (!selErr && prof) return true
+    
     const { error: insErr } = await supabase
       .from('user_profiles')
       .insert({ id: userId })
+    
     if (insErr) {
-      // Ignore if conflict or RLS prevents it; caller may still succeed if profile appears by trigger
       return false
     }
     return true
@@ -634,16 +557,18 @@ async function ensureUserProfile(userId: string): Promise<boolean> {
   }
 }
 
-export async function getOrCreateShoppingCart(userId: string) {
+export async function getOrCreateShoppingCart(userId: string): Promise<DbShoppingCart> {
   // Try existing
   const { data: existing, error: selErr } = await supabase
     .from('shopping_carts')
     .select('*')
     .eq('user_id', userId)
     .limit(1)
+  
   if (!selErr && Array.isArray(existing) && existing.length > 0) {
-    return existing[0] as ShoppingCart
+    return existing[0] as DbShoppingCart
   }
+  
   // Create new (with FK-safe retry if profile missing)
   const attemptInsert = async () => supabase
     .from('shopping_carts')
@@ -652,64 +577,80 @@ export async function getOrCreateShoppingCart(userId: string) {
     .single()
 
   let { data, error } = await attemptInsert()
-  // If FK to user_profiles missing, create profile then retry once
-  interface SupabaseError {
-    code?: string
-    message?: string
-  }
+  
+  interface SupabaseError { code?: string; message?: string }
+  const err = error as SupabaseError
 
-  if (error && (String((error as SupabaseError).code) === '23503' || /user_profiles/i.test(String((error as SupabaseError).message || '')))) {
+  if (error && (String(err.code) === '23503' || /user_profiles/i.test(err.message || ''))) {
     await ensureUserProfile(userId)
-      ; ({ data, error } = await attemptInsert())
+    const retry = await attemptInsert()
+    data = retry.data
+    error = retry.error
   }
+  
   // If unique conflict (cart already exists), select and return it
-  if (error && (String((error as SupabaseError).code) === '23505' || String((error as SupabaseError).code) === '409' || /conflict|duplicate key/i.test(String((error as SupabaseError).message || '')))) {
+  if (error && (String(err.code) === '23505' || String(err.code) === '409' || /conflict|duplicate key/i.test(err.message || ''))) {
     const { data: again, error: sel2 } = await supabase
       .from('shopping_carts')
       .select('*')
       .eq('user_id', userId)
       .limit(1)
-    if (!sel2 && Array.isArray(again) && again.length > 0) return again[0] as ShoppingCart
+    if (!sel2 && Array.isArray(again) && again.length > 0) return again[0] as DbShoppingCart
   }
+  
   if (error) throw error
-  return data as ShoppingCart
+  if (!data) throw new Error('Failed to create shopping cart')
+  return data as DbShoppingCart
 }
 
-export async function listCartItems(cartId: string) {
+export async function listCartItems(cartId: string): Promise<DbCartItem[]> {
   const { data, error } = await supabase
     .from('cart_items')
     .select('*')
     .eq('cart_id', cartId)
   if (error) throw error
-  return (data || []) as CartDbItem[]
+  return (data as DbCartItem[]) || []
 }
 
-export async function listCartItemsWithProducts(cartId: string) {
+export async function listCartItemsWithProducts(cartId: string): Promise<{ item: DbCartItem; product: Product }[]> {
   const items = await listCartItems(cartId)
-  if (items.length === 0) return [] as { item: CartDbItem; product: Product }[]
+  if (items.length === 0) return []
+  
   const productIds = Array.from(new Set(items.map(i => i.product_id)))
   const { data: products, error: pErr } = await supabase
     .from('products')
     .select('*')
     .in('id', productIds)
+  
   if (pErr) throw pErr
+  
   const map = new Map<string, Product>()
-  for (const p of (products || []) as Product[]) map.set(p.id, p)
+  for (const p of (products as DbProduct[]) || []) {
+    map.set(p.id, mapDatabaseProductToDomain(p))
+  }
+  
   return items
     .map(i => ({ item: i, product: map.get(i.product_id)! }))
     .filter(x => !!x.product)
 }
 
-export async function upsertCartItem(params: { cartId: string; productId: string; quantity: number; unitPrice?: number | null; priceListId?: string | null }) {
+export async function upsertCartItem(params: { 
+  cartId: string; 
+  productId: string; 
+  quantity: number; 
+  unitPrice?: number | null; 
+  priceListId?: string | null 
+}): Promise<DbCartItem[]> {
   const { cartId, productId, quantity, unitPrice, priceListId } = params
-  // Manual UPSERT to avoid relying on on_conflict and optional columns
+  
   const sel = await supabase
     .from('cart_items')
     .select('id')
     .eq('cart_id', cartId)
     .eq('product_id', productId)
     .limit(1)
-  const common: Record<string, unknown> = { quantity }
+  
+  const common: Record<string, Json> = { quantity }
   if (unitPrice !== undefined) common.unit_price = unitPrice
   if (priceListId !== undefined) common.price_list_id = priceListId
 
@@ -721,17 +662,18 @@ export async function upsertCartItem(params: { cartId: string; productId: string
       .eq('product_id', productId)
       .select('*')
     if (upd.error) throw upd.error
-    return (upd.data || []) as CartDbItem[]
+    return (upd.data as DbCartItem[]) || []
   }
+  
   const ins = await supabase
     .from('cart_items')
     .insert({ cart_id: cartId, product_id: productId, ...common })
     .select('*')
   if (ins.error) throw ins.error
-  return (ins.data || []) as CartDbItem[]
+  return (ins.data as DbCartItem[]) || []
 }
 
-export async function removeCartItem(cartId: string, productId: string) {
+export async function removeCartItem(cartId: string, productId: string): Promise<boolean> {
   const { error } = await supabase
     .from('cart_items')
     .delete()
@@ -741,7 +683,7 @@ export async function removeCartItem(cartId: string, productId: string) {
   return true
 }
 
-export async function clearCartItems(cartId: string) {
+export async function clearCartItems(cartId: string): Promise<boolean> {
   const { error } = await supabase
     .from('cart_items')
     .delete()
@@ -751,6 +693,7 @@ export async function clearCartItems(cartId: string) {
 }
 
 // ========== Pricing: getEffectiveUnitPrice ==========
+
 export type UserRole = 'individual' | 'dealer' | 'corporate' | 'admin'
 
 export interface UserProfileLight {
@@ -764,33 +707,27 @@ export interface OrganizationLight {
   tier_level?: number | null
 }
 
-function nowIso() {
+function nowIso(): string {
   return new Date().toISOString()
 }
 
-// Compute effective unit price for a product based on user's role/tier and active price lists.
-// Fallbacks safely to product.price numeric parse on any error or if no matching price found.
 export async function getEffectiveUnitPrice(product: Product): Promise<number> {
   const info = await getEffectivePriceInfo(product)
   return info.unitPrice
 }
 
 export async function getEffectivePriceInfo(product: Product): Promise<{ unitPrice: number, priceListId: string | null }> {
-  // Fallback: product.price numeric
   const fallback = (() => {
     const v = typeof product.price === 'number' ? product.price : parseFloat(String(product.price || 0))
     return Number.isFinite(v) ? v : 0
   })()
 
   try {
-    // Try to get current user
     const { data: authData, error: userErr } = await supabase.auth.getUser()
     const user = userErr ? null : authData?.user
 
-    // If not authenticated, return public price immediately
     if (!user) return { unitPrice: fallback, priceListId: null }
 
-    // Fetch user profile (role, organization)
     const { data: prof, error: profErr } = await supabase
       .from('user_profiles')
       .select('id, role, organization_id')
@@ -802,7 +739,6 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
     const profile = (prof || {}) as UserProfileLight
     const role = (profile.role || 'individual') as UserRole
 
-    // Fetch organization tier if available
     let tierLevel: number | null = null
     if (profile.organization_id) {
       const { data: org, error: orgErr } = await supabase
@@ -815,38 +751,46 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       }
     }
 
-    // Load active price lists (time window + is_active)
     const now = nowIso()
     const { data: lists, error: listErr } = await supabase
       .from('price_lists')
-      .select('*')
+      .select('id, is_default, allowed_user_roles, organization_tiers, effective_from')
       .eq('is_active', true)
       .lte('effective_from', now)
-      .or('effective_to.is.null,effective_to.gte.' + now)
+      .or(`effective_to.is.null,effective_to.gte.${now}`)
 
     if (listErr || !Array.isArray(lists)) return { unitPrice: fallback, priceListId: null }
 
-    // Filter lists by role and tier (client-side contains checks)
-    type AnyList = { id: string; is_default?: boolean | null; allowed_user_roles?: UserRole[] | null; organization_tiers?: number[] | null; effective_from?: string | null }
-    const filtered = (lists as AnyList[]).filter(pl => {
-      const roleOk = !pl.allowed_user_roles || pl.allowed_user_roles.length === 0 || pl.allowed_user_roles.includes(role)
-      const tierOk = tierLevel == null || !pl.organization_tiers || pl.organization_tiers.length === 0 || pl.organization_tiers.includes(tierLevel)
+    interface PriceListRow { 
+      id: string; 
+      is_default: boolean | null; 
+      allowed_user_roles: string[] | null; 
+      organization_tiers: number[] | null; 
+      effective_from: string | null 
+    }
+    
+    const castedLists = lists as unknown as PriceListRow[]
+    
+    const filtered = castedLists.filter(pl => {
+      const roles = pl.allowed_user_roles || []
+      const tiers = pl.organization_tiers || []
+      const roleOk = roles.length === 0 || roles.includes(role)
+      const tierOk = tierLevel === null || tiers.length === 0 || tiers.includes(tierLevel)
       return roleOk && tierOk
     })
 
-    // Choose a list: prefer specific over default; latest effective_from wins
     const chosen = filtered.sort((a, b) => {
       const aDef = a.is_default ? 1 : 0
       const bDef = b.is_default ? 1 : 0
-      // non-default before default
       if (aDef !== bDef) return aDef - bDef
       const aTime = a.effective_from ? Date.parse(a.effective_from) : 0
       const bTime = b.effective_from ? Date.parse(b.effective_from) : 0
       return bTime - aTime
     })[0]
 
-    // Try product_prices with chosen list, otherwise global (price_list_id is null)
-    const priceQueries: { price_list_id: string | null }[] = chosen ? [{ price_list_id: (chosen as { id: string }).id }, { price_list_id: null }] : [{ price_list_id: null }]
+    const priceQueries: { price_list_id: string | null }[] = chosen 
+      ? [{ price_list_id: chosen.id }, { price_list_id: null }] 
+      : [{ price_list_id: null }]
 
     for (const pq of priceQueries) {
       let query = supabase
@@ -856,15 +800,14 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
         .eq('is_active', true)
 
       if (pq.price_list_id === null) {
-        query = query.is('price_list_id', null as any)
+        query = query.is('price_list_id', null)
       } else {
-        query = query.eq('price_list_id', pq.price_list_id as any)
+        query = query.eq('price_list_id', pq.price_list_id)
       }
 
       const { data: rows, error: prErr } = await query
       if (prErr || !Array.isArray(rows) || rows.length === 0) continue
 
-      // pick first valid by date window
       const pick = rows.find(r => {
         const fromOk = !r.valid_from || Date.parse(r.valid_from) <= Date.now()
         const toOk = !r.valid_until || Date.parse(r.valid_until) >= Date.now()
@@ -885,8 +828,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       }
     }
 
-    // No special price found -> fallback
-    return { unitPrice: fallback, priceListId: chosen ? (chosen as { id: string }).id : null }
+    return { unitPrice: fallback, priceListId: chosen ? chosen.id : null }
   } catch (e) {
     console.error('getEffectiveUnitPrice error', e)
     return { unitPrice: fallback, priceListId: null }
@@ -895,27 +837,30 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 
 // ========== Project Management ==========
 
-export async function listUserProjects(): Promise<UserProject[]> {
-  const { data, error } = await (supabase.from as any)('user_projects')
+export async function listUserProjects(): Promise<DbUserProject[]> {
+  const { data, error } = await supabase
+    .from('user_projects')
     .select('*')
     .order('updated_at', { ascending: false })
 
   if (error) throw error
-  return (data as unknown) as UserProject[]
+  return (data as DbUserProject[]) || []
 }
 
-export async function createProject(project: Partial<UserProject>): Promise<UserProject> {
-  const { data, error } = await (supabase.from as any)('user_projects')
-    .insert(project as unknown as Record<string, unknown>)
+export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
+  const { data, error } = await supabase
+    .from('user_projects')
+    .insert(project)
     .select()
     .single()
 
   if (error) throw error
-  return (data as unknown) as UserProject
+  return data as DbUserProject
 }
 
-export async function deleteProject(id: string) {
-  const { error } = await (supabase.from as any)('user_projects')
+export async function deleteProject(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('user_projects')
     .delete()
     .eq('id', id)
 
@@ -923,36 +868,38 @@ export async function deleteProject(id: string) {
   return true
 }
 
-export async function addProductToProject(projectId: string, productId: string, quantity: number = 1) {
-  const { data, error } = await (supabase.from as any)('project_items')
-    .insert({ project_id: projectId, product_id: productId, quantity } as unknown as Record<string, unknown>)
+export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
+  const { data, error } = await supabase
+    .from('project_items')
+    .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
     .single()
 
   if (error) throw error
-  return data
+  return data as DbProjectItem
 }
 
-export async function removeProductFromProject(projectId: string, productId: string) {
-  const { error } = await (supabase.from as any)('project_items')
+export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('project_items')
     .delete()
-    .match({ project_id: projectId, product_id: productId } as unknown as Record<string, unknown>)
+    .match({ project_id: projectId, product_id: productId })
 
   if (error) throw error
   return true
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  const { data, error } = await (supabase.from as any)('project_items')
+  const { data, error } = await supabase
+    .from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)
 
   if (error) throw error
   
-  // Map internal product to unified Product type
-  const items = (data || []) as unknown as any[]
+  const items = (data as (DbProjectItem & { product: DbProduct | null })[]) || []
   return items.map(item => ({
     ...item,
-    product: item.product ? mapDatabaseProductToDomain(item.product as unknown as DbProduct) : undefined
-  })) as unknown as ProjectItem[]
+    product: item.product ? mapDatabaseProductToDomain(item.product) : undefined
+  }))
 }

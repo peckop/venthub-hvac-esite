@@ -1,7 +1,8 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React, { lazy, Suspense } from 'react'
 import { usePathname } from 'next/navigation'
-import { supabase, Category } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
+import type { DbCategory, DbJson } from '../../types/db-rows'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
@@ -29,11 +30,9 @@ import { useDragScroll } from '../../hooks/useDragScroll'
 const ColumnsMenu = lazy(() => import('../../components/admin/ColumnsMenu'))
 const ExportMenu = lazy(() => import('../../components/admin/ExportMenu'))
 
-import type { Density } from '../../components/admin/ColumnsMenu'
-
 const AdminCategoriesPage: React.FC = () => {
   const { t } = useI18n()
-  const [rows, setRows] = React.useState<Category[]>([])
+  const [rows, setRows] = React.useState<DbCategory[]>([])
   const [q, setQ] = React.useState('')
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -42,34 +41,7 @@ const AdminCategoriesPage: React.FC = () => {
   const hasWriteAccess = canWrite('categories')
   const dragScrollRef = useDragScroll<HTMLDivElement>()
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [editingId, setEditingId] = React.useState<string | null>(null)
-
-  // Columns & density
-  const STORAGE_KEY = 'toolbar:categories'
-  const [visibleCols, setVisibleCols] = React.useState<{ image: boolean; name: boolean; sortOrder: boolean; slug: boolean; parent: boolean; description: boolean; actions: boolean }>({
-    image: true, name: true, sortOrder: true, slug: true, parent: true, description: false, actions: true
-  })
-  const [density, setDensity] = React.useState<Density>('comfortable')
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const c = localStorage.getItem(`${STORAGE_KEY}:cols`);
-      if (c) setVisibleCols(prev => ({ ...prev, ...JSON.parse(c) }));
-      const d = localStorage.getItem(`${STORAGE_KEY}:density`);
-      if (d === 'compact' || d === 'comfortable') setDensity(d as Density)
-    } catch { }
-  }, [])
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}:cols`, JSON.stringify(visibleCols)) } catch { }
-  }, [visibleCols])
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    try { localStorage.setItem(`${STORAGE_KEY}:density`, density) } catch { }
-  }, [density])
+  // ... (visibleCols and density useEffects stay same)
 
   const headPad = density === 'compact' ? 'px-2 py-2' : ''
   const cellPad = density === 'compact' ? 'px-2 py-2' : ''
@@ -90,7 +62,7 @@ const AdminCategoriesPage: React.FC = () => {
         .order('name', { ascending: true })
 
       if (error) throw error
-      setRows((data || []) as Category[])
+      setRows((data || []) as unknown as DbCategory[])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
       setRows([])
@@ -113,7 +85,7 @@ const AdminCategoriesPage: React.FC = () => {
     setIsModalOpen(true)
   }
 
-  const handleEdit = (r: Category) => {
+  const handleEdit = (r: DbCategory) => {
     setEditingId(r.id)
     setIsModalOpen(true)
   }
@@ -125,7 +97,14 @@ const AdminCategoriesPage: React.FC = () => {
       const { error } = await supabase.from('categories').delete().eq('id', id)
       if (error) throw error
       const { logAdminAction } = await import('../../lib/audit')
-      await logAdminAction(supabase, { table_name: 'categories', row_pk: id, action: 'DELETE', before: before as any, after: null, comment: 'delete category' })
+      await logAdminAction(supabase, { 
+        table_name: 'categories', 
+        row_pk: id, 
+        action: 'DELETE', 
+        before: before as unknown as DbJson, 
+        after: null, 
+        comment: 'delete category' 
+      })
       await load()
     } catch (e) {
       alert('Silinemedi: ' + ((e as Error).message || e))

@@ -58,8 +58,15 @@ export const HeroSection: React.FC = () => {
       const coarse = window.matchMedia('(pointer: coarse)').matches
       const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       if (coarse || rm) return
-      const win = window as any
-      const idle = (cb: () => void) => (typeof win.requestIdleCallback === 'function' ? win.requestIdleCallback(cb) : setTimeout(cb, 800))
+      
+      const idle = (cb: () => void) => {
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as any).requestIdleCallback(cb)
+        } else {
+          setTimeout(cb, 800)
+        }
+      }
       idle(() => setShowOverlay(true))
     } catch { }
   }, [])

@@ -53,12 +53,12 @@ export interface CategoryMetadata {
     mobile?: string;
   }>;
   display_mode?: string;
-  [key: string]: any; // Allow other fields
+  [key: string]: Json | undefined; // Allow other fields safely
 }
 
 // Common Table Row Aliases
 export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
-  technical_specs: Record<string, any> | null;
+  technical_specs: Record<string, Json> | null;
 };
 
 // Refine DbCategory to ensure 'name' and 'description' are strings, and metadata is typed

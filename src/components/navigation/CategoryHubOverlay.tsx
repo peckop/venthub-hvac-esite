@@ -8,6 +8,7 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import Category3DIcon from '../products/Category3DIcon'
 import type { Category } from '../../lib/supabase'
+import type { CategoryMetadata } from '../../types/db-rows'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 
 interface CategoryHubOverlayProps {
@@ -177,16 +178,16 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
 
                                 {/* Alt: Stat'lar */}
                                 <div className="relative z-10 flex gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-[40px]">
-                                    {(hoveredCategory?.metadata as any)?.metric1?.value && (
+                                    {(hoveredCategory?.metadata as CategoryMetadata)?.metric1?.value && (
                                         <div>
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric1?.value}</p>
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric1?.label}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as CategoryMetadata)?.metric1?.value}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as CategoryMetadata)?.metric1?.label}</p>
                                         </div>
                                     )}
-                                    {(hoveredCategory?.metadata as any)?.metric2?.value && (
+                                    {(hoveredCategory?.metadata as CategoryMetadata)?.metric2?.value && (
                                         <div>
-                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as any)?.metric2?.value}</p>
-                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as any)?.metric2?.label}</p>
+                                            <p className="text-2xl font-bold tabular-nums leading-none text-white">{(hoveredCategory?.metadata as CategoryMetadata)?.metric2?.value}</p>
+                                            <p className="mt-1 text-[10px] font-semibold tracking-[0.15em] uppercase text-slate-500">{(hoveredCategory?.metadata as CategoryMetadata)?.metric2?.label}</p>
                                         </div>
                                     )}
                                 </div>
