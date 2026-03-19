@@ -5,45 +5,23 @@ import { MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { UserAddress } from '../../lib/supabase'
 
-export interface Address {
-    fullAddress: string
-    city: string
-    district: string
-    postalCode: string
-}
-
-export interface InvoiceInfo {
-    type?: 'individual' | 'corporate'
-    tckn?: string
-    companyName?: string
-    vkn?: string
-    taxOffice?: string
-    eInvoice?: boolean
-}
-
-export interface LegalConsents {
-    kvkk: boolean
-    distanceSales: boolean
-    preInfo: boolean
-    orderConfirm: boolean
-    marketing?: boolean
-}
+import { CheckoutAddressInfo, CheckoutInvoiceInfo, CheckoutLegalConsents } from '../../types/db-rows'
 
 interface StepAddressInfoProps {
-    shippingAddress: Address
-    setShippingAddress: (a: Address) => void
-    billingAddress: Address
-    setBillingAddress: (a: Address) => void
+    shippingAddress: CheckoutAddressInfo
+    setShippingAddress: (a: CheckoutAddressInfo) => void
+    billingAddress: CheckoutAddressInfo
+    setBillingAddress: (a: CheckoutAddressInfo) => void
     sameAsShipping: boolean
     setSameAsShipping: (v: boolean) => void
     shippingMethod: 'standard' | 'express'
     setShippingMethod: (v: 'standard' | 'express') => void
     invoiceType: 'individual' | 'corporate'
     setInvoiceType: (v: 'individual' | 'corporate') => void
-    invoiceInfo: InvoiceInfo
-    setInvoiceInfo: (v: InvoiceInfo) => void
-    legalConsents: LegalConsents
-    setLegalConsents: (v: LegalConsents) => void
+    invoiceInfo: CheckoutInvoiceInfo
+    setInvoiceInfo: (v: CheckoutInvoiceInfo) => void
+    legalConsents: CheckoutLegalConsents
+    setLegalConsents: (v: CheckoutLegalConsents) => void
     savedAddresses: UserAddress[]
     onOpenAddressModal: (target: 'shipping' | 'billing') => void
     onOpenInvoiceModal: () => void
@@ -124,7 +102,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                             {t('checkout.shipping.addressLabel')}
                         </label>
                         <textarea
-                            value={shippingAddress.fullAddress}
+                            value={shippingAddress.fullAddress || shippingAddress.full_address || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, fullAddress: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             rows={3}
@@ -137,7 +115,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         </label>
                         <input
                             type="text"
-                            value={shippingAddress.city}
+                            value={shippingAddress.city || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.shipping.cityPlaceholder')}
@@ -149,7 +127,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         </label>
                         <input
                             type="text"
-                            value={shippingAddress.district}
+                            value={shippingAddress.district || ''}
                             onChange={(e) => setShippingAddress({ ...shippingAddress, district: e.target.value })}
                             className="w-full h-10 px-4 bg-slate-50 border border-slate-200 rounded-lg text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-navy/20 focus:border-primary-navy transition-all"
                             placeholder={t('checkout.shipping.districtPlaceholder')}
@@ -162,7 +140,7 @@ const StepAddressInfo: React.FC<StepAddressInfoProps> = ({
                         <input
                             type="text"
                             inputMode="numeric"
-                            value={shippingAddress.postalCode}
+                            value={shippingAddress.postalCode || shippingAddress.postal_code || ''}
                             onChange={(e) => {
                                 const v = e.target.value.replace(/\D/g, '').slice(0, 10)
                                 setShippingAddress({ ...shippingAddress, postalCode: v })

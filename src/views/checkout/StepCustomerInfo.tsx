@@ -3,16 +3,11 @@
 import React from 'react'
 import { User } from 'lucide-react'
 
-interface CustomerInfo {
-    name: string
-    email: string
-    phone: string
-    identityNumber?: string
-}
+import { CheckoutCustomerInfo } from '../../types/db-rows'
 
 interface StepCustomerInfoProps {
-    customerInfo: CustomerInfo
-    setCustomerInfo: (info: CustomerInfo) => void
+    customerInfo: CheckoutCustomerInfo
+    setCustomerInfo: (info: CheckoutCustomerInfo) => void
     t: (key: string) => string
 }
 

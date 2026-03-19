@@ -173,8 +173,8 @@ export type DbJson = Json;
 // Unified Checkout & Payment Types
 export interface CheckoutCustomerInfo {
   name: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
   identityNumber?: string;
@@ -183,22 +183,30 @@ export interface CheckoutCustomerInfo {
 
 export interface CheckoutAddressInfo {
   id?: string;
-  full_name: string;
+  full_name?: string;
   phone: string;
   city: string;
   district: string;
-  full_address: string;
+  full_address?: string;
+  fullAddress?: string; // Standardized UI field
   postalCode?: string;
+  postal_code?: string;
   [key: string]: Json | undefined;
 }
 
 export interface CheckoutInvoiceInfo {
   type: 'individual' | 'corporate';
   company_name?: string;
+  companyName?: string; // Standardized UI field
   tax_office?: string;
+  taxOffice?: string; // Standardized UI field
   tax_number?: string;
+  taxNumber?: string; // Standardized UI field
   tc_id?: string;
   tckn?: string;
+  vkn?: string;
+  vknNumber?: string;
+  eInvoice?: boolean;
   [key: string]: Json | undefined;
 }
 
