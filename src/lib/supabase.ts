@@ -156,7 +156,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
-  const { data, error } = await supabase.rpc('get_products_enriched', {
+  const { data, error } = await (supabase as unknown as { rpc: (name: string, params: Record<string, unknown>) => Promise<{data: unknown, error: unknown}> }).rpc('get_products_enriched', {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
@@ -840,7 +840,7 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
-  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { data, error } = await (supabase as unknown as { from: (t: string) => any })
     .from('user_projects')
     .select('*')
     .order('updated_at', { ascending: false })
@@ -850,7 +850,7 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
-  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { data, error } = await (supabase as unknown as { from: (t: string) => any })
     .from('user_projects')
     .insert(project)
     .select()
@@ -861,7 +861,7 @@ export async function createProject(project: Partial<DbUserProject>): Promise<Db
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  const { error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { error } = await (supabase as unknown as { from: (t: string) => any })
     .from('user_projects')
     .delete()
     .eq('id', id)
@@ -871,7 +871,7 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
-  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { data, error } = await (supabase as unknown as { from: (t: string) => any })
     .from('project_items')
     .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
@@ -882,7 +882,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
-  const { error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { error } = await (supabase as unknown as { from: (t: string) => any })
     .from('project_items')
     .delete()
     .match({ project_id: projectId, product_id: productId })
@@ -892,7 +892,7 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  const { data, error } = await (supabase as unknown as SupabaseClient<Database>)
+  const { data, error } = await (supabase as unknown as { from: (t: string) => any })
     .from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)

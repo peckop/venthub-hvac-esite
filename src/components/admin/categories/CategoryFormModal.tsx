@@ -172,7 +172,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured,
                 sort_order: data.sort_order,
                 image_url: imgPath,
-                metadata: metadata as unknown as Json
+                metadata: metadata as unknown as CategoryMetadata
             }
 
             let currentId = categoryId
