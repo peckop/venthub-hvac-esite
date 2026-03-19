@@ -133,7 +133,7 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
   if (efficiencyValue) {
     const numericEff = typeof efficiencyValue === 'string' 
       ? parseFloat(String(efficiencyValue).replace(/[^0-9.]/g, '')) 
-      : Number(efficiencyValue);
+      : Number(String(efficiencyValue));
     
     if (!isNaN(numericEff)) {
       const eff = getEfficiencyInference(numericEff);
@@ -144,7 +144,7 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
   // 3. Motor Teknolojisi Analizi
   const motorType = specs.motor_tipi || specs.motor_type || specs.elektrik_motoru;
   if (motorType) {
-    const motor = getMotorInference(motorType);
+    const motor = getMotorInference(String(motorType));
     if (motor) inferences.push(motor);
   }
 
