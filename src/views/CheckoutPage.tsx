@@ -220,16 +220,16 @@ export const CheckoutPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={setCustomerInfo} t={t} />}
+              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={(info) => setCustomerInfo(info)} t={t} />}
               
               {step === 2 && (
                 <StepAddressInfo
-                  shippingAddress={shippingAddress} setShippingAddress={setShippingAddress}
-                  billingAddress={billingAddress} setBillingAddress={setBillingAddress}
+                  shippingAddress={shippingAddress} setShippingAddress={(a) => setShippingAddress(a as any)}
+                  billingAddress={billingAddress} setBillingAddress={(a) => setBillingAddress(a as any)}
                   sameAsShipping={sameAsShipping} setSameAsShipping={setSameAsShipping}
                   shippingMethod={shippingMethod} setShippingMethod={setShippingMethod}
                   invoiceType={invoiceType} setInvoiceType={setInvoiceType}
-                  invoiceInfo={invoiceInfo} setInvoiceInfo={setInvoiceInfo}
+                  invoiceInfo={invoiceInfo} setInvoiceInfo={(info) => setInvoiceInfo(info as any)}
                   legalConsents={legalConsents} setLegalConsents={setLegalConsents}
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
