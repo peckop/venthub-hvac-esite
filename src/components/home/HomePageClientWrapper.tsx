@@ -13,10 +13,15 @@ export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).openLeadModal = () => setLeadOpen(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return () => { (window as any).openLeadModal = undefined }
+    
+    interface VentHubWindow extends Window {
+      openLeadModal?: () => void
+    }
+
+    const vhWindow = window as unknown as VentHubWindow
+    vhWindow.openLeadModal = () => setLeadOpen(true)
+    
+    return () => { vhWindow.openLeadModal = undefined }
   }, [])
 
   return (

@@ -217,22 +217,17 @@ export const CheckoutPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={(info) => setCustomerInfo(info as any)} t={t} />}
+              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={setCustomerInfo} t={t} />}
               
               {step === 2 && (
                 <StepAddressInfo
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  shippingAddress={shippingAddress as any} setShippingAddress={(a) => setShippingAddress(a as any)}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  billingAddress={billingAddress as any} setBillingAddress={(a) => setBillingAddress(a as any)}
+                  shippingAddress={shippingAddress} setShippingAddress={setShippingAddress}
+                  billingAddress={billingAddress} setBillingAddress={setBillingAddress}
                   sameAsShipping={sameAsShipping} setSameAsShipping={setSameAsShipping}
                   shippingMethod={shippingMethod} setShippingMethod={setShippingMethod}
                   invoiceType={invoiceType} setInvoiceType={setInvoiceType}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  invoiceInfo={invoiceInfo as any} setInvoiceInfo={(info) => setInvoiceInfo(info as any)}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  legalConsents={legalConsents as any} setLegalConsents={(c) => setLegalConsents(c as any)}
+                  invoiceInfo={invoiceInfo} setInvoiceInfo={setInvoiceInfo}
+                  legalConsents={legalConsents} setLegalConsents={setLegalConsents}
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
@@ -244,10 +239,8 @@ export const CheckoutPage: React.FC = () => {
 
               {step === 3 && (
                 <ReviewSummary
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  customer={customerInfo as any} shipping={shippingAddress as any} billing={billingAddress as any}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo as any}
+                  customer={customerInfo} shipping={shippingAddress} billing={billingAddress}
+                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo}
                   onEditPersonal={() => setStep(1)} 
                   onEditShipping={() => setStep(2)}
                   onEditBilling={() => setStep(2)}
