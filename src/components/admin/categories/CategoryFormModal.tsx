@@ -161,7 +161,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             }
 
             const metadata: CategoryMetadata = {
-                ...(initialData?.metadata as unknown as Record<string, Json> || {}),
+                ...(initialData?.metadata as any || {}),
                 metric1: { value: data.metric1_value || '', label: data.metric1_label || '' },
                 metric2: { value: data.metric2_value || '', label: data.metric2_label || '' }
             } as unknown as CategoryMetadata

@@ -132,7 +132,7 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
   const efficiencyValue = specs.efficiency || specs.verilik || specs.isi_gerikazanım_verimi;
   if (efficiencyValue) {
     const numericEff = typeof efficiencyValue === 'string' 
-      ? parseFloat(String(efficiencyValue).replace(/[^0-9.]/g, '')) 
+      ? parseFloat((efficiencyValue as string).replace(/[^0-9.]/g, '')) 
       : Number(efficiencyValue);
     
     if (!isNaN(numericEff)) {
