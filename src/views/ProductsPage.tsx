@@ -87,7 +87,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
           <div className="grid lg:grid-cols-[1fr,450px] gap-12 items-center">
             <div className="space-y-8">
               <CategoryHero 
-                category={virtualCategory}
+            category={{...virtualCategory, description: virtualCategory.description || ''}}
                 productCount={filteredProducts.length}
               />
             </div>
@@ -101,8 +101,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({
       {/* Unified Grid Layer */}
       <div className="flex-1">
         <CategoryGridView 
-          category={virtualCategory}
-          subCategories={initialCategories} // Üst kategorileri filtre olarak sunmak için
+          category={{...virtualCategory, description: virtualCategory.description || ''}}
+          subCategories={initialCategories.map(c => ({...c, description: c.description || ''}))} // Üst kategorileri filtre olarak sunmak için
           availableBrands={availableBrands}
           products={filteredProducts}
           filters={filters}
