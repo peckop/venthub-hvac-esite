@@ -4,9 +4,12 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 
 ## 0. Zorunlu Başlangıç Ritüeli (Pre-flight Checklist)
 > [!IMPORTANT]
-> Ajan, her session başlangıcında veya yeni bir göreve (Task) geçerken aşağıdaki adımları **SIRAYLA** ve **EKSİKSİZ** yapmak zorundadır. Bu dosyalar sistem tarafından "otomatik verilmez", fiziksel olarak `view_file` ile okunmalıdır:
+> Ajan, her session başlangıcında veya yeni bir göreve (Task) geçerken aşağıdaki adımları **SIRAYLA** ve **EKSİKSİZ** yapmak zorundadır:
 > 1. `registry/PULSE.md`: Projenin genel nabzını ve açık görevleri gör.
-> 2. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
+> 2. `.gemini/hooks/current_pulse.md` (Project Orion): Otonom aktif görev kancasını oku.
+> 3. `python registry/manage_registry.py recall`: Ajanlar arası paylaşımlı hafızayı (Memory Bridge) geri çağır.
+> 4. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
+
 > 3. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
 > 4. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
 
@@ -52,6 +55,13 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 ## 6. Onay ve Planlama (No-Plan-No-Code Policy)
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
 - **Zorunlu Plan:** `plan.md` dosyası `superpowers-write-plan` skill'ini ile doldurulmadan ve her adım için `Verify:` maddesi eklenmeden `src/` dizinine bir karakter bile yazılamaz.
+
+## 7. Registry Sentinel (Koruma Sistemi)
+> [!CAUTION]
+> **Registry Güvenlik Kilidi:** `registry/` dizini altındaki hiçbir dosya veya klasör (PXX projeleri), `write_file`, `replace`, `rm` veya benzeri manuel dosya araçlarıyla manipüle edilemez.
+> - **Zorunlu Motor:** Proje başlatma, görev oluşturma, taşıma veya mühürleme işlemleri YALNIZCA `python registry/manage_registry.py` otonom motoru üzerinden yapılabilir.
+> - **Manuel Müdahale Yasağı:** Ajan, doğrudan klasör oluşturma veya dosya silme yetkisini bu dizin için kaybetmiştir. Her işlem `manage_registry.py` komutlarıyla tetiklenmek zorundadır.
+> - **İstisna:** Sadece `brainstorm.md`, `plan.md` ve `review.md` içeriklerinin doldurulması için `write_file` kullanılabilir; ancak bu dosyaların klasör yapısı mutlaka otonom motor tarafından kurulmuş olmalıdır.
 - **Workflow Sıralaması:** Ajan, `REGISTRY_PROTOCOL.md` Madde 5'teki 6 adımlık yaşam döngüsüne (Brainstorm -> Plan -> Activate -> Execute -> Review -> Close) harfiyen uymak zorundadır. Adım atlamak "Mühendislik Suçu"dur.
 - **Yüzeysel Plan Yasağı:** `...` gibi placeholder içeren veya doğrulanabilir adımı olmayan planlar "geçersiz" kabul edilir.
 - **Onay Mekanizması:** Kullanıcıdan alınan "Plan Mode" onayı, sadece planlama sürecini başlatmak içindir. Kodlama aşamasına ancak plan tamamlandıktan sonra geçilebilir.

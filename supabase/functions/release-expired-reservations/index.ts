@@ -6,6 +6,20 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+interface InventorySettings {
+    reservation_timeout_hours: number
+}
+
+interface ExpiredOrder {
+    id: string
+    order_number: string | null
+}
+
+interface OrderItem {
+    product_id: string
+    quantity: number
+}
+
 serve(async (req) => {
     // Handle CORS
     if (req.method === 'OPTIONS') {
@@ -26,11 +40,12 @@ serve(async (req) => {
 
     try {
         // 1. Ayarları al (saat cinsinden timeout)
-        const { data: settings } = await supabase
+        const { data: settingsData } = await supabase
             .from('inventory_settings')
             .select('reservation_timeout_hours')
             .maybeSingle()
         
+        const settings = settingsData as InventorySettings | null
         const hours = settings?.reservation_timeout_hours || 24
 
         // 2. Zaman eşiğini hesapla
@@ -46,7 +61,7 @@ serve(async (req) => {
             .eq('status', 'pending')
             .eq('payment_status', 'pending')
             .lt('created_at', timeoutDate.toISOString())
-            .limit(100) // Aşırı yüklenmeyi önlemek için limitliyoruz
+            .limit(100)
 
         if (findErr) throw findErr
 
@@ -59,7 +74,8 @@ serve(async (req) => {
         console.log(`[JOB] Found ${expiredOrders.length} expired orders. Processing...`)
         let releasedCount = 0
 
-        for (const order of expiredOrders) {
+        for (const order of (expiredOrders as ExpiredOrder[])) {
+
             try {
                 // a. Siparişi iptal et
                 const { error: updateErr } = await supabase
@@ -81,10 +97,12 @@ serve(async (req) => {
                 })
 
                 // c. Ürünleri ve stokları iade et
-                const { data: items } = await supabase
+                const { data: itemsRaw } = await supabase
                     .from('venthub_order_items')
                     .select('product_id, quantity')
                     .eq('order_id', order.id)
+                
+                const items = itemsRaw as OrderItem[]
                 
                 if (items && items.length > 0) {
                     for (const item of items) {
@@ -103,7 +121,7 @@ serve(async (req) => {
                         await supabase.from('inventory_movements').insert({
                             product_id: item.product_id,
                             delta: item.quantity,
-                            reason: 'return', // Rezervasyon iptali
+                            reason: 'return', 
                             order_id: order.id
                         })
                         
@@ -114,7 +132,6 @@ serve(async (req) => {
                 releasedCount++
             } catch (orderErr) {
                 console.error(`[CRITICAL] Failed to release order ${order.id}:`, orderErr)
-                // Bir siparişte hata olsa bile diğerlerine devam et
             }
         }
 

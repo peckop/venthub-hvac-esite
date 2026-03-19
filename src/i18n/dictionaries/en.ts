@@ -719,6 +719,57 @@ export const en = {
       coupons: 'Coupons',
       settings: 'Admin Settings'
     },
+    audit: {
+      subtitle: 'Monitor all system changes and user activities.',
+      filterBatch: 'Filter: Batch',
+      viewMovements: 'View Movements',
+      clear: 'Clear',
+      searchPlaceholder: 'Search table, PK or note',
+      actionTitle: 'Action',
+      history: 'Audit History',
+      details: 'Action Details',
+      noRecords: 'No Records Found',
+      noRecordsDesc: 'No audit logs found matching your filters or search criteria.',
+      errorLoad: 'Logs could not be loaded'
+    },
+    inventory: {
+      subtitle: 'Real-Time Stock Tracking',
+      allCategories: 'ALL CATEGORIES',
+      groupByCategory: 'Categorize By',
+      csvLoad: 'Upload CSV',
+      status: {
+        outOfStock: 'Out of Stock',
+        criticalLevel: 'Critical Level',
+        reserved: 'Reserved',
+        normal: 'Normal Status'
+      },
+      export: {
+        csv: 'Download Page Data (.csv)',
+        template: 'Sample CSV Template (sku,qty)'
+      },
+      table: {
+        productInfo: 'Product Info',
+        physical: 'Physical Stock',
+        reserved: 'Reserved Stock',
+        available: 'Available Stock',
+        threshold: 'Alert Threshold',
+        location: 'Warehouse Location',
+        supplier: 'Supplier',
+        abc: 'ABC Analysis',
+        daysUntilEmpty: 'Days Until Empty',
+        statusIndicator: 'Status Indicator'
+      },
+      toasts: {
+        loadFailed: 'Loading error',
+        undoNotAllowed: 'Undo action cannot be reversed',
+        undoTimePassed: 'Undo time expired (10 min)',
+        undoSuccess: 'Movement reversed',
+        undoFailed: 'Undo failed',
+        locationUpdated: 'Location updated',
+        supplierUpdated: 'Supplier updated',
+        stockAdjusted: 'Stock adjusted'
+      }
+    },
     settings: {
       siteName: 'Site Name',
       tagline: 'Tagline',

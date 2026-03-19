@@ -73,3 +73,29 @@
 5. **Dökümanlar** (Documentation links - white background)
 6. **Ürün PDF** (Downloadable catalogs - light gray background)
 7. **Sertifikalar** (Certifications - white background)
+
+## ✍️ TİPOGRAFİ OTORİTESİ (VentHub Typography Scale)
+
+VentHub projesinde metin tutarlılığı için `vh-` ön ekiyle başlayan standart CSS class'ları kullanılır.
+
+### 1. Başlıklar (Headings)
+- **.vh-display**: Dev manşetler (H1 - Hero). `4.5rem`, Black.
+- **.vh-h1**: Ana sayfa ve Kategori başlıkları. `3rem`, Extra-Bold.
+- **.vh-h2**: Bölüm başlıkları. `2.25rem`, Extra-Bold.
+- **.vh-h3**: Alt bölüm başlıkları. `1.875rem`, Bold.
+- **.vh-h4**: Kart ve grup başlıkları. `1.5rem`, Bold.
+- **.vh-h5**: Küçük grup başlıkları. `1.25rem`, Semi-Bold.
+- **.vh-h6**: En küçük başlıklar. `1.125rem`, Semi-Bold.
+
+### 2. Metinler (Body)
+- **.vh-body-lg**: Büyük paragraf metinleri. `1.125rem`.
+- **.vh-body**: Standart paragraf metni. `1rem`.
+- **.vh-body-sm**: Küçük metinler ve açıklamalar. `0.875rem`.
+
+### 3. Teknik ve Etiketler
+- **.vh-technical**: Teknik tablo verileri ve MPN/SKU etiketleri. `0.75rem`, Monospace, Uppercase.
+- **.vh-badge-label**: Badge ve küçük uyarı metinleri. `10px`, Black, Uppercase, Tracking-wide.
+- **.vh-eyebrow**: Başlık üstü ön metinler. `12px`, Bold, Uppercase, Tracking-widest.
+
+### 4. Zengin İçerik (Prose)
+- **.prose-vh**: Markdown veya RichText içeriklerin (Ürün açıklamaları vb.) standart render edilmesi için kullanılır.

@@ -5,7 +5,7 @@ priority: "Medium"
 status: "Planning"
 progress: "0%"
 depends_on: ["002"]
-updated_at: "2026-03-19 13:22:03"
+updated_at: "2026-03-19 23:10:25"
 artifacts:
   brainstorm: "registry/P05-Next15-Modernization/backlog/003-technical-debt-cleanup-type-safety/brainstorm.md"
   plan: "registry/P05-Next15-Modernization/backlog/003-technical-debt-cleanup-type-safety/plan.md"

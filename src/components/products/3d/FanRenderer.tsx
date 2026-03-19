@@ -30,11 +30,25 @@ interface FanRendererProps {
     position?: [number, number, number]
 }
 
+interface BaseModelProps {
+    slug?: string
+    scale?: number
+    explode?: number
+    onPartClick?: (partName: string) => void
+    selectedPart?: string | null
+    isolatedPart?: string | null
+    hiddenParts?: string[]
+    displayStyle?: 'shaded' | 'shadedEdges' | 'wireframe' | 'hiddenLines'
+    enableTooltip?: boolean
+    isHeated?: boolean
+    showMixed?: boolean
+}
+
 // Model tipi -> Bileşen eşleştirmesi
-const MODEL_COMPONENTS = {
+const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
     'AxialFanModel': AxialFanModel,
     'RoofFanModel': RoofFanModel,
-    'WallMountedCompactFanModel': WallMountedCompactFanModel, // [FIX] Updated Name
+    'WallMountedCompactFanModel': WallMountedCompactFanModel,
     'DomesticFanModel': DomesticFanModel,
     'DuctFanModel': DuctFanModel,
     'RectangularDuctFanModel': RectangularDuctFanModel,
@@ -45,9 +59,9 @@ const MODEL_COMPONENTS = {
     'ExproofFanModel': ExproofFanModel,
     'PlugFanModel': PlugFanModel,
     'JetFanModel': JetFanModel,
-    'AirCurtainModel': AirCurtainModel,
+    'AirCurtainModel': AirCurtainModel as React.ComponentType<BaseModelProps>,
     'AirPurifierModel': AirPurifierModel,
-} as const
+}
 
 export const FanRenderer: React.FC<FanRendererProps> = ({
     slug,
@@ -68,10 +82,10 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
 
         // 1. ÖNCELİK: Veritabanı model_type
         if (modelType && modelType in MODEL_COMPONENTS) {
-            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as React.ComponentType<Record<string, unknown>>
+            const ModelComponent = MODEL_COMPONENTS[modelType]
 
             // Hava perdesi için dinamik proplar
-            const extraProps: { isHeated?: boolean; showMixed?: boolean } = {}
+            const extraProps: Partial<BaseModelProps> = {}
             if (modelType === 'AirCurtainModel') {
                 const isHeated = s.includes('isitici') || s.includes('elektrikli')
                 const isAmbient = s.includes('ortam-havali') || s.includes('naturel')
@@ -79,19 +93,20 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
                 extraProps.showMixed = (!isHeated && !isAmbient) || s === 'hava-perdeleri'
             }
 
-            return React.createElement(ModelComponent, {
-                slug,
-                ...extraProps,
-                scale,
-                explode,
-                onPartClick,
-                selectedPart,
-                isolatedPart,
-                hiddenParts,
-                displayStyle,
-                enableTooltip
-            } as Record<string, unknown>)
+            return <ModelComponent
+                slug={slug}
+                {...extraProps}
+                scale={scale}
+                explode={explode}
+                onPartClick={onPartClick}
+                selectedPart={selectedPart}
+                isolatedPart={isolatedPart}
+                hiddenParts={hiddenParts}
+                displayStyle={displayStyle}
+                enableTooltip={enableTooltip}
+            />
         }
+
 
         // 2. FALLBACK: Slug bazlı mantık (Hiyerarşik: Spesifik -> Genel)
 
