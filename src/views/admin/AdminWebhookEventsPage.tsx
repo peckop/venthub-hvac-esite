@@ -21,13 +21,13 @@ const AdminWebhookEventsPage: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const { data, error } = await supabase
+        const { data, error: fetchErr } = await (supabase as any)
           .from('webhook_events')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(100)
 
-        if (error) throw error
+        if (fetchErr) throw fetchErr
         setEvents(data || [])
       } catch (err) {
         console.error('Webhook load error:', err)
