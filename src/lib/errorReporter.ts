@@ -5,8 +5,10 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
       const isProd = options?.env === 'production'
       if (isProd) return false // Never allow force in production
       // Force switch for local tests: window.__ERROR_LOG_FORCE__ = true or localStorage.setItem('errorlog:force','1')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = (window as any)
+      interface VentHubWindow extends Window {
+        __ERROR_LOG_FORCE__?: boolean
+      }
+      const w = (window as unknown as VentHubWindow)
       if (w && w.__ERROR_LOG_FORCE__ === true) return true
       return localStorage.getItem('errorlog:force') === '1'
     } catch { return false }

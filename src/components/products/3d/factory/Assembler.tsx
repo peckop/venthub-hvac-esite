@@ -4,13 +4,11 @@ import React, { Suspense } from 'react'
 
 interface PartConfig {
     name: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: React.ComponentType<any>
+    component: React.ElementType
     position?: [number, number, number]
     rotation?: [number, number, number]
     scale?: [number, number, number]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    props?: Record<string, any>
+    props?: Record<string, unknown>
 }
 
 interface BluePrint {

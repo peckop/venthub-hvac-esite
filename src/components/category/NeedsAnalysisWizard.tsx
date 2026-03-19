@@ -16,8 +16,7 @@ const NeedsAnalysisWizard: React.FC<NeedsAnalysisWizardProps> = ({ onFilterChang
     })
     const [isOpen, setIsOpen] = useState(false)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleSelection = (key: string, value: any) => {
+    const handleSelection = (key: string, value: string | number) => {
         const newSelections = { ...selections, [key]: value }
         setSelections(newSelections)
 
