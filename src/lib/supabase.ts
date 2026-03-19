@@ -156,7 +156,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
-  const { data, error } = await supabase.rpc('get_products_enriched', {
+  const { data, error } = await supabase.rpc('get_products_enriched' as any, {
     p_category_ids: params.categoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,

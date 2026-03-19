@@ -96,6 +96,7 @@ export default function AccountAddressesPage() {
           full_name: form.full_name,
           phone: form.phone,
           address_line: form.address_line,
+          street_address: form.address_line, // Map both
           city: form.city,
           district: form.district,
           postal_code: form.postal_code,
@@ -106,16 +107,19 @@ export default function AccountAddressesPage() {
         toast.success(t('account.addresses.toasts.updated') || 'Adres güncellendi')
       } else {
         await createAddress({
+          user_id: user.id,
+          address_type: form.is_default_shipping ? 'shipping' : 'billing',
           label: form.label,
           full_name: form.full_name,
           phone: form.phone,
           address_line: form.address_line,
+          street_address: form.address_line, // Map both
           city: form.city,
           district: form.district,
           postal_code: form.postal_code,
           country: form.country,
-          is_default_shipping: form.is_default_shipping,
-          is_default_billing: form.is_default_billing,
+          is_default_shipping: form.is_default_shipping || false,
+          is_default_billing: form.is_default_billing || false,
         })
         toast.success(t('account.addresses.toasts.created') || 'Adres eklendi')
       }
