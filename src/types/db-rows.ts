@@ -187,9 +187,9 @@ export interface CheckoutLegalConsents {
   kvkk: boolean;
   sales_agreement: boolean;
   privacy_policy: boolean;
-  distanceSales?: boolean;
-  preInfo?: boolean;
-  orderConfirm?: boolean;
-  marketing?: boolean;
+  distanceSales: boolean;
+  preInfo: boolean;
+  orderConfirm: boolean;
+  marketing: boolean;
   [key: string]: Json | undefined;
 }
