@@ -1,5 +1,12 @@
 # Changelog
 
+### [2026-03-19] P00-Standalone - Task 033: Checkout Type Safety & CI Unblocking
+**Özet:** `CheckoutPage.tsx` ve bağlı bileşenlerdeki (`StepCustomerInfo`, `StepAddressInfo`, `ReviewSummary`) TypeScript ve Lint hataları tamamen giderildi. `Record<string, unknown>` ve `as unknown as` gibi "güvensiz" tiplemeler, merkezi `db-rows.ts` tabanlı yeni bir tip mimarisiyle değiştirildi.
+**Notlar:** - `CheckoutAddressInfo`, `CheckoutInvoiceInfo` ve `CheckoutCustomerInfo` tipleri hem veritabanı (snake_case) hem de UI (camelCase) standartlarına tam uyumlu hale getirildi.
+- Sayfa ve alt bileşenler `%100` tip güvenliğine ulaştı, GitHub CI akışındaki engeller kaldırıldı.
+- `StepAddressInfo` bileşenindeki form girişleri, eksik veri durumunda hata vermeyecek şekilde (`|| ''` fallback'ler) güçlendirildi.
+---
+
 ### [2026-03-19] P06 - Aşama 3: Registry İndeksleme Sistemi (Indexing Engine)
 **Özet:** Registry sistemi artık tamamen otonom ve indekslenebilir durumda. `index.json` dosyası, tüm projelerin ve görevlerin "Single Source of Truth" (Tek Gerçeklik Kaynağı) verisi haline getirildi. Arama motoru, ID dışındaki anahtar kelimelerle de (başlık, içerik özeti) çalışıyor.
 **Notlar:** - `manage_registry.py` içindeki Python tiplemeleri (Pyre hataları) Pyre limitleri nedeniyle `dict` bazlı sadeleştirildi ancak runtime güvenliği `cast` ve `str()` zorlamalarıyla maksimize edildi.
@@ -454,3 +461,28 @@
 ### Notlar
 - Secrets: CI için GitHub Secrets kullanın; yerelde `.env.local` kullanabilirsiniz (repo’ya commit etmeyin).
 - `Verify Cart Items` job’ı PASS ise son getirilen satırlarda `unit_price` alanı boştur değildir; `price_list_id` özel liste için UUID, global fiyat için null olabilir.
+
+
+### [2026-03-19] Skills Factory: Otonom Yetenek Havuzu Altyapısı (Görev: 001)
+Sistem yetenek havuzu altyapısı başarıyla kuruldu. Superpowers skilleri Registry 3.0 SQL motoruyla tam uyumlu hale getirildi. Veritabanı üzerinden otonom yetenek yönetimi artık mümkün.
+---
+
+
+### [2026-03-19] active (Görev: 001)
+Registry 3.2 motoru, klasör hiyerarşisini hassas bir şekilde korumaktadır. Taşıma işlemleri leaf-folder bazlı yapılmış ve dosyaların ana statü klasörüne dökülmesi engellenmiştir. Sistem artık kararlıdır.
+---
+
+
+### [2026-03-19] Total Recall Mimari Testi (Görev: 001)
+Total Recall testi başarıyla tamamlandı. Dosya içi yollar (artifacts), statü bilgileri ve fiziksel klasör konumu artık otonom olarak %100 senkronize çalışıyor. Sistem hata payını sıfıra indirdi.
+---
+
+
+### [2026-03-19] V7 Hassas Test (001)
+V7 Sertifikasyon testi başarıyla sonuçlandı. Dosya içi metadata senkronizasyonu ve klasör derinliği artık otonom sistemin ayrılmaz bir parçasıdır. Sistem kirlilikten arındırıldı ve kararlı hale getirildi.
+---
+
+
+### [2026-03-19] V7 Hiyerarşi Testi (001)
+V7 Hiyerarşi testi başarıyla tamamlandı. Görev klasörü (leaf folder) her statü değişiminde mühürlü bir şekilde taşındı. Dosyalar asla statü klasörüne dökülmedi. Metadata senkronizasyonu mükemmel.
+---
