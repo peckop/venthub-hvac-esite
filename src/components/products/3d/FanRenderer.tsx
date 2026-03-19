@@ -68,7 +68,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
 
         // 1. ÖNCELİK: Veritabanı model_type
         if (modelType && modelType in MODEL_COMPONENTS) {
-            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as React.ComponentType<any>
+            const ModelComponent = MODEL_COMPONENTS[modelType as keyof typeof MODEL_COMPONENTS] as React.ComponentType<Record<string, unknown>>
 
             // Hava perdesi için dinamik proplar
             const extraProps: { isHeated?: boolean; showMixed?: boolean } = {}
@@ -90,7 +90,7 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
                 hiddenParts,
                 displayStyle,
                 enableTooltip
-            } as any)
+            } as Record<string, unknown>)
         }
 
         // 2. FALLBACK: Slug bazlı mantık (Hiyerarşik: Spesifik -> Genel)
