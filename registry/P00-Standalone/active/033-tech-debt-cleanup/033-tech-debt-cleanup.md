@@ -2,7 +2,7 @@
 id: 033
 title: "033: Teknik Borç Temizliği ve Edge Görevleri"
 priority: "HIGH"
-status: "Executing"
+status: "Planning"
 progress: 0%
 project: "P00-Standalone"
 created_at: "2026-03-17 15:50:57"
@@ -12,6 +12,11 @@ artifacts:
   plan: "registry/P00-Standalone/active/033-tech-debt-cleanup/plan.md"
   review: "registry/P00-Standalone/active/033-tech-debt-cleanup/review.md"
 ---
+
+
+
+
+
 
 
 

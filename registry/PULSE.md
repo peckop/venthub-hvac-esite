@@ -1,13 +1,13 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 2026-03-19 00:21:36 | **Sistem:** `OPERATIONAL` | **Sürüm:** `v8.0 (Otonom Sync)` 
+> **Güncelleme:** 2026-03-19 03:41:00 | **Sistem:** `OPERATIONAL` | **Sürüm:** `v8.1 (Auth Safe)` 
 
 ## 📊 GLOBAL PROJE ÖZETİ
 | İSTATİSTİK | DEĞER |
 | :--- | :--- |
-| 🎯 Global İlerleme | **%53** |
-| 📂 Toplam Proje | **6** |
-| ✅ Tamamlanan Görev | **21** |
-| 🏗️ Aktif Operasyon | **4** |
+| 🎯 Global İlerleme | **%55** |
+| 📂 Toplam Proje | **7** |
+| ✅ Tamamlanan Görev | **24** |
+| 🏗️ Aktif Operasyon | **5** |
 
 ## 📁 P00-Standalone
 > 🎯 [Strateji Belgesi](P00-Standalone/strategy.md)
@@ -108,7 +108,7 @@
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI | ÖNCELİK | DURUM | İLERLEME |
 |:---|:---|:---|:---|:---|
-| - | Hiç aktif görev yok. | - | - | - |
+| `005` | Aşama 5: PDP Gateway Mimarisi (ProductDetailPage Parçalama) | High | 🏗️ RUN | `0%` |
 
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI | ÖNCELİK |
@@ -142,4 +142,24 @@
 |:---|:---|:---|:---|:---|
 | `001` | Next.js 15: Altyapı ve Güvenlik Kilidi (Infrastructure Lockdown) | High | ✅ DONE | `100%` |
 | `002` | React 19: Auth Modernizasyonu (Server Actions) | High | ✅ DONE | `100%` |
+
+## 📁 P06-System-Intelligence-Registry
+> 🎯 [Strateji Belgesi](P06-System-Intelligence-Registry/strategy.md)
+
+### ⚡ Aktif Görevler
+| ID     | GÖREV BAŞLIĞI | ÖNCELİK | DURUM | İLERLEME |
+|:---|:---|:---|:---|:---|
+| - | Hiç aktif görev yok. | - | - | - |
+
+### ⏳ Backlog
+| ID     | GÖREV BAŞLIĞI | ÖNCELİK |
+|:---|:---|:---|
+| - | Backlog temiz. | - |
+
+### ✅ Tamamlananlar
+| ID     | GÖREV BAŞLIĞI | ÖNCELİK | DURUM | İLERLEME |
+|:---|:---|:---|:---|:---|
+| `001` | Aşama 1: Otomatik CHANGELOG Jeneratörü | Medium | ✅ DONE | `100%` |
+| `002` | Aşama 2: Registry Bağımlılık Görselleştirici (Graph Motor) | High | ✅ DONE | `100%` |
+| `003` | Aşama 3: Registry İndeksleme Sistemi (Indexing Engine) | MEDIUM | ✅ DONE | `100%` |
 

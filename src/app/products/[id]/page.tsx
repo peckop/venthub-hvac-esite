@@ -57,11 +57,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     if (cleanId !== 'generic') {
       productData = await getProductBySlugOrId(cleanId)
     }
-  } catch (e: any) {
-    if (e?.message?.includes('fetch failed')) {
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err)
+    if (errorMsg.includes('fetch failed')) {
       console.warn(`Network fetch failed for product ${cleanId} (expected if Supabase env is missing)`)
     } else {
-      console.error(`Error fetching product data for ${cleanId}:`, e)
+      console.error(`Error fetching product data for ${cleanId}:`, err)
     }
   }
 

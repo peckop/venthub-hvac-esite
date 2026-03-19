@@ -54,17 +54,25 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
     product_image_url: it.product.image_url || null,
   }))
 
-  const normalizeAddress = (addr: any) => ({
-    fullAddress: addr?.fullAddress || addr?.full_address || '',
-    city: addr?.city || '',
-    district: addr?.district || '',
-    postalCode: addr?.postalCode || addr?.postal_code || '',
-  })
+  const normalizeAddress = (addr: AddressInput | UserAddress | null) => {
+    if (!addr) return { fullAddress: '', city: '', district: '', postalCode: '' }
+    
+    // Type Guard style check
+    const a = addr as Record<string, unknown>
+    return {
+      fullAddress: String(a.fullAddress || a.full_address || ''),
+      city: String(a.city || ''),
+      district: String(a.district || ''),
+      postalCode: String(a.postalCode || a.postal_code || ''),
+    }
+  }
 
   const shippingAddress = { ...normalizeAddress(shipping), address_type: 'shipping' }
   const billingAddress = sameAsShipping ? { ...shippingAddress, address_type: 'billing' } : { ...normalizeAddress(billing), address_type: 'billing' }
 
   const customerName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim()
+
+  const consents = legalConsents as Record<string, boolean | undefined>
 
   const req = {
     amount,
@@ -80,11 +88,11 @@ export function buildPaymentRequest(args: BuildPaymentArgs) {
     invoiceType,
     invoiceInfo: { ...invoiceInfo, type: invoiceType },
     legalConsents: {
-      kvkk: { accepted: !!(legalConsents as any).kvkk, ts: new Date().toISOString() },
-      distanceSales: { accepted: !!(legalConsents as any).distanceSales, ts: new Date().toISOString() },
-      preInfo: { accepted: !!(legalConsents as any).preInfo, ts: new Date().toISOString() },
-      orderConfirm: { accepted: !!(legalConsents as any).orderConfirm, ts: new Date().toISOString() },
-      marketing: { accepted: !!(legalConsents as any).marketing, ts: (legalConsents as any).marketing ? new Date().toISOString() : null },
+      kvkk: { accepted: !!consents.kvkk, ts: new Date().toISOString() },
+      distanceSales: { accepted: !!consents.distanceSales, ts: new Date().toISOString() },
+      preInfo: { accepted: !!consents.preInfo, ts: new Date().toISOString() },
+      orderConfirm: { accepted: !!consents.orderConfirm, ts: new Date().toISOString() },
+      marketing: { accepted: !!consents.marketing, ts: consents.marketing ? new Date().toISOString() : null },
     },
     shippingMethod: shippingMethod || 'standard',
     couponCode: args.couponCode || null,

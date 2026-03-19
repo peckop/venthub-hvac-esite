@@ -6,8 +6,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
-import { supabase, Category } from '../../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import type { Database } from '../../../types/database.types'
+import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
 type Json = Database['public']['Tables']['categories']['Insert']['metadata']
@@ -50,7 +51,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
 
     // Image state
     const [image, setImage] = useState<{ url: string; file?: File; isNew?: boolean } | null>(null)
-    const [initialData, setInitialData] = useState<Category | null>(null)
+    const [initialData, setInitialData] = useState<DbCategory | null>(null)
 
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CategoryFormValues>({
         resolver: zodResolver(categorySchema),
@@ -65,22 +66,25 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         try {
             const { data, error } = await supabase.from('categories').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(data as Category)
+            const cat = data as unknown as DbCategory
+            setInitialData(cat)
+
+            const metadata = cat.metadata as CategoryMetadata | null
 
             reset({
-                name: data.name,
-                slug: data.slug,
-                parent_id: data.parent_id || '',
-                description: data.description,
-                seo_title: data.seo_title,
-                seo_desc: data.seo_desc,
-                is_featured: data.is_featured ?? false,
-                sort_order: data.sort_order ?? 0,
-                image_url: data.image_url,
-                metric1_value: (data.metadata as any)?.metric1?.value || '',
-                metric1_label: (data.metadata as any)?.metric1?.label || '',
-                metric2_value: (data.metadata as any)?.metric2?.value || '',
-                metric2_label: (data.metadata as any)?.metric2?.label || ''
+                name: cat.name,
+                slug: cat.slug,
+                parent_id: cat.parent_id || '',
+                description: cat.description,
+                seo_title: cat.seo_title,
+                seo_desc: cat.seo_desc,
+                is_featured: cat.is_featured ?? false,
+                sort_order: cat.sort_order ?? 0,
+                image_url: cat.image_url,
+                metric1_value: (metadata?.metric1 as { value?: string })?.value || '',
+                metric1_label: (metadata?.metric1 as { label?: string })?.label || '',
+                metric2_value: (metadata?.metric2 as { value?: string })?.value || '',
+                metric2_label: (metadata?.metric2 as { label?: string })?.label || ''
             })
 
             if (data.image_url) {
@@ -152,7 +156,13 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 imgPath = null
             }
 
-            const payload = {
+            const metadata: CategoryMetadata = {
+                ...(initialData?.metadata || {}),
+                metric1: { value: data.metric1_value, label: data.metric1_label },
+                metric2: { value: data.metric2_value, label: data.metric2_label }
+            }
+
+            const payload: Partial<DbCategory> = {
                 name: data.name,
                 slug: data.slug,
                 parent_id: data.parent_id === '' ? null : data.parent_id,
@@ -162,24 +172,18 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured,
                 sort_order: data.sort_order,
                 image_url: imgPath,
-                metadata: {
-                    ...(initialData?.metadata || {}),
-                    metric1: { value: data.metric1_value, label: data.metric1_label },
-                    metric2: { value: data.metric2_value, label: data.metric2_label }
-                }
-            } as any
+                metadata: metadata as unknown as Json
+            }
 
             let currentId = categoryId
 
             if (currentId) {
-                // Clean data for DB constraints
                 const updateData: CategoryUpdate = Object.fromEntries(
                     Object.entries(payload).filter(([_, v]) => v !== undefined)
                 ) as CategoryUpdate
                 const { error } = await supabase.from('categories').update(updateData).eq('id', currentId)
                 if (error) throw error
 
-                // Audit
                 const { logAdminAction } = await import('../../../lib/audit')
                 await logAdminAction(supabase, {
                     table_name: 'categories',
