@@ -21,6 +21,7 @@ artifacts:
 
 
 
+
 # 005 - PDP Gateway Mimarisi (ProductDetailPage Parçalama)
 
 ## 🎯 Hedef
