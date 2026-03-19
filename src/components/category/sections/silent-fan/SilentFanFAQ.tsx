@@ -3,13 +3,18 @@ import { Plus, Minus, HelpCircle } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
+interface FAQItem {
+    q: string
+    a: string
+}
+
 const SilentFanFAQ: React.FC = () => {
     const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
     const [openIndex, setOpenIndex] = useState<number | null>(0)
     
-    const tr = (key: string) => t(`categorySilentFan.faq.${key}`) as any
-    const items = tr('items') || []
+    const tr = (key: string) => t(`categorySilentFan.faq.${key}`)
+    const items = (tr('items') as unknown as FAQItem[]) || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-50">
@@ -19,12 +24,12 @@ const SilentFanFAQ: React.FC = () => {
                         <HelpCircle className="text-blue-600" size={32} />
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
-                        {tr('title')}
+                        {String(tr('title'))}
                     </h2>
                 </div>
 
                 <div className="space-y-4">
-                    {items.map((item: any, index: number) => {
+                    {items.map((item: FAQItem, index: number) => {
                         const isOpen = openIndex === index
                         return (
                             <div 

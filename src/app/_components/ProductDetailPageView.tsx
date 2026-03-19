@@ -44,6 +44,7 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER
 } from '../../utils/productHelpers'
+import type { CategoryMetadata } from '../../types/db-rows'
 
 export interface ProductDetailPageProps {
   initialProduct?: Product | null
@@ -331,12 +332,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           <div className="lg:col-span-7 xl:col-span-8 sticky top-24 self-start z-10">
             <div className="relative group bg-white rounded-3xl border border-light-gray/50 shadow-sm overflow-hidden p-2">
               <ImageGallery
-                key={product.id}
-                images={images}
-                productName={product.name}
-                slug={product.slug || product.name}
-                modelType={(mainCategory?.metadata as any)?.model_type}
+              key={product.id}
+              images={images}
+              productName={product.name}
+              slug={product.slug || product.name}
+              modelType={(mainCategory?.metadata as CategoryMetadata | null)?.model_type}
               />
+
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-6 left-6 z-20 pointer-events-none">
                   <div className="bg-white/95 backdrop-blur-md border border-primary-navy/20 px-3 py-2 rounded-full shadow-hvac flex items-center space-x-2 animate-pulse-subtle">
@@ -401,13 +403,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
-                      {(mainCategory?.metadata as any)?.hide_price ? (
+                      {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('pdp.techQuote')}</span>
                       ) : (
                         formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                       )}
                     </div>
-                    {!(mainCategory?.metadata as any)?.hide_price && (
+                    {!(mainCategory?.metadata as CategoryMetadata | null)?.hide_price && (
                       <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
                         {t('pdp.vatIncluded')}
                       </span>
@@ -439,7 +441,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                 {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
-                  {(mainCategory?.metadata as any)?.hide_price ? (
+                  {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? (
                     <button
                       onClick={() => setLeadOpen(true)}
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group"
@@ -587,7 +589,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="flex flex-col items-end mr-2">
                 <span className="text-[10px] font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
                 <span className="text-[10px] text-primary-navy font-black tracking-widest">
-                  {(mainCategory?.metadata as any)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                  {(mainCategory?.metadata as CategoryMetadata)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
               
@@ -659,7 +661,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em]">{t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {(mainCategory?.metadata as any)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                                {(mainCategory?.metadata as CategoryMetadata | null)?.hide_price ? t('pdp.techQuote') : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -692,7 +694,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
                       {product.technical_specs ? (
                         <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs as any) || {}).map(([groupKey, group]) => {
+                          {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
                             const isOpen = openSpecSections.includes(groupKey);
                             const Icon = group.icon;
                             return (

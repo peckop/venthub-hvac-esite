@@ -4,13 +4,18 @@ import { Microscope, Wind, ShieldCheck } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
+interface HowItWorksStep {
+    title: string
+    description: string
+}
+
 const SilentFanHowItWorks: React.FC = () => {
     const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
-    const tr = (key: string) => t(`categorySilentFan.howItWorks.${key}`) as any
+    const tr = (key: string) => t(`categorySilentFan.howItWorks.${key}`)
 
     const icons = [Microscope, Wind, ShieldCheck]
-    const steps = tr('steps') || []
+    const steps = (tr('steps') as unknown as HowItWorksStep[]) || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-900 text-white relative overflow-hidden">
@@ -38,17 +43,17 @@ const SilentFanHowItWorks: React.FC = () => {
                     {/* Content */}
                     <div className={scrollAnimationClasses.slideLeft(isVisible)}>
                         <span className="text-blue-400 font-bold tracking-wider text-sm uppercase mb-3 block">
-                            {tr('eyebrow')}
+                            {String(tr('eyebrow'))}
                         </span>
                         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                            {tr('title')}
+                            {String(tr('title'))}
                         </h2>
                         <p className="text-lg text-slate-400 mb-10 max-w-xl">
-                            {tr('subtitle')}
+                            {String(tr('subtitle'))}
                         </p>
 
                         <div className="space-y-8">
-                            {steps.map((step: any, index: number) => {
+                            {steps.map((step: HowItWorksStep, index: number) => {
                                 const Icon = icons[index % icons.length]
                                 return (
                                     <div key={index} className="flex gap-5 group">

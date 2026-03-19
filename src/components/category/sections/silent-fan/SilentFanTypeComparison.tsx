@@ -4,19 +4,25 @@ import { Check, X } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
+interface ComparisonFeature {
+    label: string
+    standard: string
+    quiet: string
+}
+
 const SilentFanTypeComparison: React.FC = () => {
     const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
-    const tr = (key: string) => t(`categorySilentFan.comparison.${key}`) as any
+    const tr = (key: string) => t(`categorySilentFan.comparison.${key}`)
 
-    const features = tr('features') || []
+    const features = (tr('features') as unknown as ComparisonFeature[]) || []
 
     return (
         <section ref={sectionRef} className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className={`text-center mb-16 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
-                        {tr('title')}
+                        {String(tr('title'))}
                     </h2>
                 </div>
 
@@ -26,7 +32,7 @@ const SilentFanTypeComparison: React.FC = () => {
                         <div className="absolute inset-0 opacity-20 grayscale bg-[url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800')] bg-cover bg-center" />
                         <div className="relative text-center z-10 p-8">
                             <h3 className="text-2xl font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">
-                                {tr('standard')}
+                                {String(tr('standard'))}
                             </h3>
                             <div className="text-slate-300">
                                 <X size={64} className="mx-auto" />
@@ -36,7 +42,7 @@ const SilentFanTypeComparison: React.FC = () => {
 
                     {/* Middle: Feature list */}
                     <div className="lg:col-span-1 bg-slate-900 flex flex-col justify-center py-8">
-                        {features.map((f: any, i: number) => (
+                        {features.map((f: ComparisonFeature, i: number) => (
                             <div key={i} className="py-4 px-2 text-center border-b border-white/5 last:border-0">
                                 <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block mb-1">
                                     {f.label}
@@ -55,7 +61,7 @@ const SilentFanTypeComparison: React.FC = () => {
                         <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]" />
                         <div className="relative text-center z-10 p-8">
                             <h3 className="text-2xl font-bold text-white uppercase tracking-[0.2em] mb-4">
-                                {tr('quiet')}
+                                {String(tr('quiet'))}
                             </h3>
                             <div className="text-blue-400">
                                 <Check size={64} className="mx-auto" />
@@ -67,7 +73,7 @@ const SilentFanTypeComparison: React.FC = () => {
                     <div className="hidden lg:block absolute inset-0 pointer-events-none">
                         <div className="grid lg:grid-cols-5 h-full">
                             <div className="lg:col-start-3 lg:col-span-1 flex flex-col justify-center">
-                                {features.map((f: any, i: number) => (
+                                {features.map((f: ComparisonFeature, i: number) => (
                                     <div key={i} className="h-[73px] flex items-center justify-center gap-12 -mx-48">
                                         {/* Standard value (Left side of middle col) */}
                                         <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-500 w-32 text-center">
@@ -86,7 +92,7 @@ const SilentFanTypeComparison: React.FC = () => {
 
                 {/* Mobile view feature details (since floating cards are desktop only) */}
                 <div className="lg:hidden mt-8 space-y-4">
-                    {features.map((f: any, i: number) => (
+                    {features.map((f: ComparisonFeature, i: number) => (
                         <div key={i} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                             <span className="text-[10px] uppercase font-bold text-slate-400 mb-2 block">{f.label}</span>
                             <div className="grid grid-cols-2 gap-4">

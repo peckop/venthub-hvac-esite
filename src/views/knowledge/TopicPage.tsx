@@ -111,7 +111,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
                 {t('knowledge.topic.stepsTitle')}
               </h2>
               <div className="space-y-6">
-                {steps.map((s: any, i: number) => (
+                {steps.map((s: string, i: number) => (
                   <div key={i} className="flex gap-4 group">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0 group-hover:scale-150 transition-transform" />
                     <p className="text-slate-600 font-light leading-relaxed">{s}</p>
@@ -127,7 +127,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
                 {t('knowledge.topic.pitfallsTitle')}
               </h2>
               <div className="space-y-6">
-                {pitfalls.map((s: any, i: number) => (
+                {pitfalls.map((s: string, i: number) => (
                   <div key={i} className="flex gap-4">
                     <CheckCircle2 size={18} className="text-amber-500 shrink-0 mt-1" />
                     <p className="text-slate-600 font-light leading-relaxed">{s}</p>

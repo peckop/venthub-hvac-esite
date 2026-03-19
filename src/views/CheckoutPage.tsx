@@ -263,7 +263,7 @@ export const CheckoutPage: React.FC = () => {
 
           <div className="lg:col-span-1">
             <OrderSummarySidebar
-              items={items as any}
+              items={items}
               totalAmount={totalAmount} vatAmount={vatAmount} finalAmount={finalAmount}
               couponApplied={couponApplied} couponCode={couponCode} setCouponCode={setCouponCode}
               onApplyCoupon={applyCoupon} onRemoveCoupon={removeCoupon}

@@ -1,5 +1,4 @@
 import PageComponent from '../../../../views/knowledge/TopicPage'
-const TopicPageAny = PageComponent as any
 import { tr } from '../../../../i18n/dictionaries/tr'
 
 export const dynamicParams = false
@@ -14,5 +13,5 @@ export async function generateStaticParams() {
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  return <TopicPageAny slug={slug} />
+  return <PageComponent slug={slug} />
 }
