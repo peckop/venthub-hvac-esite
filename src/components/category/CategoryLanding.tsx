@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Category, Product } from '../../lib/supabase'
+import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
     ChevronDown,
     Wind,
@@ -26,7 +26,6 @@ import {
 import ProductCard from '../ProductCard'
 import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
-// import { Link, useNavigate } from 'react-router-dom'
 // Premium section components for air curtains
 import {
     ProblemSection,
@@ -46,12 +45,13 @@ import { Breadcrumb } from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { VentImage } from '../ui/VentImage'
+import { mapDatabaseCategoryToDomain, mapDatabaseProductToDomain } from '../../lib/type-converters'
 
 interface CategoryLandingProps {
-    category: Category
-    products: Product[]
-    subCategories?: Category[] // For in-page subcategory selection
-    parentCategory?: Category | null
+    category: DbCategory
+    products: DbProduct[]
+    subCategories?: DbCategory[] // For in-page subcategory selection
+    parentCategory?: DbCategory | null
 }
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -86,10 +86,15 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const isAirCurtain = category.slug === 'hava-perdeleri'
     const isSilentFan = category.slug === 'sessiz-kanal-tipi-fanlar'
 
+    // Convert database objects to UI domain models for child components
+    const domainCategory = mapDatabaseCategoryToDomain(category)
+    const domainParentCategory = parentCategory ? mapDatabaseCategoryToDomain(parentCategory) : null
+
     // Restore state from URL hash on mount or back navigation
     useEffect(() => {
         const checkHash = () => {
-            const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
+            if (typeof window === 'undefined') return
+            const hash = window.location.hash.slice(1)
 
             if (hash === 'tum-modeller') {
                 setShowProducts(true)
@@ -117,11 +122,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         }
     }, [subCategories])
 
-    // REMOVED: Auto-scroll to products section when restored from hash
-    // (User wants to land at the top/hero first, even when state is restored)
-
     // V7: Scroll Bounding (Tarayıcının sayfa kısayken scroll'u yarıda kesmesi) sorununa Kesin Çözüm!
     const handleScrollToTarget = (targetId: string) => {
+        if (typeof window === 'undefined') return
         const anchor = document.getElementById(targetId)
         if (!anchor) return
 
@@ -148,8 +151,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const handleShowProducts = () => {
         setShowProducts(true)
         setSelectedSubcategory(null) // Clear subcategory selection when showing all
-        window.history.replaceState(null, '', '#tum-modeller')
-        window.dispatchEvent(new HashChangeEvent('hashchange'))
+        if (typeof window !== 'undefined') {
+            window.history.replaceState(null, '', '#tum-modeller')
+            window.dispatchEvent(new HashChangeEvent('hashchange'))
+        }
 
         // React re-render sonrası
         requestAnimationFrame(() => {
@@ -166,7 +171,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         setShowProducts(false) // Hide main products
         // Update URL hash for bookmarking
         const subcat = subCategories.find(s => s.id === subcatId)
-        if (subcat) {
+        if (subcat && typeof window !== 'undefined') {
             window.history.replaceState(null, '', `#${subcat.slug}`)
             window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
@@ -182,23 +187,23 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     // stats calculations
     const maxAirflow = products.length > 0
-        ? Math.max(...products.map(p => p.airflow_capacity || 0))
+        ? Math.max(...products.map(p => Number(p.airflow_capacity) || 0))
         : 1000
 
     // Filter products based on active filter
-    const filteredProducts = products.filter((p: Product) => {
+    const filteredProducts = products.filter((p: DbProduct) => {
         if (activeFilter === 'all') return true
-        if (activeFilter === 'quiet') return (p.noise_level || 100) <= 50
-        if (activeFilter === 'powerful') return (p.airflow_capacity || 0) >= maxAirflow * 0.8
+        if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
+        if (activeFilter === 'powerful') return (Number(p.airflow_capacity) || 0) >= maxAirflow * 0.8
         return true
     })
 
     const heroImagePath = category.image_url ? `category-images/${category.image_url}` : null
 
-    const features = (category.metadata as any)?.features || []
+    const features = category.metadata?.features ?? []
 
     // Build breadcrumb items
-    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, t('common.home'))
+    const breadcrumbItems = buildCategoryBreadcrumb(domainCategory, domainParentCategory, t('common.home'))
 
     return (
         <div className="min-h-screen bg-white">
@@ -216,20 +221,20 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             {/* Technical Summary / Badge */}
-                            {((category.metadata as any)?.technical_summary) && (
+                            {(category.metadata?.technical_summary) && (
                                 <div className="flex items-center space-x-2 text-secondary-blue mb-4">
                                     <Activity size={20} />
                                     <span className="font-medium tracking-wide text-sm uppercase">
-                                        {(category.metadata as any).technical_summary}
+                                        {category.metadata.technical_summary}
                                     </span>
                                 </div>
                             )}
 
                             <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-                                {getCategoryDisplayName(category)}
+                                {getCategoryDisplayName(domainCategory)}
                             </h1>
                             <p className="text-lg text-gray-300 mb-8 max-w-xl">
-                                {((category.metadata as any)?.hero_description) || category.description}
+                                {category.metadata?.hero_description ?? category.description}
                             </p>
 
                             {/* Dynamic Features Grid */}
@@ -289,7 +294,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
                             {/* Animated Scroll Down Indicator */}
                             <button
-                                onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
+                                onClick={() => {
+                                    if (typeof document !== 'undefined') {
+                                        document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })
+                                    }
+                                }}
                                 className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce"
                                 aria-label="Devamını keşfet"
                             >
@@ -299,9 +308,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         </div>
                     </div>
                 </div>
-                {/* Scroll Down Indicator */}
-
-
 
                 {/* Scroll Anchor */}
                 <div id="content-start" className="scroll-mt-20" />
@@ -361,7 +367,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                             <button
                                                 onClick={() => {
                                                     setSelectedSubcategory(null)
-                                                    window.history.replaceState(null, '', window.location.pathname)
+                                                    if (typeof window !== 'undefined') {
+                                                        window.history.replaceState(null, '', window.location.pathname)
+                                                    }
                                                 }}
                                                 className="text-sm text-steel-gray hover:text-industrial-gray underline"
                                             >
@@ -375,9 +383,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                                 {subcategoryProducts.map(product => (
                                                     <ProductCard
                                                         key={product.id}
-                                                        product={product}
+                                                        product={mapDatabaseProductToDomain(product)}
                                                         layout="grid"
-                                                        hidePrice={!!(category.metadata as any)?.hide_price}
+                                                        hidePrice={!!category.metadata?.hide_price}
                                                     />
                                                 ))}
                                             </div>
@@ -481,9 +489,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             {filteredProducts.map(product => (
                                 <ProductCard
                                     key={product.id}
-                                    product={product}
+                                    product={mapDatabaseProductToDomain(product)}
                                     layout="grid"
-                                    hidePrice={!!(category.metadata as any)?.hide_price}
+                                    hidePrice={!!category.metadata?.hide_price}
                                 />
                             ))}
                         </div>
@@ -502,6 +510,3 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 }
 
 export default CategoryLanding
-
-
-

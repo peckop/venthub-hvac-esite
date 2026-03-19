@@ -6,8 +6,9 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 > [!IMPORTANT]
 > Ajan, her session başlangıcında veya yeni bir göreve (Task) geçerken aşağıdaki adımları **SIRAYLA** ve **EKSİKSİZ** yapmak zorundadır. Bu dosyalar sistem tarafından "otomatik verilmez", fiziksel olarak `view_file` ile okunmalıdır:
 > 1. `registry/PULSE.md`: Projenin genel nabzını ve açık görevleri gör.
-> 2. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
-> 3. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
+> 2. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
+> 3. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
+> 4. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
 
 ## 1. İletişim Standartları
 - **Dil:** Tüm iletişim (planlar, raporlar, açıklamalar) **TÜRKÇE** olmalıdır.

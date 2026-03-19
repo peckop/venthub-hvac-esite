@@ -80,7 +80,7 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
 
   // 4. DİNAMİK RENDER (Dispatcher)
   const renderView = () => {
-    const enrichedCategory = { ...category, metadata: (category.metadata as any) || {} }
+    const enrichedCategory = { ...category, metadata: category.metadata || {} }
 
     if (displayMode === 'showcase') {
       return <CategoryShowcase category={enrichedCategory} subCategories={subCategories} parentCategory={parentCategory} />
@@ -115,8 +115,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Seo
-        title={(category as any).seo_title || `${getCategoryDisplayName(category)} | VentHub`}
-        description={(category as any).seo_desc || category.description || undefined}
+        title={category.seo_title || `${getCategoryDisplayName(category)} | VentHub`}
+        description={category.seo_desc || category.description || undefined}
         canonical={canonicalUrl || undefined}
         ogImage={categoryImageUrl || undefined}
       />

@@ -55,7 +55,7 @@ export default function AccountOverviewPage() {
             .order('created_at', { ascending: false })
             .limit(50)
 
-          if (error && (error as any).code === 'PGRST100') throw error 
+          if (error && (error as unknown as { code: string }).code === 'PGRST100') throw error 
           if (data) orderData = data as unknown as ShipmentRecord[]
         } catch {
           const fallback = await supabase
@@ -65,13 +65,13 @@ export default function AccountOverviewPage() {
             .order('created_at', { ascending: false })
             .limit(50)
           if (fallback.data) {
-            orderData = (fallback.data as any[]).map(d => ({
+            orderData = (fallback.data as unknown as Record<string, unknown>[]).map(d => ({
               ...d,
               carrier: null,
               tracking_number: null,
               shipped_at: null,
               delivered_at: null
-            }))
+            })) as unknown as ShipmentRecord[]
           }
         }
 

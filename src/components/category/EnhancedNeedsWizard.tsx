@@ -7,12 +7,14 @@ import {
 } from 'lucide-react'
 import { supabase, type Product } from '../../lib/supabase'
 import { mapDatabaseProductToDomain } from '../../lib/type-converters'
-import { DbProduct } from '../../types/db-rows'
+import { DbProduct, DbJson } from '../../types/db-rows'
 import { calculateAirCurtain } from '../../lib/hvacCalculations'
 
 // Types
+type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
+
 interface WizardState {
-    step: 1 | 2 | 3 | 4 | 5 | 6
+    step: WizardStep
     usageLocation: 'entrance' | 'cold-storage' | 'industrial' | 'retail' | null
     sector: string | null
     doorWidth: number
@@ -112,9 +114,9 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                     let score = 0
                     const reason = 'Kapasite uyumu'
 
-                    const specs = p.technical_specs as any
-                    const pWidth = specs?.width ? parseFloat(specs.width) / 1000 : 0
-                    const pHeight = specs?.max_height ? parseFloat(specs.max_height) : 0
+                    const specs = p.technical_specs as Record<string, DbJson> | null
+                    const pWidth = specs?.width ? parseFloat(String(specs.width)) / 1000 : 0
+                    const pHeight = specs?.max_height ? parseFloat(String(specs.max_height)) : 0
 
                     if (pWidth >= state.doorWidth) score += 40
                     if (pHeight >= state.doorHeight) score += 30
@@ -143,8 +145,8 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
 
     if (!isOpen) return null
 
-    const nextStep = () => setState(prev => ({ ...prev, step: (prev.step + 1) as any }))
-    const prevStep = () => setState(prev => ({ ...prev, step: (prev.step - 1) as any }))
+    const nextStep = () => setState(prev => ({ ...prev, step: (prev.step + 1) as WizardStep }))
+    const prevStep = () => setState(prev => ({ ...prev, step: (prev.step - 1) as WizardStep }))
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
@@ -185,7 +187,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 {USAGE_LOCATIONS.map((loc) => (
                                     <button
                                         key={loc.id}
-                                        onClick={() => { setState(prev => ({ ...prev, usageLocation: loc.id as any })); nextStep() }}
+                                        onClick={() => { setState(prev => ({ ...prev, usageLocation: loc.id as WizardState['usageLocation'] })); nextStep() }}
                                         className="group p-6 text-left rounded-3xl border border-slate-100 bg-slate-50 hover:border-cyan-500/30 hover:bg-white hover:shadow-xl hover:shadow-cyan-500/5 transition-all duration-500"
                                     >
                                         <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mb-6 group-hover:bg-cyan-500 group-hover:text-white transition-all">
@@ -276,7 +278,7 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                                 <div className="py-20 text-center text-slate-400 animate-pulse font-black uppercase tracking-widest text-[10px]">Modeller Analiz Ediliyor...</div>
                             ) : (
                                 <div className="grid md:grid-cols-3 gap-6">
-                                    {matchedProducts.map((p: any) => (
+                                    {matchedProducts.map((p: MatchedProduct) => (
                                         <Link
                                             key={p.id}
                                             href={`/products/${p.slug || p.id}`}

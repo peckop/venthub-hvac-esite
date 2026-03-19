@@ -4,10 +4,15 @@ import { VolumeX, Zap, Activity, Info } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
 
+interface PainPoint {
+    title: string
+    description: string
+}
+
 const SilentFanProblem: React.FC = () => {
     const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
-    const tr = (key: string) => t(`categorySilentFan.problem.${key}`) as any
+    const tr = (key: string) => t(`categorySilentFan.problem.${key}`)
 
     const icons = [VolumeX, Zap, Activity, Info]
     const colors = [
@@ -17,7 +22,7 @@ const SilentFanProblem: React.FC = () => {
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 
-    const painPoints = tr('painPoints') || []
+    const painPoints = (tr('painPoints') as unknown as PainPoint[]) || []
 
     return (
         <section ref={sectionRef} className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
@@ -25,19 +30,19 @@ const SilentFanProblem: React.FC = () => {
                 {/* Section Header */}
                 <div className={`text-center mb-12 ${scrollAnimationClasses.fadeUp(isVisible)}`}>
                     <span className="text-blue-600 font-bold tracking-wider text-sm uppercase mb-2 block">
-                        {tr('eyebrow')}
+                        {String(tr('eyebrow'))}
                     </span>
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        {tr('title')}
+                        {String(tr('title'))}
                     </h2>
                     <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                        {tr('subtitle')}
+                        {String(tr('subtitle'))}
                     </p>
                 </div>
 
                 {/* Problem Cards Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
-                    {painPoints.map((point: any, index: number) => {
+                    {painPoints.map((point: PainPoint, index: number) => {
                         const Icon = icons[index % icons.length]
                         const color = colors[index % colors.length]
                         return (

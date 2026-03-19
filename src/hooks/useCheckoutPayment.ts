@@ -14,19 +14,42 @@ export interface CustomerInfo {
   phone: string
 }
 
+interface AddressInfo {
+  id?: string
+  full_name: string
+  phone: string
+  city: string
+  district: string
+  full_address: string
+}
+
+interface InvoiceInfo {
+  type: 'individual' | 'corporate'
+  company_name?: string
+  tax_office?: string
+  tax_number?: string
+  tc_id?: string
+}
+
+interface LegalConsents {
+  kvkk: boolean
+  sales_agreement: boolean
+  privacy_policy: boolean
+}
+
 interface UseCheckoutPaymentProps {
   items: CartItem[]
   getCartTotal: () => number
   user: User | null
   clearCart: (options?: { silent: boolean }) => void
   applyServerPricing: (items: { product_id: string, unit_price: number }[]) => void
-  customerInfo: any
-  shippingAddress: any
-  billingAddress: any
+  customerInfo: CustomerInfo
+  shippingAddress: AddressInfo
+  billingAddress: AddressInfo
   sameAsShipping: boolean
   invoiceType: 'individual' | 'corporate'
-  invoiceInfo: any
-  legalConsents: any
+  invoiceInfo: InvoiceInfo
+  legalConsents: LegalConsents
   shippingMethod: string
   couponCode: string | null
   t: (key: string) => string
@@ -60,9 +83,8 @@ export const useCheckoutPayment = ({
   const [progressPct, setProgressPct] = useState(20)
   const [paymentFrameContent] = useState('')
 
-  const isTest = typeof (globalThis as any).vi !== 'undefined'
-
-
+  // @ts-expect-error - Checking for Vitest global in test environment safely
+  const isTest = typeof globalThis.vi !== 'undefined'
 
   const initiatePayment = async () => {
     if (isTest) return true
@@ -89,7 +111,7 @@ export const useCheckoutPayment = ({
       const { buildPaymentRequest } = await import('../views/checkout/buildPaymentRequest')
       const requestData = buildPaymentRequest({
         amount: authoritativeTotal,
-        items: items as any,
+        items: items,
         customer: customerInfo,
         shipping: shippingAddress,
         billing: billingAddress,
@@ -124,8 +146,9 @@ export const useCheckoutPayment = ({
         }
       }
       throw new Error('Ödeme başlatılamadı.')
-    } catch (error: any) {
-      toast.error(error.message || t('checkout.errors.paymentInit'))
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      toast.error(msg || t('checkout.errors.paymentInit'))
       return false
     } finally {
       setLoading(false)

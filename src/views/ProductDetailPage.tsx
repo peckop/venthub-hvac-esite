@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getProductBySlugOrId, getProductsBySubcategory, getCategories, Product, Category } from '../lib/supabase'
-import { supabase } from '../lib/supabase'
+import { getProductBySlugOrId, getProductsBySubcategory, getCategories, type Product, type Category, supabase } from '../lib/supabase'
 import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
@@ -14,6 +13,8 @@ import { formatCurrency } from '../i18n/format'
 import LeadModal from '../components/LeadModal'
 import toast from 'react-hot-toast'
 import { generateProductDatasheet } from '../lib/pdfGenerator'
+import type { Tables } from '../types/db-rows'
+import type { CategoryMetadata } from '../types/db-rows'
 import { 
   ArrowLeft,
   ShoppingCart,
@@ -43,6 +44,8 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER
 } from '../utils/productHelpers'
+
+type DbProductImage = Tables['product_images']['Row']
 
 export interface ProductDetailPageProps {
   initialProduct?: Product | null
@@ -113,7 +116,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             .select('path, alt, sort_order')
             .eq('product_id', productData.id)
             .order('sort_order', { ascending: true })
-          const list = (imgs || []) as { path: string; alt?: string | null }[]
+          const list = (imgs as DbProductImage[] | null || []).map(img => ({
+            path: img.path,
+            alt: img.alt
+          }))
           setImages(list)
         } catch { }
         const cats = await getCategories()
@@ -157,9 +163,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       const navEl = document.getElementById('pdp-sticky-nav')
       const headerOffset = navEl ? navEl.offsetHeight + 120 : 200
       const scrollPosition = window.scrollY + headerOffset
-      const sectionOffsets = Object.entries(sectionRefs.current).map(([id, ref]) => {
+      const sectionOffsets = Object.entries(sectionRefs.current).map(([sectionId, ref]) => {
         if (!ref) return null
-        return { id, top: ref.offsetTop, bottom: ref.offsetTop + ref.offsetHeight }
+        return { id: sectionId, top: ref.offsetTop, bottom: ref.offsetTop + ref.offsetHeight }
       }).filter(Boolean) as { id: string, top: number, bottom: number }[]
       for (const section of sectionOffsets) {
         if (scrollPosition >= section.top && scrollPosition < section.bottom) {
@@ -271,6 +277,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const canonicalUrl = `${origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
+  const categoryMetadata = mainCategory?.metadata as CategoryMetadata | null
+
   return (
     <div className="min-h-screen bg-slate-50/30">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
@@ -334,7 +342,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 images={images}
                 productName={product.name}
                 slug={product.slug || product.name}
-                modelType={(mainCategory?.metadata as any)?.model_type}
+                modelType={categoryMetadata?.model_type}
               />
               {topicSlug === 'hava-perdesi' && (
                 <div className="absolute top-6 left-6 z-20 pointer-events-none">
@@ -397,13 +405,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
-                      {(mainCategory?.metadata as any)?.hide_price ? (
+                      {categoryMetadata?.hide_price ? (
                         <span className="text-xl text-industrial-gray font-bold">{t('common.requestQuote') || 'Teklif İste'}</span>
                       ) : (
                         formatCurrency(product.price, lang, { maximumFractionDigits: 0 })
                       )}
                     </div>
-                    {!(mainCategory?.metadata as any)?.hide_price && (
+                    {!categoryMetadata?.hide_price && (
                       <span className="text-[9px] font-bold text-steel-gray uppercase mt-1">
                         {t('pdp.vatIncluded')}
                       </span>
@@ -435,7 +443,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
 
                 {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
-                  {(mainCategory?.metadata as any)?.hide_price ? (
+                  {categoryMetadata?.hide_price ? (
                     <button
                       onClick={() => setLeadOpen(true)}
                       className="w-full bg-industrial-gray hover:bg-primary-navy text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md flex items-center justify-center space-x-3 group"
@@ -583,7 +591,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               <div className="flex flex-col items-end mr-2">
                 <span className="text-[10px] font-black text-industrial-gray line-clamp-1 max-w-[120px] uppercase tracking-tight">{product.name}</span>
                 <span className="text-[10px] text-primary-navy font-black tracking-widest">
-                  {(mainCategory?.metadata as any)?.hide_price ? 'TEKLİF AL' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                  {categoryMetadata?.hide_price ? 'TEKLİF AL' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                 </span>
               </div>
               
@@ -655,7 +663,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
                               <span className="text-[10px] font-bold text-steel-gray uppercase tracking-[0.2em]">Listing Price</span>
                               <span className="text-lg font-black text-primary-navy">
-                                {(mainCategory?.metadata as any)?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
+                                {categoryMetadata?.hide_price ? 'TEKLİF ALIN' : formatCurrency(product.price, lang, { maximumFractionDigits: 0 })}
                               </span>
                             </div>
                           </div>
@@ -688,7 +696,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     <div className="col-span-full bg-white rounded-3xl p-6 sm:p-10 border border-light-gray shadow-sm">
                       {product.technical_specs ? (
                         <div className="space-y-4">
-                          {Object.entries(groupTechnicalSpecs(product.technical_specs as any) || {}).map(([groupKey, group]) => {
+                          {Object.entries(groupTechnicalSpecs(product.technical_specs) || {}).map(([groupKey, group]) => {
                             const isOpen = openSpecSections.includes(groupKey);
                             const Icon = group.icon;
                             return (
@@ -705,7 +713,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-[10px] font-bold text-steel-gray uppercase tracking-wider">{translateSpecKey(key)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val as string | number)}</span>
                                       </div>
                                     ))}
                                   </div>

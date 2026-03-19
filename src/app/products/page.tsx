@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react'
 import ProductsPage from '../../views/ProductsPage'
 import ProductsSkeleton from '../../components/products/ProductsSkeleton'
-import { getCategories, getProductsEnriched } from '../../lib/supabase'
+import { getCategories, getProductsEnriched, type Product } from '../../lib/supabase'
+import type { DbCategory } from '../../types/db-rows'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +10,7 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-function getAllDescendantIds(categories: any[], rootId: string): string[] {
+function getAllDescendantIds(categories: DbCategory[], rootId: string): string[] {
   let ids = [rootId]
   const children = categories.filter(c => c.parent_id === rootId)
   for (const child of children) {
@@ -32,10 +33,10 @@ export default async function Page({ searchParams }: PageProps) {
   const isAll = params.all === 'true'
   const hasFilters = catParam || brandsParam.length > 0 || minPriceParam || maxPriceParam || qParam
 
-  let initialProducts: any[] = []
+  let initialProducts: Product[] = []
 
   if (hasFilters) {
-    const categoryIds = catParam ? getAllDescendantIds(categories, catParam) : undefined
+    const categoryIds = catParam ? getAllDescendantIds(categories as unknown as DbCategory[], catParam) : undefined
     initialProducts = await getProductsEnriched({
       searchQuery: qParam || undefined,
       categoryIds,
