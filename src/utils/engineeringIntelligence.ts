@@ -120,7 +120,7 @@ export const getMotorInference = (motorType?: string): EngineeringInference | nu
  */
 export const generateEngineeringSummary = (product: Product): EngineeringInference[] => {
   const inferences: EngineeringInference[] = [];
-  const specs = isRecord(product.technical_specs) ? (product.technical_specs as Record<string, any>) : {};
+  const specs = isRecord(product.technical_specs) ? (product.technical_specs as Record<string, unknown>) : {};
 
   // 1. Ses Analizi
   if (product.noise_level) {

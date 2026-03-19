@@ -41,6 +41,7 @@ mockedSupabase.from.mockImplementation((table: string) => {
       return callback({ data: [], error: null })
     })
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return chain as any
 })
 
