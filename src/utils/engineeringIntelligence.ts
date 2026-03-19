@@ -129,10 +129,10 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
   }
 
   // 2. Verimlilik Analizi (technical_specs içinden)
-  const efficiencyValue = specs.efficiency || specs.verimlilik || specs.isi_gerikazanım_verimi;
+  const efficiencyValue = specs.efficiency || specs.verilik || specs.isi_gerikazanım_verimi;
   if (efficiencyValue) {
     const numericEff = typeof efficiencyValue === 'string' 
-      ? parseFloat(efficiencyValue.replace(/[^0-9.]/g, '')) 
+      ? parseFloat(String(efficiencyValue).replace(/[^0-9.]/g, '')) 
       : Number(efficiencyValue);
     
     if (!isNaN(numericEff)) {
