@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19 13:14:40",
+  "generated_at": "2026-03-19 15:57:02",
   "tasks": {
     "P00-Standalone/000": {
       "id": "000",
@@ -23,7 +23,7 @@
       "id": "033",
       "project": "P00-Standalone",
       "state": "active",
-      "path": "registry/P00-Standalone/active/033-teknik-borc-temizligi-ve-edge-gorevleri/033-teknik-borc-temizligi-ve-edge-gorevleri.md"
+      "path": "registry/P00-Standalone/active/033-technical-debt-cleanup-and-full-type-int/033-technical-debt-cleanup-and-full-type-int.md"
     },
     "P00-Standalone/004": {
       "id": "004",
@@ -115,6 +115,12 @@
       "state": "backlog",
       "path": "registry/P01-Visual-Page-Builder/backlog/017-gorsel-sayfa-olusturucu-visual-page-buil/017-gorsel-sayfa-olusturucu-visual-page-buil.md"
     },
+    "P01-Visual-Page-Builder/000": {
+      "id": "000",
+      "project": "P01-Visual-Page-Builder",
+      "state": "active",
+      "path": "registry/P01-Visual-Page-Builder/active/000-roadmap/000-roadmap.md"
+    },
     "P01-Visual-Page-Builder/008": {
       "id": "008",
       "project": "P01-Visual-Page-Builder",
@@ -145,6 +151,12 @@
       "state": "completed",
       "path": "registry/P01-Visual-Page-Builder/completed/007-technical-intelligence-layer-enhancement/007-technical-intelligence-layer-enhancement.md"
     },
+    "P02-Core-Quality-Guardians/000": {
+      "id": "000",
+      "project": "P02-Core-Quality-Guardians",
+      "state": "active",
+      "path": "registry/P02-Core-Quality-Guardians/active/000-roadmap/000-roadmap.md"
+    },
     "P02-Core-Quality-Guardians/001": {
       "id": "001",
       "project": "P02-Core-Quality-Guardians",
@@ -168,6 +180,18 @@
       "project": "P03-NextGen-3D-Experience",
       "state": "backlog",
       "path": "registry/P03-NextGen-3D-Experience/backlog/001-3d-infrastructure-and-research/001-3d-infrastructure-and-research.md"
+    },
+    "P03-NextGen-3D-Experience/000": {
+      "id": "000",
+      "project": "P03-NextGen-3D-Experience",
+      "state": "active",
+      "path": "registry/P03-NextGen-3D-Experience/active/000-roadmap/000-roadmap.md"
+    },
+    "P04-Category-Architecture/000": {
+      "id": "000",
+      "project": "P04-Category-Architecture",
+      "state": "active",
+      "path": "registry/P04-Category-Architecture/active/000-roadmap/000-roadmap.md"
     },
     "P04-Category-Architecture/005": {
       "id": "005",
@@ -229,6 +253,12 @@
       "state": "completed",
       "path": "registry/P05-Next15-Modernization/completed/002-react-19-auth-modernizasyonu-server-acti/002-react-19-auth-modernizasyonu-server-acti.md"
     },
+    "P06-System-Intelligence-Registry/000": {
+      "id": "000",
+      "project": "P06-System-Intelligence-Registry",
+      "state": "active",
+      "path": "registry/P06-System-Intelligence-Registry/active/000-roadmap/000-roadmap.md"
+    },
     "P06-System-Intelligence-Registry/001": {
       "id": "001",
       "project": "P06-System-Intelligence-Registry",
@@ -258,24 +288,6 @@
       "project": "P06-System-Intelligence-Registry",
       "state": "completed",
       "path": "registry/P06-System-Intelligence-Registry/completed/005-registry-v7-atomik-butunluk-ve-indeks-on/005-registry-v7-atomik-butunluk-ve-indeks-on.md"
-    },
-    "P07-Autonomous-Skills-Factory/001": {
-      "id": "001",
-      "project": "P07-Autonomous-Skills-Factory",
-      "state": "active",
-      "path": "registry/P07-Autonomous-Skills-Factory/active/001-skills-factory-otonom-yetenek-havuzu-alt/001-skills-factory-otonom-yetenek-havuzu-alt.md"
-    },
-    "P99-V7-Sertifikasyon-Protokol/000": {
-      "id": "000",
-      "project": "P99-V7-Sertifikasyon-Protokol",
-      "state": "active",
-      "path": "registry/P99-V7-Sertifikasyon-Protokol/active/000-v7-certification-roadmap/000-v7-certification-roadmap.md"
-    },
-    "P99-V7-Sertifikasyon-Protokol/001": {
-      "id": "001",
-      "project": "P99-V7-Sertifikasyon-Protokol",
-      "state": "completed",
-      "path": "registry/P99-V7-Sertifikasyon-Protokol/completed/001-v7-hassas-test/001-v7-hassas-test.md"
     }
   }
 }

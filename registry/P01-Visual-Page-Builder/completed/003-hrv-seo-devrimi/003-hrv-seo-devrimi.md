@@ -16,9 +16,69 @@ artifacts:
 ## 🎯 Hedef
 Isı Geri Kazanım Cihazları (HRV) kategorisini, VentHub'ın mühendislik otoritesini yansıtacak şekilde baştan aşağı yenilemek. 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [x] **Beyin Fırtınası:** HRV stratejisi ve içerik teması belirlendi.
-- [x] **Planlama:** Veri giriş ve görselleştirme planı hazırlandı.
-- [x] **İçerik Hazırlığı:** Teknik metinler ve kıyaslama verileri oluşturuldu.
-- [x] **DB Update:** HRV kategorisinin `authority_content`, `seo_title` ve `seo_desc` alanları veritabanında mühürlendi.
-- [x] **Validation:** Sayfanın dinamik motor üzerinden doğru render edildiği doğrulandı.
+- [ ] HRV için marka mirası metinlerini hazırla (Avens & Vortice vurgulu).
+- [ ] "Isı Transferi", "İç Hava Kalitesi" ve "EC Fan" teknik noktalarını detaylandır.
+- [ ] Enerji tasarruf grafiği için değerleri netleştir (%90 vs %0).
+- [ ] Hazırlanan JSON verisini `isi-geri-kazanim-cihazlari` slug'ına sahip kategoriye SQL ile mühürle.
+- [ ] Kolon: `authority_content` (006'da oluşturuldu).
+- [ ] HRV kategori sayfasını (`/category/isi-geri-kazanim-cihazlari`) ziyaret ederek dinamik blokların (Brand, Technical, Problem) doğru render edildiğini kontrol et.
+- [ ] Responsive görünümü ve ikon uyumunu test et.
+- [ ] Kategorinin `seo_title` ve `seo_desc` alanlarını veritabanında güncelle.
+- [ ] Sayfada H1-H4 hiyerarşisinin içeriğe uygunluğunu doğrula.

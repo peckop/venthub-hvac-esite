@@ -12,7 +12,7 @@ started_at: "2026-03-19 02:36:06"
 status: Completed
 progress: 100%
 completed_at: "2026-03-19 02:37:13"
-updated_at: "2026-03-19 13:22:04"
+updated_at: "2026-03-19 23:10:25"
 ---
 
 
@@ -23,8 +23,65 @@ updated_at: "2026-03-19 13:22:04"
 ## 🎯 Hedef
 Registry'deki görevlerin `depends_on` alanlarını tarayarak, hangi görevin hangisini beklediğini gösteren görsel bir tablo (veya ASCII graph) üretmek. Bu, projenin kritik yolunu (critical path) görmemizi sağlar.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ✅ Alt Görevler
-- [x] `manage_registry.py` aracına `graph` komutu eklendi.
-- [x] Tüm projeleri tarayıp bağımlılık ağacını (Directed Acyclic Graph) oluşturan mantık yazıldı.
-- [x] Bağımlılıkları ASCII ve Mermaid.js formatında çıktı veren jeneratör eklendi.
-- [x] Statü renkleri ve hiyerarşik yapı görselleştirildi.
+- [ ] `manage_registry.py` dosyasına `graph` komutu ve argümanları eklendi.
+- [ ] Tüm projeleri tarayan ve `depends_on` verilerini toplayan veri motoru yazıldı.
+- [ ] Toplanan verileri Mermaid.js formatına dönüştüren jeneratör kodlandı.
+- [ ] Terminal çıktısında ASCII tabanlı bir görselleştirme modu eklendi.
+- [ ] Döngüsel bağımlılık kontrolü (Circular Check) algoritması entegre edildi.

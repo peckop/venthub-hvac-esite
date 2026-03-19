@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 13:22:02"
+updated_at: "2026-03-19 23:10:24"
 id: 012
 title: "Medya Otoritesi (Media Authority)"
 status: "Planning"

@@ -4,11 +4,11 @@
 Genel ürün listesi sayfasını Gateway mimarisine dahil ederek projedeki mükerrer kodları temizlemek.
 
 ## ✅ Alt Görevler
-- [ ] `src/app/products/page.tsx` analizini tamamla.
-- [ ] `useCategoryGateway` hook'unu kategori bağımsız ürün çekimi için optimize et.
-- [ ] `src/views/ProductsPage.tsx` dosyasını yeni mimariye (GridView) dönüştür.
-- [ ] Eski ürün listeleme bileşenlerini temizle.
-- [ ] Final `tsc` ve `lint` kontrolünden geç.
+- [x] `src/app/products/page.tsx` analizini tamamla.
+- [x] `useCategoryGateway` hook'unu kategori bağımsız ürün çekimi için optimize et.
+- [x] `src/views/ProductsPage.tsx` dosyasını yeni mimariye (GridView) dönüştür.
+- [x] Eski ürün listeleme bileşenlerini temizle.
+- [x] Final `tsc` ve `lint` kontrolünden geç.
 
 ## 🏗️ Uygulama Adımları
 ### Step 1: Keşif
