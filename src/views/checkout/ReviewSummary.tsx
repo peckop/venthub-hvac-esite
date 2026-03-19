@@ -1,29 +1,21 @@
 import React from 'react'
 import { useI18n } from '@/i18n/I18nProvider'
 
-export interface CustomerInfo {
-  name: string
-  email: string
-  phone: string
-}
-export interface AddressInfo {
-  fullAddress: string
-  city: string
-  district: string
-  postalCode: string
-}
+import { 
+  CheckoutCustomerInfo, 
+  CheckoutAddressInfo, 
+  CheckoutInvoiceInfo 
+} from '../../types/db-rows'
+
 export type InvoiceType = 'individual' | 'corporate'
-export interface InvoiceInfoIndividual { tckn?: string }
-export interface InvoiceInfoCorporate { companyName?: string; vkn?: string; taxOffice?: string; eInvoice?: boolean }
-export type InvoiceInfo = Partial<InvoiceInfoIndividual & InvoiceInfoCorporate>
 
 export interface ReviewSummaryProps {
-  customer: CustomerInfo
-  shipping: AddressInfo
-  billing: AddressInfo
+  customer: CheckoutCustomerInfo
+  shipping: CheckoutAddressInfo
+  billing: CheckoutAddressInfo
   sameAsShipping: boolean
   invoiceType: InvoiceType
-  invoiceInfo: InvoiceInfo
+  invoiceInfo: CheckoutInvoiceInfo
   onEditPersonal: () => void
   onEditShipping: () => void
   onEditBilling: () => void
@@ -64,7 +56,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
             <button type="button" className="text-xs text-primary-navy hover:underline" onClick={onEditShipping}>{t('checkout.review.edit')}</button>
           </div>
           <div className="text-sm text-steel-gray whitespace-pre-line">
-            {shipping.fullAddress + '\n' + shipping.district + ', ' + shipping.city + ' ' + shipping.postalCode}
+            {(shipping.fullAddress || shipping.full_address || '') + '\n' + shipping.district + ', ' + shipping.city + ' ' + (shipping.postalCode || shipping.postal_code || '')}
           </div>
         </div>
         {!sameAsShipping && (
@@ -74,7 +66,7 @@ const ReviewSummary: React.FC<ReviewSummaryProps> = ({
               <button type="button" className="text-xs text-primary-navy hover:underline" onClick={onEditBilling}>{t('checkout.review.edit')}</button>
             </div>
             <div className="text-sm text-steel-gray whitespace-pre-line">
-              {billing.fullAddress + '\n' + billing.district + ', ' + billing.city + ' ' + billing.postalCode}
+              {(billing.fullAddress || billing.full_address || '') + '\n' + billing.district + ', ' + billing.city + ' ' + (billing.postalCode || billing.postal_code || '')}
             </div>
           </div>
         )}

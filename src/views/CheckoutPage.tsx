@@ -29,6 +29,7 @@ import AddressSelectModal from './checkout/AddressSelectModal'
 import { getTranslationWithFallback } from '../utils/checkoutHelpers'
 import { useCheckoutCoupon } from '../hooks/useCheckoutCoupon'
 import { useCheckoutPayment } from '../hooks/useCheckoutPayment'
+// No local type imports needed as we use Checkout types from db-rows
 
 export const CheckoutPage: React.FC = () => {
   const { items, getCartTotal, clearCart, applyServerPricing } = useCart()
@@ -42,14 +43,20 @@ export const CheckoutPage: React.FC = () => {
     name: '', firstName: '', lastName: '', email: '', phone: '', identityNumber: ''
   })
   const [shippingAddress, setShippingAddress] = useState<CheckoutAddressInfo>({
-    full_name: '', phone: '', full_address: '', city: '', district: '', postalCode: ''
+    full_name: '', phone: '', full_address: '', fullAddress: '', city: '', district: '', postalCode: '', postal_code: ''
   })
   const [billingAddress, setBillingAddress] = useState<CheckoutAddressInfo>({
-    full_name: '', phone: '', full_address: '', city: '', district: '', postalCode: ''
+    full_name: '', phone: '', full_address: '', fullAddress: '', city: '', district: '', postalCode: '', postal_code: ''
   })
 
   const [invoiceType, setInvoiceType] = useState<'individual' | 'corporate'>('individual')
-  const [invoiceInfo, setInvoiceInfo] = useState<CheckoutInvoiceInfo>({ type: 'individual', tckn: '' })
+  const [invoiceInfo, setInvoiceInfo] = useState<CheckoutInvoiceInfo>({ 
+    type: 'individual', 
+    tckn: '', 
+    companyName: '', 
+    taxOffice: '', 
+    taxNumber: '' 
+  })
   const [legalConsents, setLegalConsents] = useState<CheckoutLegalConsents>({ 
     kvkk: false, 
     sales_agreement: false, 
@@ -147,7 +154,8 @@ export const CheckoutPage: React.FC = () => {
   }
 
   const validateAddress = (address: CheckoutAddressInfo) => {
-    if (!address.full_address.trim()) return !!toast.error(t('checkout.errors.addressRequired'))
+    const full = (address.full_address || address.fullAddress || '').trim()
+    if (!full) return !!toast.error(t('checkout.errors.addressRequired'))
     if (!address.city.trim() || !address.district.trim()) return !!toast.error(t('checkout.errors.locationRequired'))
     return true
   }
@@ -217,17 +225,17 @@ export const CheckoutPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
-              {step === 1 && <StepCustomerInfo customerInfo={customerInfo as unknown as Record<string, unknown>} setCustomerInfo={setCustomerInfo as unknown as (v: any) => void} t={t} />}
+              {step === 1 && <StepCustomerInfo customerInfo={customerInfo} setCustomerInfo={setCustomerInfo} t={t} />}
               
               {step === 2 && (
                 <StepAddressInfo
-                  shippingAddress={shippingAddress as unknown as Record<string, unknown>} setShippingAddress={setShippingAddress as unknown as (v: any) => void}
-                  billingAddress={billingAddress as unknown as Record<string, unknown>} setBillingAddress={setBillingAddress as unknown as (v: any) => void}
+                  shippingAddress={shippingAddress} setShippingAddress={setShippingAddress}
+                  billingAddress={billingAddress} setBillingAddress={setBillingAddress}
                   sameAsShipping={sameAsShipping} setSameAsShipping={setSameAsShipping}
                   shippingMethod={shippingMethod} setShippingMethod={setShippingMethod}
                   invoiceType={invoiceType} setInvoiceType={setInvoiceType}
-                  invoiceInfo={invoiceInfo as unknown as Record<string, unknown>} setInvoiceInfo={setInvoiceInfo as unknown as (v: any) => void}
-                  legalConsents={legalConsents as unknown as Record<string, unknown>} setLegalConsents={setLegalConsents as unknown as (v: any) => void}
+                  invoiceInfo={invoiceInfo} setInvoiceInfo={setInvoiceInfo}
+                  legalConsents={legalConsents} setLegalConsents={setLegalConsents}
                   savedAddresses={savedAddresses}
                   onOpenAddressModal={(target) => { setAddressPickTarget(target); setShowAddressModal(true) }}
                   onOpenInvoiceModal={async () => {
@@ -239,8 +247,8 @@ export const CheckoutPage: React.FC = () => {
 
               {step === 3 && (
                 <ReviewSummary
-                  customer={customerInfo as unknown as Record<string, unknown>} shipping={shippingAddress as unknown as Record<string, unknown>} billing={billingAddress as unknown as Record<string, unknown>}
-                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo as unknown as Record<string, unknown>}
+                  customer={customerInfo} shipping={shippingAddress} billing={billingAddress}
+                  sameAsShipping={sameAsShipping} invoiceType={invoiceType} invoiceInfo={invoiceInfo}
                   onEditPersonal={() => setStep(1)} 
                   onEditShipping={() => setStep(2)}
                   onEditBilling={() => setStep(2)}
