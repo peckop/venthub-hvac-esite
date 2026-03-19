@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 12:50:43"
+updated_at: "2026-03-19 13:00:03"
 id: 017
 title: "Görsel Sayfa Oluşturucu (Visual Page Builder)"
 status: "Planning"
