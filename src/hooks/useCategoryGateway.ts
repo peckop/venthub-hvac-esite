@@ -93,8 +93,8 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
           subs = allCategories
             .filter(c => c.parent_id === targetCategoryRow!.id)
             .sort((a, b) => {
-              const orderA = (a.metadata as Record<string, any>)?.sort_order ?? 0
-              const orderB = (b.metadata as Record<string, any>)?.sort_order ?? 0
+              const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
+              const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
               return orderA !== orderB ? orderA - orderB : a.name.localeCompare(b.name)
             })
           setSubCategories(toUICategoryList(subs))

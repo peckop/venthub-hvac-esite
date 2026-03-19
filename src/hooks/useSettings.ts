@@ -1,70 +1,63 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 
-export interface SiteSettings {
-  general: {
-    site_name: string
-    tagline: string
-    contact_email: string
-    support_phone: string
-    headquarters: string
-    logo_url: string | null
-  }
-  payment: {
-    iyzico_mode: 'sandbox' | 'production'
-    iyzico_api_key: string
-    iyzico_secret_key: string
-    iyzico_enabled: boolean
-  }
+export interface AppSettings {
+  id: string
+  site_title: string
+  site_description: string
+  contact_email: string
+  contact_phone: string
+  contact_address: string
+  social_links: Record<string, string>
+  maintenance_mode: boolean
+  google_analytics_id: string | null
+  footer_text: string
+  header_announcement: string | null
+  default_meta_image: string | null
+  brand_logo_url: string | null
+  whatsapp_number: string | null
+  updated_at: string
 }
 
 export function useSettings() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null)
+  const [settings, setSettings] = useState<AppSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchSettings = async () => {
-    try {
-      setLoading(true)
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('key, value')
-
-      if (error) throw error
-
-      const settingsObj: Record<string, unknown> = {}
-      data?.forEach(item => {
-        settingsObj[item.key] = item.value
-      })
-
-      setSettings(settingsObj as unknown as SiteSettings)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateSettings = async (key: keyof SiteSettings, value: unknown) => {
-    try {
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({ key, value: value as any, updated_at: new Date().toISOString() }, { onConflict: 'key' })
-
-      if (error) throw error
-      
-      setSettings(prev => prev ? { ...prev, [key]: value as any } : null)
-      return { success: true }
-    } catch (err) {
-      return { success: false, error: err instanceof Error ? err.message : 'Unknown error' }
-    }
-  }
-
   useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('app_settings')
+          .select('*')
+          .single()
+
+        if (fetchError) throw fetchError
+        setSettings(data as AppSettings)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : String(err))
+      } finally {
+        setLoading(false)
+      }
+    }
+
     fetchSettings()
   }, [])
 
-  return { settings, loading, error, updateSettings, refresh: fetchSettings }
+  return { settings, loading, error }
+}
+
+export function useSetting<T>(key: keyof AppSettings, fallback: T): T {
+  const { settings, loading } = useSettings()
+
+  const value = useMemo(() => {
+    if (loading || !settings) return fallback;
+    const val = settings[key];
+    if (val === undefined || val === null) return fallback;
+    return val as unknown as T;
+  }, [settings, key, fallback, loading]);
+
+  return value
 }

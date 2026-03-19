@@ -78,6 +78,7 @@ export const FinalCTA: React.FC<FinalCTAProps> = ({ onQuoteClick }) => {
               type="button"
               onClick={() => {
                 if (onQuoteClick) onQuoteClick();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 else if (typeof window !== "undefined") (window as any).openLeadModal?.();
               }}
               className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] active:scale-95"

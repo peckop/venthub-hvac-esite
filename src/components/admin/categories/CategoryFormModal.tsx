@@ -81,9 +81,13 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: cat.is_featured ?? false,
                 sort_order: cat.sort_order ?? 0,
                 image_url: cat.image_url,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 metric1_value: ((metadata?.metric1 as any)?.value) || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 metric1_label: ((metadata?.metric1 as any)?.label) || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 metric2_value: ((metadata?.metric2 as any)?.value) || '',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 metric2_label: ((metadata?.metric2 as any)?.label) || ''
             })
 

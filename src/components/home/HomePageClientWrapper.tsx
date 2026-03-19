@@ -13,7 +13,9 @@ export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window as any).openLeadModal = () => setLeadOpen(true)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return () => { (window as any).openLeadModal = undefined }
   }, [])
 
