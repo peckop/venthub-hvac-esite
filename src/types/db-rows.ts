@@ -64,7 +64,7 @@ export interface CategoryMetadata {
     mobile?: string;
   }>;
   display_mode?: string;
-  [key: string]: Json | undefined; 
+  [key: string]: Json | AuthorityContent | undefined; 
 }
 
 // Common Table Row Aliases
@@ -77,7 +77,7 @@ export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description
   name: string;
   description: string | null;
   metadata: CategoryMetadata | null;
-  authority_content: AuthorityContent | Json | null;
+  authority_content: AuthorityContent | null;
 };
 
 export type DbUserAddress = Tables['user_addresses']['Row'];

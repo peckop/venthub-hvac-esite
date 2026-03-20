@@ -68,6 +68,9 @@ export interface MediaBlock extends BaseAuthorityBlock {
     mediaId: string; // P01-012 Medya Otoritesi ile eşleşen ID
     mediaType: 'video' | '3d' | 'drawing' | 'image';
     aspectRatio?: '16:9' | '4:3' | '1:1' | '21:9';
+    provider?: string;
+    format?: string;
+    category?: string;
     autoPlay?: boolean;
     loop?: boolean;
     muted?: boolean;
