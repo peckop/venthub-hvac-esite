@@ -1,7 +1,11 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 20.03.2026 17:25 | **İlerleme:** %65
+> **Güncelleme:** 21.03.2026 00:54 | **İlerleme:** %64
 
 ## 📁 P00-STANDALONE
+### ⚡ Aktif Görevler
+| ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
+|:---|:---|:---|:---|:---|
+| `999`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
@@ -14,7 +18,7 @@
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 | `018`  | Tüm Ana Kategoriler için Series Dönüşümü      | ➖ -          | 🏗️ RUN       | `0%`       |
 | `008`  | B2B Hiyerarşisi ve Yetkilendirme              | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
 | `009`  | Gelişmiş Fiyatlandırma Motoru                 | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
@@ -30,13 +34,13 @@
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
 ## 📁 P03-NEXTGEN-3D-EXPERIENCE
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
@@ -47,13 +51,13 @@
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
 ## 📁 P05-NEXT15-MODERNIZATION
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
@@ -65,5 +69,5 @@
 ### ⚡ Aktif Görevler
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      | DURUM        | İLERLEME   |
 |:---|:---|:---|:---|:---|
-| `000`  | Başlıksız                                     | ⚡ MED        | 📝 PLAN       | `0%`       |
+| `000`  | Eksik Başlık (MD dosyasını kontrol edin)      | ⚡ MED        | 📝 PLAN       | `0%`       |
 
