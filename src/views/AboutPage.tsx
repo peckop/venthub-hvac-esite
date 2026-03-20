@@ -51,14 +51,14 @@ const AboutPage: React.FC = () => {
       {/* Cinematic Hero */}
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src="/images/hvac_installation_close_up_premium_3.png" 
-            alt="VentHub Engineering" 
-            fill 
-            className="object-cover opacity-30 grayscale brightness-50" 
+          <Image
+            src="/images/hvac_installation_close_up_premium_3.png"
+            alt="VentHub Engineering"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-30 grayscale brightness-50"
             priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
+          />          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/60 to-slate-950" />
         </div>
 
         <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -125,6 +125,7 @@ const AboutPage: React.FC = () => {
                 src="/images/ekran/homepage beğendiğim yapı.png" 
                 alt="VentHub Story" 
                 fill 
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
               />
               <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
@@ -149,7 +150,13 @@ const AboutPage: React.FC = () => {
                 <div className="flex -space-x-4">
                   {[1, 2, 3, 4].map(i => (
                     <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden relative">
-                      <Image src={`/images/hvac_installation_close_up_premium_${i}.png`} alt="Team" fill className="object-cover" />
+                      <Image 
+                        src={`/images/hvac_installation_close_up_premium_3.png`} 
+                        alt="Team" 
+                        fill 
+                        sizes="48px"
+                        className="object-cover" 
+                      />
                     </div>
                   ))}
                 </div>

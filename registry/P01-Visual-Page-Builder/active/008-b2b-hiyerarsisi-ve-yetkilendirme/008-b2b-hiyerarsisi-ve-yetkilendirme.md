@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:21:15"
+updated_at: "2026-03-20 17:25:27"
 id: 008
 title: "B2B Hiyerarşisi ve Yetkilendirme"
 status: "Executing"
@@ -55,66 +55,8 @@ artifacts:
 ## 🎯 Hedef
 Bayi, proje ve son kullanıcı bazlı farklı içerik ve fiyat gösterimi için dinamik hiyerarşiyi kurmak.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## ✅ Alt Görevler
-- [ ] `src/components/category/sections/silent-fan/` altındaki bileşenlerin incelenip "Universal" şablon parametrelerinin belirlenmesi.
+- [x] `src/components/category/sections/silent-fan/` altındaki bileşenlerin incelenip "Universal" şablon parametrelerinin belirlenmesi.
 - [ ] SEO Otoritesi için gerekli olan "Question-Answer" (FAQ) ve "Problem-Solution" veri yapısının (Schema) `STATIC_CATEGORY_METADATA`'ya eklenmesi.
 - [ ] `src/components/category/universal/` klasörünün oluşturulması.
 - [ ] `UniversalProblemSection.tsx`: Her kategori için metin ve görselleri metadata'dan alan yapı.

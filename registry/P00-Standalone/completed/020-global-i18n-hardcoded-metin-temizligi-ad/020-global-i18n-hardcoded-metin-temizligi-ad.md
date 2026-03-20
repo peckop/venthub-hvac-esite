@@ -1,5 +1,5 @@
 ---
-updated_at: "2026-03-19 23:21:15"
+updated_at: "2026-03-20 17:24:01"
 id: 020
 title: "Global i18n & Hardcoded Metin Temizliği (Admin & Calculators)"
 status: "Completed"
@@ -13,64 +13,6 @@ artifacts:
 ---
 
 # 020 - Global i18n & Hardcoded Metin Temizliği
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## ✅ Alt Görevler
 - [x] `src/views/admin/` dizinindeki tüm metinlerin envanterini çıkar.

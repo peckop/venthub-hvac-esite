@@ -1,5 +1,5 @@
-﻿---
-updated_at: "2026-03-19 16:05:55"
+---
+updated_at: "2026-03-20 17:24:01"
 id: 022
 title: "Registry Evrimi: Otonom Kapı Muhafızı ve Snapshots"
 status: "Completed"
@@ -16,64 +16,6 @@ artifacts:
 
 ## 🎯 Hedef
 manage_registry.py sistemine bağımlılık kontrolü (Dependency Gatekeeper) ve geçmiş yedekleme (Snapshots) yetenekleri eklemek.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## ✅ Alt Görevler
 - [ ] `manage_registry.py` içindeki `import` ve global değişkenleri (`PROJECT_ROOT`, `REGISTRY_DIR`) standartlaştır.

@@ -11,7 +11,7 @@ artifacts:
 status: Completed
 progress: 100%
 completed_at: "2026-03-18 19:14:32"
-updated_at: "2026-03-19 23:21:19"
+updated_at: "2026-03-20 17:24:02"
 ---
 
 
@@ -20,64 +20,6 @@ updated_at: "2026-03-19 23:21:19"
 
 ## 🎯 Hedef
 Next.js 15 geçişi için temel altyapı hazırlıklarını yapmak, güvenliği `server-only` ile pekiştirmek ve dinamik rotalarda async params yapısına geçmek.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## ✅ Alt Görevler
 - [x] `pnpm run build` komutuyla `server-only` ihlali olup olmadığı kontrol edildi.
