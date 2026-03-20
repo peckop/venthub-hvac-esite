@@ -4,12 +4,14 @@ import React from 'react';
 import { 
   AuthorityContent, 
   HeroBlock as HeroBlockType, 
-  SpecsBlock as SpecsBlockType 
+  SpecsBlock as SpecsBlockType,
+  MediaBlock as MediaBlockType,
+  RichTextBlock as RichTextBlockType
 } from '@/types/authority';
 import { cn } from '@/lib/utils';
-import { VideoAuthority } from './VideoAuthority';
-import { ThreeDAuthority } from './ThreeDAuthority';
-import { TechnicalDrawingAuthority } from './TechnicalDrawingAuthority';
+import VideoAuthority from './VideoAuthority';
+import ThreeDAuthority from './ThreeDAuthority';
+import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
 
 // --- BLOK BİLEŞENLERİ ---
 
@@ -74,10 +76,6 @@ const SpecsBlock: React.FC<{ block: SpecsBlockType }> = ({ block }) => (
 
 // --- RENDERER ANA BİLEŞEN ---
 
-/**
- * @component AuthorityRenderer
- * @description JSON tabanlı otorite içeriğini görsel bloklara dönüştüren ana motor.
- */
 export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> = ({ content }) => {
   if (!content || !Array.isArray(content) || content.length === 0) return null;
 
@@ -88,61 +86,76 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
 
         switch (block.type) {
           case 'hero':
-            return <HeroBlock key={block.id} block={block} />;
+            return <HeroBlock key={block.id} block={block as HeroBlockType} />;
           
           case 'specs':
-            return <SpecsBlock key={block.id} block={block} />;
+            return <SpecsBlock key={block.id} block={block as SpecsBlockType} />;
           
-          case 'media':
+          case 'media': {
+            const mediaBlock = block as MediaBlockType;
             return (
-              <div key={block.id} className={cn(
+              <div key={mediaBlock.id} className={cn(
                 "py-12 px-6",
-                block.config?.fullWidth ? "w-full" : "max-w-7xl mx-auto"
+                mediaBlock.config?.fullWidth ? "w-full" : "max-w-7xl mx-auto"
               )}>
-                {block.content.title && (
-                  <h3 className="text-2xl font-bold text-slate-900 mb-8">{block.content.title}</h3>
+                {mediaBlock.content.title && (
+                  <h3 className="text-2xl font-bold text-slate-900 mb-8">{mediaBlock.content.title}</h3>
                 )}
                 <div className="rounded-3xl overflow-hidden bg-slate-50 border border-slate-200 shadow-2xl aspect-video relative group">
-                  {block.content.mediaType === 'video' && (
+                  {mediaBlock.content.mediaType === 'video' && (
                     <VideoAuthority 
-                      id={block.content.mediaId} 
-                      title={block.content.title}
+                      metadata={{
+                        id: mediaBlock.content.mediaId,
+                        provider: 'youtube',
+                        title: mediaBlock.content.title || 'Video',
+                        aspectRatio: (mediaBlock.content.aspectRatio as string) === 'vertical' ? 'vertical' : '16:9'
+                      }}
                     />
                   )}
-                  {block.content.mediaType === '3d' && (
+                  {mediaBlock.content.mediaType === '3d' && (
                     <ThreeDAuthority 
-                      id={block.content.mediaId} 
-                      title={block.content.title}
+                      metadata={{
+                        modelUrl: mediaBlock.content.mediaId,
+                        title: mediaBlock.content.title || '3D Model'
+                      }}
                     />
                   )}
-                  {block.content.mediaType === 'drawing' && (
+                  {mediaBlock.content.mediaType === 'drawing' && (
                     <TechnicalDrawingAuthority 
-                      id={block.content.mediaId} 
-                      title={block.content.title}
+                      drawings={[{
+                        id: mediaBlock.id,
+                        title: mediaBlock.content.title || 'Teknik Çizim',
+                        url: mediaBlock.content.mediaId,
+                        format: 'pdf',
+                        category: 'dimensions'
+                      }]}
                     />
                   )}
-                  {block.content.mediaType === 'image' && (
+                  {mediaBlock.content.mediaType === 'image' && (
                     <img 
-                      src={block.content.mediaId} 
-                      alt={block.content.title || ''} 
+                      src={mediaBlock.content.mediaId} 
+                      alt={mediaBlock.content.title || ''} 
                       className="w-full h-full object-cover" 
                     />
                   )}
                 </div>
-                {block.content.description && (
-                  <p className="mt-4 text-slate-500 text-sm italic text-center">{block.content.description}</p>
+                {mediaBlock.content.description && (
+                  <p className="mt-4 text-slate-500 text-sm italic text-center">{mediaBlock.content.description}</p>
                 )}
               </div>
             );
+          }
 
-          case 'rich-text':
+          case 'rich-text': {
+            const rtBlock = block as RichTextBlockType;
             return (
               <div 
-                key={block.id} 
+                key={rtBlock.id} 
                 className="max-w-4xl mx-auto py-16 px-6 prose prose-slate prose-lg md:prose-xl"
-                dangerouslySetInnerHTML={{ __html: block.content.html }}
+                dangerouslySetInnerHTML={{ __html: rtBlock.content.html }}
               />
             );
+          }
           
           default:
             return (
