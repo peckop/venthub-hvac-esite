@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Leaf, Users, RotateCcw, TrendingUp, ThermometerSun, Snowflake, DollarSign } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -18,6 +19,9 @@ import {
 
 const HRVCalcPage: React.FC = () => {
   const { t } = useI18n()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Dynamic Options
   const systemOptions = useMemo(() => [
@@ -48,15 +52,43 @@ const HRVCalcPage: React.FC = () => {
   ], [t])
 
   // Form state
-  const [recoveryType, setRecoveryType] = useState<RecoveryType>('hrv')
-  const [buildingType, setBuildingType] = useState<BuildingType>('office')
-  const [climateZone, setClimateZone] = useState<ClimateZone>('temperate')
-  const [area, setArea] = useState('100')
-  const [occupancy, setOccupancy] = useState('10')
-  const [operatingHours, setOperatingHours] = useState('10')
-  const [sensibleEfficiency, setSensibleEfficiency] = useState('75')
-  const [latentEfficiency, setLatentEfficiency] = useState('65')
-  const [electricityCost, setElectricityCost] = useState('3.5')
+  const [recoveryType, setRecoveryType] = useState<RecoveryType>(
+    (searchParams?.get('recoveryType') as RecoveryType) || 'hrv'
+  )
+  const [buildingType, setBuildingType] = useState<BuildingType>(
+    (searchParams?.get('buildingType') as BuildingType) || 'office'
+  )
+  const [climateZone, setClimateZone] = useState<ClimateZone>(
+    (searchParams?.get('climateZone') as ClimateZone) || 'temperate'
+  )
+  const [area, setArea] = useState(searchParams?.get('area') || '100')
+  const [occupancy, setOccupancy] = useState(searchParams?.get('occupancy') || '10')
+  const [operatingHours, setOperatingHours] = useState(searchParams?.get('operatingHours') || '10')
+  const [sensibleEfficiency, setSensibleEfficiency] = useState(searchParams?.get('sensibleEfficiency') || '75')
+  const [latentEfficiency, setLatentEfficiency] = useState(searchParams?.get('latentEfficiency') || '65')
+  const [electricityCost, setElectricityCost] = useState(searchParams?.get('electricityCost') || '3.5')
+
+  // URL Sync Effect
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams()
+    if (recoveryType !== 'hrv') params.set('recoveryType', recoveryType)
+    if (buildingType !== 'office') params.set('buildingType', buildingType)
+    if (climateZone !== 'temperate') params.set('climateZone', climateZone)
+    if (area !== '100') params.set('area', area)
+    if (occupancy !== '10') params.set('occupancy', occupancy)
+    if (operatingHours !== '10') params.set('operatingHours', operatingHours)
+    if (sensibleEfficiency !== '75') params.set('sensibleEfficiency', sensibleEfficiency)
+    if (latentEfficiency !== '65') params.set('latentEfficiency', latentEfficiency)
+    if (electricityCost !== '3.5') params.set('electricityCost', electricityCost)
+
+    const query = params.toString()
+    router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+  }, [
+    recoveryType, buildingType, climateZone, area, occupancy, 
+    operatingHours, sensibleEfficiency, latentEfficiency, electricityCost, 
+    pathname, router
+  ])
 
   // Real-time calculation
   const result = useMemo(() => {

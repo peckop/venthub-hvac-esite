@@ -164,8 +164,8 @@ const getSubcategoriesForCategory = (categorySlug: string): SubcategoryItem[] =>
         slug,
         title: formatSubcategoryLabel(key),
         parentSlug: categorySlug,
-        // Alt kategoriler için placeholder image - ileride gerçek görseller eklenebilir
-        image: `/images/subcategories/${slug}.png`
+        // Alt kategoriler için güvenli placeholder
+        image: '/images/hvac_installation_close_up_premium_3.png'
     }))
 }
 

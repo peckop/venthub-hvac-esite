@@ -142,9 +142,10 @@ export const tr = {
       getQuote: 'Teklif Al'
     },
     topics: {
-      'hava-perdesi': {
-        title: 'Hava Perdesi',
-        summary: 'Girişlerde konforu korumak ve enerji kaybını azaltmak için kapı üstüne yerleştirilir; kapı genişliğini tam kapsamalıdır.',
+      'air-curtain': {
+        title: 'Hava Perdesi Seçimi',
+        image: '/images/hvac_installation_close_up_premium_3.png',
+        summary: 'Doğru hava perdesi seçimi için kapı yüksekliği, genişliği ve kullanım amacı (konfor/endüstriyel) belirleyicidir.',
         steps: [
           'Kapı genişliği = cihaz genişliği (bariyer kesintisiz olmalı).',
           'Çıkış hızı 7–9 m/s; zeminde 2–3 m/s hedef.',
@@ -154,6 +155,7 @@ export const tr = {
       },
       'jet-fan': {
         title: 'Jet Fan (Otopark)',
+        image: '/images/hvac_installation_close_up_premium_3.png',
         summary: 'CO/NOx ve duman senaryosu için akışı egzoza yönlendiren tavan fanları; kör nokta bırakmadan yerleşim gerekir.',
         steps: [
           'Debi: Hacim × ACH (ör. 7.200 m³ × 8 ACH ≈ 57.600 m³/h).',
@@ -164,6 +166,7 @@ export const tr = {
       },
       hrv: {
         title: 'Isı Geri Kazanım (HRV/ERV)',
+        image: '/images/hvac_installation_close_up_premium_4.png',
         summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
         steps: [
           'Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).',

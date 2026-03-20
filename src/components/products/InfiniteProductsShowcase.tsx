@@ -89,7 +89,7 @@ const ProductCard: React.FC<{
                 const mat = imageRef.current.material as THREE.MeshStandardMaterial
                 mat.emissiveIntensity = THREE.MathUtils.lerp(
                     mat.emissiveIntensity || 0, 
-                    0.5 + Math.sin(state.clock.getElapsedTime() * 4) * 0.2, 
+                    0.5 + Math.sin(state.clock.elapsedTime * 4) * 0.2, 
                     0.1
                 )
             }
@@ -161,8 +161,8 @@ const SceneContent: React.FC<{ items: ProductItem[]; isPaused: boolean; onHover:
         }
 
         // Camera breathing
-        camera.position.x = THREE.MathUtils.lerp(camera.position.x, Math.sin(state.clock.getElapsedTime() * 0.3) * 0.2, 0.05)
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, Math.sin(state.clock.getElapsedTime() * 0.2) * 0.1, 0.05)
+        camera.position.x = THREE.MathUtils.lerp(camera.position.x, Math.sin(state.clock.elapsedTime * 0.3) * 0.2, 0.05)
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, Math.sin(state.clock.elapsedTime * 0.2) * 0.1, 0.05)
     })
 
     return (

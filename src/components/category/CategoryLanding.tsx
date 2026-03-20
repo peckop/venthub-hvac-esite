@@ -52,6 +52,7 @@ interface CategoryLandingProps {
     products: DbProduct[]
     subCategories?: DbCategory[] // For in-page subcategory selection
     parentCategory?: DbCategory | null
+    groupedSeries?: Array<{ name: string; products: DbProduct[]; image?: string; minPrice: number }>
 }
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -113,7 +114,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         window.addEventListener('hashchange', checkHash)
 
         // İlk yüklemede layout shift olmaması için animasyonu kısa süre sonra aç
-        // 300ms: useManualScrollRestoration'ın ilk denemeleri için yeterli süreyi tanı
         const animTimer = setTimeout(() => setDisableAnimation(false), 300)
 
         return () => {
@@ -122,13 +122,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         }
     }, [subCategories])
 
-    // V7: Scroll Bounding (Tarayıcının sayfa kısayken scroll'u yarıda kesmesi) sorununa Kesin Çözüm!
     const handleScrollToTarget = (targetId: string) => {
         if (typeof window === 'undefined') return
         const anchor = document.getElementById(targetId)
         if (!anchor) return
 
-        // Geçici padding ekleyerek animasyon bitmemiş olsa dahi tarayıcıya "scroll yapılacak kadar yer var" diyoruz.
         const originalPadding = document.body.style.paddingBottom
         document.body.style.paddingBottom = '3000px'
 
@@ -137,39 +135,34 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
             const targetY = anchor.getBoundingClientRect().top + window.pageYOffset - headerOffset
             window.scrollTo({ top: targetY, behavior: 'smooth' })
 
-            // Animasyon (500ms) bittikten sonra sahte boşluğu temizle ve olası shift'e karşı son düzeltmeyi yap
             setTimeout(() => {
                 document.body.style.paddingBottom = originalPadding
                 const finalY = anchor.getBoundingClientRect().top + window.pageYOffset - headerOffset
                 if (Math.abs(window.scrollY - finalY) > 5) {
                     window.scrollTo({ top: finalY, behavior: 'smooth' })
                 }
-            }, 800) // Animasyonun tamamen bitmesi için daha güvenli süre
+            }, 800)
         }, 10)
     }
 
     const handleShowProducts = () => {
         setShowProducts(true)
-        setSelectedSubcategory(null) // Clear subcategory selection when showing all
+        setSelectedSubcategory(null)
         if (typeof window !== 'undefined') {
             window.history.replaceState(null, '', '#tum-modeller')
             window.dispatchEvent(new HashChangeEvent('hashchange'))
         }
 
-        // React re-render sonrası
         requestAnimationFrame(() => {
             if (!selectedSubcategory) {
-                // Scroll Bounding kırma fonksiyonunu çağır
                 handleScrollToTarget('products-anchor')
             }
         })
     }
 
-    // Handle subcategory selection - show products in-page
     const handleSelectSubcategory = (subcatId: string) => {
         setSelectedSubcategory(subcatId)
-        setShowProducts(false) // Hide main products
-        // Update URL hash for bookmarking
+        setShowProducts(false)
         const subcat = subCategories.find(s => s.id === subcatId)
         if (subcat && typeof window !== 'undefined') {
             window.history.replaceState(null, '', `#${subcat.slug}`)
@@ -180,17 +173,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
         }, 50)
     }
 
-    // Get products for selected subcategory
     const subcategoryProducts = selectedSubcategory
         ? products.filter(p => p.category_id === selectedSubcategory)
         : []
 
-    // stats calculations
     const maxAirflow = products.length > 0
         ? Math.max(...products.map(p => Number(p.airflow_capacity) || 0))
         : 1000
 
-    // Filter products based on active filter
     const filteredProducts = products.filter((p: DbProduct) => {
         if (activeFilter === 'all') return true
         if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
@@ -199,29 +189,22 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     })
 
     const heroImagePath = category.image_url ? `category-images/${category.image_url}` : null
-
     const features = category.metadata?.features ?? []
-
-    // Build breadcrumb items
     const breadcrumbItems = buildCategoryBreadcrumb(domainCategory, domainParentCategory, t('common.home'))
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Breadcrumb Navigation - Dark variant for dark hero */}
             <div className="bg-zinc-900">
                 <Breadcrumb items={breadcrumbItems} variant="dark" className="border-b-0" />
             </div>
 
-            {/* Hero Section */}
             <div className="relative bg-zinc-900 text-white py-20 lg:py-32 overflow-hidden">
-                {/* Abstract Background Element */}
                 <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-zinc-800 to-transparent opacity-50 transform skew-x-12 translate-x-1/3" />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            {/* Technical Summary / Badge */}
-                            {(category.metadata?.technical_summary) && (
+                            {category.metadata?.technical_summary && (
                                 <div className="flex items-center space-x-2 text-secondary-blue mb-4">
                                     <Activity size={20} />
                                     <span className="font-medium tracking-wide text-sm uppercase">
@@ -237,10 +220,9 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 {category.metadata?.hero_description ?? category.description}
                             </p>
 
-                            {/* Dynamic Features Grid */}
                             {features.length > 0 && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                                    {features.map((feature, idx) => {
+                                    {features.map((feature, idx: number) => {
                                         const IconComponent = ICON_MAP[feature.icon] || Box
                                         return (
                                             <div key={idx} className="flex items-start space-x-3">
@@ -266,7 +248,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                     <ChevronDown className={`ml-2 transition-transform duration-300 ${showProducts ? 'rotate-180' : 'group-hover:translate-y-1'}`} />
                                 </button>
 
-                                {/* Quick Start Wizard Button (only for air curtains) */}
                                 {isAirCurtain && (
                                     <button
                                         onClick={() => setWizardOpen(true)}
@@ -280,7 +261,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             </div>
                         </div>
 
-                        {/* Hero Image */}
                         <div className="relative hidden lg:block h-[500px]">
                             <VentImage
                                 src={heroImagePath}
@@ -292,7 +272,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 priority
                             />
 
-                            {/* Animated Scroll Down Indicator */}
                             <button
                                 onClick={() => {
                                     if (typeof document !== 'undefined') {
@@ -309,30 +288,20 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     </div>
                 </div>
 
-                {/* Scroll Anchor */}
                 <div id="content-start" className="scroll-mt-20" />
 
-                {/* Enhanced Needs Analysis Wizard */}
                 <EnhancedNeedsWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}
                     parentSlug={category.slug}
                 />
 
-                {/* ====== PREMIUM AIR CURTAIN EXPERIENCE (8-Section Flow) ====== */}
                 {
                     isAirCurtain && (
                         <>
-                            {/* Section 2: Problem Recognition */}
                             <ProblemSection />
-
-                            {/* Section 3: How It Works */}
                             <HowItWorks />
-
-                            {/* Section 4: Brand Trust - Vortice Story */}
                             <VorticeBrand />
-
-                            {/* Section 5: Type Comparison (Elektrikli vs Ortam) */}
                             <TypeComparison
                                 onOpenWizard={() => setWizardOpen(true)}
                                 onSelectType={(type) => {
@@ -344,12 +313,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 }}
                             />
 
-                            {/* Section 6: Subcategory Products (In-Page Expansion) */}
                             {selectedSubcategory && (
                                 <div className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200">
                                     <div id="subcategory-anchor" className="scroll-mt-24" />
                                     <div ref={subcategoryProductsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                        {/* Section Header */}
                                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                                             <div>
                                                 <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
@@ -363,7 +330,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                                 </p>
                                             </div>
 
-                                            {/* Clear Selection Button */}
                                             <button
                                                 onClick={() => {
                                                     setSelectedSubcategory(null)
@@ -377,7 +343,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                             </button>
                                         </div>
 
-                                        {/* Products Grid */}
                                         {subcategoryProducts.length > 0 ? (
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                                 {subcategoryProducts.map(product => (
@@ -400,13 +365,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 </div>
                             )}
 
-                            {/* Section 7: Trust Signals */}
                             <TrustSignals />
-
-                            {/* Section 8: FAQ */}
                             <FAQ />
-
-                            {/* Section 9: Bottom CTA */}
                             <BottomCTA
                                 onOpenWizard={() => setWizardOpen(true)}
                                 onShowProducts={handleShowProducts}
@@ -417,7 +377,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     )
                 }
 
-                {/* ====== SILENT FAN EXPERIENCE (Vortice Lineo Quiet) ====== */}
                 {
                     isSilentFan && (
                         <>
@@ -439,10 +398,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                     )
                 }
 
-                {/* Static Anchor for All Products */}
                 <div id="products-anchor" className="scroll-mt-24" />
 
-                {/* Expandable Product List Content */}
                 <div
                     ref={productListRef}
                     className={`${disableAnimation ? '' : 'transition-all duration-500 ease-in-out'} ${showProducts ? 'opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}
@@ -462,7 +419,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 </p>
                             </div>
 
-                            {/* Quick Filters */}
                             <div className="flex flex-wrap gap-2">
                                 <span className="text-sm font-medium text-steel-gray self-center mr-2">Hızlı Filtre:</span>
                                 {[
@@ -484,7 +440,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             </div>
                         </div>
 
-                        {/* Product Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {filteredProducts.map(product => (
                                 <ProductCard

@@ -41,7 +41,8 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     loading,
     filters,
     updateFilters,
-    displayMode
+    displayMode,
+    groupedSeries
   } = useCategoryGateway(initialCategory)
 
   // 2. LOADING & ERROR STATES
@@ -87,7 +88,13 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({ initialCategory }) =
     }
 
     if (displayMode === 'series') {
-      return <CategoryLanding category={enrichedCategory} products={products} subCategories={subCategories} parentCategory={parentCategory} />
+      return <CategoryLanding 
+        category={enrichedCategory} 
+        products={products} 
+        subCategories={subCategories} 
+        parentCategory={parentCategory} 
+        groupedSeries={groupedSeries}
+      />
     }
 
     // Default Grid View (With Hero & Filters)

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { getCategories, Product, getProductsEnriched } from '../lib/supabase'
 import { mapDatabaseCategoryToDomain, toUICategoryList, DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
+import { useIsMounted } from './useIsMounted'
 import type { DbCategory } from '../types/db-rows'
 
 export interface CategoryFilters {
@@ -20,8 +21,26 @@ export interface CategoryFilters {
   catSearch: string
 }
 
+const DEFAULT_FILTERS: CategoryFilters = {
+  sortBy: 'name',
+  viewMode: 'grid',
+  priceRange: [0, 1000000],
+  selectedBrands: [],
+  airflowMin: '',
+  airflowMax: '',
+  pressureMin: '',
+  pressureMax: '',
+  noiseMax: '',
+  catSearch: ''
+}
+
 export function useCategoryGateway(initialCategory?: DbCategory | null) {
+  const isMounted = useIsMounted()
   const params = useParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
 
@@ -31,23 +50,62 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialCategory)
 
-  // Filters State
-  const [filters, setFilters] = useState<CategoryFilters>({
-    sortBy: 'name',
-    viewMode: 'grid',
-    priceRange: [0, 1000000],
-    selectedBrands: [],
-    airflowMin: '',
-    airflowMax: '',
-    pressureMin: '',
-    pressureMax: '',
-    noiseMax: '',
-    catSearch: ''
-  })
+  // 1. Always start with defaults for SSR compatibility
+  const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
 
-  const updateFilters = (updates: Partial<CategoryFilters>) => {
-    setFilters(prev => ({ ...prev, ...updates }))
-  }
+  // 2. Hydrate filters from URL after mount (Prevent Mismatch)
+  useEffect(() => {
+    if (!isMounted || !searchParams) return
+
+    const spBrands = searchParams.get('brands')
+    const viewModeParam = searchParams.get('viewMode')
+
+    setFilters({
+      sortBy: searchParams.get('sortBy') || 'name',
+      viewMode: (viewModeParam === 'grid' || viewModeParam === 'list') ? viewModeParam : 'grid',
+      priceRange: [
+        Number(searchParams.get('priceMin')) || 0,
+        Number(searchParams.get('priceMax')) || 1000000
+      ],
+      selectedBrands: spBrands ? spBrands.split(',') : [],
+      airflowMin: searchParams.get('airflowMin') || '',
+      airflowMax: searchParams.get('airflowMax') || '',
+      pressureMin: searchParams.get('pressureMin') || '',
+      pressureMax: searchParams.get('pressureMax') || '',
+      noiseMax: searchParams.get('noiseMax') || '',
+      catSearch: searchParams.get('catSearch') || ''
+    })
+  }, [isMounted, searchParams])
+
+  // Sync state changes back to URL
+  const updateFilters = useCallback((updates: Partial<CategoryFilters>) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, ...updates }
+      
+      if (typeof window !== 'undefined' && pathname) {
+        const urlParams = new URLSearchParams(window.location.search)
+        
+        if (newFilters.sortBy !== 'name') urlParams.set('sortBy', newFilters.sortBy); else urlParams.delete('sortBy');
+        if (newFilters.viewMode !== 'grid') urlParams.set('viewMode', newFilters.viewMode); else urlParams.delete('viewMode');
+        if (newFilters.priceRange[0] > 0) urlParams.set('priceMin', newFilters.priceRange[0].toString()); else urlParams.delete('priceMin');
+        if (newFilters.priceRange[1] < 1000000) urlParams.set('priceMax', newFilters.priceRange[1].toString()); else urlParams.delete('priceMax');
+        
+        if (newFilters.selectedBrands.length > 0) urlParams.set('brands', newFilters.selectedBrands.join(',')); else urlParams.delete('brands');
+        
+        if (newFilters.airflowMin) urlParams.set('airflowMin', newFilters.airflowMin); else urlParams.delete('airflowMin');
+        if (newFilters.airflowMax) urlParams.set('airflowMax', newFilters.airflowMax); else urlParams.delete('airflowMax');
+        if (newFilters.pressureMin) urlParams.set('pressureMin', newFilters.pressureMin); else urlParams.delete('pressureMin');
+        if (newFilters.pressureMax) urlParams.set('pressureMax', newFilters.pressureMax); else urlParams.delete('pressureMax');
+        if (newFilters.noiseMax) urlParams.set('noiseMax', newFilters.noiseMax); else urlParams.delete('noiseMax');
+        if (newFilters.catSearch) urlParams.set('catSearch', newFilters.catSearch); else urlParams.delete('catSearch');
+
+        const newQueryString = urlParams.toString()
+        router.replace(`${pathname}${newQueryString ? `?${newQueryString}` : ''}`, { scroll: false })
+      }
+      
+      return newFilters
+    })
+  }, [pathname, router])
 
   // Scroll Restoration
   useManualScrollRestoration(loading)
@@ -171,6 +229,40 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     [products]
   )
 
+  // 1. Group products by series for "Series View"
+  const groupedSeries = useMemo(() => {
+    const seriesMap: Record<string, { name: string; products: Product[]; image?: string; minPrice: number }> = {}
+    
+    filteredProducts.forEach(product => {
+      // Get series name from metadata or first word of the name
+      // Access metadata safely from the product object
+      const meta = (product as unknown as { metadata?: Record<string, unknown> }).metadata || {}
+
+      let seriesName = (meta.series as string) || product.name.split(' ')[0]
+      
+      // Clean up common prefixes like "Vortice", "Avens" if they are at the start
+      if (seriesName === 'Vortice' || seriesName === 'Avens' || seriesName === 'Soler') {
+        seriesName = product.name.split(' ')[1] || seriesName
+      }
+
+      if (!seriesMap[seriesName]) {
+        seriesMap[seriesName] = {
+          name: seriesName,
+          products: [],
+          image: product.image_url || undefined,
+          minPrice: Infinity
+        }
+      }
+      
+      seriesMap[seriesName].products.push(product)
+      if (product.price && product.price < seriesMap[seriesName].minPrice) {
+        seriesMap[seriesName].minPrice = product.price
+      }
+    })
+
+    return Object.values(seriesMap).sort((a, b) => a.name.localeCompare(b.name))
+  }, [filteredProducts])
+
   // Derived Display Mode logic
   const displayMode = useMemo(() => {
     if (!category) return 'grid'
@@ -194,6 +286,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     loading,
     filters,
     updateFilters,
-    displayMode
+    displayMode,
+    groupedSeries
   }
 }

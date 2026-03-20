@@ -17,11 +17,11 @@ interface TopicPageProps {
 const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
   const { t } = useI18n()
   const params = useParams()
-  const slug = propSlug || (params?.slug as string)
-  const base = slug ? `knowledge.topics.${slug}` : ''
+  const currentSlug = propSlug || (params?.slug as string)
+  const base = currentSlug ? `knowledge.topics.${currentSlug}` : ''
 
   const title = t(`${base}.title`)
-  const exists = slug && title !== `${base}.title`
+  const exists = currentSlug && title !== `${base}.title`
 
   if (!exists) {
     return (
@@ -65,10 +65,12 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
       <section className="relative pt-32 pb-20 bg-slate-950 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <Image 
-            src="/images/hvac_installation_close_up_premium_3.png" 
-            alt="Technical Detail" 
+            src={t(`${base}.image`) || "/images/hvac_installation_close_up_premium_3.png"} 
+            alt={title} 
             fill 
-            className="object-cover grayscale" 
+            priority
+            sizes="(max-width: 1280px) 100vw, 1280px"
+            className="object-cover opacity-60 mix-blend-overlay" 
           />
         </div>
         
@@ -140,7 +142,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           {/* Action Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link
-              href={slug ? getCategoryUrlFromTopic(slug) : '/products'}
+              href={currentSlug ? getCategoryUrlFromTopic(currentSlug) : '/products'}
               className="group inline-flex items-center gap-4 bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-cyan-600 transition-all shadow-2xl active:scale-95"
             >
               {t('knowledge.topic.toProducts')} <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />
