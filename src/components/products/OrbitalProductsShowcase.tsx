@@ -295,7 +295,9 @@ const OrbitalCard: React.FC<{
             if (iconGroup) {
                 // FIX: Use modelScale prop instead of hardcoded 1.5
                 const s = pulsedScale * modelScale
-                iconGroup.scale.lerp(new THREE.Vector3(s, s, s), 0.15)
+            // Optimizasyon: Her frame'de yeni Vector3 yaratmak yerine state'deki vektörü kullan
+            const targetScale = new THREE.Vector3(s, s, s)
+            iconGroup.scale.lerp(targetScale, 0.15)
             }
         }
     })
@@ -474,8 +476,10 @@ const CarouselItems: React.FC<{
 
     useFrame((state, delta) => {
         // Kameranın nefes alma efekti
-        camera.position.x = Math.sin(state.clock.getElapsedTime() * 0.1) * CONFIG.cameraBreathAmplitude
-        camera.position.y = CONFIG.cameraHeight
+        // state.clock.getElapsedTime() yerine direkt .elapsedTime kullanmak Three 0.183 uyarılarını engeller
+        const elapsedTime = state.clock.elapsedTime
+        camera.position.x = Math.sin(elapsedTime * 0.1) * CONFIG.cameraBreathAmplitude
+        camera.position.y = CONFIG.cameraHeight + Math.cos(elapsedTime * 0.15) * CONFIG.cameraBreathAmplitude * 0.5
 
         const now = Date.now()
 
@@ -517,7 +521,7 @@ const CarouselItems: React.FC<{
             let currentSpeed = delta * CONFIG.autoRotateSpeed
             if (shouldShowDragHint) {
                 currentSpeed *= 0.05
-                const t = state.clock.getElapsedTime() % 3
+                const t = state.clock.elapsedTime % 3
                 const step = (Math.PI * 2) / items.length
                 const maxSway = step * 0.8
                 let targetSway = 0
@@ -526,8 +530,7 @@ const CarouselItems: React.FC<{
                 else targetSway = 0 // Wait
                 const swayDelta = targetSway - swayOffsetRef.current
                 sharedState.current.rotation += swayDelta
-                swayOffsetRef.current = targetSway
-            } else {
+                swayOffsetRef.current = targetSway            } else {
                 if (swayOffsetRef.current !== 0) {
                     sharedState.current.rotation -= swayOffsetRef.current
                     swayOffsetRef.current = 0
@@ -731,9 +734,9 @@ const OrbitalProductsShowcase: React.FC<OrbitalProductsShowcaseProps> = ({ items
             style={{ backgroundColor: CONFIG.backgroundColor, height: containerHeight }}
         >
             <Canvas
-                shadows={{ type: THREE.PCFShadowMap }}
+                shadows
+                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 frameloop="always"
-                gl={{ antialias: true, alpha: true }}
                 dpr={typeof window !== 'undefined' ? Math.min(2, window.devicePixelRatio) : [1, 1.5]}
                 camera={{
                     position: [0, (CONFIG.cameraHeight * (typeof containerHeight === 'number' && containerHeight < 400 ? 0.8 : 1)), CONFIG.cameraDistance],

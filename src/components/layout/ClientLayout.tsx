@@ -1,22 +1,10 @@
 'use client'
 
-import React, { Suspense, lazy, useEffect, useState } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { CartProvider } from '../../contexts/CartProvider'
 import { AuthProvider } from '../../contexts/AuthContext'
-import { useScrollThrottle } from '../../hooks/useScrollThrottle'
 import { usePathname, useSearchParams } from 'next/navigation'
-
-import StickyHeader from '../StickyHeader'
-import ScrollToTop from '../ScrollToTop'
-import LanguageSwitcher from '../LanguageSwitcher'
-import PaymentWatcher from '../PaymentWatcher'
-import BackToTopButton from '../BackToTopButton'
-import Footer from '../Footer'
-
-const Toaster = lazy(() => import('react-hot-toast').then(m => ({ default: m.Toaster })))
-const AddToCartToast = lazy(() => import('../AddToCartToast'))
-const WhatsAppFloat = lazy(() => import('../WhatsAppFloat'))
-
+import MainLayout from './MainLayout'
 import { I18nProvider } from '../../i18n/I18nProvider'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
 
@@ -103,73 +91,15 @@ function NavigationTracker() {
 }
 
 function ClientLayoutInner({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname()
-    const isAdmin = pathname?.startsWith('/admin')
-    const isScrolled = useScrollThrottle({ 
-        showAt: 100, 
-        hideBelow: 60, 
-        throttleMs: 16, 
-        initialDelayMs: 180, 
-        syncKey: pathname || '' 
-    })
-
-    const [enableToaster, setEnableToaster] = useState(false)
-    useEffect(() => {
-        const enable = () => setEnableToaster(true)
-        window.addEventListener('pointerdown', enable, { once: true })
-        window.addEventListener('keydown', enable, { once: true })
-        return () => {
-            window.removeEventListener('pointerdown', enable)
-            window.removeEventListener('keydown', enable)
-        }
-    }, [])
-
-    const [enableWhatsApp, setEnableWhatsApp] = useState(false)
-    useEffect(() => {
-        const enable = () => setEnableWhatsApp(true)
-        window.addEventListener('scroll', enable, { once: true, passive: true })
-        return () => window.removeEventListener('scroll', enable)
-    }, [])
-
     return (
-        <div className={`min-h-screen bg-white ${isAdmin ? 'overflow-hidden' : ''}`}>
-            <ScrollToTop />
-            {!isAdmin && <StickyHeader isScrolled={isScrolled} />}
-
-            <main id="main-content" className={!isAdmin && isScrolled ? 'pt-16' : ''}>
-                {!isAdmin && <BackToTopButton />}
-                {typeof window !== 'undefined' && localStorage.getItem('vh_pending_order') && <PaymentWatcher />}
-                {!isAdmin && <LanguageSwitcher />}
-                {children}
-            </main>
-
-            {!isAdmin && <Footer />}
-
+        <MainLayout>
+            {children}
+            
+            {/* Mantıksal Takipçiler */}
             <Suspense fallback={null}>
                 <NavigationTracker />
             </Suspense>
-
-            {enableWhatsApp && !isAdmin && (
-                <Suspense fallback={null}>
-                    <WhatsAppFloat />
-                </Suspense>
-            )}
-
-            {enableToaster && (
-                <Suspense fallback={null}>
-                    <AddToCartToast />
-                    <Toaster
-                        position="top-right"
-                        toastOptions={{
-                            duration: 3000,
-                            style: { background: '#FFFFFF', color: '#374151', border: '1px solid #E5E7EB', borderRadius: '0.75rem', fontSize: '14px' },
-                            success: { iconTheme: { primary: '#10B981', secondary: '#FFFFFF' } },
-                            error: { iconTheme: { primary: '#EF4444', secondary: '#FFFFFF' } },
-                        }}
-                    />
-                </Suspense>
-            )}
-        </div>
+        </MainLayout>
     )
 }
 

@@ -83,7 +83,7 @@ const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
 
     useFrame((state) => {
         if (materialRef.current) {
-            materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime()
+            materialRef.current.uniforms.uTime.value = state.clock.elapsedTime
         }
         // Subtle tilt based on mouse position (Parallax)
         if (meshRef.current) {

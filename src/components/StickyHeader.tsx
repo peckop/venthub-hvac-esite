@@ -9,6 +9,7 @@ import { useNavigationState } from '../hooks/useNavigationState'
 import { useHideOnScroll } from '../hooks/useHideOnScroll'
 import { useAuth } from '../hooks/useAuth'
 import { useCart } from '../hooks/useCartHook'
+import { useIsMounted } from '../hooks/useIsMounted'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import type { Category } from '../lib/supabase'
@@ -69,6 +70,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   const [showSyncPulse, setShowSyncPulse] = useState(false)
   const [recentProducts, setRecentProducts] = useState<string[]>([])
   const [userRole, setUserRole] = useState<string>('user')
+  const isMounted = useIsMounted()
 
   const userMenuRef = useRef<HTMLDivElement>(null)
   const categoriesRequestRef = useRef<Promise<Category[] | null> | null>(null)
@@ -503,7 +505,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                     <circle cx="8" cy="19" r="2" />
                   </svg>
                 }
-                label={cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined}
+                label={isMounted && cartTotal > 0 ? formatCurrency(cartTotal, lang, { maximumFractionDigits: 0 }) : undefined}
                 labelClassName="hidden 2xl:block font-semibold text-success-green transition-all"
                 badge={
                   <>
@@ -514,7 +516,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
                         className="absolute -left-1 -top-1 h-3 w-3 rounded-full bg-amber-400 ring-2 ring-white animate-pulse"
                       />
                     )}
-                    {cartCount > 0 && (
+                    {isMounted && cartCount > 0 && (
                       <span className="absolute flex items-center justify-center rounded-full bg-gradient-to-r from-primary-navy to-secondary-blue font-bold text-white shadow-md transition-all duration-300 -right-2 -top-2 h-5 w-5 text-[11px]">
                         {cartCount}
                       </span>

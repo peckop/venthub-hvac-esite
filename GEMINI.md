@@ -5,8 +5,8 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 ## 0. Zorunlu Başlangıç Ritüeli (Pre-flight Checklist)
 > [!IMPORTANT]
 > Ajan, her session başlangıcında veya yeni bir göreve (Task) geçerken aşağıdaki adımları **SIRAYLA** ve **EKSİKSİZ** yapmak zorundadır:
-> 1. `registry/PULSE.md`: Projenin genel nabzını ve açık görevleri gör.
-> 2. `.gemini/hooks/current_pulse.md` (Project Orion): Otonom aktif görev kancasını oku.
+> 1. `python registry/manage_registry.py normalize`: Otonom senkronizasyonu tetikle (MD -> DB -> PULSE).
+> 2. `registry/PULSE.md`: Güncel projenin genel nabzını ve açık görevleri gör.
 > 3. `python registry/manage_registry.py recall`: Ajanlar arası paylaşımlı hafızayı (Memory Bridge) geri çağır.
 > 4. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
 

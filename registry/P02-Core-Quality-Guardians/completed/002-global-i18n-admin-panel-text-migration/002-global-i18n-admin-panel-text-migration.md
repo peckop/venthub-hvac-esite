@@ -5,7 +5,7 @@ status: "Completed"
 progress: "100%"
 priority: "CRIT"
 created_at: "2026-03-16 23:38:27"
-updated_at: "2026-03-19 23:21:18"
+updated_at: "2026-03-20 17:24:01"
 started_at: "2026-03-16 23:46:59"
 completed_at: "2026-03-17 07:38:20"
 depends_on: ["001"]
@@ -19,64 +19,6 @@ artifacts:
 
 ## 🎯 Hedef
 VentHub Admin Paneli üzerindeki tüm "hardcoded" (elle yazılmış) Türkçe metinleri `useI18n` sistemine taşımak, `tr.ts` sözlüğünü standardize etmek ve bu süreçte karşılaşılan tip hatalarını (TSC) temizleyerek "Tek Doğruluk Kaynağı" prensibini tüm yönetim ekranlarına yaymak.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## ✅ Alt Görevler
 - [ ] `src/lib/i18n/locales/tr.ts` içine `admin` anahtarı ekle.

@@ -29,7 +29,7 @@ const FlexDuctModel: React.FC = () => {
     }
     useFrame((state) => {
         if (!meshRef.current || !spiralRef.current) return
-        const time = state.clock.getElapsedTime()
+        const time = state.clock.elapsedTime
         
         // Optimized: Instead of regenerating whole geometry, just do light breathing/pulse
         const pulse = Math.sin(time * 2) * 0.05
