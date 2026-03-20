@@ -6,7 +6,7 @@ import { Environment, Float, Sparkles, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useRouter } from 'next/navigation'
 import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
-import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config/orbitalCarouselConfig'
+import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 import Category3DIcon from './Category3DIcon'
 
 interface ProductItem {

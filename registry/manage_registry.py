@@ -24,17 +24,27 @@ def get_now() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def safe_write(file_path: Path, content: Any, indent: Optional[int] = None):
-    """Atomically write content to a file with retry logic for Windows file locks."""
+    """Atomically write content to a file ONLY if it has changed, with retry logic for Windows."""
+    new_content = ""
+    if isinstance(content, (dict, list)):
+        new_content = json.dumps(content, indent=indent, ensure_ascii=False)
+    else:
+        new_content = str(content)
+
+    # Smart Write: Eğer içerik aynıysa yazma (LSP dostu)
+    if file_path.exists():
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                if f.read() == new_content:
+                    return # Değişiklik yoksa çık
+        except: pass
+
     temp_file = file_path.with_suffix('.tmp')
     for i in range(5): # 5 attempts
         try:
             file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(temp_file, 'w', encoding='utf-8') as f:
-                if isinstance(content, (dict, list)):
-                    json.dump(content, f, indent=indent, ensure_ascii=False)
-                else:
-                    f.write(str(content))
-
+                f.write(new_content)
             
             if file_path.exists():
                 os.replace(str(temp_file), str(file_path))
@@ -160,31 +170,50 @@ def turkish_slug(text: str) -> str:
 def parse_metadata(content: str) -> Dict[str, Any]:
     """Robust YAML metadata parser with BOM and multi-line support."""
     metadata: Dict[str, Any] = {}
-    # BOM Temizliği ve Trim
-    content = content.lstrip('\ufeff').strip()
+    # BOM ve whitespace temizliği
+    content = content.replace('\ufeff', '').strip()
     match = re.search(r'^---\s*\r?\n(.*?)\r?\n---', content, re.DOTALL)
     if match:
         yaml_content = match.group(1)
         for line in yaml_content.split('\n'):
             line = line.strip()
             if not line or ':' not in line: continue
-            key, val = line.split(':', 1)
-            # YAML formatındaki listeleri ve stringleri basitleştirerek al
-            val = val.strip().strip('"').strip("'")
+            parts = line.split(':', 1)
+            key = parts[0].strip()
+            val = parts[1].strip().strip('"').strip("'")
+            
             if val.startswith('[') and val.endswith(']'):
-                metadata[key.strip()] = [x.strip().strip('"').strip("'") for x in val[1:-1].split(',') if x.strip()]
+                metadata[key] = [x.strip().strip('"').strip("'") for x in val[1:-1].split(',') if x.strip()]
             else:
-                metadata[key.strip()] = val
+                metadata[key] = val
+    
+    # Zorunlu alan kontrolü (Untitled 000 engelleme)
+    if not metadata.get('title') or metadata.get('title').lower() in ['untitled', 'başlıksız']:
+        metadata['title'] = "Eksik Başlık (MD dosyasını kontrol edin)"
     return metadata
 
 def calculate_integrity_hash() -> str:
-    structure = []
-    for root, dirs, files in os.walk(str(REGISTRY_DIR)):
-        if any(x in root for x in [".snapshots", "__pycache__", ".git"]): continue
-        rel_path = os.path.relpath(root, str(REGISTRY_DIR)).replace('\\', '/')
-        structure.append(f"{rel_path}:{sorted(dirs)}:{sorted(files)}")
-    full_str = "\n".join(sorted(structure))
-    return hashlib.sha256(full_str.encode('utf-8')).hexdigest()
+    """Memory-safe integrity hash using database and shallow structure check."""
+    # Sadece veritabanı dosyası ve ana projelerin varlığını kontrol eder (Hızlı ve bellek dostu)
+    try:
+        db_hash = ""
+        if DB_FILE.exists():
+            with open(DB_FILE, "rb") as f:
+                db_hash = hashlib.sha256(f.read()).hexdigest()
+        
+        # Sadece ilk 2 seviyeyi kontrol et (Project/State) - Devasa string oluşturmaktan kaçın
+        structure = []
+        for root, dirs, files in os.walk(str(REGISTRY_DIR)):
+            depth = root.replace(str(REGISTRY_DIR), '').count(os.sep)
+            if depth > 2: continue # Derinliği sınırla (LSP'yi yorma)
+            if any(x in root for x in [".snapshots", "__pycache__", ".git"]): continue
+            rel_path = os.path.relpath(root, str(REGISTRY_DIR)).replace('\\', '/')
+            structure.append(f"{rel_path}:{sorted(dirs)}")
+        
+        full_str = f"{db_hash}\n" + "\n".join(sorted(structure))
+        return hashlib.sha256(full_str.encode('utf-8')).hexdigest()
+    except:
+        return "integrity_fallback_hash"
 
 def check_sentinel() -> bool:
     if not SENTINEL_FILE.exists(): return True

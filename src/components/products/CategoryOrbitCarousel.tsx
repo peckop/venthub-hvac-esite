@@ -4,7 +4,7 @@ import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity
 import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 const OrbitalProductsShowcase = dynamic(() => import('./OrbitalProductsShowcase'), { ssr: false, loading: () => <div className="w-full h-full bg-slate-900 animate-pulse rounded-2xl flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest">[ 3D MODULE LOADING ]</div> })
-import { CATEGORY_REGISTRY } from '@/config/categoryRegistry'
+import { CATEGORY_REGISTRY } from '@/config'
 
 // --- Category Data using OFFICIAL SLUGS from categoryRegistry ---
 export interface CategoryCard {
