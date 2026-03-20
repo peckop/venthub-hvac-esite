@@ -23,12 +23,9 @@ if echo "$STAGED_FILES" | grep -q '^package\.json$'; then
   fi
 fi
 
-# 3) Otonom Registry Sync (V8)
-printf "\n[*] Otonom Registry Sync başlatılıyor...\n"
-python registry/manage_registry.py repair
-# Sadece registry içindeki muhtemel güncellenen markdown dosyalarını otomatik ekle
-git add registry/PULSE.md registry/*/*.md registry/*/*/*.md >/dev/null 2>&1 || true
-printf "[+] Registry güncellendi ve commite dahil edildi.\n\n"
+# 3) Otonom Registry Sync (V8 - SAFE MODE)
+# NOT: Git pre-commit aşamasında 'git add' yapmak kilitlenmeye (deadlock) yol açar.
+# Bu yüzden registry güncellemeleri commit öncesi değil, commit sonrası veya manuel yapılmalıdır.
+printf "\n[*] Registry kontrolü atlandı (Manuel tetikleme önerilir: manage_registry.py normalize)\n"
 
 exit 0
-

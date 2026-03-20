@@ -5,6 +5,7 @@ import { Grid, List } from 'lucide-react'
 import ProductCard from '../../components/ProductCard'
 import CategoryFiltersComponent from '../../components/category/CategoryFilters'
 import { useI18n } from '../../i18n/I18nProvider'
+import PageShell from '../../components/layout/PageShell'
 import type { Product } from '../../lib/supabase'
 import type { DomainCategory } from '../../lib/type-converters'
 import type { CategoryFilters } from '../../hooks/useCategoryGateway'
@@ -33,7 +34,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
   const { t } = useI18n()
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <PageShell width="wide" spacing="md">
       <div className="flex flex-col lg:flex-row gap-12">
         
         {/* Sidebar Filters */}
@@ -110,7 +111,7 @@ const CategoryGridView: React.FC<CategoryGridViewProps> = ({
           )}
         </main>
       </div>
-    </div>
+    </PageShell>
   )
 }
 

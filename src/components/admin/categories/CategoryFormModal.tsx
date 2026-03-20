@@ -5,13 +5,14 @@ import * as Tabs from '@radix-ui/react-tabs'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Upload, Trash2, Save, Loader2, AlertCircle } from 'lucide-react'
+import { X, Upload, Trash2, Save, Loader2, Layout } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import type { Database } from '../../../types/database.types'
 import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
+import type { AuthorityContent } from '../../../types/authority'
+import { AuthorityBuilder } from '../authority-builder/AuthorityBuilder'
 type CategoryUpdate = Database['public']['Tables']['categories']['Update']
 type CategoryInsert = Database['public']['Tables']['categories']['Insert']
-type Json = Database['public']['Tables']['categories']['Insert']['metadata']
 import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
@@ -44,12 +45,12 @@ interface CategoryFormModalProps {
 }
 
 export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOpenChange, categoryId, onSuccess, categories }) => {
-    const { t: _t } = useI18n() // Placeholder for i18n
+    const { t: _t } = useI18n()
     const [activeTab, setActiveTab] = useState('info')
     const [loading, setLoading] = useState(false)
     const [uploading, setUploading] = useState(false)
 
-    // Image state
+    const [authorityContent, setAuthorityContent] = useState<AuthorityContent | null>(null)
     const [image, setImage] = useState<{ url: string; file?: File; isNew?: boolean } | null>(null)
     const [initialData, setInitialData] = useState<DbCategory | null>(null)
 
@@ -70,6 +71,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             setInitialData(cat)
 
             const metadata = cat.metadata as unknown as CategoryMetadata | null
+            setAuthorityContent(cat.authority_content as unknown as AuthorityContent)
 
             reset({
                 name: cat.name,
@@ -111,6 +113,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             reset({ is_featured: false, sort_order: 0 })
             setImage(null)
             setInitialData(null)
+            setAuthorityContent(null)
             setActiveTab('info')
         }
     }, [open, categoryId, loadCategory, reset])
@@ -136,7 +139,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         try {
             let imgPath = data.image_url
 
-            // 1. Upload Image if new
             if (image?.isNew && image.file) {
                 setUploading(true)
                 try {
@@ -144,7 +146,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     const ext = 'webp'
                     const filename = `cat_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
                     const path = `${filename}`
-
                     const { error: upErr } = await supabase.storage.from('category-images').upload(path, compressedBlob, { contentType: 'image/webp' })
                     if (upErr) throw upErr
                     imgPath = path
@@ -152,7 +153,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                     setUploading(false)
                 }
             } else if (!image) {
-                // If cleared
                 imgPath = null
             }
 
@@ -162,7 +162,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 metric2: { value: data.metric2_value || '', label: data.metric2_label || '' }
             } as unknown as CategoryMetadata
 
-            const payload: Partial<DbCategory> = {
+            const payload: Partial<DbCategory> & { authority_content?: AuthorityContent | null } = {
                 name: data.name,
                 slug: data.slug,
                 parent_id: data.parent_id === '' ? null : data.parent_id,
@@ -172,7 +172,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 is_featured: data.is_featured,
                 sort_order: data.sort_order,
                 image_url: imgPath,
-                metadata: metadata as unknown as CategoryMetadata
+                metadata: metadata as unknown as CategoryMetadata,
+                authority_content: authorityContent
             }
 
             let currentId = categoryId
@@ -183,16 +184,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 ) as CategoryUpdate
                 const { error } = await supabase.from('categories').update(updateData).eq('id', currentId)
                 if (error) throw error
-
-                const { logAdminAction } = await import('../../../lib/audit')
-                await logAdminAction(supabase, {
-                    table_name: 'categories',
-                    row_pk: currentId,
-                    action: 'UPDATE',
-                    before: initialData as unknown as Json,
-                    after: payload as unknown as Json,
-                    comment: 'Update category via Modal'
-                })
             } else {
                 const insertData: CategoryInsert = Object.fromEntries(
                     Object.entries(payload).filter(([_, v]) => v !== undefined)
@@ -200,16 +191,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                 const { data: newCat, error } = await supabase.from('categories').insert(insertData).select('id').single()
                 if (error) throw error
                 currentId = newCat.id
-
-                const { logAdminAction } = await import('../../../lib/audit')
-                await logAdminAction(supabase, {
-                    table_name: 'categories',
-                    row_pk: currentId,
-                    action: 'INSERT',
-                    before: null,
-                    after: payload as unknown as Json,
-                    comment: 'Create category via Modal'
-                })
             }
 
             onSuccess()
@@ -223,11 +204,12 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         }
     }
 
-    const TabTrigger = ({ value, label }: { value: string, label: string }) => (
+    const TabTrigger = ({ value, label, icon: Icon }: { value: string, label: string, icon?: React.ElementType }) => (
         <Tabs.Trigger
             value={value}
-            className="px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-900 transition-all uppercase tracking-tight"
+            className="px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-900 transition-all uppercase tracking-tight flex items-center gap-2"
         >
+            {Icon && <Icon size={14} />}
             {label}
         </Tabs.Trigger>
     )
@@ -236,7 +218,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 animate-in fade-in duration-300" />
-                <Dialog.Content aria-describedby={undefined} className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-2xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
+                <Dialog.Content aria-describedby={undefined} className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
 
                     <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
                         <Dialog.Title className="text-xl font-bold text-primary-navy">
@@ -244,7 +226,6 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                         </Dialog.Title>
                         <Dialog.Close
                             className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all"
-                            aria-label={_t('common.close')}
                         >
                             <X size={20} />
                         </Dialog.Close>
@@ -258,8 +239,9 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                         ) : (
                             <form id="category-form" onSubmit={handleSubmit(onSubmit)} className="p-6">
                                 <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-                                    <Tabs.List className="flex border-b border-gray-200 mb-6">
+                                    <Tabs.List className="flex border-b border-gray-200 mb-6 sticky top-0 bg-white z-10 overflow-x-auto">
                                         <TabTrigger value="info" label="Genel Bilgiler" />
+                                        <TabTrigger value="builder" label="Page Builder" icon={Layout} />
                                         <TabTrigger value="image" label="Görsel" />
                                         <TabTrigger value="seo" label="SEO" />
                                         <TabTrigger value="metrics" label="3D Metrikleri" />
@@ -273,7 +255,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Slug</label>
-                                            <input {...register('slug')} placeholder="Otomatik (boş bırakılabilir)" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
+                                            <input {...register('slug')} placeholder="Otomatik" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Üst Kategori</label>
@@ -298,6 +280,14 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         </div>
                                     </Tabs.Content>
 
+                                    <Tabs.Content value="builder" className="space-y-4 min-h-[400px]">
+                                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-700 flex items-start gap-3 mb-4">
+                                            <Layout size={16} className="shrink-0 mt-0.5" />
+                                            <p className="font-medium leading-relaxed">Page Builder ile dinamik bloklar ekleyebilirsiniz. Bu içerikler ürün listesinin üzerinde görünecektir.</p>
+                                        </div>
+                                        <AuthorityBuilder value={authorityContent} onChange={setAuthorityContent} />
+                                    </Tabs.Content>
+
                                     <Tabs.Content value="image" className="space-y-4">
                                         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-500 hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer relative">
                                             <input type="file" accept="image/*" onChange={handleImageSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
@@ -307,59 +297,44 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
                                         {image && (
                                             <div className="relative border rounded-lg overflow-hidden w-full h-64 bg-gray-50 flex items-center justify-center">
                                                 <VentImage src={image.url} alt="Kategori" className="max-w-full max-h-full object-contain"  />
-                                                <button
-                                                    type="button"
-                                                    onClick={removeImage}
-                                                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
-                                                    aria-label={_t('common.remove')}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
+                                                <button type="button" onClick={removeImage} className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"><Trash2 size={16} /></button>
                                             </div>
                                         )}
                                     </Tabs.Content>
 
                                     <Tabs.Content value="seo" className="space-y-4">
-                                        <div className="bg-primary-navy/5 p-4 rounded-xl border border-primary-navy/10 text-xs text-primary-navy mb-2 flex items-start gap-3">
-                                            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                                            <p className="leading-relaxed font-medium">Bu bilgiler arama motorlarında (Google) kategori sayfasının nasıl görüneceğini belirler.</p>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Başlığı</label>
+                                            <input {...register('seo_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Başlığı (Title)</label>
-                                            <input {...register('seo_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" placeholder="Örn: En Kaliteli Fan Modelleri - VentHub" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Açıklaması (Description)</label>
-                                            <textarea {...register('seo_desc')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" placeholder="Sayfa içeriğini özetleyen kısa bir açıklama..." />
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Açıklaması</label>
+                                            <textarea {...register('seo_desc')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                         </div>
                                     </Tabs.Content>
 
                                     <Tabs.Content value="metrics" className="space-y-6">
-                                        <div className="bg-sky-50 border border-sky-100 rounded-xl p-4 mb-4">
-                                            <p className="text-sm text-sky-800 font-medium">Mega menüdeki 3D vitrin alanında görünecek olan istatistik değerleri.</p>
-                                        </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Değer</label>
-                                                <input {...register('metric1_value')} placeholder="Örn: 99.8%" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold" />
+                                                <input {...register('metric1_value')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Etiket</label>
-                                                <input {...register('metric1_label')} placeholder="Örn: ÇALIŞMA SÜRESİ" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all uppercase" />
+                                                <input {...register('metric1_label')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Değer</label>
-                                                <input {...register('metric2_value')} placeholder="Örn: -40%" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold" />
+                                                <input {...register('metric2_value')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Etiket</label>
-                                                <input {...register('metric2_label')} placeholder="Örn: ENERJİ" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all uppercase" />
+                                                <input {...register('metric2_label')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
                                             </div>
                                         </div>
                                     </Tabs.Content>
-
                                 </Tabs.Root>
                             </form>
                         )}
@@ -378,6 +353,3 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
         </Dialog.Root>
     )
 }
-
-
-

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Wind, Thermometer, DoorOpen, Zap, ArrowRight, ArrowLeft, RotateCcw } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
@@ -19,6 +20,9 @@ import {
 
 const AirCurtainCalcPage: React.FC = () => {
   const { t } = useI18n()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // Dynamic Step Configuration
   const steps = useMemo(() => [
@@ -66,12 +70,33 @@ const AirCurtainCalcPage: React.FC = () => {
   ], [t])
 
   // Form State
-  const [currentStep, setCurrentStep] = useState(1)
-  const [doorWidth, setDoorWidth] = useState('1.5')
-  const [doorHeight, setDoorHeight] = useState('2.5')
-  const [application, setApplication] = useState<AirCurtainApplication>('comfort')
-  const [windCondition, setWindCondition] = useState<WindCondition>('none')
-  const [trafficIntensity, setTrafficIntensity] = useState<TrafficIntensity>('medium')
+  const [currentStep, setCurrentStep] = useState(Number(searchParams?.get('step')) || 1)
+  const [doorWidth, setDoorWidth] = useState(searchParams?.get('doorWidth') || '1.5')
+  const [doorHeight, setDoorHeight] = useState(searchParams?.get('doorHeight') || '2.5')
+  const [application, setApplication] = useState<AirCurtainApplication>(
+    (searchParams?.get('application') as AirCurtainApplication) || 'comfort'
+  )
+  const [windCondition, setWindCondition] = useState<WindCondition>(
+    (searchParams?.get('windCondition') as WindCondition) || 'none'
+  )
+  const [trafficIntensity, setTrafficIntensity] = useState<TrafficIntensity>(
+    (searchParams?.get('trafficIntensity') as TrafficIntensity) || 'medium'
+  )
+
+  // URL Sync Effect
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams()
+    if (currentStep !== 1) params.set('step', currentStep.toString())
+    if (doorWidth !== '1.5') params.set('doorWidth', doorWidth)
+    if (doorHeight !== '2.5') params.set('doorHeight', doorHeight)
+    if (application !== 'comfort') params.set('application', application)
+    if (windCondition !== 'none') params.set('windCondition', windCondition)
+    if (trafficIntensity !== 'medium') params.set('trafficIntensity', trafficIntensity)
+
+    const query = params.toString()
+    router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+  }, [currentStep, doorWidth, doorHeight, application, windCondition, trafficIntensity, pathname, router])
 
   // Result State
   const [result, setResult] = useState<ReturnType<typeof calculateAirCurtain> | null>(null)

@@ -38,6 +38,7 @@ import ImageGallery from '../components/ImageGallery'
 import { RichTextRenderer } from '../components/products/RichTextRenderer'
 import { AddToProjectModal } from '../components/products'
 import { useProjectLists } from '../hooks/useProjectLists'
+import PageShell from '../components/layout/PageShell'
 import { 
   translateSpecKey, 
   formatSpecValue, 
@@ -285,7 +286,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        <PageShell spacing="sm" className="pt-4 sm:pt-6">
           <nav className="flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
             <Link href="/" className="hover:text-primary-navy transition-colors">
               {t('category.breadcrumbHome')}
@@ -311,10 +312,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               {product.name}
             </span>
           </nav>
-        </div>
+        </PageShell>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <PageShell spacing="sm" className="py-6 sm:py-8">
         {/* Back Button - Lighter Style */}
         <button
           onClick={() => {
@@ -530,7 +531,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
           </div>
         </div>
-      </div>
+      </PageShell>
 
       <AddToProjectModal 
         product={product} 
@@ -569,7 +570,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         className={`transition-all duration-500 z-[40] bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <PageShell spacing="none" className="flex items-center justify-between">
           <nav className="flex space-x-1 overflow-x-auto py-3 sm:py-4 no-scrollbar">
             {sections.map((section) => (
               <button
@@ -605,20 +606,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               </button>
             </div>
           )}
-        </div>
+        </PageShell>
       </div>
 
       <div className="space-y-0">
         {sections.map((section) => {
           const IconComponent = section.icon
           return (
-            <section
+            <PageShell
               key={section.id}
               ref={(el) => { sectionRefs.current[section.id] = el }}
               data-section={section.id}
-              className={`${section.bgClass} py-12 sm:py-20 transition-all duration-500 border-b border-light-gray/20 last:border-0`}
+              spacing="lg"
+              className={`${section.bgClass} transition-all duration-500 border-b border-light-gray/20 last:border-0`}
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center space-x-4 mb-10 sm:mb-12">
                   <div className="bg-slate-900 text-white p-3 rounded-xl shadow-sm">
                     <IconComponent size={20} />
@@ -805,14 +806,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                     </div>
                   )}
                 </div>
-              </div>
-            </section>
+            </PageShell>
           )
         })}
       </div>
 
       <div className="bg-white py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <PageShell spacing="none" className="text-center">
           {relatedProducts.length > 0 && (
             <>
               <h2 className="text-xl sm:text-2xl font-black text-industrial-gray mb-10 uppercase tracking-tight">
@@ -823,7 +823,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               </div>
             </>
           )}
-        </div>
+        </PageShell>
       </div>
       <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} productId={product.id} />
     </div>

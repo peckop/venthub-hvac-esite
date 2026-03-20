@@ -1,10 +1,14 @@
 import type { Database, Json } from './database.types';
+import type { AuthorityContent as DynamicAuthorityContent } from './authority';
 
 export type PublicSchema = Database['public'];
 export type Tables = PublicSchema['Tables'];
 export type Enums = PublicSchema['Enums'];
 
-export type AuthorityContent = {
+/**
+ * @deprecated Eski statik otorite yapısı. Yeni projelerde DynamicAuthorityContent kullanılmalıdır.
+ */
+export type LegacyAuthorityContent = {
   brand?: {
     eyebrow?: string;
     title?: string;
@@ -40,6 +44,8 @@ export type AuthorityContent = {
   [key: string]: Json | undefined;
 };
 
+export type AuthorityContent = DynamicAuthorityContent;
+
 // Metadata structure for categories
 export interface CategoryMetadata {
   hero_title?: string;
@@ -71,7 +77,7 @@ export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description
   name: string;
   description: string | null;
   metadata: CategoryMetadata | null;
-  authority_content: Json | null;
+  authority_content: AuthorityContent | Json | null;
 };
 
 export type DbUserAddress = Tables['user_addresses']['Row'];

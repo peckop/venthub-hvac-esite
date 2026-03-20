@@ -97,6 +97,7 @@ export const TrustProofSection: React.FC = () => {
                 src="/images/hvac_installation_close_up_premium_3.png"
                 alt="Technical Installation"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />

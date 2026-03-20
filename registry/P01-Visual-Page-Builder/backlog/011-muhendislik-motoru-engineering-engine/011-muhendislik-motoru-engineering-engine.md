@@ -2,7 +2,7 @@
 completed_at: null
 started_at: null
 created_at: "2026-03-17 15:50:57"
-updated_at: "2026-03-19 23:21:16"
+updated_at: "2026-03-20 17:14:03"
 id: 011
 title: "Mühendislik Motoru (Engineering Engine)"
 status: "Planning"
