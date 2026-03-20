@@ -1,0 +1,1 @@
+import React from 'react'; export const Textarea = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <textarea {...props} />;

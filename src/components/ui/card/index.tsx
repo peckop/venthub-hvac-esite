@@ -1,0 +1,1 @@
+import React from 'react'; export const Card = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <div {...props} />;

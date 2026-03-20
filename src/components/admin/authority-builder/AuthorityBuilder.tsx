@@ -12,9 +12,9 @@ import {
   Layers,
   LucideIcon
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button/index';
+import { Card } from '@/components/ui/card/index';
+import { Badge } from '@/components/ui/badge/index';
 import { 
   AuthorityBlock, 
   AuthorityBlockType, 

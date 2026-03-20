@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input/index';
+import { Label } from '@/components/ui/label/index';
+import { Textarea } from '@/components/ui/textarea/index';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
+} from '@/components/ui/select/index';
 import { AuthorityBlock } from '@/types/authority';
 
 interface BlockEditorProps {

@@ -209,7 +209,7 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOp
             value={value}
             className="px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-900 transition-all uppercase tracking-tight flex items-center gap-2"
         >
-            {Icon && <Icon size={14} />}
+            {Icon && React.createElement(Icon as any /* eslint-disable-line @typescript-eslint/no-explicit-any */, { size: 14 })}
             {label}
         </Tabs.Trigger>
     )

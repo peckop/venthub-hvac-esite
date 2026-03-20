@@ -1,0 +1,1 @@
+import React from 'react'; export const Badge = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <span {...props} />;

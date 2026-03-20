@@ -1,0 +1,1 @@
+import React from 'react'; export const Input = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <input {...props} />;

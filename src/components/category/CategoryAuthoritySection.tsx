@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Shield, Settings, Info, Award, CheckCircle2 } from 'lucide-react'
-import type { AuthorityContent } from '../../types/db-rows'
+import type { LegacyAuthorityContent as AuthorityContent } from '../../types/db-rows'
 
 import { VentImage } from '@/components/ui/VentImage'
 

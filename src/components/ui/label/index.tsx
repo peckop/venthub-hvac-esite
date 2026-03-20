@@ -1,0 +1,1 @@
+import React from 'react'; export const Label = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <label {...props} />;

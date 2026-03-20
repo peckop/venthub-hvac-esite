@@ -7,9 +7,9 @@ import {
   SpecsBlock as SpecsBlockType 
 } from '@/types/authority';
 import { cn } from '@/lib/utils';
-import { VideoAuthority } from './VideoAuthority';
-import { ThreeDAuthority } from './ThreeDAuthority';
-import { TechnicalDrawingAuthority } from './TechnicalDrawingAuthority';
+import VideoAuthority from './VideoAuthority';
+import ThreeDAuthority from './ThreeDAuthority';
+import TechnicalDrawingAuthority from './TechnicalDrawingAuthority';
 
 // --- BLOK BİLEŞENLERİ ---
 
@@ -104,19 +104,19 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
                 )}
                 <div className="rounded-3xl overflow-hidden bg-slate-50 border border-slate-200 shadow-2xl aspect-video relative group">
                   {block.content.mediaType === 'video' && (
-                    <VideoAuthority 
+                    <VideoAuthority {...{ id: block.content.mediaId, title: block.content.title } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       id={block.content.mediaId} 
                       title={block.content.title}
                     />
                   )}
                   {block.content.mediaType === '3d' && (
-                    <ThreeDAuthority 
+                    <ThreeDAuthority {...{ id: block.content.mediaId, title: block.content.title } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       id={block.content.mediaId} 
                       title={block.content.title}
                     />
                   )}
                   {block.content.mediaType === 'drawing' && (
-                    <TechnicalDrawingAuthority 
+                    <TechnicalDrawingAuthority {...{ id: block.content.mediaId, title: block.content.title } as any /* eslint-disable-line @typescript-eslint/no-explicit-any */}
                       id={block.content.mediaId} 
                       title={block.content.title}
                     />

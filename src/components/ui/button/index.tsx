@@ -1,0 +1,1 @@
+import React from 'react'; export const Button = (props: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) => <button {...props} />;

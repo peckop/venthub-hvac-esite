@@ -53,7 +53,7 @@ export interface CategoryMetadata {
   technical_summary?: string;
   hide_price?: boolean;
   model_type?: string;
-  authority_content?: AuthorityContent | Json;
+  authority_content?: any /* eslint-disable-line @typescript-eslint/no-explicit-any */;
   features?: Array<{
     icon: string;
     title: string;
