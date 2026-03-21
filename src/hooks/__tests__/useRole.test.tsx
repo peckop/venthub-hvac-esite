@@ -10,7 +10,7 @@ vi.mock('../useAuth', () => ({
 
 describe('useRole', () => {
     it('should return initial loading state and restrict access', () => {
-        (useAuth as Mock).mockReturnValue({ role: null, loading: true });
+        (useAuth as Mock).mockReturnValue({ role: null, loading: true, roleLoading: false });
 
         const { result } = renderHook(() => useRole());
 
@@ -22,7 +22,7 @@ describe('useRole', () => {
     });
 
     it('should correctly evaluate "admin" role permissions', () => {
-        (useAuth as Mock).mockReturnValue({ role: 'admin', loading: false });
+        (useAuth as Mock).mockReturnValue({ role: 'admin', loading: false, roleLoading: false });
 
         const { result } = renderHook(() => useRole());
 
@@ -36,7 +36,7 @@ describe('useRole', () => {
     });
 
     it('should correctly evaluate "viewer" role permissions', () => {
-        (useAuth as Mock).mockReturnValue({ role: 'viewer', loading: false });
+        (useAuth as Mock).mockReturnValue({ role: 'viewer', loading: false, roleLoading: false });
 
         const { result } = renderHook(() => useRole());
 
@@ -49,7 +49,7 @@ describe('useRole', () => {
     });
 
     it('should correctly evaluate "super_admin" role permissions', () => {
-        (useAuth as Mock).mockReturnValue({ role: 'super_admin', loading: false });
+        (useAuth as Mock).mockReturnValue({ role: 'super_admin', loading: false, roleLoading: false });
 
         const { result } = renderHook(() => useRole());
 

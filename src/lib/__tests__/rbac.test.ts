@@ -19,8 +19,7 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canAccessPage('viewer', '/admin/users')).toBe(false);
         });
 
-        it('should allow superadmin access to /admin/users', () => {
-            expect(canAccessPage('superadmin', '/admin/users')).toBe(true);
+        it('should allow super_admin access to /admin/users', () => {
             expect(canAccessPage('super_admin', '/admin/users')).toBe(true);
         });
 
@@ -51,8 +50,7 @@ describe('RBAC (Role Based Access Control)', () => {
             expect(canWrite('admin', 'users')).toBe(false);
         });
 
-        it('should allow superadmin write access to anything', () => {
-            expect(canWrite('superadmin', 'users')).toBe(true);
+        it('should allow super_admin write access to anything', () => {
             expect(canWrite('super_admin', 'orders')).toBe(true);
         });
 
@@ -79,7 +77,7 @@ describe('RBAC (Role Based Access Control)', () => {
 
         it('should return false for admin, superadmin, warehouse, sales roles', () => {
             expect(isReadOnly('admin')).toBe(false);
-            expect(isReadOnly('superadmin')).toBe(false);
+            expect(isReadOnly('super_admin')).toBe(false);
             expect(isReadOnly('warehouse')).toBe(false);
             expect(isReadOnly('sales')).toBe(false);
         });
