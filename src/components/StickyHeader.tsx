@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 
-import { getUserRole } from '../config/admin'
+import { isAdminByEmail } from '../config/admin'
 import { useNavigationState } from '../hooks/useNavigationState'
 import { useHideOnScroll } from '../hooks/useHideOnScroll'
 import { useAuth } from '../hooks/useAuth'
@@ -36,7 +36,7 @@ interface StickyHeaderProps {
 export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHeader({ isScrolled }) {
   const { t, lang } = useI18n()
   const router = useRouter()
-  const pathname = usePathname()
+  // const pathname = usePathname()
   
   const {
     isMenuOpen,
