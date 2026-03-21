@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: { message: error.message } as AuthError };
     
@@ -88,9 +88,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     return {};
-  };
+  }, [fetchRole]);
 
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = useCallback(async (email: string, password: string, name: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -98,9 +98,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     if (error) return { error: { message: error.message } as AuthError };
     return {};
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await supabase.auth.signOut();
       setUser(null);
@@ -109,15 +109,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error signing out:', error);
     }
-  };
+  }, []);
 
-  const resetPassword = async (email: string) => {
+  const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email);
     if (error) return { error: { message: error.message } as AuthError };
     return {};
-  };
+  }, []);
 
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
     try {
       const { data: { session: refreshedSession } } = await supabase.auth.refreshSession();
       setSession(refreshedSession);
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error refreshing session:', error);
       return null;
     }
-  };
+  }, [fetchRole]);
 
   const value = useMemo(() => ({
     user,
