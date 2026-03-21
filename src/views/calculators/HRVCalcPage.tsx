@@ -40,7 +40,7 @@ const HRVCalcPage: React.FC = () => {
   ], [t])
 
   const buildingOptions = useMemo(() => [
-    { value: 'residential', label: t('common.home'), description: 'Domestic' },
+    { value: 'residential', label: t('common.homeLabel'), description: 'Domestic' },
     { value: 'office', label: t('calculators.hrv.form.office'), description: 'Workplace' },
     { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: 'Retail/Mall' }
   ], [t])

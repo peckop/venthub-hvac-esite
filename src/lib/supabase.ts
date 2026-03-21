@@ -152,7 +152,7 @@ export async function getCategories(): Promise<Category[]> {
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUICategoryList((data as DbCategory[]) || [])
+  return toUICategoryList((data as unknown as DbCategory[]) || [])
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
