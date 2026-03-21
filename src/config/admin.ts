@@ -34,19 +34,7 @@ export const FALLBACK_ADMIN_EMAILS: string[] = [
   // Acil durum için e-postalar
 ]
 
-function isProdEnv(): boolean {
-  try {
-    // Next.js & Node environment
-    if (process.env.NODE_ENV === 'production') return true
-
-    // Hostname bazlı koruma (Cloudflare Pages vs)
-    if (typeof window !== 'undefined') {
-      const h = window.location.hostname
-      if (h.endsWith('pages.dev') || /venthub-hvac-esite/i.test(h)) return true
-    }
-  } catch { }
-  return false
-}
+// function isProdEnv(): boolean { ... (Removed to avoid unused var)
 
 /**
  * Database'den kullanıcı rolünü getir
