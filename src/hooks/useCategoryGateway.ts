@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Product, getProductsEnriched } from '../lib/supabase'
-import { mapDatabaseCategoryToDomain, toUICategoryList, DomainCategory } from '../lib/type-converters'
+import { mapDatabaseCategoryToDomain, DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useIsMounted } from './useIsMounted'
 import { useCategories } from '../contexts/CategoryContext'

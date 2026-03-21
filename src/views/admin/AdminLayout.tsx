@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
 import { isAdminByEmail } from '../../config/admin'
 import AccessDenied from '../../components/admin/AccessDenied'
-import AdminSkeleton from '../../components/admin/AdminSkeleton'
+// import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   BarChart3,

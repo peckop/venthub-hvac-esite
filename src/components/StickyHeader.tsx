@@ -2,9 +2,9 @@
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
-import { isAdminByEmail } from '../config/admin'
+// import { isAdminByEmail } from '../config/admin'
 import { useNavigationState } from '../hooks/useNavigationState'
 import { useHideOnScroll } from '../hooks/useHideOnScroll'
 import { useAuth } from '../hooks/useAuth'
