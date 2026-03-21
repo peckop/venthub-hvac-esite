@@ -7,12 +7,11 @@ import {
   MediaBlock,
   RichTextBlock,
   FeaturesGridBlock,
-  AuthorityBlockType,
   ComparisonBlock,
   CtaBannerBlock,
   SpecsBlock
 } from '@/types/authority';
-import { Plus, Trash2, LayoutGrid, Type, Image as ImageIcon, Video, Box, Table, ArrowRightLeft, MousePointer2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 // Standart Form Sınıfları
 const labelClass = "text-sm font-black uppercase tracking-widest text-slate-400 mb-1 block";
