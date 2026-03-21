@@ -1,26 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
-    ChevronDown,
-    Wind,
-    Zap,
-    Activity,
-    Shield,
-    Thermometer,
-    Leaf,
-    ShieldCheck,
-    Sparkles,
-    Settings,
-    Cpu,
-    Wrench,
-    Layers,
-    Maximize,
-    Droplet,
-    Home,
-    Box,
-    Filter,
-    ArrowRight,
-    ThermometerSun,
     LucideIcon
 } from 'lucide-react'
 import ProductCard from '../ProductCard'
@@ -41,9 +21,7 @@ import {
     SilentFanTypeComparison,
     SilentFanFAQ
 } from './sections'
-import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
-import { mapDatabaseCategoryToDomain, mapDatabaseProductToDomain } from '../../lib/type-converters'
+import { mapDatabaseProductToDomain } from '../../lib/type-converters'
 
 interface CategoryLandingProps {
     category: DbCategory
@@ -53,8 +31,8 @@ interface CategoryLandingProps {
     groupedSeries?: Array<{ name: string; products: DbProduct[]; image?: string; minPrice: number }>
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [], parentCategory }) => {
-    const { t } = useI18n()
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
+    // const { t } = useI18n()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)

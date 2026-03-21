@@ -107,11 +107,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     const items = [{ label: t('category.breadcrumbHome'), href: '/' }];
     
     if (hierarchy.main) {
-      items.push({ label: (hierarchy.main as any).name, href: `/category/${(hierarchy.main as any).slug}` });
+      items.push({ label: hierarchy.main.name, href: `/category/${hierarchy.main.slug}` });
     }
     
     if (hierarchy.sub && hierarchy.sub.slug !== hierarchy.main?.slug) {
-      items.push({ label: (hierarchy.sub as any).name, href: `/category/${(hierarchy.main as any)?.slug || 'all'}/${(hierarchy.sub as any).slug}` });
+      items.push({ label: hierarchy.sub.name, href: `/category/${hierarchy.main?.slug || 'all'}/${hierarchy.sub.slug}` });
     }
     
     if (product) {
@@ -287,7 +287,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     return null
   }
 
-  const topicSlug = mapSlugToTopic((hierarchy.sub as any)?.slug) || mapSlugToTopic((hierarchy.main as any)?.slug)
+  const topicSlug = mapSlugToTopic(hierarchy.sub?.slug) || mapSlugToTopic(hierarchy.main?.slug)
   const [origin, setOrigin] = useState('')
   useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
@@ -318,7 +318,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const canonicalUrl = `${origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
-  const categoryMetadata = (hierarchy.main as any)?.metadata as CategoryMetadata | null
+  const categoryMetadata = hierarchy.main?.metadata as CategoryMetadata | null
 
   return (
     <div className="min-h-screen bg-slate-50/30">

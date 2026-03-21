@@ -68,7 +68,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
 
   const userMenuRef = useRef<HTMLDivElement>(null)
 
-  const isAdmin = pathname?.startsWith('/admin')
+  // const isAdmin = pathname?.startsWith('/admin')
 
   useEffect(() => {
     try {
