@@ -11,12 +11,14 @@ const StrategicBrands = dynamic(() => import('../../components/home/StrategicBra
 const KnowledgeBlock = dynamic(() => import('../../components/home/KnowledgeBlock'), { ssr: false, loading: () => <div className="w-full h-[400px] bg-white animate-pulse" /> })
 const RevealSection = dynamic(() => import('../../components/home/RevealSection'), { ssr: false })
 import HomePageClientWrapper from '../../components/home/HomePageClientWrapper'
-import { Category, Product } from '../../lib/supabase'
+import { Product } from '../../lib/supabase'
+import { DomainCategory } from '../../lib/type-converters'
 
 interface HomePageProps {
-  initialCategories?: Category[]
+  initialCategories?: DomainCategory[]
   initialProducts?: Product[]
 }
+
 
 export const HomePage: React.FC<HomePageProps> = ({ initialCategories = [], initialProducts = [] }) => {
   // SSR to Client Prop aktarım kuralı gereği, 'onQuoteClick' gibi event handlerlar Server Component'ten geçilemez.

@@ -6,12 +6,13 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { HVAC_BRANDS } from '../lib/brands'
-import { supabase, Product } from '../lib/supabase'
+import { getProductsEnriched, type Product } from '../lib/supabase'
 import { BrandIcon } from '../components/HVACIcons'
 import { ArrowRight, Package, ExternalLink } from 'lucide-react'
 import Seo from '../components/Seo'
 import { useI18n } from '../i18n/I18nProvider'
 import { motion } from 'framer-motion'
+import Breadcrumb from '../components/navigation/Breadcrumb'
 
 const BRAND_DETAILS: Record<string, {
   founded?: number
@@ -96,19 +97,17 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
+  // --- GATEWAY ADAPTATION: CENTRAL PRODUCT ENGINE ---
   useEffect(() => {
     const loadProducts = async () => {
       if (!brand) return
       setLoading(true)
       try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .eq('brand', brand.name)
-          .eq('status', 'active')
-          .limit(8)
-
-        if (!error && data) setProducts(data as Product[])
+        const data = await getProductsEnriched({
+          brand: brand.name,
+          limit: 8
+        })
+        setProducts(data)
       } catch (e) {
         console.error('Error loading brand products:', e)
       } finally {
@@ -117,6 +116,12 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
     }
     loadProducts()
   }, [brand])
+
+  const breadcrumbItems = [
+    { label: t('category.breadcrumbHome'), href: '/' },
+    { label: t('brands.title') || 'Markalar', href: '/brands' },
+    { label: brand?.name || slug }
+  ]
 
   if (!brand) {
     return (
@@ -138,6 +143,9 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
   return (
     <div className="min-h-screen bg-white">
       <Seo title={`${brand.name} | VentHub`} description={brand.description} />
+
+      {/* STANDARD BREADCRUMB */}
+      <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-6" />
 
       {/* Brand Hero: Ultra Premium Cinema Look */}
       <section className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden bg-slate-950 text-white">

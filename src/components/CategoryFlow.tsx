@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import Link from 'next/link'
-import { getCategories, Category } from '../lib/supabase'
 import {
     Wind, Fan, Droplet, Thermometer,
     AirVent, Settings, Package, Wrench, LucideIcon
 } from 'lucide-react'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { useCategories } from '../contexts/CategoryContext'
+import { DomainCategory } from '../lib/type-converters'
 
 // Kategori ikonları - slug bazlı eşleme
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
-    'hava-perdeleri': Wind,
+    'hava-perdesi': Wind,
     'fanlar': Fan,
     'nem-alma-cihazlari': Droplet,
     'isi-geri-kazanim-cihazlari': Thermometer,
@@ -21,7 +22,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 
 // Kategori renkleri - premium görünüm
 const CATEGORY_COLORS: Record<string, string> = {
-    'hava-perdeleri': 'from-blue-500 to-blue-700',
+    'hava-perdesi': 'from-blue-500 to-blue-700',
     'fanlar': 'from-emerald-500 to-emerald-700',
     'nem-alma-cihazlari': 'from-cyan-500 to-cyan-700',
     'isi-geri-kazanim-cihazlari': 'from-orange-500 to-orange-700',
@@ -31,7 +32,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     'aksesuarlar': 'from-gray-500 to-gray-700',
 }
 
-function CategoryCard({ category }: { category: Category }) {
+function CategoryCard({ category }: { category: DomainCategory }) {
     const Icon = CATEGORY_ICONS[category.slug] || Package
     const gradient = CATEGORY_COLORS[category.slug] || 'from-gray-500 to-gray-700'
 
@@ -82,7 +83,7 @@ function ScrollingLane({
     direction = 'left',
     speed = 30
 }: {
-    categories: Category[]
+    categories: DomainCategory[]
     direction?: 'left' | 'right'
     speed?: number
 }) {
@@ -115,32 +116,15 @@ const CategoryFlow: React.FC<CategoryFlowProps> = ({
     title = 'Ürün Kategorilerimiz',
     subtitle = 'Havalandırma çözümlerinde tüm ihtiyaçlarınız için'
 }) => {
-    const [categories, setCategories] = useState<Category[]>([])
-    const [loading, setLoading] = useState(true)
+    const { categories: allCategories, loading } = useCategories()
 
-    useEffect(() => {
-        let cancelled = false
-        async function fetchData() {
-            try {
-                const data = await getCategories()
-                // Sadece ana kategorileri al (parent_id null)
-                const mainCategories = data.filter(c => !c.parent_id)
-                if (!cancelled) {
-                    setCategories(mainCategories)
-                }
-            } catch (e) {
-                console.warn('CategoryFlow fetch error:', e)
-            } finally {
-                if (!cancelled) setLoading(false)
-            }
-        }
-        fetchData()
-        return () => { cancelled = true }
-    }, [])
+    const mainCategories = useMemo(() => 
+        allCategories.filter(c => !c.parent_id),
+    [allCategories])
 
     // İki lane için kategorileri böl
-    const lane1 = useMemo(() => categories.filter((_, i) => i % 2 === 0), [categories])
-    const lane2 = useMemo(() => categories.filter((_, i) => i % 2 === 1), [categories])
+    const lane1 = useMemo(() => mainCategories.filter((_, i) => i % 2 === 0), [mainCategories])
+    const lane2 = useMemo(() => mainCategories.filter((_, i) => i % 2 === 1), [mainCategories])
 
     if (loading) {
         return (
@@ -152,9 +136,10 @@ const CategoryFlow: React.FC<CategoryFlowProps> = ({
         )
     }
 
-    if (categories.length === 0) {
+    if (mainCategories.length === 0) {
         return null
     }
+
 
     return (
         <>

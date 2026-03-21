@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { getCategories, Product, getProductsEnriched } from '../lib/supabase'
+import { Product, getProductsEnriched } from '../lib/supabase'
 import { mapDatabaseCategoryToDomain, toUICategoryList, DomainCategory } from '../lib/type-converters'
 import { useManualScrollRestoration } from '../hooks/useManualScrollRestoration'
 import { useIsMounted } from './useIsMounted'
+import { useCategories } from '../contexts/CategoryContext'
 import type { DbCategory } from '../types/db-rows'
 
 export interface CategoryFilters {
@@ -40,6 +41,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { categories: globalCategories, loading: categoriesLoading } = useCategories()
 
   const slug = (params?.slug || params?.subCategorySlug || params?.categorySlug) as string
   const parentSlug = (params?.parentSlug || (params?.subCategorySlug ? params?.categorySlug : undefined)) as string | undefined
@@ -48,7 +50,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
   const [parentCategory, setParentCategory] = useState<DomainCategory | null>(null)
   const [subCategories, setSubCategories] = useState<DomainCategory[]>([])
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(!initialCategory)
+  const [loading, setLoading] = useState(true)
 
   // 1. Always start with defaults for SSR compatibility
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS)
@@ -112,69 +114,68 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
 
   useEffect(() => {
     async function fetchData() {
-      if (!slug) return
+      // If we are still loading categories globally, wait
+      if (categoriesLoading || globalCategories.length === 0) return
 
       try {
-        let targetCategoryRow: DbCategory | null = initialCategory || null
-        let targetParentCategoryRow: DbCategory | null = null
-        let allCategories: DbCategory[] = []
+        let targetCategory: DomainCategory | null = null
+        let targetParentCategory: DomainCategory | null = null
 
-        // Fetch categories if needed
-        if (!targetCategoryRow || targetCategoryRow.slug !== slug) {
-          setLoading(true)
-          const rawCats = await getCategories()
-          allCategories = rawCats as unknown as DbCategory[]
-
-          if (parentSlug && slug) {
-            targetParentCategoryRow = allCategories.find(c => c.slug === parentSlug && !c.parent_id) || null
-            targetCategoryRow = allCategories.find(c => c.slug === slug && !!c.parent_id) || null
+        // Find Category from Central Store
+        if (slug) {
+          if (parentSlug) {
+            targetParentCategory = globalCategories.find(c => c.slug === parentSlug && !c.parent_id) || null
+            targetCategory = globalCategories.find(c => c.slug === slug && c.parent_id === targetParentCategory?.id) || null
           } else {
-            targetCategoryRow = allCategories.find(c => c.slug === slug && !c.parent_id) || null
+            targetCategory = globalCategories.find(c => c.slug === slug && !c.parent_id) || null
           }
-        } else if (!targetCategoryRow.parent_id) {
-          const rawCats = await getCategories()
-          allCategories = rawCats as unknown as DbCategory[]
         }
 
-        if (!targetCategoryRow) {
+        // If not found and we have an initialCategory, use it (Fallback)
+        if (!targetCategory && initialCategory) {
+          targetCategory = mapDatabaseCategoryToDomain(initialCategory)
+        }
+
+        if (!targetCategory && slug) {
           setLoading(false)
           return
         }
 
-        const domainCat = mapDatabaseCategoryToDomain(targetCategoryRow)
-        setCategory(domainCat)
-        setParentCategory(targetParentCategoryRow ? mapDatabaseCategoryToDomain(targetParentCategoryRow) : null)
+        setCategory(targetCategory)
+        setParentCategory(targetParentCategory)
 
-        // Subcategories logic
-        let subs: DbCategory[] = []
-        if (!targetCategoryRow.parent_id) {
-          subs = allCategories
-            .filter(c => c.parent_id === targetCategoryRow!.id)
+        // Subcategories logic (Centralized)
+        let subs: DomainCategory[] = []
+        if (targetCategory && !targetCategory.parent_id) {
+          subs = globalCategories
+            .filter(c => c.parent_id === targetCategory!.id)
             .sort((a, b) => {
               const orderA = Number((a.metadata as Record<string, unknown>)?.sort_order ?? 0)
               const orderB = Number((b.metadata as Record<string, unknown>)?.sort_order ?? 0)
               return orderA !== orderB ? orderA - orderB : a.name.localeCompare(b.name)
             })
-          setSubCategories(toUICategoryList(subs))
+          setSubCategories(subs)
         }
 
         // Enriched Product Fetching
-        const categoryIds = (!targetCategoryRow.parent_id && subs.length > 0)
-          ? [targetCategoryRow.id, ...subs.map(s => s.id)]
-          : [targetCategoryRow.id]
+        const categoryIds = (targetCategory && !targetCategory.parent_id && subs.length > 0)
+          ? [targetCategory.id, ...subs.map(s => s.id)]
+          : (targetCategory ? [targetCategory.id] : [])
 
-        const productsData = await getProductsEnriched({
-          categoryIds,
-          limit: 100
-        })
-        
-        setProducts(productsData)
+        if (categoryIds.length > 0 || !slug) {
+          const productsData = await getProductsEnriched({
+            categoryIds: categoryIds.length > 0 ? categoryIds : undefined,
+            limit: 100
+          })
+          
+          setProducts(productsData)
 
-        // Auto-calculate max price
-        const prices = productsData.map(p => p.price).filter((v): v is number => v != null && Number.isFinite(v))
-        if (prices.length > 0) {
-          const maxPrice = Math.ceil(Math.max(...prices))
-          setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], maxPrice)] }))
+          // Auto-calculate max price
+          const prices = productsData.map(p => p.price).filter((v): v is number => v != null && Number.isFinite(v))
+          if (prices.length > 0) {
+            const maxPrice = Math.ceil(Math.max(...prices))
+            setFilters(prev => ({ ...prev, priceRange: [prev.priceRange[0], Math.max(prev.priceRange[1], maxPrice)] }))
+          }
         }
 
       } catch (error) {
@@ -185,7 +186,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     }
 
     fetchData()
-  }, [slug, parentSlug, initialCategory])
+  }, [slug, parentSlug, initialCategory, globalCategories, categoriesLoading])
 
   // Filtered and Sorted Products
   const filteredProducts = useMemo(() => {
@@ -263,17 +264,25 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     return Object.values(seriesMap).sort((a, b) => a.name.localeCompare(b.name))
   }, [filteredProducts])
 
-  // Derived Display Mode logic
+  // --- SMART DISPLAY MODE ENGINE ---
   const displayMode = useMemo(() => {
     if (!category) return 'grid'
     const meta = (category.metadata as Record<string, unknown>) || {}
     
-    // Inheritance
-    if (meta.hide_price === undefined && parentCategory?.metadata) {
-      meta.hide_price = (parentCategory.metadata as Record<string, unknown>).hide_price
-    }
+    // 1. Explicit override from Database (Source of Truth)
+    if (meta.display_mode) return meta.display_mode as string;
 
-    return (meta.display_mode as string) || (parentCategory ? 'series' : (subCategories.length > 0 ? 'showcase' : 'grid'))
+    // 2. Sub-Category or Series Level (Always Series/Grid)
+    if (parentCategory) return 'series';
+
+    // 3. Special "Premium Landing" Categories (Showcase Mode)
+    const premiumLandingSlugs = ['hava-perdesi', 'hava-perdeleri', 'sessiz-kanal-tipi-fanlar'];
+    if (premiumLandingSlugs.includes(category.slug)) return 'showcase';
+
+    // 4. Default for all other Top-Level categories (Grid Mode)
+    // This ensures "Aksesuarlar" or "Filters" show products immediately,
+    // with subcategories available in the sidebar as navigation.
+    return 'grid';
   }, [category, parentCategory, subCategories])
 
   return {

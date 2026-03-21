@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import Category3DIcon from '../products/Category3DIcon'
-import type { Category } from '../../lib/supabase'
 import type { CategoryMetadata } from '../../types/db-rows'
 import { useCategories } from '../../contexts/CategoryContext'
+import { DomainCategory } from '../../lib/type-converters'
 
 interface CategoryHubOverlayProps {
     isOpen: boolean
@@ -24,11 +24,11 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     const { categories, categoryTree: mainCategories } = useCategories()
     const [isAnimating, setIsAnimating] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
-    const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
-    const [selectedParentCategory, setSelectedParentCategory] = useState<Category | null>(null)
+    const [hoveredCategory, setHoveredCategory] = useState<DomainCategory | null>(null)
+    const [selectedParentCategory, setSelectedParentCategory] = useState<DomainCategory | null>(null)
 
     // Helper to get display name
-    const getCategoryDisplayName = (cat: Category) => {
+    const getCategoryDisplayName = (cat: DomainCategory) => {
         return cat.name;
     }
 
@@ -90,7 +90,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
         }
     }, [isOpen])
 
-    const handleCategoryClick = (category: Category) => {
+    const handleCategoryClick = (category: DomainCategory) => {
         const subCount = categories.filter(c => c.parent_id === category.id).length
         if (subCount > 0) {
             setSelectedParentCategory(category)
@@ -101,7 +101,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
         }
     }
 
-    const handleSubCategoryClick = (subCategory: Category) => {
+    const handleSubCategoryClick = (subCategory: DomainCategory) => {
         if (selectedParentCategory) {
             router.push(`/category/${selectedParentCategory.slug}/${subCategory.slug}`)
         } else {
@@ -109,6 +109,7 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
         }
         onClose()
     }
+
 
     if (!isVisible) return null
 

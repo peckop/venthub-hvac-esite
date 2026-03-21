@@ -1,13 +1,13 @@
 import type { BreadcrumbItem } from '../components/navigation/Breadcrumb'
 import { getCategoryDisplayName } from './categoryHelpers'
-import { Category } from '../lib/supabase'
+import { DomainCategory } from '../lib/type-converters'
 
 /**
  * Helper: Kategori sayfaları için breadcrumb items oluştur
  */
 export function buildCategoryBreadcrumb(
-    category: Category | null | undefined,
-    parentCategory?: Category | null,
+    category: DomainCategory | null | undefined,
+    parentCategory?: DomainCategory | null,
     homeLabel = 'Ana Sayfa'
 ): BreadcrumbItem[] {
     const items: BreadcrumbItem[] = [
@@ -30,6 +30,3 @@ export function buildCategoryBreadcrumb(
 
     return items
 }
-
-
-

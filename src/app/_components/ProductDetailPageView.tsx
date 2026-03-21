@@ -1,10 +1,14 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getProductBySlugOrId, getProductsBySubcategory, getCategories, Product, Category } from '../../lib/supabase'
-import { supabase } from '../../lib/supabase'
+import { 
+  getProductBySlugOrId, 
+  getProductsEnriched, 
+  type Product, 
+  supabase 
+} from '../../lib/supabase'
 import { useCart } from '../../hooks/useCartHook'
 import { BrandIcon } from '../../components/HVACIcons'
 import ProductCard from '../../components/ProductCard'
@@ -38,6 +42,8 @@ import { RichTextRenderer } from '../../components/products/RichTextRenderer'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
 import { AddToProjectModal } from '../../components/products'
 import { useProjectLists } from '../../hooks/useProjectLists'
+import { useCategories } from '../../contexts/CategoryContext'
+import { DomainCategory } from '../../lib/type-converters'
 import { 
   translateSpecKey, 
   formatSpecValue, 
@@ -51,17 +57,17 @@ export interface ProductDetailPageProps {
 }
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
+  const { t, lang } = useI18n()
   const params = useParams()
-  // Clean potential 'cc' suffix from URL id for consistency with database IDs
   const id = (params?.id as string)?.replace(/cc$/, '')
   const router = useRouter()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
+  const { categories } = useCategories()
+  
   const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProduct)
-  const [mainCategory, setMainCategory] = useState<Category | null>(null)
-  const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('general')
@@ -71,8 +77,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+  
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const navTriggerRef = useRef<HTMLDivElement>(null)
+
+  // --- GATEWAY ADAPTATION: CENTRAL CATEGORY DISPATCH ---
+  const { mainCategory, subCategory } = useMemo(() => {
+    if (!product) return { mainCategory: null, subCategory: null }
+    
+    const sc = categories.find(c => c.id === product.subcategory_id) || null
+    const mc = categories.find(c => c.id === product.category_id) || null
+    
+    return { mainCategory: mc, subCategory: sc }
+  }, [product, categories])
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
@@ -109,6 +126,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           return
         }
         setProduct(productData)
+        // Fetch Images
         try {
           const { data: imgs } = await supabase
             .from('product_images')
@@ -118,17 +136,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           const list = (imgs || []) as { path: string; alt?: string | null }[]
           setImages(list)
         } catch { }
-        const cats = await getCategories()
-        if (productData.category_id) {
-          const mc = cats.find(c => c.id === productData.category_id) || null
-          setMainCategory(mc)
-        }
+
+        // Related Products (GATEWAY ADAPTATION)
         if (productData.subcategory_id) {
-          const sc = cats.find(c => c.id === productData.subcategory_id) || null
-          setSubCategory(sc)
-        }
-        if (productData.subcategory_id) {
-          const related = await getProductsBySubcategory(productData.subcategory_id)
+          const related = await getProductsEnriched({ 
+            categoryIds: [productData.subcategory_id],
+            limit: 10
+          })
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
@@ -220,8 +234,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       toast.success(t('pdp.shareCopied') || 'Link kopyalandı!')
     }
   }
-
-  const { t, lang } = useI18n()
 
   const sections = [
     { id: 'general', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
