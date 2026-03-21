@@ -36,10 +36,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getInitialSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
+
+      // Force session refresh on sign-in event to ensure context is updated
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        setUser(freshUser);
+      }
     });
 
     return () => {

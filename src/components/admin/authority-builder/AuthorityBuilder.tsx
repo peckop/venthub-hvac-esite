@@ -96,9 +96,9 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
         </div>
 
         <div className="flex bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-          <button className={activeTab === 'editor' ? btnSecondary : btnGhost} onClick={() => setActiveTab('editor')}>Editör</button>
-          <button className={activeTab === 'preview' ? btnSecondary : btnGhost} onClick={() => setActiveTab('preview')}>Önizleme</button>
-          <button className={activeTab === 'json' ? btnSecondary : btnGhost} onClick={() => setActiveTab('json')}>JSON</button>
+          <button type="button" className={activeTab === 'editor' ? btnSecondary : btnGhost} onClick={() => setActiveTab('editor')}>Editör</button>
+          <button type="button" className={activeTab === 'preview' ? btnSecondary : btnGhost} onClick={() => setActiveTab('preview')}>Önizleme</button>
+          <button type="button" className={activeTab === 'json' ? btnSecondary : btnGhost} onClick={() => setActiveTab('json')}>JSON</button>
         </div>
       </div>
 
@@ -108,7 +108,8 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
             {BLOCK_TYPES.map((bt) => (
               <button
                 key={bt.type}
-                className={`${btnOutline} h-auto py-3 flex-col gap-2 border-dashed hover:border-indigo-400 hover:bg-indigo-50`}
+                type="button"
+                className={`${btnOutline} h-auto py-3 flex-col gap-2 border-dashed hover:border-indigo-400 hover:bg-indigo-50 relative z-10`}
                 onClick={() => addBlock(bt.type)}
               >
                 <bt.icon className="w-5 h-5 text-slate-400" />
@@ -130,9 +131,9 @@ export const AuthorityBuilder: React.FC<AuthorityBuilderProps> = ({
                     <span className={badgeClass}>{block.type}</span>
                     <div className="flex-1 px-4 truncate text-xs font-medium text-slate-500">ID: {block.id.slice(0, 8)}</div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={() => moveBlock(index, 'up')}><ChevronUp className="w-4 h-4" /></button>
-                      <button className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={() => moveBlock(index, 'down')}><ChevronDown className="w-4 h-4" /></button>
-                      <button className="h-8 w-8 flex items-center justify-center hover:bg-red-50 text-red-500 rounded" onClick={() => removeBlock(block.id)}><Trash2 className="w-4 h-4" /></button>
+                      <button type="button" className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={(e) => { e.preventDefault(); e.stopPropagation(); moveBlock(index, 'up'); }}><ChevronUp className="w-4 h-4" /></button>
+                      <button type="button" className="h-8 w-8 flex items-center justify-center hover:bg-slate-200 rounded" onClick={(e) => { e.preventDefault(); e.stopPropagation(); moveBlock(index, 'down'); }}><ChevronDown className="w-4 h-4" /></button>
+                      <button type="button" className="h-8 w-8 flex items-center justify-center hover:bg-red-50 text-red-500 rounded" onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeBlock(block.id); }}><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </div>
                   <div className="p-4 bg-white">

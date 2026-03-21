@@ -105,6 +105,14 @@ export function isDevAdmin(): boolean {
 export function checkAdminAccess(user: { email?: string; user_metadata?: { role?: string } } | null): boolean {
   if (!user?.email) return false
 
+  // Lokal geliştirmede tam yetki
+  const lowerEmail = user.email.toLowerCase()
+  if (process.env.NODE_ENV === 'development') {
+    if (lowerEmail === 'recep.varlik@gmail.com' || lowerEmail.includes('alize') || lowerEmail.includes('admin')) {
+      return true
+    }
+  }
+
   // 1) Supabase metadata rolü
   const metadataRole = user.user_metadata?.role
   if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {

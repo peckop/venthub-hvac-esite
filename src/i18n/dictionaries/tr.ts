@@ -45,7 +45,7 @@ export const tr = {
     featured: "Öne Çıkan Ürünler",
     newProducts: "Yeni Ürünler",
     whyUs: "Neden VentHub?",
-    home: "Ana Sayfa",
+    homeLabel: "Ana Sayfa",
     discoverPage: "Keşfet",
     notFound: "Sonuç bulunamadı",
     clearSearch: "Aramayı Temizle",
@@ -585,14 +585,6 @@ export const tr = {
       instagram: 'Instagram'
     }
   },
-  support: {
-    links: {
-      faq: 'Sıkça Sorulan Sorular',
-      returns: 'İade ve Değişim',
-      shipping: 'Teslimat ve Kargo',
-      warranty: 'Garanti ve Servis'
-    }
-  },
   admin: {
     common: {
       saveChanges: "Değişiklikleri Kaydet",
@@ -1065,5 +1057,754 @@ export const tr = {
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş'
     }
+  },
+
+  contactPage: {
+    title: 'İletişim',
+    subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
+    formTitle: 'Bize Mesaj Gönderin',
+    name: 'Adınız Soyadınız',
+    email: 'E-posta Adresiniz',
+    phone: 'Telefon Numaranız',
+    subject: 'Konu',
+    message: 'Mesajınız',
+    submit: 'Gönder',
+    submitting: 'Gönderiliyor...',
+    success: 'Mesajınız başarıyla iletildi. En kısa sürede size dönüş yapacağız.',
+    error: 'Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.',
+    officialDistributor: 'Resmi Distribütör & Mühendislik Ortağı',
+    address: 'Adres',
+    phoneLabel: 'Telefon',
+    emailLabel: 'E-posta',
+    workingHours: 'Çalışma Saatleri',
+    businessInquiry: 'İş Ortaklığı & Proje Teklifleri'
+  },
+
+  aboutPage: {
+    title: 'Hakkımızda',
+    subtitle: 'Havalandırma teknolojilerinde mühendislik ve inovasyonun birleştiği nokta.',
+    history: 'Hikayemiz',
+    vision: 'Vizyonumuz',
+    mission: 'Misyonumuz',
+    team: 'Ekibimiz',
+    stats: {
+      projects: 'Tamamlanan Projeler',
+      clients: 'Mutlu Müşteriler',
+      years: 'Yıllık Tecrübe',
+      brands: 'Global Markalar'
+    }
+  },
+
+  cartToast: {
+    added: 'Ürün sepete eklendi!',
+    whatNext: 'Ne yapmak istersiniz?',
+    continue: 'Alışverişe Devam Et',
+    goToCart: 'Sepete Git',
+    autoClose: 'Bu pencere 5 saniye içinde otomatik olarak kapanacak'
+  },
+
+  cart: {
+    emptyTitle: 'Sepetiniz boş',
+    emptyDesc: 'Henüz bir ürün eklemediniz. Alışverişe başlamak için ürünlerimizi keşfedin.',
+    startShopping: 'Alışverişe Başla',
+    title: 'Alışveriş Sepeti',
+    countLabel: 'Sepetinizde {{count}} ürün var',
+    removeItem: 'Ürünü kaldır',
+    clearCart: 'Sepeti Temizle',
+    summary: 'Sipariş Özeti',
+    subtotal: 'Ara Toplam',
+    shipping: 'Kargo',
+    free: 'Ücretsiz',
+    vatIncluded: 'KDV (%20, dahil)',
+    total: 'Toplam',
+    checkout: 'Ödemeye Geç',
+    continueShopping: 'Alışverişe Devam Et',
+    securePayment: 'Güvenli ödeme sistemi ile korunmaktadır',
+    itemTotal: 'Toplam'
+  },
+
+  checkout: {
+    saved: {
+      title: 'Kayıtlı Adresler',
+      address: 'Adres',
+      default: 'Varsayılan',
+      use: 'Bu adresi kullan',
+      manage: 'Adresleri yönet',
+      seeAll: 'Tüm adresleri gör',
+      select: 'Adres seç',
+      close: 'Kapat',
+      edit: 'Düzenle',
+      delete: 'Sil',
+      save: 'Kaydet',
+      cancel: 'İptal',
+      defaultShipping: 'Kargo için varsayılan',
+      defaultBilling: 'Fatura için varsayılan',
+      updated: 'Adres güncellendi',
+      deleted: 'Adres silindi',
+      updateError: 'Güncelleme hatası',
+      deleteError: 'Silme hatası',
+      confirmDelete: 'Bu adresi silmek istediğinizden emin misiniz?'
+    },
+    title: 'Ödeme',
+    backToCart: 'Sepete Dön',
+    securePaymentBrand: 'Güvenli ödeme • {{brand}}',
+    securePaymentProvider: '{{provider}} ve 256‑bit SSL şifreleme',
+    summaryTitle: 'Sipariş Özeti',
+    summaryThumb: 'Ürün',
+    paymentSectionTitle: 'Ödeme Bilgileri',
+    paymentLoading: 'Ödeme formu yükleniyor. Lütfen 3D doğrulamasını tamamlayın. İşlem bitince bu sayfa otomatik yenilenecektir.',
+    formPreparing: 'Form hazırlanıyor...',
+    paymentSuccess: '🎉 Ödeme başarıyla tamamlandı!',
+    paymentError: 'Ödeme sırasında bir hata oluştu',
+    steps: { step1: 'Kişisel Bilgiler', step2: 'Adres Bilgileri', step3: 'Özet', step4: 'Ödeme' },
+    overlay: {
+      dialogLabel: 'Güvenli ödeme başlatılıyor',
+      header: 'Güvenli ödeme başlatılıyor…',
+      starting: 'Ödeme başlatılıyor',
+      secureForm: 'Güvenli form yükleniyor',
+      bank3d: 'Banka 3D doğrulaması',
+      stageInit: 'Başlatılıyor',
+      stageForm: 'Güvenli form',
+      stageBank: 'Banka 3D',
+      dontClose: 'İşlem sırasında bu sayfayı kapatmayın veya geri gitmeyin. Birkaç saniye sürebilir.'
+    },
+    help: {
+      smsTitle: "Kod gelmedi mi?",
+      tip1: '30–60 saniye bekleyin ve tekrar deneyin (bankanız SMS\'i gecikmeli gönderebilir).',
+      tip2: 'Sinyal yoksa veya uçuş modu gibi sorunlar varsa, farklı bir cihaz deneyin.',
+      tip3: 'Telefon numaranızı kontrol edin ve bankanızla iletişime geçin.'
+    },
+    personal: {
+      title: 'Kişisel Bilgileriniz',
+      nameLabel: 'Ad Soyad *',
+      namePlaceholder: 'Tam adınız',
+      emailLabel: 'E-posta Adresi *',
+      emailPlaceholder: 'ad@orneksite.com',
+      phoneLabel: 'Telefon Numarası *',
+      phonePlaceholder: '+90 (5xx) xxx xx xx',
+      idLabel: 'T.C. Kimlik No (Opsiyonel)',
+      idPlaceholder: '12345678901'
+    },
+    shipping: {
+      methodTitle: 'Teslimat Yöntemi',
+      title: 'Teslimat Adresi',
+      addressLabel: 'Açık Adres *',
+      addressPlaceholder: 'Sokak, bina, kapı no, daire no',
+      cityLabel: 'Şehir *',
+      cityPlaceholder: 'İstanbul',
+      districtLabel: 'İlçe *',
+      districtPlaceholder: 'İlçe giriniz',
+      postalLabel: 'Posta Kodu *',
+      postalPlaceholder: 'Posta kodu'
+    },
+    billing: {
+      title: 'Fatura Adresi',
+      sameAsShipping: 'Teslimat adresiyle aynı',
+      addressLabel: 'Fatura Adresi *',
+      addressPlaceholder: 'Fatura adresi',
+      cityLabel: 'Şehir *',
+      cityPlaceholder: 'Şehir',
+      districtLabel: 'İlçe *',
+      districtPlaceholder: 'İlçe',
+      postalLabel: 'Posta Kodu *',
+      postalPlaceholder: 'Posta kodu'
+    },
+    invoice: {
+      title: 'Fatura Türü ve Detaylar',
+      individual: 'Bireysel',
+      corporate: 'Kurumsal',
+      tcknLabel: 'T.C. Kimlik No *',
+      tcknPlaceholder: '11 haneli T.C. No',
+      companyLabel: 'Şirket Ünvanı *',
+      companyPlaceholder: 'Örn: VentHub Mühendislik A.Ş.',
+      vknLabel: 'Vergi Numarası (VKN) *',
+      vknPlaceholder: '10 haneli VKN',
+      taxOfficeLabel: 'Vergi Dairesi *',
+      taxOfficePlaceholder: 'Örn: Kadıköy',
+      eInvoice: 'e-Fatura mükellefiyim'
+    },
+    consents: {
+      title: 'Yasal Onaylar',
+      readAcceptPrefix: '',
+      readAcceptSuffix: ' okudum ve kabul ediyorum.',
+      orderConfirmText: 'Siparişi onaylıyorum ve ürün/teslimat bilgilerinin doğruluğunu kabul ediyorum.',
+      marketingText: 'Ticari elektronik ileti almayı kabul ediyorum (opsiyonel).'
+    },
+    review: {
+      title: 'Siparişi gözden geçir',
+      edit: 'Düzenle'
+    },
+    nav: {
+      back: 'Geri',
+      next: 'Devam Et',
+      proceedPayment: 'Ödemeye Geç',
+      backToAddress: 'Adrese Dön'
+    },
+    security: {
+      secureNote: 'Ödeme bilgileriniz güvenli bir şekilde şifrelenmektedir'
+    },
+    emptyCart: {
+      title: 'Sepetiniz boş',
+      desc: 'Ödeme sayfasına erişmek için sepetinizde ürün bulunmalıdır.',
+      startShopping: 'Alışverişe Başla'
+    },
+    errors: {
+      nameRequired: 'Ad Soyad gereklidir',
+      emailInvalid: 'Lütfen geçerli bir e-posta adresi girin',
+      phoneRequired: 'Telefon numarası gereklidir',
+      addressRequired: 'Adres gereklidir',
+      cityRequired: 'Şehir gereklidir',
+      districtRequired: 'İlçe gereklidir',
+      postalRequired: 'Posta kodu gereklidir',
+      tcknRequired: 'Bireysel fatura için T.C. No gereklidir',
+      tcknFormat: 'T.C. No 11 haneli olmalıdır',
+      companyRequired: 'Kurumsal fatura için şirket ünvanı gereklidir',
+      vknRequired: 'Kurumsal fatura için VKN gereklidir',
+      vknFormat: 'VKN 10 haneli olmalıdır',
+      taxOfficeRequired: 'Vergi dairesi gereklidir',
+      kvkkRequired: 'KVKK onayı gereklidir',
+      distanceSalesRequired: 'Mesafeli satış sözleşmesi onayı gereklidir',
+      preInfoRequired: 'Ön bilgilendirme formu onayı gereklidir',
+      orderConfirmRequired: 'Lütfen siparişi onaylayın',
+      paymentInit: 'Ödeme başlatılırken bir hata oluştu',
+      validation: 'Formdaki bazı alanlar eksik veya hatalı. Lütfen kontrol edin.',
+      database: 'Veritabanı hatası. Lütfen tekrar deneyin.'
+    }
+  },
+
+  payment: {
+    verifyingTitle: 'Ödeme doğrulanıyor...',
+    verifyingDesc: 'İşlemi bankanızla teyit ediyoruz. Lütfen bekleyin.',
+    failedTitle: 'Ödeme Başarısız',
+    retry: 'Tekrar Dene',
+    orderCompletedTitle: 'Siparişiniz Tamamlandı!',
+    orderNoLabel: 'Sipariş No',
+    orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',
+    dateLabel: 'Tarih',
+    itemsCountLabel: 'Ürünler',
+    securedBy3d: '3D Secure ile korundu',
+    viewOrderDetails: 'Sipariş Detaylarını Gör',
+    failedGeneric: 'Ödeme tamamlanamadı',
+    failedToast: 'Ödeme hatası: {{msg}}',
+    verifyError: 'Doğrulama hatası',
+    errorDuring: 'Hata: {{msg}}',
+    unverified: 'Ödeme doğrulanamadı',
+    unexpected: 'Beklenmedik bir hata oluştu'
+  },
+
+  category: {
+    loading: 'Kategoriler hazırlanıyor...',
+    notFound: 'Kategori bulunamadı',
+    backHome: 'Ana Sayfaya Dön',
+    breadcrumbHome: 'Ana Sayfa'
+  },
+  categories: {
+    title: 'Ürün Kategorileri',
+    subtitle: 'Tüm HVAC alanlarını kapsayan geniş yelpazemizle profesyonel havalandırma çözümlerini bulun.',
+    subCount: '{{count}} alt kategori',
+    allTitle: 'Tüm Kategoriler',
+    variantCount: '{{count}} çeşit'
+  },
+
+  quickView: {
+    title: 'Hızlı Bakış',
+    close: 'Kapat',
+    addToCart: 'Sepete Ekle',
+    viewProduct: 'Ürünü Gör',
+    descFallback: 'Ürün açıklaması yakında eklenecektir.'
+  },
+
+  support: {
+    links: { faq: 'SSS', returns: 'İade ve Değişim', shipping: 'Kargo ve Teslimat', warranty: 'Garanti ve Servis' },
+    home: {
+      subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
+      faqDesc: 'Siparişler, ödeme, kurulum ve daha fazlası',
+      returnsDesc: 'Cayma hakkı, iade süreci ve koşulları',
+      shippingDesc: 'Teslimat süreleri, ücretler ve takip bilgileri',
+      warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgileri',
+      knowledgeDesc: 'Konu bazlı kılavuzlar ve yakında hesaplayıcılar'
+    },
+    returns: {
+      title: 'İade ve Değişim',
+      desc1: '14 gün içinde cayma hakkınızı kullanabilirsiniz. Ürün kullanılmamış, faturası ve tüm aksesuarlarıyla birlikte yeniden satılabilir durumda olmalıdır.',
+      desc2: 'İade talebi için lütfen sipariş numaranızla birlikte destek ekibimize ulaşın. Onay sonrası kargo talimatları paylaşılacaktır.'
+    },
+    shipping: {
+      desc1: 'Teslimat süresi genellikle 1–5 iş günüdür; kampanya ve stok durumuna göre değişebilir.',
+      desc2: 'Kargo ücreti/firması ödeme adımında gösterilir. Takip numarası e-posta ile iletilir.'
+    },
+    warranty: {
+      desc1: 'Garanti kapsamı üretici/ithalatçı firmaya göre değişiklik gösterebilir. Lütfen garanti belgesi ve kullanım kılavuzunu saklayınız.',
+      desc2: 'Servis bilgisi veya arıza kaydı için destek ekibimizle iletişime geçin.'
+    },
+    faq: {
+      q1: 'Siparişim ne zaman kargoya verilir?',
+      a1: 'Ödeme onayından sonra genellikle 1–5 iş günü içinde.',
+      q2: 'Ödeme yöntemleri nelerdir?',
+      a2: 'iyzico aracılığıyla kredi/banka kartları ile güvenli ödeme yapabilirsiniz.',
+      q3: 'Kurulum hizmeti veriyor musunuz?',
+      a3: 'Ürüne göre değişiklik gösterebilir. Lütfen destek ekibimizle görüşün.'
+    }
+  },
+
+  account: {
+    tabs: {
+      overview: 'Genel Bakış',
+      orders: 'Siparişlerim',
+      shipments: 'Kargolarım',
+      addresses: 'Adreslerim',
+      invoices: 'Fatura Profilleri',
+      returns: 'İade Taleplerim',
+      profile: 'Profilim',
+      security: 'Güvenlik'
+    },
+    overview: {
+      defaultAddressesTitle: 'Varsayılan Adresler',
+      shippingAddress: 'Teslimat Adresi',
+      billingAddress: 'Fatura Adresi',
+      notSetShipping: 'Varsayılan teslimat adresi tanımlanmamış.',
+      notSetBilling: 'Varsayılan fatura adresi tanımlanmamış.',
+      manageAddresses: 'Adresleri yönet'
+    },
+    addresses: {
+      title: 'Adreslerim',
+      addressLabel: 'Adres',
+      defaultShippingTag: 'Varsayılan teslimat',
+      defaultBillingTag: 'Varsayılan fatura',
+      makeDefaultShipping: 'Teslimat için varsayılan yap',
+      makeDefaultBilling: 'Fatura için varsayılan yap',
+      noItems: 'Henüz adres eklenmemiş.',
+      formTitleEdit: 'Adresi Düzenle',
+      formTitleNew: 'Yeni Adres Ekle',
+      ph: {
+        label: 'Adres Başlığı (Ev, İş)',
+        fullName: 'Ad Soyad',
+        phone: 'Telefon',
+        address: 'Adres',
+        city: 'Şehir',
+        district: 'İlçe',
+        postalCode: 'Posta Kodu'
+      },
+      toggle: {
+        shippingDefault: 'Teslimat için varsayılan',
+        billingDefault: 'Fatura için varsayılan'
+      },
+      submit: {
+        update: 'Güncelle',
+        add: 'Ekle'
+      },
+      toasts: {
+        loadError: 'Adresler yüklenemedi',
+        requiredFields: 'Lütfen zorunlu alanları doldurun',
+        updated: 'Adres güncellendi',
+        created: 'Adres oluşturuldu',
+        saveError: 'Kaydetme hatası',
+        confirmDelete: 'Bu adresi silmek istediğinizden emin misiniz?',
+        deleted: 'Adres silindi',
+        deleteError: 'Silme hatası',
+        defaultSetShipping: 'Varsayılan teslimat adresi ayarlandı',
+        defaultSetBilling: 'Varsayılan fatura adresi ayarlandı',
+        updateError: 'Güncelleme hatası'
+      }
+    },
+    invoices: {
+      title: 'Fatura Profilleri',
+      addNew: 'Yeni Profil Ekle',
+      type: 'Tür',
+      individual: 'Bireysel',
+      corporate: 'Kurumsal',
+      titleLabel: 'Başlık (Opsiyonel)',
+      tcknLabel: 'T.C. Kimlik No',
+      companyLabel: 'Şirket Ünvanı',
+      vknLabel: 'Vergi Numarası (VKN)',
+      taxOfficeLabel: 'Vergi Dairesi',
+      eInvoice: 'e-Fatura mükellefiyim',
+      setDefault: 'Varsayılan Yap',
+      default: 'Varsayılan',
+      save: 'Kaydet',
+      delete: 'Sil',
+      cancel: 'İptal',
+      confirmDelete: 'Bu fatura profilini silmek istediğinizden emin misiniz?',
+      created: 'Fatura profili oluşturuldu',
+      updated: 'Fatura profili güncellendi',
+      deleted: 'Fatura profili silindi',
+      setDefaultSuccess: 'Varsayılan profil güncellendi',
+      noProfiles: 'Kayıtlı fatura profili bulunmuyor'
+    },
+    security: {
+      title: 'Şifre Değiştir',
+      currentLabel: 'Mevcut şifre',
+      newLabel: 'Yeni şifre',
+      confirmLabel: 'Yeni şifre (tekrar)',
+      save: 'Kaydet',
+      currentRequired: 'Lütfen mevcut şifrenizi girin',
+      minLength: 'Şifre en az 8 karakter olmalıdır',
+      mismatch: 'Şifreler eşleşmiyor',
+      pwned: 'Bu şifre veri sızıntılarında görülmüş. Lütfen daha güçlü bir şifre seçin.',
+      wrongCurrent: 'Mevcut şifre hatalı',
+      updated: 'Şifreniz güncellendi',
+      updateError: 'Şifre güncellenirken bir hata oluştu'
+    }
+  },
+
+  orders: {
+    title: 'Siparişlerim',
+    empty: 'Henüz siparişiniz bulunmuyor.',
+    orderDate: 'Sipariş Tarihi',
+    orderTotal: 'Toplam Tutar',
+    status: 'Durum',
+    orderNo: 'Sipariş No',
+    orderCode: 'Sipariş Kodu (son 8)',
+    orderCodePlaceholder: 'Örn: 7016DD05',
+    noImage: 'Görsel Yok',
+    unexpectedError: 'Beklenmedik bir hata oluştu',
+    product: 'Ürün',
+    productSearchPlaceholder: 'Ürün adına göre ara',
+    clearFilters: 'Filtreleri Temizle',
+    noOrdersTitle: 'Henüz sipariş yok',
+    noOrdersDesc: 'İlk siparişinizi vermek için ürünleri keşfedin',
+    exploreProducts: 'Ürünleri Keşfet',
+    details: 'Detaylar',
+    customerInfo: 'Müşteri Bilgileri',
+    deliveryAddress: 'Teslimat Adresi',
+    orderInfo: 'Sipariş Bilgileri',
+    name: 'İsim',
+    email: 'E-posta',
+    orderId: 'Sipariş ID',
+    copy: 'Kopyala',
+    conversationId: 'İşlem ID',
+    orderDetails: 'Sipariş Detayları',
+    productCol: 'Ürün',
+    imageCol: 'Görsel',
+    qtyCol: 'Adet',
+    unitPriceCol: 'Birim Fiyat',
+    totalCol: 'Toplam',
+    grandTotal: 'Genel Toplam',
+    noItems: 'Ürün detayı bulunamadı',
+    demoNote: 'Bu test amaçlı bir demo sipariştir',
+    totalAmount: 'Toplam Tutar',
+    reorder: 'Tekrar Sipariş Et',
+    viewReceipt: 'Makbuzu Görüntüle',
+    copied: 'Kopyalandı',
+    copyFailed: 'Kopyalanamadı',
+    reorderedToast: '{{count}} ürün sepete eklendi',
+    reorderNotFound: 'Ürünler stokta bulunamadı',
+    reorderError: 'Tekrar sipariş sırasında hata',
+    shippingInfo: 'Kargo / Takip',
+    carrier: 'Kargo Firması',
+    trackingNumber: 'Takip Numarası',
+    trackingLink: 'Takip Linki',
+    openLink: 'Linki aç',
+    shippedAt: 'Kargoya Veriliş',
+    deliveredAt: 'Teslim Tarihi',
+    noShippingInfo: 'Kargo bilgisi henüz girilmemiş.',
+    invoicePdf: 'Proforma (PDF)'
+  },
+
+  returns: {
+    title: 'İade Taleplerim',
+    new: 'Yeni İade Talebi',
+    empty: 'Henüz bir iade talebiniz bulunmuyor.',
+    order: 'Sipariş',
+    reason: 'Neden',
+    status: 'Durum',
+    created: 'Oluşturulma',
+    selectOrder: 'Sipariş seçin',
+    selectReason: 'Neden seçin',
+    description: 'Açıklama (opsiyonel)',
+    descriptionPh: 'Sorunu kısaca tarif edin (opsiyonel)',
+    submit: 'Talep Oluştur',
+    required: 'Lütfen sipariş ve neden seçin',
+    createdToast: 'İade talebi oluşturuldu',
+    createError: 'İade talebi oluşturulamadı',
+    fetchError: 'İade kayıtları yüklenemedi',
+    requestReturn: 'İade Talebi Et',
+    statusLabels: {
+      requested: 'Talep Edildi',
+      approved: 'Onaylandı',
+      rejected: 'Reddedildi',
+      in_transit: 'Kargoda',
+      received: 'Teslim Alındı',
+      refunded: 'İade Edildi',
+      cancelled: 'İptal Edildi'
+    }
+  },
+
+  lead: {
+    message: 'Mesaj',
+    title: 'Teknik Teklif İsteği',
+    product: 'Ürün',
+    contactInfo: 'İletişim Bilgileri',
+    name: 'Ad Soyad',
+    company: 'Şirket',
+    email: 'E-posta',
+    phone: 'Telefon',
+    city: 'Şehir',
+    projectNeed: 'Proje/İhtiyaç',
+    applicationArea: 'Uygulama Alanı',
+    select: 'Seçiniz',
+    quantity: 'Adet',
+    budgetRange: 'Bütçe Aralığı',
+    timeframe: 'Zaman Çizelgesi',
+    contactPref: 'İletişim Tercihi',
+    contactTime: 'Uygun saatler (örneğin: 10:00–12:00)',
+    consent: 'Gizlilik bildirimini okudum ve kabul ediyorum. ',
+    submit: 'Gönder',
+    submitting: 'Gönderiliyor...',
+    cancel: 'İptal',
+    errors: {
+      name: 'Lütfen ad soyad girin',
+      contact: 'E-posta veya telefon gereklidir',
+      consent: 'Onay gereklidir'
+    },
+    aboutPage: {
+      stats: {
+        yearsExperience: 'Proje Hattı'
+      }
+    },
+    cinematicShowcase: {
+      eyebrow: 'TEKNİK DETAY',
+      title: 'Mühendislik Başyapıtı',
+      subtitle: 'Zirve Performans ve Verimlilik',
+      description: 'Her bir bileşen, en zorlu endüstriyel koşullarda kesintisiz hava akışı sağlamak üzere optimize edilmiştir.',
+      cta: 'Teknik Kataloğu İncele',
+      badge: 'Endüstriyel Sınıf',
+      componentLabel: 'Sistem Bileşeni',
+      hotspots: {
+        motor: 'EC Motor Teknolojisi',
+        motorDetail: 'Düşük enerji tüketimi ve yüksek tork sağlayan fırçasız motor yapısı.',
+        clamps: 'Easy-Fit Kelepçeler',
+        clampsDetail: 'Alet gerektirmeden hızlı montaj ve bakım sağlayan özel bağlantı sistemi.',
+        housing: 'Polimer Gövde',
+        housingDetail: 'Darbe ve korozyon direnci yüksek, hafif aerodinamik dış yüzey.',
+        airflow: 'Laminar Akış',
+        airflowDetail: 'Türbülansı minimize eden ve ses seviyesini düşüren iç kanat tasarımı.'
+      }
+    },
+    trustProof: {
+      badge: 'Güvenilir',
+      eyebrow: 'NEDEN VENTHUB?',
+      title: 'Mühendislik ve Güven Odaklı Yaklaşım',
+      subtitle: 'Sektörün lider markaları ve uzman mühendis kadromuzla projelerinize değer katıyoruz.',
+      items: {
+        brands: { eyebrow: 'Yetkinlik', title: 'Global Markalar', description: 'Dünyanın en güvenilir HVAC üreticilerinin yetkili ortağı.' },
+        guidance: { eyebrow: 'Uzmanlık', title: 'Proje Desteği', description: 'Şartnameden devreye almaya kadar her adımda yanınızdayız.' },
+        delivery: { eyebrow: 'Hız', title: 'Hızlı Teslimat', description: 'Geniş stok ağımızla Türkiye genelinde zamanında teslimat.' },
+        support: { eyebrow: 'Süreklilik', title: 'Satış Sonrası', description: 'Teknik destek ve yedek parça garantisi ile kesintisiz işletme.' }
+      }
+    }
+  },
+
+  calculators: {
+    airCurtain: {
+      title: 'Hava Perdesi Hesaplayıcı',
+      description: 'Kapı ölçüleri ve kullanım koşullarına göre ideal hava perdesi seçimi',
+      infoText: 'Bu araç mühendislik standartlarına (ISO 27327-1) uygun ön boyutlandırma yapar. Gerekli hava debisi, üfleme hızı ve motor gücü değerlerini hesaplar.',
+      steps: {
+        dimensions: 'Kapı Ölçüleri',
+        dimensionsDesc: 'Genişlik ve yükseklik',
+        application: 'Uygulama',
+        applicationDesc: 'Kullanım amacı',
+        conditions: 'Koşullar',
+        conditionsDesc: 'Rüzgar ve trafik',
+        results: 'Sonuçlar',
+        resultsDesc: 'Hesaplama çıktıları'
+      },
+      form: {
+        doorWidth: 'Kapı Genişliği',
+        doorHeight: 'Kapı Yüksekliği',
+        doorWidthTooltip: 'Kapının iç net açıklık genişliği (0.5 - 10 m)',
+        doorHeightTooltip: 'Kapının iç net açıklık yüksekliği (1.5 - 6 m)',
+        applicationLabel: 'Uygulama Seçin',
+        applicationPurpose: 'Hava perdesinin kullanım amacını seçin',
+        environmentalConditions: 'Çevresel Koşullar',
+        windStatus: 'Rüzgar Durumu',
+        windTooltip: 'Kapı dışındaki beklenen rüzgar şiddeti',
+        trafficIntensity: 'Trafik Yoğunluğu',
+        trafficTooltip: 'Saatlik tahmini geçiş sayısı',
+        inputSummary: 'Giriş Özeti'
+      },
+      applications: {
+        comfort: { label: 'Konfor / Enerji', desc: 'Genel ticari alanlar, mağazalar', info: 'Genel ticari alanlar için enerji tasarrufu sağlar. Nozul hızı: 8-12 m/s' },
+        insect: { label: 'Sinek Kontrolü', desc: 'Gıda işletmeleri, restoranlar', info: 'Gıda işletmeleri ve restoranlar için sinek girişini engeller. Nozul hızı: 12-15 m/s' },
+        coldRoom: { label: 'Soğuk Oda', desc: 'Soğuk depolar, buzhane', info: 'Soğuk hava depolarında ısı kaybını minimize eder. Nozul hızı: 15-18 m/s' }
+      },
+      conditions: {
+        wind: { none: 'Yok', light: 'Hafif', moderate: 'Orta', strong: 'Şiddetli' },
+        traffic: { low: 'Düşük', medium: 'Orta', high: 'Yoğun' }
+      },
+      results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Önerilen hava perdesi özellikleri',
+        gridTitle: 'Hesaplanan Değerler',
+        airflow: 'Gerekli Hava Debisi',
+        airflowDesc: 'Etkili bir hava bariyeri için gereken toplam debi',
+        velocity: 'Nozul Üfleme Hızı',
+        velocityDesc: 'Hava perdesi çıkışındaki hava hızı',
+        floorVelocity: 'Taban Hızı (Tahmini)',
+        floorVelocityDesc: 'Zemin seviyesinde beklenen hava hızı',
+        power: 'Önerilen Motor Gücü',
+        powerDesc: 'Minimum motor gücü gereksinimi',
+        nozzleWidth: 'Nozul Genişliği',
+        nozzleHeight: 'Nozul Yüksekliği',
+        efficiency: 'Verimlilik',
+        efficiencyOptimal: 'Optimal',
+        efficiencyAcceptable: 'Kabul Edilebilir',
+        efficiencyWarning: 'Sınırda',
+        efficiencyOptimalDesc: 'Hesaplanan parametreler ideal performans sağlayacaktır',
+        efficiencyAcceptableDesc: 'Performans yeterlidir, ihtiyaç halinde iyileştirme düşünülebilir',
+        efficiencyWarningDesc: 'Daha güçlü bir model veya ek önlemler gerekebilir'
+      },
+      diagram: {
+        unit: 'Hava Perdesi'
+      }
+    },
+    duct: {
+      title: 'Kanal Basınç Kaybı Hesaplayıcı',
+      description: 'Hava kanalı hız hesaplaması ve basınç düşümü tahmini',
+      infoText: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplar.',
+      form: {
+        shape: 'Kanal Tipi',
+        round: 'Yuvarlak',
+        roundDesc: 'Spiral veya kaynaklı boru',
+        rectangular: 'Dikdörtgen',
+        rectangularDesc: 'Köşeli kanal',
+        material: 'Malzeme',
+        steel: 'Galvaniz Saç',
+        pvc: 'PVC',
+        flex: 'Flex Kanal',
+        airflow: 'Hava Debisi',
+        airflowTooltip: 'Kanaldan geçmesi gereken hava miktarı',
+        diameter: 'Kanal Çapı',
+        diameterTooltip: 'İç çap (50-2000 mm)',
+        width: 'Genişlik (a)',
+        height: 'Yükseklik (b)',
+        length: 'Kanal Uzunluğu',
+        lengthTooltip: 'Toplam kanal boyu'
+      },
+      results: {
+        velocity: 'Hava Hızı',
+        specificLoss: 'Basınç Kaybı (Spesifik)',
+        totalLoss: 'Toplam Basınç Kaybı',
+        equivDiameter: 'Eşdeğer Çap',
+        equivDiameterDesc: 'Yuvarlak kanal karşılığı'
+      }
+    },
+    hrv: {
+      title: 'Isı Geri Kazanım Tasarruf Hesaplayıcı',
+      description: 'Isı geri kazanım cihazı verimliliği ve enerji tasarrufu hesabı',
+      infoText: 'Isı geri kazanım cihazlarının (IGK) veya entalpi geri kazanım cihazlarının (ERV) yıllık enerji tasarruf potansiyelini hesaplar.',
+      form: {
+        type: 'Cihaz Tipi',
+        hrv: 'HRV (Isı Geri Kazanım)',
+        hrvDesc: 'Sadece duyulur ısı',
+        erv: 'ERV (Enerji Geri Kazanım)',
+        ervDesc: 'Isı + Nem geri kazanımı',
+        climate: 'İklim Bölgesi',
+        cold: 'Soğuk',
+        temperate: 'Ilıman',
+        hot: 'Sıcak',
+        usage: 'Mahal Tipi',
+        office: 'Ofis',
+        commercial: 'Ticari',
+        occupancy: 'Kişi Sayısı',
+        workingHours: 'Günlük Çalışma',
+        electricityPrice: 'Elektrik Birim Fiyatı'
+      },
+      results: {
+        heatingGain: 'Isıtma Kazancı',
+        coolingGain: 'Soğutma Kazancı',
+        co2Reduction: 'CO₂ Azaltımı',
+        co2Desc: 'Yıllık karbon salınım düşüşü',
+        payback: 'Geri Ödeme Süresi',
+        paybackDesc: 'Tahmini yatırım geri dönüşü'
+      }
+    },
+    jetFan: {
+      title: 'Jet Fan Hesaplayıcı',
+      description: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
+      infoText: 'Kapalı otopark veya tünellerde gereken jet fan adedini, itki kuvvetini ve hava değişim miktarını hesaplar.',
+      form: {
+        appType: 'Uygulama Alanı',
+        parking: 'Otopark',
+        parkingDesc: 'Kapalı otopark havalandırması',
+        tunnel: 'Tünel',
+        tunnelDesc: 'Karayolu veya metro tüneli',
+        mode: 'Havalandırma Modu',
+        normal: 'Normal',
+        normalDesc: 'Günlük havalandırma',
+        smoke: 'Duman Tahliye',
+        smokeDesc: 'Yangın senaryosu',
+        capacity: 'Araç Kapasitesi',
+        width: 'Genişlik',
+        height: 'Yükseklik'
+      },
+      results: {
+        ach: 'Hava Değişim Sayısı',
+        totalThrust: 'Toplam İtki Kuvveti',
+        count: 'Jet Fan Adedi'
+      }
+    }
+  },
+
+  categorySilentFan: {
+    problem: {
+      eyebrow: 'SES VE KONFOR',
+      title: 'Huzurunuzu Bozan Seslere Son Verin',
+      subtitle: 'Standart kanal fanları sadece havayı değil, gürültüyü de yaşam alanlarınıza taşır. Vortice Lineo Quiet ile sessizliğin yeni standardını keşfedin.',
+      painPoints: [
+        { title: 'Akustik Kirlilik', description: 'Konvansiyonel fanların yarattığı uğultu, odaklanmayı zorlaştırır ve konforu düşürür.' },
+        { title: 'Düşük Verimlilik', description: 'Gürültülü fanlar genellikle aerodinamik olarak verimsizdir ve daha fazla enerji harcar.' },
+        { title: 'Titreşim Sorunları', description: 'İzole edilmemiş cihazlar montaj yüzeylerinde titreşim ve ikincil gürültüye sebep olur.' },
+        { title: 'Bölünen Odak', description: 'Sürekli gürültü, kütüphane ve ofislerde verimliliği %20 oranında düşürebilir.' }
+      ],
+      visual: {
+        without: 'Standart Fan İle',
+        with: 'Lineo Quiet İle',
+        withoutPoints: ['Yüksek desibel seviyeleri', 'Mekanik titreşim', 'Türbülanslı hava akışı', 'Enerji kaybı'],
+        withPoints: ['Fısıltı düzeyinde sessizlik', '%60 enerji tasarrufu', 'Laminar hava akışı', 'Titreşimsiz çalışma']
+      }
+    },
+    howItWorks: {
+      eyebrow: 'TEKNOLOJİ',
+      title: 'Sessiz Gücün Arkasındaki Mühendislik',
+      subtitle: 'Vortice Lineo Quiet, aerodinamik olarak optimize edilmiş gövdesi ve ses emici katmanları ile fısıltı seviyesinde performans sunar.',
+      steps: [
+        { title: 'Ses Emici Gövde', description: 'Özel kompozit dış gövde, motor sesini içeride hapseder.' },
+        { title: 'Laminar Akış', description: 'Hava yönlendirici kanatlar türbülansı azaltır ve sesi kaynağında keser.' },
+        { title: 'Dinamik Balans', description: 'Yüksek hassasiyetli fan pervanesi, titreşimsiz ve sessiz bir sirkülasyon sağlar.' }
+      ]
+    },
+    comparison: {
+      title: 'Neden Lineo Quiet?',
+      standard: 'Standart Fanlar',
+      quiet: 'Vortice Lineo Quiet',
+      features: [
+        { label: 'Ses Seviyesi', standard: '55-65 dB(A)', quiet: '25-30 dB(A)' },
+        { label: 'Enerji Tüketimi', standard: 'Yüksek (AC Motor)', quiet: '%60 Tasarruf (ES/EC Motor)' },
+        { label: 'Hava Kalitesi', standard: 'Türbülanslı Akış', quiet: 'Laminar ve Sürekli' },
+        { label: 'Montaj', standard: 'Karmaşık ve Sert', quiet: 'Hızlı ve Titreşim İzole' }
+      ]
+    },
+    faq: {
+      title: 'Sıkça Sorulan Sorular',
+      items: [
+        { q: 'Gerçekten ne kadar sessiz?', a: 'Lineo Quiet, düşük hızda fısıltı sesine (yaklaşık 25 dB) yakındır. Bu, normal bir konuşmanın yarısından daha azdır.' },
+        { q: 'Montajı zor mu?', a: 'Hayır, hızlı montaj kelepçeleri sayesinde bakım veya kurulum için cihazı kanaldan ayırmanız gerekmez.' },
+        { q: 'Hangi alanlar için uygundur?', a: 'Kütüphaneler, ofisler, yatak odaları ve otel odaları gibi sessizliğin kritik olduğu her yer için idealdir.' }
+      ]
+    },
+    brand: {
+      eyebrow: 'MÜHENDİSLİK MİRASI',
+      title: 'İtalyan Sessizliği: Vortice Efsanesi',
+      description: '1954\'ten beri havalandırma dünyasına yön veren Vortice, Lineo Quiet serisi ile sessiz kanal fanı kategorisinde zirveyi temsil ediyor.',
+      badges: ['Yetkili Distribütör', '2 Yıl Garanti'],
+      stats: [
+        { label: 'Yıllık Deneyim', value: '70+' },
+        { label: 'Ülke', value: '90+' },
+        { label: "Compasso d'Oro", value: '3x' },
+        { label: 'Avrupa', value: '#1' }
+      ]
+    }
   }
-}
+};

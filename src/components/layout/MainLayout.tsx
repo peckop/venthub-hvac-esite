@@ -1,9 +1,10 @@
 'use client'
 
 import React, { Suspense, lazy, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useScrollThrottle } from '../../hooks/useScrollThrottle'
+import '@/lib/three-setup'
 
 // Bileşenler
 import StickyHeader from '../StickyHeader'
@@ -22,11 +23,6 @@ interface MainLayoutProps {
     children: React.ReactNode
 }
 
-/**
- * P01-016: Master Şablon (Master Layout)
- * VentHub'ın tüm sayfalarını kapsayan merkezi mimari kabuk.
- * Sayfa geçiş animasyonları ve global katmanlar burada yönetilir.
- */
 export default function MainLayout({ children }: MainLayoutProps) {
     const pathname = usePathname()
     const isAdmin = pathname?.startsWith('/admin')
@@ -59,7 +55,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
     }, [])
 
     if (isAdmin) {
-        return <div className="min-h-screen bg-gray-50 overflow-hidden">{children}</div>
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <div className="bg-slate-900 text-white px-6 py-3 flex justify-between items-center shrink-0 z-[100]">
+                    <span className="font-bold tracking-tighter">VH / ADMIN</span>
+                    <Link href="/" className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors uppercase font-bold tracking-widest">Siteye Dön</Link>
+                </div>
+                <div className="flex-grow overflow-auto">
+                    {children}
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -68,28 +74,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
             
             <StickyHeader isScrolled={isScrolled} />
 
-            {/* Sayfa Geçiş Animasyonu ve Ana İçerik */}
+            {/* Sayfa Geçişleri için Animasyonu kapattık (Sorun kaynağı buydu) */}
             <main 
                 id="main-content" 
-                className={`flex-grow transition-all duration-300 ${isScrolled ? 'pt-16' : ''}`}
+                className="flex-grow transition-all duration-300"
             >
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={pathname}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ 
-                            duration: 0.35, 
-                            ease: [0.22, 1, 0.36, 1] // Custom cubic-bezier for premium feel
-                        }}
-                    >
-                        {children}
-                    </motion.div>
-                </AnimatePresence>
+                {children}
             </main>
 
-            {/* Global Overlays & Utilities */}
             <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
                 <BackToTopButton />
                 
@@ -104,7 +96,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
             <LanguageSwitcher />
             <Footer />
 
-            {/* Toast & Notifications */}
             {enableToaster && (
                 <Suspense fallback={null}>
                     <AddToCartToast />
@@ -118,9 +109,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                                 border: '1px solid #E5E7EB', 
                                 borderRadius: '0.75rem', 
                                 fontSize: '14px' 
-                            },
-                            success: { iconTheme: { primary: '#10B981', secondary: '#FFFFFF' } },
-                            error: { iconTheme: { primary: '#EF4444', secondary: '#FFFFFF' } },
+                            }
                         }}
                     />
                 </Suspense>
