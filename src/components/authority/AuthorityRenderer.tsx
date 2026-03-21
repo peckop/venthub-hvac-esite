@@ -115,8 +115,9 @@ export const AuthorityRenderer: React.FC<{ content: AuthorityContent | null }> =
                   {mediaBlock.content.mediaType === '3d' && (
                     <ThreeDAuthority 
                       metadata={{
+                        modelId: mediaBlock.content.mediaId,
                         modelUrl: mediaBlock.content.mediaId,
-                        title: mediaBlock.content.title || '3D Model'
+                        format: 'glb'
                       }}
                     />
                   )}

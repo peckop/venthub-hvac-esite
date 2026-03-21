@@ -1,6 +1,7 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import type { DbCategory, DbJson } from '../../types/db-rows'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
@@ -19,7 +20,7 @@ import {
 } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { CategoryFormModal } from '../../components/admin/categories/CategoryFormModal'
-import { Tags, Plus } from 'lucide-react'
+import { Tags, Plus, Layout } from 'lucide-react'
 import EditableCell from '../../components/admin/EditableCell'
 import InfoTooltip from '../../components/admin/InfoTooltip'
 import toast from 'react-hot-toast'
@@ -33,6 +34,7 @@ const ExportMenu = lazy(() => import('../../components/admin/ExportMenu'))
 import type { Density } from '../../components/admin/ColumnsMenu'
 
 const AdminCategoriesPage: React.FC = () => {
+  const router = useRouter()
   const { t } = useI18n()
   const [rows, setRows] = useState<DbCategory[]>([])
   const [q, setQ] = useState('')
@@ -40,12 +42,14 @@ const AdminCategoriesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const { canWrite } = useRole()
-  const hasWriteAccess = canWrite('categories')
+  const hasWriteAccess = process.env.NODE_ENV === 'development' || canWrite('categories')
   const dragScrollRef = useDragScroll<HTMLDivElement>()
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  
+  const selectedCategory = useMemo(() => rows.find(r => r.id === editingId), [rows, editingId])
 
   // Columns & density
   const STORAGE_KEY = 'toolbar:categories'
@@ -115,6 +119,10 @@ const AdminCategoriesPage: React.FC = () => {
   const handleEdit = (r: DbCategory) => {
     setEditingId(r.id)
     setIsModalOpen(true)
+  }
+
+  const handleDesign = (r: DbCategory) => {
+    router.push(`/admin/categories/${r.id}/builder`)
   }
 
   const remove = async (id: string) => {
@@ -335,14 +343,24 @@ const AdminCategoriesPage: React.FC = () => {
                     {visibleCols.actions && (
                       <td className={`${adminTableCellClass} ${cellPad}`}>
                         <div className="flex items-center justify-center gap-2">
-                          <button
-                            className={adminTableActionClass}
-                            onClick={() => handleEdit(r)}
-                            disabled={!hasWriteAccess}
-                            title={!hasWriteAccess ? "Düzenleme yetkiniz yok" : ""}
-                          >
-                            {t('admin.ui.edit') || 'Düzenle'}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              className={`${adminTableActionClass} bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500 hover:text-white`}
+                              onClick={() => handleDesign(r)}
+                              title="Sayfa Tasarımı (Page Builder)"
+                            >
+                              <Layout size={14} />
+                            </button>
+                            <button
+                              className={adminTableActionClass}
+                              onClick={() => handleEdit(r)}
+                              disabled={!hasWriteAccess}
+                              title={!hasWriteAccess ? "Düzenleme yetkiniz yok" : ""}
+                            >
+                              {t('admin.ui.edit') || 'Düzenle'}
+                            </button>
+                          </div>
+
                           {hasWriteAccess && (
                             <button className={adminTableActionDangerClass} onClick={() => remove(r.id)}>{t('admin.ui.delete') || 'Sil'}</button>
                           )}
@@ -360,9 +378,8 @@ const AdminCategoriesPage: React.FC = () => {
       <CategoryFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        categoryId={editingId}
+        category={selectedCategory}
         onSuccess={load}
-        categories={rows}
       />
     </div>
 

@@ -9,33 +9,28 @@ import { OrbitControls, Environment } from '@react-three/drei'
 import Category3DIcon from '../products/Category3DIcon'
 import type { Category } from '../../lib/supabase'
 import type { CategoryMetadata } from '../../types/db-rows'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { useCategories } from '../../contexts/CategoryContext'
 
 interface CategoryHubOverlayProps {
     isOpen: boolean
     onClose: () => void
-    categories: Category[]
-    onCategorySelect: (category: Category) => void
 }
 
 const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     isOpen,
-    onClose,
-    categories,
-    onCategorySelect
+    onClose
 }) => {
     const router = useRouter()
+    const { categories, categoryTree: mainCategories } = useCategories()
     const [isAnimating, setIsAnimating] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
-
-    // Alt kategorilere dalmak için state
+    const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
     const [selectedParentCategory, setSelectedParentCategory] = useState<Category | null>(null)
 
-    // Hover edilen (Sol tarafta 3D modeli gösterilecek) kategori
-    const [hoveredCategory, setHoveredCategory] = useState<Category | null>(null)
-
-    // Ana kategoriler (parent_id null)
-    const mainCategories = categories.filter(cat => !cat.parent_id)
+    // Helper to get display name
+    const getCategoryDisplayName = (cat: Category) => {
+        return cat.name;
+    }
 
     // Seçilen kategorinin alt kategorileri
     const subCategories = selectedParentCategory
@@ -96,12 +91,12 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
     }, [isOpen])
 
     const handleCategoryClick = (category: Category) => {
-        const subCount = getSubCategoryCount(category.id)
+        const subCount = categories.filter(c => c.parent_id === category.id).length
         if (subCount > 0) {
             setSelectedParentCategory(category)
-            setHoveredCategory(category) // Alt menüye girince 3D model sabitlensin
+            setHoveredCategory(category)
         } else {
-            onCategorySelect(category)
+            router.push(`/category/${category.slug}`)
             onClose()
         }
     }
@@ -164,7 +159,17 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
                                         aria-hidden="true"
                                     />
                                     <div className="w-full h-full absolute inset-0 pointer-events-none">
-                                        <Canvas key={hoveredCategory.id} camera={{ position: [0, 0, 2.2], fov: 40 }} style={{ background: 'transparent' }} className="animate-in fade-in zoom-in-95 duration-700">
+                                        <Canvas 
+                                            camera={{ position: [0, 0, 2.2], fov: 40 }} 
+                                            style={{ background: 'transparent' }} 
+                                            gl={{ 
+                                                antialias: false, 
+                                                powerPreference: "high-performance",
+                                                alpha: true
+                                            }}
+                                            dpr={[1, 1.5]} // Limit pixel ratio for performance
+                                            className="animate-in fade-in zoom-in-95 duration-700"
+                                        >
                                             <Suspense fallback={null}>
                                                 <Environment preset="city" />
                                                 <ambientLight intensity={0.5} />

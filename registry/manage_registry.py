@@ -598,6 +598,32 @@ if __name__ == "__main__":
         move_task(args.project_id, args.task_id, "active")
         sys.exit(0)
 
+    if args.action == "create-task":
+        if not args.project_id or not args.task_id or not args.query:
+            print("❌ HATA: Proje ID, Görev ID ve Başlık (--query) gerekli.")
+            sys.exit(1)
+        
+        proj_dir = next((d for d in REGISTRY_DIR.iterdir() if d.is_dir() and d.name.startswith(args.project_id)), None)
+        if not proj_dir:
+            print(f"❌ HATA: Proje {args.project_id} bulunamadı.")
+            sys.exit(1)
+            
+        task_slug = args.query.lower().replace(' ', '-').replace('(', '').replace(')', '').replace('ı', 'i').replace('ü', 'u').replace('ö', 'o').replace('ç', 'c').replace('ş', 's').replace('ğ', 'g')
+        task_dir = proj_dir / "backlog" / f"{args.task_id.zfill(3)}-{task_slug}"
+        task_dir.mkdir(parents=True, exist_ok=True)
+        
+        md_file = task_dir / f"{args.task_id.zfill(3)}.md"
+        content = f"---\nid: \"{args.task_id.zfill(3)}\"\ntitle: \"{args.query}\"\nstatus: \"Backlog\"\npriority: \"High\"\n---\n\n# {args.query}\n\n## 🎯 Hedef\n\n## 📝 Notlar\n"
+        safe_write(md_file, content)
+        
+        # Otonom dosya oluşturma
+        safe_write(task_dir / "brainstorm.md", "# 🧠 Brainstorming: " + args.query)
+        safe_write(task_dir / "plan.md", "# 📋 Implementation Plan: " + args.query)
+        
+        print(f"✅ GÖREV OLUŞTURULDU (BACKLOG): {task_dir}")
+        normalize_registry()
+        sys.exit(0)
+
     if args.action == "task":
         if not args.project_id:
             print("❌ HATA: Proje ID (P01) gerekli.")

@@ -72,7 +72,7 @@ export const VentImage: React.FC<VentImageProps> = ({
       className={wrapperClass} 
       style={{ 
         width: isFillMode ? undefined : (width || (needsDefaultSizes ? '100%' : undefined)), 
-        height: isFillMode ? undefined : height 
+        height: isFillMode ? undefined : 'auto' 
       }}
     >
       <Image

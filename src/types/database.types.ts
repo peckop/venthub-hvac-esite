@@ -121,6 +121,7 @@ export type Database = {
       }
       categories: {
         Row: {
+          authority_content: Json | null
           created_at: string
           description: string | null
           id: string
@@ -138,6 +139,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          authority_content?: Json | null
           created_at?: string
           description?: string | null
           id?: string
@@ -155,6 +157,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          authority_content?: Json | null
           created_at?: string
           description?: string | null
           id?: string
@@ -813,6 +816,67 @@ export type Database = {
         }
         Relationships: []
       }
+      product_authorities: {
+        Row: {
+          badge_text: string | null
+          content: string
+          created_at: string | null
+          expert_avatar_url: string | null
+          expert_name: string
+          expert_title: string | null
+          id: string
+          product_id: string
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          badge_text?: string | null
+          content: string
+          created_at?: string | null
+          expert_avatar_url?: string | null
+          expert_name: string
+          expert_title?: string | null
+          id?: string
+          product_id: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          badge_text?: string | null
+          content?: string
+          created_at?: string | null
+          expert_avatar_url?: string | null
+          expert_name?: string
+          expert_title?: string | null
+          id?: string
+          product_id?: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_authorities_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_authorities_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_authorities_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           alt: string | null
@@ -1034,6 +1098,65 @@ export type Database = {
             columns: ["subcategory_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string | null
+          product_id: string
+          project_id: string
+          quantity: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          product_id: string
+          project_id: string
+          quantity?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          product_id?: string
+          project_id?: string
+          quantity?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "project_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "project_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "user_projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1446,6 +1569,41 @@ export type Database = {
             foreignKeyName: "user_profiles_id_fkey"
             columns: ["id"]
             isOneToOne: true
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_projects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_projects_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "admin_users"
             referencedColumns: ["id"]
           },
@@ -2008,6 +2166,10 @@ export type Database = {
             }
             Returns: undefined
           }
+      adjust_stock_v2: {
+        Args: { p_delta: number; p_product_id: string }
+        Returns: undefined
+      }
       admin_list_all_users: {
         Args: never
         Returns: {
@@ -2178,6 +2340,45 @@ export type Database = {
           role: string
         }[]
       }
+      get_products_enriched: {
+        Args: {
+          p_brand?: string
+          p_category_ids?: string[]
+          p_limit?: number
+          p_max_price?: number
+          p_min_price?: number
+          p_offset?: number
+          p_search_query?: string
+          p_sort_by?: string
+        }
+        Returns: {
+          airflow_capacity: number
+          brand: string
+          category_id: string
+          created_at: string
+          description: string
+          id: string
+          image_alt: string
+          image_url: string
+          is_featured: boolean
+          low_stock_override: boolean
+          low_stock_threshold: number
+          model_code: string
+          name: string
+          noise_level: number
+          pressure_rating: number
+          price: number
+          sku: string
+          slug: string
+          status: string
+          stock_qty: number
+          subcategory_id: string
+          supplier_name: string
+          technical_specs: Json
+          updated_at: string
+          warehouse_location: string
+        }[]
+      }
       get_search_suggestions: {
         Args: { p_limit?: number; p_q: string }
         Returns: {
@@ -2195,6 +2396,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_admin_user: { Args: never; Returns: boolean }
+      is_staff_user: { Args: never; Returns: boolean }
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
       jwt_role: { Args: never; Returns: string }
       process_order_stock_reduction: {

@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect } from 'react'
 import { CartProvider } from '../../contexts/CartProvider'
 import { AuthProvider } from '../../contexts/AuthContext'
+import { CategoryProvider } from '../../contexts/CategoryContext'
 import { usePathname, useSearchParams } from 'next/navigation'
 import MainLayout from './MainLayout'
 import { I18nProvider } from '../../i18n/I18nProvider'
@@ -12,19 +13,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <I18nProvider>
             <AuthProvider>
-                <CartProvider>
-                    <ProjectProvider>
-                        {children}
-                    </ProjectProvider>
-                </CartProvider>
+                <CategoryProvider>
+                    <CartProvider>
+                        <ProjectProvider>
+                            {children}
+                        </ProjectProvider>
+                    </CartProvider>
+                </CategoryProvider>
             </AuthProvider>
         </I18nProvider>
     )
 }
 
 /**
- * useSearchParams() kullanan navigasyon takip mantığı.
- * Ayrı bir bileşen olarak Suspense içinde tutulmalıdır.
+ * useSearchParams() kullanan navigasyon takip mantÄ±ÄŸÄ±.
+ * AyrÄ± bir bileÅŸen olarak Suspense iÃ§inde tutulmalÄ±dÄ±r.
  */
 function NavigationTracker() {
     const pathname = usePathname()
@@ -95,7 +98,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         <MainLayout>
             {children}
             
-            {/* Mantıksal Takipçiler */}
+            {/* MantÄ±ksal TakipÃ§iler */}
             <Suspense fallback={null}>
                 <NavigationTracker />
             </Suspense>

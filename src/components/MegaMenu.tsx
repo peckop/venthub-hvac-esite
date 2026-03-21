@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import type { Category } from '../lib/supabase'
+import { useCategories } from '../contexts/CategoryContext'
 import { EliteMegaMenu, MobileMegaMenu } from './navigation/EliteMegaMenu'
 
 interface MegaMenuProps {
@@ -10,36 +10,15 @@ interface MegaMenuProps {
 }
 
 export const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
+  const { categories, loading } = useCategories()
   const [isMobile, setIsMobile] = useState(false)
-
-  // Check for mobile viewport
+  
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024)
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
-
-  // Fetch categories when menu opens
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const { getCategories } = await import('../lib/supabase')
-        const data = await getCategories()
-        setCategories(data)
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (isOpen) {
-      fetchCategories()
-    }
-  }, [isOpen])
 
   // Close on escape key
   useEffect(() => {
