@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import Link from 'next/link'
-import { getCategories, Category } from '../lib/supabase'
 import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { useCategories } from '../contexts/CategoryContext'
+import { DomainCategory } from '../lib/type-converters'
 
 interface SubcategoryCardProps {
-    subcategory: Category
+    subcategory: DomainCategory
     parentSlug: string
 }
 
@@ -57,13 +58,15 @@ function ScrollingLane({
     direction = 'left',
     speed = 25
 }: {
-    subcategories: Category[]
+    subcategories: DomainCategory[]
     parentSlug: string
     direction?: 'left' | 'right'
     speed?: number
 }) {
     // 3 set for seamless loop
     const items = [...subcategories, ...subcategories, ...subcategories]
+
+
 
     return (
         <div className="relative overflow-hidden">
@@ -93,31 +96,12 @@ interface SubcategoryFlowProps {
 const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
     title = 'Alt Kategoriler'
 }) => {
-    const [categories, setCategories] = useState<Category[]>([])
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        let cancelled = false
-        async function fetchData() {
-            try {
-                const data = await getCategories()
-                if (!cancelled) {
-                    setCategories(data)
-                }
-            } catch (e) {
-                console.warn('SubcategoryFlow fetch error:', e)
-            } finally {
-                if (!cancelled) setLoading(false)
-            }
-        }
-        fetchData()
-        return () => { cancelled = true }
-    }, [])
+    const { categories: allCategories, loading } = useCategories()
 
     // Alt kategorileri parent slugları ile birlikte hazırla
     const subcategoriesWithParent = useMemo(() => {
-        const mainCategories = categories.filter(c => !c.parent_id)
-        const subCategories = categories.filter(c => !!c.parent_id)
+        const mainCategories = allCategories.filter(c => !c.parent_id)
+        const subCategories = allCategories.filter(c => !!c.parent_id)
 
         return subCategories.map(sub => {
             const parent = mainCategories.find(m => m.id === sub.parent_id)
@@ -126,7 +110,7 @@ const SubcategoryFlow: React.FC<SubcategoryFlowProps> = ({
                 parentSlug: parent?.slug || ''
             }
         }).filter(s => s.parentSlug && s.subcategory.slug !== s.parentSlug) // Sadece parent'ı olanlar ve kendi kendini tekrarlamayanlar
-    }, [categories])
+    }, [allCategories])
 
     // İki lane için alt kategorileri böl
     const lane1 = useMemo(() =>

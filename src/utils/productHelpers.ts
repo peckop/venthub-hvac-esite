@@ -1,3 +1,4 @@
+import React from 'react'
 import { Settings, Ruler } from 'lucide-react'
 
 // Helper function to translate spec keys from English to Turkish

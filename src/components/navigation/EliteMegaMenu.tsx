@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import * as NavigationMenu from '@radix-ui/react-navigation-menu'
 import Link from 'next/link'
 import { ChevronDown, ExternalLink } from 'lucide-react'
-import type { Category } from '../../lib/supabase'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import { trackEvent } from '../../utils/analytics'
 import MegaMenu3DBackground from './MegaMenu3DBackground'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { DomainCategory } from '../../lib/type-converters'
 
 interface EliteMegaMenuProps {
-    categories: Category[]
+    categories: DomainCategory[]
     onNavigate?: () => void
 }
 
@@ -134,7 +134,7 @@ export const EliteMegaMenu: React.FC<EliteMegaMenuProps> = ({ categories, onNavi
 interface MobileMegaMenuProps {
     isOpen: boolean
     onClose: () => void
-    categories: Category[]
+    categories: DomainCategory[]
 }
 
 export const MobileMegaMenu: React.FC<MobileMegaMenuProps> = ({ isOpen, onClose, categories }) => {

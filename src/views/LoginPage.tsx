@@ -3,15 +3,15 @@
 import React, { useState, useTransition, useActionState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { loginAction, type AuthActionState } from '../actions/auth'
+import { useAuth } from '../hooks/useAuth'
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
 
 export const LoginPage: React.FC = () => {
-  const [state, formAction] = useActionState<AuthActionState | null, FormData>(loginAction, null)
-  const [isPending] = useTransition()
+  const [isPending, setIsPending] = useState(false)
+  const { signIn, role, user, loading: authLoading } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -21,14 +21,24 @@ export const LoginPage: React.FC = () => {
   const { t } = useI18n()
   const from = searchParams?.get('redirect') || '/'
 
-  React.useEffect(() => {
-    if (state?.success) {
-      toast.success(t('auth.loginSuccess'))
-      router.push(from)
-    } else if (state?.error) {
-      toast.error(state.error)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsPending(true)
+    try {
+      const result = await signIn(email, password)
+      if (result.error) {
+        toast.error(result.error.message)
+      } else {
+        toast.success(t('auth.loginSuccess'))
+        router.refresh()
+        router.push(from)
+      }
+    } catch (err) {
+      toast.error(t('auth.loginError'))
+    } finally {
+      setIsPending(false)
     }
-  }, [state, router, from, t])
+  }
 
   async function handleGoogleSignIn() {
     try {
@@ -75,7 +85,7 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          <form action={formAction} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-industrial-gray mb-2">
                 {t('auth.email')}

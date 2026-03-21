@@ -1,3 +1,9 @@
+---
+id: "000"
+title: "Roadmap"
+status: "Active"
+---
+
 # Proje Stratejisi: Görsel Sayfa Oluşturucu (017)
 
 Bu proje, VentHub'ın kategori ve ürün sayfalarını kod bağımlılığından kurtarmayı ve merkezi bir otorite yapısına kavuşturmayı hedefler.

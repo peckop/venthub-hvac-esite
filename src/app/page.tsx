@@ -1,6 +1,7 @@
 import React from 'react'
 import HomePage from '../views/HomePage'
-import { getCategories, getProducts, type Category, type Product } from '../lib/supabase'
+import { getCategories, getProducts, type Product } from '../lib/supabase'
+import { DomainCategory, toUICategoryList } from '../lib/type-converters'
 import { tr } from '../i18n/dictionaries/tr'
 import { en } from '../i18n/dictionaries/en'
 import type { Metadata } from 'next'
@@ -59,7 +60,7 @@ export default async function RootPage({ searchParams }: Props) {
   await searchParams
 
   // Değişkenleri doğru tiplerle tanımlayarak 'never[]' hatasını engelliyoruz
-  let categories: Category[] = []
+  let categories: DomainCategory[] = []
   let products: Product[] = []
 
   try {
@@ -67,7 +68,7 @@ export default async function RootPage({ searchParams }: Props) {
       getCategories(),
       getProducts(12)
     ])
-    categories = (catData as Category[]) || []
+    categories = toUICategoryList(catData)
     products = (prodData as Product[]) || []
   } catch (error) {
     console.error('SSR Data Fetch Error:', error)

@@ -9,6 +9,7 @@ export interface AuthContextType {
     session: Session | null
     role: UserRole | null
     loading: boolean
+    roleLoading: boolean
     signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error?: AuthError }>
     signUp: (email: string, password: string, name: string) => Promise<{ error?: AuthError }>
     signOut: () => Promise<void>

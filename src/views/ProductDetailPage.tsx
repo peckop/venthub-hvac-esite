@@ -1,9 +1,14 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getProductBySlugOrId, getProductsBySubcategory, getCategories, type Product, type Category, supabase } from '../lib/supabase'
+import { 
+  getProductBySlugOrId, 
+  getProductsEnriched, 
+  type Product, 
+  supabase 
+} from '../lib/supabase'
 import { useCart } from '../hooks/useCartHook'
 import { BrandIcon } from '../components/HVACIcons'
 import ProductCard from '../components/ProductCard'
@@ -39,6 +44,8 @@ import { RichTextRenderer } from '../components/products/RichTextRenderer'
 import { AddToProjectModal } from '../components/products'
 import { useProjectLists } from '../hooks/useProjectLists'
 import PageShell from '../components/layout/PageShell'
+import { useCategories } from '../contexts/CategoryContext'
+import Breadcrumb from '../components/navigation/Breadcrumb'
 import { 
   translateSpecKey, 
   formatSpecValue, 
@@ -53,17 +60,17 @@ export interface ProductDetailPageProps {
 }
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialProduct }) => {
+  const { t, lang } = useI18n()
   const params = useParams()
-  // Clean potential 'cc' suffix from URL id for consistency with database IDs
   const id = (params?.id as string)?.replace(/cc$/, '')
   const router = useRouter()
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
+  const { categories } = useCategories()
+  
   const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(!initialProduct)
-  const [mainCategory, setMainCategory] = useState<Category | null>(null)
-  const [subCategory, setSubCategory] = useState<Category | null>(null)
   const [images, setImages] = useState<{ path: string; alt?: string | null }[]>([])
   const [quantity, setQuantity] = useState(1)
   const [activeSection, setActiveSection] = useState('genel')
@@ -73,8 +80,46 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const [isNavSticky, setIsNavSticky] = useState(false)
   const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+  
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const navTriggerRef = useRef<HTMLDivElement>(null)
+
+  // --- GATEWAY ADAPTATION: RECURSIVE HIERARCHY DISPATCH ---
+  const hierarchy = useMemo(() => {
+    if (!product || categories.length === 0) return { main: null, sub: null };
+    
+    // 1. Ürünün direkt bağlı olduğu kategoriyi bul (Çocuk)
+    const directCat = categories.find(c => c.id === product.subcategory_id || c.id === product.category_id);
+    if (!directCat) return { main: null, sub: null };
+
+    // 2. Eğer bu bir alt kategoriyse, ebeveynini bul (Ana)
+    if (directCat.parent_id) {
+      const parentCat = categories.find(c => c.id === directCat.parent_id);
+      return { main: parentCat || null, sub: directCat };
+    }
+
+    // 3. Eğer direkt ana kategoriyse
+    return { main: directCat, sub: null };
+  }, [product, categories]);
+
+  // --- STANDARD BREADCRUMB BUILDER ---
+  const breadcrumbItems = useMemo(() => {
+    const items = [{ label: t('category.breadcrumbHome'), href: '/' }];
+    
+    if (hierarchy.main) {
+      items.push({ label: (hierarchy.main as any).name, href: `/category/${(hierarchy.main as any).slug}` });
+    }
+    
+    if (hierarchy.sub && hierarchy.sub.slug !== hierarchy.main?.slug) {
+      items.push({ label: (hierarchy.sub as any).name, href: `/category/${(hierarchy.main as any)?.slug || 'all'}/${(hierarchy.sub as any).slug}` });
+    }
+    
+    if (product) {
+      items.push({ label: product.name, href: '' });
+    }
+    
+    return items;
+  }, [hierarchy, product, t]);
 
   const toggleSpecSection = (sectionKey: string) => {
     setOpenSpecSections(prev =>
@@ -92,7 +137,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     async function fetchProduct() {
       if (!id) return
       
-      // If we already have the correct product (from initialProduct or previous fetch), don't fetch again
       if (product && (product.id === id || product.sku === id || product.slug === id)) {
         return
       }
@@ -111,6 +155,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           return
         }
         setProduct(productData)
+        
+        // Fetch Images
         try {
           const { data: imgs } = await supabase
             .from('product_images')
@@ -123,17 +169,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           }))
           setImages(list)
         } catch { }
-        const cats = await getCategories()
-        if (productData.category_id) {
-          const mc = cats.find(c => c.id === productData.category_id) || null
-          setMainCategory(mc)
-        }
+
+        // Related Products (GATEWAY ADAPTATION)
         if (productData.subcategory_id) {
-          const sc = cats.find(c => c.id === productData.subcategory_id) || null
-          setSubCategory(sc)
-        }
-        if (productData.subcategory_id) {
-          const related = await getProductsBySubcategory(productData.subcategory_id)
+          const related = await getProductsEnriched({ 
+            categoryIds: [productData.subcategory_id],
+            limit: 10
+          })
           setRelatedProducts(related.filter(p => p.id !== productData.id).slice(0, 4))
         }
       } catch (error) {
@@ -144,7 +186,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
       }
     }
     fetchProduct()
-  }, [id, initialProduct, product]) // Included product to satisfy lint, but fetch logic is guarded
+  }, [id, initialProduct, product])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -226,8 +268,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     }
   }
 
-  const { t, lang } = useI18n()
-
   const sections = [
     { id: 'genel', title: t('pdp.sections.general'), icon: FileText, bgClass: 'bg-white' },
     { id: 'olcuiler', title: t('pdp.sections.specs') || 'Teknik Özellikler', icon: Ruler, bgClass: 'bg-white' },
@@ -247,7 +287,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
     return null
   }
 
-  const topicSlug = mapSlugToTopic(subCategory?.slug) || mapSlugToTopic(mainCategory?.slug)
+  const topicSlug = mapSlugToTopic((hierarchy.sub as any)?.slug) || mapSlugToTopic((hierarchy.main as any)?.slug)
   const [origin, setOrigin] = useState('')
   useEffect(() => { if (typeof window !== 'undefined') setOrigin(window.location.origin) }, [])
 
@@ -278,55 +318,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const canonicalUrl = `${origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
-  const categoryMetadata = mainCategory?.metadata as CategoryMetadata | null
+  const categoryMetadata = (hierarchy.main as any)?.metadata as CategoryMetadata | null
 
   return (
     <div className="min-h-screen bg-slate-50/30">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* Seamless Integrated Breadcrumb */}
-      <div className="relative z-20">
-        <PageShell spacing="sm" className="pt-4 sm:pt-6">
-          <nav className="flex items-center space-x-2 text-[10px] sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href="/" className="hover:text-primary-navy transition-colors">
-              {t('category.breadcrumbHome')}
-            </Link>
-            <ChevronRight size={10} className="flex-shrink-0" />
-            {mainCategory && (
-              <>
-                <Link href={`/category/${mainCategory.slug}`} className="hover:text-primary-navy transition-colors">
-                  {mainCategory.name}
-                </Link>
-                {subCategory && subCategory.slug !== mainCategory.slug && (
-                  <>
-                    <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={`/category/${mainCategory.slug}/${subCategory.slug}`} className="hover:text-primary-navy transition-colors">
-                      {subCategory.name}
-                    </Link>
-                  </>
-                )}
-                <ChevronRight size={10} className="flex-shrink-0" />
-              </>
-            )}
-            <span className="text-industrial-gray truncate max-w-[150px] sm:max-w-none">
-              {product.name}
-            </span>
-          </nav>
-        </PageShell>
-      </div>
+      {/* STANDARD INTEGRATED BREADCRUMB */}
+      <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-4 sm:pt-6" />
 
       <PageShell spacing="sm" className="py-6 sm:py-8">
-        {/* Back Button - Lighter Style */}
+        {/* Back Button - Adaptive Logic */}
         <button
           onClick={() => {
             if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
             let stack: string[] = [];
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
-            if (lastSafeStop) { router.push(lastSafeStop, { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(`/category/${mainCategory.slug}/${subCategory.slug}`, { scroll: false }) }
-            else if (mainCategory) { router.push(`/category/${mainCategory.slug}`, { scroll: false }) }
-            else { router.push('/', { scroll: false }) }
+            
+            if (lastSafeStop) { 
+              router.push(lastSafeStop, { scroll: false }); 
+            } else if (hierarchy.sub && hierarchy.main) { 
+              router.push(`/category/${hierarchy.main.slug}/${hierarchy.sub.slug}`, { scroll: false });
+            } else if (hierarchy.main) { 
+              router.push(`/category/${hierarchy.main.slug}`, { scroll: false });
+            } else { 
+              router.push('/products', { scroll: false });
+            }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-all group font-bold text-xs uppercase tracking-widest"
         >
@@ -654,7 +672,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {[
                               { label: t('pdp.brand'), value: product.brand },
                               { label: t('pdp.model'), value: product.model_code ?? product.sku },
-                              { label: t('pdp.labels.category'), value: mainCategory?.name || '-' }
+                              { label: t('pdp.labels.category'), value: hierarchy.main?.name || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
                                 <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>

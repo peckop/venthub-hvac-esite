@@ -1,16 +1,31 @@
-# Brainstorm: Technical Debt Cleanup & Type Safety
+# Brainstorm: Admin Panel Erisebilirlik Sorunu
 
-## 🎯 Goal
-Next.js 15 ve React 19 modernizasyonu sırasında "hızlı ilerlemek" adına eklenen `as any` casting ve geçici tip tanımlarının (Technical Debt) temizlenmesi.
+## 🎯 Hedef
+Giriş başarılı olmasına rağmen admin paneline erişememe (tekrar login'e atma veya Access Denied) sorununu kökten çözmek.
 
-## 🛡️ Constraints & Risks
-- **Deneysel Özellik Riski**: İptal edildi. `unstable_after` kullanılmayacak, stabilite öncelikli.
-- **Tip Karmaşası**: React 19 ile değişen `Ref` ve `ComponentProps` tiplerinin Lucide ikonları ile uyumu sarsıntısız sağlanmalı.
-- **Regresyon Risk**: Tip düzeltmeleri sırasında çalışma mantığının bozulmaması için `pnpm build` sürekli kontrol edilmeli.
+## 🛠️ Mevcut Durum Analizi
+- Kullanıcı login oluyor (yeşil bildirim alıyor).
+- Admin paneline yönleniyor.
+- `AdminLayout.tsx` içindeki `canAccess` kontrolü, `AuthContext`'ten gelen `role` bilgisinin yüklenmesini bekleyemiyor olabilir.
+- `useRole` hook'u `useAuth`'u kullanıyor, `useAuth` ise `AuthContext`'i.
+- `AuthContext` içinde `fetchRole` async çalışıyor, bu sırada `role` null kalıyor.
+- `AdminLayout` bu sırada `loading` (authLoading || roleLoading) false ise (ki başlangıçta false olabilir veya auth bittiğinde role hala gelmemiş olabilir) `canAccess` false döner ve `router.replace('/')` tetiklenir.
 
-## 💡 Options & Recommendation
-- **Tavsiye**: 'Any Casting Protokolü' (v8) kapsamında eklenen ara değişkenleri, `src/types/` altındaki kalıcı tanımlarla değiştirerek ilerlemek.
+## 🚀 Çözüm Seçenekleri
 
-## ✅ Acceptance Criteria
-- `SearchOverlay`, `TopicPage` ve `LoginPage` bileşenlerinde `as any` kullanımı %90 azaltıldı.
-- `pnpm exec tsc -b` komutu sıfır hata ile tamamlandı.
+### Seçenek 1: RBAC Logic Standardizasyonu (Önerilen)
+- `AuthContext` içindeki `role` yükleme sürecini daha sağlam hale getirmek.
+- `AdminLayout` koruma mantığını `loading` durumuna daha sıkı bağlamak.
+- `checkAdminAccessAsync` gibi doğrudan DB sorgusu yapan yedek mekanizmaları devreye sokmak.
+
+### Seçenek 2: LocalStorage / Cookie Backup
+- Rol bilgisini sadece DB'den değil, kısa süreliğine session metadata veya cookie'den okumak. (Daha hızlı ama senkronizasyon riski var).
+
+## ⚠️ Riskler
+- **Güvenlik Riski:** Yanlışlıkla yetkisiz birine admin erişimi vermek (Kabul edilemez).
+- **UX Riski:** Çok uzun yükleme süreleri (Skeleton ile çözülecek).
+
+## ✅ Kabul Kriterleri
+- Admin kullanıcısı login olduktan sonra Dashboard'u görebilmeli.
+- Sayfa yenilendiğinde (refresh) admin yetkisi kaybolmamalı.
+- Yetkisiz kullanıcılar kesinlikle içeri alınmamalı.

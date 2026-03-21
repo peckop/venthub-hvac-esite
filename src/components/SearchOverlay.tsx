@@ -8,6 +8,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { highlightMatch } from '../utils/searchHighlight'
 import { getCategoryIcon } from '../utils/getCategoryIcon'
 import type { DbCategory } from '../types/db-rows'
+import { useCategories } from '../contexts/CategoryContext'
 
 interface SearchOverlayProps {
   open: boolean
@@ -20,6 +21,7 @@ const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const { t } = useI18n()
+  const { categories: globalCategories } = useCategories()
   const [q, setQ] = React.useState('')
   const [debounced, setDebounced] = React.useState('')
   const [loading, setLoading] = React.useState(false)
@@ -31,7 +33,11 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
-  const [popularCategories, setPopularCategories] = React.useState<Partial<DbCategory>[]>([])
+
+  // Popüler kategorileri merkezi hiyerarşiden çek
+  const popularCategories = React.useMemo(() => {
+    return globalCategories.filter(c => !c.parent_id).slice(0, 5) as Partial<DbCategory>[]
+  }, [globalCategories])
 
   const router = useRouter()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -43,16 +49,6 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY)
       if (stored) setRecentSearches(JSON.parse(stored).slice(0, 5))
     } catch { /* ignore */ }
-
-    // Fetch top categories dynamically
-    const fetchPopularCats = async () => {
-      try {
-        const { supabase } = await import('../lib/supabase')
-        const { data } = await supabase.from('categories').select('id, name, slug').eq('level', 1).limit(5)
-        if (data) setPopularCategories(data as Partial<DbCategory>[])
-      } catch { }
-    }
-    fetchPopularCats()
   }, [])
 
   // Debounce logic
