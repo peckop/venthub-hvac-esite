@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
-    LucideIcon
 } from 'lucide-react'
 import ProductCard from '../ProductCard'
-import { useI18n } from '../../i18n/I18nProvider'
+// import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 // Premium section components for air curtains
 import {
