@@ -4,19 +4,16 @@ import React from 'react'
 import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import BuildTag from './BuildTag'
+import { useCategories } from '../contexts/CategoryContext'
+import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 const Footer: React.FC = () => {
   const { t } = useI18n()
-  const mainCategories = [
-    { name: t('common.categoryList.exproofFans'), slug: 'fanlar' },
-    { name: t('common.categoryList.heatRecovery'), slug: 'isi-geri-kazanim-cihazlari' },
-    { name: t('common.categoryList.airCurtains'), slug: 'hava-perdeleri' },
-    { name: t('common.categoryList.dehumidifiers'), slug: 'nem-alma-cihazlari' },
-    { name: t('common.categoryList.airPurifiers'), slug: 'hava-temizleyiciler' },
-    { name: t('common.categoryList.flexibleDucts'), slug: 'flexible-hava-kanallari' },
-    { name: t('common.categoryList.speedControllers'), slug: 'hiz-kontrolu-cihazlari' },
-    { name: t('common.categoryList.accessories'), slug: 'aksesuarlar' }
-  ]
+  const { categories: globalCategories } = useCategories()
+  
+  const mainCategories = React.useMemo(() => {
+    return globalCategories.filter(c => !c.parent_id).slice(0, 8);
+  }, [globalCategories]);
 
   return (
     <footer className="bg-industrial-gray text-white selection:bg-white/20 selection:text-white">

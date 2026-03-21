@@ -1,3 +1,9 @@
+---
+id: "000"
+title: "Roadmap"
+status: "Active"
+---
+
 # P05-Next15-Modernization Roadmap
 
 Bu dosya, Next.js 15 ve React 19 modernizasyon sürecinin ana orkestratörüdür.

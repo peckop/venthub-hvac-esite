@@ -30,6 +30,7 @@ export const FALLBACK_ADMIN_EMAILS: string[] = [
   'info@venthub.com',
   'alize@venthub.com',
   'recep.varlik@gmail.com',
+  'recepvarlk@gmail.com',
   // Acil durum için e-postalar
 ]
 
@@ -49,8 +50,19 @@ function isProdEnv(): boolean {
 
 /**
  * Database'den kullanıcı rolünü getir
+ * @param userId Kullanıcı ID
+ * @param userEmail Opsiyonel email (fallback için)
  */
-export async function getUserRole(userId: string): Promise<string> {
+export async function getUserRole(userId: string, userEmail?: string): Promise<string> {
+  // 1. Email Fallback (En yüksek öncelikli güvenlik ağı)
+  if (userEmail && isAdminByEmail(userEmail)) {
+    // Özel superadmin emailleri kontrolü
+    if (userEmail === 'recep.varlik@gmail.com' || userEmail === 'recepvarlk@gmail.com') {
+      return 'super_admin'
+    }
+    return 'admin'
+  }
+
   try {
     const { supabase } = await import('../lib/supabase')
     const { data, error } = await supabase
@@ -61,10 +73,16 @@ export async function getUserRole(userId: string): Promise<string> {
 
     if (error) {
       console.warn('getUserRole error:', error)
+      // Hata durumunda email kontrolü (parametre gelmemişse auth'tan çekmeyi dene)
       return 'user'
     }
 
-    return data?.role || 'user'
+    if (data?.role) return data.role
+
+    // 2. Database'de kayıt yoksa ama email listedeyse (yeni admin kaydı durumu)
+    if (userEmail && isAdminByEmail(userEmail)) return 'admin'
+
+    return 'user'
   } catch (error) {
     console.warn('getUserRole exception:', error)
     return 'user'
@@ -113,19 +131,16 @@ export function checkAdminAccess(user: { email?: string; user_metadata?: { role?
     }
   }
 
-  // 1) Supabase metadata rolü
+  // 1) Email Fallback (En yüksek öncelikli güvenlik ağı - her zaman çalışmalı)
+  if (isAdminByEmail(user.email)) return true
+
+  // 2) Supabase metadata rolü
   const metadataRole = user.user_metadata?.role
   if (metadataRole && ['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(metadataRole)) {
     return true
   }
 
-  // 2) Prod ortamında email fallback KAPALI
-  if (isProdEnv()) return false
-
-  // 3) Dev fallback: e-posta listesi
-  if (isAdminByEmail(user.email)) return true
-
-  // 4) Lokal geliştirme ortamı
+  // 3) Lokal dev fallback
   if (isDevAdmin()) return true
 
   return false
@@ -150,13 +165,10 @@ export async function checkAdminAccessAsync(user: { id?: string; email?: string 
     }
   }
 
-  // 2) Prod ortamında fallback yok
-  if (isProdEnv()) return false
-
-  // 3) Dev fallback: e-posta listesi
+  // 2) Email Fallback (Her zaman izin ver)
   if (user.email && isAdminByEmail(user.email)) return true
 
-  // 4) Lokal dev fallback
+  // 3) Lokal dev fallback
   if (isDevAdmin()) return true
 
   return false

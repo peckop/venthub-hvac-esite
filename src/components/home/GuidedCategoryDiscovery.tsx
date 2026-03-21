@@ -5,11 +5,11 @@ import Image from 'next/image'
 import React from 'react'
 import { motion } from 'framer-motion'
 import { useI18n } from '../../i18n/I18nProvider'
-import { type Category } from '../../lib/supabase'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { DomainCategory } from '../../lib/type-converters'
 
 interface GuidedCategoryDiscoveryProps {
-  categories?: Category[]
+  categories?: DomainCategory[]
 }
 
 // Güvenli yedek görsel (Veritabanında resim yoksa bu gösterilecek)

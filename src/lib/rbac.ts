@@ -1,11 +1,10 @@
-export type UserRole = 'super_admin' | 'superadmin' | 'admin' | 'moderator' | 'warehouse' | 'sales' | 'viewer' | 'user';
+export type UserRole = 'super_admin' | 'admin' | 'moderator' | 'warehouse' | 'sales' | 'viewer' | 'user';
 
 /**
  * Sayfa Erişim Matrisi
  */
 export const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'], // Her seye erişim
-    superadmin: ['*'],
     admin: ['*'], // Her seye erişim (kullanıcılar sayfası haricinde kontrol edilecek)
     moderator: ['*'],
     warehouse: [
@@ -31,7 +30,6 @@ export const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
  */
 export const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
-    superadmin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups'],
     moderator: ['orders', 'logistics', 'returns', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook', 'logs', 'error_groups'],
     warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
@@ -49,11 +47,11 @@ export function canAccessPage(role: UserRole | null | undefined, path: string): 
     if (role === 'user') return false;
 
     // Özel yetki: super_admin hariç kimse 'Kullanıcılar' sayfasını göremez
-    if (role !== 'super_admin' && role !== 'superadmin' && path.startsWith('/admin/users')) {
+    if (role !== 'super_admin' && path.startsWith('/admin/users')) {
         return false;
     }
 
-    const allowedPaths = ROLE_PAGE_ACCESS[role] || [];
+    const allowedPaths = ROLE_PAGE_ACCESS[role as UserRole] || [];
     if (allowedPaths.includes('*')) return true;
 
     // Path ile eşleşme
