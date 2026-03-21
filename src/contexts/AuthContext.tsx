@@ -14,7 +14,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [roleLoading, setRoleLoading] = useState(false);
 
-  const fetchRole = async (userId: string, email?: string) => {
+  const fetchRole = useCallback(async (userId: string, email?: string) => {
     setRoleLoading(true);
     try {
       // Önce config'deki isAdminByEmail kontrolünü dene (hızlı fallback)
@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setRoleLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // Get initial session
