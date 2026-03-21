@@ -64,6 +64,9 @@ export interface CategoryMetadata {
     mobile?: string;
   }>;
   display_mode?: string;
+  metric1?: { label: string; value: string };
+  metric2?: { label: string; value: string };
+  sort_order?: number;
   [key: string]: Json | AuthorityContent | undefined; 
 }
 

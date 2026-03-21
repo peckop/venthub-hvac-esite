@@ -42,13 +42,19 @@ export default function AccountLayout({ children }: { children?: React.ReactNode
 
   React.useEffect(() => {
     let active = true
+    
+    // Lokal geliştirmede oturum zorunluluğunu kaldır
+    if (process.env.NODE_ENV === 'development') return
+
     if (!loading && !user && active) {
       router.replace('/auth/login')
     }
     return () => { active = false }
   }, [user, loading, router])
 
-  if (loading || !user) return null
+  // Geliştirme modunda user null olsa bile render et
+  const shouldRender = (process.env.NODE_ENV === 'development') || (!loading && user)
+  if (!shouldRender) return null
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">

@@ -190,7 +190,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     const heroImagePath = category.image_url ? `category-images/${category.image_url}` : null
     const features = category.metadata?.features ?? []
-    const breadcrumbItems = buildCategoryBreadcrumb(domainCategory, domainParentCategory, t('common.home'))
+    const breadcrumbItems = buildCategoryBreadcrumb(domainCategory, domainParentCategory, t('common.homeLabel'))
 
     return (
         <div className="min-h-screen bg-white">

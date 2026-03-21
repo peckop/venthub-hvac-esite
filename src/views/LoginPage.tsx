@@ -8,7 +8,6 @@ import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useI18n } from '../i18n/I18nProvider'
 import { supabase } from '../lib/supabase'
-import { VentImage } from '@/components/ui/VentImage'
 
 export const LoginPage: React.FC = () => {
   const [state, formAction] = useActionState<AuthActionState | null, FormData>(loginAction, null)
@@ -204,15 +203,18 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Brand Footer */}
+        {/* Brand Footer        */}
         <div className="mt-8 text-center">
-          <VentImage 
-            src="/images/venthub_logo_navy.png" 
-            alt="VentHub" 
-            width={120} 
-            height={40} 
-            className="mx-auto mb-4 opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700"
-          />
+          <Link href="/" className="group inline-flex items-center gap-3 transition-all duration-500">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-navy via-primary-navy to-secondary-blue text-white shadow-[0_20px_40px_-15px_rgba(37,99,235,0.4)] px-4 py-3 transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_25px_50px_-15px_rgba(37,99,235,0.5)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3),transparent_60%)] opacity-80" />
+              <span className="relative block text-sm font-bold tracking-[0.25em]">VH</span>
+            </div>
+            <div className="text-left">
+              <div className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-primary-navy transition-colors">VentHub</div>
+              <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400">Ventilation & HVAC</div>
+            </div>
+          </Link>
           <p className="text-xs text-steel-gray font-medium">
             &copy; {new Date().getFullYear()} VentHub HVAC Solutions. <br />
             {t('common.allRightsReserved')}

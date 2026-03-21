@@ -1,53 +1,49 @@
-import React, { Suspense, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { PerspectiveCamera, Image, Float, shaderMaterial, Sparkles } from '@react-three/drei'
-import * as THREE from 'three'
-import { extend } from '@react-three/fiber'
+'use client'
 
-/**
- * Holographic Shader Material
- * Adds a premium "technological sheen" and scanline effect over the image
- */
+import React, { useRef } from 'react'
+import { Canvas, useFrame, extend } from '@react-three/fiber'
+import * as THREE from 'three'
+import { Float, shaderMaterial } from '@react-three/drei'
+
+// Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(
     {
         uTime: 0,
-        uColor: new THREE.Color('#22d3ee'),
-        uTexture: new THREE.Texture(),
-        uOpacity: 1.0
+        uTexture: null,
+        uOpacity: 1.0,
     },
     // Vertex Shader
     `
     varying vec2 vUv;
-    varying vec3 vPosition;
+    varying vec3 vNormal;
     void main() {
         vUv = uv;
-        vPosition = position;
+        vNormal = normalize(normalMatrix * normal);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
     `,
     // Fragment Shader
     `
+    varying vec2 vUv;
+    varying vec3 vNormal;
     uniform float uTime;
-    uniform vec3 uColor;
     uniform sampler2D uTexture;
     uniform float uOpacity;
-    varying vec2 vUv;
-    varying vec3 vPosition;
 
     void main() {
         vec4 texColor = texture2D(uTexture, vUv);
         
-        // Dynamic scanline
-        float scanline = sin(vUv.y * 200.0 - uTime * 2.0) * 0.05;
+        // Holographic scanline effect
+        float scanline = sin(vUv.y * 100.0 + uTime * 5.0) * 0.1;
+        float glitchness = sin(uTime * 10.0) * 0.05;
         
-        // Holographic sheen (diagonal movement)
-        float sheen = max(0.0, sin(vUv.x * 5.0 + vUv.y * 5.0 + uTime) * 0.2);
+        // Blueprint blue color
+        vec3 blueTint = vec3(0.0, 0.5, 1.0);
         
-        // Edge glow
-        float edge = 1.0 - smoothstep(0.4, 0.5, length(vUv - 0.5));
+        // Edge highlighting (fresnel-like)
+        float fresnel = pow(1.0 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
         
-        // Final composition: Original Image + Tech Overlay
-        vec3 finalColor = texColor.rgb + (uColor * (sheen + scanline));
+        vec3 finalColor = texColor.rgb + blueTint * (fresnel + scanline);
         
         // Boost vibrancy for the "Cinematic" look
         finalColor = mix(finalColor, finalColor * 1.2, 0.5);
@@ -59,16 +55,13 @@ const HolographicMaterial = shaderMaterial(
 
 extend({ HolographicMaterial })
 
-// ThreeElements is used in the module declaration below
-import type { ThreeElements as _ThreeElements } from '@react-three/fiber'
-
 declare module '@react-three/fiber' {
     interface ThreeElements {
-        holographicMaterial: _ThreeElements['shaderMaterial'] & {
-            uTime?: number
-            uColor?: THREE.Color
-            uTexture?: THREE.Texture
-            uOpacity?: number
+        holographicMaterial: {
+            uTexture: THREE.Texture;
+            uOpacity?: number;
+            uTime?: number;
+            transparent?: boolean;
         }
     }
 }
@@ -79,36 +72,39 @@ declare module '@react-three/fiber' {
  */
 const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
     const meshRef = useRef<THREE.Mesh>(null)
-    const materialRef = useRef<THREE.ShaderMaterial>(null)
 
     useFrame((state) => {
-        if (materialRef.current) {
-            materialRef.current.uniforms.uTime.value = state.clock.elapsedTime
-        }
         // Subtle tilt based on mouse position (Parallax)
         if (meshRef.current) {
             const { x, y } = state.mouse
             meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, -y * 0.2, 0.1)
             meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, x * 0.2, 0.1)
+
+            // Update shader time
+            const material = meshRef.current.material as THREE.ShaderMaterial;
+            if (material && material.uniforms && material.uniforms.uTime) {
+                material.uniforms.uTime.value = state.clock.getElapsedTime();
+            }
         }
     })
 
     return (
         <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5} floatingRange={[-0.1, 0.1]}>
             <group>
-                {/* Main Card with Image */}
-                <Image
-                    ref={meshRef}
-                    url={image}
-                    transparent
-                    scale={[4, 3]}
-                    toneMapped={false}
-                />
+                {/* Main Card with Image & Holographic Overlay */}
+                <mesh ref={meshRef}>
+                    <planeGeometry args={[4, 3]} />
+                    <holographicMaterial 
+                        transparent 
+                        uTexture={new THREE.TextureLoader().load(image)} 
+                        uOpacity={0.9}
+                    />
+                </mesh>
 
-                {/* Back Glow / Halo */}
-                <mesh position={[0, 0, -0.1]} scale={[4.5, 3.5, 1]}>
-                    <planeGeometry />
-                    <meshBasicMaterial color="#0891b2" transparent opacity={0.15} blending={THREE.AdditiveBlending} />
+                {/* Ambient Glow behind the card */}
+                <mesh position={[0, 0, -0.1]}>
+                    <planeGeometry args={[4.2, 3.2]} />
+                    <meshBasicMaterial color="#0066ff" transparent opacity={0.1} />
                 </mesh>
             </group>
         </Float>
@@ -116,54 +112,48 @@ const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
 }
 
 interface BlueprintCanvasProps {
-    type?: 'fan' | 'unit' | 'box'
-    image?: string
-    className?: string
+    image: string
 }
 
-const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image, className }) => {
-    // Fallback if no image is provided
-    if (!image) return null;
-
+export const BlueprintCanvas: React.FC<BlueprintCanvasProps> = ({ image }) => {
     return (
-        <ErrorBoundaryFallback>
-            <div className={`w-full h-full min-h-[200px] ${className}`}>
-                <Canvas shadows={false} dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
-                    <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={45} />
+        <div className="w-full h-full min-h-[400px] relative group overflow-hidden rounded-3xl bg-[#05070A] border border-white/5 shadow-2xl">
+            {/* Dark Tech Grid Background */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none" 
+                 style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)', backgroundSize: '24px 24px' }} 
+            />
+            
+            <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+                <ambientLight intensity={0.5} />
+                <pointLight position={[10, 10, 10]} />
+                <CinematicCard image={image} />
+            </Canvas>
 
-                    {/* Atmospheric Lighting */}
-                    <ambientLight intensity={0.8} />
-                    <pointLight position={[10, 10, 10]} intensity={2} color="#22d3ee" />
-                    <pointLight position={[-10, -10, -10]} intensity={1} color="#3b82f6" />
-
-                    <Suspense fallback={null}>
-                        <CinematicCard image={image} />
-
-                        {/* Environmental Particles for "Space" feel */}
-                        <Sparkles count={30} scale={4} size={2} speed={0.4} opacity={0.5} color="#22d3ee" />
-                    </Suspense>
-                </Canvas>
+            {/* Corner Tech Decor */}
+            <div className="absolute top-6 left-6 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                <span className="text-[8px] font-black text-cyan-500 uppercase tracking-widest leading-none">Scanning Blueprint...</span>
             </div>
-        </ErrorBoundaryFallback>
+
+            <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+                <div className="flex flex-col gap-1">
+                    <div className="w-24 h-[1px] bg-white/10" />
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none">Object Reference: P-501</span>
+                </div>
+                <div className="text-right">
+                    <span className="text-[8px] font-black text-white uppercase tracking-widest leading-none">Cinematic Mode</span>
+                    <div className="mt-1 flex gap-1 justify-end">
+                        <div className="w-3 h-[2px] bg-cyan-500" />
+                        <div className="w-1 h-[2px] bg-white/20" />
+                        <div className="w-1 h-[2px] bg-white/20" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Subtle Overlay Vignette */}
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.5)]" />
+        </div>
     )
 }
 
-/** 
- * Local error boundary to prevent the whole page from crashing if WebGL fails
- */
-class ErrorBoundaryFallback extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-    constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false };
-    }
-    static getDerivedStateFromError() { return { hasError: true }; }
-    render() {
-        if (this.state.hasError) return <div className="flex items-center justify-center h-full text-cyan-500/50 text-xs">3D Render Error</div>;
-        return this.props.children;
-    }
-}
-
-export default BlueprintCanvas
-
-
-
+export default BlueprintCanvas;

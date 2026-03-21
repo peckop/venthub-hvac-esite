@@ -1,21 +1,20 @@
-import { VentImage } from '@/components/ui/VentImage'
 import React, { useState, useEffect } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tabs from '@radix-ui/react-tabs'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Upload, Trash2, Save, Loader2, Layout } from 'lucide-react'
+import { X, Upload, Trash2, Save, Loader2 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { supabase } from '../../../lib/supabase'
-import type { Database } from '../../../types/database.types'
+import type { Database, Json } from '../../../types/database.types'
 import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
-import type { AuthorityContent } from '../../../types/authority'
-import { AuthorityBuilder } from '../authority-builder/AuthorityBuilder'
-type CategoryUpdate = Database['public']['Tables']['categories']['Update']
-type CategoryInsert = Database['public']['Tables']['categories']['Insert']
-import { useI18n } from '../../../i18n/I18nProvider'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
+import { VentImage } from '../../ui/VentImage'
+
+type CategoryUpdate = Database['public']['Tables']['categories']['Update']
+type CategoryInsert = Database['public']['Tables']['categories']['Insert']
 
 // --- Zod Schema ---
 const categorySchema = z.object({
@@ -39,317 +38,464 @@ type CategoryFormValues = z.infer<typeof categorySchema>
 interface CategoryFormModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    categoryId?: string | null
+    category?: DbCategory | null
     onSuccess: () => void
-    categories: { id: string; name: string }[]
 }
 
-export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ open, onOpenChange, categoryId, onSuccess, categories }) => {
-    const { t: _t } = useI18n()
-    const [activeTab, setActiveTab] = useState('info')
+export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
+    open,
+    onOpenChange,
+    category,
+    onSuccess
+}) => {
     const [loading, setLoading] = useState(false)
-    const [uploading, setUploading] = useState(false)
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
+    const [uploadingImage, setUploadingImage] = useState(false)
+    const [parentIdOptions, setParentIdOptions] = useState<{ id: string, name: string }[]>([])
 
-    const [authorityContent, setAuthorityContent] = useState<AuthorityContent | null>(null)
-    const [image, setImage] = useState<{ url: string; file?: File; isNew?: boolean } | null>(null)
-    const [initialData, setInitialData] = useState<DbCategory | null>(null)
-
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CategoryFormValues>({
+    const form = useForm<CategoryFormValues>({
         resolver: zodResolver(categorySchema),
         defaultValues: {
+            name: '',
+            slug: '',
+            parent_id: null,
+            description: '',
+            seo_title: '',
+            seo_desc: '',
             is_featured: false,
-            sort_order: 0
+            sort_order: 0,
+            image_url: null,
+            metric1_value: '',
+            metric1_label: '',
+            metric2_value: '',
+            metric2_label: '',
         }
     })
 
-    const loadCategory = React.useCallback(async (id: string) => {
-        setLoading(true)
-        try {
-            const { data, error } = await supabase.from('categories').select('*').eq('id', id).single()
-            if (error) throw error
-            const cat = data as unknown as DbCategory
-            setInitialData(cat)
-
-            const metadata = cat.metadata as unknown as CategoryMetadata | null
-            setAuthorityContent(cat.authority_content as unknown as AuthorityContent)
-
-            reset({
-                name: cat.name,
-                slug: cat.slug,
-                parent_id: cat.parent_id || '',
-                description: cat.description,
-                seo_title: cat.seo_title,
-                seo_desc: cat.seo_desc,
-                is_featured: cat.is_featured ?? false,
-                sort_order: cat.sort_order ?? 0,
-                image_url: cat.image_url,
-                metric1_value: ((metadata?.metric1 as unknown as Record<string, string>)?.value) || '',
-                metric1_label: ((metadata?.metric1 as unknown as Record<string, string>)?.label) || '',
-                metric2_value: ((metadata?.metric2 as unknown as Record<string, string>)?.value) || '',
-                metric2_label: ((metadata?.metric2 as unknown as Record<string, string>)?.label) || ''
-            })
-
-            if (data.image_url) {
-                setImage({
-                    url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${data.image_url}`,
-                    isNew: false
-                })
-            } else {
-                setImage(null)
-            }
-
-        } catch (e) {
-            console.error('Category load error:', e)
-            alert('Kategori yüklenirken hata oluştu')
-        } finally {
-            setLoading(false)
-        }
-    }, [reset])
-
+    // Fetch parent category options
     useEffect(() => {
-        if (open && categoryId) {
-            loadCategory(categoryId)
-        } else if (open && !categoryId) {
-            reset({ is_featured: false, sort_order: 0 })
-            setImage(null)
-            setInitialData(null)
-            setAuthorityContent(null)
-            setActiveTab('info')
+        const fetchParents = async () => {
+            const { data } = await supabase
+                .from('categories')
+                .select('id, name')
+                .is('parent_id', null)
+                .neq('id', category?.id || '00000000-0000-0000-0000-000000000000') // Avoid self-parenting
+            
+            if (data) setParentIdOptions(data)
         }
-    }, [open, categoryId, loadCategory, reset])
+        if (open) fetchParents()
+    }, [open, category])
 
-    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0]
-            setImage({
-                url: URL.createObjectURL(file),
-                file,
-                isNew: true
+    // Load category data when editing
+    useEffect(() => {
+        if (category) {
+            form.reset({
+                name: category.name || '',
+                slug: category.slug || '',
+                parent_id: category.parent_id,
+                description: category.description || '',
+                seo_title: category.seo_title || '',
+                seo_desc: category.seo_desc || '',
+                is_featured: category.is_featured || false,
+                sort_order: category.sort_order || 0,
+                image_url: category.image_url,
+                metric1_value: category.metadata?.metric1?.value || '',
+                metric1_label: category.metadata?.metric1?.label || '',
+                metric2_value: category.metadata?.metric2?.value || '',
+                metric2_label: category.metadata?.metric2?.label || '',
             })
+            setPreviewImage(category.image_url)
+        } else {
+            form.reset({
+                name: '',
+                slug: '',
+                parent_id: null,
+                description: '',
+                seo_title: '',
+                seo_desc: '',
+                is_featured: false,
+                sort_order: 0,
+                image_url: null,
+                metric1_value: '',
+                metric1_label: '',
+                metric2_value: '',
+                metric2_label: '',
+            })
+            setPreviewImage(null)
+        }
+    }, [category, form])
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploadingImage(true)
+        try {
+            // Compress image before upload
+            const compressedFile = await compressImage(file);
+            
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${Math.random()}.${fileExt}`
+            const filePath = `category-images/${fileName}`
+
+            const { error: uploadError } = await supabase.storage
+                .from('products')
+                .upload(filePath, compressedFile)
+
+            if (uploadError) throw uploadError
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('products')
+                .getPublicUrl(filePath)
+
+            form.setValue('image_url', publicUrl)
+            setPreviewImage(publicUrl)
+            toast.success('Görsel yüklendi')
+        } catch (error: unknown) {
+            toast.error('Görsel yüklenemedi: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'))
+        } finally {
+            setUploadingImage(false)
         }
     }
 
-    const removeImage = () => {
-        setImage(null)
-        setValue('image_url', null)
-    }
-
-    const onSubmit = async (data: CategoryFormValues) => {
+    const onSubmit = async (values: CategoryFormValues) => {
         setLoading(true)
         try {
-            let imgPath = data.image_url
-
-            if (image?.isNew && image.file) {
-                setUploading(true)
-                try {
-                    const compressedBlob = await compressImage(image.file)
-                    const ext = 'webp'
-                    const filename = `cat_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
-                    const path = `${filename}`
-                    const { error: upErr } = await supabase.storage.from('category-images').upload(path, compressedBlob, { contentType: 'image/webp' })
-                    if (upErr) throw upErr
-                    imgPath = path
-                } finally {
-                    setUploading(false)
-                }
-            } else if (!image) {
-                imgPath = null
-            }
-
             const metadata: CategoryMetadata = {
-                ...(initialData?.metadata as unknown as Record<string, unknown> || {}),
-                metric1: { value: data.metric1_value || '', label: data.metric1_label || '' },
-                metric2: { value: data.metric2_value || '', label: data.metric2_label || '' }
-            } as unknown as CategoryMetadata
-
-            const payload: Partial<DbCategory> & { authority_content?: AuthorityContent | null } = {
-                name: data.name,
-                slug: data.slug,
-                parent_id: data.parent_id === '' ? null : data.parent_id,
-                description: data.description,
-                seo_title: data.seo_title,
-                seo_desc: data.seo_desc,
-                is_featured: data.is_featured,
-                sort_order: data.sort_order,
-                image_url: imgPath,
-                metadata: metadata as unknown as CategoryMetadata,
-                authority_content: authorityContent
+                metric1: { label: values.metric1_label || '', value: values.metric1_value || '' },
+                metric2: { label: values.metric2_label || '', value: values.metric2_value || '' }
             }
 
-            let currentId = categoryId
+            if (category) {
+                // Update
+                const updateData: CategoryUpdate = {
+                    name: values.name,
+                    slug: values.slug,
+                    parent_id: values.parent_id,
+                    description: values.description,
+                    seo_title: values.seo_title,
+                    seo_desc: values.seo_desc,
+                    is_featured: values.is_featured,
+                    sort_order: values.sort_order,
+                    image_url: values.image_url,
+                    metadata: metadata as unknown as Json
+                }
 
-            if (currentId) {
-                const updateData: CategoryUpdate = Object.fromEntries(
-                    Object.entries(payload).filter(([_, v]) => v !== undefined)
-                ) as CategoryUpdate
-                const { error } = await supabase.from('categories').update(updateData).eq('id', currentId)
+                const { error } = await supabase
+                    .from('categories')
+                    .update(updateData)
+                    .eq('id', category.id)
+
                 if (error) throw error
+                toast.success('Kategori güncellendi')
             } else {
-                const insertData: CategoryInsert = Object.fromEntries(
-                    Object.entries(payload).filter(([_, v]) => v !== undefined)
-                ) as CategoryInsert
-                const { data: newCat, error } = await supabase.from('categories').insert(insertData).select('id').single()
+                // Insert
+                const insertData: CategoryInsert = {
+                    name: values.name,
+                    slug: values.slug,
+                    parent_id: values.parent_id,
+                    description: values.description,
+                    seo_title: values.seo_title,
+                    seo_desc: values.seo_desc,
+                    is_featured: values.is_featured,
+                    sort_order: values.sort_order,
+                    image_url: values.image_url,
+                    metadata: metadata as unknown as Json,
+                    authority_content: []
+                }
+
+                const { error } = await supabase
+                    .from('categories')
+                    .insert(insertData)
+
                 if (error) throw error
-                currentId = newCat.id
+                toast.success('Kategori oluşturuldu')
             }
 
             onSuccess()
             onOpenChange(false)
-
-        } catch (e) {
-            console.error('Save error:', e)
-            alert('Kaydetme başarısız: ' + (e as Error).message)
+        } catch (error: unknown) {
+            toast.error('Hata: ' + (error instanceof Error ? error.message : 'Bilinmeyen hata'))
         } finally {
             setLoading(false)
         }
     }
 
-    const TabTrigger = ({ value, label, icon: Icon }: { value: string, label: string, icon?: React.ElementType }) => (
-        <Tabs.Trigger
-            value={value}
-            className="px-6 py-3 text-sm font-bold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-900 transition-all uppercase tracking-tight flex items-center gap-2"
-        >
-            {Icon && <Icon size={14} />}
-            {label}
-        </Tabs.Trigger>
-    )
-
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 animate-in fade-in duration-300" />
-                <Dialog.Content aria-describedby={undefined} className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none overflow-hidden transform transition-all animate-in zoom-in-95 duration-300">
-
-                    <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
-                        <Dialog.Title className="text-xl font-bold text-primary-navy">
-                            {categoryId ? 'Kategoriyi Düzenle' : 'Yeni Kategori'}
-                        </Dialog.Title>
-                        <Dialog.Close
-                            className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all"
-                        >
+                <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" />
+                <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] overflow-hidden bg-[#0A0F1E] border border-white/10 rounded-2xl shadow-2xl z-[101] flex flex-col">
+                    <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+                        <div>
+                            <Dialog.Title className="text-xl font-bold text-white tracking-tight">
+                                {category ? 'Kategoriyi Düzenle' : 'Yeni Kategori Oluştur'}
+                            </Dialog.Title>
+                            <Dialog.Description className="text-sm text-slate-400 mt-1">
+                                Kategori bilgilerini, SEO ayarlarını ve görsellerini yönetin.
+                            </Dialog.Description>
+                        </div>
+                        <Dialog.Close className="p-2 rounded-lg hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
                             <X size={20} />
                         </Dialog.Close>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto">
-                        {loading && !uploading ? (
-                            <div className="flex items-center justify-center h-64">
-                                <Loader2 className="animate-spin text-blue-600" size={32} />
-                            </div>
-                        ) : (
-                            <form id="category-form" onSubmit={handleSubmit(onSubmit)} className="p-6">
-                                <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-                                    <Tabs.List className="flex border-b border-gray-200 mb-6 sticky top-0 bg-white z-10 overflow-x-auto">
-                                        <TabTrigger value="info" label="Genel Bilgiler" />
-                                        <TabTrigger value="builder" label="Page Builder" icon={Layout} />
-                                        <TabTrigger value="image" label="Görsel" />
-                                        <TabTrigger value="seo" label="SEO" />
-                                        <TabTrigger value="metrics" label="3D Metrikleri" />
-                                    </Tabs.List>
+                    <Tabs.Root defaultValue="general" className="flex-1 flex flex-col overflow-hidden">
+                        <Tabs.List className="px-6 py-2 border-b border-white/5 flex gap-4 bg-white/[0.01]">
+                            <Tabs.Trigger 
+                                value="general"
+                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-all"
+                            >
+                                Genel Bilgiler
+                            </Tabs.Trigger>
+                            <Tabs.Trigger 
+                                value="seo"
+                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-all"
+                            >
+                                SEO & Pazarlama
+                            </Tabs.Trigger>
+                            <Tabs.Trigger 
+                                value="content"
+                                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 border-b-2 border-transparent data-[state=active]:text-cyan-400 data-[state=active]:border-cyan-400 transition-all"
+                            >
+                                Metrikler & Görünüm
+                            </Tabs.Trigger>
+                        </Tabs.List>
 
-                                    <Tabs.Content value="info" className="space-y-4">
+                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                            <form id="category-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <Tabs.Content value="general" className="space-y-6">
+                                    <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Ad *</label>
-                                            <input {...register('name')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-900" />
-                                            {errors.name && <span className="text-xs text-rose-500 font-bold">{errors.name.message}</span>}
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Kategori Adı</label>
+                                            <input 
+                                                {...form.register('name')}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-600"
+                                                placeholder="Örn: Endüstriyel Fanlar"
+                                            />
+                                            {form.formState.errors.name && <p className="text-[10px] font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.name.message}</p>}
                                         </div>
+
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Slug</label>
-                                            <input {...register('slug')} placeholder="Otomatik" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Slug (URL)</label>
+                                            <input 
+                                                {...form.register('slug')}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-600 font-mono"
+                                                placeholder="endustriyel-fanlar"
+                                            />
+                                            {form.formState.errors.slug && <p className="text-[10px] font-bold text-red-400 mt-1 uppercase tracking-tighter px-1">{form.formState.errors.slug.message}</p>}
                                         </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Üst Kategori</label>
-                                            <select {...register('parent_id')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer font-medium text-slate-700">
-                                                <option value="">(Ana Kategori)</option>
-                                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Üst Kategori</label>
+                                            <select 
+                                                {...form.register('parent_id')}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all appearance-none cursor-pointer"
+                                            >
+                                                <option value="" className="bg-[#0A0F1E]">Ana Kategori (Yok)</option>
+                                                {parentIdOptions.map(p => (
+                                                    <option key={p.id} value={p.id} className="bg-[#0A0F1E]">{p.name}</option>
+                                                ))}
                                             </select>
                                         </div>
+
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Açıklama</label>
-                                            <textarea {...register('description')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Sıralama (Pozisyon)</label>
+                                            <input 
+                                                type="number"
+                                                {...form.register('sort_order', { valueAsNumber: true })}
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all"
+                                            />
                                         </div>
-                                        <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                            <div className="flex items-center gap-3">
-                                                <input type="checkbox" {...register('is_featured')} id="is_featured" className="w-4 h-4 rounded border-slate-300 text-primary-navy focus:ring-primary-navy/20" />
-                                                <label htmlFor="is_featured" className="text-sm font-bold text-slate-700 uppercase tracking-tight cursor-pointer">Öne Çıkan</label>
-                                            </div>
-                                            <div className="flex items-center gap-3 ml-auto">
-                                                <label className="text-sm font-bold text-slate-500 uppercase tracking-tight">Sıralama:</label>
-                                                <input type="number" {...register('sort_order', { valueAsNumber: true })} className="w-20 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-center" />
-                                            </div>
-                                        </div>
-                                    </Tabs.Content>
+                                    </div>
 
-                                    <Tabs.Content value="builder" className="space-y-4 min-h-[400px]">
-                                        <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-xs text-indigo-700 flex items-start gap-3 mb-4">
-                                            <Layout size={16} className="shrink-0 mt-0.5" />
-                                            <p className="font-medium leading-relaxed">Page Builder ile dinamik bloklar ekleyebilirsiniz. Bu içerikler ürün listesinin üzerinde görünecektir.</p>
-                                        </div>
-                                        <AuthorityBuilder value={authorityContent} onChange={setAuthorityContent} />
-                                    </Tabs.Content>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Açıklama</label>
+                                        <textarea 
+                                            {...form.register('description')}
+                                            rows={4}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all placeholder:text-slate-600 resize-none"
+                                            placeholder="Kategori hakkında genel bilgi..."
+                                        />
+                                    </div>
+                                </Tabs.Content>
 
-                                    <Tabs.Content value="image" className="space-y-4">
-                                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-500 hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer relative">
-                                            <input type="file" accept="image/*" onChange={handleImageSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                            <Upload size={32} className="mb-2" />
-                                            <p className="text-sm font-medium">Görsel Seç veya Sürükle</p>
-                                        </div>
-                                        {image && (
-                                            <div className="relative border rounded-lg overflow-hidden w-full h-64 bg-gray-50 flex items-center justify-center">
-                                                <VentImage src={image.url} alt="Kategori" className="max-w-full max-h-full object-contain"  />
-                                                <button type="button" onClick={removeImage} className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"><Trash2 size={16} /></button>
-                                            </div>
-                                        )}
-                                    </Tabs.Content>
+                                <Tabs.Content value="seo" className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">SEO Başlığı</label>
+                                        <input 
+                                            {...form.register('seo_title')}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all"
+                                            placeholder="Arama motoru başlığı"
+                                        />
+                                    </div>
 
-                                    <Tabs.Content value="seo" className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Başlığı</label>
-                                            <input {...register('seo_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO Açıklaması</label>
-                                            <textarea {...register('seo_desc')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
-                                        </div>
-                                    </Tabs.Content>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">SEO Açıklaması</label>
+                                        <textarea 
+                                            {...form.register('seo_desc')}
+                                            rows={3}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 focus:bg-white/[0.05] transition-all"
+                                            placeholder="Arama motoru açıklaması"
+                                        />
+                                    </div>
 
-                                    <Tabs.Content value="metrics" className="space-y-6">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Değer</label>
-                                                <input {...register('metric1_value')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
+                                    <div className="flex items-center gap-4 bg-white/[0.02] p-6 rounded-2xl border border-white/5">
+                                        <input 
+                                            type="checkbox"
+                                            {...form.register('is_featured')}
+                                            id="is_featured"
+                                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-cyan-500 focus:ring-cyan-500/50 focus:ring-offset-0"
+                                        />
+                                        <label htmlFor="is_featured" className="text-sm font-bold text-white cursor-pointer select-none">
+                                            Öne Çıkarılan Kategori
+                                            <span className="block text-[10px] font-normal text-slate-500 mt-1 uppercase tracking-tight">Ana sayfada ve üst menüde vurgulanır</span>
+                                        </label>
+                                    </div>
+                                </Tabs.Content>
+
+                                <Tabs.Content value="content" className="space-y-8">
+                                    {/* Image Selection */}
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Kategori Görseli</label>
+                                        <div className="flex items-start gap-8">
+                                            <div className="w-48 h-48 rounded-2xl bg-white/5 border-2 border-dashed border-white/10 overflow-hidden flex items-center justify-center relative group">
+                                                {previewImage ? (
+                                                    <>
+                                                        <VentImage 
+                                                            src={previewImage} 
+                                                            alt="Preview" 
+                                                            className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <button 
+                                                                type="button"
+                                                                onClick={() => { setPreviewImage(null); form.setValue('image_url', '') }}
+                                                                className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all transform hover:scale-110 shadow-xl"
+                                                            >
+                                                                <Trash2 size={20} />
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center p-6">
+                                                        <Upload size={32} className="mx-auto text-slate-600 mb-2" />
+                                                        <span className="text-[10px] font-bold text-slate-500 leading-tight">Yüklemek için tıklayın</span>
+                                                    </div>
+                                                )}
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    onChange={handleImageUpload}
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    disabled={uploadingImage}
+                                                />
+                                                {uploadingImage && (
+                                                    <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center">
+                                                        <Loader2 className="animate-spin text-cyan-400 mb-2" />
+                                                        <span className="text-[8px] font-black text-white uppercase tracking-widest">Yükleniyor...</span>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 1 Etiket</label>
-                                                <input {...register('metric1_label')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
+                                            <div className="flex-1 space-y-4">
+                                                <p className="text-xs text-slate-500 leading-relaxed">
+                                                    Kategori görselleri ana sayfa ve kategori listelerinde kullanılır. <br/>
+                                                    Önerilen çözünürlük: <span className="text-white font-bold">800x800px</span>. <br/>
+                                                    Desteklenen formatlar: <span className="text-white font-bold">WebP, PNG, JPG</span>.
+                                                </p>
+                                                <div className="space-y-2">
+                                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Görsel URL (veya Manuel Giriş)</label>
+                                                    <input 
+                                                        {...form.register('image_url')}
+                                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2 text-[10px] focus:outline-none focus:border-cyan-500/50 font-mono"
+                                                        placeholder="https://..."
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Değer</label>
-                                                <input {...register('metric2_value')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
+                                    </div>
+
+                                    {/* Metrics (Technical specs summary for cards) */}
+                                    <div className="space-y-4 pt-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="w-1 h-4 bg-cyan-500 rounded-full" />
+                                            <label className="text-[10px] font-black text-white uppercase tracking-widest">Hızlı Metrikler</label>
+                                        </div>
+                                        <p className="text-[10px] text-slate-500 uppercase font-medium tracking-tight mt-1">Bu alanlar kategori kartlarında kısa teknik bilgi olarak gösterilir.</p>
+                                        
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 1 Etiketi</label>
+                                                    <input 
+                                                        {...form.register('metric1_label')}
+                                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-medium"
+                                                        placeholder="Örn: Kapasite"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 1 Değeri</label>
+                                                    <input 
+                                                        {...form.register('metric1_value')}
+                                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-bold text-cyan-400"
+                                                        placeholder="Örn: 20.000 m³/h"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Metrik 2 Etiket</label>
-                                                <input {...register('metric2_label')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm" />
+
+                                            <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 2 Etiketi</label>
+                                                    <input 
+                                                        {...form.register('metric2_label')}
+                                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-medium"
+                                                        placeholder="Örn: Güç Aralığı"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest px-1">Metrik 2 Değeri</label>
+                                                    <input 
+                                                        {...form.register('metric2_value')}
+                                                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all font-bold text-cyan-400"
+                                                        placeholder="Örn: 0.75 - 45 kW"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
-                                    </Tabs.Content>
-                                </Tabs.Root>
+                                    </div>
+                                </Tabs.Content>
                             </form>
-                        )}
-                    </div>
+                        </div>
 
-                    <div className="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/80 backdrop-blur-sm">
-                        <button type="button" onClick={() => onOpenChange(false)} className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200">Vazgeç</button>
-                        <button type="submit" form="category-form" disabled={loading || uploading} className={`${adminButtonPrimaryClass} flex items-center gap-2 px-8 py-2.5 rounded-xl shadow-lg shadow-primary-navy/10 transition-transform active:scale-95 disabled:opacity-50`}>
-                            {(loading || uploading) ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                            Kaydet
-                        </button>
-                    </div>
-
+                        <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/[0.02]">
+                            <button 
+                                type="button" 
+                                onClick={() => onOpenChange(false)}
+                                className="px-6 py-3 text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest transition-colors"
+                            >
+                                Vazgeç
+                            </button>
+                            <button 
+                                type="submit" 
+                                form="category-form"
+                                disabled={loading || uploadingImage}
+                                className={`${adminButtonPrimaryClass} flex items-center gap-2 group`}
+                            >
+                                {loading ? (
+                                    <Loader2 className="animate-spin" size={16} />
+                                ) : (
+                                    <Save size={16} className="group-hover:translate-y-[-1px] transition-transform" />
+                                )}
+                                {category ? 'Kategoriyi Güncelle' : 'Kategori Oluştur'}
+                            </button>
+                        </div>
+                    </Tabs.Root>
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
     )
 }
+
+export default CategoryFormModal;
