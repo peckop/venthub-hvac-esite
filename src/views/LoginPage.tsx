@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useTransition, useActionState } from 'react'
+import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../hooks/useAuth'
@@ -11,7 +11,7 @@ import { supabase } from '../lib/supabase'
 
 export const LoginPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false)
-  const { signIn, role, user, loading: authLoading } = useAuth()
+  const { signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
