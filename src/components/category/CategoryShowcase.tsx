@@ -26,7 +26,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     const isQuietFan = category.slug === 'sessiz-kanal-tipi-fanlar'
 
     // Hero image logic (GATEWAY READY)
-    const showcaseImages = ((category.metadata as unknown) as Record<string, any>)?.showcase_images
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const showcaseImages = (category.metadata as any)?.showcase_images
     const heroImage = (showcaseImages?.[0]?.desktop) ||
         (isAirCurtain ? '/images/category/hero-vortice.png' : null) ||
         (isQuietFan ? '/images/vortice/vortice_lineo_hero.png' : null) ||

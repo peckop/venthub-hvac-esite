@@ -20,7 +20,8 @@ import * as LucideIcons from 'lucide-react';
 // --- YARDIMCI BİLEŞENLER ---
 
 const IconRenderer = ({ name, className }: { name: string, className?: string }) => {
-  const Icon = ((LucideIcons as unknown) as Record<string, any>)[name.charAt(0).toUpperCase() + name.slice(1)] || LucideIcons.Zap;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Icon = (LucideIcons as any)[name.charAt(0).toUpperCase() + name.slice(1)] || LucideIcons.Zap;
   return <Icon className={className} />;
 };
 
