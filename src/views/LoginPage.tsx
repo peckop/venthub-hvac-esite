@@ -33,6 +33,7 @@ export const LoginPage: React.FC = () => {
         router.refresh()
         router.push(from)
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (_err) {
       toast.error(t('auth.loginError'))
     } finally {

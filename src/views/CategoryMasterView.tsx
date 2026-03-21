@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 import { useCategoryGateway } from '../hooks/useCategoryGateway';
 import { AuthorityRenderer } from '../components/authority/AuthorityRenderer';
-import CategoryShowcase from '../components/category/CategoryShowcase';
+// import CategoryShowcase from '../components/category/CategoryShowcase';
 import CategoryHero from '../components/category/CategoryHero';
 import Breadcrumb from '../components/navigation/Breadcrumb';
 import { buildCategoryBreadcrumb } from '../utils/breadcrumbUtils';
@@ -11,7 +11,7 @@ import ProductsGrid from '../components/products/ProductsGrid';
 import CategorySidebar from '../components/category/CategoryFilters';
 import CategoryLanding from '../components/category/CategoryLanding';
 import { useI18n } from '../i18n/I18nProvider';
-import { getCategoryDisplayName } from '../utils/categoryHelpers';
+// import { getCategoryDisplayName } from '../utils/categoryHelpers';
 import { mapDomainCategoryToDatabase, mapDomainProductToDatabase } from '../lib/type-converters';
 import type { DbCategory } from '../types/db-rows';
 import { motion, AnimatePresence } from 'framer-motion';
