@@ -33,7 +33,7 @@ export const LoginPage: React.FC = () => {
         router.refresh()
         router.push(from)
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t('auth.loginError'))
     } finally {
       setIsPending(false)
