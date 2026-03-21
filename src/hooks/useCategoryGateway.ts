@@ -283,7 +283,7 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     // This ensures "Aksesuarlar" or "Filters" show products immediately,
     // with subcategories available in the sidebar as navigation.
     return 'grid';
-  }, [category, parentCategory, subCategories])
+  }, [category, parentCategory])
 
   return {
     category,
