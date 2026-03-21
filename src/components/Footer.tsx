@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useI18n } from '../i18n/I18nProvider'
 import BuildTag from './BuildTag'
 import { useCategories } from '../contexts/CategoryContext'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+// import { getCategoryDisplayName } from '../utils/categoryHelpers'
 
 const Footer: React.FC = () => {
   const { t } = useI18n()

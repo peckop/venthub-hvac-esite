@@ -43,7 +43,7 @@ import { ProductSmartInference } from '../../components/product/ProductSmartInfe
 import { AddToProjectModal } from '../../components/products'
 import { useProjectLists } from '../../hooks/useProjectLists'
 import { useCategories } from '../../contexts/CategoryContext'
-import { DomainCategory } from '../../lib/type-converters'
+// import { DomainCategory } from '../../lib/type-converters'
 import { 
   translateSpecKey, 
   formatSpecValue, 
