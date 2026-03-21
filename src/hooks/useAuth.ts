@@ -10,10 +10,12 @@ export function useAuth() {
       session: null,
       role: null,
       loading: false,
+      roleLoading: false,
       signIn: async () => ({ error: { message: 'Auth not available' } }),
       signUp: async () => ({ error: { message: 'Auth not available' } }),
       signOut: async () => { },
-      resetPassword: async () => ({ error: { message: 'Auth not available' } })
+      resetPassword: async () => ({ error: { message: 'Auth not available' } }),
+      refreshSession: async () => null
     }
   }
   return context

@@ -60,11 +60,10 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
 
   const { loading: isCategoriesLoading } = useCategories()
   const { getCartCount, getCartTotal } = useCart()
-  const { user, signOut } = useAuth()
+  const { user, signOut, role: contextRole } = useAuth()
   const [manualLogout, setManualLogout] = useState(false)
   
   const [recentProducts, setRecentProducts] = useState<string[]>([])
-  const [userRole, setUserRole] = useState<string>('user')
   const isMounted = useIsMounted()
 
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -88,24 +87,8 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [closeUserMenu])
 
-  useEffect(() => {
-    let active = true
-    async function loadRole() {
-      try {
-        if (user?.id) {
-          const role = await getUserRole(user.id)
-          if (active) setUserRole(role)
-        } else if (active) {
-          setUserRole('user')
-        }
-      } catch {
-        if (active) setUserRole('user')
-      }
-    }
-    if (user?.id) loadRole()
-    else setUserRole('user')
-    return () => { active = false }
-  }, [user?.id])
+  // Rol bilgisini direkt context Role'den alıyoruz
+  const userRole = contextRole || 'user'
 
   const roleLabel = useCallback((role: string) => {
     switch (role) {
@@ -173,10 +156,16 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   )
 
   // --- DEV BYPASS LOGIC ---
-  const isDevBypass = process.env.NODE_ENV === 'development' && !manualLogout
+  // Sadece gerçekten user yoksa ve manuel logout değilse bypass devreye girer
+  const isDevBypass = process.env.NODE_ENV === 'development' && !user && !manualLogout
+  
   const finalUserDisplayName = user?.user_metadata?.full_name || (isDevBypass ? 'Recep Varlık' : t('roles.user'))
-  const finalIsAdmin = isDevBypass ? true : isAdmin
-  const finalHasPrivilegedRole = isDevBypass ? true : ['superadmin', 'super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'].includes(userRole)
+  // Admin kontrolü: URL admin'deyse VEYA kullanıcının yetkili bir rolü varsa (contextRole)
+  const privilegedRoles = ['superadmin', 'super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer']
+  const hasAccessRole = privilegedRoles.includes(userRole)
+  
+  const finalIsAdmin = isDevBypass ? true : hasAccessRole
+  const finalHasPrivilegedRole = isDevBypass ? true : hasAccessRole
 
   const cartCount = getCartCount()
   const cartTotal = getCartTotal ? getCartTotal() : 0

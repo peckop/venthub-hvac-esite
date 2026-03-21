@@ -3,8 +3,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../../hooks/useAuth'
 import { useRole } from '../../hooks/useRole'
-import { checkAdminAccessAsync } from '../../config/admin'
+import { isAdminByEmail } from '../../config/admin'
 import AccessDenied from '../../components/admin/AccessDenied'
+import AdminSkeleton from '../../components/admin/AdminSkeleton'
 import { useI18n } from '../../i18n/I18nProvider'
 import {
   BarChart3,
@@ -27,29 +28,52 @@ import CommandPalette from '../../components/admin/CommandPalette'
 import AdminRealtimeNotifications from '../../components/admin/AdminRealtimeNotifications'
 
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true) // Masaüstünde açık başlasın
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
-  const { user, loading } = useAuth()
-  const { canAccess, loading: roleLoading } = useRole()
+  const { user, loading: authLoading } = useAuth()
+  const { role, canAccess, loading: roleLoading } = useRole()
   const router = useRouter()
   const { t } = useI18n()
 
-  const isDev = process.env.NODE_ENV === 'development'
+  const loading = authLoading || roleLoading
+
+  // 1. Email Fallback Check (Immediate bypass)
+  const isEmailAdmin = user?.email ? isAdminByEmail(user.email) : false
 
   useEffect(() => {
-    if (isDev) return
-    let active = true
-    async function guard() {
-      if (loading) return
-      const ok = await checkAdminAccessAsync(user)
-      if (!ok && active) router.replace('/')
-    }
-    guard()
-    return () => { active = false }
-  }, [user, loading, router, isDev])
+    // Wait for both auth and role to load, but email bypass can happen
+    if (loading) return
 
-  const hasAccess = isDev || canAccess(pathname ?? '')
-  if (!loading && !roleLoading && !hasAccess) return <AccessDenied />
+    // If no user at all, redirect to home
+    if (!user) {
+      router.replace('/')
+      return
+    }
+
+    // Email admin'ler her zaman erişir
+    if (isEmailAdmin) return
+
+    // Check if user has admin role access
+    // Next.js 15+ navigation senkronizasyonu için bir kez daha rol kontrolü
+    const hasAccess = canAccess(pathname ?? '')
+    if (!hasAccess && role !== undefined) {
+      // Sadece rol bilgisi kesinleşmişse (undefined değilse) kararı uygula
+      // router.replace('/') // AccessDenied zaten render ediliyor
+    }
+  }, [loading, user, pathname, canAccess, router, isEmailAdmin, role])
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#0A0F1E]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400" />
+      </div>
+    )
+  }
+
+  // Final check for render
+  if (!isEmailAdmin && !canAccess(pathname ?? '')) {
+    return <AccessDenied />
+  }
 
   const navGroups = [
     { label: t('admin.menu.groupMain'), items: [{ href: '/admin', label: t('admin.menu.dashboard'), icon: BarChart3 }] },

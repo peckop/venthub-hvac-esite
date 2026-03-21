@@ -1,21 +1,21 @@
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Category } from '../../lib/supabase'
 import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2, Activity, ShieldCheck } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
-import { Breadcrumb } from '../navigation/Breadcrumb'
+import Breadcrumb from '../navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { DomainCategory } from '../../lib/type-converters'
 
 interface CategoryShowcaseProps {
-    category: Category
-    subCategories: Category[]
-    parentCategory?: Category | null
+    category: DomainCategory
+    subCategories: DomainCategory[]
+    parentCategory?: DomainCategory | null
 }
 
 const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
@@ -25,11 +25,11 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     const isAirCurtain = category.slug === 'hava-perdeleri'
     const isQuietFan = category.slug === 'sessiz-kanal-tipi-fanlar'
 
-    // Hero image logic
-    const heroImage = category.metadata?.showcase_images?.[0]?.desktop ||
+    // Hero image logic (GATEWAY READY)
+    const heroImage = (category.metadata as any)?.showcase_images?.[0]?.desktop ||
         (isAirCurtain ? '/images/category/hero-vortice.png' : null) ||
         (isQuietFan ? '/images/vortice/vortice_lineo_hero.png' : null) ||
-        (category.image_url ? `${(import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}` : null)
+        (category.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}` : null)
 
 
 

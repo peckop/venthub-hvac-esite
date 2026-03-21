@@ -1,3 +1,9 @@
+---
+id: "000"
+title: "Search Architecture"
+status: "Backlog"
+---
+
 # Kurumsal Seviye Arama Mimarisi
 
 **Durum:** Bu belge `NEXT_STEPS.md` arşivlendiği için oradaki "Arama Mimarisini Kurumsal Seviyeye Taşıma" görevlerinden oluşturulmuştur.

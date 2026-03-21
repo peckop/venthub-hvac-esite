@@ -1,3 +1,9 @@
+---
+id: "000"
+title: "Roadmap"
+status: "Active"
+---
+
 # P04 - Category Architecture Reform
 
 ## 🎯 Projenin Amacı

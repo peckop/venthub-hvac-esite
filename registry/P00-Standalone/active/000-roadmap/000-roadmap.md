@@ -1,3 +1,9 @@
+---
+id: "000"
+title: "Roadmap"
+status: "Active"
+---
+
 # P00-Standalone Strategy: Core System Integrity
 
 ## 1. Vizyon (Vision)

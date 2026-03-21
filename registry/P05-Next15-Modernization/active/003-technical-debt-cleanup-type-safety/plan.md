@@ -1,22 +1,27 @@
-# Plan: Technical Debt Cleanup & Type Safety
+# Plan: Admin Panel Erisebilirlik Sorunu (003)
 
-## 🎯 Goal
-Next.js 15 stabilite ve tip güvenliği restorasyonu.
+## 🎯 Hedef
+Admin kullanıcısının login olduktan sonra Dashboard'a yönlendirilip başarılı bir şekilde yetkilendirilmesini sağlamak.
 
-## 🏗️ Steps
+## 🧱 Adımlar
 
-1. **Envanter Çıkarma**: 
-   - `grep -r "as any" src/` komutu ile tüm geçici çözümleri listele.
-   - `grep -r "server-only" src/` kontrolü yap.
+### 1. `AuthContext.tsx` Stabilizasyonu
+- **İşlem:** `roleLoading` state'i ekleyerek rol bilgisinin gelip gelmediğini kontrol etmek.
+- **Verify:** `useRole` hook'u içinden `roleLoading` bilgisi erişilebilir olacak.
 
-2. **Kritik Bileşen Refactor**: 
-   - `src/components/navigation/SearchOverlay.tsx` (İkon tipleri)
-   - `src/views/TopicPage.tsx` (React 19 Props)
-   - `src/actions/auth.ts` (Server Action tipleri)
+### 2. `AdminLayout.tsx` Koruma Mantığının Güncellenmesi
+- **İşlem:** `canAccess` ve `loading` durumunu (authLoading || roleLoading) daha dikkatli incelemek.
+- **İşlem:** `loading` durumunda spinner'ı kesin göstermek.
+- **Verify:** Manuel refresh yapıldığında admin paneli açılmalı.
 
-3. **Global Tip Güncellemesi**:
-   - `src/types/db-rows.ts` içindeki eksik alias'ları tamamla.
+### 3. `useRole.ts` Hook'unu `AuthContext` ile Senkron Etmek
+- **İşlem:** Rol state'ini daha güvenli bir şekilde sunmak.
+- **Verify:** `canAccess` fonksiyonu rol null iken false dönmeli ama loading true iken beklemeli.
 
-4. **Doğrulama (Verify)**:
-   - `pnpm run lint:ci`
-   - `pnpm exec tsc -b tsconfig.build.json`
+### 4. Giriş Sonrası `router.refresh()` ve `revalidatePath` Kontrolü
+- **İşlem:** `LoginPage.tsx` içindeki refresh mantığını doğrulamak.
+- **Verify:** Login sonrası `/admin` sayfasına geçildiğinde yeni state gelmeli.
+
+---
+## 🏁 Sonuç
+Tüm adımlar tamamlandığında admin erişim sorunu çözülmüş olacak.
