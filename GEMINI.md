@@ -56,17 +56,19 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 - **Planning-First:** Bir görev `backlog`'dan `active`'e çekildiğinde statüsü otomatik olarak `Planning` olur. 
 - **Zorunlu Plan:** `plan.md` dosyası `superpowers-write-plan` skill'ini ile doldurulmadan ve her adım için `Verify:` maddesi eklenmeden `src/` dizinine bir karakter bile yazılamaz.
 
-## 7. Registry Sentinel (Koruma Sistemi)
+## 7. Registry Sentinel (Koruma Sistemi) - [🚨 GÜVENLİK KİLİDİ]
 > [!CAUTION]
 > **Registry Güvenlik Kilidi:** `registry/` dizini altındaki hiçbir dosya veya klasör (PXX projeleri), `write_file`, `replace`, `rm` veya benzeri manuel dosya araçlarıyla manipüle edilemez.
 > - **Zorunlu Motor:** Proje başlatma, görev oluşturma, taşıma veya mühürleme işlemleri YALNIZCA `python registry/manage_registry.py` otonom motoru üzerinden yapılabilir.
 > - **Manuel Müdahale Yasağı:** Ajan, doğrudan klasör oluşturma veya dosya silme yetkisini bu dizin için kaybetmiştir. Her işlem `manage_registry.py` komutlarıyla tetiklenmek zorundadır.
-> - **İstisna:** Sadece `brainstorm.md`, `plan.md` ve `review.md` içeriklerinin doldurulması için `write_file` kullanılabilir; ancak bu dosyaların klasör yapısı mutlaka otonom motor tarafından kurulmuş olmalıdır.
+> - **Orion Güvenli Hafıza (V8):** `recall` ve `remember` komutları artık eski güvensiz JSON yerine, doğrudan `registry.db` içindeki `agent_memory` tablosuna yazmaktadır. Ajanlar arası kritik veri aktarımları *sadece* bu komutlarla yapılmalıdır.
+> - **Planlama Disiplini (Superpowers):** Planlar asla AI'nın kendi cümleleriyle manuel yazılamaz. Mutlaka `.agent/skills/superpowers-workflow/scripts/write_artifact.py` scripti kullanılmalı ve `artifacts/superpowers/plan.md` yoluna kaydedilmelidir.
+
 - **Workflow Sıralaması:** Ajan, `REGISTRY_PROTOCOL.md` Madde 5'teki 6 adımlık yaşam döngüsüne (Brainstorm -> Plan -> Activate -> Execute -> Review -> Close) harfiyen uymak zorundadır. Adım atlamak "Mühendislik Suçu"dur.
-- **Yüzeysel Plan Yasağı:** `...` gibi placeholder içeren veya doğrulanabilir adımı olmayan planlar "geçersiz" kabul edilir.
-- **Onay Mekanizması:** Kullanıcıdan alınan "Plan Mode" onayı, sadece planlama sürecini başlatmak içindir. Kodlama aşamasına ancak plan tamamlandıktan sonra geçilebilir.
-- **Geri Besleme Takibi (Feedback Loop):** Herhangi bir `manage_registry.py` komutundan sonra terminal çıktısını MUTLAKA oku. Eğer `[🚨 SENTINEL]` veya `[🚨 PROTOKOL İHLALİ]` uyarısı görürsen, bu "Sistem senin yetkini elinden aldı" demektir. Bu durumda hemen dur ve eksik planlama/brainstorming adımlarını tamamla.
-- **Durum Teyidi:** Her yeni turn başlangıcında veya görev değişiminde ilk iş olarak ilgili `.md` dosyasını `view_file` ile oku. Kendi hafızandaki duruma değil, dosyadaki gerçek statüye güven.
+- **Yüzeysel Plan Yasağı:** `...` gibi placeholder içeren veya doğrulanabilir adımı olmayan planlar "geçersiz" kabul edilir. Her adımda `Verify:` maddesi zorunludur.
+- **Geri Besleme Takibi (Feedback Loop):** Herhangi bir `manage_registry.py` komutundan sonra terminal çıktısını MUTLAKA oku. Eğer `[🚨 SENTINEL]` veya `[🚨 PROTOKOL İHLALİ]` uyarısı görürsen, bu "Sistem senin yetkini elinden aldı" demektir.
+- **Dosya Bütünlüğü:** Registry motoru (v5.0) artık dosya içeriğini silmemektedir. Eğer bir dosya boş görünüyorsa, bu AI'nın scripti doğru kullanmadığını gösterir.
+
 
 ---
 *Bu anayasa, projenin sürdürülebilirliğini ve güvenliğini korumak için mühürlenmiştir.*
