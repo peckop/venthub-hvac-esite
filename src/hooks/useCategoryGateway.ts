@@ -127,7 +127,12 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
             targetParentCategory = globalCategories.find(c => c.slug === parentSlug && !c.parent_id) || null
             targetCategory = globalCategories.find(c => c.slug === slug && c.parent_id === targetParentCategory?.id) || null
           } else {
-            targetCategory = globalCategories.find(c => c.slug === slug && !c.parent_id) || null
+            targetCategory = globalCategories.find(c => c.slug === slug && !c.parent_id) || 
+                             globalCategories.find(c => c.slug === slug) || null
+            
+            if (targetCategory?.parent_id) {
+              targetParentCategory = globalCategories.find(c => c.id === targetCategory!.parent_id) || null
+            }
           }
         }
 
@@ -272,12 +277,12 @@ export function useCategoryGateway(initialCategory?: DbCategory | null) {
     // 1. Explicit override from Database (Source of Truth)
     if (meta.display_mode) return meta.display_mode as string;
 
-    // 2. Sub-Category or Series Level (Always Series/Grid)
-    if (parentCategory) return 'series';
-
-    // 3. Special "Premium Landing" Categories (Showcase Mode)
+    // 2. Special "Premium Landing" Categories (Showcase Mode)
     const premiumLandingSlugs = ['hava-perdesi', 'hava-perdeleri', 'sessiz-kanal-tipi-fanlar'];
     if (premiumLandingSlugs.includes(category.slug)) return 'showcase';
+
+    // 3. Sub-Category or Series Level (Always Series/Grid)
+    if (parentCategory) return 'series';
 
     // 4. Default for all other Top-Level categories (Grid Mode)
     // This ensures "Aksesuarlar" or "Filters" show products immediately,

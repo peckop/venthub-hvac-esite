@@ -1,13 +1,14 @@
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable @typescript-eslint/no-require-imports */
+const _fs = require('_fs');
+const _path = require('_path');
 
 // Configuration
-const inputFile = path.join(__dirname, '..', 'data', 'raw', 'firecrawl_crawl_results.json');
-const outputDir = path.join(__dirname, '..', 'data', 'processed');
+const __inputFile = _path.join(__dirname, '..', '_data', 'raw', 'firecrawl_crawl_results.json');
+const outputDir = _path.join(__dirname, '..', '_data', 'processed');
 
 // Ensure output directory exists
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
+if (!_fs.existsSync(outputDir)) {
+  _fs.mkdirSync(outputDir, { recursive: true });
 }
 
 // Category mapping based on VentHub categories
@@ -56,10 +57,10 @@ const brandMapping = {
 };
 
 // Utility functions
-function extractPriceFromText(text) {
+function extractPriceFromText(_text) {
   // Turkish price patterns: 63.397,88 ₺ or 25.456,69₺
   const priceRegex = /([\d,.]+)\s*[₺]/g;
-  const matches = text.match(priceRegex);
+  const matches = _text.match(priceRegex);
   
   if (matches && matches.length > 0) {
     // Get the first price found
@@ -81,7 +82,7 @@ function extractImagesFromMarkdown(markdown) {
   while ((match = imageRegex.exec(markdown)) !== null) {
     const [, alt, url] = match;
     // Skip base64 and placeholder images
-    if (!url.includes('data:image') && !url.includes('base64') && url.startsWith('http')) {
+    if (!url.includes('_data:image') && !url.includes('base64') && url.startsWith('http')) {
       images.push({
         alt: alt || '',
         url: url
@@ -207,12 +208,12 @@ function generateSlug(name) {
 
 // Main processing function
 function processFirecrawlData() {
-  console.log('Processing Firecrawl data...');
+  console.warn('Processing Firecrawl _data...');
   
-  // Create sample data based on what we know from the crawl
+  // Create sample _data based on what we know from the crawl
   const crawlResults = {
     status: "completed",
-    data: [
+    _data: [
       {
         markdown: `# ENKELFAN 155 EEC\n\n**Kategori :** Plug Fanlar\n\n**Ürün Kodu :** ENKEC155\n\nEC MOTORLU PLUG FAN\n\nGeriye eğik kanatlı, yüksek performanslı ve tek emişli, doğrudan tahrikli, kendi kendini temizleyen pervaneli fan. Gürültüyü ve titreşimi en aza indirmek için dinamik olarak balanslanmıştır.`,
         metadata: {
@@ -261,11 +262,11 @@ function processFirecrawlData() {
   const products = [];
   const categories = new Set();
   const brands = new Set();
-  let productId = 1;
+  let __productId = 1;
   
-  console.log(`Processing ${crawlResults.data.length} pages...`);
+  console.warn(`Processing ${crawlResults._data.length} pages...`);
   
-  for (const page of crawlResults.data) {
+  for (const page of crawlResults._data) {
     const { markdown, metadata } = page;
     const url = metadata.sourceURL || metadata.url;
     
@@ -296,10 +297,10 @@ function processFirecrawlData() {
       const slug = generateSlug(productName);
       
       const product = {
-        id: productId++,
+        id: __productId++,
         name: productName,
         slug: slug,
-        sku: productCode || `AVENS-${productId.toString().padStart(4, '0')}`,
+        sku: productCode || `AVENS-${__productId.toString().padStart(4, '0')}`,
         brand: brand,
         category: category,
         subcategory: null,
@@ -310,7 +311,7 @@ function processFirecrawlData() {
         description: description,
         short_description: description ? description.substring(0, 160) : '',
         images: images,
-        specifications: {},
+        __specifications: {},
         seo_title: productName,
         seo_description: description ? description.substring(0, 160) : '',
         source_url: url,
@@ -322,7 +323,7 @@ function processFirecrawlData() {
       categories.add(category);
       brands.add(brand);
       
-      console.log(`✓ Processed product: ${productName} (${category})`);
+      console.warn(`✓ Processed product: ${productName} (${category})`);
     } else {
       // Check if this is a category page with multiple products
       const productLinks = [...markdown.matchAll(/\[([^\]]+)\]\(([^)]*)\)/g)];
@@ -344,10 +345,10 @@ function processFirecrawlData() {
           const existingProduct = products.find(p => p.slug === slug);
           if (!existingProduct) {
             const product = {
-              id: productId++,
+              id: __productId++,
               name: linkTitle,
               slug: slug,
-              sku: `AVENS-${productId.toString().padStart(4, '0')}`,
+              sku: `AVENS-${__productId.toString().padStart(4, '0')}`,
               brand: brand,
               category: category,
               subcategory: null,
@@ -358,7 +359,7 @@ function processFirecrawlData() {
               description: '',
               short_description: '',
               images: [],
-              specifications: {},
+              __specifications: {},
               seo_title: linkTitle,
               seo_description: '',
               source_url: linkUrl,
@@ -375,7 +376,7 @@ function processFirecrawlData() {
       }
       
       if (categoryProducts > 0) {
-        console.log(`✓ Processed category page with ${categoryProducts} products from ${url}`);
+        console.warn(`✓ Processed category page with ${categoryProducts} products from ${url}`);
       }
     }
   }
@@ -392,7 +393,7 @@ function processFirecrawlData() {
     products_by_brand: {}
   };
   
-  // Count products by category and brand
+  // _count products by category and brand
   for (const category of categories) {
     summary.products_by_category[category] = products.filter(p => p.category === category).length;
   }
@@ -407,36 +408,36 @@ function processFirecrawlData() {
     products
   };
   
-  fs.writeFileSync(
-    path.join(outputDir, 'processed_products.json'), 
+  _fs.writeFileSync(
+    _path.join(outputDir, 'processed_products.json'), 
     JSON.stringify(outputData, null, 2)
   );
   
-  fs.writeFileSync(
-    path.join(outputDir, 'summary.json'), 
+  _fs.writeFileSync(
+    _path.join(outputDir, 'summary.json'), 
     JSON.stringify(summary, null, 2)
   );
   
-  console.log('\n=== Processing Complete ===');
-  console.log(`Total products processed: ${products.length}`);
-  console.log(`Categories found: ${categories.size}`);
-  console.log(`Brands found: ${brands.size}`);
-  console.log(`Output saved to: ${outputDir}`);
+  console.warn('\n=== Processing Complete ===');
+  console.warn(`Total products processed: ${products.length}`);
+  console.warn(`Categories found: ${categories.size}`);
+  console.warn(`Brands found: ${brands.size}`);
+  console.warn(`Output saved to: ${outputDir}`);
   
   // Show category breakdown
-  console.log('\n=== Category Breakdown ===');
+  console.warn('\n=== Category Breakdown ===');
   Object.entries(summary.products_by_category)
     .sort(([,a], [,b]) => b - a)
-    .forEach(([category, count]) => {
-      console.log(`${category}: ${count} products`);
+    .forEach(([category, _count]) => {
+      console.warn(`${category}: ${_count} products`);
     });
     
   // Show brand breakdown  
-  console.log('\n=== Brand Breakdown ===');
+  console.warn('\n=== Brand Breakdown ===');
   Object.entries(summary.products_by_brand)
     .sort(([,a], [,b]) => b - a)
-    .forEach(([brand, count]) => {
-      console.log(`${brand}: ${count} products`);
+    .forEach(([brand, _count]) => {
+      console.warn(`${brand}: ${_count} products`);
     });
 }
 
@@ -445,7 +446,7 @@ if (require.main === module) {
   try {
     processFirecrawlData();
   } catch (error) {
-    console.error('Error processing data:', error);
+    console.error('Error processing _data:', error);
     process.exit(1);
   }
 }

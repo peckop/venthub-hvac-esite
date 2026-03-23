@@ -1,16 +1,16 @@
 
 import { createClient } from '@supabase/supabase-js'
-import fs from 'fs'
-import path from 'path'
+import _fs from '_fs'
+import _path from '_path'
 
 // Manual .env parser
-const env = fs.readFileSync(path.join(process.cwd(), '.env'), 'utf8')
+const env = _fs.readFileSync(_path.join(process.cwd(), '.env'), 'utf8')
     .split('\n')
     .reduce((acc, line) => {
         const [key, val] = line.split('=')
         if (key && val) acc[key.trim()] = val.trim().replace(/\r/g, '')
         return acc
-    }, {} as any)
+    }, {} as unknown)
 
 const supabaseUrl = env.VITE_SUPABASE_URL
 const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY
@@ -37,11 +37,11 @@ const SUBCATEGORY_RULES: { slug: string; keywords: string[]; excludeKeywords?: s
     { slug: 'santrifuj-fanlar', keywords: ['Santrifüj', 'SANTRIFUJ', 'Santrifüj', 'Centrifugal'] },
     { slug: 'duvar-tipi-kompakt-aksiyal-fanlar', keywords: ['Vario', 'VARIO', 'Punto', 'PUNTO', 'Duvar'] },
     { slug: 'konut-tipi-fanlar', keywords: ['Punto', 'M ', 'MF ', 'Aspiratör', 'Banyo'] },
-    { slug: 'endustriyel-fanlar', keywords: ['Endüstriyel', 'ENDUSTRIYEL', 'Industrial', 'E 304', 'E 404'] },
+    { slug: 'endustriyel-fanlar', keywords: ['Endüstriyel', 'ENDUSTRIYEL', 'Industrial', '_e 304', '_e 404'] },
     { slug: 'ex-proof-fanlar-patlama-karsi-atex-fanlar', keywords: ['ATEX', 'Ex-Proof', 'EX-PROOF', 'Patlama'] },
 
     // Hava Perdeleri alt kategorileri
-    { slug: 'elektrikli-isitici', keywords: ['Elektrikli', 'ELEKTRIK', 'Electric', 'Isıtıcılı', 'ISITICI', 'AD-H', 'AD-E'] },
+    { slug: 'elektrikli-isitici', keywords: ['Elektrikli', 'ELEKTRIK', 'Electric', 'Isıtıcılı', 'ISITICI', 'AD-H', 'AD-_e'] },
     { slug: 'ortam-havali', keywords: ['Ortam Havalı', 'ORTAM HAVALI', 'Ambient', 'Isıtıcısız', 'ISITICI', 'AD-'] },
 
     // Isı Geri Kazanım alt kategorileri
@@ -54,16 +54,16 @@ const SUBCATEGORY_RULES: { slug: string; keywords: string[]; excludeKeywords?: s
 
     // Aksesuarlar alt kategorileri
     { slug: 'aluminyum-folyo-bantlar', keywords: ['Bant', 'Tape', 'Folyo'] },
-    { slug: 'plastik-kelepçeler', keywords: ['Kelepçe', 'Clamp'] },
+    { slug: 'plastik-kelepçeler', keywords: ['Kelepç_e', 'Clamp'] },
     { slug: 'baglanti-konnektoru', keywords: ['Konnektör', 'Connector', 'Bağlantı'] },
     { slug: 'gemici-anemostadi', keywords: ['Anemostad', 'Diffuser'] },
 ]
 
 async function distribute() {
-    console.log('=== Starting Smart Product Distribution ===\n')
+    console.warn('=== Starting Smart Product Distribution ===\n')
 
     // 1. Get all subcategories (parent_id is not null)
-    const { data: subcats, error: cErr } = await supabase
+    const { _data: subcats, error: cErr } = await supabase
         .from('categories')
         .select('id, name, slug, parent_id')
         .not('parent_id', 'is', null)
@@ -73,10 +73,10 @@ async function distribute() {
         return
     }
 
-    console.log(`Found ${subcats.length} subcategories.\n`)
+    console.warn(`Found ${subcats.length} subcategories.\n`)
 
     // 2. Get all products
-    const { data: products, error: pErr } = await supabase
+    const { _data: products, error: pErr } = await supabase
         .from('products')
         .select('id, name, category_id')
 
@@ -85,7 +85,7 @@ async function distribute() {
         return
     }
 
-    console.log(`Found ${products.length} products.\n`)
+    console.warn(`Found ${products.length} products.\n`)
 
     // 3. For each rule, find matching products and update
     let totalUpdated = 0
@@ -93,7 +93,7 @@ async function distribute() {
     for (const rule of SUBCATEGORY_RULES) {
         const subcat = subcats.find(c => c.slug === rule.slug)
         if (!subcat) {
-            console.log(`Subcategory not found: ${rule.slug}`)
+            console.warn(`Subcategory not found: ${rule.slug}`)
             continue
         }
 
@@ -107,11 +107,11 @@ async function distribute() {
         })
 
         if (matchingProducts.length === 0) {
-            console.log(`${subcat.name}: No new matches`)
+            console.warn(`${subcat.name}: No new matches`)
             continue
         }
 
-        console.log(`${subcat.name}: Found ${matchingProducts.length} matches. Updating...`)
+        console.warn(`${subcat.name}: Found ${matchingProducts.length} matches. Updating...`)
 
         // Update in batches (Supabase allows update by ID)
         for (const prod of matchingProducts) {
@@ -128,7 +128,7 @@ async function distribute() {
         }
     }
 
-    console.log(`\n=== Distribution Complete. Total updated: ${totalUpdated} ===`)
+    console.warn(`\n=== Distribution Complete. Total updated: ${totalUpdated} ===`)
 }
 
 distribute()

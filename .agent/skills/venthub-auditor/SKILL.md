@@ -1,58 +1,36 @@
 ---
 name: venthub-auditor
-description: Next.js 15, React 19 ve Edge Runtime standartlarına göre projeyi denetler. Teknik borç, tip güvenliği, i18n ihlalleri ve performans engellerini raporlar.
+description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, Next.js 15/React 19 uyumu, tip güvenliği ve robotik temizlik denetimi yapar.
 ---
 
-# VentHub Auditor Skill (Modernized v8.0)
+# 🛡️ VentHub Unified Auditor Skill (v10.0)
 
-Bu yetenek, VentHub projesinin Next.js 15 ve Edge Native mimarisine tam uyumunu denetlemek için tasarlanmıştır.
+Bu yetenek, projenin sadece "çalışmasını" değil, "mimari açıdan kusursuz" kalmasını sağlar. Projedeki tüm otonom ajanlar bu skill'in kurallarına biat etmek zorundadır.
 
-## Kullanım Senaryoları
-- **Commit Öncesi:** Yeni yazılan kodun anayasaya uygunluğunu denetlemek.
-- **Modernizasyon Audit:** Eski (Vite/Next 14) kalıntılarını temizlemek.
-- **Edge Deployment Kontrolü:** Kodun Cloudflare Pages üzerinde çalışabilirliğini teyit etmek.
+## 💎 Mimari Korkuluklar (Architectural Guardrails)
+1.  **Metrik Tuzağı Yasağı:** Hata sayılarını düşürmek için kodun mantıksal ve isimlendirme bütünlüğü bozulamaz. `_` öneki ile susturma son çaredir.
+2.  **Dörtlü Mühür Denetimi:** Her görev `brainstorm`, `plan` ve `review` aşamalarında karşılıklı teknik kanıtlara (metadata) sahip olmalıdır.
+3.  **PascalCase Zorunluluğu:** React bileşenleri her zaman büyük harfle başlamalı ve standart isimlendirmeye sahip olmalıdır.
 
-## Teftiş Kriterleri (Audit Matrix)
+## 📐 Teknik Teftiş Kriterleri
 
-### 1. Next.js 15 & React 19 Denetimi
-Next.js 15 ile gelen asenkron yapıları ve React 19 hook'larını denetler.
-- **Kritik:** `page.tsx` veya `layout.tsx` içinde `params` veya `searchParams` nesnelerinin `await` edilmeden kullanılması yasaktır.
-  - *Regex:* `const\s+\{.*\}\s+=\s+params` (Await yoksa hata ver!)
-- **Yeni:** `useFormState` yerine `useActionState` kullanımı zorunludur.
-  - *Regex:* `useFormState` (Gördüğünde `useActionState` öner!)
+### 1. Next.js 15 & React 19
+- `params` ve `searchParams` nesneleri asenkron (await) kullanılmalıdır.
+- `useI18n` hook'u bileşen bütünlüğünü bozmadan, standart şekilde kullanılmalıdır.
+- Hydration güvenliği için `window` erişimleri `useEffect` veya `typeof window` ile sarmalanmalıdır.
 
-### 2. Edge Runtime & Cloudflare Uyumluluğu
-Proje Edge Runtime üzerinde çalıştığı için Node.js'e özgü kütüphanelerin kullanımı denetlenmelidir.
-- **Yasaklılar:** `fs`, `path`, `crypto` (node: modülleri), `Buffer` (doğrudan kullanım).
-- **SSR-First:** `ssr: false` kullanımı mimari bir zorunluluk olmadıkça yasaktır.
-  - *Regex:* `ssr:\s*false`
+### 2. Tip Güvenliği (Strict Typing)
+- `any` dökümü kesinlikle yasaktır. 
+- `unknown` sadece geçici dökümler için kullanılabilir. 
+- Veri modelleri için `src/types/` altındaki tanımlar (Source of Truth) zorunludur.
 
-### 3. Supabase & Veri Katmanı (Strict Typing)
-`as any` ile susturulmuş veritabanı çağrılarını bulur.
-- **Kritik:** `supabase.rpc as any` kullanımı yasaktır.
-  - *Doğru Kullanım:* `supabase.rpc<"function_name">(...)`
-- **Model Uyumu:** Veritabanı satırları için her zaman `src/types/db-rows.ts` içindeki aliaslar (`DbProduct`, `DbOrder` vb.) kullanılmalıdır.
+### 3. I18n ve Performans
+- Hardcoded Türkçe metinler tespit edildiğinde i18n sistemine taşınmalıdır.
+- Three.js objeleri (`geometry`, `material`) `dispose()` edilerek bellek sızıntıları önlenmelidir.
 
-### 4. i18n ve Hardcoded Metin Denetimi
-- **Kural:** Tüm kullanıcıya görünen metinler `t()` fonksiyonu içinde olmalıdır.
-- **İstisna:** Teknik loglar ve veritabanı ID'leri hariçtir.
-- **Tespit:** Türkçe karakter (`şğüöçıŞĞÜÖÇİ`) içeren ve `t(` sarmalı olmayan tırnaklı metinleri raporlar.
+## 🚀 Denetim Araçları (Executables)
+Projenin bütünlüğünü denetlemek için şu script kullanılmalıdır:
+`python .agent/scripts/check_integrity.py`
 
-### 5. Performans ve CLS (LCP Focus)
-- **Skeleton-First:** Her dinamik veri yükleyen bileşen için bir `Skeleton` muadili tanımlanmalıdır.
-- **Image:** Tüm `<img` etiketleri Next.js `Image` (veya `VentImage`) ile değiştirilmelidir.
-- **Window Safety:** `typeof window !== 'undefined'` kontrolü olmadan yapılan `window` veya `localStorage` erişimleri yasaktır.
-
-## Denetim Komutları
-
-### Genel Teknik Borç Taraması
-`grep_search --pattern "\bas any\b|ssr:\s*false|useFormState" --include_pattern "src/**"`
-
-### Next.js 15 Params Taraması
-`grep_search --pattern "params:" --include_pattern "src/app/**/page.tsx"`
-
-### Supabase RPC Taraması
-`grep_search --pattern "\.rpc as any" --include_pattern "src/lib/supabase.ts"`
-
-## İyileştirme Talimatı
-Audit sonucunda bulunan hatalar için **"Surgical Update" (Cerrahi Güncelleme)** yapılmalıdır. Tüm dosya yerine sadece sorunlu satır `replace` aracıyla düzeltilmelidir.
+## 🏁 Başarı Kriteri
+Bir görev ancak `check_integrity.py` scriptinden tam puan (0 hata) alırsa ve mimari bütünlük korunursa "Completed" olarak işaretlenebilir.

@@ -18,15 +18,15 @@ async function inspect() {
     try {
         await client.connect();
 
-        console.log('\n--- Duplicate Indexes on product_images ---');
+        console.warn('\n--- Duplicate Indexes on product_images ---');
         const dupRes = await client.query(`
             SELECT indexname, indexdef
             FROM pg_indexes
             WHERE tablename = 'product_images'
         `);
-        dupRes.rows.forEach(r => console.log(r.indexname));
+        dupRes.rows.forEach(r => console.warn(r.indexname));
 
-        console.log('\n--- Permissive Policies on product_images ---');
+        console.warn('\n--- Permissive Policies on product_images ---');
         const rlsRes = await client.query(`
             SELECT policyname, cmd, permissive
             FROM pg_policies
@@ -34,7 +34,7 @@ async function inspect() {
             ORDER BY cmd;
         `);
         rlsRes.rows.forEach(r => {
-            console.log(`[${r.cmd}] ${r.policyname} (${r.permissive})`);
+            console.warn(`[${r.cmd}] ${r.policyname} (${r.permissive})`);
         });
 
     } catch (err) {

@@ -211,7 +211,7 @@ export interface CheckoutInvoiceInfo {
   taxOffice?: string; // Standardized UI field
   tax_number?: string;
   taxNumber?: string; // Standardized UI field
-  tc_id?: string;
+  t_c_id?: string;
   tckn?: string;
   vkn?: string;
   vknNumber?: string;

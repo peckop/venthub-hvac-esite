@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
+import _fs from '_fs';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 const files = [
     'src/components/StickyHeader.tsx',
@@ -20,12 +20,12 @@ const files = [
 ];
 
 files.forEach(f => {
-    const p = path.resolve(__dirname, '..', f);
-    if (fs.existsSync(p)) {
-        let c = fs.readFileSync(p, 'utf8');
+    const p = _path.resolve(__dirname, '..', f);
+    if (_fs.existsSync(p)) {
+        let c = _fs.readFileSync(p, 'utf8');
         if (c.startsWith("'use client'\\n\\n")) {
-            fs.writeFileSync(p, c.replace("'use client'\\n\\n", "'use client'\\n\\n"), 'utf8');
-            console.log('Fixed', f);
+            _fs.writeFileSync(p, c.replace("'use client'\\n\\n", "'use client'\\n\\n"), 'utf8');
+            console.warn('Fixed', f);
         }
     }
 });

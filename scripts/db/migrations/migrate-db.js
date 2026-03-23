@@ -10,14 +10,14 @@ if (!connectionString && process.env.VITE_SUPABASE_URL) {
   // URL: https://[project-ref].supabase.co
   // DB: postgres://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
 
-  const urlParts = process.env.VITE_SUPABASE_URL.split('://');
-  if (urlParts.length > 1) {
-    const hostPart = urlParts[1].split('.')[0]; // project-ref
+  const _urlParts = process.env.VITE_SUPABASE_URL.split('://');
+  if (_urlParts.length > 1) {
+    const hostPart = _urlParts[1].split('.')[0]; // project-ref
     const password = process.env.SUPABASE_DB_PASSWORD || process.env.POSTGRES_PASSWORD;
 
     if (hostPart && password) {
       connectionString = `postgres://postgres:${password}@db.${hostPart}.supabase.co:5432/postgres`;
-      console.log('Constructed connection string from env vars.');
+      console.warn('Constructed connection string from env vars.');
     }
   }
 }
@@ -25,8 +25,8 @@ if (!connectionString && process.env.VITE_SUPABASE_URL) {
 if (!connectionString) {
   console.error('❌ Error: DATABASE_URL not found and could not be constructed (missing password).');
   // Fallback: Check if user provided it in a specific var
-  console.log('Debug: VITE_SUPABASE_URL is present:', !!process.env.VITE_SUPABASE_URL);
-  console.log('Debug: SUPABASE_DB_PASSWORD is present:', !!process.env.SUPABASE_DB_PASSWORD);
+  console.warn('Debug: VITE_SUPABASE_URL is present:', !!process.env.VITE_SUPABASE_URL);
+  console.warn('Debug: SUPABASE_DB_PASSWORD is present:', !!process.env.SUPABASE_DB_PASSWORD);
   process.exit(1);
 }
 
@@ -154,14 +154,14 @@ WHERE slug = 'nem-alma-cihazlari';
 
 async function runMigration() {
   try {
-    console.log('Connecting to database...');
+    console.warn('Connecting to database...');
     await client.connect();
-    console.log('✅ Connected!');
+    console.warn('✅ Connected!');
 
-    console.log('Running migration...');
+    console.warn('Running migration...');
     const res = await client.query(migrationSQL);
-    console.log('✅ Migration successful!');
-    console.log('Result:', res);
+    console.warn('✅ Migration successful!');
+    console.warn('Result:', res);
 
     await client.end();
   } catch (err) {

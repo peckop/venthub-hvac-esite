@@ -17,11 +17,11 @@ const client = new Client({
 async function checkPerformance() {
     try {
         await client.connect();
-        console.log('Connected to database...');
+        console.warn('Connected to database...');
 
         const query = `
             SELECT
-                c.conrelid::regclass AS table_name,
+                c.conrel_id::regclass AS table_name,
                 c.conname AS fk_name,
                 pg_get_constraintdef(c.oid) AS definition
             FROM pg_constraint c
@@ -40,16 +40,16 @@ async function checkPerformance() {
         const res = await client.query(query);
 
         if (res.rows.length === 0) {
-            console.log('✅ No unindexed foreign keys found.');
+            console.warn('✅ No unindexed foreign keys found.');
         } else {
-            console.log('⚠️  Found potential unindexed Foreign Keys:');
+            console.warn('⚠️  Found potential unindexed Foreign Keys:');
             res.rows.forEach(row => {
                 const dbDef = row.definition;
                 const match = dbDef.match(/FOREIGN KEY \((.*?)\)/);
                 const columns = match ? match[1] : 'unknown';
 
-                console.log(`- Table: ${row.table_name}, FK: ${row.fk_name}, Columns: ${columns}`);
-                console.log(`  SUGGESTION: CREATE INDEX idx_${row.fk_name}_perf ON ${row.table_name} (${columns});`);
+                console.warn(`- Table: ${row.table_name}, FK: ${row.fk_name}, Columns: ${columns}`);
+                console.warn(`  SUGGESTION: CREATE INDEX idx_${row.fk_name}_perf ON ${row.table_name} (${columns});`);
             });
         }
 

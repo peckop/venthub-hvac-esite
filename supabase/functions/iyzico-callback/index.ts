@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
       conversationId = body?.conversationId;
       orderId = body?.orderId;
     }
-    // URL query'den de parametre al (callbackUrl'e eklendi)
+    // URL query'den de parametre al (callbackUrl'_e eklendi)
     let successUrl: string | null = null;
     try {
       const url = new URL(req.url);
@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
         } catch {}
       }
       if (!token) {
-        // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'e yönlendir (pending)
+        // Token yine yoksa, uygulama çağrısı ise JSON, değilse frontend'_e yönlendir (pending)
         if (wantsJson) {
           return new Response(JSON.stringify({ status: 'pending', reason: 'missing_token' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         } else if (successUrl) {
@@ -100,8 +100,8 @@ Deno.serve(async (req) => {
             if (conversationId) target.searchParams.set('conversationId', conversationId);
             target.searchParams.set('status', 'pending');
             const t = target.toString();
-            const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){location.href=${JSON.stringify(t)}};</script></body></html>`;
-            return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+            const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){location.href=${JSON.stringify(t)}};</script></body></html>`;
+            return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': '_text/html' } });
           } catch {}
         }
         // Son çare
@@ -301,7 +301,7 @@ Deno.serve(async (req) => {
               'apikey': serviceRoleKey,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ p_order_id: orderId })
+            body: JSON.stringify({ p__order_id: orderId })
           });
 
           if (rpcResp.ok) {
@@ -351,7 +351,7 @@ Deno.serve(async (req) => {
                             'Authorization': `Bearer ${serviceRoleKey}`,
                             'Content-Type': 'application/json'
                           },
-                          body: JSON.stringify({ productId: it.product_id })
+                          body: JSON.stringify({ _productId: it.product_id })
                         }).catch(() => {});
                       }
                     }
@@ -360,12 +360,12 @@ Deno.serve(async (req) => {
               }
             } catch { /* ignore */ }
           } else {
-            const errTxt = await rpcResp.text().catch(() => '');
+            const errTxt = await rpcResp._text().catch(() => '');
             console.warn('process_order_stock_reduction failed', rpcResp.status, errTxt);
           }
         }
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e ?? '')
+      } catch (_e: unknown) {
+        const msg = _e instanceof Error ? _e.message : String(_e ?? '')
         console.warn('Stock reduction RPC error:', msg);
       }
       
@@ -375,7 +375,7 @@ Deno.serve(async (req) => {
         const sk = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
         if (su && sk) {
           // Fetch order row to get user_id
-          let uid: string | null = null
+          const _u_id: string | null = null
           if (orderId) {
             const oResp = await fetch(`${su}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}&select=user_id`, {
               headers: { Authorization: `Bearer ${sk}`, apikey: sk }
@@ -442,17 +442,17 @@ Deno.serve(async (req) => {
         if (conversationId) target.searchParams.set('conversationId', conversationId);
         target.searchParams.set('status', paid ? 'success' : 'failure');
         const t = target.toString();
-        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
-        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': '_text/html' } });
       }
     } catch {}
 
     // Yine de base yoksa düz metin yerine bilgilendirici HTML döndür (OK kaldırıldı)
     const infoHtml = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
-    return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
+    return new Response(infoHtml, { status: 200, headers: { ...corsHeaders, "Content-Type": "_text/html" } });
   } catch (error: unknown) {
     console.error("iyzico-callback error:", error);
-    // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'e 'pending' ile yönlendir
+    // Hata olsa bile JSON bekleyen isteklere 'pending' JSON dön, aksi halde frontend'_e 'pending' ile yönlendir
     const accept = (req.headers.get('accept') || '').toLowerCase()
     const wantsJson = accept.includes('application/json') || !!req.headers.get('x-client-info')
     if (wantsJson) {
@@ -475,13 +475,13 @@ Deno.serve(async (req) => {
         if (conversationId) target.searchParams.set('conversationId', conversationId);
         target.searchParams.set('status', 'failure');
         const t = target.toString();
-        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
-        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
+        const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
+        return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': '_text/html' } });
       }
     } catch {}
     // Yine olmazsa bilgilendirici HTML döndür (OK kaldırıldı)
     const infoHtml2 = `<!doctype html><html><head><meta charset="utf-8"><title>Ödeme Sonucu</title></head><body style="font-family:system-ui,Arial,sans-serif;padding:16px;"><h3>Ödeme sonucu alındı</h3><p>Bu pencereyi kapatabilirsiniz. Sonuç sayfasına yönlendirme yapılamadı.</p></body></html>`;
-    return new Response(infoHtml2, { status: 200, headers: { ...corsHeaders, "Content-Type": "text/html" } });
+    return new Response(infoHtml2, { status: 200, headers: { ...corsHeaders, "Content-Type": "_text/html" } });
   }
 });
 

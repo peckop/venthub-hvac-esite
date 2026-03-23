@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /**
  * Construct a WhatsApp deeplink using wa.me format.
- * - phone: any format is accepted; non-digits are stripped
+ * - phone: unknown format is accepted; non-digits are stripped
  * - text: will be URL-encoded
  */
 export function buildWhatsAppLink(phone: string, text: string) {

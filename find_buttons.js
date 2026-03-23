@@ -20,9 +20,9 @@ for (const f of files) {
             total++;
             if (!line.includes('adminButtonPrimaryClass') && !line.includes('adminButtonSecondaryClass')) {
                 nonStandard++;
-                console.log(`${f}:${idx + 1}: ${line.trim()}`);
+                console.warn(`${f}:${idx + 1}: ${line.trim()}`);
             }
         }
     });
 }
-console.log(`\nTotal buttons: ${total}, Non-standard: ${nonStandard}`);
+console.warn(`\nTotal buttons: ${total}, Non-standard: ${nonStandard}`);

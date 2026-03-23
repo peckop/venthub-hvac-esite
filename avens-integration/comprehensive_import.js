@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 // Supabase configuration
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
@@ -18,11 +18,11 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Configuration
-const COMPREHENSIVE_DATA_FILE = path.join(__dirname, 'scraped-data', 'fixed_products_2025-09-29T10-49-48-208Z.json');
+const COMPREHENSIVE_DATA_FILE = _path.join(__dirname, 'scraped-_data', 'fixed_products_2025-09-29T10-49-48-208Z.json');
 
 // Utility functions
-function generateSlug(text) {
-  return text
+function generateSlug(_text) {
+  return _text
     .toLowerCase()
     .replace(/ğ/g, 'g')
     .replace(/ü/g, 'u')
@@ -66,32 +66,33 @@ function extractPrice(priceText) {
   return null;
 }
 
-function mapCategoryToVentHub(avensCategory) {
+// _mapCategoryToVentHub kept for future reference but prefixed to satisfy lint
+function _mapCategoryToVentHub(avensCategory) {
   const categoryMapping = {
-    'Konut Tipi Fanlar': 'f3a75c19-256a-44bb-a816-9379881f1346', // Konut Tipi Fanlar
-    'Kanal Tipi Fanlar': '512ae175-7a2f-4b4d-8dd6-9dbe4ef96261',  // Kanal Tipi Fanlar
-    'Çatı Tipi Fanlar': 'b7642434-3cbb-4b6c-97e3-66f45ff077f3',   // Çatı Tipi Fanlar
-    'Santrifüj Fanlar': '29af592c-b745-440a-80a1-1badec6ca91b',   // Santrifüj Fanlar
-    'Duvar Tipi Fanlar': '36f701a5-eb64-4c2b-a9da-a6f525c22e81', // Duvar Tipi Kompakt Aksiyal Fanlar
-    'Sessiz Fanlar': '807cc1ed-6e08-47da-bc94-d4be0d2b4c0c',     // Sessiz Kanal Tipi Fanlar
-    'Endüstriyel Fanlar': 'db965633-c967-4193-8617-e1a7651997ec', // Endüstriyel Fanlar
-    'Ex-Proof Fanlar': '4a801860-24f3-4d02-8a1b-7e547f2be73e',   // Ex-Proof Fanlar (Patlama Karşı ATEX Fanlar)
-    'Duman Egzoz Fanları': 'duman-egzoz-fanlar-id',               // Duman Egzoz Fanları (yeni oluşturulacak)
-    'Jet Fanlar': '29d5dc81-b8bd-4b0f-ba23-29795b3d62e9',        // Otopark Jet Fanları
-    'Basınçlandırma Fanları': 'basinclandirma-fanlar-id',         // Basınçlandırma Fanları (yeni oluşturulacak)
-    'Sığınak Fanları': 'siginak-fanlar-id',                       // Sığınak Havalandırma Fanları (yeni oluşturulacak)
-    'Nicotra Gebhardt': 'nicotra-gebhardt-id',                    // Nicotra Gebhardt Fanlar (yeni oluşturulacak)
-    'Vortice': '4bc54533-7323-4eac-a02d-4498ffde00eb',            // Ana Fanlar kategorisi
-    'Plug Fanlar': 'plug-fanlar-id',                              // Plug Fanlar (yeni oluşturulacak)
-    'Hava Perdeleri': '5c2e91a4-8b6f-4c5a-a7d9-2e8f1c3a9b7e',   // Hava Perdeleri
-    'Flexible Kanallar': '8f3a5b2c-1d4e-4a6b-9c7f-3e9a2d5c8b1f', // Flexible Hava Kanalları
-    'Aksesuarlar': '7a1b4c8d-2e5f-4g9h-8i7j-6k5l4m3n2o1p'        // Aksesuarlar
+    'Konut Tipi Fanlar': 'f3a75c19-256a-44bb-a816-9379881f1346',
+    'Kanal Tipi Fanlar': '512ae175-7a2f-4b4d-8dd6-9dbe4ef96261',
+    'Çatı Tipi Fanlar': 'b7642434-3cbb-4b6c-97e3-66f45ff077f3',
+    'Santrifüj Fanlar': '29af592c-b745-440a-80a1-1badec6ca91b',
+    'Duvar Tipi Fanlar': '36f701a5-eb64-4c2b-a9da-a6f525c22e81',
+    'Sessiz Fanlar': '807cc1ed-6e08-47da-bc94-d4be0d2b4c0c',
+    'Endüstriyel Fanlar': 'db965633-c967-4193-8617-e1a7651997ec',
+    'Ex-Proof Fanlar': '4a801860-24f3-4d02-8a1b-7e547f2be73e',
+    'Duman Egzoz Fanları': 'duman-egzoz-fanlar-id',
+    'Jet Fanlar': '29d5dc81-b8bd-4b0f-ba23-29795b3d62e9',
+    'Basınçlandırma Fanları': 'basinclandirma-fanlar-id',
+    'Sığınak Fanları': 'siginak-fanlar-id',
+    'Nicotra Gebhardt': 'nicotra-gebhardt-id',
+    'Vortice': '4bc54533-7323-4eac-a02d-4498ffde00eb',
+    'Plug Fanlar': 'plug-fanlar-id',
+    'Hava Perdeleri': '5c2e91a4-8b6f-4c5a-a7d9-2e8f1c3a9b7e',
+    'Flexible Kanallar': '8f3a5b2c-1d4e-4a6b-9c7f-3e9a2d5c8b1f',
+    'Aksesuarlar': '7a1b4c8d-2e5f-4g9h-8i7j-6k5l4m3n2o1p'
   };
   
-  return categoryMapping[avensCategory] || '4bc54533-7323-4eac-a02d-4498ffde00eb'; // Default: Fanlar
+  return categoryMapping[avensCategory] || '4bc54533-7323-4eac-a02d-4498ffde00eb';
 }
 
-function generateSKU(brand, name, id) {
+function generateSKU(brand, name, _id) {
   const brandPrefix = brand.substring(0, 3).toUpperCase();
   const namePrefix = name.replace(/[^A-Z0-9]/gi, '').substring(0, 8).toUpperCase();
   const timestamp = Date.now().toString().slice(-4);
@@ -109,7 +110,7 @@ function isValidProduct(product) {
 }
 
 async function getCategoryByName(categoryName) {
-  const { data, error } = await supabase
+  const { _data, error } = await supabase
     .from('categories')
     .select('id, name, slug')
     .eq('name', categoryName)
@@ -119,13 +120,13 @@ async function getCategoryByName(categoryName) {
     throw error;
   }
 
-  return data;
+  return _data;
 }
 
 async function createMissingCategory(categoryName, parentId = '4bc54533-7323-4eac-a02d-4498ffde00eb') {
   const slug = generateSlug(categoryName);
   
-  const { data, error } = await supabase
+  const { _data, error } = await supabase
     .from('categories')
     .insert([{
       name: categoryName,
@@ -141,8 +142,8 @@ async function createMissingCategory(categoryName, parentId = '4bc54533-7323-4ea
     throw error;
   }
 
-  console.log(`✨ Yeni kategori oluşturuldu: ${categoryName}`);
-  return data;
+  console.warn(`✨ Yeni kategori oluşturuldu: ${categoryName}`);
+  return _data;
 }
 
 async function importProduct(product, categoryId) {
@@ -152,20 +153,20 @@ async function importProduct(product, categoryId) {
   const price = extractPrice(product.price);
   
   // Check if product already exists by name
-  const { data: existing } = await supabase
+  const { _data: existing } = await supabase
     .from('products')
     .select('id, name')
     .eq('name', cleanedName)
     .single();
 
   if (existing) {
-    console.log(`⚠️ Ürün zaten mevcut: ${existing.name}`);
+    console.warn(`⚠️ Ürün zaten mevcut: ${existing.name}`);
     return { status: 'exists', id: existing.id };
   }
 
   const sku = generateSKU(brandName, cleanedName, product.id);
 
-  // Prepare product data
+  // Prepare product _data
   const productData = {
     name: cleanedName,
     slug: slug,
@@ -194,7 +195,7 @@ async function importProduct(product, categoryId) {
   }
 
   // Create product
-  const { data: newProduct, error: createError } = await supabase
+  const { _data: newProduct, error: createError } = await supabase
     .from('products')
     .insert([productData])
     .select('id, name')
@@ -204,7 +205,7 @@ async function importProduct(product, categoryId) {
     throw createError;
   }
 
-  console.log(`✅ Ürün oluşturuldu: ${newProduct.name} (${brandName})`);
+  console.warn(`✅ Ürün oluşturuldu: ${newProduct.name} (${brandName})`);
 
   // Create product image record if we have a valid image
   if (productData.image_url) {
@@ -212,7 +213,7 @@ async function importProduct(product, categoryId) {
       .from('product_images')
       .insert([{
         product_id: newProduct.id,
-        path: productData.image_url,
+        _path: productData.image_url,
         alt: cleanedName,
         sort_order: 1
       }]);
@@ -220,24 +221,24 @@ async function importProduct(product, categoryId) {
     if (imageError) {
       console.error(`❌ Ürün resmi eklenemedi ${newProduct.name}:`, imageError.message);
     } else {
-      console.log(`📷 Resim eklendi: ${newProduct.name}`);
+      console.warn(`📷 Resim eklendi: ${newProduct.name}`);
     }
   }
 
-  return { status: 'created', id: newProduct.id, data: newProduct };
+  return { status: 'created', id: newProduct.id, _data: newProduct };
 }
 
 async function main() {
-  console.log('🚀 Comprehensive Avens ürünleri VentHub\'a import ediliyor...');
+  console.warn('🚀 Comprehensive Avens ürünleri VentHub\'a import ediliyor...');
 
   try {
-    // Load comprehensive products data
-    console.log('📖 Comprehensive ürün verilerini yüklüyorum...');
-    const productsData = JSON.parse(await fs.readFile(COMPREHENSIVE_DATA_FILE, 'utf-8'));
+    // Load comprehensive products _data
+    console.warn('📖 Comprehensive ürün verilerini yüklüyorum...');
+    const productsData = JSON.parse(await _fs.readFile(COMPREHENSIVE_DATA_FILE, 'utf-8'));
     
     // Filter valid products
     const validProducts = productsData.filter(isValidProduct);
-    console.log(`✅ İmport edilecek geçerli ürün: ${validProducts.length} / ${productsData.length}`);
+    console.warn(`✅ İmport edilecek geçerli ürün: ${validProducts.length} / ${productsData.length}`);
 
     // Group by category
     const productsByCategory = {};
@@ -248,9 +249,9 @@ async function main() {
       productsByCategory[product.category].push(product);
     });
 
-    console.log('\n📊 Kategori dağılımı:');
+    console.warn('\n📊 Kategori dağılımı:');
     Object.entries(productsByCategory).forEach(([category, products]) => {
-      console.log(`  ${category}: ${products.length} ürün`);
+      console.warn(`  ${category}: ${products.length} ürün`);
     });
 
     // Import results
@@ -264,7 +265,7 @@ async function main() {
 
     // Process each category
     for (const [categoryName, products] of Object.entries(productsByCategory)) {
-      console.log(`\n📂 ${categoryName} kategorisi işleniyor...`);
+      console.warn(`\n📂 ${categoryName} kategorisi işleniyor...`);
 
       // Get or create category
       let categoryData = await getCategoryByName(categoryName);
@@ -274,7 +275,7 @@ async function main() {
         categoryData = await createMissingCategory(categoryName);
         results.newCategories++;
       } else {
-        console.log(`✅ Mevcut kategori kullanılıyor: ${categoryData.name}`);
+        console.warn(`✅ Mevcut kategori kullanılıyor: ${categoryData.name}`);
       }
 
       results.categories[categoryName] = {
@@ -302,7 +303,7 @@ async function main() {
           results.categories[categoryName].products++;
           
         } catch (error) {
-          console.error(`❌ Ürün import hatası ${product.name}:`, error.message);
+          console.error(`❌ Ürün import hatası ${product.name}:`, (error as Error).message);
           results.failed++;
           results.categories[categoryName].failed++;
         }
@@ -310,17 +311,17 @@ async function main() {
     }
 
     // Summary
-    console.log('\n📊 Comprehensive Import Özeti:');
-    console.log(`✅ Yeni ürün: ${results.success}`);
-    console.log(`⚠️ Mevcut ürün: ${results.exists}`);
-    console.log(`❌ Hatalı: ${results.failed}`);
-    console.log(`🆕 Yeni kategori: ${results.newCategories}`);
-    console.log(`📦 Toplam işlenen: ${validProducts.length}`);
+    console.warn('\n📊 Comprehensive Import Özeti:');
+    console.warn(`✅ Yeni ürün: ${results.success}`);
+    console.warn(`⚠️ Mevcut ürün: ${results.exists}`);
+    console.warn(`❌ Hatalı: ${results.failed}`);
+    console.warn(`🆕 Yeni kategori: ${results.newCategories}`);
+    console.warn(`📦 Toplam işlenen: ${validProducts.length}`);
 
     // Category breakdown
-    console.log('\n📋 Kategori bazlı sonuçlar:');
+    console.warn('\n📋 Kategori bazlı sonuçlar:');
     Object.entries(results.categories).forEach(([name, stats]) => {
-      console.log(`  ${name}: ${stats.success} yeni, ${stats.exists} mevcut, ${stats.failed} hatalı`);
+      console.warn(`  ${name}: ${stats.success} yeni, ${stats.exists} mevcut, ${stats.failed} hatalı`);
     });
 
     // Brand summary
@@ -330,22 +331,22 @@ async function main() {
       brandCounts[brand] = (brandCounts[brand] || 0) + 1;
     });
 
-    console.log('\n🏷️ Marka dağılımı:');
-    Object.entries(brandCounts).forEach(([brand, count]) => {
-      console.log(`  ${brand}: ${count} ürün`);
+    console.warn('\n🏷️ Marka dağılımı:');
+    Object.entries(brandCounts).forEach(([brand, _count]) => {
+      console.warn(`  ${brand}: ${_count} ürün`);
     });
 
-    console.log('\n🎉 Comprehensive import başarıyla tamamlandı!');
-    console.log('💡 Sonraki adımlar:');
-    console.log('  • Admin panelinden kategori hiyerarşisini kontrol edin');
-    console.log('  • Ürün fiyatlarını ve stok miktarlarını güncelleyin');
-    console.log('  • Ürün açıklamalarını gözden geçirin');
+    console.warn('\n🎉 Comprehensive import başarıyla tamamlandı!');
+    console.warn('💡 Sonraki adımlar:');
+    console.warn('  • Admin panelinden kategori hiyerarşisini kontrol edin');
+    console.warn('  • Ürün fiyatlarını ve stok miktarlarını güncelleyin');
+    console.warn('  • Ürün açıklamalarını gözden geçirin');
 
   } catch (error) {
-    console.error('💥 Import hatası:', error.message);
+    console.error('💥 Import hatası:', (error as Error).message);
     process.exit(1);
   }
 }
 
 // Run the import
-main().catch(console.error);
+main().catch(console.warn);

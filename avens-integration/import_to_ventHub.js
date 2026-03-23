@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 // Supabase configuration - .env dosyasından okumalı
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
@@ -19,11 +19,11 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Configuration
-const SCRAPED_PRODUCTS_FILE = path.join(__dirname, 'scraped-data', 'all_products.json');
+const SCRAPED_PRODUCTS_FILE = _path.join(__dirname, 'scraped-_data', 'all_products.json');
 
 // Utility functions
-function generateSlug(text) {
-  return text
+function generateSlug(_text) {
+  return _text
     .toLowerCase()
     .replace(/ğ/g, 'g')
     .replace(/ü/g, 'u')
@@ -99,7 +99,7 @@ async function ensureCategory(categoryName) {
   const slug = generateSlug(categoryName);
   
   // Check if category exists
-  const { data: existing, error: checkError } = await supabase
+  const { _data: existing, error: checkError } = await supabase
     .from('categories')
     .select('id, name, slug')
     .eq('slug', slug)
@@ -110,12 +110,12 @@ async function ensureCategory(categoryName) {
   }
 
   if (existing) {
-    console.log(`✅ Category exists: ${existing.name}`);
+    console.warn(`✅ Category exists: ${existing.name}`);
     return existing.id;
   }
 
   // Create new category
-  const { data: newCategory, error: createError } = await supabase
+  const { _data: newCategory, error: createError } = await supabase
     .from('categories')
     .insert([{
       name: categoryName,
@@ -130,7 +130,7 @@ async function ensureCategory(categoryName) {
     throw createError;
   }
 
-  console.log(`✨ Created new category: ${categoryName}`);
+  console.warn(`✨ Created new category: ${categoryName}`);
   return newCategory.id;
 }
 
@@ -138,7 +138,7 @@ async function ensureBrand(brandName) {
   const slug = generateSlug(brandName);
   
   // Check if brand exists
-  const { data: existing, error: checkError } = await supabase
+  const { _data: existing, error: checkError } = await supabase
     .from('brands')
     .select('id, name, slug')
     .eq('slug', slug)
@@ -149,12 +149,12 @@ async function ensureBrand(brandName) {
   }
 
   if (existing) {
-    console.log(`✅ Brand exists: ${existing.name}`);
+    console.warn(`✅ Brand exists: ${existing.name}`);
     return existing.id;
   }
 
   // Create new brand
-  const { data: newBrand, error: createError } = await supabase
+  const { _data: newBrand, error: createError } = await supabase
     .from('brands')
     .insert([{
       name: brandName,
@@ -169,7 +169,7 @@ async function ensureBrand(brandName) {
     throw createError;
   }
 
-  console.log(`✨ Created new brand: ${brandName}`);
+  console.warn(`✨ Created new brand: ${brandName}`);
   return newBrand.id;
 }
 
@@ -179,7 +179,7 @@ async function importProduct(product, categoryId, brandId) {
   const brandName = normalizeBrandName(product.brand);
   
   // Check if product already exists by slug
-  const { data: existing, error: checkError } = await supabase
+  const { _data: existing, error: checkError } = await supabase
     .from('products')
     .select('id, name, slug')
     .eq('slug', slug)
@@ -190,14 +190,14 @@ async function importProduct(product, categoryId, brandId) {
   }
 
   if (existing) {
-    console.log(`⚠️ Product already exists: ${existing.name} (${slug})`);
+    console.warn(`⚠️ Product already exists: ${existing.name} (${slug})`);
     return existing.id;
   }
 
   // Generate SKU
   const sku = product.product_code || generateSKU(brandName, cleanedName, product.id);
 
-  // Prepare product data
+  // Prepare product _data
   const productData = {
     name: cleanedName,
     slug: slug,
@@ -215,7 +215,7 @@ async function importProduct(product, categoryId, brandId) {
     weight: 0,
     meta_title: `${cleanedName} - ${brandName} | VentHub`,
     meta_description: `${cleanedName} ürününü VentHub'dan uygun fiyatlarla satın alın. ${brandName} kalitesi ile güvenli alışveriş.`,
-    specifications: {},
+    __specifications: {},
     tags: [brandName, 'Avens', 'HVAC', 'Havalandırma'],
     external_id: product.id,
     source_url: product.product_url
@@ -227,7 +227,7 @@ async function importProduct(product, categoryId, brandId) {
   }
 
   // Create product
-  const { data: newProduct, error: createError } = await supabase
+  const { _data: newProduct, error: createError } = await supabase
     .from('products')
     .insert([productData])
     .select('id, name')
@@ -237,7 +237,7 @@ async function importProduct(product, categoryId, brandId) {
     throw createError;
   }
 
-  console.log(`✨ Created product: ${newProduct.name} (${brandName})`);
+  console.warn(`✨ Created product: ${newProduct.name} (${brandName})`);
 
   // Create product image record if we have an image
   if (productData.image_url) {
@@ -254,7 +254,7 @@ async function importProduct(product, categoryId, brandId) {
     if (imageError) {
       console.error(`❌ Error creating product image for ${newProduct.name}:`, imageError.message);
     } else {
-      console.log(`📷 Added image for: ${newProduct.name}`);
+      console.warn(`📷 Added image for: ${newProduct.name}`);
     }
   }
 
@@ -262,13 +262,13 @@ async function importProduct(product, categoryId, brandId) {
 }
 
 async function main() {
-  console.log('🚀 Starting Avens product import to VentHub...');
+  console.warn('🚀 Starting Avens product import to VentHub...');
 
   try {
-    // Load scraped products data
-    console.log('📖 Loading scraped products data...');
-    const productsData = JSON.parse(await fs.readFile(SCRAPED_PRODUCTS_FILE, 'utf-8'));
-    console.log(`📦 Found ${productsData.length} products to import`);
+    // Load scraped products _data
+    console.warn('📖 Loading scraped products _data...');
+    const productsData = JSON.parse(await _fs.readFile(SCRAPED_PRODUCTS_FILE, 'utf-8'));
+    console.warn(`📦 Found ${productsData.length} products to import`);
 
     // Filter out invalid products (404s, empty titles, etc.)
     const validProducts = productsData.filter(product => 
@@ -283,7 +283,7 @@ async function main() {
       !product.name.toLowerCase().includes('marmara sanayi')
     );
 
-    console.log(`✅ Found ${validProducts.length} valid products after filtering`);
+    console.warn(`✅ Found ${validProducts.length} valid products after filtering`);
 
     // Process each product
     const results = {
@@ -296,7 +296,7 @@ async function main() {
 
     for (const product of validProducts) {
       try {
-        console.log(`\\n🔄 Processing: ${product.name}`);
+        console.warn(`\\n🔄 Processing: ${product.name}`);
 
         // Determine category
         const categoryName = mapCategoryName(product.name);
@@ -313,10 +313,10 @@ async function main() {
         const brandId = await ensureBrand(brandName);
 
         // Import product
-        const productId = await importProduct(product, categoryId, brandId);
+        const __productId = await importProduct(product, categoryId, brandId);
 
         results.success++;
-        console.log(`✅ Successfully processed: ${product.name}`);
+        console.warn(`✅ Successfully processed: ${product.name}`);
       } catch (error) {
         console.error(`❌ Failed to process ${product.name}:`, error.message);
         results.failed++;
@@ -324,20 +324,20 @@ async function main() {
     }
 
     // Summary
-    console.log('\\n📊 Import Summary:');
-    console.log(`✅ Success: ${results.success}`);
-    console.log(`❌ Failed: ${results.failed}`);
-    console.log(`⚠️ Skipped: ${results.skipped}`);
-    console.log(`📂 Categories created/used: ${results.categories.size}`);
-    console.log(`🏷️ Brands created/used: ${results.brands.size}`);
+    console.warn('\\n📊 Import Summary:');
+    console.warn(`✅ Success: ${results.success}`);
+    console.warn(`❌ Failed: ${results.failed}`);
+    console.warn(`⚠️ Skipped: ${results.skipped}`);
+    console.warn(`📂 Categories created/used: ${results.categories.size}`);
+    console.warn(`🏷️ Brands created/used: ${results.brands.size}`);
 
-    console.log('\\n📂 Categories:');
-    [...results.categories].forEach(cat => console.log(`  - ${cat}`));
+    console.warn('\\n📂 Categories:');
+    [...results.categories].forEach(cat => console.warn(`  - ${cat}`));
     
-    console.log('\\n🏷️ Brands:');
-    [...results.brands].forEach(brand => console.log(`  - ${brand}`));
+    console.warn('\\n🏷️ Brands:');
+    [...results.brands].forEach(brand => console.warn(`  - ${brand}`));
 
-    console.log('\\n🎉 Import completed successfully!');
+    console.warn('\\n🎉 Import completed successfully!');
 
   } catch (error) {
     console.error('💥 Import failed:', error.message);

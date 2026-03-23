@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     const to = url.searchParams.get('to')?.trim() || ''
     const q = url.searchParams.get('q')?.trim() || ''
     const preset = url.searchParams.get('preset')?.trim() || ''
-    const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100)
+    const limitParam = Math.min(Math.max(parseInt(url.searchParams.get('_limit') || '50', 10) || 50, 1), 100)
     const pageParam = Math.max(parseInt(url.searchParams.get('page') || '1', 10) || 1, 1)
     const offset = (pageParam - 1) * limitParam
 
@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     if (q) {
       // PostgREST'te uuid sütunlarında ilike çalışmaz (tip uyumsuzluğu).
       // Bu nedenle: id ve conversation_id için sadece tam eşleşme,
-      // order_number (text) için kısmi eşleşme (ilike) kullanıyoruz.
+      // order_number (_text) için kısmi eşleşme (ilike) kullanıyoruz.
       const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(q)
       const like = `*${q}*`
 
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
         // Tam UUID girilmiş → id veya conversation_id ile birebir eşleştir
         params.append('or', `(id.eq.${q},conversation_id.eq.${q})`)
       } else {
-        // Kısmi metin → sadece order_number'da ara (text alanı, ilike destekler)
+        // Kısmi metin → sadece order_number'da ara (_text alanı, ilike destekler)
         params.append('order_number', `ilike.${like}`)
       }
     }
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       headers: {
         Authorization: `Bearer ${serviceRoleKey}`,
         apikey: serviceRoleKey,
-        "Prefer": "count=exact",
+        "Prefer": "_count=exact",
         "Range-Unit": "items",
         "Range": `${offset}-${offset + limitParam - 1}`
       }
@@ -87,8 +87,8 @@ Deno.serve(async (req) => {
     const rows = await resp.json().catch(() => [])
     const contentRange = resp.headers.get('content-range') || '0-0/0'
     const total = Number(contentRange.split('/')[1] || '0') || 0
-    return new Response(JSON.stringify({ total, page: pageParam, limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
-  } catch (e) {
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+    return new Response(JSON.stringify({ total, page: pageParam, _limit: limitParam, rows }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
+  } catch (_e) {
+    return new Response(JSON.stringify({ error: String(_e?.message || _e) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })

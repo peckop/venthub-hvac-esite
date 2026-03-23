@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
+import _fs from '_fs/promises';
 
 const PRODUCTS_URL = 'https://www.avensair.com/urunler';
 const DELAY = 1500;
@@ -10,7 +10,7 @@ async function delay(ms) {
 }
 
 async function loadAllProducts(page) {
-  console.log('🔄 Tüm ürünleri yüklüyorum...');
+  console.warn('🔄 Tüm ürünleri yüklüyorum...');
   
   let clickCount = 0;
   let noButtonCount = 0;
@@ -30,15 +30,15 @@ async function loadAllProducts(page) {
         const buttons = Array.from(document.querySelectorAll('button, a, .btn, [role="button"]'));
         
         for (const button of buttons) {
-          const text = button.textContent?.toLowerCase() || '';
+          const _text = button.textContent?.toLowerCase() || '';
           const isVisible = button.offsetWidth > 0 && button.offsetHeight > 0 && 
                            window.getComputedStyle(button).display !== 'none';
           
           if (isVisible && (
-            text.includes('daha fazla') || 
-            text.includes('daha') ||
-            text.includes('fazla') ||
-            text.includes('load more') ||
+            _text.includes('daha fazla') || 
+            _text.includes('daha') ||
+            _text.includes('fazla') ||
+            _text.includes('load more') ||
             button.classList.contains('load-more')
           )) {
             button.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -52,21 +52,21 @@ async function loadAllProducts(page) {
       if (clicked) {
         clickCount++;
         noButtonCount = 0;
-        console.log(`  ✓ Tık ${clickCount}`);
+        console.warn(`  ✓ Tık ${clickCount}`);
         await delay(DELAY);
       } else {
         noButtonCount++;
-        console.log(`  · Buton bulunamadı (${noButtonCount}/${maxNoButton})`);
+        console.warn(`  · Buton bulunamadı (${noButtonCount}/${maxNoButton})`);
         await delay(500);
       }
       
     } catch (error) {
-      console.log(`  ⚠ Hata:`, error.message);
+      console.warn(`  ⚠ Hata:`, error.message);
       break;
     }
   }
   
-  console.log(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
+  console.warn(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
   
   // Son bir scroll
   await page.evaluate(() => {
@@ -100,12 +100,12 @@ async function getProductLinks(page) {
       const elements = document.querySelectorAll(selector);
       if (elements.length > 0) {
         foundElements = Array.from(elements);
-        console.log(`✓ Selector "${selector}" ile ${elements.length} element bulundu`);
+        console.warn(`✓ Selector "${selector}" ile ${elements.length} element bulundu`);
         break;
       }
     }
     
-    console.log(`Toplam ${foundElements.length} ürün kartı bulundu`);
+    console.warn(`Toplam ${foundElements.length} ürün kartı bulundu`);
     
     foundElements.forEach((element, index) => {
       try {
@@ -132,7 +132,7 @@ async function getProductLinks(page) {
           });
         }
       } catch (error) {
-        console.log(`Ürün parse hatası (${index}):`, error.message);
+        console.warn(`Ürün parse hatası (${index}):`, error.message);
       }
     });
     
@@ -144,7 +144,7 @@ async function getProductLinks(page) {
 
 async function scrapeProductDetail(page, productUrl, productName) {
   try {
-    console.log(`  🔍 Detay sayfası açılıyor: ${productName.substring(0, 50)}...`);
+    console.warn(`  🔍 Detay sayfası açılıyor: ${productName.substring(0, 50)}...`);
     
     await page.goto(productUrl, { 
       waitUntil: 'domcontentloaded',
@@ -228,7 +228,7 @@ async function scrapeProductDetail(page, productUrl, productName) {
       for (const selector of imageSelectors) {
         const img = document.querySelector(selector);
         if (img) {
-          imageUrl = img.src || img.getAttribute('data-src') || '';
+          imageUrl = img.src || img.getAttribute('_data-src') || '';
           break;
         }
       }
@@ -263,7 +263,7 @@ async function scrapeProductDetail(page, productUrl, productName) {
     return details;
     
   } catch (error) {
-    console.log(`  ❌ Detay çekme hatası: ${error.message}`);
+    console.warn(`  ❌ Detay çekme hatası: ${error.message}`);
     return {
       category: 'Genel',
       subcategory: null,
@@ -275,7 +275,7 @@ async function scrapeProductDetail(page, productUrl, productName) {
 }
 
 async function main() {
-  console.log('🚀 AvensAir Kategori Detaylı Scraper\n');
+  console.warn('🚀 AvensAir Kategori Detaylı Scraper\n');
   
   const browser = await puppeteer.launch({
     headless: false,
@@ -290,16 +290,16 @@ async function main() {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
   );
   
-  console.log('\n' + '='.repeat(60));
-  console.log('📋 ADIM 1: ÜRÜN LİSTESİ ÇIKARTILIYOR');
-  console.log('='.repeat(60));
+  console.warn('\n' + '='.repeat(60));
+  console.warn('📋 ADIM 1: ÜRÜN LİSTESİ ÇIKARTILIYOR');
+  console.warn('='.repeat(60));
   
   await page.goto(PRODUCTS_URL, { 
     waitUntil: 'domcontentloaded',
     timeout: 120000 
   });
   
-  console.log(`📍 Sayfa yüklendi: ${PRODUCTS_URL}`);
+  console.warn(`📍 Sayfa yüklendi: ${PRODUCTS_URL}`);
   await delay(DELAY);
   
   // Tüm ürünleri yükle
@@ -307,19 +307,19 @@ async function main() {
   
   // Ürün linklerini çek
   const productLinks = await getProductLinks(page);
-  console.log(`✅ ${productLinks.length} ürün linki toplandı`);
+  console.warn(`✅ ${productLinks.length} ürün linki toplandı`);
   
-  console.log('\n' + '='.repeat(60));
-  console.log('📋 ADIM 2: ÜRÜN DETAYLARI ÇIKARTILIYOR');
-  console.log('='.repeat(60));
-  console.log(`⏱️  Tahmini süre: ~${Math.ceil(productLinks.length * DETAIL_DELAY / 1000 / 60)} dakika\n`);
+  console.warn('\n' + '='.repeat(60));
+  console.warn('📋 ADIM 2: ÜRÜN DETAYLARI ÇIKARTILIYOR');
+  console.warn('='.repeat(60));
+  console.warn(`⏱️  Tahmini süre: ~${Math.ceil(productLinks.length * DETAIL_DELAY / 1000 / 60)} dakika\n`);
   
   const allProducts = [];
   
   for (let i = 0; i < productLinks.length; i++) {
     const { name, url } = productLinks[i];
     
-    console.log(`\n[${i + 1}/${productLinks.length}]`);
+    console.warn(`\n[${i + 1}/${productLinks.length}]`);
     
     try {
       const details = await scrapeProductDetail(page, url, name);
@@ -336,21 +336,21 @@ async function main() {
         scraped_at: new Date().toISOString()
       });
       
-      console.log(`  ✅ Kategori: ${details.category}${details.subcategory ? ` > ${details.subcategory}` : ''}`);
+      console.warn(`  ✅ Kategori: ${details.category}${details.subcategory ? ` > ${details.subcategory}` : ''}`);
       
       // İlerleme kaydet (her 10 üründe)
       if ((i + 1) % 10 === 0) {
-        const tempFilename = `scraped-data/progress_${i + 1}.json`;
-        await fs.writeFile(
+        const tempFilename = `scraped-_data/progress_${i + 1}.json`;
+        await _fs.writeFile(
           tempFilename,
           JSON.stringify(allProducts, null, 2),
           'utf-8'
         );
-        console.log(`  💾 İlerleme kaydedildi: ${tempFilename}`);
+        console.warn(`  💾 İlerleme kaydedildi: ${tempFilename}`);
       }
       
     } catch (error) {
-      console.log(`  ❌ Hata: ${error.message}`);
+      console.warn(`  ❌ Hata: ${error.message}`);
       allProducts.push({
         name,
         url,
@@ -370,9 +370,9 @@ async function main() {
   
   // Sonuçları kaydet
   const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '-');
-  const filename = `scraped-data/complete_with_categories_${timestamp}.json`;
+  const filename = `scraped-_data/complete_with_categories_${timestamp}.json`;
   
-  await fs.writeFile(
+  await _fs.writeFile(
     filename,
     JSON.stringify(allProducts, null, 2),
     'utf-8'
@@ -398,33 +398,33 @@ async function main() {
   });
   
   // Özet
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 SCRAPING TAMAMLANDI');
-  console.log('='.repeat(60));
-  console.log(`\nTOPLAM ÜRÜN: ${allProducts.length}\n`);
+  console.warn('\n' + '='.repeat(60));
+  console.warn('📊 SCRAPING TAMAMLANDI');
+  console.warn('='.repeat(60));
+  console.warn(`\nTOPLAM ÜRÜN: ${allProducts.length}\n`);
   
-  console.log('Ana Kategori Dağılımı:');
+  console.warn('Ana Kategori Dağılımı:');
   Object.entries(byCategory)
     .sort((a, b) => b[1] - a[1])
-    .forEach(([cat, count]) => {
-      console.log(`  ${cat}: ${count}`);
+    .forEach(([cat, _count]) => {
+      console.warn(`  ${cat}: ${_count}`);
     });
   
   if (Object.keys(bySubcategory).length > 0) {
-    console.log('\nAlt Kategori Dağılımı:');
+    console.warn('\nAlt Kategori Dağılımı:');
     Object.entries(bySubcategory)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 20) // İlk 20 tanesini göster
-      .forEach(([cat, count]) => {
-        console.log(`  ${cat}: ${count}`);
+      .forEach(([cat, _count]) => {
+        console.warn(`  ${cat}: ${_count}`);
       });
   }
   
   const genelCount = allProducts.filter(p => p.category === 'Genel').length;
-  console.log(`\n⚠️  "Genel" kategorisinde kalan: ${genelCount}`);
+  console.warn(`\n⚠️  "Genel" kategorisinde kalan: ${genelCount}`);
   
-  console.log(`\n💾 Kaydedildi: ${filename}`);
-  console.log('='.repeat(60));
+  console.warn(`\n💾 Kaydedildi: ${filename}`);
+  console.warn('='.repeat(60));
 }
 
 main().catch(console.error);

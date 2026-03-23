@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 // Supabase configuration
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
@@ -19,11 +19,11 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Configuration
-const SCRAPED_PRODUCTS_FILE = path.join(__dirname, 'scraped-data', 'all_products.json');
+const SCRAPED_PRODUCTS_FILE = _path.join(__dirname, 'scraped-_data', 'all_products.json');
 
 // Utility functions
-function generateSlug(text) {
-  return text
+function generateSlug(_text) {
+  return _text
     .toLowerCase()
     .replace(/ğ/g, 'g')
     .replace(/ü/g, 'u')
@@ -134,7 +134,7 @@ function isValidProduct(product) {
 
 // Database functions
 async function getCategoryByName(categoryName) {
-  const { data, error } = await supabase
+  const { _data, error } = await supabase
     .from('categories')
     .select('id, name, slug')
     .eq('name', categoryName)
@@ -144,14 +144,14 @@ async function getCategoryByName(categoryName) {
     throw error;
   }
 
-  return data;
+  return _data;
 }
 
 async function createNewCategory(categoryName, description = null) {
   const slug = generateSlug(categoryName);
   
   // Check if slug already exists and generate alternative if needed
-  const { data: existingSlug } = await supabase
+  const { _data: existingSlug } = await supabase
     .from('categories')
     .select('slug')
     .eq('slug', slug)
@@ -161,10 +161,10 @@ async function createNewCategory(categoryName, description = null) {
   if (existingSlug) {
     // Generate unique slug with timestamp
     finalSlug = `${slug}-${Date.now()}`;
-    console.log(`⚠️ Slug çakışması, alternatif kullanılıyor: ${finalSlug}`);
+    console.warn(`⚠️ Slug çakışması, alternatif kullanılıyor: ${finalSlug}`);
   }
   
-  const { data, error } = await supabase
+  const { _data, error } = await supabase
     .from('categories')
     .insert([{
       name: categoryName,
@@ -179,8 +179,8 @@ async function createNewCategory(categoryName, description = null) {
     throw error;
   }
 
-  console.log(`✨ Yeni kategori oluşturuldu: ${categoryName}`);
-  return data;
+  console.warn(`✨ Yeni kategori oluşturuldu: ${categoryName}`);
+  return _data;
 }
 
 async function importProduct(product, categoryId) {
@@ -191,7 +191,7 @@ async function importProduct(product, categoryId) {
   // Check if product already exists by SKU or slug
   const sku = product.product_code || generateSKU(brandName, cleanedName, product.id);
   
-  const { data: existing, error: checkError } = await supabase
+  const { _data: existing, error: checkError } = await supabase
     .from('products')
     .select('id, name, sku')
     .or(`sku.eq.${sku},slug.eq.${slug}`)
@@ -202,11 +202,11 @@ async function importProduct(product, categoryId) {
   }
 
   if (existing) {
-    console.log(`⚠️ Ürün zaten mevcut: ${existing.name} (${existing.sku})`);
+    console.warn(`⚠️ Ürün zaten mevcut: ${existing.name} (${existing.sku})`);
     return existing.id;
   }
 
-  // Prepare product data
+  // Prepare product _data
   const productData = {
     name: cleanedName,
     slug: slug,
@@ -232,7 +232,7 @@ async function importProduct(product, categoryId) {
   }
 
   // Create product
-  const { data: newProduct, error: createError } = await supabase
+  const { _data: newProduct, error: createError } = await supabase
     .from('products')
     .insert([productData])
     .select('id, name')
@@ -242,7 +242,7 @@ async function importProduct(product, categoryId) {
     throw createError;
   }
 
-  console.log(`✨ Ürün oluşturuldu: ${newProduct.name} (${brandName})`);
+  console.warn(`✨ Ürün oluşturuldu: ${newProduct.name} (${brandName})`);
 
   // Create product image record if we have an image
   if (productData.image_url) {
@@ -250,7 +250,7 @@ async function importProduct(product, categoryId) {
       .from('product_images')
       .insert([{
         product_id: newProduct.id,
-        path: productData.image_url,
+        _path: productData.image_url,
         alt: cleanedName,
         sort_order: 1
       }]);
@@ -258,7 +258,7 @@ async function importProduct(product, categoryId) {
     if (imageError) {
       console.error(`❌ Ürün resmi eklenemedi ${newProduct.name}:`, imageError.message);
     } else {
-      console.log(`📷 Resim eklendi: ${newProduct.name}`);
+      console.warn(`📷 Resim eklendi: ${newProduct.name}`);
     }
   }
 
@@ -266,16 +266,16 @@ async function importProduct(product, categoryId) {
 }
 
 async function main() {
-  console.log('🚀 Avens ürünlerini VentHub\'a akıllı import başlıyor...');
+  console.warn('🚀 Avens ürünlerini VentHub\'a akıllı import başlıyor...');
 
   try {
-    // Load products data
-    console.log('📖 Ürün verilerini yüklüyorum...');
-    const productsData = JSON.parse(await fs.readFile(SCRAPED_PRODUCTS_FILE, 'utf-8'));
+    // Load products _data
+    console.warn('📖 Ürün verilerini yüklüyorum...');
+    const productsData = JSON.parse(await _fs.readFile(SCRAPED_PRODUCTS_FILE, 'utf-8'));
     
     // Filter valid products
     const validProducts = productsData.filter(isValidProduct);
-    console.log(`✅ İmport edilecek geçerli ürün: ${validProducts.length}`);
+    console.warn(`✅ İmport edilecek geçerli ürün: ${validProducts.length}`);
 
     // Analyze category mapping
     const categoryAnalysis = {};
@@ -295,13 +295,13 @@ async function main() {
       }
     });
 
-    console.log('\n📊 Kategori dağılımı:');
+    console.warn('\n📊 Kategori dağılımı:');
     Object.entries(categoryAnalysis).forEach(([category, products]) => {
-      console.log(`  ${category}: ${products.length} ürün`);
+      console.warn(`  ${category}: ${products.length} ürün`);
     });
 
     if (needsNewCategory.size > 0) {
-      console.log(`\n🆕 Oluşturulacak yeni kategoriler: ${[...needsNewCategory].join(', ')}`);
+      console.warn(`\n🆕 Oluşturulacak yeni kategoriler: ${[...needsNewCategory].join(', ')}`);
     }
 
     // Process each category
@@ -315,7 +315,7 @@ async function main() {
     const categoryCache = new Map();
 
     for (const [categoryName, products] of Object.entries(categoryAnalysis)) {
-      console.log(`\n📂 ${categoryName} kategorisi işleniyor...`);
+      console.warn(`\n📂 ${categoryName} kategorisi işleniyor...`);
 
       let categoryData = await getCategoryByName(categoryName);
       
@@ -324,7 +324,7 @@ async function main() {
         categoryData = await createNewCategory(categoryName);
         results.newCategories++;
       } else {
-        console.log(`✅ Mevcut kategori kullanılıyor: ${categoryData.name}`);
+        console.warn(`✅ Mevcut kategori kullanılıyor: ${categoryData.name}`);
         results.existingCategories++;
       }
 
@@ -344,7 +344,7 @@ async function main() {
 
     // Create ATEX category if needed
     if (needsNewCategory.has('ATEX/Ex-Proof Fanlar')) {
-      console.log('\n🆕 ATEX/Ex-Proof Fanlar kategorisi oluşturuluyor...');
+      console.warn('\n🆕 ATEX/Ex-Proof Fanlar kategorisi oluşturuluyor...');
       const endCategoryData = categoryCache.get('Endüstriyel Fanlar');
       if (endCategoryData) {
         await createNewCategory('ATEX/Ex-Proof Fanlar', 'Patlamaya dayanıklı ATEX sertifikalı fanlar');
@@ -352,12 +352,12 @@ async function main() {
     }
 
     // Summary
-    console.log('\n📊 Import Özeti:');
-    console.log(`✅ Başarılı: ${results.success}`);
-    console.log(`❌ Hatalı: ${results.failed}`);
-    console.log(`🆕 Yeni kategori: ${results.newCategories}`);
-    console.log(`📂 Mevcut kategori kullanıldı: ${results.existingCategories}`);
-    console.log(`📦 Toplam ürün: ${validProducts.length}`);
+    console.warn('\n📊 Import Özeti:');
+    console.warn(`✅ Başarılı: ${results.success}`);
+    console.warn(`❌ Hatalı: ${results.failed}`);
+    console.warn(`🆕 Yeni kategori: ${results.newCategories}`);
+    console.warn(`📂 Mevcut kategori kullanıldı: ${results.existingCategories}`);
+    console.warn(`📦 Toplam ürün: ${validProducts.length}`);
 
     // Brand summary
     const brandCounts = {};
@@ -366,16 +366,16 @@ async function main() {
       brandCounts[brand] = (brandCounts[brand] || 0) + 1;
     });
 
-    console.log('\n🏷️ Marka dağılımı:');
-    Object.entries(brandCounts).forEach(([brand, count]) => {
-      console.log(`  ${brand}: ${count} ürün`);
+    console.warn('\n🏷️ Marka dağılımı:');
+    Object.entries(brandCounts).forEach(([brand, _count]) => {
+      console.warn(`  ${brand}: ${_count} ürün`);
     });
 
-    console.log('\n🎉 İmport başarıyla tamamlandı!');
-    console.log('💡 Öneriler:');
-    console.log('  • Ürün fiyatlarını admin panelinden güncelleyin');
-    console.log('  • Stok miktarlarını ayarlayın');
-    console.log('  • Ürün açıklamalarını gözden geçirin');
+    console.warn('\n🎉 İmport başarıyla tamamlandı!');
+    console.warn('💡 Öneriler:');
+    console.warn('  • Ürün fiyatlarını admin panelinden güncelleyin');
+    console.warn('  • Stok miktarlarını ayarlayın');
+    console.warn('  • Ürün açıklamalarını gözden geçirin');
 
   } catch (error) {
     console.error('💥 Import hatası:', error.message);

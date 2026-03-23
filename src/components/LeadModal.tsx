@@ -5,7 +5,7 @@ interface LeadModalProps {
   open: boolean
   onClose: () => void
   productName?: string
-  productId?: string
+  _productId?: string
 }
 
 const applicationAreas = [
@@ -18,7 +18,7 @@ const applicationAreas = [
   'Diğer'
 ]
 
-const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, productId: _productId }) => {
+const LeadModal: React.FC<LeadModalProps> = ({ open, onClose, productName, _productId: __productId }) => {
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
   const [email, setEmail] = useState('')

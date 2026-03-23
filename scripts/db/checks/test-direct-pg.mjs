@@ -6,7 +6,7 @@ const { Client } = pg;
 const connectionString = 'postgresql://postgres.tnofewwkwlyjsqgwjjga:***REMOVED***@aws-1-eu-central-1.pooler.supabase.com:5432/postgres';
 
 async function test() {
-    console.log('Testing direct connection to postgres database...');
+    console.warn('Testing direct connection to postgres database...');
     const client = new Client({
         connectionString,
         ssl: { rejectUnauthorized: false }
@@ -14,9 +14,9 @@ async function test() {
 
     try {
         await client.connect();
-        console.log('✅ Success! Connected to postgres database.');
+        console.warn('✅ Success! Connected to postgres database.');
         const res = await client.query('SELECT current_database();');
-        console.log('Current Database:', res.rows[0].current_database);
+        console.warn('Current Database:', res.rows[0].current_database);
     } catch (err) {
         console.error('❌ Failed:', err.message);
     } finally {

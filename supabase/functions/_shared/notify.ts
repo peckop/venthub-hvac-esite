@@ -4,23 +4,33 @@
 
 export type NotifyField = { title: string; value: string; short?: boolean };
 
+// Deno specific env access
+const getEnv = (key: string): string => {
+  try {
+    // @ts-expect-error: Deno is available in Edge Functions
+    return Deno.env.get(key) || '';
+  } catch {
+    return '';
+  }
+};
+
 function getSlackWebhook(): string | null {
-  const url = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SLACK_WEBHOOK_URL') || ''
-  return url && /^https:\/\//.test(url) ? url : null
+  const url = getEnv('SLACK_WEBHOOK_URL');
+  return url && /^https:\/\//.test(url) ? url : null;
 }
 
 function getEmailConfig() {
-  const to = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('NOTIFY_EMAIL') || ''
-  const supabaseUrl = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SUPABASE_URL') || ''
-  const serviceKey = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SUPABASE_SERVICE_ROLE_KEY') || ''
-  return { to, supabaseUrl, serviceKey }
+  const to = getEnv('NOTIFY_EMAIL');
+  const supabaseUrl = getEnv('SUPABASE_URL');
+  const serviceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+  return { to, supabaseUrl, serviceKey };
 }
 
-async function sendSlack(text: string, fields?: NotifyField[]) {
-  const url = getSlackWebhook()
-  if (!url) return false
+async function sendSlack(_text: string, fields?: NotifyField[]) {
+  const url = getSlackWebhook();
+  if (!url) return false;
   
-  const payload: Record<string, unknown> = { text }
+  const payload: Record<string, unknown> = { _text };
   if (Array.isArray(fields) && fields.length > 0) {
     payload.attachments = [{
       color: '#e01e5a',
@@ -29,7 +39,7 @@ async function sendSlack(text: string, fields?: NotifyField[]) {
         value: String(f.value),
         short: !!f.short,
       })),
-    }]
+    }];
   }
   
   try {
@@ -37,20 +47,20 @@ async function sendSlack(text: string, fields?: NotifyField[]) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    })
-    return true
+    });
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
-async function sendEmail(subject: string, text: string, fields?: NotifyField[]) {
-  const { to, supabaseUrl, serviceKey } = getEmailConfig()
-  if (!to || !supabaseUrl || !serviceKey) return false
+async function sendEmail(subject: string, _text: string, fields?: NotifyField[]) {
+  const { to, supabaseUrl, serviceKey } = getEmailConfig();
+  if (!to || !supabaseUrl || !serviceKey) return false;
   
-  let message = text
+  let message = _text;
   if (fields && fields.length > 0) {
-    message += '\n\n' + fields.map(f => `${f.title}: ${f.value}`).join('\n')
+    message += '\n\n' + fields.map(f => `${f.title}: ${f.value}`).join('\n');
   }
   
   const payload = {
@@ -59,8 +69,8 @@ async function sendEmail(subject: string, text: string, fields?: NotifyField[]) 
     message: message,
     priority: 'high',
     template: undefined,
-    data: { subject: `VentHub Alert: ${subject}` }
-  }
+    _data: { subject: `VentHub Alert: ${subject}` }
+  };
   
   try {
     const resp = await fetch(`${supabaseUrl}/functions/v1/notification-service`, {
@@ -71,33 +81,33 @@ async function sendEmail(subject: string, text: string, fields?: NotifyField[]) 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
-    })
-    return resp.ok
+    });
+    return resp.ok;
   } catch {
-    return false
+    return false;
   }
 }
 
-export async function notify(text: string, fields?: NotifyField[]) {
-  const debug = ((globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('NOTIFY_DEBUG') || '').toLowerCase() === 'true'
-  const subject = text.slice(0, 50) // First 50 chars as subject
+export async function notify(_text: string, fields?: NotifyField[]) {
+  const debug = (getEnv('NOTIFY_DEBUG') || '').toLowerCase() === 'true';
+  const subject = _text.slice(0, 50); // First 50 chars as subject
   
-  let sent = false
+  let sent = false;
   
   // Try Slack first
-  if (await sendSlack(text, fields)) {
-    sent = true
-    if (debug) console.log('[notify] sent via Slack')
+  if (await sendSlack(_text, fields)) {
+    sent = true;
+    if (debug) console.warn('[notify] sent via Slack');
   }
   
   // Try Email if Slack failed or not configured
-  if (!sent && await sendEmail(subject, text, fields)) {
-    sent = true
-    if (debug) console.log('[notify] sent via Email')
+  if (!sent && await sendEmail(subject, _text, fields)) {
+    sent = true;
+    if (debug) console.warn('[notify] sent via Email');
   }
   
   if (!sent && debug) {
-    console.log('[notify] no channels configured ->', text, fields)
+    console.warn('[notify] no channels configured ->', _text, fields);
   }
 }
 

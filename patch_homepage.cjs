@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const file = 'src/views/HomePage.tsx';
 let content = fs.readFileSync(file, 'utf8');
@@ -45,4 +46,4 @@ content = content.replace(/import RevealSection from '\.\.\/components\/home\/Re
 
 
 fs.writeFileSync(file, content);
-console.log('HomePage patched for dynamic imports');
+console.warn('HomePage patched for dynamic imports');

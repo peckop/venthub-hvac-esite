@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
+import _fs from '_fs/promises';
 
 const PRODUCTS_URL = 'https://www.avensair.com/urunler';
 const DELAY = 2000;
@@ -9,7 +9,7 @@ async function delay(ms) {
 }
 
 async function loadAllProducts(page) {
-  console.log('🔄 Tüm ürünleri yüklüyorum...');
+  console.warn('🔄 Tüm ürünleri yüklüyorum...');
   
   let clickCount = 0;
   let noButtonCount = 0;
@@ -28,15 +28,15 @@ async function loadAllProducts(page) {
         const buttons = Array.from(document.querySelectorAll('button, a, .btn, [role="button"]'));
         
         for (const button of buttons) {
-          const text = button.textContent?.toLowerCase() || '';
+          const _text = button.textContent?.toLowerCase() || '';
           const isVisible = button.offsetWidth > 0 && button.offsetHeight > 0 && 
                            window.getComputedStyle(button).display !== 'none';
           
           if (isVisible && (
-            text.includes('daha fazla') || 
-            text.includes('daha') ||
-            text.includes('fazla') ||
-            text.includes('load more') ||
+            _text.includes('daha fazla') || 
+            _text.includes('daha') ||
+            _text.includes('fazla') ||
+            _text.includes('load more') ||
             button.classList.contains('load-more')
           )) {
             button.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -50,21 +50,21 @@ async function loadAllProducts(page) {
       if (clicked) {
         clickCount++;
         noButtonCount = 0;
-        console.log(`  ✓ Tık ${clickCount}`);
+        console.warn(`  ✓ Tık ${clickCount}`);
         await delay(DELAY);
       } else {
         noButtonCount++;
-        console.log(`  · Buton bulunamadı (${noButtonCount}/${maxNoButton})`);
+        console.warn(`  · Buton bulunamadı (${noButtonCount}/${maxNoButton})`);
         await delay(500);
       }
       
     } catch (error) {
-      console.log(`  ⚠ Hata:`, error.message);
+      console.warn(`  ⚠ Hata:`, error.message);
       break;
     }
   }
   
-  console.log(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
+  console.warn(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
   
   // Son bir scroll
   await page.evaluate(() => {
@@ -74,9 +74,9 @@ async function loadAllProducts(page) {
 }
 
 async function scrapeAllProducts(page) {
-  console.log('\n' + '='.repeat(60));
-  console.log('🔍 TÜM ÜRÜNLER SAYFASI');
-  console.log('='.repeat(60));
+  console.warn('\n' + '='.repeat(60));
+  console.warn('🔍 TÜM ÜRÜNLER SAYFASI');
+  console.warn('='.repeat(60));
   
   try {
     await page.goto(PRODUCTS_URL, { 
@@ -84,7 +84,7 @@ async function scrapeAllProducts(page) {
       timeout: 120000 
     });
     
-    console.log(`📍 Sayfa yüklendi: ${PRODUCTS_URL}`);
+    console.warn(`📍 Sayfa yüklendi: ${PRODUCTS_URL}`);
     await delay(DELAY);
 
     // Tüm ürünleri yükle
@@ -115,12 +115,12 @@ async function scrapeAllProducts(page) {
         const elements = document.querySelectorAll(selector);
         if (elements.length > 0) {
           foundElements = Array.from(elements);
-          console.log(`✓ Selector "${selector}" ile ${elements.length} element bulundu`);
+          console.warn(`✓ Selector "${selector}" ile ${elements.length} element bulundu`);
           break;
         }
       }
       
-      console.log(`Toplam ${foundElements.length} ürün kartı bulundu`);
+      console.warn(`Toplam ${foundElements.length} ürün kartı bulundu`);
       
       foundElements.forEach((element, index) => {
         try {
@@ -139,7 +139,7 @@ async function scrapeAllProducts(page) {
           // URL'den kategori çıkar (varsa)
           let category = 'Genel';
           if (productLink) {
-            const urlParts = productLink.split('/');
+            const __urlParts = productLink.split('/');
             // Kategori bilgisini URL'den veya breadcrumb'dan al
             const breadcrumb = element.closest('.urunkutu')?.querySelector('.breadcrumb');
             if (breadcrumb) {
@@ -171,14 +171,14 @@ async function scrapeAllProducts(page) {
             });
           }
         } catch (error) {
-          console.log(`Ürün parse hatası (${index}):`, error.message);
+          console.warn(`Ürün parse hatası (${index}):`, error.message);
         }
       });
       
       return productCards;
     });
     
-    console.log(`✅ ${products.length} ürün bulundu`);
+    console.warn(`✅ ${products.length} ürün bulundu`);
     return products;
     
   } catch (error) {
@@ -188,7 +188,7 @@ async function scrapeAllProducts(page) {
 }
 
 async function main() {
-  console.log('🚀 AvensAir Tüm Ürünler Scraper\n');
+  console.warn('🚀 AvensAir Tüm Ürünler Scraper\n');
   
   const browser = await puppeteer.launch({
     headless: false,
@@ -209,9 +209,9 @@ async function main() {
   
   // Sonuçları kaydet
   const timestamp = new Date().toISOString().replace(/:/g, '-');
-  const filename = `scraped-data/all_products_${timestamp}.json`;
+  const filename = `scraped-_data/all_products_${timestamp}.json`;
   
-  await fs.writeFile(
+  await _fs.writeFile(
     filename,
     JSON.stringify(products, null, 2),
     'utf-8'
@@ -227,20 +227,20 @@ async function main() {
   });
   
   // Özet
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 SCRAPING TAMAMLANDI');
-  console.log('='.repeat(60));
-  console.log(`\nTOPLAM ÜRÜN: ${products.length}\n`);
+  console.warn('\n' + '='.repeat(60));
+  console.warn('📊 SCRAPING TAMAMLANDI');
+  console.warn('='.repeat(60));
+  console.warn(`\nTOPLAM ÜRÜN: ${products.length}\n`);
   
-  console.log('Kategori Dağılımı:');
+  console.warn('Kategori Dağılımı:');
   Object.entries(byCategory)
     .sort((a, b) => b[1] - a[1])
-    .forEach(([cat, count]) => {
-      console.log(`  ${cat}: ${count}`);
+    .forEach(([cat, _count]) => {
+      console.warn(`  ${cat}: ${_count}`);
     });
   
-  console.log(`\n💾 Kaydedildi: ${filename}`);
-  console.log('='.repeat(60));
+  console.warn(`\n💾 Kaydedildi: ${filename}`);
+  console.warn('='.repeat(60));
 }
 
 main().catch(console.error);

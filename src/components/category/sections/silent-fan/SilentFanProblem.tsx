@@ -1,4 +1,4 @@
-﻿import { VentImage } from '@/components/ui/VentImage'
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { VolumeX, Zap, Activity, Info } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'
@@ -79,7 +79,7 @@ const SilentFanProblem: React.FC = () => {
                                 {/* Without */}
                                 <div className="text-left bg-black/20 backdrop-blur-md rounded-xl p-6 border border-white/10">
                                     <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">âœ•</div>
+                                        <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">✕</div>
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.without'))}</h3>
                                     </div>
                                     <ul className="space-y-2">
@@ -94,7 +94,7 @@ const SilentFanProblem: React.FC = () => {
                                 {/* With */}
                                 <div className="text-left bg-blue-500/20 backdrop-blur-md rounded-xl p-6 border border-blue-400/30">
                                     <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">âœ“</div>
+                                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center font-bold">✓</div>
                                         <h3 className="text-lg font-bold text-white">{String(tr('visual.with'))}</h3>
                                     </div>
                                     <ul className="space-y-2">

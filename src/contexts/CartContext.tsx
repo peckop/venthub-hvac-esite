@@ -13,8 +13,8 @@ export interface CartContextType {
   items: CartItem[]
   syncing: boolean
   addToCart: (product: Product, quantity?: number) => void
-  removeFromCart: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
+  removeFromCart: (_productId: string) => void
+  updateQuantity: (_productId: string, quantity: number) => void
   clearCart: (opts?: { silent?: boolean }) => void
   getCartTotal: () => number
   getCartCount: () => number

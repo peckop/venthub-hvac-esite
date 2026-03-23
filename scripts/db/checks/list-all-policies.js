@@ -19,30 +19,30 @@ async function listPolicies() {
             ORDER BY tablename, cmd, policyname;
         `);
 
-        console.log('=== ALL PUBLIC POLICIES ===\n');
+        console.warn('=== ALL PUBLIC POLICIES ===\n');
         let currentTable = '';
         for (const r of res.rows) {
             if (r.tablename !== currentTable) {
-                console.log(`\n--- ${r.tablename} ---`);
+                console.warn(`\n--- ${r.tablename} ---`);
                 currentTable = r.tablename;
             }
             const hasInitPlan = (r.qual && r.qual.includes('auth.uid()')) || (r.with_check && r.with_check.includes('auth.uid()'));
             const marker = hasInitPlan ? '⚠️ INITPLAN' : '';
-            console.log(`  [${r.cmd}] ${r.policyname} (${r.permissive}) ${marker}`);
+            console.warn(`  [${r.cmd}] ${r.policyname} (${r.permissive}) ${marker}`);
         }
 
-        // Count multiple permissive per table/cmd
-        console.log('\n\n=== MULTIPLE PERMISSIVE (NEED CONSOLIDATION) ===');
+        // _count multiple permissive per table/cmd
+        console.warn('\n\n=== MULTIPLE PERMISSIVE (NEED CONSOLIDATION) ===');
         const multiRes = await client.query(`
-            SELECT tablename, cmd, COUNT(*) cnt, string_agg(policyname, ', ') policies
+            SELECT tablename, cmd, _count(*) cnt, string_agg(policyname, ', ') policies
             FROM pg_policies
             WHERE permissive = 'PERMISSIVE' AND schemaname = 'public'
             GROUP BY tablename, cmd
-            HAVING COUNT(*) > 1
+            HAVING _count(*) > 1
             ORDER BY tablename, cmd;
         `);
-        if (multiRes.rows.length === 0) console.log('  ✅ None');
-        else multiRes.rows.forEach(r => console.log(`  ${r.tablename} (${r.cmd}): ${r.policies}`));
+        if (multiRes.rows.length === 0) console.warn('  ✅ None');
+        else multiRes.rows.forEach(r => console.warn(`  ${r.tablename} (${r.cmd}): ${r.policies}`));
 
     } catch (err) {
         console.error(err);

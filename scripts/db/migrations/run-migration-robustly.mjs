@@ -45,7 +45,7 @@ async function run() {
 
     const tryConnect = async (url) => {
         const maskedUrl = url.replace(/:([^:@]+)@/, ':****@');
-        console.log(`🔗 Attempting connection to: ${maskedUrl}`);
+        console.warn(`🔗 Attempting connection to: ${maskedUrl}`);
         const client = new Client({
             connectionString: url,
             ssl: { rejectUnauthorized: false },
@@ -65,7 +65,7 @@ async function run() {
 
     // Otomatik düzeltme protokolü
     if (!client && connectionString.includes('pooler')) {
-        console.log('🔄 Secondary protocol: Trying direct connection (port 5432)...');
+        console.warn('🔄 Secondary protocol: Trying direct connection (port 5432)...');
         const directUrl = connectionString
             .replace(':6543', ':5432')
             .replace('.pooler.', '.')
@@ -74,7 +74,7 @@ async function run() {
     }
 
     if (!client && connectionString.includes('.supabase.co')) {
-        console.log('🔄 Tertiary protocol: Trying .com variation...');
+        console.warn('🔄 Tertiary protocol: Trying .com variation...');
         const comUrl = connectionString.replace('.supabase.co', '.supabase.com');
         client = await tryConnect(comUrl);
     }
@@ -85,7 +85,7 @@ async function run() {
     }
 
     try {
-        console.log('✅ Connected to Supabase.');
+        console.warn('✅ Connected to Supabase.');
 
         // Migration dosyasını oku
         const migrationFile = 'supabase/migrations/20251218_wizard_selections.sql';
@@ -97,10 +97,10 @@ async function run() {
         }
 
         const sql = fs.readFileSync(sqlPath, 'utf8');
-        console.log(`🚀 Executing migration: ${migrationFile}...`);
+        console.warn(`🚀 Executing migration: ${migrationFile}...`);
 
         await client.query(sql);
-        console.log('✅ Migration applied successfully.');
+        console.warn('✅ Migration applied successfully.');
 
     } catch (err) {
         console.error('❌ Migration Execution failed:', err.message);

@@ -12,7 +12,10 @@ export interface AdminAuditLogInput {
   actor?: string | null // optional; auto-filled from auth if not provided
 }
 
-// Lightweight helper; errors are swallowed on purpose to not block UI
+/**
+ * @function logAdminAction
+ * @description Admin paneli işlemlerini denetim günlüğüne (audit log) kaydeder.
+ */
 export async function logAdminAction(
   client: SupabaseClient,
   input: AdminAuditLogInput | AdminAuditLogInput[]
@@ -21,23 +24,23 @@ export async function logAdminAction(
     const rows = Array.isArray(input) ? input : [input]
 
     // Best-effort: get current user id to set actor if not provided
-    let uid: string | null = null
+    let userId: string | null = null
     try {
       // Prefer session for reliability; fall back to getUser
       const { data: sessData } = await client.auth.getSession()
-      uid = sessData?.session?.user?.id ?? null
-      if (!uid) {
+      userId = sessData?.session?.user?.id ?? null
+      if (!userId) {
         const { data } = await client.auth.getUser()
-        uid = data?.user?.id ?? null
+        userId = data?.user?.id ?? null
       }
     } catch {
-      uid = null
+      userId = null
     }
 
     const prepared = rows.map((r) => {
       // Only set actor if not explicitly provided
       const hasActor = Object.prototype.hasOwnProperty.call(r, 'actor') && r.actor != null
-      return hasActor ? r : { ...r, actor: uid }
+      return hasActor ? r : { ...r, actor: userId }
     })
 
     // Chain .select() to satisfy TS and to ensure request executes immediately
@@ -49,7 +52,3 @@ export async function logAdminAction(
     console.warn('audit log insert exception', e)
   }
 }
-
-
-
-

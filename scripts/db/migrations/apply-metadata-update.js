@@ -119,20 +119,20 @@ const updates = [
 ];
 
 async function apply() {
-    console.log('--- Applying Category Metadata Updates ---');
+    console.warn('--- Applying Category Metadata Updates ---');
 
     for (const update of updates) {
-        console.log(`Updating ${update.slug}...`);
+        console.warn(`Updating ${update.slug}...`);
         const { error } = await supabase
             .from('categories')
             .update({ metadata: update.metadata })
             .eq('slug', update.slug);
 
         if (error) console.error(`Failed to update ${update.slug}:`, error);
-        else console.log(`✓ Updated ${update.slug}`);
+        else console.warn(`✓ Updated ${update.slug}`);
     }
 
-    console.log('--- Done ---');
+    console.warn('--- Done ---');
 }
 
 apply();

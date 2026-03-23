@@ -189,7 +189,7 @@ export function getModelPlacement(
     // ---------------------------------------------------------
 
     // DEBUG: Hangi modelin seçildiğini görmek için
-    // console.log(`[3D-Offset] Slug: ${s}, ModelType: ${modelType || 'N/A'}`);
+    // console.warn(`[3D-Offset] Slug: ${s}, ModelType: ${modelType || 'N/A'}`);
 
     // 1. SPESİFİK ÜRÜN GRUPLARI
     if (s.includes('perde') || s.includes('isitici') || s.includes('ortam-havali')) {

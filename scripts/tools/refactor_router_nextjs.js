@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
+import _fs from '_fs';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 const filesToRefactor = [
     'src/components/StickyHeader.tsx',
@@ -21,14 +21,14 @@ const filesToRefactor = [
 ];
 
 filesToRefactor.forEach(relativeFilePath => {
-    const filePath = path.join(__dirname, '..', relativeFilePath);
+    const filePath = _path.join(__dirname, '..', relativeFilePath);
 
-    if (!fs.existsSync(filePath)) {
-        console.log(`Skipping: ${relativeFilePath} (not found)`);
+    if (!_fs.existsSync(filePath)) {
+        console.warn(`Skipping: ${relativeFilePath} (not found)`);
         return;
     }
 
-    let content = fs.readFileSync(filePath, 'utf8');
+    let content = _fs.readFileSync(filePath, 'utf8');
     let originalContent = content;
 
     if (!content.includes("'use client'") && !content.includes('"use client"')) {
@@ -67,14 +67,14 @@ filesToRefactor.forEach(relativeFilePath => {
         content = content.replace(/<Link([^>]*?)to=/g, "<Link$1href=");
 
         if (content.includes('react-router-dom')) {
-            console.log(`Manual review needed for react-router-dom in ${relativeFilePath}`);
+            console.warn(`Manual review needed for react-router-dom in ${relativeFilePath}`);
         }
     }
 
     if (content !== originalContent) {
-        fs.writeFileSync(filePath, content, 'utf8');
-        console.log(`Refactored: ${relativeFilePath}`);
+        _fs.writeFileSync(filePath, content, 'utf8');
+        console.warn(`Refactored: ${relativeFilePath}`);
     } else {
-        console.log(`No changes: ${relativeFilePath}`);
+        console.warn(`No changes: ${relativeFilePath}`);
     }
 });

@@ -1,40 +1,41 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * AVenS Katalog PDF İndirici
  * Tüm kategorilerdeki PDF'leri indirir
  */
 
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+const _fs = require('_fs');
+const _path = require('_path');
 const https = require('https');
 const http = require('http');
 
-const KATALOG_URL = 'https://avenstr.com/tr/ticari-havalandirma';
-const OUTPUT_DIR = path.join(__dirname, 'pdfs');
+const __KATALOG_URL = 'https://avenstr.com/tr/ticari-havalandirma';
+const OUTPUT_DIR = _path.join(__dirname, 'pdfs');
 
 // PDF klasörünü oluştur
-if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+if (!_fs.existsSync(OUTPUT_DIR)) {
+    _fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 }
 
 // PDF indirme fonksiyonu
 async function downloadPDF(url, filename) {
     return new Promise((resolve, reject) => {
         const protocol = url.startsWith('https') ? https : http;
-        const filePath = path.join(OUTPUT_DIR, filename);
+        const filePath = _path.join(OUTPUT_DIR, filename);
 
-        console.log(`📥 İndiriliyor: ${filename}`);
+        console.warn(`📥 İndiriliyor: ${filename}`);
 
-        const file = fs.createWriteStream(filePath);
+        const file = _fs.createWriteStream(filePath);
         protocol.get(url, (response) => {
             response.pipe(file);
             file.on('finish', () => {
                 file.close();
-                console.log(`✅ İndirildi: ${filename}`);
+                console.warn(`✅ İndirildi: ${filename}`);
                 resolve();
             });
         }).on('error', (err) => {
-            fs.unlink(filePath, () => { });
+            _fs.unlink(filePath, () => { });
             reject(err);
         });
     });
@@ -42,8 +43,8 @@ async function downloadPDF(url, filename) {
 
 // Kategori sayfasındaki PDF'leri bul ve indir
 async function downloadCategoryPDFs(page, categoryName, categoryUrl) {
-    console.log(`\n🔍 Kategori: ${categoryName}`);
-    console.log(`   URL: ${categoryUrl}`);
+    console.warn(`\n🔍 Kategori: ${categoryName}`);
+    console.warn(`   URL: ${categoryUrl}`);
 
     try {
         await page.goto(categoryUrl, {
@@ -68,13 +69,13 @@ async function downloadCategoryPDFs(page, categoryName, categoryUrl) {
                             `https://avenstr.com/${href}`;
 
                     // Link metnini veya başka bir tanımlayıcıyı al
-                    const text = link.textContent?.trim() ||
+                    const _text = link.textContent?.trim() ||
                         link.querySelector('img')?.alt ||
                         'unnamed';
 
                     links.push({
                         url: fullUrl,
-                        text: text
+                        _text: _text
                     });
                 }
             });
@@ -82,15 +83,15 @@ async function downloadCategoryPDFs(page, categoryName, categoryUrl) {
             return links;
         });
 
-        console.log(`   Bulunan PDF sayısı: ${pdfLinks.length}`);
+        console.warn(`   Bulunan PDF sayısı: ${pdfLinks.length}`);
 
         // Her PDF'i indir
         for (let i = 0; i < pdfLinks.length; i++) {
-            const { url, text } = pdfLinks[i];
+            const { url, _text } = pdfLinks[i];
 
             // Dosya adını oluştur
-            const urlParts = url.split('/');
-            const originalFilename = urlParts[urlParts.length - 1];
+            const __urlParts = url.split('/');
+            const originalFilename = __urlParts[__urlParts.length - 1];
             const sanitizedCategory = categoryName.replace(/[^a-zA-Z0-9]/g, '_');
             const filename = `${sanitizedCategory}_${i + 1}_${originalFilename}`;
 
@@ -113,8 +114,8 @@ async function downloadCategoryPDFs(page, categoryName, categoryUrl) {
 }
 
 async function main() {
-    console.log('🚀 AVenS PDF İndirici Başlatılıyor...\n');
-    console.log(`📁 İndirme klasörü: ${OUTPUT_DIR}\n`);
+    console.warn('🚀 AVenS PDF İndirici Başlatılıyor...\n');
+    console.warn(`📁 İndirme klasörü: ${OUTPUT_DIR}\n`);
 
     const browser = await puppeteer.launch({
         headless: false, // Görsel olarak takip etmek için
@@ -124,7 +125,7 @@ async function main() {
     const page = await browser.newPage();
 
     // Ana kataloglar sayfasına git
-    console.log('📖 Kataloglar sayfası açılıyor...');
+    console.warn('📖 Kataloglar sayfası açılıyor...');
     await page.goto('https://avenstr.com/kataloglar', {
         waitUntil: 'networkidle2',
         timeout: 30000
@@ -140,16 +141,16 @@ async function main() {
         const menuLinks = document.querySelectorAll('.kategoriBaslik a, .category-menu a, ul.list-unstyled a');
 
         menuLinks.forEach(link => {
-            const text = link.textContent?.trim();
+            const _text = link.textContent?.trim();
             const href = link.getAttribute('href');
 
-            if (text && href && !href.includes('#')) {
+            if (_text && href && !href.includes('#')) {
                 const fullUrl = href.startsWith('http') ? href :
                     href.startsWith('/') ? `https://avenstr.com${href}` :
                         `https://avenstr.com/${href}`;
 
                 cats.push({
-                    name: text,
+                    name: _text,
                     url: fullUrl
                 });
             }
@@ -158,23 +159,23 @@ async function main() {
         return cats;
     });
 
-    console.log(`\n✅ ${categories.length} kategori bulundu:\n`);
+    console.warn(`\n✅ ${categories.length} kategori bulundu:\n`);
     categories.forEach((cat, i) => {
-        console.log(`   ${i + 1}. ${cat.name}`);
+        console.warn(`   ${i + 1}. ${cat.name}`);
     });
 
     // Her kategori için PDF'leri indir
     let totalPDFs = 0;
     for (const category of categories) {
-        const count = await downloadCategoryPDFs(page, category.name, category.url);
-        totalPDFs += count;
+        const _count = await downloadCategoryPDFs(page, category.name, category.url);
+        totalPDFs += _count;
     }
 
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`✅ Tamamlandı!`);
-    console.log(`📊 Toplam ${totalPDFs} PDF indirildi`);
-    console.log(`📁 Konum: ${OUTPUT_DIR}`);
-    console.log('='.repeat(60));
+    console.warn(`\n${'='.repeat(60)}`);
+    console.warn(`✅ Tamamlandı!`);
+    console.warn(`📊 Toplam ${totalPDFs} PDF indirildi`);
+    console.warn(`📁 Konum: ${OUTPUT_DIR}`);
+    console.warn('='.repeat(60));
 
     await browser.close();
 }

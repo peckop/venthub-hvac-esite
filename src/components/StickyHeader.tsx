@@ -146,12 +146,12 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
   }, [closeUserMenu, router, signOut])
 
   const primaryItems = useMemo(
-    () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ ...item, label: t(item.labelKey) })),
+    () => NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href, label: t(item.labelKey) })),
     [t]
   )
 
   const secondaryItems = useMemo(
-    () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ ...item, label: t(item.labelKey) })),
+    () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ id: item.id, href: item.href, label: t(item.labelKey) })),
     [t]
   )
 
@@ -246,7 +246,7 @@ export const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function Sti
         bottomTierChildren={
           <>
             <NavBrand brandName={t('header.brandName')} />
-            <NavPrimaryRail items={primaryItems} isCategoriesLoading={isCategoriesLoading} isCategoryHubOpen={isCategoryHubOpen} onCategoryClick={handleOpenCategoryHub} onCategoryHover={handleOpenCategoryHub} onItemHover={handleNavItemHover} />
+            <NavPrimaryRail items={primaryItems} isCategoriesLoading={isCategoriesLoading} isCategoryHubOpen={isCategoryHubOpen} onCategoryClick={handleOpenCategoryHub} onItemHover={handleNavItemHover} />
             <div className="flex-1 max-w-xl hidden sm:flex justify-center md:px-4"><NavSearchTrigger label={t('header.commandSearchCompact')} shortcutLabel="/" ariaLabel={t('common.search')} onClick={openSearchOverlay} /></div>
             <NavUtilityRail>
               <div className="hidden xl:flex items-center gap-1.5 w-auto opacity-100">

@@ -1,15 +1,15 @@
 import React from 'react'
 
 interface InventoryStockAdjustProps {
-    productId: string
-    onAdjust: (productId: string, delta: number, reason: string) => void
+    _productId: string
+    onAdjust: (_productId: string, delta: number, reason: string) => void
     moving: boolean
     moveQty: number
     setMoveQty: (qty: number) => void
 }
 
 export default function InventoryStockAdjust({
-    productId,
+    _productId,
     onAdjust,
     moving,
     moveQty,
@@ -29,14 +29,14 @@ export default function InventoryStockAdjust({
                 <button
                     disabled={moving}
                     className="flex-1 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-50"
-                    onClick={() => onAdjust(productId, Math.abs(moveQty), 'manual_in')}
+                    onClick={() => onAdjust(_productId, Math.abs(moveQty), 'manual_in')}
                 >
                     Stok Girişi
                 </button>
                 <button
                     disabled={moving}
                     className="flex-1 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500/20 transition-all disabled:opacity-50"
-                    onClick={() => onAdjust(productId, -Math.abs(moveQty), 'manual_out')}
+                    onClick={() => onAdjust(_productId, -Math.abs(moveQty), 'manual_out')}
                 >
                     Stok Çıkışı
                 </button>

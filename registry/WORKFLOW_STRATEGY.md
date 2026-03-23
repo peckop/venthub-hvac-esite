@@ -11,7 +11,7 @@ Bir AI asistanı göreve başladığında şu otonom akışı izler:
    - `/superpowers-write-plan` → `plan.md`'ya kaydet (Adımlar, Doğrulama)
    - **Implement:** Kodu yaz. Karmaşık değişimlerde `superpowers-tdd` skill'ini kullan.
    - `/superpowers-review` → `review.md`'ya kaydet (Blocker/Major/Minor)
-   - `/bitir` → Lint+test+commit+Registry sync (PULSE güncelle)
+   - `/bitir` → Dörtlü Mühür (Lint + TSC + Build) + Registry Sync + PULSE güncelle
 4. **Gatekeeper:** `manage_registry.py activate` komutu; `brainstorm.md` ve `plan.md` boşsa görevi aktive etmez.
 
 ## 2. Nihai Hedef: "Visual Page Builder"
@@ -20,6 +20,7 @@ Projenin kalbi, kategori ve ürün sayfalarını kod bağımlılığından kurta
 ## 3. Kodlama ve Tip Güvenliği
 - Tüm işlemler `src/types/database.types.ts` merkezli yürütülür.
 - `any` kullanımı kesinlikle yasaktır (Anayasa kuralı).
+- Tüm dinamik rotalar Next.js 15 Async Params protokolüne uygun şekilde `await` edilmelidir.
 
 ---
 *Bu strateji, projenin "Kimseye Bağımlı Kalmadan" büyümesini sağlar.*

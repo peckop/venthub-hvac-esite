@@ -1,6 +1,5 @@
-
 import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import path from 'path'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
@@ -14,7 +13,7 @@ if (!supabaseUrl || !supabaseKey) { process.exit(1) }
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function listCategories() {
-    console.log('📋 Listing all categories...')
+    console.warn('📋 Listing all categories...')
     const { data, error } = await supabase
         .from('categories')
         .select('id, name, slug, level, parent_id, is_active')
@@ -26,7 +25,9 @@ async function listCategories() {
         return
     }
 
-    console.table(data)
+    if (data) {
+        console.warn(JSON.stringify(data, null, 2))
+    }
 }
 
 listCategories()

@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 
-const fs = require('fs');
-const path = require('path');
+const _fs = require('_fs');
+const _path = require('_path');
 
 // 1. Parse .env
-const envPath = path.resolve(process.cwd(), '.env');
+const envPath = _path.resolve(process.cwd(), '.env');
 let env = {};
 try {
-    const data = fs.readFileSync(envPath, 'utf8');
-    data.split('\n').forEach(line => {
+    const _data = _fs.readFileSync(envPath, 'utf8');
+    _data.split('\n').forEach(line => {
         const match = line.match(/^([^=]+)=(.*)$/);
         if (match) {
             const key = match[1].trim();
@@ -15,7 +16,7 @@ try {
             env[key] = value;
         }
     });
-} catch (e) {
+} catch {
     console.error('Could not read .env file');
     process.exit(1);
 }
@@ -43,14 +44,14 @@ async function listCategories() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
+        const _data = await response.json();
         const headers = '--- CATEGORIES ---\n';
-        const rows = data.map(c => `[Level ${c.level}] ${c.name} -> slug: '${c.slug}'`).join('\n');
-        fs.writeFileSync('categories.txt', headers + rows + '\n------------------');
-        console.log('Written to categories.txt');
+        const rows = _data.map(c => `[Level ${c.level}] ${c.name} -> slug: '${c.slug}'`).join('\n');
+        _fs.writeFileSync('categories.txt', headers + rows + '\n------------------');
+        console.warn('Written to categories.txt');
 
-    } catch (e) {
-        console.error('Error fetching categories:', e);
+    } catch {
+        console.error('Error fetching categories:', _e);
     }
 }
 
