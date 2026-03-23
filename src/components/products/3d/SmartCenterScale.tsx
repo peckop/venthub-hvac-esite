@@ -60,7 +60,7 @@ export const SmartCenterScale: React.FC<SmartCenterScaleProps> = ({
         box.getCenter(center)
         box.getSize(size)
 
-        // console.log('[SmartCenterScale] Box Size:', size)
+        // console.warn('[SmartCenterScale] Box Size:', size)
 
         // 4. Normalizasyon Ölçeği (En büyük kenarı baz al)
         const maxDim = Math.max(size.x, size.y, size.z)

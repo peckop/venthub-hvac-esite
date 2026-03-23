@@ -1,5 +1,5 @@
 import Iyzipay from "npm:iyzipay";
-/* eslint-disable no-console */
+
 
 /**
  * @file Supabase Edge Function - Iyzico Payment
@@ -65,14 +65,14 @@ Deno.serve(async (req: Request) => {
                 const ip = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '') || 'unknown'
                 const key = `iyzico:${ip}`
                 const { checkRateLimit, rateLimitHeaders } = await import('../_shared/rate_limit.ts')
-                const { result, limit, windowSec } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { limit: Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), windowSec: Number(Deno.env.get('PAYMENT_RATE_LIMIT_WINDOW_SEC') || 60) })
+                const { result, _limit, _windowSec } = await checkRateLimit(key, supabaseUrl, serviceRoleKey, { _limit: Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), _windowSec: Number(Deno.env.get('PAYMENT_RATE_LIMIT_WINDOW_SEC') || 60) })
                 if (!result.allowed) {
                     const rl = rateLimitHeaders(Number(Deno.env.get('PAYMENT_RATE_LIMIT_PER_MINUTE') || 30), result.remaining, result.resetAt)
                     return new Response(JSON.stringify({ error: { code: 'RATE_LIMITED', message: 'Çok fazla istek' } }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json', ...rl } })
                 }
             }
-        } catch (e) {
-            if (debugEnabled) console.warn('rate_limit skipped:', e)
+        } catch (_e) {
+            if (debugEnabled) console.warn('rate_limit skipped:', _e)
         }
 
         const mask = (s?: string) => typeof s === 'string' ? s.replace(/.(?=.{2})/g, '*') : s;
@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
             shippingAddress: obj?.shippingAddress ? { ...obj.shippingAddress, address: '***' } : undefined,
             billingAddress: obj?.billingAddress ? { ...obj.billingAddress, address: '***' } : undefined,
         });
-        if (debugEnabled) console.log('İyzico Payment Request Started');
+        if (debugEnabled) console.warn('İyzico Payment Request Started');
 
         // Parse request body
         const requestData = await req.json();
@@ -197,7 +197,7 @@ Deno.serve(async (req: Request) => {
             if (s.length <= 10) return s;
             return s.slice(0, 6) + '…' + s.slice(-4);
         };
-        if (debugEnabled) console.log('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
+        if (debugEnabled) console.warn('Iyzico keys (masked):', maskKey(iyzicoApiKey), maskKey(iyzicoSecretKey));
 
         // Generate unique identifiers
         const orderId = `VH-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -220,7 +220,7 @@ Deno.serve(async (req: Request) => {
         const forwarded = req.headers.get('x-forwarded-for') || '';
         const realIp = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || (forwarded.split(',')[0]?.trim() || '');
 
-        if (debugEnabled) console.log('Order ID:', orderId);
+        if (debugEnabled) console.warn('Order ID:', orderId);
 
         // Create order in database
         // Not: venthub_orders.id NOT NULL ise, burada UUID oluşturup gönderiyoruz.
@@ -260,7 +260,7 @@ Deno.serve(async (req: Request) => {
         });
 
         if (!orderResponse.ok) {
-            const errorText = await orderResponse.text();
+            const errorText = await orderResponse._text();
             // Fallback: remove shipping_method if column doesn't exist yet
             const mayRetry = /shipping_method/i.test(errorText) && /does not exist|column/i.test(errorText)
             if (mayRetry) {
@@ -297,9 +297,9 @@ Deno.serve(async (req: Request) => {
         }
 
         const createdOrders = await orderResponse.json().catch(() => null);
-        const dbOrderId = (Array.isArray(createdOrders) && createdOrders[0]?.id) ? createdOrders[0].id : dbGeneratedId;
+        const dbOrderId = (Array.isArray(createdOrders) && createdOrders[0]?.id) ? createdOrders[0].id: dbGeneratedId;
 
-        if (debugEnabled) console.log('✅ Order created successfully with id:', dbOrderId);
+        if (debugEnabled) console.warn('✅ Order created successfully with id:', dbOrderId);
 
 
         // Create order items (order_id olarak veritabanındaki gerçek id kullanılır) using authoritative items
@@ -342,17 +342,17 @@ Deno.serve(async (req: Request) => {
         // Şema uyumlu kolonlar: order_id, product_id, product_name, unit_price, quantity, total_price,
         // opsiyonel: price_at_time, product_image_url
         const orderItems = authoritativeItems.map((raw) => {
-            const productId = raw.product_id
+            const _productId = raw.product_id
             const unitPrice = Number(raw.unit_price)
             const qty = Math.max(1, Number(raw.quantity ?? 1))
             const safeUnit = Number.isFinite(unitPrice) ? unitPrice : 0
-            const p = productId ? (prodMap.get(productId) as any || {}) : {};
-            const fid = String(productId || '')
-            const fallbackName = (p.name) || nameMap.get(fid) || 'Ürün';
-            const fallbackImage = (p.image_url) || imageMap.get(fid) || null;
+            const p = _productId ? (prodMap.get(_productId) as Record<string, unknown> || {}) : {};
+            const fid = String(_productId || '')
+            const fallbackName = (p.name as string) || nameMap.get(fid) || 'Ürün';
+            const fallbackImage = (p.image_url as string | null) || imageMap.get(fid) || null;
             return {
                 order_id: dbOrderId,
-                product_id: productId,
+                product_id: _productId,
                 product_name: fallbackName,
                 unit_price: safeUnit,
                 quantity: qty,
@@ -374,7 +374,7 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify(orderItems)
         });
         if (!itemsResp.ok) {
-            const errTxt = await itemsResp.text().catch(() => '')
+            const errTxt = await itemsResp._text().catch(() => '')
             console.error('Order items insert failed:', itemsResp.status, errTxt)
             return new Response(JSON.stringify({ error: { code: 'DATABASE_ERROR', message: 'Sipariş kalemleri eklenemedi' } }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
         }
@@ -463,7 +463,7 @@ Deno.serve(async (req: Request) => {
             basketItems
         };
 
-        if (debugEnabled) console.log('İyzico Request:', JSON.stringify(sanitize(iyzicoRequest), null, 2));
+        if (debugEnabled) console.warn('İyzico Request:', JSON.stringify(sanitize(iyzicoRequest), null, 2));
 
         // İyzipay Node SDK ile isteği yap
         type IyziStatic = { PAYMENT_CHANNEL?: { WEB: string }, BASKET_ITEM_TYPE?: { PHYSICAL: string } }
@@ -503,9 +503,9 @@ Deno.serve(async (req: Request) => {
             });
         });
 
-        if (debugEnabled) console.log('İyzico Result:', { status: iyzicoResult?.status, hasToken: !!iyzicoResult?.token, hasPaymentPageUrl: !!iyzicoResult?.paymentPageUrl });
+        if (debugEnabled) console.warn('İyzico Result:', { status: iyzicoResult?.status, hasToken: !!iyzicoResult?.token, hasPaymentPageUrl: !!iyzicoResult?.paymentPageUrl });
         if (iyzicoResult && iyzicoResult.status === 'success' && (iyzicoResult.checkoutFormContent || iyzicoResult.paymentPageUrl || iyzicoResult.token)) {
-            if (debugEnabled) console.log('✅ İyzico checkout form created successfully');
+            if (debugEnabled) console.warn('✅ İyzico checkout form created successfully');
 
             // Minimal token saklama: reconcile için yeterli.
             try {
@@ -521,13 +521,13 @@ Deno.serve(async (req: Request) => {
                         body: JSON.stringify({ payment_token: iyzicoResult.token })
                     })
                 }
-            } catch (e) {
-                const msg = e instanceof Error ? e.message : String(e ?? '')
+            } catch (_e) {
+                const msg = _e instanceof Error ? _e.message : String(_e ?? '')
                 console.warn('payment_data token patch skipped:', msg)
             }
 
             return new Response(JSON.stringify({
-                data: {
+                _data: {
                     status: 'success',
                     orderId: dbOrderId,
                     orderNumber: orderId,

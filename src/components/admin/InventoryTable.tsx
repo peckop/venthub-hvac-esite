@@ -18,15 +18,15 @@ interface InventoryTableProps {
     sortKey: SortKey
     sortDir: 'asc' | 'desc'
     groupByCategory: boolean
-    groupedRows: { cid: string | null; name: string; items: InventoryRow[] }[]
+    groupedRows: { _c_id: string | null; name: string; items: InventoryRow[] }[]
     onSort: (key: SortKey) => void
     onSelect: (r: InventoryRow) => void
-    onUpdateLocation: (productId: string, val: string) => Promise<void>
-    onUpdateSupplier: (productId: string, val: string) => Promise<void>
+    onUpdateLocation: (_productId: string, val: string) => Promise<void>
+    onUpdateSupplier: (_productId: string, val: string) => Promise<void>
     hasWriteAccess: boolean
     thresholdMap: Record<string, number | null>
     defaultThreshold: number | null
-    effectiveThreshold: (productId: string) => number | null
+    effectiveThreshold: (_productId: string) => number | null
 }
 
 export default function InventoryTable({
@@ -241,7 +241,7 @@ export default function InventoryTable({
                         </tr>
                     ) : groupByCategory ? (
                         groupedRows.map(g => (
-                            <React.Fragment key={g.cid ?? 'null'}>
+                            <React.Fragment key={g._c_id ?? 'null'}>
                                 <tr className="bg-white/[0.02] group">
                                     <th colSpan={10} className={`text-left ${density === 'compact' ? 'px-4 py-2' : 'px-8 py-4'} text-cyan-400 font-black uppercase text-[10px] tracking-[0.3em] border-y border-white/5`}>
                                         <div className="flex items-center gap-3">

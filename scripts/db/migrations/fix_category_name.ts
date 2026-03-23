@@ -9,11 +9,11 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function fixCategory() {
-    console.log('--- FIX START ---')
+    console.warn('--- FIX START ---')
 
     // 1. Find the category
-    console.log('Searching for "endustriyel-fanlar"...')
-    const { data: cat, error: findError } = await supabase
+    console.warn('Searching for "endustriyel-fanlar"...')
+    const { _data: cat, error: findError } = await supabase
         .from('categories')
         .select('*')
         .eq('slug', 'endustriyel-fanlar')
@@ -22,8 +22,8 @@ async function fixCategory() {
     if (findError) {
         console.error('Error finding category:', findError)
         // Try finding by name just in case
-        const { data: catByName } = await supabase.from('categories').select('*').ilike('name', '%Exproof%').single()
-        if (catByName) console.log('Found by name "Exproof":', catByName)
+        const { _data: catByName } = await supabase.from('categories').select('*').ilike('name', '%Exproof%').single()
+        if (catByName) console.warn('Found by name "Exproof":', catByName)
         return
     }
 
@@ -32,10 +32,10 @@ async function fixCategory() {
         return
     }
 
-    console.log('Current Category:', { id: cat.id, name: cat.name, slug: cat.slug, metadata: cat.metadata })
+    console.warn('Current Category:', { id: cat.id, name: cat.name, slug: cat.slug, metadata: cat.metadata })
 
     // 2. Prepare updates
-    const updates: any = {
+    const updates: unknown = {
         name: 'Exproof Fanlar', // FORCE THIS NAME
     }
 
@@ -50,8 +50,8 @@ async function fixCategory() {
     updates.metadata = newMeta
 
     // 3. Update
-    console.log('Applying updates:', updates)
-    const { data: updated, error: updateError } = await supabase
+    console.warn('Applying updates:', updates)
+    const { _data: updated, error: updateError } = await supabase
         .from('categories')
         .update(updates)
         .eq('id', cat.id)
@@ -61,10 +61,10 @@ async function fixCategory() {
     if (updateError) {
         console.error('Update failed:', updateError)
     } else {
-        console.log('Update SUCCESS:', updated)
+        console.warn('Update SUCCESS:', updated)
     }
 
-    console.log('--- FIX END ---')
+    console.warn('--- FIX END ---')
 }
 
 fixCategory().catch(console.error)

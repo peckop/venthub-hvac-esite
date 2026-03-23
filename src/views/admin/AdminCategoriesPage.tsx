@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { VentImage } from '@/components/ui/VentImage'
 import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo } from 'react'
 import { usePathname } from 'next/navigation'

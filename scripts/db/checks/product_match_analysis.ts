@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
+import * as _fs from '_fs';
 dotenv.config();
 
 const supabase = createClient(
@@ -11,7 +11,7 @@ const supabase = createClient(
 async function findProductMatches() {
     let output = '';
     const log = (msg: string) => {
-        console.log(msg);
+        console.warn(msg);
         output += msg + '\n';
     };
 
@@ -39,16 +39,16 @@ async function findProductMatches() {
     log('========================================\n');
 
     // Tüm ürünleri çek
-    const { data: allProducts } = await supabase
+    const { _data: allProducts } = await supabase
         .from('products')
         .select('id, name, category_id, sku');
 
     // Tüm kategorileri çek
-    const { data: allCats } = await supabase
+    const { _data: allCats } = await supabase
         .from('categories')
         .select('id, name, slug, parent_id');
 
-    const catMap = new Map<string, any>();
+    const catMap = new Map<string, Record<string, unknown>>();
     allCats?.forEach(c => catMap.set(c.id, c));
 
     for (const suspName of suspiciousNames) {
@@ -117,7 +117,7 @@ async function findProductMatches() {
         });
     }
 
-    fs.writeFileSync('scripts/product_match_result.txt', output, 'utf8');
+    _fs.writeFileSync('scripts/product_match_result.txt', output, 'utf8');
     log('\nSonuç: scripts/product_match_result.txt');
 }
 

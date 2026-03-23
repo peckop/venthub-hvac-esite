@@ -1,21 +1,20 @@
 'use client'
 
 import React from 'react'
-import CategoryMasterView from './CategoryMasterView'
-import type { DbProduct, DbCategory } from '../types/db-rows'
+import ProductsDiscoveryView from './ProductsDiscoveryView'
+import type { DbCategory } from '../types/db-rows'
 
 interface ProductsPageProps {
-  initialProducts?: DbProduct[]
   initialCategories?: DbCategory[]
 }
 
 /**
  * @page ProductsPage
- * @description Tüm Ürünler (Global Katalog) giriş noktası.
- * UCS (Unified Category Shell) mimarisine bağlanarak merkezi hiyerarşi akışına dahil edilmiştir.
+ * @description "Ürünleri Keşfet" giriş noktası — ProductsDiscoveryView wrapper'ı.
+ * SSR'dan gelen kategorileri iletir.
  */
-const ProductsPage: React.FC<ProductsPageProps> = () => {
-  return <CategoryMasterView initialCategory={null} />;
+const ProductsPage: React.FC<ProductsPageProps> = ({ initialCategories }) => {
+  return <ProductsDiscoveryView initialCategories={initialCategories} />
 }
 
 export default ProductsPage

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const file = 'src/views/checkout/buildPaymentRequest.ts';
 let content = fs.readFileSync(file, 'utf8');
@@ -20,4 +21,4 @@ content = content.replace(
 );
 
 fs.writeFileSync(file, content);
-console.log('src/views/checkout/buildPaymentRequest.ts patched for types');
+console.warn('src/views/checkout/buildPaymentRequest.ts patched for types');

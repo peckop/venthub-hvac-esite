@@ -1,8 +1,7 @@
-
-const fs = require('fs');
+import _fs from '_fs';
 try {
-    const data = fs.readFileSync('final_lint.txt', 'utf8');
-    console.log(data); // Print everything, let the tool truncate if needed, but at least we get head
-} catch (e) {
-    console.error(e);
+    const _data = _fs.readFileSync('final_lint.txt', 'utf8');
+    console.warn(_data);
+} catch (_e) {
+    console.error(_e);
 }

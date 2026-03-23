@@ -15,6 +15,12 @@ import { AirPurifierModel } from './types/AirPurifierModel'
 import { PlugFanModel } from './types/PlugFanModel'
 import { WallMountedCompactFanModel } from './types/WallMountedCompactFanModel'
 import { VorticeLineoModel } from './factory/VorticeLineoModel'
+import { HRVModel } from './types/HRVModel'
+import { DehumidifierModel } from './types/DehumidifierModel'
+import { RoundDuctFanModel } from './types/RoundDuctFanModel'
+import { AccessoryModel } from './types/AccessoryModel'
+import { SpeedControlModel } from './types/SpeedControlModel'
+import { FlexibleDuctModel } from './types/FlexibleDuctModel'
 
 interface FanRendererProps {
     slug: string
@@ -61,6 +67,13 @@ const MODEL_COMPONENTS: Record<string, React.ComponentType<BaseModelProps>> = {
     'JetFanModel': JetFanModel,
     'AirCurtainModel': AirCurtainModel as React.ComponentType<BaseModelProps>,
     'AirPurifierModel': AirPurifierModel,
+    'VorticeLineoModel': VorticeLineoModel as React.ComponentType<BaseModelProps>,
+    'HRVModel': HRVModel as React.ComponentType<BaseModelProps>,
+    'DehumidifierModel': DehumidifierModel as React.ComponentType<BaseModelProps>,
+    'RoundDuctFanModel': RoundDuctFanModel as React.ComponentType<BaseModelProps>,
+    'AccessoryModel': AccessoryModel as React.ComponentType<BaseModelProps>,
+    'SpeedControlModel': SpeedControlModel as React.ComponentType<BaseModelProps>,
+    'FlexibleDuctModel': FlexibleDuctModel as React.ComponentType<BaseModelProps>,
 }
 
 export const FanRenderer: React.FC<FanRendererProps> = ({

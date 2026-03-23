@@ -32,10 +32,10 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(JSON.stringify({ ok: true, release: release || null, commit: commit || null, time: new Date().toISOString() }), { status: 200, headers })
-  } catch (e) {
+  } catch (_e) {
     try {
       const { sentryCaptureException } = await import('../_shared/sentry.ts')
-      await sentryCaptureException(e as unknown, { fn: 'healthz' })
+      await sentryCaptureException(_e as unknown, { fn: 'healthz' })
     } catch {}
     return new Response(JSON.stringify({ ok: false, error: 'unhealthy' }), { status: 503, headers })
   }

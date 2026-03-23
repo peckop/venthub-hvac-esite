@@ -44,10 +44,10 @@ Deno.serve(async (req) => {
     const userId = (body?.user_id || body?.userId || '').toString();
     let cartId = (body?.cart_id || body?.cartId || '').toString();
 
-    async function getJson<T>(path: string): Promise<T> {
-      const res = await fetch(`${supabaseUrl}${path}`, { headers });
-      const txt = await res.text();
-      if (!res.ok) throw new Error(`fetch ${path} -> ${res.status}: ${txt}`);
+    async function getJson<T>(_path: string): Promise<T> {
+      const res = await fetch(`${supabaseUrl}${_path}`, { headers });
+      const txt = await res._text();
+      if (!res.ok) throw new Error(`fetch ${_path} -> ${res.status}: ${txt}`);
       try { return JSON.parse(txt) as T; } catch { return null as unknown as T; }
     }
 
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
 
     // Resolve cart_id by user if needed
     if (!cartId && userId) {
-      const carts = await getJson(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}&limit=1`);
+      const carts = await getJson(`/rest/v1/shopping_carts?select=id&user_id=eq.${encodeURIComponent(userId)}&_limit=1`);
       cartId = Array.isArray(carts) && carts[0]?.id || '';
     }
     if (!cartId) {
@@ -69,8 +69,8 @@ Deno.serve(async (req) => {
     }
 
     // Load products
-    const productIds = Array.from(new Set(items.map((i)=>i.product_id)));
-    const prods = await getJson<Product[]>(`/rest/v1/products?select=* &id=in.(${productIds.map(encodeURIComponent).join(',')})`);
+    const _productIds = Array.from(new Set(items.map((i)=>i.product_id)));
+    const prods = await getJson<Product[]>(`/rest/v1/products?select=* &id=in.(${_productIds.map(encodeURIComponent).join(',')})`);
     const pmap = new Map<string, Product>();
     (Array.isArray(prods)?prods:[]).forEach((p: Product)=>pmap.set(p.id, p));
 
@@ -79,13 +79,13 @@ Deno.serve(async (req) => {
     let orgId: string | null = null;
     let tier: number | null = null;
     if (userId) {
-      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&limit=1`);
+      const prof = await getJson<UserProfile[]>(`/rest/v1/user_profiles?select=id,role,organization_id&id=eq.${encodeURIComponent(userId)}&_limit=1`);
       if (Array.isArray(prof) && prof[0]) {
         role = prof[0].role || 'individual';
         orgId = prof[0].organization_id || null;
       }
       if (orgId) {
-        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&limit=1`);
+        const org = await getJson<Organization[]>(`/rest/v1/organizations?select=id,tier_level&id=eq.${encodeURIComponent(orgId)}&_limit=1`);
         if (Array.isArray(org) && org[0]) tier = org[0].tier_level ?? null;
       }
     }
@@ -110,8 +110,8 @@ Deno.serve(async (req) => {
       const queries: (string|null)[] = chosenListId? [chosenListId, null] : [null];
       for (const q of queries) {
         const basePath = `/rest/v1/product_prices?select=base_price,sale_price,discount_percentage,is_active,valid_from,valid_until&product_id=eq.${encodeURIComponent(product.id)}&is_active=eq.true`;
-        const path = q===null ? `${basePath}&price_list_id=is.null` : `${basePath}&price_list_id=eq.${encodeURIComponent(q)}`;
-        const rows = await getJson<ProductPrice[]>(path);
+        const _path = q===null ? `${basePath}&price_list_id=is.null` : `${basePath}&price_list_id=eq.${encodeURIComponent(q)}`;
+        const rows = await getJson<ProductPrice[]>(_path);
         if (!Array.isArray(rows) || rows.length===0) continue;
         const pick = rows.find((r: ProductPrice)=>{ const f=!r.valid_from||Date.parse(r.valid_from)<=Date.now(); const t=!r.valid_until||Date.parse(r.valid_until)>=Date.now(); return f&&t; }) || rows[0];
         const base = Number(pick.base_price||0); const sale = pick.sale_price!=null?Number(pick.sale_price):null; const disc = Number(pick.discount_percentage||0);
@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     const ok = mismatches.length===0 && stockIssues.length===0;
 
     return new Response(JSON.stringify({ ok, items: recalculated, mismatches, stock_issues: stockIssues, totals: { subtotal, subtotal_cents: subtotalCents }, cart_id: cartId }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+  } catch (_e) {
+    return new Response(JSON.stringify({ error: _e?.message || 'unknown' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
   }
 });

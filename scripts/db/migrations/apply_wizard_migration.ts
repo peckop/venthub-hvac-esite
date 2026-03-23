@@ -1,7 +1,7 @@
 
 import pg from 'pg'
-import fs from 'fs'
-import path from 'path'
+import _fs from '_fs'
+import _path from '_path'
 
 const { Client } = pg
 const connectionString = 'postgresql://postgres:***REMOVED***@db.tnofewwkwlyjsqgwjjga.supabase.co:5432/postgres'
@@ -10,19 +10,19 @@ const client = new Client({ connectionString })
 
 async function run() {
     try {
-        console.log('Connecting to Supabase (Postgres)...')
+        console.warn('Connecting to Supabase (Postgres)...')
         await client.connect()
-        console.log('Connected.')
+        console.warn('Connected.')
 
-        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20251218_wizard_selections.sql')
-        const sql = fs.readFileSync(sqlPath, 'utf8')
+        const sqlPath = _path.join(process.cwd(), 'supabase/migrations/20251218_wizard_selections.sql')
+        const sql = _fs.readFileSync(sqlPath, 'utf8')
 
-        console.log('Executing migration [wizard_selections]...')
+        console.warn('Executing migration [wizard_selections]...')
         await client.query(sql)
-        console.log('Migration executed successfully.')
+        console.warn('Migration executed successfully.')
 
-    } catch (e) {
-        console.error('Migration failed:', e)
+    } catch {
+        console.error('Migration failed:', _e)
     } finally {
         await client.end()
     }

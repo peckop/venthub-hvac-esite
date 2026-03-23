@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 
 const BASE_URL = 'https://avensair.com';
 const DELAY = 2000; // 2 saniye bekleme
@@ -32,7 +32,7 @@ async function delay(ms) {
 }
 
 async function scrapeCategory(page, categoryInfo) {
-  console.log(`\n🔍 ${categoryInfo.name} kategorisi scraping başlıyor...`);
+  console.warn(`\n🔍 ${categoryInfo.name} kategorisi scraping başlıyor...`);
   
   const fullUrl = `${BASE_URL}${categoryInfo.url}`;
   
@@ -42,7 +42,7 @@ async function scrapeCategory(page, categoryInfo) {
       timeout: 30000 
     });
     
-    console.log(`📍 Sayfa yüklendi: ${fullUrl}`);
+    console.warn(`📍 Sayfa yüklendi: ${fullUrl}`);
     await delay(DELAY);
 
     // Sayfada ürün kartlarını bul
@@ -57,7 +57,7 @@ async function scrapeCategory(page, categoryInfo) {
         '.card',
         '.item',
         'article',
-        '[data-product]',
+        '[_data-product]',
         '.grid-item',
         '.product-box'
       ];
@@ -108,14 +108,14 @@ async function scrapeCategory(page, categoryInfo) {
       return productCards;
     });
 
-    console.log(`📦 ${products.length} ürün bulundu`);
+    console.warn(`📦 ${products.length} ürün bulundu`);
 
     // Her ürün için detaylı bilgi çek
     const detailedProducts = [];
     
     for (let i = 0; i < products.length; i++) {
       const product = products[i];
-      console.log(`📝 ${i + 1}/${products.length}: ${product.title}`);
+      console.warn(`📝 ${i + 1}/${products.length}: ${product.title}`);
       
       try {
         // Ürün detay sayfasına git
@@ -226,7 +226,7 @@ async function scrapeCategory(page, categoryInfo) {
 }
 
 async function scrapeAllCategories() {
-  console.log('🚀 AvensAir sitesi kategori kategori scraping başlıyor...');
+  console.warn('🚀 AvensAir sitesi kategori kategori scraping başlıyor...');
   
   const browser = await puppeteer.launch({
     headless: false,
@@ -246,13 +246,13 @@ async function scrapeAllCategories() {
       const categoryProducts = await scrapeCategory(page, category);
       
       categoryResults[category.name] = {
-        count: categoryProducts.length,
+        _count: categoryProducts.length,
         url: category.url
       };
       
       allProducts.push(...categoryProducts);
       
-      console.log(`✅ ${category.name}: ${categoryProducts.length} ürün`);
+      console.warn(`✅ ${category.name}: ${categoryProducts.length} ürün`);
       
       // Kategoriler arası bekleme
       await delay(DELAY);
@@ -262,12 +262,12 @@ async function scrapeAllCategories() {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     
     // Tüm ürünler
-    const allProductsFile = path.join(process.cwd(), 'scraped-data', `all_products_comprehensive_${timestamp}.json`);
-    await fs.writeFile(allProductsFile, JSON.stringify(allProducts, null, 2));
+    const allProductsFile = _path.join(process.cwd(), 'scraped-_data', `all_products_comprehensive_${timestamp}.json`);
+    await _fs.writeFile(allProductsFile, JSON.stringify(allProducts, null, 2));
     
     // Kategori özeti
-    const summaryFile = path.join(process.cwd(), 'scraped-data', `category_summary_${timestamp}.json`);
-    await fs.writeFile(summaryFile, JSON.stringify(categoryResults, null, 2));
+    const summaryFile = _path.join(process.cwd(), 'scraped-_data', `category_summary_${timestamp}.json`);
+    await _fs.writeFile(summaryFile, JSON.stringify(categoryResults, null, 2));
     
     // Kategori bazlı dosyalar
     for (const [categoryName, products] of Object.entries(
@@ -277,27 +277,27 @@ async function scrapeAllCategories() {
         return acc;
       }, {})
     )) {
-      const categoryFile = path.join(
+      const categoryFile = _path.join(
         process.cwd(), 
-        'scraped-data', 
+        'scraped-_data', 
         `${categoryName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${timestamp}.json`
       );
-      await fs.writeFile(categoryFile, JSON.stringify(products, null, 2));
+      await _fs.writeFile(categoryFile, JSON.stringify(products, null, 2));
     }
     
-    console.log('\n📊 Scraping Özeti:');
-    console.log(`📦 Toplam ürün: ${allProducts.length}`);
-    console.log(`📂 Kategori sayısı: ${Object.keys(categoryResults).length}`);
-    console.log('\n📋 Kategori detayları:');
+    console.warn('\n📊 Scraping Özeti:');
+    console.warn(`📦 Toplam ürün: ${allProducts.length}`);
+    console.warn(`📂 Kategori sayısı: ${Object.keys(categoryResults).length}`);
+    console.warn('\n📋 Kategori detayları:');
     
     Object.entries(categoryResults).forEach(([name, info]) => {
-      console.log(`  ${name}: ${info.count} ürün (${info.url})`);
+      console.warn(`  ${name}: ${info._count} ürün (${info.url})`);
     });
     
-    console.log(`\n💾 Veriler kaydedildi:`);
-    console.log(`  - Tüm ürünler: ${allProductsFile}`);
-    console.log(`  - Kategori özeti: ${summaryFile}`);
-    console.log(`  - Kategori dosyaları: scraped-data/`);
+    console.warn(`\n💾 Veriler kaydedildi:`);
+    console.warn(`  - Tüm ürünler: ${allProductsFile}`);
+    console.warn(`  - Kategori özeti: ${summaryFile}`);
+    console.warn(`  - Kategori dosyaları: scraped-_data/`);
     
   } catch (error) {
     console.error('💥 Scraping hatası:', error.message);

@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 
 const BASE_URL = 'https://avensair.com';
 const DELAY = 3000; // 3 saniye bekleme
@@ -32,7 +32,7 @@ async function delay(ms) {
 }
 
 async function loadAllProducts(page) {
-  console.log('🔄 "Daha fazla" butonları kontrol ediliyor...');
+  console.warn('🔄 "Daha fazla" butonları kontrol ediliyor...');
   
   let clickCount = 0;
   let maxClicks = 200; // Her kategoride yeterince tıklamak için
@@ -42,11 +42,11 @@ async function loadAllProducts(page) {
       // "Daha fazla" butonunu ara - farklı yöntemler
       let loadMoreButton = null;
       
-      // Yöntem 1: Text içeriğine göre ara
+      // Yöntem 1: _text içeriğine göre ara
       const buttons = await page.$$('button, a, .btn, [role="button"]');
       for (const button of buttons) {
-        const text = await page.evaluate(el => el.textContent, button);
-        if (text && text.trim().toLowerCase().includes('daha fazla')) {
+        const _text = await page.evaluate(el => el.textContent, button);
+        if (_text && _text.trim().toLowerCase().includes('daha fazla')) {
           loadMoreButton = button;
           break;
         }
@@ -58,7 +58,7 @@ async function loadAllProducts(page) {
           '.load-more',
           '.more-button', 
           '.btn-load-more',
-          '[data-load-more]',
+          '[_data-load-more]',
           'button[class*="load"]',
           'button[class*="more"]',
           '.show-more',
@@ -79,7 +79,7 @@ async function loadAllProducts(page) {
         }, loadMoreButton);
         
         if (isVisible) {
-          console.log(`📱 "Daha fazla" butonuna tıklanıyor... (${clickCount + 1}. tık)`);
+          console.warn(`📱 "Daha fazla" butonuna tıklanıyor... (${clickCount + 1}. tık)`);
           
           // Butona scroll et
           await page.evaluate(button => {
@@ -99,31 +99,31 @@ async function loadAllProducts(page) {
           await delay(2000);
           
         } else {
-          console.log('💡 "Daha fazla" butonu görünmüyor, tüm ürünler yüklenmiş olabilir');
+          console.warn('💡 "Daha fazla" butonu görünmüyor, tüm ürünler yüklenmiş olabilir');
           break;
         }
       } else {
-        console.log('✅ "Daha fazla" butonu bulunamadı, tüm ürünler yüklenmiş');
+        console.warn('✅ "Daha fazla" butonu bulunamadı, tüm ürünler yüklenmiş');
         break;
       }
     } catch (error) {
-      console.log('⚠️ "Daha fazla" butonu işleminde hata:', error.message);
+      console.warn('⚠️ "Daha fazla" butonu işleminde hata:', error.message);
       break;
     }
   }
   
   if (clickCount >= maxClicks) {
-    console.log('⚠️ Maksimum tık sayısına ulaşıldı, işlem durduruldu');
+    console.warn('⚠️ Maksimum tık sayısına ulaşıldı, işlem durduruldu');
   }
   
-  console.log(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
+  console.warn(`📊 Toplam ${clickCount} kez "Daha fazla" butonuna tıklandı`);
   
   // Son kontrol için biraz bekle
   await delay(DELAY);
 }
 
 async function scrapeCategory(page, categoryInfo) {
-  console.log(`\n🔍 ${categoryInfo.name} kategorisi scraping başlıyor...`);
+  console.warn(`\n🔍 ${categoryInfo.name} kategorisi scraping başlıyor...`);
   
   const fullUrl = `${BASE_URL}${categoryInfo.url}`;
   
@@ -133,7 +133,7 @@ async function scrapeCategory(page, categoryInfo) {
       timeout: 30000 
     });
     
-    console.log(`📍 Sayfa yüklendi: ${fullUrl}`);
+    console.warn(`📍 Sayfa yüklendi: ${fullUrl}`);
     await delay(DELAY);
 
     // Tüm ürünleri yükle
@@ -151,7 +151,7 @@ async function scrapeCategory(page, categoryInfo) {
         '.card',
         '.item',
         'article',
-        '[data-product]',
+        '[_data-product]',
         '.grid-item',
         '.product-box',
         '.col-md-4', // Bootstrap grid
@@ -165,7 +165,7 @@ async function scrapeCategory(page, categoryInfo) {
         const elements = document.querySelectorAll(selector);
         if (elements.length > 0) {
           foundElements = Array.from(elements);
-          console.log(`Selector ${selector} ile ${elements.length} element bulundu`);
+          console.warn(`Selector ${selector} ile ${elements.length} element bulundu`);
           break;
         }
       }
@@ -175,10 +175,10 @@ async function scrapeCategory(page, categoryInfo) {
         const allLinks = document.querySelectorAll('a[href*="/urun"], a[href*="/product"], a[href*="detail"]');
         foundElements = Array.from(allLinks).filter(link => {
           // Boş veya anlamsız linkleri filtrele
-          const text = link.textContent.trim();
-          return text.length > 3 && !text.includes('404') && !text.includes('Sepet');
+          const _text = link.textContent.trim();
+          return _text.length > 3 && !_text.includes('404') && !_text.includes('Sepet');
         });
-        console.log(`Link selector ile ${foundElements.length} element bulundu`);
+        console.warn(`Link selector ile ${foundElements.length} element bulundu`);
       }
       
       foundElements.forEach((element, index) => {
@@ -231,7 +231,7 @@ async function scrapeCategory(page, categoryInfo) {
       return uniqueProducts;
     });
 
-    console.log(`📦 ${products.length} benzersiz ürün bulundu`);
+    console.warn(`📦 ${products.length} benzersiz ürün bulundu`);
 
     // Her ürün için detaylı bilgi çek (sadece ilk 5 ürün için test)
     const detailedProducts = [];
@@ -239,7 +239,7 @@ async function scrapeCategory(page, categoryInfo) {
     
     for (let i = 0; i < maxProducts; i++) {
       const product = products[i];
-      console.log(`📝 ${i + 1}/${maxProducts}: ${product.title}`);
+      console.warn(`📝 ${i + 1}/${maxProducts}: ${product.title}`);
       
       try {
         // Ürün detay sayfasına git
@@ -341,8 +341,8 @@ async function scrapeCategory(page, categoryInfo) {
 }
 
 async function scrapeAllCategories() {
-  console.log('🚀 AvensAir sitesi kategori kategori scraping başlıyor...');
-  console.log('💡 "Daha fazla" butonlarına tıklayarak tüm ürünler yüklenecek');
+  console.warn('🚀 AvensAir sitesi kategori kategori scraping başlıyor...');
+  console.warn('💡 "Daha fazla" butonlarına tıklayarak tüm ürünler yüklenecek');
   
   const browser = await puppeteer.launch({
     headless: false,
@@ -366,13 +366,13 @@ async function scrapeAllCategories() {
       const categoryProducts = await scrapeCategory(page, category);
       
       categoryResults[category.name] = {
-        count: categoryProducts.length,
+        _count: categoryProducts.length,
         url: category.url
       };
       
       allProducts.push(...categoryProducts);
       
-      console.log(`✅ ${category.name}: ${categoryProducts.length} ürün`);
+      console.warn(`✅ ${category.name}: ${categoryProducts.length} ürün`);
       
       // Kategoriler arası bekleme
       await delay(DELAY);
@@ -382,25 +382,25 @@ async function scrapeAllCategories() {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     
     // Tüm ürünler
-    const allProductsFile = path.join(process.cwd(), 'scraped-data', `fixed_products_${timestamp}.json`);
-    await fs.writeFile(allProductsFile, JSON.stringify(allProducts, null, 2));
+    const allProductsFile = _path.join(process.cwd(), 'scraped-_data', `fixed_products_${timestamp}.json`);
+    await _fs.writeFile(allProductsFile, JSON.stringify(allProducts, null, 2));
     
     // Kategori özeti
-    const summaryFile = path.join(process.cwd(), 'scraped-data', `fixed_summary_${timestamp}.json`);
-    await fs.writeFile(summaryFile, JSON.stringify(categoryResults, null, 2));
+    const summaryFile = _path.join(process.cwd(), 'scraped-_data', `fixed_summary_${timestamp}.json`);
+    await _fs.writeFile(summaryFile, JSON.stringify(categoryResults, null, 2));
     
-    console.log('\n📊 Scraping Özeti:');
-    console.log(`📦 Toplam ürün: ${allProducts.length}`);
-    console.log(`📂 Test edilen kategori: ${Object.keys(categoryResults).length}`);
-    console.log('\n📋 Kategori detayları:');
+    console.warn('\n📊 Scraping Özeti:');
+    console.warn(`📦 Toplam ürün: ${allProducts.length}`);
+    console.warn(`📂 Test edilen kategori: ${Object.keys(categoryResults).length}`);
+    console.warn('\n📋 Kategori detayları:');
     
     Object.entries(categoryResults).forEach(([name, info]) => {
-      console.log(`  ${name}: ${info.count} ürün (${info.url})`);
+      console.warn(`  ${name}: ${info._count} ürün (${info.url})`);
     });
     
-    console.log(`\n💾 Veriler kaydedildi:`);
-    console.log(`  - Tüm ürünler: ${allProductsFile}`);
-    console.log(`  - Kategori özeti: ${summaryFile}`);
+    console.warn(`\n💾 Veriler kaydedildi:`);
+    console.warn(`  - Tüm ürünler: ${allProductsFile}`);
+    console.warn(`  - Kategori özeti: ${summaryFile}`);
     
   } catch (error) {
     console.error('💥 Scraping hatası:', error.message);

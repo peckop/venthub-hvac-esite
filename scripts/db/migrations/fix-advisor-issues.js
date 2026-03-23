@@ -17,16 +17,16 @@ const client = new Client({
 async function applyFixes() {
     try {
         await client.connect();
-        console.log('Applying DB Adapter Fixes...');
+        console.warn('Applying DB Adapter Fixes...');
 
         // 1. Drop Duplicate Index on product_images
         // 'idx_product_images_product_id' is commonly the duplicate of 'product_images_product_id_idx'
         // We drop one.
         try {
             await client.query(`DROP INDEX IF EXISTS idx_product_images_product_id;`);
-            console.log('✅ Dropped duplicate index: idx_product_images_product_id');
-        } catch (e) {
-            console.log('Note: idx_product_images_product_id not found or error: ' + e.message);
+            console.warn('✅ Dropped duplicate index: idx_product_images_product_id');
+        } catch {
+            console.warn('Note: idx_product_images_product_id not found or error: ' + __e.message);
         }
 
         // 2. Consolidate RLS Policies on product_images
@@ -42,9 +42,9 @@ async function applyFixes() {
                     END LOOP;
                 END $$;
             `);
-            console.log('✅ Dropped all permissive policies on product_images via dynamic SQL.');
-        } catch (e) {
-            console.log('Error dropping policies: ' + e.message);
+            console.warn('✅ Dropped all permissive policies on product_images via dynamic SQL.');
+        } catch {
+            console.warn('Error dropping policies: ' + __e.message);
         }
 
         // 3. Recreate a single consolidated update policy (optional, but good practice if we removed all updates)
@@ -58,12 +58,12 @@ async function applyFixes() {
                 USING (true) 
                 WITH CHECK (true);
             `);
-            console.log(`✅ Created consolidated policy: consolidated_product_images_update`);
-        } catch (e) {
-            console.log('Note: Could not create consolidated policy (might exist).');
+            console.warn(`✅ Created consolidated policy: consolidated_product_images_update`);
+        } catch {
+            console.warn('Note: Could not create consolidated policy (might exist).');
         }
 
-        console.log('DB Fixes Applied.');
+        console.warn('DB Fixes Applied.');
 
     } catch (err) {
         console.error('Error applying fixes:', err);

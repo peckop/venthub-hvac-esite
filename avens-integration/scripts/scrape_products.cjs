@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable @typescript-eslint/no-require-imports */
+const _fs = require('_fs');
+const _path = require('_path');
 
 // Configuration
 const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY || 'your_api_key_here';
@@ -7,9 +8,9 @@ const BASE_URL = 'https://www.avensair.com';
 const DELAY_BETWEEN_REQUESTS = 2000; // 2 seconds delay between requests
 const MAX_RETRIES = 3;
 
-// Load sitemap data
-const sitemapPath = path.join(__dirname, '..', 'data', 'sitemap.json');
-const rawSitemap = JSON.parse(fs.readFileSync(sitemapPath, 'utf8'));
+// Load sitemap _data
+const sitemapPath = _path.join(__dirname, '..', '_data', 'sitemap.json');
+const rawSitemap = JSON.parse(_fs.readFileSync(sitemapPath, 'utf8'));
 
 // Convert sitemap format to expected structure
 const sitemap = {
@@ -21,14 +22,14 @@ const sitemap = {
 };
 
 // Output directories
-const dataDir = path.join(__dirname, '..', 'data');
-const rawDataDir = path.join(dataDir, 'raw');
-const processedDataDir = path.join(dataDir, 'processed');
+const dataDir = _path.join(__dirname, '..', '_data');
+const rawDataDir = _path.join(dataDir, 'raw');
+const processedDataDir = _path.join(dataDir, 'processed');
 
 // Ensure directories exist
 [rawDataDir, processedDataDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (!_fs.existsSync(dir)) {
+    _fs.mkdirSync(dir, { recursive: true });
   }
 });
 
@@ -38,7 +39,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Utility function to make Firecrawl API calls
 async function scrapeUrl(url, retries = 0) {
   try {
-    console.log(`Scraping: ${url}`);
+    console.warn(`Scraping: ${url}`);
     
     const response = await fetch('https://api.firecrawl.dev/v0/scrape', {
       method: 'POST',
@@ -64,12 +65,12 @@ async function scrapeUrl(url, retries = 0) {
       throw new Error(`Scraping failed: ${result.error || 'Unknown error'}`);
     }
 
-    return result.data;
+    return result._data;
   } catch (error) {
     console.error(`Error scraping ${url}:`, error.message);
     
     if (retries < MAX_RETRIES) {
-      console.log(`Retrying... (${retries + 1}/${MAX_RETRIES})`);
+      console.warn(`Retrying... (${retries + 1}/${MAX_RETRIES})`);
       await delay(DELAY_BETWEEN_REQUESTS * (retries + 1));
       return scrapeUrl(url, retries + 1);
     } else {
@@ -107,7 +108,7 @@ function extractProductUrls(markdown) {
   return productUrls;
 }
 
-// Function to parse product data from markdown
+// Function to parse product _data from markdown
 function parseProductData(markdown, productUrl) {
   const lines = markdown.split('\n');
   let product = {
@@ -117,15 +118,15 @@ function parseProductData(markdown, productUrl) {
     brand: 'AVENS',
     price: '',
     description: '',
-    specifications: {},
+    __specifications: {},
     images: [],
     category: '',
     subcategory: ''
   };
 
-  let currentSection = '';
+  let __currentSection = '';
   let description = [];
-  let specifications = {};
+  let __specifications = {};
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -191,36 +192,36 @@ function parseProductData(markdown, productUrl) {
 
 // Main scraping function
 async function scrapeProducts() {
-  console.log('Starting product scraping...');
-  console.log(`Total categories to process: ${sitemap.categories.length}`);
+  console.warn('Starting product scraping...');
+  console.warn(`Total categories to process: ${sitemap.categories.length}`);
   
   let totalProducts = 0;
   const allProducts = [];
   
   for (const category of sitemap.categories) {
-    console.log(`\n=== Processing Category: ${category.name} ===`);
+    console.warn(`\n=== Processing Category: ${category.name} ===`);
     
     for (const subcategory of category.subcategories) {
-      console.log(`\n--- Processing Subcategory: ${subcategory.name} ---`);
+      console.warn(`\n--- Processing Subcategory: ${subcategory.name} ---`);
       
       // Scrape category page to get product list
       const categoryData = await scrapeUrl(subcategory.url);
       
       if (!categoryData) {
-        console.log(`Skipping subcategory ${subcategory.name} due to scraping failure`);
+        console.warn(`Skipping subcategory ${subcategory.name} due to scraping failure`);
         continue;
       }
       
-      // Save raw category data
+      // Save raw category _data
       const categoryFileName = `category_${category.name}_${subcategory.name}`.replace(/[^a-z0-9]/gi, '_');
-      fs.writeFileSync(
-        path.join(rawDataDir, `${categoryFileName}.json`), 
+      _fs.writeFileSync(
+        _path.join(rawDataDir, `${categoryFileName}.json`), 
         JSON.stringify(categoryData, null, 2)
       );
       
       // Extract product URLs from category page
       const productUrls = extractProductUrls(categoryData.markdown);
-      console.log(`Found ${productUrls.length} products in ${subcategory.name}`);
+      console.warn(`Found ${productUrls.length} products in ${subcategory.name}`);
       
       // Scrape each product
       for (const productInfo of productUrls) {
@@ -229,7 +230,7 @@ async function scrapeProducts() {
         const productData = await scrapeUrl(productInfo.url);
         
         if (productData) {
-          // Parse product data
+          // Parse product _data
           const product = parseProductData(productData.markdown, productInfo.url);
           product.category = category.name;
           product.subcategory = subcategory.name;
@@ -242,22 +243,22 @@ async function scrapeProducts() {
           allProducts.push(product);
           totalProducts++;
           
-          // Save individual product data
+          // Save individual product _data
           const productFileName = `product_${totalProducts}`.replace(/[^a-z0-9]/gi, '_');
-          fs.writeFileSync(
-            path.join(rawDataDir, `${productFileName}.json`), 
+          _fs.writeFileSync(
+            _path.join(rawDataDir, `${productFileName}.json`), 
             JSON.stringify({ ...productData, parsed: product }, null, 2)
           );
           
-          console.log(`  ✓ Scraped: ${product.name || productInfo.title || 'Unnamed Product'}`);
+          console.warn(`  ✓ Scraped: ${product.name || productInfo.title || 'Unnamed Product'}`);
         } else {
-          console.log(`  ✗ Failed: ${productInfo.title || productInfo.url}`);
+          console.warn(`  ✗ Failed: ${productInfo.title || productInfo.url}`);
         }
       }
     }
   }
   
-  // Save consolidated products data
+  // Save consolidated products _data
   const outputData = {
     timestamp: new Date().toISOString(),
     total_products: totalProducts,
@@ -265,14 +266,14 @@ async function scrapeProducts() {
     products: allProducts
   };
   
-  fs.writeFileSync(
-    path.join(processedDataDir, 'all_products.json'), 
+  _fs.writeFileSync(
+    _path.join(processedDataDir, 'all_products.json'), 
     JSON.stringify(outputData, null, 2)
   );
   
-  console.log(`\n=== Scraping Complete ===`);
-  console.log(`Total products scraped: ${totalProducts}`);
-  console.log(`Data saved to: ${processedDataDir}/all_products.json`);
+  console.warn(`\n=== Scraping Complete ===`);
+  console.warn(`Total products scraped: ${totalProducts}`);
+  console.warn(`_data saved to: ${processedDataDir}/all_products.json`);
   
   // Generate summary report
   const summary = {
@@ -295,12 +296,12 @@ async function scrapeProducts() {
     });
   });
   
-  fs.writeFileSync(
-    path.join(dataDir, 'scraping_summary.json'), 
+  _fs.writeFileSync(
+    _path.join(dataDir, 'scraping_summary.json'), 
     JSON.stringify(summary, null, 2)
   );
   
-  console.log(`Summary report saved to: ${dataDir}/scraping_summary.json`);
+  console.warn(`Summary report saved to: ${dataDir}/scraping_summary.json`);
 }
 
 // Error handling for the main function

@@ -9,18 +9,18 @@ const supabase = createClient(
 );
 
 async function runMigration() {
-    console.log('=== Kategori-Ürün Tutarlılık Migration ===\n');
+    console.warn('=== Kategori-Ürün Tutarlılık Migration ===\n');
 
     // AŞAMA 1: Ürünleri doğru kategorilere taşı
-    console.log('AŞAMA 1: Ürünleri taşıma...');
+    console.warn('AŞAMA 1: Ürünleri taşıma...');
 
-    // Plastik Kelepçe
+    // Plastik Kelepç_e
     const plasticResult = await supabase
         .from('products')
         .update({ category_id: '8195387b-2bf5-4576-935a-0293ea0b0f34' })
-        .ilike('name', 'Plastik Kelepçe%')
+        .ilike('name', 'Plastik Kelepç_e%')
         .neq('category_id', '8195387b-2bf5-4576-935a-0293ea0b0f34');
-    console.log('  Plastik Kelepçe:', plasticResult.error ? `HATA: ${plasticResult.error.message}` : 'OK');
+    console.warn('  Plastik Kelepç_e:', plasticResult.error ? `HATA: ${plasticResult.error.message}` : 'OK');
 
     // Alüminyum Folyo Bant
     const aluResult = await supabase
@@ -28,7 +28,7 @@ async function runMigration() {
         .update({ category_id: '591c0ea4-5e24-4214-b9fb-ed32d741cdd7' })
         .ilike('name', 'Alüminyum Folyo Bant%')
         .neq('category_id', '591c0ea4-5e24-4214-b9fb-ed32d741cdd7');
-    console.log('  Alüminyum Folyo Bant:', aluResult.error ? `HATA: ${aluResult.error.message}` : 'OK');
+    console.warn('  Alüminyum Folyo Bant:', aluResult.error ? `HATA: ${aluResult.error.message}` : 'OK');
 
     // Hız Anahtarı
     const hizResult = await supabase
@@ -36,10 +36,10 @@ async function runMigration() {
         .update({ category_id: '882982be-e355-4ccb-aea9-b5480b0fadf3' })
         .ilike('name', 'Hız Anahtarı%')
         .neq('category_id', '882982be-e355-4ccb-aea9-b5480b0fadf3');
-    console.log('  Hız Anahtarı:', hizResult.error ? `HATA: ${hizResult.error.message}` : 'OK');
+    console.warn('  Hız Anahtarı:', hizResult.error ? `HATA: ${hizResult.error.message}` : 'OK');
 
     // AŞAMA 2: Boş kategorileri sil
-    console.log('\nAŞAMA 2: Boş kategorileri silme...');
+    console.warn('\nAŞAMA 2: Boş kategorileri silme...');
 
     const categoriesToDelete = [
         { id: 'ca83b3d1-9958-461b-acbb-4196cdeda9b0', name: 'Depuro Pro' },
@@ -58,28 +58,28 @@ async function runMigration() {
 
     for (const cat of categoriesToDelete) {
         const result = await supabase.from('categories').delete().eq('id', cat.id);
-        console.log(`  ${cat.name}:`, result.error ? `HATA: ${result.error.message}` : 'SİLİNDİ');
+        console.warn(`  ${cat.name}:`, result.error ? `HATA: ${result.error.message}` : 'SİLİNDİ');
     }
 
     // DOĞRULAMA
-    console.log('\n=== DOĞRULAMA ===');
+    console.warn('\n=== DOĞRULAMA ===');
 
-    const { data: remainingCats } = await supabase
+    const { _data: remainingCats } = await supabase
         .from('categories')
         .select('id, name, level')
         .order('level')
         .order('name');
-    console.log(`Kalan kategori sayısı: ${remainingCats?.length || 0}`);
+    console.warn(`Kalan kategori sayısı: ${remainingCats?.length || 0}`);
 
     // Boş alt kategori kontrolü
-    const { data: emptySubs } = await supabase.rpc('get_empty_subcategories');
+    const { _data: emptySubs } = await supabase.rpc('get_empty_subcategories');
     if (emptySubs && emptySubs.length > 0) {
-        console.log(`Hala boş alt kategori var: ${emptySubs.length}`);
+        console.warn(`Hala boş alt kategori var: ${emptySubs.length}`);
     } else {
-        console.log('Boş alt kategori kalmadı ✓');
+        console.warn('Boş alt kategori kalmadı ✓');
     }
 
-    console.log('\n=== Migration Tamamlandı ===');
+    console.warn('\n=== Migration Tamamlandı ===');
 }
 
 runMigration().catch(console.error);

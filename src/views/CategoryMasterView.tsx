@@ -10,6 +10,7 @@ import { buildCategoryBreadcrumb } from '../utils/breadcrumbUtils';
 import ProductsGrid from '../components/products/ProductsGrid';
 import CategorySidebar from '../components/category/CategoryFilters';
 import CategoryLanding from '../components/category/CategoryLanding';
+import { useRouter } from 'next/navigation';
 import { useI18n } from '../i18n/I18nProvider';
 // import { getCategoryDisplayName } from '../utils/categoryHelpers';
 import { mapDomainCategoryToDatabase, mapDomainProductToDatabase } from '../lib/type-converters';
@@ -28,6 +29,7 @@ interface CategoryMasterViewProps {
  */
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory }) => {
   const { t } = useI18n();
+  const router = useRouter();
   
   const {
     category,
@@ -64,7 +66,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
           <div className="max-w-md mx-auto bg-slate-50 rounded-[2rem] p-12 border border-slate-100">
             <h2 className="text-2xl font-black text-slate-900 mb-4">{t('category.notFound')}</h2>
             <p className="text-slate-500 mb-8 font-medium">Aradığınız kategori bulunamadı veya taşınmış olabilir.</p>
-            <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors">
+            <button onClick={() => router.push('/')} className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors">
               Ana Sayfaya Dön
             </button>
           </div>
@@ -97,8 +99,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
         >
           <CategoryLanding 
             category={mapDomainCategoryToDatabase(category)} 
-            products={products.map(p => mapDomainProductToDatabase(p))}
-            subCategories={subCategories.map(s => mapDomainCategoryToDatabase(s))}
+            products={(products || []).map(p => mapDomainProductToDatabase(p))}
+            subCategories={(subCategories || []).map(s => mapDomainCategoryToDatabase(s))}
             parentCategory={parentCategory ? mapDomainCategoryToDatabase(parentCategory) : null}
           />
         </motion.div>

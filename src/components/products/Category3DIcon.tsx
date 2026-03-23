@@ -1,337 +1,238 @@
-"use client"
+'use client';
 
 import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { Float, Box, Cylinder, Sphere, Torus, Html, useProgress } from '@react-three/drei'
 import * as THREE from 'three'
-import { FanRenderer } from './3d/FanRenderer'
-import { useFanMaterials } from './3d/materials/useFanMaterials'
-import { AxialFanModel } from './3d/types/AxialFanModel'
-import { getModelPlacement } from '../../utils/3dModelOffsets'
-import { SmartCenterScale } from './3d/SmartCenterScale'
+import { 
+    MousePointerClick, 
+    ChevronLeft, 
+    ChevronRight 
+} from 'lucide-react'
 
+// --- Types ---
+export interface IconMaterials {
+    primary: THREE.Material
+    secondary: THREE.Material
+    glass: THREE.Material
+    matteBlack: THREE.Material
+    galvanizedSteel: THREE.Material
+    copper: THREE.Material
+    glowingCyan: THREE.Material
+}
 
-const FlexDuctModel: React.FC = () => {
-    const meshRef = useRef<THREE.Mesh>(null)
-    const spiralRef = useRef<THREE.Group>(null)
-    const materials = useFanMaterials()
-    const createWaveCurve = (time: number) => {
-        const points: THREE.Vector3[] = []
-        const segments = 30
-        for (let i = 0; i <= segments; i++) {
-            const t = i / segments
-            const x = (t - 0.5) * 2.4
-            const wavePhase = t * Math.PI * 2 - time * 2
-            const waveAmplitude = Math.sin(t * Math.PI) * 0.3
-            const y = Math.sin(wavePhase) * waveAmplitude
-            points.push(new THREE.Vector3(x, y, 0))
-        }
-        return new THREE.CatmullRomCurve3(points)
-    }
-    useFrame((state) => {
-        if (!meshRef.current || !spiralRef.current) return
-        const time = state.clock.elapsedTime
-        
-        // Optimized: Instead of regenerating whole geometry, just do light breathing/pulse
-        const pulse = Math.sin(time * 2) * 0.05
-        meshRef.current.scale.set(1, 1 + pulse, 1 + pulse)
-        
-        // Shift spiral slightly to simulate airflow
-        spiralRef.current.position.x = Math.sin(time * 1.5) * 0.05
-    })
-    const initialCurve = createWaveCurve(0)
-    const spiralCount = 20
+// --- AIR CURTAIN MODEL (PREMIUM) ---
+const AirCurtainModel: React.FC<{ isHeated?: boolean; showMixed?: boolean }> = ({ isHeated, showMixed }) => {
     return (
         <group>
-            <mesh ref={meshRef} material={materials.brushedAluminum}>
-                <tubeGeometry args={[initialCurve, 64, 0.28, 24, false]} />
-            </mesh>
-            <group ref={spiralRef}>
-                {Array(spiralCount).fill(0).map((_, i) => (
-                    <mesh key={i} material={materials.industrialSteel}>
-                        <torusGeometry args={[0.29, 0.018, 8, 24]} />
-                    </mesh>
-                ))}
-            </group>
-        </group>
-    )
-}
-
-// Profesyonel modeller (AirCurtainModel, AirPurifierModel vb.) artık FanRenderer üzerinden çağrılıyor.
-// Bu dosyadaki geçici çizimler kademeli olarak temizleniyor.
-
-const DehumidifierIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    return (
-        <group>
-            <mesh material={materials.ral7035}>
-                <boxGeometry args={[0.9, 1.25, 0.5]} />
-            </mesh>
-            <group position={[0, 0.15, 0.26]}>
-                {Array(5).fill(0).map((_, i) => (
-                    <mesh key={i} position={[0, (i - 2) * 0.1, 0]} material={materials.industrialSteel}>
-                        <boxGeometry args={[0.75, 0.012, 0.012]} />
-                    </mesh>
-                ))}
-            </group>
-            {[-0.3, 0.3].map((x, i) => (
-                <mesh key={i} position={[x, -0.67, 0]} rotation={[0, 0, Math.PI / 2]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.045, 0.045, 0.035, 12]} />
-                </mesh>
-            ))}
-            <CondensationDrops />
-        </group>
-    )
-}
-
-const CondensationDrops: React.FC = () => {
-    const groupRef = useRef<THREE.Group>(null)
-    const drops = useMemo(() => Array(6).fill(0).map(() => ({
-        x: (Math.random() - 0.5) * 0.4,
-        y: 0.35,
-        speed: 0.5 + Math.random() * 0.5,
-        offset: Math.random() * Math.PI
-    })), [])
-
-    useFrame((_, delta) => {
-        if (!groupRef.current) return
-        groupRef.current.children.forEach((child, i) => {
-            const d = drops[i]
-            d.y -= delta * d.speed
-            if (d.y < -0.4) {
-                d.y = 0.35
-                d.x = (Math.random() - 0.5) * 0.4
-            }
-            child.position.set(d.x, d.y, 0.28)
-        })
-    })
-
-    return (
-        <group ref={groupRef}>
-            {drops.map((_, i) => (
-                <mesh key={i}>
-                    <sphereGeometry args={[0.02, 8, 8]} />
-                    <meshBasicMaterial color="#38bdf8" transparent opacity={0.8} />
-                </mesh>
-            ))}
-        </group>
-    )
-}
-
-const HRVIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    return (
-        <group>
-            <mesh material={materials.ral7035}>
-                <boxGeometry args={[1.2, 1.3, 0.65]} />
-            </mesh>
-            {[
-                [-0.35, 0.7, 0.12], [0.35, 0.7, 0.12],
-                [-0.35, 0.7, -0.12], [0.35, 0.7, -0.12]
-            ].map((pos, i) => (
-                <mesh key={i} position={pos as [number, number, number]} rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.09, 0.09, 0.18, 12]} />
-                </mesh>
-            ))}
-            <CrossFlowAnimation />
-        </group>
-    )
-}
-
-const CrossFlowAnimation: React.FC = () => {
-    const cleanRef = useRef<THREE.Group>(null)
-    const dirtyRef = useRef<THREE.Group>(null)
-
-    const timeRef = useRef(0)
-    useFrame((state, delta) => {
-        timeRef.current += delta
-        const t = timeRef.current
-        if (cleanRef.current) {
-            cleanRef.current.position.x = (t * 0.5) % 1.5 - 0.75
-        }
-        if (dirtyRef.current) {
-            dirtyRef.current.position.x = -((t * 0.5) % 1.5 - 0.75)
-        }
-    })
-
-    return (
-        <group position={[0, 0, 0.35]}>
-            <group ref={cleanRef}>
-                <mesh>
-                    <sphereGeometry args={[0.04, 8, 8]} />
-                    <meshBasicMaterial color="#3b82f6" />
-                </mesh>
-            </group>
-            <group ref={dirtyRef} position={[0, 0.3, 0]}>
-                <mesh>
-                    <sphereGeometry args={[0.04, 8, 8]} />
-                    <meshBasicMaterial color="#ef4444" />
-                </mesh>
-            </group>
-        </group>
-    )
-}
-
-const SpeedControlIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    return (
-        <group>
-            <mesh material={materials.brushedAluminum}>
-                <boxGeometry args={[0.7, 0.9, 0.3]} />
-            </mesh>
-            <mesh position={[0, 0, 0.151]} material={materials.industrialSteel}>
-                <boxGeometry args={[0.62, 0.82, 0.002]} />
-            </mesh>
-            <mesh position={[0, 0.15, 0.152]}>
-                <planeGeometry args={[0.58, 0.48]} />
-                <meshPhysicalMaterial color="#000000" roughness={0.05} metalness={0.9} clearcoat={1.0} clearcoatRoughness={0.0} emissive="#000000" />
-            </mesh>
-            <group position={[0, 0.15, 0.153]} scale={0.7}>
-                <group position={[0, 0.1, 0]}>
-                    <mesh position={[0, 0, 0]}>
-                        <planeGeometry args={[0.6, 0.04]} />
-                        <meshBasicMaterial color="#1e293b" />
-                    </mesh>
-                    <mesh position={[-0.075, 0, 0.001]}>
-                        <planeGeometry args={[0.45, 0.04]} />
-                        <meshBasicMaterial color="#22c55e" toneMapped={false} />
-                    </mesh>
+            <Box args={[3, 0.8, 0.8]} castShadow>
+                <meshStandardMaterial color="#cbd5e1" metalness={0.8} roughness={0.2} />
+            </Box>
+            <Box args={[2.8, 0.1, 0.6]} position={[0, -0.36, 0.1]}>
+                <meshStandardMaterial color="#1e293b" />
+            </Box>
+            {isHeated && (
+                <group position={[0, 0, 0.45]}>
+                    <Cylinder args={[0.02, 0.02, 2.6, 8]} rotation={[0, 0, Math.PI / 2]}>
+                        <meshStandardMaterial color="#f87171" emissive="#ef4444" emissiveIntensity={2} />
+                    </Cylinder>
                 </group>
-                <mesh position={[0, -0.15, 0]}>
-                    <circleGeometry args={[0.03, 16]} />
-                    <meshBasicMaterial color="#3b82f6" toneMapped={false} />
-                </mesh>
-            </group>
-            <group position={[0, -0.25, 0.155]}>
-                <mesh rotation={[Math.PI / 2, 0, 0]} material={materials.matteBlack}>
-                    <cylinderGeometry args={[0.07, 0.07, 0.03, 32]} />
-                </mesh>
-                <mesh position={[0, 0, 0.016]} rotation={[Math.PI / 2, 0, 0]} material={materials.galvanizedSteel}>
-                    <boxGeometry args={[0.015, 0.08, 0.02]} />
-                </mesh>
-            </group>
-        </group>
-    )
-}
-
-const AccessoryIcon: React.FC = () => {
-    const materials = useFanMaterials()
-    const bladeRef = useRef<THREE.Group>(null)
-    const timeRef = useRef(0)
-    useFrame((state, delta) => {
-        if (bladeRef.current) {
-            timeRef.current += delta
-            const angle = Math.sin(timeRef.current * 0.5) * 0.4
-            bladeRef.current.children.forEach(child => {
-                child.rotation.x = angle
-            })
-        }
-    })
-    return (
-        <group scale={[0.65, 0.65, 0.65]}>
-            <group position={[-0.4, 0, -0.2]}>
-                <mesh material={materials.galvanizedSteel}><boxGeometry args={[0.8, 0.8, 0.3]} /></mesh>
-                <group ref={bladeRef} position={[0, 0, 0.18]}>
-                    {[0.2, 0, -0.2].map((y, i) => (
-                        <mesh key={i} position={[0, y, 0]} material={materials.brushedAluminum}><boxGeometry args={[0.7, 0.18, 0.02]} /></mesh>
-                    ))}
+            )}
+            {showMixed && (
+                <group position={[0, -1, 0]}>
+                    <Cylinder args={[1.4, 1.4, 0.1, 32]} rotation={[Math.PI / 2, 0, 0]} >
+                        <meshStandardMaterial color="#38bdf8" transparent opacity={0.1} />
+                    </Cylinder>
                 </group>
-                <mesh position={[0.45, 0, 0]} material={materials.safetyOrange}><boxGeometry args={[0.15, 0.25, 0.15]} /></mesh>
-            </group>
-            <group position={[0.5, 0, -0.1]} rotation={[0, 0, Math.PI / 2]}>
-                <mesh position={[0, 0.25, 0]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.3, 0.3, 0.05, 32]} /></mesh>
-                <mesh position={[0, -0.25, 0]} material={materials.galvanizedSteel}><cylinderGeometry args={[0.3, 0.3, 0.05, 32]} /></mesh>
-                <mesh material={materials.matteBlack}><cylinderGeometry args={[0.28, 0.28, 0.45, 32]} /></mesh>
-            </group>
+            )}
         </group>
     )
 }
 
-// NOT: Tüm offsetler artık merkezi src/utils/3dModelOffsets.ts içinden yönetiliyor.
-// Hava perdeleri, aksesuarlar vb. için yerel liste kaldırıldı.
+const FanIcon: React.FC<{ _materials: IconMaterials }> = () => (
+    <group>
+        <Cylinder args={[1, 1, 0.4, 32]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <meshStandardMaterial color="#94a3b8" metalness={0.8} roughness={0.2} />
+        </Cylinder>
+        <Box args={[0.1, 1.8, 0.05]} rotation={[0, 0, Math.PI / 4]}>
+            <meshStandardMaterial color="#1e40af" />
+        </Box>
+        <Box args={[0.1, 1.8, 0.05]} rotation={[0, 0, -Math.PI / 4]}>
+            <meshStandardMaterial color="#1e40af" />
+        </Box>
+    </group>
+)
+
+const DepuroIcon: React.FC<{ _materials: IconMaterials }> = () => (
+    <group>
+        <Box args={[1.2, 2, 1.2]} castShadow>
+            <meshStandardMaterial color="#f8fafc" metalness={0.1} roughness={0.8} />
+        </Box>
+        <Box args={[1, 0.8, 0.1]} position={[0, 0.4, 0.56]}>
+            <meshStandardMaterial color="#0ea5e9" emissive="#38bdf8" emissiveIntensity={0.5} />
+        </Box>
+    </group>
+)
+
+const DehumidifierIcon: React.FC<{ _materials: IconMaterials }> = () => (
+    <group>
+        <Box args={[1.5, 1.8, 1]} castShadow>
+            <meshStandardMaterial color="#e2e8f0" />
+        </Box>
+        <Torus args={[0.3, 0.05, 16, 32]} rotation={[Math.PI / 2, 0, 0]} position={[0, 0.4, 0.51]}>
+            <meshStandardMaterial color="#3b82f6" />
+        </Torus>
+    </group>
+)
+
+const HRVIcon: React.FC<{ _materials: IconMaterials }> = () => (
+    <group>
+        <Box args={[2, 0.8, 2]} castShadow>
+            <meshStandardMaterial color="#cbd5e1" metalness={0.5} roughness={0.5} />
+        </Box>
+        <Cylinder args={[0.3, 0.3, 0.4, 16]} position={[-0.8, 0, 1.1]} rotation={[Math.PI / 2, 0, 0]}>
+            <meshStandardMaterial color="#475569" />
+        </Cylinder>
+        <Cylinder args={[0.3, 0.3, 0.4, 16]} position={[0.8, 0, 1.1]} rotation={[Math.PI / 2, 0, 0]}>
+            <meshStandardMaterial color="#475569" />
+        </Cylinder>
+    </group>
+)
+
+const SpeedControlIcon: React.FC<{ _materials: IconMaterials }> = () => (
+    <group>
+        <Box args={[1.2, 1.2, 0.4]} castShadow>
+            <meshStandardMaterial color="#f1f5f9" />
+        </Box>
+        <Cylinder args={[0.3, 0.3, 0.2, 32]} position={[0, 0, 0.25]} rotation={[Math.PI / 2, 0, 0]}>
+            <meshStandardMaterial color="#1e40af" />
+        </Cylinder>
+        <Sphere args={[0.05, 16, 16]} position={[0.4, 0.4, 0.21]}>
+            <meshStandardMaterial color="#22c55e" emissive="#22c55e" />
+        </Sphere>
+    </group>
+)
+
+const GenericIcon: React.FC = () => (
+    <Box args={[1, 1, 1]} castShadow>
+        <meshStandardMaterial color="#94a3b8" metalness={0.5} roughness={0.5} />
+    </Box>
+)
+
 interface Category3DIconProps {
     categorySlug: string
-    scale?: number
-    offsetContext?: 'grounded' | 'centered' | 'orbital'
-    modelType?: string // [NEW] Kesin model eşleşmesi için
+    materials?: IconMaterials
+    hovered?: boolean
+    isFrontCard?: boolean
+    shouldShowTapHint?: boolean
+    shouldShowDragHint?: boolean
+    hintStage?: 'idle' | 'tap' | 'drag' | 'scroll' | 'down' | 'finished'
+    onStageChange?: (stage: 'idle' | 'tap' | 'drag' | 'scroll' | 'down' | 'finished') => void
+    DetailedModel?: React.ComponentType | null
+    scale?: number; offsetContext?: string; modelType?: string
 }
 
-const Category3DIcon: React.FC<Category3DIconProps> = ({ categorySlug, scale = 1, offsetContext = 'centered', modelType }) => {
-    const safeSlug = (categorySlug || '').toLowerCase()
-    // SmartCenterScale: Sadece 'centered' (Kategori Grid, Mega Menu) için aktif.
-    // 'orbital' (Ana Sayfa) ve 'grounded' (Ürün Detay) için manuel offsetler kullanılır.
-    // SmartCenterScale: Sadece 'centered' (Kategori Grid, Mega Menu) için aktif.
-    // 'orbital' (Ana Sayfa) ve 'grounded' (Ürün Detay) için manuel offsetler kullanılır.
-    const useSmartCenter = offsetContext === 'centered'
+function Loader() {
+    const { progress } = useProgress()
+    return <Html center><div className="text-white text-[10px] font-bold">{progress.toFixed(0)}%</div></Html>
+}
 
-    const content = useMemo(() => {
-        if (safeSlug === 'fanlar') return <AxialFanModel />
-        if (safeSlug.includes('hiz') || safeSlug.includes('kontrol')) return <SpeedControlIcon />
+const Category3DIcon: React.FC<Category3DIconProps> = ({
+    categorySlug,
+    materials,
+    hovered,
+    isFrontCard,
+    shouldShowTapHint,
+    shouldShowDragHint,
+    hintStage,
+    DetailedModel,
+    scale = 1
+}) => {
+    const meshRef = useRef<THREE.Group>(null)
 
-        switch (safeSlug) {
-            case 'flexible-hava-kanallari':
-            case 'flexible':
-                return <FlexDuctModel />
-            case 'hava-perdeleri':
-                return <FanRenderer slug={safeSlug} />
-            case 'hava-temizleyiciler-anti-viral-urunler':
-            case 'hava-temizleyiciler':
-                return <FanRenderer slug={safeSlug} />
-            case 'nem-alma-cihazlari':
-            case 'nem-alma':
-                return <DehumidifierIcon />
-            case 'isi-geri-kazanim-cihazlari':
-            case 'isi-geri-kazanim':
-                return <HRVIcon />
-            case 'aksesuarlar':
-            case 'yedek-parca':
-                return <AccessoryIcon />
-            default:
-                return <FanRenderer slug={safeSlug} modelType={modelType} /> // [FIX] modelType geçirildi
+    useFrame((state) => {
+        if (meshRef.current) {
+            meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1
+            if (hovered) {
+                meshRef.current.rotation.y += Math.sin(state.clock.elapsedTime * 2) * 0.2
+            }
         }
-    }, [safeSlug, modelType])
+    })
 
-    // Placement logic
-    const placement = useMemo(() => {
-        // modelPosition prop is deprecated but kept for compatibility if passed explicitly
-        // (Though it is not part of the interface anymore, we handle it if it exists in props via ...rest or if re-added)
-
-        // DEBUG: Exproof veya diğer modellerin neden pozisyon almadığını görmek için
-        // console.log(`[Category3DIcon] Slug: ${safeSlug}, ModelType: ${modelType}, Context: ${offsetContext}`);
-
-        if (useSmartCenter) {
-            // Centered context doesn't use modelType strict layout usually, but we pass it anyway
-            const p = getModelPlacement(modelType, safeSlug, 'centered')
-            return p
+    const IconComponent = useMemo(() => {
+        const slug = categorySlug.toLowerCase()
+        if (slug.includes('fan')) return FanIcon
+        if (slug.includes('depuro')) return DepuroIcon
+        if (slug.includes('nem-alma')) return DehumidifierIcon
+        if (slug.includes('isi-geri-kazanim')) return HRVIcon
+        if (slug.includes('hiz-kontrol')) return SpeedControlIcon
+        if (slug.includes('hava-perdesi')) {
+            const isHeated = slug.includes('isitici')
+            const showMixed = slug === 'hava-perdeleri'
+            const WrappedAirCurtain: React.FC<{ _materials: IconMaterials }> = () => (
+                <AirCurtainModel isHeated={isHeated} showMixed={showMixed} />
+            )
+            return WrappedAirCurtain
         }
-        // Orbital & Grounded (Detailed View)
-        const p = getModelPlacement(modelType, safeSlug, offsetContext)
+        return GenericIcon
+    }, [categorySlug])
 
-        return p
-    }, [safeSlug, offsetContext, useSmartCenter, modelType])
+    const iconElement = useMemo(() => {
+        const fallbackMaterial = new THREE.MeshStandardMaterial({ color: "#94a3b8" });
+        const defaultMats: IconMaterials = {
+            primary: fallbackMaterial,
+            secondary: fallbackMaterial,
+            glass: fallbackMaterial,
+            matteBlack: fallbackMaterial,
+            galvanizedSteel: fallbackMaterial,
+            copper: fallbackMaterial,
+            glowingCyan: fallbackMaterial
+        };
+        const Comp = IconComponent as React.ComponentType<{ _materials: IconMaterials }>
+        return <Comp _materials={materials || defaultMats} />
+    }, [IconComponent, materials])
 
-    // Apply manual scale from config
-    const finalScale = scale * (placement.scale || 1)
-
-    if (useSmartCenter) {
-        return (
-            <group scale={finalScale}>
-                <SmartCenterScale targetSize={1.4} enabled={true} shift={placement.position}>
-                    <group rotation={placement.rotation}>
-                        {content}
-                    </group>
-                </SmartCenterScale>
-            </group>
-        )
-    }
+    const showTapHint = shouldShowTapHint && hintStage === 'tap'
+    const showLabel = !isFrontCard || hintStage === 'finished'
 
     return (
-        <group scale={finalScale} position={placement.position} rotation={placement.rotation}>
-            {content}
+        <group ref={meshRef}>
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} scale={[scale, scale, scale]}>
+                <React.Suspense fallback={<Loader />}>
+                    {DetailedModel ? <DetailedModel /> : iconElement}
+                </React.Suspense>
+            </Float>
+
+            {/* Tap Hint */}
+            {isFrontCard && showTapHint && (
+                <Html position={[0, 0, 1]} center>
+                    <div className="animate-bounce bg-white/90 p-2 rounded-full shadow-lg border border-primary-navy/20">
+                        <MousePointerClick className="text-primary-navy" size={24} />
+                    </div>
+                </Html>
+            )}
+
+            {/* Drag Hint */}
+            {isFrontCard && shouldShowDragHint && hintStage === 'drag' && (
+                <Html position={[0, 1.5, 0]} center>
+                    <div className="flex items-center gap-4 bg-slate-900/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/10">
+                        <ChevronLeft className="text-cyan-400 animate-pulse" />
+                        <span className="text-white text-xs font-bold uppercase tracking-widest">Tut Çevir</span>
+                        <ChevronRight className="text-cyan-400 animate-pulse" />
+                    </div>
+                </Html>
+            )}
+
+            {/* Label */}
+            {showLabel && (
+                <Html position={[0, -1.2, 0]} center>
+                    <div className="bg-white/80 backdrop-blur-sm px-3 py-1 rounded-lg border border-slate-200 shadow-sm whitespace-nowrap">
+                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-tighter">{categorySlug}</span>
+                    </div>
+                </Html>
+            )}
         </group>
     )
 }
 
 export default Category3DIcon
-
-
-

@@ -20,7 +20,7 @@ try {
             }
         }
     })
-} catch (e) {
+} catch {
     // .env might not exist or we are in prod
 }
 
@@ -35,35 +35,35 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function inspect() {
-    console.log('--- Inspecting Categories ---')
+    console.warn('--- Inspecting Categories ---')
     const { data: cats, error: catError } = await supabase
         .from('categories')
         .select('*')
         .limit(3)
 
-    if (catError) console.error(catError)
-    else {
+    if (catError) {
+        console.error(catError)
+    } else if (cats) {
         cats.forEach(c => {
-            console.log(`Category: ${c.name} (${c.slug})`)
-            console.log('Keys:', Object.keys(c))
-            console.log('Metadata:', JSON.stringify(c.metadata, null, 2))
-            console.log('---')
+            console.warn(`Category: ${c.name} (${c.slug})`)
+            console.warn('Keys:', Object.keys(c))
+            console.warn('---')
         })
     }
 
-    console.log('\n--- Inspecting Products ---')
+    console.warn('\n--- Inspecting Products ---')
     const { data: prods, error: prodError } = await supabase
         .from('products')
         .select('*')
         .limit(3)
 
-    if (prodError) console.error(prodError)
-    else {
+    if (prodError) {
+        console.error(prodError)
+    } else if (prods) {
         prods.forEach(p => {
-            console.log(`Product: ${p.name}`)
-            console.log('Keys:', Object.keys(p))
-            console.log('Technical Specs:', JSON.stringify(p.technical_specs, null, 2))
-            console.log('---')
+            console.warn(`Product: ${p.name}`)
+            console.warn('Keys:', Object.keys(p))
+            console.warn('---')
         })
     }
 }

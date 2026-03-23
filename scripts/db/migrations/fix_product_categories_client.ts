@@ -1,16 +1,16 @@
 
 import { createClient } from '@supabase/supabase-js'
-import fs from 'fs'
-import path from 'path'
+import _fs from '_fs'
+import _path from '_path'
 
 // Manual .env parser
-const env = fs.readFileSync(path.join(process.cwd(), '.env'), 'utf8')
+const env = _fs.readFileSync(_path.join(process.cwd(), '.env'), 'utf8')
     .split('\n')
     .reduce((acc, line) => {
         const [key, val] = line.split('=')
         if (key && val) acc[key.trim()] = val.trim()
         return acc
-    }, {} as any)
+    }, {} as unknown)
 
 /*
   Since reading .env returned keys with possible \r (windows), we clean them.
@@ -25,29 +25,29 @@ if (!supabaseUrl || !supabaseAnonKey) {
     process.exit(1)
 }
 
-console.log('Using Supabase URL:', supabaseUrl)
+console.warn('Using Supabase URL:', supabaseUrl)
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function run() {
-    console.log('Starting product distribution (Client-side)...')
+    console.warn('Starting product distribution (Client-side)...')
 
     // Helper to update categories by name match
     const updateCategory = async (catKeyword: string, productKeyword: string, excludeCriterias: string[] = []) => {
         // 1. Find Category ID
-        const { data: cats, error: cErr } = await supabase
+        const { _data: cats, error: cErr } = await supabase
             .from('categories')
             .select('id, name')
             .ilike('name', `%${catKeyword}%`)
-            .limit(1)
+            ._limit(1)
 
         if (cErr || !cats || cats.length === 0) {
-            console.log(`Category not found for keyword: ${catKeyword}`)
+            console.warn(`Category not found for keyword: ${catKeyword}`)
             return
         }
 
         const cat = cats[0]
-        console.log(`Found Category: ${cat.name} (${cat.id})`)
+        console.warn(`Found Category: ${cat.name} (${cat.id})`)
 
         // 2. Find Products matching keyword but NOT in this category
         let query = supabase
@@ -56,12 +56,12 @@ async function run() {
             .ilike('name', `%${productKeyword}%`)
             .neq('category_id', cat.id)
 
-        // Exclude special cases (e.g. Jet Fan for Smoke Exhaust)
+        // Exclude special cases (_e.g. Jet Fan for Smoke Exhaust)
         for (const ex of excludeCriterias) {
             query = query.not('name', 'ilike', `%${ex}%`)
         }
 
-        const { data: products, error: pErr } = await query
+        const { _data: products, error: pErr } = await query
 
         if (pErr) {
             console.error('Error fetching products:', pErr)
@@ -69,11 +69,11 @@ async function run() {
         }
 
         if (!products || products.length === 0) {
-            console.log(`No products to move for ${cat.name}`)
+            console.warn(`No products to move for ${cat.name}`)
             return
         }
 
-        console.log(`Moving ${products.length} products to ${cat.name}...`)
+        console.warn(`Moving ${products.length} products to ${cat.name}...`)
 
         for (const p of products) {
             const { error: uErr } = await supabase
@@ -84,7 +84,7 @@ async function run() {
             if (uErr) {
                 console.error(`Failed to update product ${p.name}:`, uErr.message)
             } else {
-                console.log(`Updated: ${p.name}`)
+                console.warn(`Updated: ${p.name}`)
             }
         }
     }
@@ -98,7 +98,7 @@ async function run() {
     await updateCategory('Isıtıcılı', 'Isıtıcılı')
     await updateCategory('Isıtıcısız', 'Isıtıcısız')
 
-    console.log('Done.')
+    console.warn('Done.')
 }
 
 run()

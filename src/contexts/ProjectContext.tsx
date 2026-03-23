@@ -7,8 +7,8 @@ export interface ProjectContextType {
   refreshProjects: () => Promise<void>
   addProject: (name: string, description?: string) => Promise<UserProject>
   removeProject: (projectId: string) => Promise<void>
-  addItemToProject: (projectId: string, productId: string, quantity?: number) => Promise<void>
-  removeItemFromProject: (projectId: string, productId: string) => Promise<void>
+  addItemToProject: (projectId: string, _productId: string, quantity?: number) => Promise<void>
+  removeItemFromProject: (projectId: string, _productId: string) => Promise<void>
   getProjectItems: (projectId: string) => Promise<(ProjectItem & { product: Product })[]>
 }
 

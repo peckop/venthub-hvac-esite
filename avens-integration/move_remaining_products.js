@@ -42,7 +42,7 @@ const PRODUCT_MAPPINGS = [
 ];
 
 async function moveProducts() {
-  console.log('📦 Ürünler doğru kategorilere taşınıyor...');
+  console.warn('📦 Ürünler doğru kategorilere taşınıyor...');
   
   let moved = 0;
   let failed = 0;
@@ -58,7 +58,7 @@ async function moveProducts() {
         console.error(`❌ ${product.name} taşıma hatası:`, error.message);
         failed++;
       } else {
-        console.log(`✅ Taşındı: ${product.name}`);
+        console.warn(`✅ Taşındı: ${product.name}`);
         moved++;
       }
     } catch (error) {
@@ -71,7 +71,7 @@ async function moveProducts() {
 }
 
 async function deleteEmptyCategories() {
-  console.log('\n🗑️ Boş kategoriler siliniyor...');
+  console.warn('\n🗑️ Boş kategoriler siliniyor...');
   
   const CATEGORIES_TO_DELETE = [
     '722a7194-51fb-48e1-87e1-821ae765bcab', // Havalandırma Fanları
@@ -92,7 +92,7 @@ async function deleteEmptyCategories() {
       if (error) {
         console.error(`❌ Kategori silme hatası:`, error.message);
       } else {
-        console.log(`✅ Kategori silindi`);
+        console.warn(`✅ Kategori silindi`);
         deleted++;
       }
     } catch (error) {
@@ -104,9 +104,9 @@ async function deleteEmptyCategories() {
 }
 
 async function showFinalState() {
-  console.log('\n🔍 Final kategori yapısı...');
+  console.warn('\n🔍 Final kategori yapısı...');
   
-  const { data: categories, error } = await supabase
+  const { _data: categories, error } = await supabase
     .from('categories')
     .select('id, name, parent_id, level')
     .ilike('name', '%fan%')
@@ -117,42 +117,42 @@ async function showFinalState() {
     return;
   }
 
-  console.log('\n📂 Final kategori yapısı:');
+  console.warn('\n📂 Final kategori yapısı:');
   
   const mainCategories = categories.filter(c => c.parent_id === null);
   const subCategories = categories.filter(c => c.parent_id !== null);
 
   mainCategories.forEach(mainCat => {
-    console.log(`📁 ${mainCat.name}`);
+    console.warn(`📁 ${mainCat.name}`);
     
     const directSubs = subCategories.filter(sub => sub.parent_id === mainCat.id);
     directSubs.forEach(sub => {
-      console.log(`  └── ${sub.name}`);
+      console.warn(`  └── ${sub.name}`);
       
       const subSubs = subCategories.filter(subsub => subsub.parent_id === sub.id);
       subSubs.forEach(subsub => {
-        console.log(`      └── ${subsub.name}`);
+        console.warn(`      └── ${subsub.name}`);
       });
     });
   });
 
   // Ürün sayılarını da göster
-  console.log('\n📊 Kategori başına ürün sayıları:');
+  console.warn('\n📊 Kategori başına ürün sayıları:');
   for (const category of categories) {
-    const { data: productCount } = await supabase
+    const { _data: productCount } = await supabase
       .from('products')
-      .select('id', { count: 'exact' })
+      .select('id', { _count: 'exact' })
       .eq('category_id', category.id);
     
     if (productCount && productCount.length > 0) {
       const indentation = category.parent_id ? '  ' : '';
-      console.log(`${indentation}${category.name}: ${productCount.length} ürün`);
+      console.warn(`${indentation}${category.name}: ${productCount.length} ürün`);
     }
   }
 }
 
 async function main() {
-  console.log('🚀 Kalan ürünleri taşıma işlemi başlıyor...');
+  console.warn('🚀 Kalan ürünleri taşıma işlemi başlıyor...');
 
   try {
     // 1. Ürünleri doğru kategorilere taşı
@@ -164,13 +164,13 @@ async function main() {
     // 3. Final durumu göster
     await showFinalState();
 
-    console.log(`\n📊 İşlem Özeti:`);
-    console.log(`✅ Taşınan ürün: ${moveResult.moved}`);
-    console.log(`❌ Hatalı ürün taşıma: ${moveResult.failed}`);
-    console.log(`🗑️ Silinen kategori: ${deleteResult}`);
+    console.warn(`\n📊 İşlem Özeti:`);
+    console.warn(`✅ Taşınan ürün: ${moveResult.moved}`);
+    console.warn(`❌ Hatalı ürün taşıma: ${moveResult.failed}`);
+    console.warn(`🗑️ Silinen kategori: ${deleteResult}`);
     
-    console.log(`\n🎉 Kategori düzenleme tamamen tamamlandı!`);
-    console.log(`💡 Şimdi tüm fan ürünleri "Fanlar" ana kategorisinin altındaki doğru alt kategorilerde.`);
+    console.warn(`\n🎉 Kategori düzenleme tamamen tamamlandı!`);
+    console.warn(`💡 Şimdi tüm fan ürünleri "Fanlar" ana kategorisinin altındaki doğru alt kategorilerde.`);
 
   } catch (error) {
     console.error('💥 İşlem hatası:', error.message);

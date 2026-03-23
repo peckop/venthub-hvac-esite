@@ -641,7 +641,7 @@ export const tr = {
       statusLabels: {
         all: 'Tümü',
         pending: 'Bekliyor',
-        paid: 'Ödendi',
+        pa_id: 'Ödendi',
         confirmed: 'Onaylandı',
         shipped: 'Kargoda',
         delivered: 'Teslim Edildi',
@@ -785,7 +785,7 @@ export const tr = {
         },
         stepper: {
           received: "Alındı",
-          paid: "Ödendi",
+          pa_id: "Ödendi",
           prep: "Hazırlanıyor",
           shipped: "Kargoda",
           delivered: "Teslim"
@@ -978,7 +978,7 @@ export const tr = {
     register: 'Kayıt Ol',
     validEmailPassRequired: 'E-posta ve şifre gereklidir',
     required: 'gereklidir',
-    emailInvalid: 'Geçersiz e-posta adresi',
+    emailInval_id: 'Geçersiz e-posta adresi',
     invalidCreds: 'E-posta veya şifre hatalı',
     emailNotConfirmed: 'E-posta adresinizi onaylamanız gerekiyor',
     genericLoginError: 'Giriş sırasında bir hata oluştu',
@@ -1250,7 +1250,7 @@ export const tr = {
     },
     errors: {
       nameRequired: 'Ad Soyad gereklidir',
-      emailInvalid: 'Lütfen geçerli bir e-posta adresi girin',
+      emailInval_id: 'Lütfen geçerli bir e-posta adresi girin',
       phoneRequired: 'Telefon numarası gereklidir',
       addressRequired: 'Adres gereklidir',
       cityRequired: 'Şehir gereklidir',

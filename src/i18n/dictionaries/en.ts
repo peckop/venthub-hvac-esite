@@ -961,7 +961,7 @@ export const en = {
       statusLabels: {
         all: 'All',
         pending: 'Pending',
-        paid: 'Paid',
+        pa_id: 'Paid',
         confirmed: 'Confirmed',
         shipped: 'Shipped',
         delivered: 'Delivered',
@@ -1112,7 +1112,7 @@ export const en = {
         },
         stepper: {
           received: "Received",
-          paid: "Paid",
+          pa_id: "Paid",
           prep: "Preparing",
           shipped: "Shipped",
           delivered: "Delivered"
@@ -1127,7 +1127,7 @@ export const en = {
     webhooks: {
       title: 'Webhook Events',
       tabs: { returns: 'Returns', shipping: 'Shipping Emails' },
-      search: { returns: 'event_id, order_id, return_id, carrier, status_mapped', shipping: 'order_id, email, subject, provider' },
+      search: { returns: 'event_id, order_id, _return_id, carrier, status_mapped', shipping: 'order_id, email, subject, provider' },
       tip: { rowAction: 'Click a row to open details and reprocess menu.' },
       returnsTable: { eventId: 'Event ID', order: 'Order', carrier: 'Carrier', statusMapped: 'Status (mapped)', received: 'Received' },
       emailsTable: { order: 'Order', to: 'To', subject: 'Subject', provider: 'Provider', date: 'Date' }
@@ -1371,7 +1371,7 @@ export const en = {
     labels: {
       productFeatures: 'Product Features',
       productDescription: 'Product Description',
-      technicalSpecs: 'Technical Specifications',
+      technicalSpecs: 'Technical _specifications',
       category: 'Category',
       price: 'Price',
       physicalDimensions: 'Physical Dimensions',
@@ -1384,7 +1384,7 @@ export const en = {
       pressure: 'Pressure',
       power: 'Power',
       noise: 'Noise Level',
-      noSpecsAvailable: 'No technical specifications available for this product.',
+      noSpecsAvailable: 'No technical _specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET'
     },
     features: {
@@ -1410,7 +1410,7 @@ export const en = {
       maintenanceManual: 'Maintenance Manual',
       safetyInfo: 'Safety Information',
       warrantyTerms: 'Warranty Terms',
-      technicalSpecsDoc: 'Technical Specifications',
+      technicalSpecsDoc: 'Technical _specifications',
       productCatalog: 'Product Catalog',
       technicalBrochure: 'Technical Brochure',
       productReleaseNotes: 'Product Release Notes',
@@ -1451,7 +1451,7 @@ export const en = {
       documents: 'Documents',
       brochure: 'Brochure/Catalog',
       certificates: 'Certificates',
-      specs: 'Technical Specifications'
+      specs: 'Technical _specifications'
     }
   },
   cart: {
@@ -1487,7 +1487,7 @@ export const en = {
     status: 'Status',
     all: 'All',
     pending: 'Pending',
-    paid: 'Paid',
+    pa_id: 'Paid',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -1560,7 +1560,7 @@ export const en = {
     register: 'Sign Up',
     validEmailPassRequired: 'Email and password are required',
     required: 'is required',
-    emailInvalid: 'Invalid email address',
+    emailInval_id: 'Invalid email address',
     invalidCreds: 'Email or password is incorrect',
     emailNotConfirmed: 'You need to confirm your email address',
     genericLoginError: 'An error occurred during sign in',
@@ -1735,7 +1735,7 @@ export const en = {
     },
     errors: {
       nameRequired: 'Full name is required',
-      emailInvalid: 'Please enter a valid email address',
+      emailInval_id: 'Please enter a valid email address',
       phoneRequired: 'Phone number is required',
       addressRequired: 'Address is required',
       cityRequired: 'City is required',
@@ -2093,7 +2093,7 @@ export const en = {
         },
         results: {
           title: 'Calculation Results',
-          subtitle: 'Recommended air curtain specifications',
+          subtitle: 'Recommended air curtain _specifications',
           gridTitle: 'Calculated Values',
           airflow: 'Required Airflow',
           airflowDesc: 'Total flow required for an effective air barrier',

@@ -27,7 +27,7 @@ const CATEGORY_MAPPING = {
 };
 
 async function moveProductsToCorrectCategories() {
-  console.log('🔧 Kategori düzeltme işlemi başlıyor...');
+  console.warn('🔧 Kategori düzeltme işlemi başlıyor...');
   
   const results = {
     moved: 0,
@@ -38,9 +38,9 @@ async function moveProductsToCorrectCategories() {
   for (const [wrongCategoryId, correctCategoryId] of Object.entries(CATEGORY_MAPPING)) {
     try {
       // İlk olarak yanlış kategorideki ürünleri doğru kategoriye taşı
-      console.log(`\n📦 Kategoriler arası ürün taşıma işlemi...`);
+      console.warn(`\n📦 Kategoriler arası ürün taşıma işlemi...`);
       
-      const { data: products, error: fetchError } = await supabase
+      const { _data: products, error: fetchError } = await supabase
         .from('products')
         .select('id, name')
         .eq('category_id', wrongCategoryId);
@@ -49,7 +49,7 @@ async function moveProductsToCorrectCategories() {
         throw fetchError;
       }
 
-      console.log(`📊 ${products.length} ürün taşınacak`);
+      console.warn(`📊 ${products.length} ürün taşınacak`);
 
       // Her ürünü doğru kategoriye taşı
       for (const product of products) {
@@ -62,7 +62,7 @@ async function moveProductsToCorrectCategories() {
           console.error(`❌ Ürün taşıma hatası ${product.name}:`, updateError.message);
           results.failed++;
         } else {
-          console.log(`✅ Taşındı: ${product.name}`);
+          console.warn(`✅ Taşındı: ${product.name}`);
           results.moved++;
         }
       }
@@ -76,7 +76,7 @@ async function moveProductsToCorrectCategories() {
       if (deleteError) {
         console.error(`❌ Kategori silme hatası:`, deleteError.message);
       } else {
-        console.log(`🗑️ Yanlış kategori silindi`);
+        console.warn(`🗑️ Yanlış kategori silindi`);
         results.categories_deleted++;
       }
 
@@ -90,7 +90,7 @@ async function moveProductsToCorrectCategories() {
 }
 
 async function fixATEXCategory() {
-  console.log('\n🔧 ATEX kategorisini Endüstriyel Fanlar alt kategorisi yapıyoruz...');
+  console.warn('\n🔧 ATEX kategorisini Endüstriyel Fanlar alt kategorisi yapıyoruz...');
   
   try {
     // ATEX kategorisini Endüstriyel Fanlar'ın alt kategorisi yap
@@ -106,14 +106,14 @@ async function fixATEXCategory() {
       throw updateError;
     }
 
-    console.log('✅ ATEX kategorisi Endüstriyel Fanlar alt kategorisi olarak ayarlandı');
+    console.warn('✅ ATEX kategorisi Endüstriyel Fanlar alt kategorisi olarak ayarlandı');
   } catch (error) {
     console.error('❌ ATEX kategori güncelleme hatası:', error.message);
   }
 }
 
 async function updateCategoryHierarchy() {
-  console.log('\n📊 Kategori hiyerarşisi güncellemesi...');
+  console.warn('\n📊 Kategori hiyerarşisi güncellemesi...');
   
   try {
     // Endüstriyel Fanlar kategorisini Fanlar'ın alt kategorisi olarak ayarla (eğer değilse)
@@ -128,7 +128,7 @@ async function updateCategoryHierarchy() {
     if (endError) {
       console.error('❌ Endüstriyel Fanlar güncelleme hatası:', endError.message);
     } else {
-      console.log('✅ Endüstriyel Fanlar kategorisi düzeltildi');
+      console.warn('✅ Endüstriyel Fanlar kategorisi düzeltildi');
     }
 
   } catch (error) {
@@ -137,7 +137,7 @@ async function updateCategoryHierarchy() {
 }
 
 async function main() {
-  console.log('🚀 VentHub kategori düzeltme başlıyor...');
+  console.warn('🚀 VentHub kategori düzeltme başlıyor...');
 
   try {
     // 1. Ürünleri doğru kategorilere taşı ve yanlış kategorileri sil
@@ -150,14 +150,14 @@ async function main() {
     await updateCategoryHierarchy();
 
     // Sonuç özeti
-    console.log('\n📊 Düzeltme Özeti:');
-    console.log(`✅ Taşınan ürün: ${results.moved}`);
-    console.log(`❌ Hatalı işlem: ${results.failed}`);
-    console.log(`🗑️ Silinen kategori: ${results.categories_deleted}`);
+    console.warn('\n📊 Düzeltme Özeti:');
+    console.warn(`✅ Taşınan ürün: ${results.moved}`);
+    console.warn(`❌ Hatalı işlem: ${results.failed}`);
+    console.warn(`🗑️ Silinen kategori: ${results.categories_deleted}`);
 
     // Son durumu kontrol et
-    console.log('\n🔍 Son durum kontrolü...');
-    const { data: categoryStructure, error } = await supabase
+    console.warn('\n🔍 Son durum kontrolü...');
+    const { _data: categoryStructure, error } = await supabase
       .from('categories')
       .select('id, name, parent_id, level')
       .ilike('name', '%fan%')
@@ -167,20 +167,20 @@ async function main() {
       throw error;
     }
 
-    console.log('\n📂 Güncel kategori yapısı:');
+    console.warn('\n📂 Güncel kategori yapısı:');
     const mainCategories = categoryStructure.filter(c => c.parent_id === null);
     const subCategories = categoryStructure.filter(c => c.parent_id !== null);
 
     mainCategories.forEach(mainCat => {
-      console.log(`📁 ${mainCat.name}`);
+      console.warn(`📁 ${mainCat.name}`);
       const subs = subCategories.filter(sub => sub.parent_id === mainCat.id);
       subs.forEach(sub => {
-        console.log(`  └── ${sub.name}`);
+        console.warn(`  └── ${sub.name}`);
       });
     });
 
-    console.log('\n🎉 Kategori düzeltme başarıyla tamamlandı!');
-    console.log('💡 Şimdi tüm fan kategorileri "Fanlar" ana kategorisinin altında düzgün şekilde organize edildi.');
+    console.warn('\n🎉 Kategori düzeltme başarıyla tamamlandı!');
+    console.warn('💡 Şimdi tüm fan kategorileri "Fanlar" ana kategorisinin altında düzgün şekilde organize edildi.');
 
   } catch (error) {
     console.error('💥 Düzeltme hatası:', error.message);

@@ -49,7 +49,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem(CART_VERSION_KEY)
           localStorage.removeItem(CART_OWNER_KEY)
           localStorage.removeItem('vh_pending_order')
-          localStorage.removeItem('vh_last_order_id')
+          localStorage.removeItem('vh_last__order_id')
           // keep a breadcrumb but don't keep success forever to avoid repeated forced clears
           localStorage.removeItem('vh_last_order_status')
           // Cross-tab sync
@@ -194,15 +194,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           merged.map(async (it) => {
             try {
               const info = await getEffectivePriceInfo(it.product)
-              await upsertCartItem({ cartId: cart.id, productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
-              return { productId: it.product.id, unitPrice: info.unitPrice }
+              await upsertCartItem({ cartId: cart.id, _productId: it.product.id, quantity: it.quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+              return { _productId: it.product.id, unitPrice: info.unitPrice }
             } catch (e) {
               console.error('cart upsert error', e)
-              return { productId: it.product.id, unitPrice: undefined as number | undefined }
+              return { _productId: it.product.id, unitPrice: undefined as number | undefined }
             }
           })
         )
-        const unitMap = new Map<string, number | undefined>(priceInfoList.map(p => [p.productId, p.unitPrice]))
+        const unitMap = new Map<string, number | undefined>(priceInfoList.map(p => [p._productId, p.unitPrice]))
         const mergedWithPrices = merged.map(it => ({ ...it, unitPrice: unitMap.get(it.product.id) ?? it.unitPrice }))
         setItems(mergedWithPrices)
 
@@ -286,7 +286,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
         getEffectivePriceInfo(product)
           .then(info => {
-            upsertCartItem({ cartId: serverCartId, productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+            upsertCartItem({ cartId: serverCartId, _productId: product.id, quantity: (items.find(i => i.product.id === product.id)?.quantity || 0) + quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
               .catch(err => console.error('server addToCart error', err))
             // Update local snapshot unit price
             setItems(curr => curr.map(it => it.product.id === product.id ? { ...it, unitPrice: info.unitPrice } : it))
@@ -305,46 +305,46 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const removeFromCart = (productId: string) => {
+  const removeFromCart = (_productId: string) => {
     setItems(currentItems => {
-      const item = currentItems.find(item => item.product.id === productId)
+      const item = currentItems.find(item => item.product.id === _productId)
       if (item) {
         import('react-hot-toast').then(({ default: toast }) => toast.success(`${item.product.name} sepetten çıkarıldı`, { duration: 2000, position: 'top-right' })).catch(() => { })
       }
-      return currentItems.filter(item => item.product.id !== productId)
+      return currentItems.filter(item => item.product.id !== _productId)
     })
 
     if (CART_SERVER_SYNC && user && serverCartId) {
       import('../lib/supabase').then(({ removeCartItem }) => {
-        return removeCartItem(serverCartId, productId)
+        return removeCartItem(serverCartId, _productId)
       }).catch(err => console.error('server removeFromCart error', err))
     }
   }
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (_productId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(productId)
+      removeFromCart(_productId)
       return
     }
 
     setItems(currentItems =>
       currentItems.map(item =>
-        item.product.id === productId
+        item.product.id === _productId
           ? { ...item, quantity }
           : item
       )
     )
 
     if (CART_SERVER_SYNC && user && serverCartId) {
-      const product = items.find(i => i.product.id === productId)?.product
+      const product = items.find(i => i.product.id === _productId)?.product
       if (product) {
         import('../lib/supabase').then(({ getEffectivePriceInfo, upsertCartItem }) => {
           getEffectivePriceInfo(product)
             .then(info => {
-              upsertCartItem({ cartId: serverCartId, productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
+              upsertCartItem({ cartId: serverCartId, _productId, quantity, unitPrice: info.unitPrice, priceListId: info.priceListId || undefined })
                 .catch(err => console.error('server updateQuantity error', err))
               // Ensure local snapshot unit price is present
-              setItems(curr => curr.map(it => it.product.id === productId ? { ...it, unitPrice: info.unitPrice } : it))
+              setItems(curr => curr.map(it => it.product.id === _productId ? { ...it, unitPrice: info.unitPrice } : it))
             })
             .catch(err => console.error('server updateQuantity error', err))
         }).catch(() => { })
@@ -436,7 +436,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             if (!changedIds.has(it.product.id)) return Promise.resolve()
             const up = pmap.get(it.product.id)
             if (up == null) return Promise.resolve()
-            return upsertCartItem({ cartId: serverCartId, productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
+            return upsertCartItem({ cartId: serverCartId, _productId: it.product.id, quantity: it.quantity, unitPrice: up, priceListId: undefined })
               .catch(e => console.warn('applyServerPricing upsert error', e))
           })
           Promise.allSettled(tasks).catch(() => { })

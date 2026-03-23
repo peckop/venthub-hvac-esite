@@ -1,14 +1,14 @@
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
+import _fs from '_fs/promises';
+import _path from '_path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = _path.dirname(__filename);
 
 // Configuration
 const BASE_URL = 'https://www.avensair.com';
-const OUTPUT_DIR = path.join(__dirname, 'scraped-data');
+const OUTPUT_DIR = _path.join(__dirname, 'scraped-_data');
 const DELAY_MS = 2000; // Respectful delay between requests
 
 // Utility functions
@@ -37,13 +37,13 @@ function extractBrand(productName) {
 
 // Main scraping functions
 async function scrapeMainCategories(page) {
-  console.log('🔍 Discovering main categories...');
+  console.warn('🔍 Discovering main categories...');
   
   await page.goto(BASE_URL, { waitUntil: 'networkidle2', timeout: 60000 });
   await new Promise(resolve => setTimeout(resolve, 3000));
   
   // Take a screenshot to debug
-  await page.screenshot({ path: 'scraped-data/homepage.png', fullPage: true });
+  await page.screenshot({ _path: 'scraped-_data/homepage.png', fullPage: true });
   
   // Look for category links with more specific criteria
   const categories = await page.evaluate(() => {
@@ -51,20 +51,20 @@ async function scrapeMainCategories(page) {
     
     // Get all links and analyze them
     const allLinks = document.querySelectorAll('a[href]');
-    console.log(`Found ${allLinks.length} total links`);
+    console.warn(`Found ${allLinks.length} total links`);
     
     for (const link of allLinks) {
       const href = link.getAttribute('href');
-      const text = link.textContent?.trim();
+      const _text = link.textContent?.trim();
       
-      if (href && text) {
+      if (href && _text) {
         // Log all links for debugging
-        console.log(`Link: "${text}" -> ${href}`);
+        console.warn(`Link: "${_text}" -> ${href}`);
         
         // Look for HVAC-related category patterns
         const hvacKeywords = ['fan', 'hava', 'klima', 'motor', 'ventil', 'soğutma', 'ısıtma', 'vortice', 'nicotra'];
         const isHvacRelated = hvacKeywords.some(keyword => 
-          text.toLowerCase().includes(keyword) || href.toLowerCase().includes(keyword)
+          _text.toLowerCase().includes(keyword) || href.toLowerCase().includes(keyword)
         );
         
         // Filter valid category links
@@ -78,7 +78,7 @@ async function scrapeMainCategories(page) {
             !categoryLinks.find(c => c.url === href)) {
           
           categoryLinks.push({
-            name: text,
+            name: _text,
             url: href.startsWith('http') ? href : `https://www.avensair.com${href.startsWith('/') ? href : '/' + href}`
           });
         }
@@ -88,11 +88,11 @@ async function scrapeMainCategories(page) {
     return categoryLinks;
   });
   
-  console.log(`📋 Found ${categories.length} potential HVAC categories`);
+  console.warn(`📋 Found ${categories.length} potential HVAC categories`);
   
   // If no HVAC categories found, try direct product discovery
   if (categories.length === 0) {
-    console.log('🔍 No HVAC categories found, trying direct product pages...');
+    console.warn('🔍 No HVAC categories found, trying direct product pages...');
     
     const directPages = [
       { name: 'Fanlar', url: `${BASE_URL}` }, // Start from homepage
@@ -106,23 +106,23 @@ async function scrapeMainCategories(page) {
 }
 
 async function scrapeProductLinks(page, categoryUrl) {
-  console.log(`🔍 Scraping products from: ${categoryUrl}`);
+  console.warn(`🔍 Scraping products from: ${categoryUrl}`);
   
   try {
     await page.goto(categoryUrl, { waitUntil: 'networkidle2', timeout: 60000 });
     await new Promise(resolve => setTimeout(resolve, DELAY_MS));
     
     // Take a screenshot for debugging
-    await page.screenshot({ path: `scraped-data/category_${Date.now()}.png`, fullPage: false });
+    await page.screenshot({ _path: `scraped-_data/category_${Date.now()}.png`, fullPage: false });
     
     const productLinks = await page.evaluate(() => {
       const links = [];
       
-      console.log('Looking for products on page...');
+      console.warn('Looking for products on page...');
       
       // Get all links and analyze them for HVAC products
       const allLinks = document.querySelectorAll('a[href]');
-      console.log(`Found ${allLinks.length} total links on page`);
+      console.warn(`Found ${allLinks.length} total links on page`);
       
       // HVAC product patterns
       const productKeywords = [
@@ -133,11 +133,11 @@ async function scrapeProductLinks(page, categoryUrl) {
       
       for (const link of allLinks) {
         const href = link.getAttribute('href');
-        const text = link.textContent?.trim();
+        const _text = link.textContent?.trim();
         const title = link.getAttribute('title') || '';
         
-        if (href && (text || title)) {
-          const combinedText = `${text} ${title}`.toLowerCase();
+        if (href && (_text || title)) {
+          const combinedText = `${_text} ${title}`.toLowerCase();
           
           // Check if this looks like a product
           const looksLikeProduct = productKeywords.some(keyword => 
@@ -157,7 +157,7 @@ async function scrapeProductLinks(page, categoryUrl) {
             const fullUrl = href.startsWith('http') ? href : `https://www.avensair.com${href.startsWith('/') ? href : '/' + href}`;
             
             if (!links.includes(fullUrl) && !fullUrl.includes('#')) {
-              console.log(`Found potential product: "${text}" -> ${fullUrl}`);
+              console.warn(`Found potential product: "${_text}" -> ${fullUrl}`);
               links.push(fullUrl);
             }
           }
@@ -173,7 +173,7 @@ async function scrapeProductLinks(page, categoryUrl) {
           if (href && href.length > 5) {
             const fullUrl = href.startsWith('http') ? href : `https://www.avensair.com${href.startsWith('/') ? href : '/' + href}`;
             if (!links.includes(fullUrl) && !fullUrl.includes('#')) {
-              console.log(`Found product via image: ${fullUrl}`);
+              console.warn(`Found product via image: ${fullUrl}`);
               links.push(fullUrl);
             }
           }
@@ -193,7 +193,7 @@ async function scrapeProductLinks(page, categoryUrl) {
       }
     });
     
-    console.log(`📦 Found ${cleanLinks.length} potential product links`);
+    console.warn(`📦 Found ${cleanLinks.length} potential product links`);
     return cleanLinks;
     
   } catch (error) {
@@ -275,9 +275,9 @@ async function scrapeProductDetails(page, productUrl) {
       };
     }, productUrl);
     
-    // Process the scraped data
+    // Process the scraped _data
     if (!productData.title) {
-      console.log(`⚠️ No title found for ${productUrl}`);
+      console.warn(`⚠️ No title found for ${productUrl}`);
       return null;
     }
     
@@ -304,19 +304,19 @@ async function scrapeProductDetails(page, productUrl) {
   }
 }
 
-async function saveData(filename, data) {
-  const filepath = path.join(OUTPUT_DIR, filename);
-  await fs.writeFile(filepath, JSON.stringify(data, null, 2), 'utf-8');
-  console.log(`💾 Saved ${data.length} items to ${filename}`);
+async function saveData(filename, _data) {
+  const filepath = _path.join(OUTPUT_DIR, filename);
+  await _fs.writeFile(filepath, JSON.stringify(_data, null, 2), 'utf-8');
+  console.warn(`💾 Saved ${_data.length} items to ${filename}`);
 }
 
 async function ensureOutputDirectory() {
-  await fs.mkdir(OUTPUT_DIR, { recursive: true });
-  console.log('📁 Output directory ready');
+  await _fs.mkdir(OUTPUT_DIR, { recursive: true });
+  console.warn('📁 Output directory ready');
 }
 
 async function main() {
-  console.log('🚀 Starting comprehensive Avens scraping...');
+  console.warn('🚀 Starting comprehensive Avens scraping...');
   
   const browser = await puppeteer.launch({ 
     headless: 'new',
@@ -345,7 +345,7 @@ async function main() {
     await saveData('categories.json', categories);
     
     if (categories.length === 0) {
-      console.log('❌ No categories found. Let\'s try direct product discovery...');
+      console.warn('❌ No categories found. Let\'s try direct product discovery...');
       
       // Fallback: try common HVAC product pages
       const commonPages = [
@@ -358,7 +358,7 @@ async function main() {
       ];
       
       for (const pageUrl of commonPages) {
-        console.log(`🔍 Trying: ${pageUrl}`);
+        console.warn(`🔍 Trying: ${pageUrl}`);
         const products = await scrapeProductLinks(page, pageUrl);
         if (products.length > 0) {
           categories.push({ name: 'Ürünler', url: pageUrl });
@@ -371,8 +371,8 @@ async function main() {
     const allProductLinks = [];
     const categoryProducts = {};
     
-    for (const category of categories.slice(0, 15)) { // Limit to first 15 categories for comprehensive data
-      console.log(`\n📂 Processing category: ${category.name}`);
+    for (const category of categories.slice(0, 15)) { // _limit to first 15 categories for comprehensive _data
+      console.warn(`\n📂 Processing category: ${category.name}`);
       
       const productLinks = await scrapeProductLinks(page, category.url);
       categoryProducts[category.name] = productLinks;
@@ -383,7 +383,7 @@ async function main() {
     
     // Remove duplicates
     const uniqueProductLinks = [...new Set(allProductLinks)];
-    console.log(`\n📦 Total unique products found: ${uniqueProductLinks.length}`);
+    console.warn(`\n📦 Total unique products found: ${uniqueProductLinks.length}`);
     
     await saveData('product_links.json', uniqueProductLinks);
     await saveData('category_products.json', categoryProducts);
@@ -395,15 +395,15 @@ async function main() {
     for (let i = 0; i < uniqueProductLinks.length; i += batchSize) {
       const batch = uniqueProductLinks.slice(i, i + batchSize);
       
-      console.log(`\n🔄 Processing products ${i + 1}-${i + batch.length} of ${uniqueProductLinks.length}`);
+      console.warn(`\n🔄 Processing products ${i + 1}-${i + batch.length} of ${uniqueProductLinks.length}`);
       
       for (const productUrl of batch) {
-        console.log(`📦 Scraping: ${productUrl}`);
+        console.warn(`📦 Scraping: ${productUrl}`);
         
         const product = await scrapeProductDetails(page, productUrl);
         if (product) {
           allProducts.push(product);
-          console.log(`✅ ${product.name} - ${product.price ? product.price + ' TL' : 'Fiyat yok'}`);
+          console.warn(`✅ ${product.name} - ${product.price ? product.price + ' TL' : 'Fiyat yok'}`);
         }
         
         await new Promise(resolve => setTimeout(resolve, DELAY_MS)); // Be respectful
@@ -417,12 +417,12 @@ async function main() {
     await saveData('all_products.json', allProducts);
     
     // Summary
-    console.log('\n📊 Scraping Summary:');
-    console.log(`📂 Categories found: ${categories.length}`);
-    console.log(`🔗 Product links found: ${uniqueProductLinks.length}`);
-    console.log(`📦 Products scraped: ${allProducts.length}`);
-    console.log(`💰 Products with prices: ${allProducts.filter(p => p.price).length}`);
-    console.log(`🖼️ Products with images: ${allProducts.filter(p => p.image_url).length}`);
+    console.warn('\n📊 Scraping Summary:');
+    console.warn(`📂 Categories found: ${categories.length}`);
+    console.warn(`🔗 Product links found: ${uniqueProductLinks.length}`);
+    console.warn(`📦 Products scraped: ${allProducts.length}`);
+    console.warn(`💰 Products with prices: ${allProducts.filter(p => p.price).length}`);
+    console.warn(`🖼️ Products with images: ${allProducts.filter(p => p.image_url).length}`);
     
     // Group by brand
     const brandCounts = {};
@@ -430,13 +430,13 @@ async function main() {
       brandCounts[product.brand] = (brandCounts[product.brand] || 0) + 1;
     });
     
-    console.log('\n📊 Brand breakdown:');
-    Object.entries(brandCounts).forEach(([brand, count]) => {
-      console.log(`  ${brand}: ${count} products`);
+    console.warn('\n📊 Brand breakdown:');
+    Object.entries(brandCounts).forEach(([brand, _count]) => {
+      console.warn(`  ${brand}: ${_count} products`);
     });
     
-    console.log('\n🎉 Scraping completed successfully!');
-    console.log(`📁 Data saved to: ${OUTPUT_DIR}`);
+    console.warn('\n🎉 Scraping completed successfully!');
+    console.warn(`📁 _data saved to: ${OUTPUT_DIR}`);
     
   } catch (error) {
     console.error('💥 Scraping failed:', error);
@@ -447,7 +447,7 @@ async function main() {
 
 // Handle process termination
 process.on('SIGINT', async () => {
-  console.log('\n⏹️ Scraping interrupted by user');
+  console.warn('\n⏹️ Scraping interrupted by user');
   process.exit(0);
 });
 

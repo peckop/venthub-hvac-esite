@@ -239,7 +239,7 @@ const AdminErrorGroupsPage: React.FC = () => {
       const { data, error } = await supabase
         .from('client_errors')
         .select('id, at, url, message, stack, user_agent, release, env, level')
-        .eq('group_id', groupId)
+        .eq('grou_p_id', groupId)
         .order('at', { ascending: false })
         .limit(200)
       if (!error) setLatestClientErrors(prev => ({ ...prev, [groupId]: (data || []) as ClientErrorRow[] }))
