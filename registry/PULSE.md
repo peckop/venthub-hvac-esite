@@ -1,5 +1,5 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 23.03.2026 21:08 | **İlerleme:** %62
+> **Güncelleme:** 23.03.2026 22:21 | **İlerleme:** %62
 
 ## 📁 P00-STANDALONE
 ### ⏳ Backlog
@@ -49,7 +49,7 @@
 | `000`  | Roadmap                                       | ⚡ MED        | ⏳ WAIT       | `0%`       |
 | `009`  | Hotfix: Fix Category Visibility and 3D Orb    | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
 | `010`  | urunleri-kesfet-sayfasi-yeniden-insa          | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
-| `011`  | Category Data Architecture & Gateway Refac    | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
+| `011`  | Category Data Architecture & Gateway Refac    | 🔥 HIGH       | 🏗️ RUN       | `25%`      |
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
