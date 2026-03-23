@@ -7,9 +7,9 @@ progress: "100%"
 depends_on: ["002"]
 updated_at: "2026-03-23 11:47:30"
 artifacts:
-  brainstorm: "registry/P05-Next15-Modernization/active/003-technical-debt-cleanup-type-safety/brainstorm.md"
-  plan: "registry/P05-Next15-Modernization/active/003-technical-debt-cleanup-type-safety/plan.md"
-  review: "registry/P05-Next15-Modernization/active/003-technical-debt-cleanup-type-safety/review.md"
+  brainstorm: "registry/P05-Next15-Modernization/completed/003-technical-debt-cleanup-type-safety/brainstorm.md"
+  plan: "registry/P05-Next15-Modernization/completed/003-technical-debt-cleanup-type-safety/plan.md"
+  review: "registry/P05-Next15-Modernization/completed/003-technical-debt-cleanup-type-safety/review.md"
 ---
 
 # 003: Technical Debt Cleanup & Type Safety
