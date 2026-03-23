@@ -1,91 +1,60 @@
-import { VentImage } from '@/components/ui/VentImage'
-import React, { useState, useEffect } from 'react'
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import * as Tabs from '@radix-ui/react-tabs'
+import { X, Loader2, Save } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { X, Upload, Trash2, Plus, Save, Loader2 } from 'lucide-react'
+import * as z from 'zod'
 import { supabase } from '../../../lib/supabase'
-import type { DbProduct } from '../../../types/db-rows'
-import type { Database, Json } from '../../../types/database.types'
-type ProductUpdate = Database['public']['Tables']['products']['Update']
-type ProductInsert = Database['public']['Tables']['products']['Insert']
-import { useI18n } from '../../../i18n/I18nProvider'
-import { adminButtonPrimaryClass } from '../../../utils/adminUi'
+import type { DbCategory } from '../../../types/db-rows'
+import toast from 'react-hot-toast'
 
-// --- Zod Schema ---
+// Form schema
 const productSchema = z.object({
-    name: z.string().min(1, 'Ürün adı zorunludur'),
-    sku: z.string().min(1, 'SKU zorunludur'),
-    brand: z.string().optional(),
+    name: z.string().min(3, 'İsim en az 3 karakter olmalı'),
+    sku: z.string().min(3, 'SKU gereklidir'),
+    brand: z.string().min(1, 'Marka seçiniz'),
     model_code: z.string().optional(),
-    category_id: z.string().optional(),
-    status: z.enum(['active', 'inactive', 'out_of_stock']).default('active'),
-    price: z.number().min(0).optional().nullable(),
-    purchase_price: z.number().min(0).optional().nullable(),
-    stock_qty: z.number().int().min(0).optional().nullable(),
-    low_stock_threshold: z.number().int().min(0).optional().nullable(),
-    description: z.string().optional().nullable(),
-    slug: z.string().optional(),
-    meta_title: z.string().optional(),
-    meta_description: z.string().optional(),
-    is_featured: z.boolean().default(false),
-    technical_specs: z.record(z.string(), z.unknown()).default({}),
+    category_id: z.string().min(1, 'Kategori seçiniz'),
+    status: z.enum(['active', 'out_of_stock', 'inactive']),
+    price: z.number().min(0),
+    purchase_price: z.number().optional(),
+    stock_qty: z.number().min(0),
+    low_stock_threshold: z.number().min(0),
+    description: z.string().optional(),
+    technical_specs: z.record(z.any()).optional()
 })
 
 type ProductFormValues = z.infer<typeof productSchema>
 
 interface ProductFormModalProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
     _productId?: string | null
+    open: boolean
+    onClose: () => void
     onSuccess: () => void
-    categories: { id: string; name: string }[]
 }
 
-import { compressImage } from '../../../utils/imageUtils'
-
-export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpenChange, _productId, onSuccess, categories }) => {
-    const { t: _t } = useI18n()
-    const [activeTab, setActiveTab] = useState('info')
+const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false)
-    const [uploading, setUploading] = useState(false)
-
-    // Images state (separate from form for easier handling)
-    const [images, setImages] = useState<{ id?: string; path?: string; url: string; file?: File; isNew?: boolean }[]>([])
-
-    // Technical Specs State (Key-Value pairs for UI)
-    const [specs, setSpecs] = useState<{ key: string; value: string }[]>([])
-    const [initialData, setInitialData] = useState<DbProduct | null>(null)
+    const [categories, setCategories] = useState<DbCategory[]>([])
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema),
         defaultValues: {
             status: 'active',
-            is_featured: false,
-            technical_specs: {}
+            stock_qty: 0,
+            low_stock_threshold: 5,
+            price: 0
         }
     })
 
-    const loadProduct = React.useCallback(async (id: string) => {
+    const loadProduct = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            // Fetch product
             const { data: product, error } = await supabase.from('products').select('*').eq('id', id).single()
             if (error) throw error
-            setInitialData(product as unknown as DbProduct)
 
-            // Fetch images
-            const { data: imgs, error: imgError } = await supabase
-                .from('product_images')
-                .select('*')
-                .eq('_productId', id)
-                .order('sort_order')
-
-            if (imgError) throw imgError
-
-            // Set Form
             reset({
                 name: product.name,
                 sku: product.sku,
@@ -93,432 +62,126 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                 model_code: product.model_code || '',
                 category_id: product.category_id || '',
                 status: (product.status as 'active' | 'out_of_stock' | 'inactive') || 'active',
-                price: product.price ?? 0,
-                purchase_price: product.purchase_price,
-                stock_qty: product.stock_qty,
-                low_stock_threshold: product.low_stock_threshold,
-                description: product.description,
-                slug: product.slug || undefined,
-                meta_title: product.meta_title || '',
-                meta_description: product.meta_description || '',
-                is_featured: product.is_featured ?? false,
+                price: Number(product.price) || 0,
+                purchase_price: Number(product.purchase_price) || 0,
+                stock_qty: product.stock_qty || 0,
+                low_stock_threshold: product.low_stock_threshold || 5,
+                description: product.description || '',
                 technical_specs: (product.technical_specs as Record<string, unknown>) || {}
             })
-
-            // Set Images
-            const loadedImages = (imgs || []).map(img => ({
-                id: img.id,
-                path: img.path,
-                url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product-images/${img.path}`,
-                isNew: false
-            }))
-            setImages(loadedImages)
-
-            // Set Specs
-            const loadedSpecs = Object.entries(product.technical_specs || {}).map(([key, value]) => ({
-                key,
-                value: value !== undefined && value !== null ? String(value) : ''
-            }))
-            setSpecs(loadedSpecs)
-
-        } catch (e) {
-            console.error('Error loading product:', e)
-            alert('Ürün yüklenirken hata oluştu')
+        } catch {
+            toast.error('Ürün yüklenemedi')
         } finally {
             setLoading(false)
         }
     }, [reset])
 
-    // Load Data
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const { data } = await supabase.from('categories').select('*').order('name')
+            setCategories((data as unknown as DbCategory[]) || [])
+        }
+        fetchCategories()
+    }, [])
+
     useEffect(() => {
         if (open && _productId) {
             loadProduct(_productId)
         } else if (open && !_productId) {
-            reset({ status: 'active', is_featured: false, technical_specs: {} })
-            setImages([])
-            setSpecs([])
-            setInitialData(null)
-            setActiveTab('info')
+            reset({
+                status: 'active',
+                stock_qty: 0,
+                low_stock_threshold: 5,
+                price: 0
+            })
         }
-    }, [open, _productId, loadProduct, reset])
+    }, [open, _productId, reset, loadProduct])
 
-    // --- Handlers ---
-
-    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files)
-            const newImages = files.map(file => ({
-                url: URL.createObjectURL(file),
-                file,
-                isNew: true
-            }))
-            setImages(prev => [...prev, ...newImages])
-        }
-    }
-
-    const removeImage = (index: number) => {
-        setImages(prev => prev.filter((_, i) => i !== index))
-    }
-
-    const handleSpecChange = (index: number, field: 'key' | 'value', val: string) => {
-        const newSpecs = [...specs]
-        newSpecs[index][field] = val
-        setSpecs(newSpecs)
-    }
-
-    const addSpec = () => setSpecs([...specs, { key: '', value: '' }])
-    const removeSpec = (index: number) => setSpecs(specs.filter((_, i) => i !== index))
-
-    const onSubmit = async (data: ProductFormValues) => {
+    const onSubmit = async (values: ProductFormValues) => {
         setLoading(true)
         try {
-            // 1. Prepare Specs JSON
-            const specsJson = specs.reduce((acc, curr) => {
-                if (curr.key.trim()) acc[curr.key.trim()] = curr.value
-                return acc
-            }, {} as Record<string, string>)
-
-            data.technical_specs = specsJson
-
-            let current_productId = _productId
-
-            // 2. Insert/Update Product
-            if (current_productId) {
-                // Clean data for DB constraints
-                const updateData: ProductUpdate = Object.fromEntries(
-                    Object.entries(data).filter(([_, v]) => v !== undefined)
-                ) as ProductUpdate
-                const { error } = await supabase.from('products').update(updateData).eq('id', current_productId)
+            if (_productId) {
+                const { error } = await supabase.from('products').update(values).eq('id', _productId)
                 if (error) throw error
-
-                // Audit Log
-                const { logAdminAction } = await import('../../../lib/audit')
-                await logAdminAction(supabase, {
-                    table_name: 'products',
-                    row_pk: current_productId,
-                    action: 'UPDATE',
-                    before: initialData as unknown as Json,
-                    after: data as unknown as Json,
-                    comment: 'Updated via Modal'
-                })
-
             } else {
-                const insertData: ProductInsert = Object.fromEntries(
-                    Object.entries(data).filter(([_, v]) => v !== undefined)
-                ) as ProductInsert
-                const { data: newProd, error } = await supabase.from('products').insert(insertData).select('id').single()
+                const { error } = await supabase.from('products').insert([values])
                 if (error) throw error
-                current_productId = newProd.id
-
-                // Audit Log
-                const { logAdminAction } = await import('../../../lib/audit')
-                await logAdminAction(supabase, {
-                    table_name: 'products',
-                    row_pk: current_productId,
-                    action: 'INSERT',
-                    before: null,
-                    after: data as unknown as Json,
-                    comment: 'Created via Modal'
-                })
             }
 
-            // 3. Handle Images
-            if (!current_productId) throw new Error("Ürün ID alınamadı.")
-            if (images.some(img => img.isNew) || images.length < (await fetchExistingImageCount(current_productId))) {
-                await processImages(current_productId, data.name)
-            }
-
+            toast.success(_productId ? 'Ürün güncellendi' : 'Ürün oluşturuldu')
             onSuccess()
-            onOpenChange(false)
-
-        } catch (e: unknown) {
-            console.error('Save error:', e)
-            alert(`Kaydetme hatası: ${e instanceof Error ? e.message : 'Bilinmeyen hata'}`)
+            onClose()
+        } catch {
+            toast.error('İşlem başarısız')
         } finally {
             setLoading(false)
         }
     }
 
-    const fetchExistingImageCount = async (pid: string) => {
-        const { count } = await supabase.from('product_images').select('*', { count: 'exact', head: true }).eq('product_id', pid)
-        return count || 0
-    }
-
-    const processImages = async (pid: string, productName: string) => {
-        setUploading(true)
-        try {
-            const { data: existingImgs } = await supabase.from('product_images').select('id, path').eq('product_id', pid)
-            const keptIds = images.filter(i => !i.isNew && i.id).map(i => i.id)
-            const toDelete = existingImgs?.filter(ei => !keptIds.includes(ei.id)) || []
-
-            for (const del of toDelete) {
-                await supabase.from('product_images').delete().eq('id', del.id)
-                await supabase.storage.from('product-images').remove([del.path])
-            }
-
-            // 2. Upload New Images
-            let sortOrder = 0
-            for (const img of images) {
-                sortOrder++
-                if (img.isNew && img.file) {
-                    // Compress
-                    const compressedBlob = await compressImage(img.file)
-                    const ext = 'webp'
-                    const filename = `prod_${pid}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
-                    const path = `product/${pid}/${filename}`
-
-                    // Upload
-                    const { error: upErr } = await supabase.storage.from('product-images').upload(path, compressedBlob, { contentType: 'image/webp' })
-                    if (upErr) throw upErr
-
-                    // Insert DB
-                    await supabase.from('product_images').insert({
-                        product_id: pid,
-                        path: path,
-                        sort_order: sortOrder,
-                        alt: productName
-                    })
-                } else if (img.id) {
-                    // Update sort order for existing
-                    await supabase.from('product_images').update({ sort_order: sortOrder }).eq('id', img.id)
-                }
-            }
-
-        } catch (e) {
-            console.error('Image process error:', e)
-            throw e
-        } finally {
-            setUploading(false)
-        }
-    }
-
-    // --- UI Components ---
-    const TabTrigger = ({ value, label }: { value: string, label: string }) => (
-        <Tabs.Trigger
-            value={value}
-            className="px-4 py-2.5 text-sm font-semibold text-slate-500 border-b-2 border-transparent data-[state=active]:border-primary-navy data-[state=active]:text-primary-navy hover:text-slate-800 transition-all duration-200 whitespace-nowrap"
-        >
-            {label}
-        </Tabs.Trigger>
-    )
+    if (!open) return null
 
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
+        <Dialog.Root open={open} onOpenChange={onClose}>
             <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[60] transition-opacity animate-in fade-in duration-300" />
-                <Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl z-[70] flex flex-col outline-none transform transition-all animate-in fade-in zoom-in-95 duration-300 overflow-hidden">
-
-                    {/* Premium Header */}
-                    <div className="flex items-center justify-between p-6 bg-slate-50/50 border-b border-slate-100">
-                        <div className="flex flex-col">
-                            <Dialog.Title className="text-xl font-bold text-primary-navy">
-                                {_productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
-                            </Dialog.Title>
-                            <p className="text-xs text-slate-500 mt-0.5">VentHub Katalog Yönetim Sistemi</p>
-                        </div>
-                        <Dialog.Close className="p-2 hover:bg-white hover:shadow-sm rounded-full text-slate-400 hover:text-primary-navy transition-all duration-200">
+                <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1000]" />
+                <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl z-[1001] p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <Dialog.Title className="text-xl font-bold text-industrial-gray">
+                            {_productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
+                        </Dialog.Title>
+                        <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <X size={20} />
-                        </Dialog.Close>
+                        </button>
                     </div>
 
-                    {/* Body */}
-                    <div className="flex-1 overflow-y-auto">
-                        {loading ? (
-                            <div className="flex items-center justify-center h-64">
-                                <Loader2 className="animate-spin text-blue-600" size={32} />
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase">Ürün Adı</label>
+                                <input {...register('name')} className="w-full px-4 py-2 border rounded-lg" />
+                                {errors.name && <p className="text-red-500 text-[10px]">{errors.name.message}</p>}
                             </div>
-                        ) : (
-                            <form id="product-form" onSubmit={handleSubmit(onSubmit)} className="p-6">
-                                <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
-                                    <Tabs.List className="flex border-b border-gray-200 mb-6 overflow-x-auto">
-                                        <TabTrigger value="info" label="Genel Bilgiler" />
-                                        <TabTrigger value="pricing" label="Fiyat & Stok" />
-                                        <TabTrigger value="images" label="Görseller" />
-                                        <TabTrigger value="specs" label="Teknik Özellikler" />
-                                        <TabTrigger value="seo" label="SEO" />
-                                    </Tabs.List>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase">SKU</label>
+                                <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg" />
+                                {errors.sku && <p className="text-red-500 text-[10px]">{errors.sku.message}</p>}
+                            </div>
+                        </div>
 
-                                    {/* INFO TAB */}
-                                    <Tabs.Content value="info" className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Ürün Adı *</label>
-                                                <input {...register('name')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                                {errors.name && <span className="text-xs text-red-500">{errors.name.message}</span>}
-                                            </div>
-                                            <div className="space-y-2 text-right">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SKU (Stok Kodu) *</label>
-                                                <input {...register('sku')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                                {errors.sku && <span className="text-xs text-red-500">{errors.sku.message}</span>}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Marka</label>
-                                                <input {...register('brand')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                            </div>
-                                            <div className="space-y-2 text-right">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Model Kodu</label>
-                                                <input {...register('model_code')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Kategori</label>
-                                                <select {...register('category_id')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer">
-                                                    <option value="">Seçiniz</option>
-                                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                                </select>
-                                            </div>
-                                            <div className="space-y-2 text-right">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Durum</label>
-                                                <select {...register('status')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all appearance-none cursor-pointer">
-                                                    <option value="active">Aktif</option>
-                                                    <option value="inactive">Pasif</option>
-                                                    <option value="out_of_stock">Stok Yok</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Açıklama</label>
-                                            <textarea {...register('description')} rows={4} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <input type="checkbox" {...register('is_featured')} id="is_featured" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                                            <label htmlFor="is_featured" className="text-sm font-medium text-gray-700">Öne Çıkan Ürün</label>
-                                        </div>
-                                    </Tabs.Content>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase">Kategori</label>
+                                <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg">
+                                    <option value="">Seçiniz</option>
+                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase">Durum</label>
+                                <select {...register('status')} className="w-full px-4 py-2 border rounded-lg">
+                                    <option value="active">Aktif</option>
+                                    <option value="out_of_stock">Stok Yok</option>
+                                    <option value="inactive">Pasif</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-slate-500 uppercase">Fiyat</label>
+                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg" />
+                            </div>
+                        </div>
 
-                                    {/* PRICING TAB */}
-                                    <Tabs.Content value="pricing" className="space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Satış Fiyatı (TL)</label>
-                                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-900" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Alış Fiyatı (TL)</label>
-                                                <input type="number" step="0.01" {...register('purchase_price', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-semibold text-slate-600" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Stok Adedi</label>
-                                                <input type="number" {...register('stock_qty', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-slate-900" />
-                                            </div>
-                                            <div className="space-y-2 text-right">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Kritik Stok Seviyesi</label>
-                                                <input type="number" {...register('low_stock_threshold', { valueAsNumber: true })} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all font-bold text-rose-600" />
-                                            </div>
-                                        </div>
-                                    </Tabs.Content>
-
-                                    {/* IMAGES TAB */}
-                                    <Tabs.Content value="images" className="space-y-4">
-                                        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center text-gray-500 hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer relative">
-                                            <input type="file" multiple accept="image/*" onChange={handleImageSelect} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                            <Upload size={32} className="mb-2" />
-                                            <p className="text-sm font-medium">Resimleri buraya sürükleyin veya seçin</p>
-                                            <p className="text-xs text-gray-400 mt-1">Otomatik WebP sıkıştırma uygulanır</p>
-                                        </div>
-
-                                        <div className="grid grid-cols-4 gap-4 mt-4">
-                                            {images.map((img, idx) => (
-                                                <div key={idx} className="relative group border rounded-lg overflow-hidden aspect-square bg-gray-50">
-                                                    <VentImage src={img.url} alt="Product" className="w-full h-full object-contain"  />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeImage(idx)}
-                                                        className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                    {idx === 0 && (
-                                                        <div className="absolute bottom-0 inset-x-0 bg-blue-600 text-white text-[10px] py-1 text-center">
-                                                            Kapak Görseli
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Tabs.Content>
-
-                                    {/* SPECS TAB */}
-                                    <Tabs.Content value="specs" className="space-y-4">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h3 className="text-sm font-medium text-gray-700">Teknik Özellikler (JSON)</h3>
-                                            <button type="button" onClick={addSpec} className="text-blue-600 text-sm flex items-center gap-1 hover:underline">
-                                                <Plus size={16} /> Özellik Ekle
-                                            </button>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            {specs.map((spec, idx) => (
-                                                <div key={idx} className="flex gap-2 items-center">
-                                                    <input
-                                                        placeholder="Özellik Adı (örn. Güç)"
-                                                        value={spec.key}
-                                                        onChange={(e) => handleSpecChange(idx, 'key', e.target.value)}
-                                                        className="flex-1 border rounded px-3 py-2 text-sm"
-                                                    />
-                                                    <input
-                                                        placeholder="Değer (örn. 5kW)"
-                                                        value={spec.value}
-                                                        onChange={(e) => handleSpecChange(idx, 'value', e.target.value)}
-                                                        className="flex-1 border rounded px-3 py-2 text-sm"
-                                                    />
-                                                    <button type="button" onClick={() => removeSpec(idx)} className="text-red-500 hover:bg-red-50 p-2 rounded">
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            {specs.length === 0 && (
-                                                <div className="text-center py-8 text-gray-400 text-sm border rounded-lg border-dashed">
-                                                    Henüz teknik özellik eklenmemiş.
-                                                </div>
-                                            )}
-                                        </div>
-                                    </Tabs.Content>
-
-                                    {/* SEO TAB */}
-                                    <Tabs.Content value="seo" className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">SEO URL (Slug)</label>
-                                            <input {...register('slug')} placeholder="Otomatik oluşturulur" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta Başlık</label>
-                                            <input {...register('meta_title')} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-tight">Meta Açıklama</label>
-                                            <textarea {...register('meta_description')} rows={3} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-navy/10 focus:border-primary-navy transition-all resize-none" />
-                                        </div>
-                                    </Tabs.Content>
-                                </Tabs.Root>
-                            </form>
-                        )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="p-6 bg-slate-50/80 border-t border-slate-100 flex justify-end gap-3 backdrop-blur-sm">
-                        <button
-                            type="button"
-                            onClick={() => onOpenChange(false)}
-                            className="px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded-xl transition-all duration-200"
-                        >
-                            İptal
-                        </button>
-                        <button
-                            type="submit"
-                            form="product-form"
-                            disabled={loading || uploading}
-                            className={`${adminButtonPrimaryClass} flex items-center gap-2 px-8 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-navy/10 transition-transform active:scale-95`}
-                        >
-                            {(loading || uploading) ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                            {_productId ? 'Değişiklikleri Kaydet' : 'Ürünü Oluştur'}
-                        </button>
-                    </div>
-
+                        <div className="flex justify-end gap-3 mt-8">
+                            <button type="button" onClick={onClose} className="px-6 py-2 border rounded-lg font-bold">Vazgeç</button>
+                            <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-navy text-white rounded-lg font-bold flex items-center gap-2">
+                                {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                                Kaydet
+                            </button>
+                        </div>
+                    </form>
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
     )
 }
 
-
-
+export default ProductFormModal
