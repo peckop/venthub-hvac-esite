@@ -1,26 +1,27 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+const _fs = require('_fs');
+const _path = require('_path');
 const https = require('https');
 const http = require('http');
 
-const OUTPUT_BASE_DIR = path.join(__dirname, 'product_pdfs');
+const OUTPUT_BASE_DIR = _path.join(__dirname, 'product_pdfs');
 
 async function downloadPDF(url, filename, categoryDir) {
     return new Promise((resolve, reject) => {
         const protocol = url.startsWith('https') ? https : http;
-        const filePath = path.join(categoryDir, filename);
+        const filePath = _path.join(categoryDir, filename);
 
-        if (fs.existsSync(filePath)) {
-            console.log(`      ⚠️ Dosya zaten var: ${filename}`);
+        if (_fs.existsSync(filePath)) {
+            console.warn(`      ⚠️ Dosya zaten var: ${filename}`);
             resolve();
             return;
         }
 
-        const file = fs.createWriteStream(filePath);
+        const file = _fs.createWriteStream(filePath);
         protocol.get(url, (response) => {
             if (response.statusCode !== 200) {
-                fs.unlink(filePath, () => { });
+                _fs.unlink(filePath, () => { });
                 reject(new Error(`Status code: ${response.statusCode}`));
                 return;
             }
@@ -28,18 +29,18 @@ async function downloadPDF(url, filename, categoryDir) {
             response.pipe(file);
             file.on('finish', () => {
                 file.close();
-                console.log(`      ⬇️ İndirildi: ${filename}`);
+                console.warn(`      ⬇️ İndirildi: ${filename}`);
                 resolve();
             });
         }).on('error', (err) => {
-            fs.unlink(filePath, () => { });
+            _fs.unlink(filePath, () => { });
             reject(err);
         });
     });
 }
 
 async function getAllCategories(page) {
-    console.log('🔍 Kategori yapısı taranıyor...');
+    console.warn('🔍 Kategori yapısı taranıyor...');
     await page.goto('https://avensair.com/urunler', { waitUntil: 'networkidle2', timeout: 60000 });
 
     return await page.evaluate(() => {
@@ -49,7 +50,7 @@ async function getAllCategories(page) {
         const fanlarLink = allLinks.find(a => a.textContent.trim() === 'Fanlar');
 
         if (!fanlarLink) {
-            console.log('Fanlar linki bulunamadı');
+            console.warn('Fanlar linki bulunamadı');
             return [];
         }
 
@@ -87,14 +88,14 @@ async function getAllCategories(page) {
 }
 
 async function processCategory(page, category) {
-    console.log(`\n📂 Kategori: ${category.name}`);
-    console.log(`   URL: ${category.url}`);
+    console.warn(`\n📂 Kategori: ${category.name}`);
+    console.warn(`   URL: ${category.url}`);
 
     const safeName = category.name.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]/g, '_');
-    const categoryDir = path.join(OUTPUT_BASE_DIR, safeName);
+    const categoryDir = _path.join(OUTPUT_BASE_DIR, safeName);
 
-    if (!fs.existsSync(categoryDir)) {
-        fs.mkdirSync(categoryDir, { recursive: true });
+    if (!_fs.existsSync(categoryDir)) {
+        _fs.mkdirSync(categoryDir, { recursive: true });
     }
 
     try {
@@ -110,21 +111,21 @@ async function processCategory(page, category) {
             }));
         });
 
-        console.log(`   📦 ${products.length} ürün bulundu.`);
+        console.warn(`   📦 ${products.length} ürün bulundu.`);
 
         if (products.length > 0) {
             const product = products[0];
-            console.log(`   🔍 Ürün (Temsili): ${product.name}`);
+            console.warn(`   🔍 Ürün (Temsili): ${product.name}`);
 
             try {
                 await page.goto(product.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
                 const clicked = await page.evaluate(() => {
                     // Tab linkini bul (genellikle 'a' tagi olur)
-                    const tabs = Array.from(document.querySelectorAll('ul.nav-tabs a, .nav-tabs li a, a[data-toggle="tab"]'));
+                    const tabs = Array.from(document.querySelectorAll('ul.nav-tabs a, .nav-tabs li a, a[_data-toggle="tab"]'));
                     const docTab = tabs.find(el => {
-                        const text = el.textContent.trim().toLowerCase();
-                        return text === 'dökümanlar' || text === 'dokumanlar' || text.includes('döküman');
+                        const _text = el.textContent.trim().toLowerCase();
+                        return _text === 'dökümanlar' || _text === 'dokumanlar' || _text.includes('döküman');
                     });
 
                     if (docTab) {
@@ -135,8 +136,8 @@ async function processCategory(page, category) {
                     // Fallback: herhangi bir 'a' tagi
                     const allLinks = Array.from(document.querySelectorAll('a'));
                     const anyDocLink = allLinks.find(el => {
-                        const text = el.textContent.trim().toLowerCase();
-                        return text === 'dökümanlar' || text === 'dokumanlar';
+                        const _text = el.textContent.trim().toLowerCase();
+                        return _text === 'dökümanlar' || _text === 'dokumanlar';
                     });
 
                     if (anyDocLink) {
@@ -160,7 +161,7 @@ async function processCategory(page, category) {
                     }));
                 });
 
-                console.log(`      📄 ${pdfLinks.length} PDF bulundu.`);
+                console.warn(`      📄 ${pdfLinks.length} PDF bulundu.`);
 
                 if (pdfLinks.length > 0) {
                     for (const pdf of pdfLinks) {
@@ -183,7 +184,7 @@ async function processCategory(page, category) {
 }
 
 async function main() {
-    console.log('🚀 AVenS Kapsamlı Ürün PDF İndirici Başlatılıyor...\n');
+    console.warn('🚀 AVenS Kapsamlı Ürün PDF İndirici Başlatılıyor...\n');
 
     const browser = await puppeteer.launch({
         headless: false,
@@ -194,7 +195,7 @@ async function main() {
 
     try {
         const categories = await getAllCategories(page);
-        console.log(`✅ Toplam ${categories.length} kategori tespit edildi.\n`);
+        console.warn(`✅ Toplam ${categories.length} kategori tespit edildi.\n`);
 
         for (const category of categories) {
             await processCategory(page, category);
@@ -204,7 +205,7 @@ async function main() {
         console.error('❌ Genel Hata:', error);
     } finally {
         await browser.close();
-        console.log('\n✅ Tüm işlemler tamamlandı.');
+        console.warn('\n✅ Tüm işlemler tamamlandı.');
     }
 }
 

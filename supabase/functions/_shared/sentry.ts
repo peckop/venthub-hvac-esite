@@ -1,6 +1,6 @@
 // supabase/functions/_shared/sentry.ts
 // Minimal Sentry client for Edge Functions (no external deps)
-// Usage: set SENTRY_DSN (e.g., https://PUBLIC_KEY@o123456.ingest.sentry.io/987654) and optionally SENTRY_ENV/SENTRY_RELEASE
+// Usage: set SENTRY_DSN (_e.g., https://PUBLIC_KEY@o123456.ingest.sentry.io/987654) and optionally SENTRY_ENV/SENTRY_RELEASE
 
 export type SentryLevel = 'fatal' | 'error' | 'warning' | 'info' | 'debug' | 'log';
 
@@ -59,19 +59,19 @@ export async function sentryCaptureMessage(message: string, level: SentryLevel =
   await postStore(dsn, event)
 }
 
-export async function sentryCaptureException(e: unknown, extra?: Record<string, unknown>) {
+export async function sentryCaptureException(_e: unknown, extra?: Record<string, unknown>) {
   const dsn = (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_DSN') || ''
   if (!dsn) return
-  const isErr = e instanceof Error
-  const message = isErr ? (e.message || String(e)) : String(e)
-  const stack = isErr ? (e.stack || undefined) : undefined
+  const isErr = _e instanceof Error
+  const message = isErr ? (_e.message || String(_e)) : String(_e)
+  const stack = isErr ? (_e.stack || undefined) : undefined
   const event = {
     platform: 'javascript',
     logger: 'edge',
     timestamp: Date.now() / 1000,
     level: 'error' as const,
     message,
-    exception: stack ? { values: [{ type: e && (e as Error).name || 'Error', value: message, stacktrace: { frames: [{ function: '<edge>', filename: '<edge>', lineno: 0, colno: 0 }] } }] } : undefined,
+    exception: stack ? { values: [{ type: _e && (_e as Error).name || 'Error', value: message, stacktrace: { frames: [{ function: '<edge>', filename: '<edge>', lineno: 0, colno: 0 }] } }] } : undefined,
     extra,
     environment: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_ENV') || undefined,
     release: (globalThis as unknown as { Deno?: { env?: { get?: (key: string) => string | undefined } } }).Deno?.env?.get?.('SENTRY_RELEASE') || undefined,

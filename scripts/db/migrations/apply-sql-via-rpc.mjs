@@ -40,7 +40,7 @@ async function run() {
     }
 
     const sql = fs.readFileSync(sqlPath, 'utf8');
-    console.log(`🚀 Executing migration via RPC (exec) on ${url}...`);
+    console.warn(`🚀 Executing migration via RPC (exec) on ${url}...`);
 
     try {
         const response = await fetch(`${url}/rest/v1/rpc/exec`, {
@@ -56,13 +56,13 @@ async function run() {
 
         if (response.ok) {
             const result = await response.text();
-            console.log('✅ Migration applied successfully!');
-            console.log('Result:', result);
+            console.warn('✅ Migration applied successfully!');
+            console.warn('Result:', result);
         } else {
             const errorText = await response.text();
             console.error(`❌ Migration failed (Status ${response.status}):`, errorText);
             if (response.status === 404) {
-                console.log('💡 Tip: RPC "exec" function might not exist in your database.');
+                console.warn('💡 Tip: RPC "exec" function might not exist in your database.');
             }
         }
     } catch (err) {

@@ -11,7 +11,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Manuel RPC çağrısı
 async function testStockReduction() {
   try {
-    console.log('🧪 Testing stock reduction for order:', orderID);
+    console.warn('🧪 Testing stock reduction for order:', orderID);
     
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_order_stock_reduction`, {
       method: 'POST',
@@ -21,18 +21,18 @@ async function testStockReduction() {
         'apikey': SUPABASE_ANON_KEY
       },
       body: JSON.stringify({
-        p_order_id: orderID
+        p__order_id: orderID
       })
     });
     
-    console.log('📊 Response status:', response.status);
+    console.warn('📊 Response status:', response.status);
     
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Stock reduction result:', result);
+      console.warn('✅ Stock reduction result:', result);
       return result;
     } else {
-      const error = await response.text();
+      const error = await response._text();
       console.error('❌ Stock reduction failed:', error);
       return null;
     }

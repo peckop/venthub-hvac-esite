@@ -110,7 +110,7 @@ export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | unde
   return groups;
 };
 
-// Standard sort order for technical specifications
+// Standard sort order for technical _specifications
 export const SPEC_SORT_ORDER: Record<string, number> = {
   // Performance Group Priority
   'number_of_speeds': 1,

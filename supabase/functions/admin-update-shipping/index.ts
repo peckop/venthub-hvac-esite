@@ -29,9 +29,9 @@ serve(async (req) => {
   }
 
   try {
-    const text = await req.text()
+    const _text = await req._text()
     let parsed: Record<string, unknown> = {}
-    try { parsed = text ? JSON.parse(text) : {} } catch {}
+    try { parsed = _text ? JSON.parse(_text) : {} } catch {}
 
     const pick = (keys: string[]): string | null => {
       for (const k of keys) {
@@ -53,10 +53,10 @@ serve(async (req) => {
     })()
 
     // Body + query fallback
-    let order_id = pick(['order_id','orderId']) || qs.get('order_id') || qs.get('orderId')
-    let carrier = pick(['carrier']) || qs.get('carrier')
-    let tracking_number = pick(['tracking_number','trackingNumber']) || qs.get('tracking_number') || qs.get('trackingNumber')
-    let tracking_url = pick(['tracking_url','trackingUrl']) || qs.get('tracking_url') || qs.get('trackingUrl')
+    const order_id = pick(['order_id','orderId']) || qs.get('order_id') || qs.get('orderId')
+    const carrier = pick(['carrier']) || qs.get('carrier')
+    const tracking_number = pick(['tracking_number','trackingNumber']) || qs.get('tracking_number') || qs.get('trackingNumber')
+    const tracking_url = pick(['tracking_url','trackingUrl']) || qs.get('tracking_url') || qs.get('trackingUrl')
     const send_email = ((): boolean => {
       const v = (parsed['send_email'] ?? parsed['sendEmail'] ?? qs.get('send_email') ?? qs.get('sendEmail'))
       if (typeof v === 'boolean') return v
@@ -101,13 +101,13 @@ serve(async (req) => {
         body: JSON.stringify({ carrier: null, tracking_number: null, tracking_url: null, shipped_at: null, status: 'confirmed' })
       })
       if (!updCancel.ok) {
-        const txt = await updCancel.text()
+        const txt = await updCancel._text()
         return new Response(JSON.stringify({ error: 'cancel_failed', status: updCancel.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
       }
       return new Response(JSON.stringify({ ok: true, action: 'cancel' }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
-    // Validate for ship/update path
+    // Validate for ship/update _path
     if (!order_id || !carrier || !tracking_number) {
       return new Response(JSON.stringify({ error: 'missing_fields', missing: [!order_id && 'order_id', !carrier && 'carrier', !tracking_number && 'tracking_number'].filter(Boolean) }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
@@ -152,7 +152,7 @@ serve(async (req) => {
     })
 
     if (!upd.ok) {
-      const txt = await upd.text()
+      const txt = await upd._text()
       return new Response(JSON.stringify({ error: 'update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
     }
 
@@ -187,7 +187,7 @@ serve(async (req) => {
             headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
           })
           if (usrResp.ok) {
-            const u = await usrResp.json().catch(()=>null) as any
+            const u = await usrResp.json().catch(()=>null) as { email?: string; user_metadata?: { full_name?: string; name?: string } }
             customer_email = (u && u.email) || null
             const metaName = u && u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)
             customer_name = (customer_name || metaName || null)
@@ -197,7 +197,7 @@ serve(async (req) => {
     } catch {}
 
     // optional email with result flags
-    let emailResult = { sent: false, disabled: false }
+    const emailResult = { sent: false, disabled: false }
     if (send_email) {
       try {
         const resp = await fetch(`${supabaseUrl}/functions/v1/shipping-notification`, {
@@ -205,7 +205,8 @@ serve(async (req) => {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey },
           body: JSON.stringify({ order_id, carrier, tracking_number, tracking_url, customer_email, customer_name })
         })
-        let j: any = null
+        interface ShippingNotifyResponse { disabled?: boolean; subject?: string; result?: { id?: string } }
+        let j: ShippingNotifyResponse | null = null
         try { j = await resp.json() } catch {}
         if (resp.ok) {
           if (j && j.disabled) emailResult.disabled = true; else emailResult.sent = true
@@ -231,8 +232,8 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ ok: true, email: emailResult }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
+  } catch (_e) {
+    const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: 'unexpected', message: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json', 'X-Request-Id': requestId } })
   }
 })

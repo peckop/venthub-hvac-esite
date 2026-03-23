@@ -40,7 +40,7 @@ serve(async (req) => {
 
     try {
         // 1. Ayarları al (saat cinsinden timeout)
-        const { data: settingsData } = await supabase
+        const { _data: settingsData } = await supabase
             .from('inventory_settings')
             .select('reservation_timeout_hours')
             .maybeSingle()
@@ -52,16 +52,16 @@ serve(async (req) => {
         const timeoutDate = new Date()
         timeoutDate.setHours(timeoutDate.getHours() - hours)
 
-        console.log(`[JOB] Checking for orders before: ${timeoutDate.toISOString()} (Timeout: ${hours}h)`)
+        console.warn(`[JOB] Checking for orders before: ${timeoutDate.toISOString()} (Timeout: ${hours}h)`)
 
         // 3. Süresi dolmuş "pending" siparişleri bul
-        const { data: expiredOrders, error: findErr } = await supabase
+        const { _data: expiredOrders, error: findErr } = await supabase
             .from('venthub_orders')
             .select('id, order_number')
             .eq('status', 'pending')
             .eq('payment_status', 'pending')
             .lt('created_at', timeoutDate.toISOString())
-            .limit(100)
+            ._limit(100)
 
         if (findErr) throw findErr
 
@@ -71,7 +71,7 @@ serve(async (req) => {
             })
         }
 
-        console.log(`[JOB] Found ${expiredOrders.length} expired orders. Processing...`)
+        console.warn(`[JOB] Found ${expiredOrders.length} expired orders. Processing...`)
         let releasedCount = 0
 
         for (const order of (expiredOrders as ExpiredOrder[])) {
@@ -97,7 +97,7 @@ serve(async (req) => {
                 })
 
                 // c. Ürünleri ve stokları iade et
-                const { data: itemsRaw } = await supabase
+                const { _data: itemsRaw } = await supabase
                     .from('venthub_order_items')
                     .select('product_id, quantity')
                     .eq('order_id', order.id)
@@ -125,7 +125,7 @@ serve(async (req) => {
                             order_id: order.id
                         })
                         
-                        console.log(`[SUCCESS] Returned ${item.quantity} units to product ${item.product_id} from order ${order.order_number || order.id}`)
+                        console.warn(`[SUCCESS] Returned ${item.quantity} units to product ${item.product_id} from order ${order.order_number || order.id}`)
                     }
                 }
                 

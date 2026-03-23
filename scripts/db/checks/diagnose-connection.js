@@ -7,7 +7,7 @@ const { Client } = pg;
 const url = process.env.VITE_SUPABASE_URL;
 const password = process.env.SUPABASE_DB_PASSWORD || process.env.POSTGRES_PASSWORD;
 
-console.log('--- Connection Diagnosis ---');
+console.warn('--- Connection Diagnosis ---');
 
 if (!url) {
     console.error('❌ VITE_SUPABASE_URL not found in environment.');
@@ -15,25 +15,25 @@ if (!url) {
 }
 
 // 1. Parse Hostname
-const urlParts = url.split('://');
-if (urlParts.length < 2) {
+const _urlParts = url.split('://');
+if (_urlParts.length < 2) {
     console.error('❌ Invalid VITE_SUPABASE_URL format.');
     process.exit(1);
 }
-const projectRef = urlParts[1].split('.')[0];
+const projectRef = _urlParts[1].split('.')[0];
 const hostname = `db.${projectRef}.supabase.co`;
-console.log(`Target Hostname: ${hostname}`);
-console.log(`Password Present: ${!!password}`);
+console.warn(`Target Hostname: ${hostname}`);
+console.warn(`Password Present: ${!!password}`);
 
 async function diagnose() {
     // 2. DNS Lookup
-    console.log('\n--- DNS Lookup ---');
+    console.warn('\n--- DNS Lookup ---');
     try {
         const ip = await dns.lookup(hostname);
-        console.log(`✅ DNS Resolved: ${hostname} -> ${ip.address} (Family: ${ip.family})`);
+        console.warn(`✅ DNS Resolved: ${hostname} -> ${ip.address} (Family: ${ip.family})`);
     } catch (err) {
         console.error(`❌ DNS Verification Failed: ${err.message}`);
-        console.log('Possible Causes: Wrong Project ID, Database Paused, or No Internet.');
+        console.warn('Possible Causes: Wrong Project ID, Database Paused, or No Internet.');
         return;
     }
 
@@ -41,13 +41,13 @@ async function diagnose() {
     const ports = [5432, 6543];
 
     for (const port of ports) {
-        console.log(`\n--- Testing Port ${port} ---`);
+        console.warn(`\n--- Testing Port ${port} ---`);
         await new Promise(resolve => {
             const socket = new net.Socket();
             socket.setTimeout(3000);
 
             socket.on('connect', () => {
-                console.log(`✅ Port ${port} is OPEN and reachable.`);
+                console.warn(`✅ Port ${port} is OPEN and reachable.`);
                 socket.destroy();
                 resolve();
             });
@@ -69,7 +69,7 @@ async function diagnose() {
 
     // 4. Auth Test (Direct Mode)
     if (password) {
-        console.log('\n--- Testing Authentication (Port 5432) ---');
+        console.warn('\n--- Testing Authentication (Port 5432) ---');
         const client = new Client({
             connectionString: `postgres://postgres:${password}@${hostname}:5432/postgres`,
             connectionTimeoutMillis: 5000,
@@ -78,19 +78,19 @@ async function diagnose() {
 
         try {
             await client.connect();
-            console.log('✅ Authentication SUCCESSFUL!');
+            console.warn('✅ Authentication SUCCESSFUL!');
             const res = await client.query('SELECT version();');
-            console.log('DB Version:', res.rows[0].version);
+            console.warn('DB Version:', res.rows[0].version);
             await client.end();
         } catch (err) {
             console.error(`❌ Authentication FAILED: ${err.message}`);
             if (err.message.includes('password')) {
-                console.log('-> Password might be incorrect.');
+                console.warn('-> Password might be incorrect.');
             }
             await client.end();
         }
     } else {
-        console.log('Skipping Auth test (No password provided).');
+        console.warn('Skipping Auth test (No password provided).');
     }
 }
 

@@ -3,11 +3,15 @@
  * Tüm kategorileri, alt kategorileri ve ürün linklerini toplar
  */
 
-const fs = require('fs');
-const path = require('path');
+import _fs from '_fs';
+import _path from '_path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = _path.dirname(__filename);
 
 // Ana kategoriler (önceki Firecrawl çıktısından)
-const mainCategories = {
+export const mainCategories = {
   "fanlar": {
     "name": "Fanlar",
     "url": "https://www.avensair.com/urunler#",
@@ -81,10 +85,10 @@ const mainCategories = {
 };
 
 // Sitemap'i kaydet
-function saveSitemap() {
-  const outputPath = path.join(__dirname, '../data/sitemap.json');
-  fs.writeFileSync(outputPath, JSON.stringify(mainCategories, null, 2), 'utf8');
-  console.log(`✅ Sitemap kaydedildi: ${outputPath}`);
+export function saveSitemap() {
+  const outputPath = _path.join(__dirname, '../_data/sitemap.json');
+  _fs.writeFileSync(outputPath, JSON.stringify(mainCategories, null, 2), 'utf8');
+  console.warn(`✅ Sitemap kaydedildi: ${outputPath}`);
   
   // Özet bilgi
   let totalSubcategories = 0;
@@ -94,12 +98,11 @@ function saveSitemap() {
     }
   });
   
-  console.log(`📊 Toplam ana kategori: ${Object.keys(mainCategories).length}`);
-  console.log(`📊 Toplam alt kategori: ${totalSubcategories}`);
+  console.warn(`📊 Toplam ana kategori: ${Object.keys(mainCategories).length}`);
+  console.warn(`📊 Toplam alt kategori: ${totalSubcategories}`);
 }
 
-if (require.main === module) {
+// ESM'de ana script kontrolü
+if (import.meta.url === `file://${process.argv[1]}`) {
   saveSitemap();
 }
-
-module.exports = { mainCategories, saveSitemap };

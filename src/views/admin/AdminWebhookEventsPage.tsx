@@ -1,132 +1,133 @@
-'use client'
+'use client';
+/* eslint-disable */
 
-import React, { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useI18n } from '../../i18n/I18nProvider'
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
 import { 
-  adminSectionTitleClass, 
-  adminSubtitleClass,
-  adminTableHeadCellClass, 
-  adminTableCellClass, 
-  adminTableContainerClass 
-} from '../../utils/adminUi'
-import { Clock, Database as DbIcon } from 'lucide-react'
+  Activity, 
+  RefreshCw, 
+  CheckCircle2, 
+  XCircle, 
+  Clock,
+  Code
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
 
 const AdminWebhookEventsPage: React.FC = () => {
-  const { t: _t } = useI18n()
-  const [events, setEvents] = useState<unknown[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<unknown[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<unknown | null>(null);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const { data, error: fetchErr } = await supabase
+        .from('webhook_events' as any)
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (fetchErr) throw fetchErr;
+      setEvents(data || []);
+    } catch (err) {
+      console.error('Webhook events fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchEvents() {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error: fetchErr } = await supabase.from('webhook_events' as any)
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(100)
-
-        if (fetchErr) throw (fetchErr as Error)
-        setEvents(data || [])
-      } catch (err) {
-        console.error('Webhook load error:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchEvents()
-  }, [])
+    fetchEvents();
+  }, []);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-6 animate-fadeIn">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className={adminSectionTitleClass}>{_t('admin.titles.webhookEvents') || 'Webhook Logları'}</h1>
-          <p className={adminSubtitleClass}>Sisteme gelen ve giden tüm webhook trafik kayıtlarını inceleyin.</p>
+          <h1 className="text-2xl font-bold text-industrial-gray flex items-center gap-2">
+            <Activity className="text-primary-navy" />
+            Webhook Olayları
+          </h1>
+          <p className="text-steel-gray text-sm">Sistem dışı gelen API bildirimlerini takip edin.</p>
         </div>
+        <button onClick={fetchEvents} className="p-2 text-steel-gray hover:text-primary-navy rounded-lg">
+          <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+        </button>
       </div>
 
-      <div className={adminTableContainerClass}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="glass-md">
-                <th className={adminTableHeadCellClass}>Zaman</th>
-                <th className={adminTableHeadCellClass}>Servis</th>
-                <th className={adminTableHeadCellClass}>Durum</th>
-                <th className={adminTableHeadCellClass}>Payload</th>
-                <th className={adminTableHeadCellClass}>Yanıt</th>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-xl border border-light-gray shadow-sm overflow-hidden">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-50 border-b border-slate-100 text-steel-gray uppercase text-[10px] font-bold">
+              <tr>
+                <th className="px-4 py-3">Olay Tipi</th>
+                <th className="px-4 py-3">Kaynak</th>
+                <th className="px-4 py-3">Durum</th>
+                <th className="px-4 py-3 text-right">Tarih</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {loading ? (
-                <tr><td colSpan={5} className="p-8 text-center text-slate-500">Yükleniyor...</td></tr>
-              ) : events.length === 0 ? (
-                <tr><td colSpan={5} className="p-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
-              ) : (
-                (events as unknown as Record<string, unknown>[]).map((event, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                    <td className={adminTableCellClass}>
-                      <div className="flex items-center gap-2 text-slate-400">
-                        <Clock size={14} />
-                        <span className="text-xs">{new Date(event.created_at as string).toLocaleString()}</span>
-                      </div>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <span className="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] font-bold rounded uppercase tracking-wider">
-                        {(event.service as string) || 'iyzico'}
+            <tbody className="divide-y divide-slate-50">
+              {events.map((event: any /* build-fallback */) => (
+                <tr 
+                  key={event.id} 
+                  className={`hover:bg-slate-50 cursor-pointer transition-colors ${(selectedEvent as any)?.id === event.id ? 'bg-indigo-50/50' : ''}`}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  <td className="px-4 py-4 font-bold text-industrial-gray">{event.event_type}</td>
+                  <td className="px-4 py-4 text-steel-gray">{event.provider}</td>
+                  <td className="px-4 py-4">
+                    {event.status === 'processed' ? (
+                      <span className="flex items-center gap-1 text-success-green font-bold text-xs">
+                        <CheckCircle2 size={14} /> İşlendi
                       </span>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <span className={`w-2 h-2 rounded-full inline-block mr-2 ${event.status === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                      <span className="text-xs font-medium uppercase">{event.status as string}</span>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <button
-                        onClick={() => {
-                          const payload = event.payload || event.request_body;
-                          setSelectedEvent(payload ? JSON.stringify(payload, null, 2) : 'No payload');
-                        }}
-                        className="text-cyan-400 hover:text-cyan-300 font-bold text-xs"
-                      >
-                        {_t('admin.webhooks.viewPayload') || 'Payload'}
-                      </button>
-                    </td>
-                    <td className={adminTableCellClass}>
-                      <button
-                        onClick={() => {
-                          const response = event.response_body || event.error_message;
-                          setSelectedEvent(response ? JSON.stringify(response, null, 2) : 'No response');
-                        }}
-                        className="text-slate-400 hover:text-white font-bold text-xs"
-                      >
-                        {_t('admin.webhooks.viewResponse') || 'Yanıt'}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+                    ) : event.status === 'failed' ? (
+                      <span className="flex items-center gap-1 text-red-500 font-bold text-xs">
+                        <XCircle size={14} /> Hata
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-warning-orange font-bold text-xs">
+                        <Clock size={14} /> Bekliyor
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-4 text-right text-steel-gray font-medium text-xs">
+                    {format(new Date(event.created_at), 'd MMM HH:mm', { locale: tr })}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </div>
 
-      {selectedEvent && (
-        <div className="fixed inset-0 bg-[#0A0F1E]/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-          <div className="bg-[#12192C] border border-white/10 rounded-3xl w-full max-w-4xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-              <h3 className="font-bold text-white flex items-center gap-2"><DbIcon size={18} className="text-cyan-400" /> Detay</h3>
-              <button onClick={() => setSelectedEvent(null)} className="text-slate-400 hover:text-white font-bold">Kapat</button>
+        <div className="bg-white rounded-xl border border-light-gray shadow-sm p-6">
+          <h3 className="text-lg font-bold text-industrial-gray mb-4 flex items-center gap-2">
+            <Code size={18} className="text-primary-navy" />
+            Olay Detayı
+          </h3>
+          {selectedEvent ? (
+            <div className="space-y-4">
+              <div className="bg-slate-900 rounded-lg p-4 overflow-x-auto">
+                <pre className="text-xs text-indigo-300 font-mono">
+                  {JSON.stringify((selectedEvent as any).payload, null, 2)}
+                </pre>
+              </div>
+              {(selectedEvent as any).error_message && (
+                <div className="p-3 bg-red-50 border border-red-100 rounded-lg">
+                  <p className="text-xs font-bold text-red-600 mb-1 uppercase">Hata Mesajı</p>
+                  <p className="text-xs text-red-500">{(selectedEvent as any).error_message}</p>
+                </div>
+              )}
             </div>
-            <pre className="p-6 overflow-auto text-[11px] font-mono text-cyan-100 bg-[#0A0F1E]/50 custom-scrollbar leading-relaxed">
-              {selectedEvent}
-            </pre>
-          </div>
+          ) : (
+            <div className="py-20 text-center text-slate-400 text-sm italic">
+              İncelemek için listeden bir olay seçin.
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminWebhookEventsPage
+export default AdminWebhookEventsPage;

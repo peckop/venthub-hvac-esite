@@ -41,6 +41,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
           {onViewModeChange && (
             <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
               <button 
+                type="button"
                 onClick={() => onViewModeChange('grid')}
                 className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 title={t('category.view.grid') || 'Izgara Görünümü'}
@@ -48,6 +49,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
                 <Grid size={18} />
               </button>
               <button 
+                type="button"
                 onClick={() => onViewModeChange('list')}
                 className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary-navy text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                 title={t('category.view.list') || 'Liste Görünümü'}
@@ -58,16 +60,21 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({
           )}
 
           {onSortChange && (
-            <select 
-              value={sortBy}
-              onChange={(e) => onSortChange(e.target.value)}
-              className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-all shadow-sm"
-              aria-label={t('category.sort.title') || 'Sıralama'}
-            >
-              <option value="name">{t('category.sort.name') || 'İsim'}</option>
-              <option value="price-low">{t('category.sort.priceLow') || 'Düşük Fiyat'}</option>
-              <option value="price-high">{t('category.sort.priceHigh') || 'Yüksek Fiyat'}</option>
-            </select>
+            <div className="relative">
+              <select 
+                value={sortBy}
+                onChange={(e) => onSortChange(e.target.value)}
+                className="bg-white border-slate-200 rounded-xl text-sm font-bold text-slate-700 py-2.5 pl-4 pr-10 focus:ring-primary-ocean/20 transition-all shadow-sm appearance-none"
+                aria-label={t('category.sort.title') || 'Sıralama'}
+              >
+                <option value="name">{t('category.sort.name') || 'İsim'}</option>
+                <option value="price-low">{t('category.sort.priceLow') || 'Düşük Fiyat'}</option>
+                <option value="price-high">{t('category.sort.priceHigh') || 'Yüksek Fiyat'}</option>
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                {/* Custom arrow icon could go here if needed */}
+              </div>
+            </div>
           )}
         </div>
       </div>

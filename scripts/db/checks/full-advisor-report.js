@@ -17,10 +17,10 @@ const client = new Client({
 async function runFullAdvisor() {
     try {
         await client.connect();
-        console.log('=== SUPABASE ADVISOR FULL REPORT ===\n');
+        console.warn('=== SUPABASE ADVISOR FULL REPORT ===\n');
 
         // 1. Unindexed Foreign Keys (with proper casting)
-        console.log('--- 1. Unindexed Foreign Keys ---');
+        console.warn('--- 1. Unindexed Foreign Keys ---');
         const fkQuery = `
           WITH fks AS (
             SELECT n.nspname AS schema_name, c.relname AS table_name, con.conname AS fk_name, con.conkey::int[], con.conrelid
@@ -39,12 +39,12 @@ async function runFullAdvisor() {
           ORDER BY 1,2;
         `;
         const fkRes = await client.query(fkQuery);
-        if (fkRes.rows.length === 0) console.log('  ✅ None');
-        else fkRes.rows.forEach(r => console.log(`  ⚠️ ${r.table_name}.${r.fk_name}`));
+        if (fkRes.rows.length === 0) console.warn('  ✅ None');
+        else fkRes.rows.forEach(r => console.warn(`  ⚠️ ${r.table_name}.${r.fk_name}`));
 
 
         // 2. Duplicate Indexes
-        console.log('\n--- 2. Duplicate Indexes ---');
+        console.warn('\n--- 2. Duplicate Indexes ---');
         const dupQuery = `
           WITH idx AS (
             SELECT n.nspname AS schema_name, c.relname AS table_name, i.relname AS index_name,
@@ -58,16 +58,16 @@ async function runFullAdvisor() {
           SELECT schema_name, table_name, string_agg(index_name, ', ') AS duplicates
           FROM idx
           GROUP BY schema_name, table_name, indexdef_norm
-          HAVING COUNT(*) > 1
+          HAVING _count(*) > 1
           ORDER BY 1,2;
         `;
         const dupRes = await client.query(dupQuery);
-        if (dupRes.rows.length === 0) console.log('  ✅ None');
-        else dupRes.rows.forEach(r => console.log(`  ⚠️ ${r.table_name}: ${r.duplicates}`));
+        if (dupRes.rows.length === 0) console.warn('  ✅ None');
+        else dupRes.rows.forEach(r => console.warn(`  ⚠️ ${r.table_name}: ${r.duplicates}`));
 
 
         // 3. Unused Indexes (idx_scan = 0, excluding pkey/unique)
-        console.log('\n--- 3. Unused Indexes (idx_scan=0) ---');
+        console.warn('\n--- 3. Unused Indexes (idx_scan=0) ---');
         const unusedQuery = `
           SELECT schemaname, relname AS table_name, indexrelname AS index_name
           FROM pg_stat_user_indexes
@@ -76,27 +76,27 @@ async function runFullAdvisor() {
           ORDER BY 1,2;
         `;
         const unusedRes = await client.query(unusedQuery);
-        if (unusedRes.rows.length === 0) console.log('  ✅ None');
-        else unusedRes.rows.forEach(r => console.log(`  ⚠️ ${r.table_name}.${r.index_name}`));
+        if (unusedRes.rows.length === 0) console.warn('  ✅ None');
+        else unusedRes.rows.forEach(r => console.warn(`  ⚠️ ${r.table_name}.${r.index_name}`));
 
 
         // 4. Multiple Permissive RLS Policies (same table, same command)
-        console.log('\n--- 4. Multiple Permissive RLS Policies ---');
+        console.warn('\n--- 4. Multiple Permissive RLS Policies ---');
         const rlsQuery = `
-          SELECT schemaname, tablename, cmd, COUNT(*) AS cnt, string_agg(policyname, ', ') AS policies
+          SELECT schemaname, tablename, cmd, _count(*) AS cnt, string_agg(policyname, ', ') AS policies
           FROM pg_policies
           WHERE permissive = 'PERMISSIVE' AND schemaname = 'public'
           GROUP BY schemaname, tablename, cmd
-          HAVING COUNT(*) > 1
+          HAVING _count(*) > 1
           ORDER BY 1,2,3;
         `;
         const rlsRes = await client.query(rlsQuery);
-        if (rlsRes.rows.length === 0) console.log('  ✅ None');
-        else rlsRes.rows.forEach(r => console.log(`  ⚠️ ${r.tablename} (${r.cmd}): ${r.policies}`));
+        if (rlsRes.rows.length === 0) console.warn('  ✅ None');
+        else rlsRes.rows.forEach(r => console.warn(`  ⚠️ ${r.tablename} (${r.cmd}): ${r.policies}`));
 
 
         // 5. RLS initplan issues (auth.uid() in policies - rough heuristic)
-        console.log('\n--- 5. RLS using auth.uid() directly (potential initplan issue) ---');
+        console.warn('\n--- 5. RLS using auth.uid() directly (potential initplan issue) ---');
         const initplanQuery = `
           SELECT tablename, policyname, qual
           FROM pg_policies
@@ -104,11 +104,11 @@ async function runFullAdvisor() {
           ORDER BY 1,2;
         `;
         const initplanRes = await client.query(initplanQuery);
-        if (initplanRes.rows.length === 0) console.log('  ✅ None (or using sub-select pattern)');
-        else initplanRes.rows.forEach(r => console.log(`  ⚠️ ${r.tablename}.${r.policyname}`));
+        if (initplanRes.rows.length === 0) console.warn('  ✅ None (or using sub-select pattern)');
+        else initplanRes.rows.forEach(r => console.warn(`  ⚠️ ${r.tablename}.${r.policyname}`));
 
 
-        console.log('\n=== END OF REPORT ===');
+        console.warn('\n=== END OF REPORT ===');
 
     } catch (err) {
         console.error('Error:', err.message);

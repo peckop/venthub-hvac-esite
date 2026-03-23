@@ -8,6 +8,8 @@ interface QrLabelProps {
 }
 
 export const printQrLabel = async (r: QrLabelProps, setPrintingQr: (v: boolean) => void) => {
+  if (typeof window === 'undefined') return
+  
   try {
     setPrintingQr(true)
     const url = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(r.product_id)}`

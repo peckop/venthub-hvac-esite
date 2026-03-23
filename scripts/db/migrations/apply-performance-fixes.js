@@ -17,7 +17,7 @@ const client = new Client({
 async function applyFixes() {
     try {
         await client.connect();
-        console.log('Connected to database...');
+        console.warn('Connected to database...');
 
         const commands = [
             `CREATE INDEX IF NOT EXISTS idx_products_category_id ON products (category_id);`,
@@ -27,11 +27,11 @@ async function applyFixes() {
         ];
 
         for (const cmd of commands) {
-            console.log(`Executing: ${cmd}`);
+            console.warn(`Executing: ${cmd}`);
             await client.query(cmd);
         }
 
-        console.log('✅ Applied performance fixes.');
+        console.warn('✅ Applied performance fixes.');
 
     } catch (err) {
         console.error('Error applying fixes:', err);

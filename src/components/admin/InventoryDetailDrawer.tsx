@@ -156,7 +156,7 @@ export default function InventoryDetailDrawer(props: InventoryDetailDrawerProps)
                     {hasWriteAccess && (
                         <div className="glass rounded-[2rem] border border-white/5 p-6 space-y-4">
                             <InventoryStockAdjust
-                                productId={selected.product_id}
+                                _productId={selected.product_id}
                                 onAdjust={adjustStock}
                                 moving={moving}
                                 moveQty={moveQty}

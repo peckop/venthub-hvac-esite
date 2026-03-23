@@ -200,7 +200,7 @@ export async function generateProductDatasheet(
         doc.setFont('Roboto', 'bold');
         doc.setFontSize(14);
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
-        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical Specifications', margin + 4, currentY);
+        doc.text(lang === 'tr' ? 'Teknik Özellikler' : 'Technical _specifications', margin + 4, currentY);
         currentY += 8;
 
         const tableData: string[][] = [];

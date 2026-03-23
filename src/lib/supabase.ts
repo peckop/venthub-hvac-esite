@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { createClient } from '@supabase/supabase-js'
 import type { Database, Json } from '../types/database.types'
 import type { DomainCategory, DomainProduct } from '../types/ui-models'
@@ -156,8 +157,27 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
+  let resolvedCategoryIds = params.categoryIds;
+
+  // If we have category IDs that are actually SLUGS (from CATEGORY_REGISTRY), resolve them to IDs first
+  if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
+    const potentialSlugs = resolvedCategoryIds.filter(id => id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+    
+    if (potentialSlugs.length > 0) {
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('id, slug')
+        .in('slug', potentialSlugs);
+      
+      if (categories && categories.length > 0) {
+        const slugToIdMap = new Map(categories.map(c => [c.slug, c.id]));
+        resolvedCategoryIds = resolvedCategoryIds.map(id => slugToIdMap.get(id) || id);
+      }
+    }
+  }
+
   const { data, error } = await (supabase as unknown as { rpc: (name: string, params: Record<string, unknown>) => Promise<{data: unknown, error: unknown}> }).rpc('get_products_enriched', {
-    p_category_ids: params.categoryIds,
+    p_category_ids: resolvedCategoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
     p_search_query: params.searchQuery,
@@ -168,6 +188,18 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
 
   if (error) {
     console.error('getProductsEnriched error:', error)
+    
+    // If there was an error with filtering, don't just return 50 random products
+    // Instead return empty or a more specific fallback
+    if (resolvedCategoryIds && resolvedCategoryIds.length > 0) {
+        const { data: fallbackData } = await supabase
+          .from('products')
+          .select('*')
+          .or(`category_id.in.(${resolvedCategoryIds.join(',')}),subcategory_id.in.(${resolvedCategoryIds.join(',')})`)
+          .limit(params.limit || 50)
+        return toUIProductList((fallbackData as DbProduct[]) || [])
+    }
+
     const { data: fallbackData } = await supabase
       .from('products')
       .select('*')
@@ -618,11 +650,11 @@ export async function listCartItemsWithProducts(cartId: string): Promise<{ item:
   const items = await listCartItems(cartId)
   if (items.length === 0) return []
   
-  const productIds = Array.from(new Set(items.map(i => i.product_id)))
+  const _productIds = Array.from(new Set(items.map(i => i.product_id)))
   const { data: products, error: pErr } = await supabase
     .from('products')
     .select('*')
-    .in('id', productIds)
+    .in('id', _productIds)
   
   if (pErr) throw pErr
   
@@ -638,18 +670,18 @@ export async function listCartItemsWithProducts(cartId: string): Promise<{ item:
 
 export async function upsertCartItem(params: { 
   cartId: string; 
-  productId: string; 
+  _productId: string; 
   quantity: number; 
   unitPrice?: number | null; 
   priceListId?: string | null 
 }): Promise<DbCartItem[]> {
-  const { cartId, productId, quantity, unitPrice, priceListId } = params
+  const { cartId, _productId, quantity, unitPrice, priceListId } = params
   
   const sel = await supabase
     .from('cart_items')
     .select('id')
     .eq('cart_id', cartId)
-    .eq('product_id', productId)
+    .eq('product_id', _productId)
     .limit(1)
   
   const common: Record<string, Json> = { quantity }
@@ -661,7 +693,7 @@ export async function upsertCartItem(params: {
       .from('cart_items')
       .update(common)
       .eq('cart_id', cartId)
-      .eq('product_id', productId)
+      .eq('product_id', _productId)
       .select('*')
     if (upd.error) throw upd.error
     return (upd.data as DbCartItem[]) || []
@@ -669,7 +701,7 @@ export async function upsertCartItem(params: {
   
   const ins = await supabase
     .from('cart_items')
-    .insert({ cart_id: cartId, product_id: productId, ...common })
+    .insert({ cart_id: cartId, product_id: _productId, ...common })
     .select('*')
   if (ins.error) throw ins.error
   return (ins.data as DbCartItem[]) || []
@@ -768,51 +800,51 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       is_default: boolean | null; 
       allowed_user_roles: string[] | null; 
       organization_tiers: number[] | null; 
-      effective_from: string | null 
+      effective_from: string;
     }
+
+    const typedLists = lists as unknown as PriceListRow[]
     
-    const castedLists = lists as unknown as PriceListRow[]
-    
-    const filtered = castedLists.filter(pl => {
-      const roles = pl.allowed_user_roles || []
-      const tiers = pl.organization_tiers || []
-      const roleOk = roles.length === 0 || roles.includes(role)
-      const tierOk = tierLevel === null || tiers.length === 0 || tiers.includes(tierLevel)
-      return roleOk && tierOk
+    // Filter and sort lists
+    const matchedLists = typedLists.filter(list => {
+      let match = false
+      if (list.allowed_user_roles && Array.isArray(list.allowed_user_roles) && list.allowed_user_roles.includes(role)) match = true
+      if (!match && tierLevel !== null && list.organization_tiers && Array.isArray(list.organization_tiers) && list.organization_tiers.includes(tierLevel)) match = true
+      if (!match && list.is_default) match = true
+      return match
     })
 
-    const chosen = filtered.sort((a, b) => {
-      const aDef = a.is_default ? 1 : 0
-      const bDef = b.is_default ? 1 : 0
-      if (aDef !== bDef) return aDef - bDef
-      const aTime = a.effective_from ? Date.parse(a.effective_from) : 0
-      const bTime = b.effective_from ? Date.parse(b.effective_from) : 0
+    const sorted = matchedLists.sort((a, b) => {
+      if (a.is_default !== b.is_default) return a.is_default ? 1 : -1
+      const aTime = a.effective_from ? new Date(a.effective_from).getTime() : 0
+      const bTime = b.effective_from ? new Date(b.effective_from).getTime() : 0
       return bTime - aTime
-    })[0]
+    })
 
-    const priceQueries: { price_list_id: string | null }[] = chosen 
-      ? [{ price_list_id: chosen.id }, { price_list_id: null }] 
-      : [{ price_list_id: null }]
+    const chosen = sorted.length > 0 ? sorted[0] : null
 
-    for (const pq of priceQueries) {
+    // Try price lists in order: chosen, then fallback (null)
+    const priceListIds = chosen ? [chosen.id, null] : [null]
+
+    for (const plId of priceListIds) {
       let query = supabase
         .from('product_prices')
-        .select('base_price, sale_price, discount_percentage, is_active, valid_from, valid_until')
+        .select('*')
         .eq('product_id', product.id)
         .eq('is_active', true)
 
-      if (pq.price_list_id === null) {
+      if (plId === null) {
         query = query.is('price_list_id', null)
       } else {
-        query = query.eq('price_list_id', pq.price_list_id)
+        query = query.eq('price_list_id', plId)
       }
 
       const { data: rows, error: prErr } = await query
       if (prErr || !Array.isArray(rows) || rows.length === 0) continue
 
       const pick = rows.find(r => {
-        const fromOk = !r.valid_from || Date.parse(r.valid_from) <= Date.now()
-        const toOk = !r.valid_until || Date.parse(r.valid_until) >= Date.now()
+        const fromOk = !r.valid_from || new Date(r.valid_from).getTime() <= Date.now()
+        const toOk = !r.valid_until || new Date(r.valid_until).getTime() >= Date.now()
         return fromOk && toOk
       }) || rows[0]
 
@@ -820,19 +852,19 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       const sale = pick.sale_price != null ? Number(pick.sale_price) : null
       const disc = Number(pick.discount_percentage || 0)
 
-      if (sale != null && Number.isFinite(sale) && sale > 0) return { unitPrice: sale, priceListId: pq.price_list_id }
+      if (sale != null && Number.isFinite(sale) && sale > 0) return { unitPrice: sale, priceListId: plId }
       if (Number.isFinite(base) && base > 0) {
         if (disc > 0) {
           const val = base * (1 - disc / 100)
-          return { unitPrice: Math.max(0, Number(val.toFixed(2))), priceListId: pq.price_list_id }
+          return { unitPrice: Math.max(0, Number(val.toFixed(2))), priceListId: plId }
         }
-        return { unitPrice: base, priceListId: pq.price_list_id }
+        return { unitPrice: base, priceListId: plId }
       }
     }
 
     return { unitPrice: fallback, priceListId: chosen ? chosen.id : null }
   } catch (e) {
-    console.error('getEffectiveUnitPrice error', e)
+    console.error('getEffectivePriceInfo error', e)
     return { unitPrice: fallback, priceListId: null }
   }
 }
@@ -840,31 +872,29 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
 // ========== Project Management ==========
 
 export async function listUserProjects(): Promise<DbUserProject[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.from('user_projects' as any)
+  const { data, error } = await supabase.from('user_projects')
     .select('*')
     .order('updated_at', { ascending: false })
 
   if (error) throw (error as Error)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (data as any) || []
+  
+  return (data as DbUserProject[]) || []
 }
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.from('user_projects' as any)
-    .insert(project)
+  const { data, error } = await supabase.from('user_projects')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(project as any)
     .select()
     .single()
 
   if (error) throw (error as Error)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any
+  
+  return data as unknown as DbUserProject
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await supabase.from('user_projects' as any)
+  const { error } = await supabase.from('user_projects')
     .delete()
     .eq('id', id)
 
@@ -873,20 +903,18 @@ export async function deleteProject(id: string): Promise<boolean> {
 }
 
 export async function addProductToProject(projectId: string, productId: string, quantity: number = 1): Promise<DbProjectItem> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.from('project_items' as any)
+  const { data, error } = await supabase.from('project_items')
     .insert({ project_id: projectId, product_id: productId, quantity })
     .select()
     .single()
 
   if (error) throw (error as Error)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any
+  
+  return data as unknown as DbProjectItem
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await supabase.from('project_items' as any)
+  const { error } = await supabase.from('project_items')
     .delete()
     .match({ project_id: projectId, product_id: productId })
 
@@ -895,15 +923,14 @@ export async function removeProductFromProject(projectId: string, productId: str
 }
 
 export async function listProjectItems(projectId: string): Promise<ProjectItem[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await supabase.from('project_items' as any)
+  const { data, error } = await supabase.from('project_items')
     .select('*, product:products(*)')
     .eq('project_id', projectId)
 
   if (error) throw (error as Error)
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const items = (data as any) || []
+  
+  const items = (data as (DbProjectItem & { product: DbProduct | null })[]) || []
   return items.map(item => ({
     ...item,
     product: item.product ? mapDatabaseProductToDomain(item.product) : undefined

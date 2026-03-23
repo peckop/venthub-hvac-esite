@@ -373,7 +373,7 @@ def move_task(proj_id: str, task_id_raw: Optional[str] = None, target_state: str
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="VentHub Registry Engine 5.0")
-    parser.add_argument("action", choices=["repair", "normalize", "activate", "create-project", "create-task", "remember", "recall", "dashboard", "init"])
+    parser.add_argument("action", choices=["repair", "normalize", "activate", "backlog", "create-project", "create-task", "remember", "recall", "dashboard", "init"])
     parser.add_argument("project_id", nargs="?", help="Project ID (P01)")
     parser.add_argument("task_id", nargs="?", help="Task ID (008)")
     parser.add_argument("--query", "-q", help="Title / Query")
@@ -398,6 +398,11 @@ if __name__ == "__main__":
             log_error("Proje ID ve Görev ID gerekli.")
             sys.exit(1)
         move_task(args.project_id, args.task_id, "active")
+    elif args.action == "backlog":
+        if not args.project_id or not args.task_id:
+            log_error("Proje ID ve Görev ID gerekli.")
+            sys.exit(1)
+        move_task(args.project_id, args.task_id, "backlog")
     elif args.action == "dashboard":
         with RegistryDB() as db:
             db.cursor.execute("SELECT id, title, status, progress FROM tasks WHERE state='active' ORDER BY updated_at DESC")

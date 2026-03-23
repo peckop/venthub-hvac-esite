@@ -64,8 +64,8 @@ const NEW_CATEGORIES = [
   }
 ];
 
-function generateSlug(text) {
-  return text
+function generateSlug(_text) {
+  return _text
     .toLowerCase()
     .replace(/ğ/g, 'g')
     .replace(/ü/g, 'u')
@@ -81,7 +81,7 @@ function generateSlug(text) {
 }
 
 async function renameExistingCategories() {
-  console.log('🏷️ Mevcut kategori isimleri güncelleniyor...');
+  console.warn('🏷️ Mevcut kategori isimleri güncelleniyor...');
   
   let renamed = 0;
   
@@ -100,7 +100,7 @@ async function renameExistingCategories() {
       if (error) {
         console.error(`❌ ${category.current_name} → ${category.new_name} güncelleme hatası:`, error.message);
       } else {
-        console.log(`✅ ${category.current_name} → ${category.new_name}`);
+        console.warn(`✅ ${category.current_name} → ${category.new_name}`);
         renamed++;
       }
     } catch (error) {
@@ -112,7 +112,7 @@ async function renameExistingCategories() {
 }
 
 async function createNewCategories() {
-  console.log('\n📂 Yeni kategoriler oluşturuluyor...');
+  console.warn('\n📂 Yeni kategoriler oluşturuluyor...');
   
   let created = 0;
   const MAIN_FANLAR_ID = '4bc54533-7323-4eac-a02d-4498ffde00eb';
@@ -122,14 +122,14 @@ async function createNewCategories() {
       const slug = generateSlug(category.name);
       
       // Kategori zaten var mı kontrol et
-      const { data: existing } = await supabase
+      const { _data: existing } = await supabase
         .from('categories')
         .select('id')
         .eq('name', category.name)
         .single();
 
       if (existing) {
-        console.log(`⚠️ ${category.name} zaten mevcut`);
+        console.warn(`⚠️ ${category.name} zaten mevcut`);
         continue;
       }
       
@@ -146,7 +146,7 @@ async function createNewCategories() {
       if (error) {
         console.error(`❌ ${category.name} oluşturma hatası:`, error.message);
       } else {
-        console.log(`✅ Yeni kategori: ${category.name}`);
+        console.warn(`✅ Yeni kategori: ${category.name}`);
         created++;
       }
     } catch (error) {
@@ -158,7 +158,7 @@ async function createNewCategories() {
 }
 
 async function updateATEXCategoryName() {
-  console.log('\n🔧 ATEX kategorisi güncelleniyor...');
+  console.warn('\n🔧 ATEX kategorisi güncelleniyor...');
   
   try {
     const { error } = await supabase
@@ -172,7 +172,7 @@ async function updateATEXCategoryName() {
     if (error) {
       console.error('❌ ATEX kategori güncelleme hatası:', error.message);
     } else {
-      console.log('✅ ATEX kategorisi güncellendi');
+      console.warn('✅ ATEX kategorisi güncellendi');
     }
   } catch (error) {
     console.error('❌ ATEX güncelleme hatası:', error.message);
@@ -180,16 +180,16 @@ async function updateATEXCategoryName() {
 }
 
 async function redistributeProducts() {
-  console.log('\n📦 Ürünler uygun kategorilere dağıtılıyor...');
+  console.warn('\n📦 Ürünler uygun kategorilere dağıtılıyor...');
   
   // Duman egzoz ürünlerini taşı
-  const { data: dumanProducts } = await supabase
+  const { _data: dumanProducts } = await supabase
     .from('products')
     .select('id, name')
     .ilike('name', '%duman%egzoz%');
 
   if (dumanProducts && dumanProducts.length > 0) {
-    const { data: dumanCategory } = await supabase
+    const { _data: dumanCategory } = await supabase
       .from('categories')
       .select('id')
       .eq('name', 'Duman Egzoz Fanları')
@@ -201,19 +201,19 @@ async function redistributeProducts() {
           .from('products')
           .update({ category_id: dumanCategory.id })
           .eq('id', product.id);
-        console.log(`📦 ${product.name} → Duman Egzoz Fanları`);
+        console.warn(`📦 ${product.name} → Duman Egzoz Fanları`);
       }
     }
   }
 
   // Basınçlandırma ürünlerini taşı
-  const { data: basinclProducts } = await supabase
+  const { _data: basinclProducts } = await supabase
     .from('products')
     .select('id, name')
     .ilike('name', '%basınç%');
 
   if (basinclProducts && basinclProducts.length > 0) {
-    const { data: basincCategory } = await supabase
+    const { _data: basincCategory } = await supabase
       .from('categories')
       .select('id')
       .eq('name', 'Basınçlandırma Fanları')
@@ -225,19 +225,19 @@ async function redistributeProducts() {
           .from('products')
           .update({ category_id: basincCategory.id })
           .eq('id', product.id);
-        console.log(`📦 ${product.name} → Basınçlandırma Fanları`);
+        console.warn(`📦 ${product.name} → Basınçlandırma Fanları`);
       }
     }
   }
 
   // Sığınak ürünlerini taşı
-  const { data: siginakProducts } = await supabase
+  const { _data: siginakProducts } = await supabase
     .from('products')
     .select('id, name')
     .ilike('name', '%sığınak%');
 
   if (siginakProducts && siginakProducts.length > 0) {
-    const { data: siginakCategory } = await supabase
+    const { _data: siginakCategory } = await supabase
       .from('categories')
       .select('id')
       .eq('name', 'Sığınak Havalandırma Fanları')
@@ -249,19 +249,19 @@ async function redistributeProducts() {
           .from('products')
           .update({ category_id: siginakCategory.id })
           .eq('id', product.id);
-        console.log(`📦 ${product.name} → Sığınak Havalandırma Fanları`);
+        console.warn(`📦 ${product.name} → Sığınak Havalandırma Fanları`);
       }
     }
   }
 
   // Nicotra Gebhardt ürünlerini taşı
-  const { data: nicotraProducts } = await supabase
+  const { _data: nicotraProducts } = await supabase
     .from('products')
     .select('id, name')
     .eq('brand', 'Nicotra Gebhardt');
 
   if (nicotraProducts && nicotraProducts.length > 0) {
-    const { data: nicotraCategory } = await supabase
+    const { _data: nicotraCategory } = await supabase
       .from('categories')
       .select('id')
       .eq('name', 'Nicotra Gebhardt Fanlar')
@@ -273,42 +273,42 @@ async function redistributeProducts() {
           .from('products')
           .update({ category_id: nicotraCategory.id })
           .eq('id', product.id);
-        console.log(`📦 ${product.name} → Nicotra Gebhardt Fanlar`);
+        console.warn(`📦 ${product.name} → Nicotra Gebhardt Fanlar`);
       }
     }
   }
 }
 
 async function showFinalCategories() {
-  console.log('\n📂 Final kategori yapısı (resminize uygun):');
+  console.warn('\n📂 Final kategori yapısı (resminize uygun):');
   
-  const { data: categories } = await supabase
+  const { _data: categories } = await supabase
     .from('categories')
     .select('id, name, parent_id')
     .eq('parent_id', '4bc54533-7323-4eac-a02d-4498ffde00eb')
     .order('name');
 
   if (categories) {
-    console.log('\n📁 Fanlar');
+    console.warn('\n📁 Fanlar');
     categories.forEach(cat => {
-      console.log(`  └── ${cat.name}`);
+      console.warn(`  └── ${cat.name}`);
     });
 
     // ATEX alt kategorisini de göster
-    const { data: atexCategory } = await supabase
+    const { _data: atexCategory } = await supabase
       .from('categories')
       .select('name')
       .eq('parent_id', 'db965633-c967-4193-8617-e1a7651997ec')
       .single();
 
     if (atexCategory) {
-      console.log(`      └── ${atexCategory.name}`);
+      console.warn(`      └── ${atexCategory.name}`);
     }
   }
 }
 
 async function main() {
-  console.log('🚀 Kategori yapısını resminize uygun hale getiriyorum...');
+  console.warn('🚀 Kategori yapısını resminize uygun hale getiriyorum...');
 
   try {
     // 1. Mevcut kategori isimlerini güncelle
@@ -326,12 +326,12 @@ async function main() {
     // 5. Final yapıyı göster
     await showFinalCategories();
 
-    console.log(`\n📊 İşlem Özeti:`);
-    console.log(`✅ Güncellenen kategori: ${renamed}`);
-    console.log(`✅ Oluşturulan kategori: ${created}`);
+    console.warn(`\n📊 İşlem Özeti:`);
+    console.warn(`✅ Güncellenen kategori: ${renamed}`);
+    console.warn(`✅ Oluşturulan kategori: ${created}`);
     
-    console.log(`\n🎉 Kategori yapısı artık resminizde gösterdiğiniz ile aynı!`);
-    console.log(`💡 Tüm fan kategorileri doğru isimlerle "Fanlar" ana kategorisinin altında.`);
+    console.warn(`\n🎉 Kategori yapısı artık resminizde gösterdiğiniz ile aynı!`);
+    console.warn(`💡 Tüm fan kategorileri doğru isimlerle "Fanlar" ana kategorisinin altında.`);
 
   } catch (error) {
     console.error('💥 İşlem hatası:', error.message);

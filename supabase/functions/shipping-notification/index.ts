@@ -2,16 +2,16 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
 
 // Tiny template renderer for {{var}} and {{#if var}} ... {{/if}}
-function renderTemplate(tpl: string, data: Record<string, unknown>): string {
+function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
   // if-blocks
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
-    const v = data[key]
+    const v = _data[key]
     const truthy = !!(typeof v === 'string' ? v : v)
     return truthy ? inner : ''
   })
   // variables
   tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
-    const v = data[key]
+    const v = _data[key]
     return v == null ? '' : String(v)
   })
   return tpl
@@ -49,301 +49,80 @@ serve(async (req) => {
     'Access-Control-Allow-Methods': requestMethod,
     'Access-Control-Max-Age': '86400',
   }
-  if (!originAllowed && req.method !== 'OPTIONS') {
-    return new Response(JSON.stringify({ error: 'forbidden_origin' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-  }
 
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: corsHeaders })
-  }
-
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { status: 200, headers: corsHeaders })
+  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   try {
-    // Parse body robustly and support camelCase as well
-    const text = await req.text()
-    let parsed: Record<string, unknown>
-    try { parsed = text ? JSON.parse(text) : {} } catch { parsed = {} }
-    const pick = (keys: string[]): string | null => {
-      for (const k of keys) {
-        const v = parsed[k]
-        if (typeof v === 'string') {
-          const s = v.trim()
-          if (s.length > 0) return s
-        }
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          return String(v)
-        }
-      }
-      return null
-    }
-    let order_id = pick(['order_id','orderId'])
-    let customer_email = pick(['customer_email','customerEmail'])
-    let customer_name = pick(['customer_name','customerName'])
-    let order_number = pick(['order_number','orderNumber'])
-    let carrier = pick(['carrier'])
-    let tracking_number = pick(['tracking_number','trackingNumber'])
-    let tracking_url = pick(['tracking_url','trackingUrl'])
+    const body = await req.json().catch(()=>({})) as ShippingNotificationRequest
+    const { order_id, customer_email, customer_name, carrier, tracking_number, tracking_url } = body
+    let { order_number } = body
 
-    // Ensure env-derived flags are available before validation branches
-    const testMode = Deno.env.get('EMAIL_TEST_MODE') === 'true'
-    const testTo = Deno.env.get('EMAIL_TEST_TO') || 'delivered@resend.dev'
-
-    // Derive fields from DB if not provided
-    try {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-      if (order_id && supabaseUrl && serviceKey) {
-        // Load order basics if needed
-        if (!order_number || !customer_email || !customer_name || !carrier || !tracking_number || !tracking_url) {
-          const sel = encodeURIComponent('user_id,order_number,carrier,tracking_number,tracking_url')
-          const ordResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=${sel}`, {
-            headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-          })
-          if (ordResp.ok) {
-            const arr = await ordResp.json().catch(()=>[])
-            const row = Array.isArray(arr) ? arr[0] : null
-            if (row) {
-              if (!order_number && row.order_number) order_number = row.order_number
-              if (!carrier && row.carrier) carrier = String(row.carrier)
-              if (!tracking_number && row.tracking_number) tracking_number = String(row.tracking_number)
-              if (!tracking_url && row.tracking_url) tracking_url = String(row.tracking_url)
-              const uid = row.user_id as string | undefined
-              if ((!customer_email || !customer_name) && uid) {
-                // Use Auth Admin API to fetch user email securely with service role
-                const usrResp = await fetch(`${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(uid)}`, {
-                  headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey }
-                })
-                if (usrResp.ok) {
-                  const u = await usrResp.json().catch(()=>null) as any
-                  if (u) {
-                    customer_email = customer_email || u.email || customer_email
-                    // Try to read name from user_metadata
-                    const metaName = (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name)) || null
-                    customer_name = customer_name || metaName || customer_name
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    } catch { /* best effort */ }
-
-    // Validate required fields (after derivation)
-    // In test mode, allow missing fields by auto-filling placeholders
-    if (testMode) {
-      if (!order_id) order_id = 'TEST-ORDER'
-      if (!carrier) carrier = 'test-carrier'
-      if (!tracking_number) tracking_number = 'T123'
-      if (!customer_email) customer_email = testTo
+    if (!order_id || !customer_email || !customer_name || !carrier || !tracking_number) {
+      const missing = [!order_id && 'order_id', !customer_email && 'customer_email', !customer_name && 'customer_name', !carrier && 'carrier', !tracking_number && 'tracking_number'].filter(Boolean)
+      return new Response(JSON.stringify({ error: 'missing_fields', missing }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    if (!order_id || !carrier || !tracking_number) {
-      const missing: string[] = []
-      if (!order_id) missing.push('order_id')
-      if (!carrier) missing.push('carrier')
-      if (!tracking_number) missing.push('tracking_number')
-      return new Response(JSON.stringify({ 
-        error: 'missing_fields',
-        missing,
-        received: Object.keys(parsed)
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || ''
+    const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
+    const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
-    // Create email content
-    const prettyOrderNo = order_number ? `#${String(order_number).split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
-    
-    const brandName = Deno.env.get('BRAND_NAME') || 'VentHub'
-    const brandPrimary = Deno.env.get('BRAND_PRIMARY_COLOR') || '#2563eb'
-    const brandLogoUrl = Deno.env.get('BRAND_LOGO_URL') || ''
-
-    const emailSubject = `${brandName} | Siparişiniz kargoya verildi - ${prettyOrderNo}`
-    
-    const emailContent = `
-Merhaba ${customer_name},
-
-${prettyOrderNo} numaralı siparişiniz kargoya verildi! 📦
-
-🚛 Kargo Firması: ${carrier}
-📋 Takip Numarası: ${tracking_number}
-${tracking_url ? `🔗 Takip Linki: ${tracking_url}` : ''}
-
-Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.
-
-Teşekkürler,
-VentHub Ekibi
-
----
-Bu otomatik bir e-postadır. Lütfen yanıtlamayın.
-    `.trim()
-
-    // (Info only) notification-service payload kept for reference; direct Resend is used below
-    const _notificationRequest = {
-      type: 'email',
-      to: customer_email,
-      message: emailContent,
-      priority: 'medium',
-      data: {
-        subject: emailSubject,
-        customer_name,
-        order_number: prettyOrderNo,
-        carrier,
-        tracking_number,
-        tracking_url
-      }
-    }
-
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    let emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub Test <onboarding@resend.dev>'
-    const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
-    const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || 'recep.varlik@gmail.com').split(',').map(s=>s.trim()).filter(Boolean)
-    if (!resendApiKey) {
-      if (notifyDebug) console.warn('[shipping-notification] Email disabled: missing RESEND_API_KEY')
-      return new Response(JSON.stringify({ success: true, disabled: true, channel: 'email' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-    }
-
-    // Build recipients with optional BCC; if no customer email, fall back to first BCC for testing
-    const toList: string[] = []
-    if (testMode) {
-      toList.push(testTo)
-    } else if (customer_email) {
-      toList.push(customer_email)
-    }
-    const bcc = [...bccList]
-    if (toList.length === 0 && bcc.length > 0) {
-      toList.push(bcc[0])
-      bcc.shift()
-    }
-
-    // Prepare HTML body: try file-based template, fallback to inline
-    let htmlBody = ''
-    try {
-      const tpl = await loadShippingTemplate()
-      if (tpl) {
-        htmlBody = renderTemplate(tpl, {
-          customer_name,
-          order_number: prettyOrderNo,
-          carrier,
-          tracking_number,
-          tracking_url,
-          brand_name: brandName,
-          brand_primary_color: brandPrimary,
-          brand_logo_url: brandLogoUrl,
+    // Resolve order_number if missing
+    if (!order_number && SUPABASE_URL && SERVICE_KEY) {
+      try {
+        const o = await fetch(`${SUPABASE_URL}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(order_id)}&select=order_number`, {
+          headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
         })
-      }
-    } catch {/* ignore */}
-    if (!htmlBody) {
-      htmlBody = [
-        '<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">',
-        '<h2 style="color: #2563eb;">Siparişiniz kargoya verildi! 📦</h2>',
-        `<p>Merhaba <strong>${customer_name}</strong>,</p>`,
-        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verildi!</p>`,
-        '<div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">',
-        '<h3 style="margin-top: 0; color: #374151;">Kargo Bilgileri</h3>',
-        `<p><strong>🚛 Kargo Firması:</strong> ${carrier}</p>`,
-        `<p><strong>📋 Takip Numarası:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 4px;">${tracking_number}</code></p>`,
-        tracking_url ? `<p><strong>🔗 Takip Linki:</strong> <a href="${tracking_url}" target="_blank" style="color: #2563eb;">Kargo takip sayfası</a></p>` : '',
-        '</div>',
-        '<p>Siparişinizi takip edebilir ve teslimat durumunu kontrol edebilirsiniz.</p>',
-        '<p>Teşekkürler,<br><strong>VentHub Ekibi</strong></p>',
-        '<hr style="margin-top: 30px; border: none; border-top: 1px solid #e5e7eb;">',
-        '<p style="color: #6b7280; font-size: 14px;">Bu otomatik bir e-postadır. Lütfen yanıtlamayın.</p>',
+        if (o.ok) {
+          const arr = await o.json().catch(()=>[])
+          if (Array.isArray(arr) && arr[0]) order_number = arr[0].order_number
+        }
+      } catch {}
+    }
+
+    const prettyOrderNo = order_number ? `#${order_number.split('-')[1]}` : `#${order_id.slice(-8).toUpperCase()}`
+    const subject = `Siparişiniz kargoya verildi - ${prettyOrderNo}`
+
+    let html = (await loadShippingTemplate()) || ''
+    if (!html) {
+      html = [
+        '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">',
+        '<h2>Siparişiniz Kargoya Verildi</h2>',
+        `<p>Merhaba ${customer_name},</p>`,
+        `<p><strong>${prettyOrderNo}</strong> numaralı siparişiniz kargoya verilmiştir.</p>`,
+        `<p><strong>Kargo Firması:</strong> ${carrier}</p>`,
+        `<p><strong>Takip Numarası:</strong> ${tracking_number}</p>`,
+        tracking_url ? `<p><a href="${tracking_url}" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Kargomu Takip Et</a></p>` : '',
+        '<p>Teşekkürler,<br>VentHub Ekibi</p>',
         '</div>'
       ].join('')
+    } else {
+      html = renderTemplate(html, { customer_name, order_number: prettyOrderNo, carrier, tracking_number, tracking_url: tracking_url || '#' })
     }
 
-    // Direct email sending (bypass notification-service for simplicity)
-    async function sendEmail(fromAddr: string, to: string[], bccArr: string[]) {
-      return await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${resendApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromAddr,
-          to,
-          bcc: bccArr.length > 0 ? bccArr : undefined,
-          subject: emailSubject,
-          text: emailContent,
-          html: htmlBody,
-        }),
-      })
+    if (!RESEND_API_KEY) {
+      return new Response(JSON.stringify({ success: true, disabled: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    // Try with configured from; if domain not verified, fallback to onboarding@resend.dev
-    let response = await sendEmail(emailFrom, toList, bcc)
-    if (!response.ok) {
-      const errorText = await response.text()
-      const normalized = errorText.toLowerCase()
-      if (normalized.includes('domain') && normalized.includes('verify') || normalized.includes('from address')) {
-        // Retry once with Resend test sender
-        emailFrom = 'VentHub Test <onboarding@resend.dev>'
-        response = await sendEmail(emailFrom, toList, bcc)
-      }
-      if (!response.ok) {
-        try { await sentryCaptureException(new Error(`Email send failed: ${errorText}`), { fn: 'shipping-notification' }) } catch {}
-        throw new Error(`Email send failed: ${errorText}`)
-      }
-    }
-
-    const result = await response.json()
-
-    // Best-effort audit insert; silent on failure
-    try {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
-      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
-      if (supabaseUrl && serviceKey) {
-        const payload = {
-          order_id,
-          email_to: toList[0] || '',
-          subject: emailSubject,
-          provider: 'resend',
-          provider_message_id: (result && result.id) || null,
-          carrier: carrier || null,
-          tracking_number: tracking_number || null
-        }
-        await fetch(`${supabaseUrl}/rest/v1/shipping_email_events`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, Prefer: 'return=minimal' },
-          body: JSON.stringify(payload)
-        })
-      }
-    } catch {}
-
-    console.log(`📧 Shipping notification sent to ${customer_email} for order ${prettyOrderNo}`)
-
-    return new Response(JSON.stringify({ 
-      success: true,
-      result,
-      order_id,
-      customer_email,
-      subject: emailSubject,
-      timestamp: new Date().toISOString()
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: EMAIL_FROM, to: [customer_email], subject, html })
     })
+
+    if (!resp.ok) {
+      const t = await resp.text().catch(()=>'')
+      throw new Error(`Resend failed (${resp.status}): ${t}`)
+    }
+
+    const result = await resp.json().catch(()=>({}))
+    return new Response(JSON.stringify({ success: true, order_id, result }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error ?? 'Unknown error')
-    console.error('Shipping notification error:', msg)
-    
-    return new Response(JSON.stringify({ 
-      error: msg,
-      success: false 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    const err = error as Error
+    console.error('Shipping notification error:', err.message)
+    try { sentryCaptureException(err) } catch {}
+    return new Response(JSON.stringify({ error: err.message, success: false }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })

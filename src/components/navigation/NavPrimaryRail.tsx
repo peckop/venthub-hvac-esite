@@ -14,7 +14,6 @@ interface NavPrimaryRailProps {
     isCategoriesLoading: boolean
     isCategoryHubOpen: boolean
     onCategoryClick: () => void
-    onCategoryHover: () => void
     onItemHover?: (itemId: string) => void
 }
 
@@ -26,7 +25,6 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
     isCategoriesLoading,
     isCategoryHubOpen,
     onCategoryClick,
-    onCategoryHover,
     onItemHover,
 }) => {
     return (
@@ -38,7 +36,6 @@ const NavPrimaryRail: React.FC<NavPrimaryRailProps> = React.memo(({
                             key={item.id}
                             type="button"
                             onClick={onCategoryClick}
-                            onMouseEnter={onCategoryHover}
                             aria-expanded={isCategoryHubOpen}
                             aria-haspopup="dialog"
                             className={cn(itemBaseClass, isCategoryHubOpen && 'border-primary-navy/15 bg-air-blue/40 text-primary-navy')}

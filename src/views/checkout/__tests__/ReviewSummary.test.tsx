@@ -24,7 +24,9 @@ vi.mock('lucide-react', () => ({ ArrowLeft: () => null, CreditCard: () => null, 
 afterEach(() => cleanup())
 
 function wrap(ui: React.ReactElement) {
-  window.localStorage.setItem('lang', 'tr')
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem('lang', 'tr')
+  }
   return render(<I18nProvider>{ui}</I18nProvider>)
 }
 

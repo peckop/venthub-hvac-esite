@@ -393,16 +393,16 @@ const AdminProductsPage: React.FC = () => {
   }
 
   // Load tech specs for expanded row
-  const loadTechSpecs = async (productId: string) => {
-    if (techSpecs[productId]) return
+  const loadTechSpecs = async (_productId: string) => {
+    if (techSpecs[_productId]) return
     try {
-      const { data } = await supabase.from('products').select('technical_specs').eq('id', productId).maybeSingle()
+      const { data } = await supabase.from('products').select('technical_specs').eq('id', _productId).maybeSingle()
       if (data?.technical_specs && typeof data.technical_specs === 'object') {
-        setTechSpecs(prev => ({ ...prev, [productId]: data.technical_specs as Record<string, string> }))
+        setTechSpecs(prev => ({ ...prev, [_productId]: data.technical_specs as Record<string, string> }))
       } else {
-        setTechSpecs(prev => ({ ...prev, [productId]: {} }))
+        setTechSpecs(prev => ({ ...prev, [_productId]: {} }))
       }
-    } catch { setTechSpecs(prev => ({ ...prev, [productId]: {} })) }
+    } catch { setTechSpecs(prev => ({ ...prev, [_productId]: {} })) }
   }
 
   const toggleSort = (key: SortKey) => {
@@ -866,7 +866,7 @@ const AdminProductsPage: React.FC = () => {
       <ProductFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        productId={editingId}
+        _productId={editingId}
         onSuccess={handleModalSuccess}
         categories={cats.map(c => ({ id: c.id, name: c.name }))}
       />

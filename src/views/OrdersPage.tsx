@@ -192,7 +192,7 @@ export const OrdersPage: React.FC = () => {
   const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
   const stepLabel: Record<string, string> = {
     pending: t('orders.pending'),
-    paid: t('orders.paid'),
+    pa_id: t('orders.paid'),
     shipped: t('orders.shipped'),
     delivered: t('orders.delivered')
   }

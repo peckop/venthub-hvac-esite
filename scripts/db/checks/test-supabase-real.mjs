@@ -10,10 +10,10 @@ dotenv.config()
 const supabaseUrl = process.env.VITE_SUPABASE_URL
 const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
 
-console.log('🔍 Supabase Credentials Check:')
-console.log('URL:', supabaseUrl ? '✅ Found' : '❌ Missing')
-console.log('Anon Key:', supabaseAnonKey ? '✅ Found' : '❌ Missing')
-console.log('')
+console.warn('🔍 Supabase Credentials Check:')
+console.warn('URL:', supabaseUrl ? '✅ Found' : '❌ Missing')
+console.warn('Anon Key:', supabaseAnonKey ? '✅ Found' : '❌ Missing')
+console.warn('')
 
 if (!supabaseUrl || !supabaseAnonKey) {
     console.error('❌ ERROR: Supabase credentials missing in .env file')
@@ -23,9 +23,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function testRealQuery() {
-    console.log('🧪 TEST 1: Counting categories...')
+    console.warn('🧪 TEST 1: Counting categories...')
     try {
-        const { data, error, count } = await supabase
+        const { data, error, count: _count } = await supabase
             .from('categories')
             .select('*', { count: 'exact', head: false })
 
@@ -35,9 +35,9 @@ async function testRealQuery() {
             return false
         }
 
-        console.log(`✅ SUCCESS: Found ${data.length} categories`)
-        console.log('Sample:', data[0]?.name || 'No data')
-        console.log('')
+        console.warn(`✅ SUCCESS: Found ${data.length} categories`)
+        console.warn('Sample:', data[0]?.name || 'No data')
+        console.warn('')
         return true
     } catch (err) {
         console.error('❌ EXCEPTION:', err)
@@ -46,7 +46,7 @@ async function testRealQuery() {
 }
 
 async function testProductCount() {
-    console.log('🧪 TEST 2: Counting products...')
+    console.warn('🧪 TEST 2: Counting products...')
     try {
         const { count, error } = await supabase
             .from('products')
@@ -57,8 +57,8 @@ async function testProductCount() {
             return false
         }
 
-        console.log(`✅ SUCCESS: Found ${count} products`)
-        console.log('')
+        console.warn(`✅ SUCCESS: Found ${count} products`)
+        console.warn('')
         return true
     } catch (err) {
         console.error('❌ EXCEPTION:', err)
@@ -67,19 +67,19 @@ async function testProductCount() {
 }
 
 async function runAllTests() {
-    console.log('🚀 Starting Supabase Client Tests...\n')
+    console.warn('🚀 Starting Supabase Client Tests...\n')
 
     const test1 = await testRealQuery()
     const test2 = await testProductCount()
 
-    console.log('📊 RESULTS:')
-    console.log(`Test 1 (Categories): ${test1 ? '✅ PASS' : '❌ FAIL'}`)
-    console.log(`Test 2 (Products): ${test2 ? '✅ PASS' : '❌ FAIL'}`)
+    console.warn('📊 RESULTS:')
+    console.warn(`Test 1 (Categories): ${test1 ? '✅ PASS' : '❌ FAIL'}`)
+    console.warn(`Test 2 (Products): ${test2 ? '✅ PASS' : '❌ FAIL'}`)
 
     if (test1 && test2) {
-        console.log('\n🎉 ALL TESTS PASSED! Supabase client is fully functional!')
+        console.warn('\n🎉 ALL TESTS PASSED! Supabase client is fully functional!')
     } else {
-        console.log('\n❌ SOME TESTS FAILED! Client has issues.')
+        console.warn('\n❌ SOME TESTS FAILED! Client has issues.')
     }
 }
 

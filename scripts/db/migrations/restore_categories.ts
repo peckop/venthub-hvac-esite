@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
+import * as _fs from '_fs';
 dotenv.config();
 
 const supabase = createClient(
@@ -33,7 +33,7 @@ const categoriesToRestore = [
 // geri yüklenmeyecek çünkü kullanıcı bunların ürün olması gerektiğini söyledi
 
 async function restoreCategories() {
-    console.log('=== Yanlış Silinen Kategorileri Geri Yükleme ===\n');
+    console.warn('=== Yanlış Silinen Kategorileri Geri Yükleme ===\n');
 
     for (const cat of categoriesToRestore) {
         const { error } = await supabase.from('categories').upsert({
@@ -46,28 +46,28 @@ async function restoreCategories() {
         }, { onConflict: 'id' });
 
         if (error) {
-            console.log(`❌ ${cat.name}: ${error.message}`);
+            console.warn(`❌ ${cat.name}: ${error.message}`);
         } else {
-            console.log(`✅ ${cat.name}: GERİ YÜKLENDİ`);
+            console.warn(`✅ ${cat.name}: GERİ YÜKLENDİ`);
         }
     }
 
     // Doğrulama
-    console.log('\n=== DOĞRULAMA ===');
+    console.warn('\n=== DOĞRULAMA ===');
 
-    const { data: fanlarSubs } = await supabase
+    const { _data: fanlarSubs } = await supabase
         .from('categories')
         .select('name')
         .eq('parent_id', '4bc54533-7323-4eac-a02d-4498ffde00eb')
         .order('name');
 
-    console.log(`\nFanlar alt kategorileri: ${fanlarSubs?.length || 0}`);
-    fanlarSubs?.forEach(c => console.log(`  - ${c.name}`));
+    console.warn(`\nFanlar alt kategorileri: ${fanlarSubs?.length || 0}`);
+    fanlarSubs?.forEach(c => console.warn(`  - ${c.name}`));
 
-    const { data: allCats } = await supabase
+    const { _data: allCats } = await supabase
         .from('categories')
         .select('id')
-    console.log(`\nToplam kategori: ${allCats?.length || 0}`);
+    console.warn(`\nToplam kategori: ${allCats?.length || 0}`);
 }
 
 restoreCategories().catch(console.error);
