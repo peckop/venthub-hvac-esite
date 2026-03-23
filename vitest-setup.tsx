@@ -15,7 +15,9 @@ const iconNames = [
 ]
 
 iconNames.forEach(name => {
-  mockIcons[name] = (props) => <div {...props} data-testid={`lucide-${name.toLowerCase()}`} />
+  const MockIcon: React.FC<React.ComponentPropsWithoutRef<'div'>> = (props) => <div {...props} data-testid={`lucide-${name.toLowerCase()}`} />
+  MockIcon.displayName = `Lucide${name}`
+  mockIcons[name] = MockIcon
 })
 
 vi.mock('lucide-react', async () => {
@@ -26,24 +28,50 @@ vi.mock('lucide-react', async () => {
   }
 })
 
-// Mock Framer Motion with proper Ref types
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(({ children, ...props }, ref) => <div {...props} ref={ref}>{children}</div>),
-    button: React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(({ children, ...props }, ref) => <button {...props} ref={ref}>{children}</button>),
-    h2: ({ children, ...props }: React.ComponentPropsWithoutRef<'h2'>) => <h2 {...props}>{children}</h2>,
-    p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => <p {...props}>{children}</p>,
-    span: ({ children, ...props }: React.ComponentPropsWithoutRef<'span'>) => <span {...props}>{children}</span>,
-    section: ({ children, ...props }: React.ComponentPropsWithoutRef<'section'>) => <section {...props}>{children}</section>,
-    nav: ({ children, ...props }: React.ComponentPropsWithoutRef<'nav'>) => <nav {...props}>{children}</nav>
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}))
+// Mock Framer Motion with proper Ref types and Display Names
+vi.mock('framer-motion', () => {
+  const MockDiv = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(({ children, ...props }, ref) => <div {...props} ref={ref}>{children}</div>)
+  MockDiv.displayName = 'MockMotionDiv'
+
+  const MockButton = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithoutRef<'button'>>(({ children, ...props }, ref) => <button {...props} ref={ref}>{children}</button>)
+  MockButton.displayName = 'MockMotionButton'
+
+  const MockH2: React.FC<React.ComponentPropsWithoutRef<'h2'>> = ({ children, ...props }) => <h2 {...props}>{children}</h2>
+  MockH2.displayName = 'MockH2'
+
+  const MockP: React.FC<React.ComponentPropsWithoutRef<'p'>> = ({ children, ...props }) => <p {...props}>{children}</p>
+  MockP.displayName = 'MockP'
+
+  const MockSpan: React.FC<React.ComponentPropsWithoutRef<'span'>> = ({ children, ...props }) => <span {...props}>{children}</span>
+  MockSpan.displayName = 'MockSpan'
+
+  const MockSection: React.FC<React.ComponentPropsWithoutRef<'section'>> = ({ children, ...props }) => <section {...props}>{children}</section>
+  MockSection.displayName = 'MockSection'
+
+  const MockNav: React.FC<React.ComponentPropsWithoutRef<'nav'>> = ({ children, ...props }) => <nav {...props}>{children}</nav>
+  MockNav.displayName = 'MockNav'
+
+  const MockAnimatePresence: React.FC<{ children: React.ReactNode }> = ({ children }) => <>{children}</>
+  MockAnimatePresence.displayName = 'AnimatePresence'
+
+  return {
+    motion: {
+      div: MockDiv,
+      button: MockButton,
+      h2: MockH2,
+      p: MockP,
+      span: MockSpan,
+      section: MockSection,
+      nav: MockNav
+    },
+    AnimatePresence: MockAnimatePresence,
+  }
+})
 
 // Mock Supabase with internal Promise tracking to avoid 'any'
 vi.mock('@/lib/supabase', () => {
   const createMockQuery = () => {
-    const p = {
+    const p: Record<string, unknown> = {
       select: vi.fn(),
       insert: vi.fn(),
       update: vi.fn(),
@@ -53,6 +81,7 @@ vi.mock('@/lib/supabase', () => {
       limit: vi.fn(),
       single: vi.fn(),
       maybeSingle: vi.fn(),
+      maybe_single: vi.fn(),
       match: vi.fn(),
       in: vi.fn(),
       or: vi.fn(),
@@ -67,6 +96,7 @@ vi.mock('@/lib/supabase', () => {
     p.limit.mockReturnValue(p)
     p.single.mockReturnValue(p)
     p.maybeSingle.mockReturnValue(p)
+    p.maybe_single.mockReturnValue(p)
     p.match.mockReturnValue(p)
     p.in.mockReturnValue(p)
     p.or.mockReturnValue(p)
