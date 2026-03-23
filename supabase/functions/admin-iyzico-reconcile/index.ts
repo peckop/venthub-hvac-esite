@@ -14,8 +14,8 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'CONFIG_MISSING' }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    const _id: string | null = null|const _id: string | null = null
-    let conv: string |const _id: string | null = null
+    let _id: string | null = null
+    let conv: string | null = null
     if (req.method === 'POST') {
       const body = await req.json().catch(()=>null)
       _id = body?.id || null
@@ -27,8 +27,7 @@ Deno.serve(async (req) => {
     }
 
     // RPC ile listeleme
-    let _limit = 10
-    try { const url = new URL(req.url); const l = url.searchParams.get('_limit'); if (l) _limit = Math.max(1, Math.min(100, parseInt(l))) } catch { /* ignore parse error */ }
+    const _limit = 10
     const rpcListUrl = `${supabaseUrl}/rest/v1/rpc/fn_admin_get_orders`
     const listBody: { p_id: string | null; p_conv: string | null; p_limit: number; p_status?: string | null } = { p_id: _id, p_conv: conv, p_limit: _limit }
     if (!_id && !conv) listBody.p_status = 'pending'; else listBody.p_status = null
@@ -39,15 +38,15 @@ Deno.serve(async (req) => {
       body: JSON.stringify(listBody)
     })
     if (!listResp.ok) {
-      const _text = await listResp._text().catch(()=>'' )
-      return new Response(JSON.stringify({ ok:false, httpStatus: listResp.status, rpcListUrl, body:_text }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
+      const text = await listResp.text().catch(()=>'' )
+      return new Response(JSON.stringify({ ok:false, httpStatus: listResp.status, rpcUrl: rpcListUrl, body:text }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
     }
     const orders = await listResp.json().catch(()=>[])
     if (!Array.isArray(orders) || orders.length === 0) {
-      return new Response(JSON.stringify({ ok:false, processed:0, rpcListUrl, message:'no orders found' }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
+      return new Response(JSON.stringify({ ok:false, processed:0, rpcUrl: rpcListUrl, message:'no orders found' }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
     }
 
-    // Callback üzerinden doğrula (SDK'yı burada kullanma). Callback hem İyzico ile konuşur hem DB'yi günceller.
+    // Callback üzerinden doğrula
     const fnHost = (() => { const su = supabaseUrl!; try { const host = new URL(su).host; const ref = host.split('.')[0]; return `https://${ref}.functions.supabase.co`; } catch { return '' } })();
 
     const results: Array<Record<string, unknown>> = []
@@ -64,7 +63,6 @@ Deno.serve(async (req) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Add Authorization header to satisfy verify_jwt when enabled
             Authorization: `Bearer ${serviceRoleKey}`,
             apikey: serviceRoleKey
           },
@@ -73,15 +71,15 @@ Deno.serve(async (req) => {
         const cbJson = await cbResp.json().catch(()=>({}))
         const st = cbJson?.status || 'pending'
         results.push({ id:o.id, conversation_id:o.conversation_id, status: st, from:'callback' })
-      } catch (_e: unknown) {
-        const msg = _e instanceof Error ? _e.message : String(_e ?? '')
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e ?? '')
         results.push({ id:o.id, conversation_id:o.conversation_id, error: msg })
       }
     }
 
     return new Response(JSON.stringify({ ok:true, processed: results.length, results }), { status: 200, headers: { ...cors, 'Content-Type':'application/json' } })
-  } catch (_e: unknown) {
-    const msg = _e instanceof Error ? _e.message : String(_e ?? '')
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e ?? '')
     return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })

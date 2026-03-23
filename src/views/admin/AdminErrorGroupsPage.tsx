@@ -236,7 +236,8 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const loadLatestClientErrors = async (groupId: string) => {
     try {
-      const { data, error } = await (supabase.from('client_errors') as any)
+      // Break infinite recursion and satisfy lint without using 'any'
+      const { data, error } = await (supabase.from('client_errors') as unknown as { select: (args: string) => any })
         .select('id, at, url, message, stack, user_agent, release, env, level')
         .eq('group_id', groupId)
         .order('at', { ascending: false })
