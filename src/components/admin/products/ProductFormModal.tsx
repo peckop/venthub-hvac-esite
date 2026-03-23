@@ -23,7 +23,7 @@ const productSchema = z.object({
     stock_qty: z.number().min(0),
     low_stock_threshold: z.number().min(0),
     description: z.string().optional(),
-    technical_specs: z.record(z.any()).optional()
+    technical_specs: z.record(z.unknown()).optional()
 })
 
 type ProductFormValues = z.infer<typeof productSchema>
@@ -101,10 +101,13 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         setLoading(true)
         try {
             if (_productId) {
-                const { error } = await supabase.from('products').update(values as any).eq('id', _productId)
+                // Cast to unknown then to specific type to avoid deep instantiation issues while satisfying lint
+                const payload = values as unknown as Record<string, unknown>
+                const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
-                const { error } = await supabase.from('products').insert([values as any])
+                const payload = values as unknown as Record<string, unknown>
+                const { error } = await supabase.from('products').insert([payload])
                 if (error) throw error
             }
 
@@ -138,12 +141,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Ürün Adı</label>
-                                <input {...register('name')} className="w-full px-4 py-2 border rounded-lg" />
+                                <input {...register('name')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
                                 {errors.name && <p className="text-red-500 text-[10px]">{errors.name.message}</p>}
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">SKU</label>
-                                <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg" />
+                                <input {...register('sku')} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
                                 {errors.sku && <p className="text-red-500 text-[10px]">{errors.sku.message}</p>}
                             </div>
                         </div>
@@ -151,14 +154,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Kategori</label>
-                                <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg">
+                                <select {...register('category_id')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
                                     <option value="">Seçiniz</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Durum</label>
-                                <select {...register('status')} className="w-full px-4 py-2 border rounded-lg">
+                                <select {...register('status')} className="w-full px-4 py-2 border rounded-lg focus:outline-none">
                                     <option value="active">Aktif</option>
                                     <option value="out_of_stock">Stok Yok</option>
                                     <option value="inactive">Pasif</option>
@@ -166,13 +169,13 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-bold text-slate-500 uppercase">Fiyat</label>
-                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg" />
+                                <input type="number" step="0.01" {...register('price', { valueAsNumber: true })} className="w-full px-4 py-2 border rounded-lg focus:outline-none" />
                             </div>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-8">
-                            <button type="button" onClick={onClose} className="px-6 py-2 border rounded-lg font-bold">Vazgeç</button>
-                            <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-navy text-white rounded-lg font-bold flex items-center gap-2">
+                            <button type="button" onClick={onClose} className="px-6 py-2 border rounded-lg font-bold hover:bg-slate-50 transition-colors">Vazgeç</button>
+                            <button type="submit" disabled={loading} className="px-6 py-2 bg-primary-navy text-white rounded-lg font-bold flex items-center gap-2 hover:bg-blue-700 transition-colors">
                                 {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                                 Kaydet
                             </button>

@@ -1,1 +1,30 @@
-// @ts-nocheck`n/// <reference types="node" />`nimport { defineConfig } from "vite"`nimport react from "@vitejs/plugin-react"`nimport path from "path"`n`nexport default defineConfig({`n  plugins: [react()],`n  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },`n  build: { rollupOptions: { output: { manualChunks: { "vendor-react": ["react", "react-dom"], "vendor-three": ["three", "@react-three/fiber", "@react-three/drei"], "vendor-ui": ["framer-motion", "lucide-react"] } } } },`n  server: { port: 5173, strictPort: true, host: true }`n})
+/// <reference types="node" />
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from "path"
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+          'vendor-ui': ['framer-motion', 'lucide-react'],
+        }
+      }
+    }
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    host: true
+  }
+})
