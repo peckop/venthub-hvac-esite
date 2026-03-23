@@ -236,8 +236,7 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const loadLatestClientErrors = async (groupId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('client_errors')
+      const { data, error } = await (supabase.from('client_errors') as any)
         .select('id, at, url, message, stack, user_agent, release, env, level')
         .eq('group_id', groupId)
         .order('at', { ascending: false })
