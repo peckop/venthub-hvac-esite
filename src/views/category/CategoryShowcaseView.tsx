@@ -1,0 +1,360 @@
+import { VentImage } from '@/components/ui/VentImage'
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { ArrowRight, ThermometerSun, ChevronDown, Zap, Wind, CheckCircle2, Activity, ShieldCheck } from 'lucide-react'
+import { getCategoryIcon } from '../../utils/getCategoryIcon'
+import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
+import { BottomCTA } from '@/components/category/sections'
+import Breadcrumb from '@/components/navigation/Breadcrumb'
+import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
+import { getCategoryDisplayName } from '../../utils/categoryHelpers'
+import { DomainCategory } from '../../lib/type-converters'
+
+interface CategoryShowcaseProps {
+    category: DomainCategory
+    subCategories: DomainCategory[]
+    parentCategory?: DomainCategory | null
+}
+
+const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCategories, parentCategory }) => {
+    const [wizardOpen, setWizardOpen] = useState(false)
+
+    // Check if this is special showcase categories
+    const isAirCurtain = category.slug === 'hava-perdeleri'
+    const isQuietFan = category.slug === 'sessiz-kanal-tipi-fanlar'
+
+    interface CategoryMetadataExtended { showcase_images?: { desktop: string }[] }
+    const metadata = category.metadata as CategoryMetadataExtended | null
+    const showcaseImages = metadata?.showcase_images
+    const heroImage = (showcaseImages?.[0]?.desktop) ||
+        (isAirCurtain ? '/images/category/hero-vortice.png' : null) ||
+        (isQuietFan ? '/images/vortice/vortice_lineo_hero.png' : null) ||
+        (category.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${category.image_url}` : null)
+
+
+
+    // Build breadcrumb items
+    const breadcrumbItems = buildCategoryBreadcrumb(category, parentCategory, 'Ana Sayfa')
+
+    return (
+        <div className="min-h-screen bg-white">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb items={breadcrumbItems} variant="white" />
+
+            {/* Hero Section */}
+            <div className="relative h-[600px] w-full overflow-hidden bg-primary-navy">
+                {heroImage && (
+                    <div className="absolute inset-0">
+                        <Image
+                            src={heroImage}
+                            alt={getCategoryDisplayName(category)}
+                            fill
+                            priority
+                            sizes="100vw"
+                            className="object-cover opacity-75"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/40 to-transparent" />
+                    </div>
+                )}
+
+                <div className="absolute inset-0 flex items-center">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div className="max-w-3xl animate-fadeIn">
+                            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-blue/20 text-secondary-blue backdrop-blur-sm border border-secondary-blue/30 text-sm font-medium mb-6">
+                                Premium Koleksiyon
+                            </span>
+                            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                                {getCategoryDisplayName(category)}
+                            </h1>
+                            <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
+                                {category.metadata?.hero_description || category.description}
+                            </p>
+
+                            {/* Quick Start Wizard Button (only for air curtains) */}
+                            {isAirCurtain && (
+                                <button
+                                    onClick={() => setWizardOpen(true)}
+                                    className="group flex items-center bg-gradient-to-r from-secondary-blue to-blue-600 text-white px-8 py-4 rounded-full font-bold transition-all shadow-lg shadow-blue-500/30 hover:scale-105"
+                                >
+                                    <ThermometerSun className="mr-3" size={24} />
+                                    <span>Bana Uygun Modeli Bul</span>
+                                    <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={20} />
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Animated Scroll Down Indicator */}
+                <button
+                    onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
+                    aria-label="Devam¦-n¦- ke+þfet"
+                >
+                    <span className="text-xs uppercase tracking-widest font-medium">Devam¦-n¦- Ke+þfet</span>
+                    <ChevronDown className="w-6 h-6" />
+                </button>
+            </div>
+
+            {/* Scroll Anchor */}
+            <div id="content-start" className="scroll-mt-20" />
+
+            {/* Enhanced Needs Analysis Wizard */}
+            <EnhancedNeedsWizard
+                isOpen={wizardOpen}
+                onClose={() => setWizardOpen(false)}
+                parentSlug={category.slug}
+            />
+
+            {/* Educational Section (Air Curtains only) */}
+            {isAirCurtain && (
+                <div className="bg-gray-50 py-16 border-b border-gray-100">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-industrial-gray mb-4">Hangi Hava Perdesini Se+ðmelisiniz?</h2>
+                            <p className="text-steel-gray max-w-2xl mx-auto">
+                                ¦-htiyac¦-n¦-za en uygun +ð+Âz+-m+- belirlemenize yard¦-mc¦- olal¦-m.
+                            </p>
+                        </div>
+
+                        {/* Comparison Image */}
+                        <div className="flex justify-center mb-12">
+                            <VentImage src="/images/category/electric-vs-ambient.png"
+                                alt="Elektrikli vs Ortam Haval¦- Kar+þ¦-la+þt¦-rma"
+                                className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
+                             />
+                        </div>
+
+                        {/* Quick Selection Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                            {/* Elektrikli Card */}
+                            <Link
+                                href={category.slug === 'elektrikli-isitici' ? `/category/${category.slug}` : `/category/${category.slug}/elektrikli-isitici`}
+                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-all"
+                            >
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <div className="p-3 bg-orange-50 rounded-lg text-orange-500 group-hover:bg-orange-100 transition-colors">
+                                        <Zap size={32} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-industrial-gray">Elektrikli Is¦-t¦-c¦-l¦-</h4>
+                                </div>
+                                <p className="text-gray-600 mb-4">
+                                    K¦-+þ aylar¦-nda kap¦- +Ân+-nde s¦-cak kar+þ¦-lama sa¦þlar.
+                                </p>
+                                <div className="flex items-center text-orange-500 font-semibold">
+                                    <span>Modelleri ¦-ncele</span>
+                                    <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </Link>
+
+                            {/* Ortam Haval¦- Card */}
+                            <Link
+                                href={category.slug === 'ortam-havali' ? `/category/${category.slug}` : `/category/${category.slug}/ortam-havali`}
+                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all"
+                            >
+                                <div className="flex items-center space-x-4 mb-4">
+                                    <div className="p-3 bg-blue-50 rounded-lg text-blue-500 group-hover:bg-blue-100 transition-colors">
+                                        <Wind size={32} />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-industrial-gray">Ortam Haval¦-</h4>
+                                </div>
+                                <p className="text-gray-600 mb-4">
+                                    So¦þuk depolar ve hijyen gereken alanlar i+ðin ideal.
+                                </p>
+                                <div className="flex items-center text-blue-500 font-semibold">
+                                    <span>Modelleri ¦-ncele</span>
+                                    <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Premium Application Areas (Quiet Fans only) */}
+            {isQuietFan && (
+                <div className="bg-slate-50 py-24 border-y border-slate-100 overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                            <motion.div 
+                                initial={{ opacity: 0, x: -30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl group"
+                            >
+                                <Image
+                                    src="/images/vortice/vortice_lineo_loft.png"
+                                    alt="Modern Loft Uygulamas¦-"
+                                    fill
+                                    sizes="(max-width: 1024px) 100vw, 600px"
+                                    className="object-cover transition-transform duration-[2s] group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+                                <div className="absolute bottom-8 left-8 right-8">
+                                    <h4 className="text-2xl font-bold text-white mb-2">Modern Ya+þam Alanlar¦-</h4>
+                                    <p className="text-slate-200 text-sm">Minimalist tasar¦-m ve f¦-s¦-lt¦- sessizli¦þinde konfor.</p>
+                                </div>
+                            </motion.div>
+
+                            <div className="space-y-12">
+                                <div>
+                                    <h2 className="text-4xl font-bold text-slate-900 mb-6 tracking-tight">Esneklik ve Estetik</h2>
+                                    <p className="text-lg text-slate-600 leading-relaxed italic">
+                                        "Lineo Quiet ES, sadece bir fan de¦þil; modern mimarinin sessiz kahraman¦-d¦-r."
+                                    </p>
+                                </div>
+
+                                <div className="grid gap-8">
+                                    <div className="flex gap-6">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-cyan-500">
+                                            <Activity size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 mb-2">Ak¦-ll¦- Kontrol</h4>
+                                            <p className="text-slate-600 text-sm">Hava kalitesine g+Âre otomatik h¦-z ayar¦- ile kesintisiz taze hava.</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-6">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-cyan-500">
+                                            <ShieldCheck size={24} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 mb-2">Uzun +ûm+-rl+- Yat¦-r¦-m</h4>
+                                            <p className="text-slate-600 text-sm">Bak¦-m gerektirmeyen motor teknolojisi ve dayan¦-kl¦- polimer g+Âvde.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    className="relative aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white"
+                                >
+                                    <Image
+                                        src="/images/vortice/vortice_lineo_neon.png"
+                                        alt="End+-striyel Laboratuvar Uygulamas¦-"
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 600px"
+                                        className="object-cover"
+                                    />
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Technical Diagram Section */}
+            {(isAirCurtain || isQuietFan) && (
+                <div className="bg-primary-navy py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-white mb-4">
+                                {isQuietFan ? 'Vortice Lineo Quiet ES Teknolojisi' : 'Nas¦-l +çal¦-+þ¦-r?'}
+                            </h2>
+                            <p className="text-gray-300 max-w-2xl mx-auto">
+                                {isQuietFan 
+                                    ? 'Sessizlik ve performans¦-n m+-kemmel uyumu. Geli+þmi+þ aerodinamik tasar¦-m ile tan¦-+þ¦-n.' 
+                                    : 'Hava perdesi, g+Âr+-nmez bir bariyer olu+þturarak i+ð ve d¦-+þ ortam¦- birbirinden ay¦-r¦-r.'}
+                            </p>
+                        </div>
+                        <div className="flex justify-center">
+                            <div className="relative w-full max-w-4xl aspect-[16/9] rounded-xl overflow-hidden shadow-2xl">
+                                <Image
+                                    src={isQuietFan ? '/images/vortice/vortice_lineo_technical.png' : '/images/category/air-curtain-diagram.png'}
+                                    alt={isQuietFan ? 'Linieo Quiet Teknik Detay' : 'Hava Perdesi +çal¦-+þma Prensibi'}
+                                    fill
+                                    sizes="(max-width: 1024px) 100vw, 900px"
+                                    className="object-contain bg-slate-900/50"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Series Grid */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-industrial-gray mb-4">T+-m Seriler</h2>
+                    <p className="text-steel-gray">¦-htiyac¦-n¦-za uygun seriyi se+ðin</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {subCategories.filter(sub => sub.slug !== category.slug).map((sub) => (
+                        <Link
+                            key={sub.id}
+                            href={`/category/${category.slug}/${sub.slug}`}
+                            className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+                        >
+                            <div className="aspect-[4/3] bg-light-gray relative overflow-hidden">
+                                {sub.image_url ? (
+                                    <VentImage src={`${(process.env.NEXT_PUBLIC_SUPABASE_URL || '')}/storage/v1/object/public/product-images/${sub.image_url}`}
+                                        alt={getCategoryDisplayName(sub)}
+                                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                     />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                        {getCategoryIcon(sub.slug, { size: 64, className: "text-gray-300 group-hover:text-secondary-blue transition-colors" })}
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+
+                                <div className="absolute bottom-4 left-4 right-4">
+                                    <h3 className="text-2xl font-bold text-white mb-1">{getCategoryDisplayName(sub)}</h3>
+                                    <p className="text-gray-200 text-sm line-clamp-1">{sub.description}</p>
+                                </div>
+                            </div>
+
+                            <div className="p-6">
+                                <div className="flex items-center justify-between text-primary-navy font-semibold group-hover:text-secondary-blue transition-colors">
+                                    <span>Seriyi ¦-ncele</span>
+                                    <ArrowRight size={20} className="transform group-hover:translate-x-2 transition-transform" />
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {/* Value Proposition / Features Section */}
+            <div className="bg-light-gray py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl font-bold text-industrial-gray mb-4">Neden {getCategoryDisplayName(category)}?</h2>
+                        <p className="text-steel-gray max-w-2xl mx-auto">
+                            End+-striyel standartlarda +-retim ve y+-ksek m+-hendislik +ð+Âz+-mleriyle projelerinize de¦þer kat¦-yoruz.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {[
+                            { title: "Y+-ksek Verimlilik", desc: "ErP standartlar¦-na uygun enerji tasarrufu sa¦þlayan motor teknolojisi." },
+                            { title: "Sessiz +çal¦-+þma", desc: "+ûzel akustik izolasyon ve aerodinamik fan tasar¦-m¦-." },
+                            { title: "Uzun +ûm+-r", desc: "Korozyona dayan¦-kl¦- g+Âvde ve a¦þ¦-r hizmet tipi bile+þenler." }
+                        ].map((feature, i) => (
+                            <div key={i} className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="w-12 h-12 bg-primary-navy/10 rounded-lg flex items-center justify-center mb-6">
+                                    <CheckCircle2 className="text-primary-navy" />
+                                </div>
+                                <h3 className="text-xl font-bold text-industrial-gray mb-3">{feature.title}</h3>
+                                <p className="text-steel-gray">{feature.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom CTA Section */}
+            <BottomCTA
+                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
+                showWizard={isAirCurtain}
+                categoryName={getCategoryDisplayName(category)}
+            />
+        </div >
+    )
+}
+
+export default CategoryShowcase
