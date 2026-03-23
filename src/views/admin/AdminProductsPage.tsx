@@ -18,7 +18,7 @@ import {
 } from '../../utils/adminUi'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCurrency } from '../../i18n/format'
-import { ProductFormModal } from '../../components/admin/products/ProductFormModal'
+import ProductFormModal from '../../components/admin/products/ProductFormModal'
 import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
 import BulkActionToolbar from '../../components/admin/BulkActionToolbar'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
@@ -865,10 +865,10 @@ const AdminProductsPage: React.FC = () => {
 
       <ProductFormModal
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        onClose={() => setIsModalOpen(false)}
         _productId={editingId}
         onSuccess={handleModalSuccess}
-        categories={cats.map(c => ({ id: c.id, name: c.name }))}
+        
       />
     </div>
 
