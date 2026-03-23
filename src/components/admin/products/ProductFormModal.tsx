@@ -100,11 +100,14 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const onSubmit = async (values: ProductFormValues) => {
         setLoading(true)
         try {
+            // Strip undefined values to strictly comply with expected Supabase types
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const payload: any = Object.fromEntries(Object.entries(values).filter(([_, v]) => v !== undefined))
             if (_productId) {
-                const { error } = await supabase.from('products').update(values).eq('id', _productId)
+                const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
-                const { error } = await supabase.from('products').insert([values])
+                const { error } = await supabase.from('products').insert([payload])
                 if (error) throw error
             }
 

@@ -21,6 +21,6 @@ module.exports = [
     }
   },
   {
-    ignores: [".next/**", "out/**", "public/**", "supabase/migrations/**", "node_modules/**"]
+    ignores: [".next/**", "out/**", "next-env.d.ts", "public/**", "supabase/migrations/**", "node_modules/**"]
   }
 ];
