@@ -78,6 +78,8 @@ export type DbProduct = Omit<Tables['products']['Row'], 'technical_specs'> & {
 // Refine DbCategory to ensure 'name' and 'description' are strings, and metadata is typed
 export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description' | 'metadata' | 'authority_content'> & {
   name: string;
+  menu_label: string | null;
+  marketing_title: string | null;
   description: string | null;
   metadata: CategoryMetadata | null;
   authority_content: AuthorityContent | null;
