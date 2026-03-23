@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+ï»¿import React, { useState, useRef, useEffect } from 'react'
 import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
 } from 'lucide-react'
@@ -145,7 +145,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                         </h2>
                                     </div>
                                     <button onClick={() => setSelectedSubcategory(null)} className="text-sm text-steel-gray hover:text-industrial-gray underline">
-                                        ÔåÉ Se+ðimi Kald¦-r
+                                        Ã”Ã¥Ã‰ Se+ÄŸimi KaldÂ¦-r
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -202,7 +202,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                             {[
                                 { key: 'all', label: 'T+-m Modeller' },
                                 { key: 'quiet', label: 'En Sessiz' },
-                                { key: 'powerful', label: 'En G+-+ðl+-' }
+                                { key: 'powerful', label: 'En G+-+ÄŸl+-' }
                             ].map((f) => (
                                 <button
                                     key={f.key}
