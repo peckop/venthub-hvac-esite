@@ -1,19 +1,34 @@
-import type { DbCategory, CategoryMetadata } from '../types/db-rows'
+import type { DbCategory } from '../types/db-rows'
 
 /**
- * Returns the display name for a category.
- * Prioritizes the 'hero_title' from database metadata (SSOT).
- * If not present, falls back to the database name.
+ * Returns the CLEAN display name for a category (Mainly for Menus, Cards, Breadcrumbs).
+ * Prioritizes 'menu_label' from database (SSOT).
+ * Falls back to 'name' column.
  */
 export const getCategoryDisplayName = (category: DbCategory | null | undefined): string => {
     if (!category) return ''
     
-    const meta = category.metadata as CategoryMetadata | null
-    if (meta?.hero_title) {
-        return meta.hero_title
+    // SSOT: Menu Label (New professional standard)
+    if (category.menu_label) {
+        return category.menu_label
     }
 
     return category.name
+}
+
+/**
+ * Returns the rich MARKETING title for a category (Mainly for Hero sections).
+ * Prioritizes 'marketing_title' from database.
+ * Falls back to the result of getCategoryDisplayName.
+ */
+export const getCategoryMarketingTitle = (category: DbCategory | null | undefined): string => {
+    if (!category) return ''
+
+    if (category.marketing_title) {
+        return category.marketing_title
+    }
+
+    return getCategoryDisplayName(category)
 }
 
 /**
@@ -22,9 +37,9 @@ export const getCategoryDisplayName = (category: DbCategory | null | undefined):
 export const getCategoryDescription = (category: DbCategory | null | undefined): string => {
     if (!category) return ''
 
-    const meta = category.metadata as CategoryMetadata | null
+    const meta = category.metadata
     if (meta?.hero_description) {
-        return meta.hero_description
+        return meta.hero_description as string
     }
 
     return category.description || ''

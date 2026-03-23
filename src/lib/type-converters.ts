@@ -12,6 +12,8 @@ export const mapDatabaseCategoryToDomain = (dbCat: DbCategory): DomainCategory =
   return {
     ...dbCat,
     name: String(dbCat.name || ''),
+    menu_label: String(dbCat.menu_label || dbCat.name || ''),
+    marketing_title: String(dbCat.marketing_title || dbCat.name || ''),
     description: String(dbCat.description || ''),
   }
 }
