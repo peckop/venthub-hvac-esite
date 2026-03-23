@@ -101,10 +101,10 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         setLoading(true)
         try {
             if (_productId) {
-                const { error } = await supabase.from('products').update(values).eq('id', _productId)
+                const { error } = await supabase.from('products').update(values as any).eq('id', _productId)
                 if (error) throw error
             } else {
-                const { error } = await supabase.from('products').insert([values])
+                const { error } = await supabase.from('products').insert([values as any])
                 if (error) throw error
             }
 
