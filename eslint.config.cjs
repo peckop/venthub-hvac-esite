@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
 

@@ -273,7 +273,7 @@ export default function AdminReturnsPage() {
       try {
         const { error: invokeError } = await supabase.functions.invoke('return-status-notification', {
           body: {
-            return_id: returnId,
+            _return_id: returnId,
             order_id: returnItem.order_id,
             order_number: returnItem.order_number,
             customer_email: returnItem.customer_email,

@@ -16,7 +16,7 @@ interface InventoryCsvImportProps {
     isOpen: boolean
     onClose: () => void
     onSuccess: () => void
-    effectiveThreshold: (productId: string) => number | null
+    effectiveThreshold: (_productId: string) => number | null
 }
 
 export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effectiveThreshold }: InventoryCsvImportProps) {
@@ -167,12 +167,12 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
             for (let i = 0; i < csvPreview.length; i += BATCH_SIZE) {
                 const chunk = csvPreview.slice(i, i + BATCH_SIZE)
                 await Promise.all(chunk.map(async (item) => {
-                    const productId = skuToId.get(item.sku)
-                    if (!productId || item.delta === 0) return
+                    const _productId = skuToId.get(item.sku)
+                    if (!_productId || item.delta === 0) return
                     try {
                         const reason = `CSV import: ${item.delta > 0 ? 'add' : 'remove'} ${Math.abs(item.delta)}`
                         const { error } = await supabase.rpc('adjust_stock', {
-                            p_product_id: productId,
+                            p_product_id: _productId,
                             p_delta: item.delta,
                             p_reason: reason,
                             p_batch_id: batchId
@@ -181,7 +181,7 @@ export default function InventoryCsvImport({ isOpen, onClose, onSuccess, effecti
                         const { logAdminAction } = await import('../../lib/audit')
                         await logAdminAction(supabase, {
                             table_name: 'inventory_movements',
-                            row_pk: productId,
+                            row_pk: _productId,
                             action: 'INSERT',
                             before: null,
                             after: { delta: item.delta, reason, batch_id: batchId },

@@ -14,22 +14,22 @@ async function probe() {
     const candidates = ['exec_sql', 'execute_sql', 'run_sql', 'exec'];
 
     for (const fn of candidates) {
-        console.log(`Probing rpc('${fn}')...`);
-        const { data, error } = await supabase.rpc(fn, { query: 'SELECT 1' });
+        console.warn(`Probing rpc('${fn}')...`);
+        const { _data, error } = await supabase.rpc(fn, { query: 'SELECT 1' });
         // Note: Parameter name might be 'sql', 'query', 'command' etc. 
         // This is a hail mary.
 
         // Try with 'sql' param just in case
-        const { data: data2, error: error2 } = await supabase.rpc(fn, { sql: 'SELECT 1' });
+        const { _data: _data2, error: _error2 } = await supabase.rpc(fn, { sql: 'SELECT 1' });
 
-        if (!error || !error2) {
-            console.log(`✅ FOUND FUNCTION: ${fn}`);
+        if (!error || !_error2) {
+            console.warn(`✅ FOUND FUNCTION: ${fn}`);
             process.exit(0);
         } else {
-            console.log(`❌ ${fn} failed:`, error?.message || error2?.message);
+            console.warn(`❌ ${fn} failed:`, error?.message || _error2?.message);
         }
     }
-    console.log('No SQL execution function found.');
+    console.warn('No SQL execution function found.');
 }
 
 probe();

@@ -1,9 +1,10 @@
-const fs = require('fs');
+/* eslint-disable @typescript-eslint/no-require-imports */
+const _fs = require('_fs');
 
 function walkSync(currentDirPath, callback) {
-    fs.readdirSync(currentDirPath).forEach(function (name) {
-        var filePath = require('path').join(currentDirPath, name);
-        var stat = fs.statSync(filePath);
+    _fs.readdirSync(currentDirPath).forEach(function (name) {
+        var filePath = require('_path').join(currentDirPath, name);
+        var stat = _fs.statSync(filePath);
         if (stat.isFile()) {
             callback(filePath, stat);
         } else if (stat.isDirectory() && name !== 'node_modules') {
@@ -17,7 +18,7 @@ const dir = 'c:\\Users\\alize\\venthub-hvac\\src';
 walkSync(dir, function (filePath) {
     if (!filePath.endsWith('.tsx') && !filePath.endsWith('.ts')) return;
 
-    let content = fs.readFileSync(filePath, 'utf8');
+    let content = _fs.readFileSync(filePath, 'utf8');
     let modified = false;
 
     // React Router DOM imports replace
@@ -50,7 +51,7 @@ walkSync(dir, function (filePath) {
     }
 
     if (modified) {
-        fs.writeFileSync(filePath, content, 'utf8');
-        console.log(`Updated ${filePath}`);
+        _fs.writeFileSync(filePath, content, 'utf8');
+        console.warn(`Updated ${filePath}`);
     }
 });

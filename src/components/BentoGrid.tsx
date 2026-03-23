@@ -1,5 +1,7 @@
+'use client';
+
 import { VentImage } from '@/components/ui/VentImage'
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
@@ -17,9 +19,14 @@ interface BentoItem {
 const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large }) => {
   const { t } = useI18n()
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const isCoarse = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+  
   return (
     <div
       className={`relative overflow-hidden rounded-2xl border border-light-gray shadow-sm group ${large ? 'md:col-span-2 md:row-span-2' : ''}`}
@@ -67,8 +74,13 @@ const BentoCard: React.FC<{ item: BentoItem; large?: boolean }> = ({ item, large
   )
 }
 
+/**
+ * @component BentoGrid
+ * @description Ana sayfadaki kategorileri ve uygulama alanlarını görsel bir ızgara yapısında sunar.
+ */
 const BentoGrid: React.FC = () => {
   const { t } = useI18n()
+  
   const items: BentoItem[] = [
     { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.OTOPARK_JET) },
     { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: getCategoryUrl('HAVA_PERDELERI') },
@@ -77,7 +89,7 @@ const BentoGrid: React.FC = () => {
     { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.DUMAN_EGZOZ) },
     { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: getCategoryUrl('HIZ_KONTROL') },
   ]
-  // 2x3 grid, bir büyük karo
+
   return (
     <section className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,7 +111,3 @@ const BentoGrid: React.FC = () => {
 }
 
 export default BentoGrid
-
-
-
-

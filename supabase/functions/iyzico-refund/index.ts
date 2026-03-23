@@ -168,8 +168,8 @@ Deno.serve(async (req) => {
           }, (err: unknown, res: IyziRefundResponse) => err ? reject(err) : resolve(res));
         });
       }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
+    } catch (_e: unknown) {
+      const msg = _e instanceof Error ? _e.message : String(_e);
       return new Response(JSON.stringify({ error: { code: "IYZICO_ERROR", message: msg } }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -237,13 +237,13 @@ Deno.serve(async (req) => {
         });
 
         return new Response(JSON.stringify({ status: newStatusPayment, type: 'refund', amount: targetAmount, refunded_total: newRefundedTotal, order_id: orderId }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
+      } catch (_e: unknown) {
+        const msg = _e instanceof Error ? _e.message : String(_e);
         return new Response(JSON.stringify({ error: { code: 'DB_UPDATE_FAIL', message: msg } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
     }
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
+  } catch (_e: unknown) {
+    const msg = _e instanceof Error ? _e.message : String(_e);
     return new Response(JSON.stringify({ error: { code: 'UNEXPECTED', message: msg } }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

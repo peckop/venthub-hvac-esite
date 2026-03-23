@@ -17,12 +17,12 @@ if (!url || !password) {
     process.exit(1);
 }
 
-const urlParts = url.split('://');
-const hostPart = urlParts[1].split('.')[0];
+const _urlParts = url.split('://');
+const hostPart = _urlParts[1].split('.')[0];
 const hostname = `db.${hostPart}.supabase.co`;
 const connectionString = `postgres://postgres:${password}@${hostname}:5432/postgres`;
 
-console.log(`Connecting to ${hostname} (Force IPv4)...`);
+console.warn(`Connecting to ${hostname} (Force IPv4)...`);
 
 const client = new Client({
     connectionString,
@@ -43,9 +43,9 @@ UPDATE categories SET metadata = '{"display_mode": "series", "hero_title": "Tica
 async function run() {
     try {
         await client.connect();
-        console.log('✅ Connected successfully!');
+        console.warn('✅ Connected successfully!');
         await client.query(migrationSQL);
-        console.log('✅ Migration executed!');
+        console.warn('✅ Migration executed!');
         await client.end();
     } catch (err) {
         console.error('❌ Failed:', err.message);

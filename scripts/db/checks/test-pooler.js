@@ -11,7 +11,7 @@ if (!connectionString) {
 
 // Mask password for logging
 const masked = connectionString.replace(/:([^:@]+)@/, ':****@');
-console.log(`Testing connection to: ${masked}`);
+console.warn(`Testing connection to: ${masked}`);
 
 if (connectionString.includes('[YOUR-PASSWORD]')) {
     console.error('❌ Error: You forgot to replace [YOUR-PASSWORD] with your actual password!');
@@ -27,16 +27,16 @@ const client = new Client({
 async function test() {
     try {
         await client.connect();
-        console.log('✅ Connected successfully via Pooler!');
+        console.warn('✅ Connected successfully via Pooler!');
         const res = await client.query('SELECT version();');
-        console.log('Database version:', res.rows[0].version);
+        console.warn('Database version:', res.rows[0].version);
         await client.end();
     } catch (err) {
         console.error('❌ Connection Failed:', err.message);
         if (err.message.includes('password')) {
-            console.log('-> Check your password.');
+            console.warn('-> Check your password.');
         } else if (err.message.includes('ETIMEDOUT')) {
-            console.log('-> Network timeout. Firewall might still be blocking or port is wrong.');
+            console.warn('-> Network timeout. Firewall might still be blocking or port is wrong.');
         }
         process.exit(1);
     }

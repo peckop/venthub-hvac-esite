@@ -9,6 +9,7 @@ Bu dosya, VentHub projesindeki tüm AI asistanları ve mühendisler için en üs
 > 2. `registry/PULSE.md`: Güncel projenin genel nabzını ve açık görevleri gör.
 > 3. `python registry/manage_registry.py recall`: Ajanlar arası paylaşımlı hafızayı (Memory Bridge) geri çağır.
 > 4. `docs/CHANGELOG.md`: Projenin yakın geçmişini ve yapılan mimari değişiklikleri oku.
+> 5. `.agent/skills/venthub-integrity-guard/SKILL.md`: **[KRİTİK]** Bütünlük kalkanı kurallarını ve korunan varlık listesini oku.
 
 > 3. `registry/REGISTRY_PROTOCOL.md`: Dosya isimlendirme ve hiyerarşi kurallarını tazele.
 > 4. İlgili görevin `.md` dosyası (Örn: `033-tech-debt-cleanup.md`): Görevin GERÇEK statüsünü (TODO/Planning/Executing) teyit et.
@@ -68,6 +69,15 @@ Ajan, projede dosya ararken "körlemesine" `grep` yapmak yerine aşağıdaki har
 - **Yüzeysel Plan Yasağı:** `...` gibi placeholder içeren veya doğrulanabilir adımı olmayan planlar "geçersiz" kabul edilir. Her adımda `Verify:` maddesi zorunludur.
 - **Geri Besleme Takibi (Feedback Loop):** Herhangi bir `manage_registry.py` komutundan sonra terminal çıktısını MUTLAKA oku. Eğer `[🚨 SENTINEL]` veya `[🚨 PROTOKOL İHLALİ]` uyarısı görürsen, bu "Sistem senin yetkini elinden aldı" demektir.
 - **Dosya Bütünlüğü:** Registry motoru (v5.0) artık dosya içeriğini silmemektedir. Eğer bir dosya boş görünüyorsa, bu AI'nın scripti doğru kullanmadığını gösterir.
+
+## 8. Last-Mile Engineering (Son Kilometre Disiplini)
+> [!IMPORTANT]
+> **Üretim Standartı:** VentHub projesinde ilerleme lineer değil, logaritmik bir ciddiyetle ele alınır.
+> - **Logaritmik Hassasiyet:** Hata sayısı azaldıkça, kalan her bir hatanın toplam kalite üzerindeki ağırlığı artar. 1000 hatadan 10'a inmek sadece "zemin hazırlığı"dır; gerçek mühendislik o son 10 hatada başlar.
+> - **Cerrahi Eşik (Surgical Threshold):** Hata sayısı 20'nin altına düştüğünde ajan otomatik olarak "Cerrahi Mod"a geçer. Bu modda her bir hata, görevin %100 başarısı önündeki devasa bir engel olarak görülür.
+> - **Sıfır Tolerans:** "İhmal edilebilir hata" veya "önemsiz uyarı" kavramı yasaktır. Bir görev ancak tüm denetim araçları (`lint`, `check_integrity.py`) tam 0 (sıfır) hata verdiğinde mühürlenebilir.
+> - **Robotik Refleks Yasağı:** Sadece sayıları düşürmek için yapılan her hamle (isimlendirme bozma, anlamsız prefix ekleme) "Mühendislik Suçu"dur ve görevin derhal durdurulmasını gerektirir.
+
 
 
 ---

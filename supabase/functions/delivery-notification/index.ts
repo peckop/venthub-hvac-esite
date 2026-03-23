@@ -7,8 +7,8 @@ interface DeliveryRequest {
   order_number?: string
 }
 
-function render(tpl: string, data: Record<string, unknown>) {
-  return tpl.replace(/{{(\w+)}}/g, (_m, k) => String(data[k] ?? ''))
+function render(tpl: string, _data: Record<string, unknown>) {
+  return tpl.replace(/{{(\w+)}}/g, (_m, k) => String(_data[k] ?? ''))
 }
 
 async function loadTemplate() {
@@ -37,10 +37,14 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
-    let emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
 
     const body = await req.json().catch(()=>({})) as DeliveryRequest
-    let { order_id, customer_email, customer_name, order_number } = body
+    const order_id = body.order_id
+    let customer_email = body.customer_email
+    let customer_name = body.customer_name
+    let order_number = body.order_number
+
     if (!order_id) return new Response(JSON.stringify({ error: 'missing_fields', missing: ['order_id'] }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } })
 
     // Derive info if missing
@@ -91,7 +95,7 @@ serve(async (req) => {
       body: JSON.stringify({ from: emailFrom, to: [customer_email], subject, html })
     })
     if (!resp.ok) {
-      const t = await resp.text().catch(()=> '')
+      const t = await resp._text().catch(()=> '')
       return new Response(JSON.stringify({ error: 'send_failed', body: t }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=>({}))
@@ -108,8 +112,8 @@ serve(async (req) => {
     } catch {}
 
     return new Response(JSON.stringify({ ok: true, order_id, subject, result }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e)
+  } catch (_e: unknown) {
+    const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

@@ -1,4 +1,4 @@
-﻿import { VentImage } from '@/components/ui/VentImage'
+import { VentImage } from '@/components/ui/VentImage'
 import React from 'react'
 import { Microscope, Wind, ShieldCheck } from 'lucide-react'
 import { useScrollAnimation, scrollAnimationClasses } from '@/hooks/useScrollAnimation'

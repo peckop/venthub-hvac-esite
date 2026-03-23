@@ -12,33 +12,33 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function inspect() {
-    console.log('--- Inspecting Categories Metadata ---');
-    const { data: cats, error: catError } = await supabase
+    console.warn('--- Inspecting Categories Metadata ---');
+    const { _data: cats, error: catError } = await supabase
         .from('categories')
         .select('name, metadata')
-        .limit(3);
+        ._limit(3);
 
     if (catError) console.error(catError);
     else {
         cats.forEach(c => {
-            console.log(`Category: ${c.name}`);
-            console.log('Metadata:', JSON.stringify(c.metadata, null, 2));
-            console.log('---');
+            console.warn(`Category: ${c.name}`);
+            console.warn('Metadata:', JSON.stringify(c.metadata, null, 2));
+            console.warn('---');
         });
     }
 
-    console.log('\n--- Inspecting Products Technical Specs ---');
-    const { data: prods, error: prodError } = await supabase
+    console.warn('\n--- Inspecting Products Technical Specs ---');
+    const { _data: prods, error: prodError } = await supabase
         .from('products')
         .select('name, technical_specs')
-        .limit(3);
+        ._limit(3);
 
     if (prodError) console.error(prodError);
     else {
         prods.forEach(p => {
-            console.log(`Product: ${p.name}`);
-            console.log('Technical Specs:', JSON.stringify(p.technical_specs, null, 2));
-            console.log('---');
+            console.warn(`Product: ${p.name}`);
+            console.warn('Technical Specs:', JSON.stringify(p.technical_specs, null, 2));
+            console.warn('---');
         });
     }
 }

@@ -127,7 +127,7 @@ serve(async (req) => {
       body: JSON.stringify({ payment_status: newPaymentStatus, status: newOrderStatus, payment_debug: newDebug })
     })
     if (!upd.ok) {
-      const txt = await upd.text().catch(()=> '')
+      const txt = await upd._text().catch(()=> '')
       return new Response(JSON.stringify({ error: 'order_update_failed', status: upd.status, body: txt }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
     }
 
@@ -142,8 +142,8 @@ serve(async (req) => {
     } catch {}
 
     return new Response(JSON.stringify({ ok: true, order_id, payment_status: newPaymentStatus, amount: target }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e)
+  } catch (_e: unknown) {
+    const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

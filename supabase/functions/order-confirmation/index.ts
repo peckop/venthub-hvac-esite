@@ -1,14 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { sentryCaptureException } from "../_shared/sentry.ts"
 
-function renderTemplate(tpl: string, data: Record<string, unknown>): string {
+function renderTemplate(tpl: string, _data: Record<string, unknown>): string {
   tpl = tpl.replace(/{{#if\s+(\w+)}}([\s\S]*?){{\/?if}}/g, (_m, key: string, inner: string) => {
-    const v = data[key]
+    const v = _data[key]
     const truthy = !!(typeof v === 'string' ? v : v)
     return truthy ? inner : ''
   })
   tpl = tpl.replace(/{{(\w+)}}/g, (_m, key: string) => {
-    const v = data[key]
+    const v = _data[key]
     return v == null ? '' : String(v)
   })
   return tpl
@@ -22,7 +22,7 @@ async function loadTemplate(): Promise<string | null> {
 }
 
 serve(async (req) => {
-  // CORS: origin whitelist (ALLOWED_ORIGINS), yoksa sadece gelen Origin'e vary başlığı ile cevap ver
+  // CORS: origin whitelist (ALLOWED_ORIGINS), yoksa sadece gelen Origin'_e vary başlığı ile cevap ver
   const requestOrigin = req.headers.get('origin') || ''
   const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '').split(',').map(s=>s.trim()).filter(Boolean)
   const originAllowed = allowedOrigins.length === 0 || (requestOrigin && allowedOrigins.includes(requestOrigin))
@@ -41,9 +41,9 @@ serve(async (req) => {
   if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'method_not_allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json' } })
 
   try {
-    const text = await req.text()
+    const _text = await req._text()
     let parsed: Record<string, unknown> = {}
-    try { parsed = text ? JSON.parse(text) : {} } catch {}
+    try { parsed = _text ? JSON.parse(_text) : {} } catch {}
 
     // inputs
     const order_id = ((): string | null => {
@@ -55,7 +55,7 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
-    let emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub Test <onboarding@resend.dev>'
+    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub Test <onboarding@resend.dev>'
     const testMode = (Deno.env.get('EMAIL_TEST_MODE') || '').toLowerCase() === 'true'
     const testTo = Deno.env.get('EMAIL_TEST_TO') || 'delivered@resend.dev'
     const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || '').split(',').map(s=>s.trim()).filter(Boolean)
@@ -91,7 +91,8 @@ serve(async (req) => {
           if ((!customer_email || !customer_name) && uid) {
             const u = await fetch(`${supabaseUrl}/auth/v1/admin/users/${encodeURIComponent(uid)}`, { headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey } })
             if (u.ok) {
-              const uj = await u.json().catch(()=>null) as any
+              interface UserResponse { email?: string; user_metadata?: { full_name?: string; name?: string } }
+              const uj = await u.json().catch(()=>null) as UserResponse | null
               if (uj) {
                 customer_email = customer_email || uj.email || null
                 const metaName = (uj.user_metadata && (uj.user_metadata.full_name || uj.user_metadata.name)) || null
@@ -135,13 +136,13 @@ serve(async (req) => {
       return await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, text: `${subject}` })
+        body: JSON.stringify({ from: emailFrom, to: toList, bcc: bcc.length > 0 ? bcc : undefined, subject, html, _text: `${subject}` })
       })
     }
 
     let resp = await send()
     if (!resp.ok) {
-      const txt = await resp.text().catch(()=> '')
+      const txt = await resp._text().catch(()=> '')
       if (txt.toLowerCase().includes('domain') && txt.toLowerCase().includes('verify')) {
         emailFrom = 'VentHub Test <onboarding@resend.dev>'
         resp = await send()
@@ -155,14 +156,14 @@ serve(async (req) => {
       await fetch(`${supabaseUrl}/rest/v1/order_email_events`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ order_id, email_to: toList[0] || '', subject, provider: 'resend', provider_message_id: result?.id || result?.data?.id || null })
+        body: JSON.stringify({ order_id, email_to: toList[0] || '', subject, provider: 'resend', provider_message_id: result?.id || result?._data?.id || null })
       })
     } catch {}
 
     return new Response(JSON.stringify({ success: true, subject, result }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
-  } catch (e) {
-    try { await sentryCaptureException(e as unknown, { fn: 'order-confirmation' }) } catch {}
-    const msg = e instanceof Error ? e.message : String(e)
+  } catch (_e) {
+    try { await sentryCaptureException(_e as unknown, { fn: 'order-confirmation' }) } catch {}
+    const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: 'unexpected', message: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

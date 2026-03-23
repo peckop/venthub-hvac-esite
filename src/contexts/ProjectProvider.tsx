@@ -20,8 +20,8 @@ interface ProjectContextType {
   refreshProjects: () => Promise<void>
   addProject: (name: string, description?: string) => Promise<UserProject | null>
   removeProject: (id: string) => Promise<void>
-  addItem: (projectId: string, productId: string, quantity?: number) => Promise<void>
-  removeItem: (projectId: string, productId: string) => Promise<void>
+  addItem: (projectId: string, _productId: string, quantity?: number) => Promise<void>
+  removeItem: (projectId: string, _productId: string) => Promise<void>
   getProjectItems: (projectId: string) => Promise<ProjectItem[]>
 }
 
@@ -76,18 +76,18 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }
 
-  const addItem = async (projectId: string, productId: string, quantity: number = 1) => {
+  const addItem = async (projectId: string, _productId: string, quantity: number = 1) => {
     try {
-      await addProductToProject(projectId, productId, quantity)
+      await addProductToProject(projectId, _productId, quantity)
       toast.success('Ürün projeye eklendi.')
     } catch {
       toast.error('Ürün eklenemedi.')
     }
   }
 
-  const removeItem = async (projectId: string, productId: string) => {
+  const removeItem = async (projectId: string, _productId: string) => {
     try {
-      await removeProductFromProject(projectId, productId)
+      await removeProductFromProject(projectId, _productId)
       toast.success('Ürün projeden çıkarıldı.')
     } catch {
       toast.error('Ürün çıkarılamadı.')

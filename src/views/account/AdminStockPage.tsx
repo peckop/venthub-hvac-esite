@@ -52,20 +52,20 @@ export default function AdminStockPage() {
     return all.filter(p => [p.name, p.sku, p.brand].some(v => (v || '').toLowerCase().includes(t)))
   }, [all, q])
 
-  async function adjust(productId: string, delta: number) {
+  async function adjust(_productId: string, delta: number) {
     try {
-      setSaving(productId)
+      setSaving(_productId)
       // Direkt UPDATE query - RPC yerine
-      const currentProduct = all.find(p => p.id === productId)
+      const currentProduct = all.find(p => p.id === _productId)
       const newQty = Math.max(0, (currentProduct?.stock_qty ?? 0) + delta)
 
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
-        .eq('id', productId)
+        .eq('id', _productId)
 
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
+      setAll(prev => prev.map(p => p.id === _productId ? { ...p, stock_qty: newQty } : p))
     } catch (err) {
       console.error('Stock adjust error:', err)
     } finally {
@@ -73,20 +73,20 @@ export default function AdminStockPage() {
     }
   }
 
-  async function setQty(productId: string, qty: number) {
+  async function setQty(_productId: string, qty: number) {
     try {
-      setSaving(productId)
+      setSaving(_productId)
       // Direkt UPDATE query - RPC yerine
       const newQty = Math.max(0, qty)
 
       const { error } = await supabase
         .from('products')
         .update({ stock_qty: newQty })
-        .eq('id', productId)
+        .eq('id', _productId)
 
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === productId ? { ...p, stock_qty: newQty } : p))
-      setTempQty(prev => ({ ...prev, [productId]: '' }))
+      setAll(prev => prev.map(p => p.id === _productId ? { ...p, stock_qty: newQty } : p))
+      setTempQty(prev => ({ ...prev, [_productId]: '' }))
     } catch (err) {
       console.error('Stock set error:', err)
     } finally {
@@ -94,20 +94,20 @@ export default function AdminStockPage() {
     }
   }
 
-  async function setThreshold(productId: string, threshold: number | null) {
+  async function setThreshold(_productId: string, threshold: number | null) {
     try {
-      setSaving(productId)
+      setSaving(_productId)
       // null değeri "varsayılan kullan" anlamına gelir
       const newThreshold = threshold !== null && threshold >= 0 ? threshold : null
 
       const { error } = await supabase
         .from('products')
         .update({ low_stock_threshold: newThreshold })
-        .eq('id', productId)
+        .eq('id', _productId)
 
       if (error) throw error
-      setAll(prev => prev.map(p => p.id === productId ? { ...p, low_stock_threshold: newThreshold } : p))
-      setTempThreshold(prev => ({ ...prev, [productId]: '' }))
+      setAll(prev => prev.map(p => p.id === _productId ? { ...p, low_stock_threshold: newThreshold } : p))
+      setTempThreshold(prev => ({ ...prev, [_productId]: '' }))
     } catch (err) {
       console.error('Threshold set error:', err)
     } finally {

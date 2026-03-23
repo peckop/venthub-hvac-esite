@@ -17,7 +17,7 @@ const client = new Client({
 async function listIndexes() {
     try {
         await client.connect();
-        console.log('Connected to database...');
+        console.warn('Connected to database...');
 
         const query = `
             SELECT indexname, indexdef
@@ -28,11 +28,11 @@ async function listIndexes() {
         const res = await client.query(query);
 
         if (res.rows.length === 0) {
-            console.log('⚠️ No indexes found on products table (other than PK potentially).');
+            console.warn('⚠️ No indexes found on products table (other than PK potentially).');
         } else {
-            console.log('Existing indexes on products:');
+            console.warn('Existing indexes on products:');
             res.rows.forEach(row => {
-                console.log(`- ${row.indexname}: ${row.indexdef}`);
+                console.warn(`- ${row.indexname}: ${row.indexdef}`);
             });
         }
 

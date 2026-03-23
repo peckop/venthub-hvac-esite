@@ -33,7 +33,7 @@ function normalizePayload(obj: unknown) {
   const rec = (typeof obj === 'object' && obj !== null) ? (obj as Record<string, unknown>) : {}
   const pick = (...keys: string[]) => { for (const k of keys) { if (k in rec) { const v = rec[k]; if (v!=null) return v } } return undefined }
   return {
-    return_id: (pick('return_id','returnId','rid') || '').toString(),
+    _return_id: (pick('_return_id','returnId','rid') || '').toString(),
     order_id: (pick('order_id','orderId','id') || '').toString(),
     carrier: (pick('carrier','provider') || '').toString(),
     tracking_number: (pick('tracking_number','trackingNumber','tn') || '').toString(),
@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
   try {
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 })
 
-    const raw = await req.text()
+    const raw = await req._text()
     let body: unknown = {}
     try { body = JSON.parse(raw) } catch {}
 
@@ -71,27 +71,27 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    const p = normalizePayload(body) as { return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
+    const p = normalizePayload(body) as { _return_id?: string; order_id?: string; carrier?: string; tracking_number?: string; status?: string; delivered_at?: string }
 
     // Optional dedup
     const eventId = (req.headers.get('x-id') || req.headers.get('x-event-id') || '').trim()
     if (eventId) {
-      const { data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId).limit(1)
+      const { _data: exist } = await supabase.from('returns_webhook_events').select('event_id').eq('event_id', eventId)._limit(1)
       if (Array.isArray(exist) && exist.length > 0) return json({ ok: true, event_id: eventId, duplicate: true })
     }
 
-    // Resolve return_id if missing using order_id + tracking_number if necessary (best effort)
-    let returnId = (p.return_id || '').trim()
+    // Resolve _return_id if missing using order_id + tracking_number if necessary (best effort)
+    let returnId = (p._return_id || '').trim()
     if (!returnId && p.order_id) {
       try {
-        const { data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).order('created_at',{ ascending:false }).limit(1)
-        if (Array.isArray(data) && data[0]) returnId = data[0].id
+        const { _data } = await supabase.from('venthub_returns').select('id').eq('order_id', p.order_id).order('created_at',{ ascending:false })._limit(1)
+        if (Array.isArray(_data) && _data[0]) returnId = _data[0].id
       } catch {}
     }
-    if (!returnId) return json({ error: 'Missing return_id' }, { status: 400 })
+    if (!returnId) return json({ error: 'Missing _return_id' }, { status: 400 })
 
     // Fetch current status
-    const { data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
+    const { _data: cur, error: curErr } = await supabase.from('venthub_returns').select('id,status').eq('id', returnId).single()
     if (curErr || !cur) return json({ error: 'Return not found' }, { status: 404 })
 
     const mapped = mapReturnStatus(p.status)
@@ -120,7 +120,7 @@ Deno.serve(async (req: Request) => {
       if (eventId) {
         await supabase.from('returns_webhook_events').insert({
           event_id: eventId,
-          return_id: returnId,
+          _return_id: returnId,
           order_id: p.order_id || null,
           carrier: p.carrier || null,
           tracking_number: p.tracking_number || null,
@@ -143,8 +143,8 @@ Deno.serve(async (req: Request) => {
         if (SUPABASE_URL && SERVICE_KEY) {
           // 1) Return details (reason, description, order_id fallback)
           let rOrderId = p.order_id || ''
-          let reason = ''
-          let description = ''
+          const reason = ''
+          const description = ''
           try {
             const r = await fetch(`${SUPABASE_URL}/rest/v1/venthub_returns?id=eq.${encodeURIComponent(returnId)}&select=order_id,reason,description,status`, {
               headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
@@ -186,10 +186,12 @@ Deno.serve(async (req: Request) => {
                 headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY }
               })
               if (u.ok) {
-                const ju = await u.json().catch(()=>null) as any
+                interface UserMetadata { full_name?: string; name?: string }
+                interface UserResponse { email?: string; user_metadata?: UserMetadata }
+                const ju = await u.json().catch(()=>null) as UserResponse | null
                 if (ju) {
                   customerEmail = String(ju.email || '')
-                  const meta = (ju.user_metadata || {}) as { full_name?: string; name?: string }
+                  const meta = (ju.user_metadata || {}) as UserMetadata
                   customerName = String(meta.full_name || meta.name || '')
                 }
               }
@@ -202,7 +204,7 @@ Deno.serve(async (req: Request) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY },
                 body: JSON.stringify({
-                  return_id: returnId,
+                  _return_id: returnId,
                   order_id: rOrderId,
                   order_number: orderNumber,
                   customer_email: customerEmail,
@@ -219,8 +221,8 @@ Deno.serve(async (req: Request) => {
       }
     } catch {}
 
-    return json({ ok: true, return_id: returnId, status: (patch['status'] || cur.status) })
-  } catch (e) {
-    return json({ error: (e as Error).message || 'Unexpected error' }, { status: 500 })
+    return json({ ok: true, _return_id: returnId, status: (patch['status'] || cur.status) })
+  } catch (_e) {
+    return json({ error: (_e as Error).message || 'Unexpected error' }, { status: 500 })
   }
 })

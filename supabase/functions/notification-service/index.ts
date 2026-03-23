@@ -8,14 +8,14 @@ interface NotificationRequest {
   message: string
   priority: 'low' | 'medium' | 'high' | 'critical'
   template?: string
-  data?: TemplateData
+  _data?: TemplateData
 }
 
 interface _StockAlertData {
   productName: string
   currentStock: number
   threshold: number
-  productId: string
+  _productId: string
 }
 
 serve(async (req) => {
@@ -38,12 +38,12 @@ serve(async (req) => {
 
   try {
     const body = await req.json() as NotificationRequest
-    const { type, to, message, priority, template, data } = body
+    const { type, to, message, priority, template, _data } = body
 
     // Environment variables
     const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
     const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN')
-    const twilioWhatsAppNumber = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // e.g., 'whatsapp:+14155238886'
+    const twilioWhatsAppNumber = Deno.env.get('TWILIO_WHATSAPP_NUMBER') // _e.g., 'whatsapp:+14155238886'
     const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER')
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <noreply@venthub.com>'
@@ -63,8 +63,8 @@ serve(async (req) => {
           result = { success: true, disabled: true, channel: 'whatsapp' }
           break
         }
-        result = await sendWhatsApp(to, message, template, data, {
-          accountSid: twilioAccountSid!,
+        result = await sendWhatsApp(to, message, template, _data, {
+          accountS_id: twilioAccountSid!,
           authToken: twilioAuthToken!,
           fromNumber: twilioWhatsAppNumber!
         })
@@ -77,7 +77,7 @@ serve(async (req) => {
           break
         }
         result = await sendSMS(to, message, {
-          accountSid: twilioAccountSid!,
+          accountS_id: twilioAccountSid!,
           authToken: twilioAuthToken!,
           fromNumber: twilioPhoneNumber!
         })
@@ -89,7 +89,7 @@ serve(async (req) => {
           result = { success: true, disabled: true, channel: 'email' }
           break
         }
-        result = await sendEmail(to, message, template, { ...(data||{}), emailFrom }, {
+        result = await sendEmail(to, message, template, { ...(_data||{}), emailFrom }, {
           apiKey: resendApiKey!,
           from: emailFrom,
         })
@@ -99,7 +99,7 @@ serve(async (req) => {
         throw new Error(`Unsupported notification type: ${type}`)
     }
 
-    console.log(`📱 Notification sent: ${type} to ${to} - Priority: ${priority}`)
+    console.warn(`📱 Notification sent: ${type} to ${to} - Priority: ${priority}`)
     
     return new Response(JSON.stringify({ 
       success: true, 
@@ -126,14 +126,14 @@ serve(async (req) => {
   }
 })
 
-interface TwilioConfig { accountSid: string; authToken: string; fromNumber: string }
+interface TwilioConfig { accountS_id: string; authToken: string; fromNumber: string }
 
-async function sendWhatsApp(to: string, message: string, template?: string, data?: TemplateData, config?: TwilioConfig) {
+async function sendWhatsApp(to: string, message: string, template?: string, _data?: TemplateData, config?: TwilioConfig) {
   if (!config?.accountSid || !config?.authToken || !config?.fromNumber) {
     throw new Error('WhatsApp configuration missing')
   }
 
-  const finalMessage = template ? formatTemplate(template, data) : message
+  const finalMessage = template ? formatTemplate(template, _data) : message
   
   // Format phone number for WhatsApp (must include whatsapp: prefix)
   const formattedTo = to.startsWith('whatsapp:') ? to : `whatsapp:${to}`
@@ -155,7 +155,7 @@ async function sendWhatsApp(to: string, message: string, template?: string, data
   })
   
   if (!response.ok) {
-    const error = await response.text()
+    const error = await response._text()
     throw new Error(`WhatsApp send failed: ${error}`)
   }
   
@@ -184,21 +184,21 @@ async function sendSMS(to: string, message: string, config: TwilioConfig) {
   })
   
   if (!response.ok) {
-    const error = await response.text()
+    const error = await response._text()
     throw new Error(`SMS send failed: ${error}`)
   }
   
   return await response.json()
 }
 
-async function sendEmail(to: string, message: string, template?: string, data?: TemplateData, config?: { apiKey: string; from?: string }) {
+async function sendEmail(to: string, message: string, template?: string, _data?: TemplateData, config?: { apiKey: string; from?: string }) {
   if (!config?.apiKey) {
     throw new Error('Email configuration missing')
   }
 
-  const subject = data?.subject || 'VentHub Bildirim'
-  const finalMessage = template ? formatTemplate(template, data) : message
-  const from = config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
+  const subject = _data?.subject || 'VentHub Bildirim'
+  const finalMessage = template ? formatTemplate(template, _data) : message
+  const from = config?.from || _data?.emailFrom || 'VentHub <noreply@venthub.com>'
   
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -210,26 +210,26 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
       from,
       to: [to],
       subject: subject,
-      text: finalMessage,
+      _text: finalMessage,
       html: `<p>${finalMessage.replace(/\n/g, '<br>')}</p>`,
     }),
   })
   
   if (!response.ok) {
-    const error = await response.text()
+    const error = await response._text()
     throw new Error(`Email send failed: ${error}`)
   }
   
   return await response.json()
 }
 
-function formatTemplate(template: string, data: TemplateData): string {
-  if (!data) return template
+function formatTemplate(template: string, _data: TemplateData): string {
+  if (!_data) return template
   
   let formatted = template
-  Object.keys(data).forEach(key => {
+  Object.keys(_data).forEach(key => {
     const placeholder = new RegExp(`{{${key}}}`, 'g')
-    const value = String(data[key])
+    const value = String(_data[key])
     formatted = formatted.replace(placeholder, value)
   })
   

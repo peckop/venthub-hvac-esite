@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 interface Product {
   id: string
@@ -21,6 +21,14 @@ interface AlertRecipient {
     whatsapp: boolean
     email: boolean
   }
+}
+
+interface AlertData {
+  productName: string
+  _productId: string
+  currentStock: number
+  threshold: number
+  alertType: 'out_of_stock' | 'low_stock'
 }
 
 const corsHeaders = {
@@ -50,9 +58,9 @@ serve(async (req) => {
       alertResults = await checkAllProducts(supabase)
     } else if (req.method === 'POST') {
       // Spesifik bir ürünü kontrol et (Genelde stok değişimi sonrası tetiklenir)
-      const { productId } = await req.json()
-      if (!productId) throw new Error('Product ID is required')
-      alertResults = await checkSpecificProduct(supabase, productId)
+      const { _productId } = await req.json()
+      if (!_productId) throw new Error('Product ID is required')
+      alertResults = await checkSpecificProduct(supabase, _productId)
     }
 
     return new Response(JSON.stringify({
@@ -65,25 +73,20 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
 
-  } catch (error: any) {
-    console.error('[FATAL] Stock alert error:', error)
-    return new Response(JSON.stringify({ error: error.message, success: false }), {
+  } catch (error: unknown) {
+    const err = error as Error
+    console.error('[FATAL] Stock alert error:', err)
+    return new Response(JSON.stringify({ error: err.message, success: false }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 })
 
-async function checkAllProducts(supabase: any) {
+async function checkAllProducts(supabase: SupabaseClient) {
   // Eşik değerinin altında kalan ürünleri çek
-  // Not: stock_qty <= low_stock_threshold
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('id, name, stock_qty, low_stock_threshold')
-    .lte('stock_qty', supabase.raw('low_stock_threshold')) // Bu kullanım Supabase JS ile her zaman çalışmayabilir, fallback olarak 5 alalım
-  
   // Üstteki filtreleme SQL tarafında karmaşık olabilir, basitleştirip JS tarafında filtreleyelim
-  const { data: allLowStock, error: fetchErr } = await supabase
+  const { _data: allLowStock, error: fetchErr } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
     .filter('stock_qty', 'lte', 10) // Önce genel bir filtre
@@ -91,7 +94,7 @@ async function checkAllProducts(supabase: any) {
   if (fetchErr) throw fetchErr
 
   const productsToAlert = (allLowStock as Product[]).filter(p => p.stock_qty <= (p.low_stock_threshold || 5))
-  console.log(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
+  console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
 
   const results = []
   for (const product of productsToAlert) {
@@ -100,11 +103,11 @@ async function checkAllProducts(supabase: any) {
   return results
 }
 
-async function checkSpecificProduct(supabase: any, productId: string) {
-  const { data: product, error } = await supabase
+async function checkSpecificProduct(supabase: SupabaseClient, _productId: string) {
+  const { _data: product, error } = await supabase
     .from('products')
     .select('id, name, stock_qty, low_stock_threshold')
-    .eq('id', productId)
+    .eq('id', _productId)
     .single()
 
   if (error || !product) throw new Error('Product not found')
@@ -113,17 +116,17 @@ async function checkSpecificProduct(supabase: any, productId: string) {
     return [{ product: product.name, message: 'Stock above threshold' }]
   }
 
-  return [await processProductAlert(supabase, product)]
+  return [await processProductAlert(supabase, product as Product)]
 }
 
-async function processProductAlert(supabase: any, product: Product) {
+async function processProductAlert(supabase: SupabaseClient, product: Product) {
   const recipients = await getAlertRecipients(supabase)
   const alertType = product.stock_qty <= 0 ? 'out_of_stock' : 'low_stock'
   const priority = product.stock_qty <= 0 ? 'critical' : 'high'
 
-  const alertData = {
+  const alertData: AlertData = {
     productName: product.name,
-    productId: product.id,
+    _productId: product.id,
     currentStock: product.stock_qty,
     threshold: product.low_stock_threshold || 5,
     alertType
@@ -155,7 +158,7 @@ async function processProductAlert(supabase: any, product: Product) {
   }
 }
 
-async function sendNotification(type: string, to: string, data: any, priority: string) {
+async function sendNotification(type: string, to: string, _data: AlertData, priority: string) {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -170,9 +173,9 @@ async function sendNotification(type: string, to: string, data: any, priority: s
         type,
         to,
         priority,
-        data: {
-          ...data,
-          subject: data.alertType === 'out_of_stock' ? '🚨 KRİTİK: STOK TÜKENDİ' : '⚠️ DÜŞÜK STOK UYARISI'
+        _data: {
+          ..._data,
+          subject: _data.alertType === 'out_of_stock' ? '🚨 KRİTİK: STOK TÜKENDİ' : '⚠️ DÜŞÜK STOK UYARISI'
         }
       })
     })
@@ -184,9 +187,9 @@ async function sendNotification(type: string, to: string, data: any, priority: s
   }
 }
 
-async function getAlertRecipients(supabase: any): Promise<AlertRecipient[]> {
+async function getAlertRecipients(supabase: SupabaseClient): Promise<AlertRecipient[]> {
   // inventory_settings'den ana email'i al
-  const { data: settings } = await supabase
+  const { _data: settings } = await supabase
     .from('inventory_settings')
     .select('alert_email')
     .maybeSingle()

@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 const corsHeaders = {
@@ -33,14 +32,14 @@ Deno.serve(async (req: Request) => {
     })
     const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-    const { data: userRes, error: userErr } = await supabaseUser.auth.getUser()
+    const { _data: userRes, error: userErr } = await supabaseUser.auth.getUser()
     if (userErr || !userRes?.user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const userId = userRes.user.id
 
-    const { data: profile, error: profErr } = await supabaseAdmin
+    const { _data: profile, error: profErr } = await supabaseAdmin
       .from('user_profiles')
       .select('role')
       .eq('id', userId)
@@ -50,12 +49,21 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'profile_error', details: profErr.message }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
-    const role = (profile as any)?.role || 'user'
-    if (!['admin', 'superadmin'].includes(role)) {
+    const userRole = profile?.role as string | undefined || 'user'
+    if (!['admin', 'superadmin'].includes(userRole)) {
       return new Response(JSON.stringify({ error: 'forbidden', details: 'admin_only' }), { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
-    const body = await req.json().catch(() => ({})) as Record<string, any>
+    interface CouponBody {
+      code?: string
+      type?: string
+      value?: number | string
+      starts_at?: string
+      ends_at?: string
+      active?: boolean
+      usage_limit?: number | string | null
+    }
+    const body = await req.json().catch(() => ({})) as CouponBody
 
     const code = String(body.code || '').trim()
     const type = String(body.type || '')
@@ -76,7 +84,7 @@ Deno.serve(async (req: Request) => {
     if (!['percent', 'fixed'].includes(type)) errs.push('type')
     if (!value || value <= 0) errs.push('value')
     if (errs.length > 0) {
-      return new Response(JSON.stringify({ error: 'bad_request', missing_or_invalid: errs }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+      return new Response(JSON.stringify({ error: 'bad_request', missing_or_inval_id: errs }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
     const payload = {
@@ -91,7 +99,7 @@ Deno.serve(async (req: Request) => {
       created_by: userId,
     }
 
-    const { data, error: insErr } = await supabaseAdmin
+    const { _data, error: insErr } = await supabaseAdmin
       .from('coupons')
       .insert(payload)
       .select('id, code, discount_type, discount_value, valid_from, valid_until, is_active, usage_limit, used_count, created_at')
@@ -101,9 +109,9 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'insert_failed', details: insErr.message }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
     }
 
-    return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
+    return new Response(JSON.stringify(_data), { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
+  } catch (_e: unknown) {
+    const msg = _e instanceof Error ? _e.message : String(_e)
     return new Response(JSON.stringify({ error: 'internal', details: msg }), { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } })
   }
 })

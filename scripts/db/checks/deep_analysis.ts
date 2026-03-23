@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
+import * as _fs from '_fs';
 dotenv.config();
 
 const supabase = createClient(
@@ -8,10 +8,26 @@ const supabase = createClient(
     process.env.VITE_SUPABASE_ANON_KEY!
 );
 
+interface CategoryRow {
+    id: string;
+    name: string;
+    slug: string;
+    level: number;
+    parent_id: string | null;
+}
+
+interface ProductRow {
+    id: string;
+    name: string;
+    sku: string;
+    category_id: string;
+    status: string;
+}
+
 async function deepAnalysis() {
     let output = '';
     const log = (msg: string) => {
-        console.log(msg);
+        console.warn(msg);
         output += msg + '\n';
     };
 
@@ -19,20 +35,21 @@ async function deepAnalysis() {
     log('========================================');
     log('1. CATEGORIES TABLOSU (TÜM KAYITLAR)');
     log('========================================');
-    const { data: allCats } = await supabase
+    const { _data: allCats } = await supabase
         .from('categories')
         .select('id, name, slug, level, parent_id')
         .order('level')
         .order('name');
 
-    const catMap = new Map<string, any>();
-    allCats?.forEach(c => catMap.set(c.id, c));
+    const castedCats = (allCats as unknown as CategoryRow[]) || [];
+    const catMap = new Map<string, CategoryRow>();
+    castedCats.forEach(c => catMap.set(c.id, c));
 
-    log(`Toplam kategori sayısı: ${allCats?.length || 0}`);
+    log(`Toplam kategori sayısı: ${castedCats.length}`);
     log('');
 
     // Hiyerarşik liste
-    allCats?.forEach(cat => {
+    castedCats.forEach(cat => {
         const indent = '  '.repeat(cat.level);
         const parentName = cat.parent_id ? catMap.get(cat.parent_id)?.name || 'UNKNOWN' : 'ROOT';
         log(`${indent}[L${cat.level}] ${cat.name}`);
@@ -45,17 +62,18 @@ async function deepAnalysis() {
     log('\n========================================');
     log('2. PRODUCTS TABLOSU (TÜM KAYITLAR)');
     log('========================================');
-    const { data: allProducts } = await supabase
+    const { _data: allProducts } = await supabase
         .from('products')
         .select('id, name, sku, category_id, status')
         .order('name');
 
-    log(`Toplam ürün sayısı: ${allProducts?.length || 0}`);
+    const castedProducts = (allProducts as unknown as ProductRow[]) || [];
+    log(`Toplam ürün sayısı: ${castedProducts.length}`);
     log('');
 
     // Kategori bazlı ürün sayıları
-    const productsByCategory = new Map<string, any[]>();
-    allProducts?.forEach(p => {
+    const productsByCategory = new Map<string, ProductRow[]>();
+    castedProducts.forEach(p => {
         if (!productsByCategory.has(p.category_id)) {
             productsByCategory.set(p.category_id, []);
         }
@@ -73,17 +91,16 @@ async function deepAnalysis() {
     log('3. ÇAKIŞMA ANALİZİ');
     log('========================================');
 
-    const categoryNames = new Set(allCats?.map(c => c.name.toLowerCase().trim()) || []);
-    const productNames = allProducts?.map(p => p.name.toLowerCase().trim()) || [];
+    const categoryNames = new Set(castedCats.map(c => c.name.toLowerCase().trim()));
 
     const conflicts: string[] = [];
-    allProducts?.forEach(p => {
+    castedProducts.forEach(p => {
         const pNameLower = p.name.toLowerCase().trim();
         if (categoryNames.has(pNameLower)) {
-            const matchingCat = allCats?.find(c => c.name.toLowerCase().trim() === pNameLower);
+            const matchingCat = castedCats.find(c => c.name.toLowerCase().trim() === pNameLower);
             conflicts.push(`ÇAKIŞMA: "${p.name}" hem ürün hem kategori olarak var!`);
             conflicts.push(`  - Ürün ID: ${p.id}, category_id: ${p.category_id}`);
-            conflicts.push(`  - Kategori ID: ${matchingCat?.id}, parent: ${catMap.get(matchingCat?.parent_id)?.name || 'ROOT'}`);
+            conflicts.push(`  - Kategori ID: ${matchingCat?.id}, parent: ${matchingCat?.parent_id ? (catMap.get(matchingCat.parent_id)?.name || 'UNKNOWN') : 'ROOT'}`);
         }
     });
 
@@ -100,18 +117,18 @@ async function deepAnalysis() {
     log('========================================');
 
     // Alt kategorileri (level > 0) kontrol et, içinde ürün yoksa şüpheli
-    const subCategories = allCats?.filter(c => c.level > 0) || [];
-    const suspiciousCategories: any[] = [];
+    const subCategories = castedCats.filter(c => c.level > 0);
+    const suspiciousCategories: (CategoryRow & { parentName: string })[] = [];
 
     for (const subCat of subCategories) {
         const productsInCat = productsByCategory.get(subCat.id) || [];
-        const childCategories = allCats?.filter(c => c.parent_id === subCat.id) || [];
+        const childCategories = castedCats.filter(c => c.parent_id === subCat.id);
 
         // Bu alt kategorinin altında ne ürün ne de başka kategori yoksa şüpheli
         if (productsInCat.length === 0 && childCategories.length === 0) {
             suspiciousCategories.push({
                 ...subCat,
-                parentName: catMap.get(subCat.parent_id)?.name || 'UNKNOWN'
+                parentName: subCat.parent_id ? (catMap.get(subCat.parent_id)?.name || 'UNKNOWN') : 'ROOT'
             });
         }
     }
@@ -141,8 +158,8 @@ async function deepAnalysis() {
     }
 
     // UTF-8 olarak kaydet
-    fs.writeFileSync('scripts/deep_analysis_result.txt', output, 'utf8');
+    _fs.writeFileSync('scripts/deep_analysis_result.txt', output, 'utf8');
     log('\nAnaliz tamamlandı. Sonuç: scripts/deep_analysis_result.txt');
 }
 
-deepAnalysis().catch(console.error);
+deepAnalysis().catch(err => console.error(err));

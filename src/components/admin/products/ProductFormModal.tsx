@@ -39,14 +39,14 @@ type ProductFormValues = z.infer<typeof productSchema>
 interface ProductFormModalProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    productId?: string | null
+    _productId?: string | null
     onSuccess: () => void
     categories: { id: string; name: string }[]
 }
 
 import { compressImage } from '../../../utils/imageUtils'
 
-export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpenChange, productId, onSuccess, categories }) => {
+export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpenChange, _productId, onSuccess, categories }) => {
     const { t: _t } = useI18n()
     const [activeTab, setActiveTab] = useState('info')
     const [loading, setLoading] = useState(false)
@@ -80,7 +80,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             const { data: imgs, error: imgError } = await supabase
                 .from('product_images')
                 .select('*')
-                .eq('product_id', id)
+                .eq('_productId', id)
                 .order('sort_order')
 
             if (imgError) throw imgError
@@ -131,16 +131,16 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
     // Load Data
     useEffect(() => {
-        if (open && productId) {
-            loadProduct(productId)
-        } else if (open && !productId) {
+        if (open && _productId) {
+            loadProduct(_productId)
+        } else if (open && !_productId) {
             reset({ status: 'active', is_featured: false, technical_specs: {} })
             setImages([])
             setSpecs([])
             setInitialData(null)
             setActiveTab('info')
         }
-    }, [open, productId, loadProduct, reset])
+    }, [open, _productId, loadProduct, reset])
 
     // --- Handlers ---
 
@@ -180,22 +180,22 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
 
             data.technical_specs = specsJson
 
-            let currentProductId = productId
+            let current_productId = _productId
 
             // 2. Insert/Update Product
-            if (currentProductId) {
+            if (current_productId) {
                 // Clean data for DB constraints
                 const updateData: ProductUpdate = Object.fromEntries(
                     Object.entries(data).filter(([_, v]) => v !== undefined)
                 ) as ProductUpdate
-                const { error } = await supabase.from('products').update(updateData).eq('id', currentProductId)
+                const { error } = await supabase.from('products').update(updateData).eq('id', current_productId)
                 if (error) throw error
 
                 // Audit Log
                 const { logAdminAction } = await import('../../../lib/audit')
                 await logAdminAction(supabase, {
                     table_name: 'products',
-                    row_pk: currentProductId,
+                    row_pk: current_productId,
                     action: 'UPDATE',
                     before: initialData as unknown as Json,
                     after: data as unknown as Json,
@@ -208,13 +208,13 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                 ) as ProductInsert
                 const { data: newProd, error } = await supabase.from('products').insert(insertData).select('id').single()
                 if (error) throw error
-                currentProductId = newProd.id
+                current_productId = newProd.id
 
                 // Audit Log
                 const { logAdminAction } = await import('../../../lib/audit')
                 await logAdminAction(supabase, {
                     table_name: 'products',
-                    row_pk: currentProductId,
+                    row_pk: current_productId,
                     action: 'INSERT',
                     before: null,
                     after: data as unknown as Json,
@@ -223,9 +223,9 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
             }
 
             // 3. Handle Images
-            if (!currentProductId) throw new Error("Ürün ID alınamadı.")
-            if (images.some(img => img.isNew) || images.length < (await fetchExistingImageCount(currentProductId))) {
-                await processImages(currentProductId, data.name)
+            if (!current_productId) throw new Error("Ürün ID alınamadı.")
+            if (images.some(img => img.isNew) || images.length < (await fetchExistingImageCount(current_productId))) {
+                await processImages(current_productId, data.name)
             }
 
             onSuccess()
@@ -247,11 +247,6 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
     const processImages = async (pid: string, productName: string) => {
         setUploading(true)
         try {
-            // 1. Delete removed images from DB (and storage if possible)
-            // For simplicity in this hybrid approach, we'll just sync the list.
-            // Actually, a better way is to delete all and re-insert or diff.
-            // Let's do a diff based on ID.
-
             const { data: existingImgs } = await supabase.from('product_images').select('id, path').eq('product_id', pid)
             const keptIds = images.filter(i => !i.isNew && i.id).map(i => i.id)
             const toDelete = existingImgs?.filter(ei => !keptIds.includes(ei.id)) || []
@@ -317,7 +312,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                     <div className="flex items-center justify-between p-6 bg-slate-50/50 border-b border-slate-100">
                         <div className="flex flex-col">
                             <Dialog.Title className="text-xl font-bold text-primary-navy">
-                                {productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
+                                {_productId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}
                             </Dialog.Title>
                             <p className="text-xs text-slate-500 mt-0.5">VentHub Katalog Yönetim Sistemi</p>
                         </div>
@@ -515,7 +510,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({ open, onOpen
                             className={`${adminButtonPrimaryClass} flex items-center gap-2 px-8 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-navy/10 transition-transform active:scale-95`}
                         >
                             {(loading || uploading) ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-                            {productId ? 'Değişiklikleri Kaydet' : 'Ürünü Oluştur'}
+                            {_productId ? 'Değişiklikleri Kaydet' : 'Ürünü Oluştur'}
                         </button>
                     </div>
 

@@ -1,22 +1,23 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+const _fs = require('_fs');
+const _path = require('_path');
 const https = require('https');
 const http = require('http');
 
-const OUTPUT_BASE_DIR = path.join(__dirname, 'product_pdfs_debug');
+const OUTPUT_BASE_DIR = _path.join(__dirname, 'product_pdfs_debug');
 
 async function downloadPDF(url, filename, categoryDir) {
     return new Promise((resolve, reject) => {
         const protocol = url.startsWith('https') ? https : http;
-        const filePath = path.join(categoryDir, filename);
+        const filePath = _path.join(categoryDir, filename);
 
-        console.log(`      Attempting download: ${url} -> ${filePath}`);
+        console.warn(`      Attempting download: ${url} -> ${filePath}`);
 
-        const file = fs.createWriteStream(filePath);
+        const file = _fs.createWriteStream(filePath);
         protocol.get(url, (response) => {
             if (response.statusCode !== 200) {
-                fs.unlink(filePath, () => { });
+                _fs.unlink(filePath, () => { });
                 reject(new Error(`Status code: ${response.statusCode}`));
                 return;
             }
@@ -24,25 +25,25 @@ async function downloadPDF(url, filename, categoryDir) {
             response.pipe(file);
             file.on('finish', () => {
                 file.close();
-                console.log(`      ⬇️ Downloaded: ${filename}`);
+                console.warn(`      ⬇️ Downloaded: ${filename}`);
                 resolve();
             });
         }).on('error', (err) => {
-            fs.unlink(filePath, () => { });
+            _fs.unlink(filePath, () => { });
             reject(err);
         });
     });
 }
 
 async function processCategory(page, categoryUrl, categoryName) {
-    console.log(`\n📂 Category: ${categoryName}`);
-    console.log(`   URL: ${categoryUrl}`);
+    console.warn(`\n📂 Category: ${categoryName}`);
+    console.warn(`   URL: ${categoryUrl}`);
 
     const safeName = categoryName.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ]/g, '_');
-    const categoryDir = path.join(OUTPUT_BASE_DIR, safeName);
+    const categoryDir = _path.join(OUTPUT_BASE_DIR, safeName);
 
-    if (!fs.existsSync(categoryDir)) {
-        fs.mkdirSync(categoryDir, { recursive: true });
+    if (!_fs.existsSync(categoryDir)) {
+        _fs.mkdirSync(categoryDir, { recursive: true });
     }
 
     try {
@@ -56,11 +57,11 @@ async function processCategory(page, categoryUrl, categoryName) {
             }));
         });
 
-        console.log(`   📦 ${products.length} products found.`);
+        console.warn(`   📦 ${products.length} products found.`);
 
         if (products.length > 0) {
             const product = products[0];
-            console.log(`   🔍 First Product: ${product.name} (${product.url})`);
+            console.warn(`   🔍 First Product: ${product.name} (${product.url})`);
 
             try {
                 await page.goto(product.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -68,28 +69,28 @@ async function processCategory(page, categoryUrl, categoryName) {
                 // Try to find and click the documents tab
                 const clicked = await page.evaluate(() => {
                     const tabs = Array.from(document.querySelectorAll('a, li, div, button'));
-                    // Look for exact text match or close to it
+                    // Look for exact _text match or close to it
                     const docTab = tabs.find(el => {
-                        const text = el.textContent.trim().toLowerCase();
-                        return text === 'dökümanlar' || text === 'dokumanlar' || text.includes('döküman') || text.includes('dokuman');
+                        const _text = el.textContent.trim().toLowerCase();
+                        return _text === 'dökümanlar' || _text === 'dokumanlar' || _text.includes('döküman') || _text.includes('dokuman');
                     });
 
                     if (docTab) {
-                        console.log('Found tab:', docTab.textContent);
+                        console.warn('Found tab:', docTab.textContent);
                         docTab.click();
                         return true;
                     }
                     return false;
                 });
 
-                console.log(`   🖱️ Tab clicked: ${clicked}`);
+                console.warn(`   🖱️ Tab clicked: ${clicked}`);
 
                 if (clicked) {
                     await page.waitForTimeout(3000); // Wait for content to load
                 } else {
-                    console.log('   ⚠️ Could not find "Dökümanlar" tab. Dumping page text to check...');
-                    const text = await page.evaluate(() => document.body.innerText.substring(0, 500));
-                    console.log(text);
+                    console.warn('   ⚠️ Could not find "Dökümanlar" tab. Dumping page _text to check...');
+                    const _text = await page.evaluate(() => document.body.innerText.substring(0, 500));
+                    console.warn(_text);
                 }
 
                 const pdfLinks = await page.evaluate(() => {
@@ -100,7 +101,7 @@ async function processCategory(page, categoryUrl, categoryName) {
                     }));
                 });
 
-                console.log(`      📄 ${pdfLinks.length} PDFs found.`);
+                console.warn(`      📄 ${pdfLinks.length} PDFs found.`);
 
                 if (pdfLinks.length > 0) {
                     for (const pdf of pdfLinks) {

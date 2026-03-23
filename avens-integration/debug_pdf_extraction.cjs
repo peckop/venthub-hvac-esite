@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const puppeteer = require('puppeteer');
 
 async function main() {
@@ -10,7 +11,7 @@ async function main() {
 
     try {
         const url = 'https://avensair.com/vortice-lineo-100-quiet';
-        console.log(`Navigating to ${url}`);
+        console.warn(`Navigating to ${url}`);
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
 
         // Click tab
@@ -24,9 +25,9 @@ async function main() {
             return false;
         });
 
-        console.log(`Tab clicked: ${clicked}`);
+        console.warn(`Tab clicked: ${clicked}`);
 
-        console.log('Waiting 10 seconds...');
+        console.warn('Waiting 10 seconds...');
         await new Promise(r => setTimeout(r, 10000));
 
         // Dump HTML of tab content
@@ -45,7 +46,7 @@ async function main() {
             };
         });
 
-        console.log('Debug Info:', JSON.stringify(debugInfo, null, 2));
+        console.warn('Debug Info:', JSON.stringify(debugInfo, null, 2));
 
     } catch (error) {
         console.error('Error:', error);

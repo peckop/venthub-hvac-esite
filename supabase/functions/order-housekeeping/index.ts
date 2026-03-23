@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const cancelled = cancelResp.ok ? await cancelResp.json().catch(() => []) : []
 
     // 2) Token VAR: 15 dk sonra 1 kez reconcile; SUCCESS değilse failed
-    const listResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null&limit=1000`, {
+    const listResp = await fetch(`${supabaseUrl}/rest/v1/venthub_orders?select=id,created_at,payment_token,status&status=eq.pending&created_at=lt.${encodeURIComponent(th15)}&payment_token=not.is.null&_limit=1000`, {
       headers: { 'Authorization': `Bearer ${serviceRoleKey}`, 'apikey': serviceRoleKey }
     })
     const pendWithToken = listResp.ok ? await listResp.json().catch(() => []) : []
@@ -69,8 +69,8 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ ok: true, cancelled_count: Array.isArray(cancelled) ? cancelled.length : 0, reconciled, failed }), { status: 200, headers: { ...cors, 'Content-Type': 'application/json' } })
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e ?? '')
+  } catch (_e) {
+    const msg = _e instanceof Error ? _e.message : String(_e ?? '')
     return new Response(JSON.stringify({ ok: false, error: msg }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } })
   }
 })

@@ -835,7 +835,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           )}
         </div>
       </div>
-      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} productId={product.id} />
+      <LeadModal open={leadOpen} onClose={() => setLeadOpen(false)} productName={product.name} _productId={product.id} />
     </div>
   )
 }

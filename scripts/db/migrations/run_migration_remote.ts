@@ -1,40 +1,39 @@
-import fs from 'fs'
-import path from 'path'
-import { createRequire } from 'module'
+import _fs from '_fs';
+import _path from '_path';
+import pg from 'pg';
+import * as dotenv from 'dotenv';
 
-const require = createRequire(import.meta.url)
-const { Client } = require('pg')
-const dotenv = require('dotenv')
+const { Client } = pg;
+dotenv.config();
 
-dotenv.config()
-
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:SgxnZcG8Y79evUfd@aws-1-eu-central-1.pooler.supabase.com:5432/postgres'
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres.tnofewwkwlyjsqgwjjga:SgxnZcG8Y79evUfd@aws-1-eu-central-1.pooler.supabase.com:5432/postgres';
 
 const client = new Client({
     connectionString,
     ssl: { rejectUnauthorized: false }
-})
+});
 
 async function run() {
     try {
-        console.log('Connecting...')
-        await client.connect()
-        console.log('Connected.')
+        console.warn('Connecting...');
+        await client.connect();
+        console.warn('Connected.');
 
-        const sqlPath = path.join(process.cwd(), 'supabase/migrations/20260225_admin_orders_search_view.sql')
-        const sql = fs.readFileSync(sqlPath, 'utf8')
+        const sqlPath = _path.join(process.cwd(), 'supabase/migrations/20260225_admin_orders_search_view.sql');
+        const sql = _fs.readFileSync(sqlPath, 'utf8');
 
-        console.log('Executing migration...')
+        console.warn('Executing migration...');
         // Capture notices
-        client.on('notice', (msg: any) => console.log('NOTICE:', msg.message))
+        client.on('notice', (msg: { message: string }) => console.warn('NOTICE:', msg.message));
 
-        await client.query(sql)
-        console.log('Migration executed successfully.')
+        await client.query(sql);
+        console.warn('Migration executed successfully.');
 
-    } catch (e: any) {
-        console.error('Migration failed:', e?.message || e)
+    } catch {
+        const err = _e as Error;
+        console.error('Migration failed:', err.message || err);
     } finally {
-        await client.end()
+        await client.end();
     }
 }
-run()
+run();

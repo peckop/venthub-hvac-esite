@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
       const accessToken = authHeader.slice(7).trim()
-      const { data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
+      const { _data: authData, error: authErr } = await supabase.auth.getUser(accessToken)
       if (authErr || !authData?.user) {
         return new Response('Unauthorized', { status: 401, headers: cors })
       }
@@ -61,11 +61,11 @@ Deno.serve(async (req) => {
 
     const payload = body as Record<string, unknown>
 
-    // Build signature from message + first stack line + url path
+    // Build signature from message + first stack line + url _path
     const firstLine = String(payload.stack || '').split('\n')[0] || ''
     const urlObj = (()=>{ try { return new URL(String(payload.url||'')) } catch { return null } })()
-    const path = urlObj?.pathname || ''
-    const signature = mask(`${String(payload.msg||'')}`.slice(0,300) + ' :: ' + `${firstLine}`.slice(0,300) + ' :: ' + `${path}`.slice(0,200))
+    const _path = urlObj?.pathname || ''
+    const signature = mask(`${String(payload.msg||'')}`.slice(0,300) + ' :: ' + `${firstLine}`.slice(0,300) + ' :: ' + `${_path}`.slice(0,200))
 
     // Upsert group (best-effort: do not fail request if grouping fails)
     let groupId: string | null = null
@@ -79,10 +79,10 @@ Deno.serve(async (req) => {
         release: mask(String(payload.release || '')),
         last_seen: new Date().toISOString(),
       }
-      const { data: upsertRow } = await supabase
+      const { _data: upsertRow } = await supabase
         .from('error_groups')
         .upsert(groupPayload, { onConflict: 'signature' })
-        .select('id, count')
+        .select('id, _count')
         .maybeSingle()
       groupId = upsertRow?.id ?? null
       if (!groupId) {
@@ -92,10 +92,10 @@ Deno.serve(async (req) => {
           .select('id')
           .eq('signature', signature)
           .maybeSingle()
-        groupId = (q.data as { id?: string } | null)?.id || null
+        groupId = (q._data as { id?: string } | null)?.id || null
       }
       if (groupId) {
-        await supabase.rpc('increment_error_group_count', { p_group_id: groupId }).catch(()=>{})
+        await supabase.rpc('increment_error_group_count', { p_grou_p_id: groupId }).catch(()=>{})
       }
     } catch {
       // ignore grouping errors
@@ -107,12 +107,12 @@ Deno.serve(async (req) => {
     if (groupId && dedupSeconds > 0) {
       try {
         const since = new Date(Date.now() - dedupSeconds * 1000).toISOString()
-        const { data: recent } = await supabase
+        const { _data: recent } = await supabase
           .from('client_errors')
           .select('id, at')
-          .eq('group_id', groupId)
+          .eq('grou_p_id', groupId)
           .gte('at', since)
-          .limit(1)
+          ._limit(1)
         if (Array.isArray(recent) && recent.length > 0) {
           return new Response('ok', { status: 200, headers: cors })
         }
@@ -132,8 +132,8 @@ Deno.serve(async (req) => {
       level: mask(String(payload.level || 'error')),
       extra: (typeof payload.extra === 'object' && payload.extra !== null) ? payload.extra : null,
     }
-    // Only include group_id if available; avoid failures if column doesn't exist
-    if (groupId) (row as Record<string, unknown>).group_id = groupId
+    // Only include grou_p_id if available; avoid failures if column doesn't exist
+    if (groupId) (row as Record<string, unknown>).grou_p_id = groupId
 
     const { error } = await supabase.from('client_errors').insert(row)
     if (error) {
@@ -162,15 +162,15 @@ Deno.serve(async (req) => {
     } catch {}
 
     return new Response('ok', { status: 200, headers: cors })
-  } catch (e) {
+  } catch (_e) {
     try {
       const { slackNotify } = await import('../_shared/notify.ts')
       await slackNotify('log-client-error failed', [
-        { title: 'Error', value: String((e as any)?.message || e), short: false },
+        { title: 'Error', value: String((_e as unknown)?.message || _e), short: false },
         { title: 'Request-Id', value: requestId, short: true },
       ])
     } catch {}
-    return new Response(JSON.stringify({ error: String(e?.message || e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
+    return new Response(JSON.stringify({ error: String(_e?.message || _e) }), { status: 500, headers: { ...cors, 'Content-Type':'application/json' } })
   }
 })
 

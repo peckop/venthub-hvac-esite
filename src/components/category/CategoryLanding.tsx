@@ -93,14 +93,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     }
 
     const subcategoryProducts = selectedSubcategory
-        ? products.filter(p => p.category_id === selectedSubcategory)
+        ? (products || []).filter(p => p.category_id === selectedSubcategory)
         : []
 
-    const maxAirflow = products.length > 0
-        ? Math.max(...products.map(p => Number(p.airflow_capacity) || 0))
+    const maxAirflow = (products && products.length > 0)
+        ? Math.max(...(products || []).map(p => Number(p.airflow_capacity) || 0))
         : 1000
 
-    const filteredProducts = products.filter((p: DbProduct) => {
+    const filteredProducts = (products || []).filter((p: DbProduct) => {
         if (activeFilter === 'all') return true
         if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
         if (activeFilter === 'powerful') return (Number(p.airflow_capacity) || 0) >= maxAirflow * 0.8
@@ -149,7 +149,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {subcategoryProducts.map(product => (
+                                    {(subcategoryProducts || []).map(product => (
                                         <ProductCard key={product.id} product={mapDatabaseProductToDomain(product)} layout="grid" hidePrice={!!category.metadata?.hide_price} />
                                     ))}
                                 </div>
@@ -215,7 +215,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredProducts.map(p => (
+                        {(filteredProducts || []).map(p => (
                             <ProductCard key={p.id} product={mapDatabaseProductToDomain(p)} layout="grid" hidePrice={!!category.metadata?.hide_price} />
                         ))}
                     </div>

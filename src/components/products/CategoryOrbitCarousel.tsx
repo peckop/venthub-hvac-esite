@@ -1,10 +1,11 @@
+"use client"
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
-const OrbitalProductsShowcase = dynamic(() => import('./OrbitalProductsShowcase'), { ssr: false, loading: () => <div className="w-full h-full bg-slate-900 animate-pulse rounded-2xl flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest">[ 3D MODULE LOADING ]</div> })
 import { CATEGORY_REGISTRY } from '@/config'
+import OrbitalProductsShowcase from './OrbitalProductsShowcase'
 
 // --- Category Data using OFFICIAL SLUGS from categoryRegistry ---
 export interface CategoryCard {
@@ -113,7 +114,6 @@ const categories: CategoryCard[] = [
 // Alt kategori label formatla
 const formatSubcategoryLabel = (key: string): string => {
     const labelMap: Record<string, string> = {
-        // Fanlar
         BASINCLANDIRMA: 'Basınçlandırma Fanları',
         CATI_TIPI: 'Çatı Tipi Fanlar',
         DUMAN_EGZOZ: 'Duman Egzoz Fanları',
@@ -127,20 +127,15 @@ const formatSubcategoryLabel = (key: string): string => {
         SIGINAK: 'Sığınak Fanları',
         SESSIZ_KANAL: 'Sessiz Kanal Tipi',
         NICOTRA: 'Nicotra Gebhardt',
-        // Hava Perdeleri
         ELEKTRIKLI: 'Elektrikli Isıtıcı',
         ORTAM_HAVALI: 'Ortam Havalı',
-        // Isı Geri Kazanım
         TICARI_TIP: 'Ticari Tip',
-        // Hava Temizleyiciler
         DEPURO_PRO: 'Depuro Pro',
         SG_DISPENSER: 'SG Dispenser',
         UV_LOGIKA: 'UV Logika',
         VORT_SUPER_DRY: 'Vort Super Dry',
-        // Hız Kontrol
         FREKANS_KONVERTOR: 'Frekans Konvertörü',
         HIZ_ANAHTARI: 'Hız Anahtarı',
-        // Aksesuarlar
         ALUMINYUM_BANT: 'Alüminyum Bantlar',
         BAGLANTI_KONNEKTORU: 'Bağlantı Konnektörü',
         GEMICI_ANEMOSTADI: 'Gemici Anemostadı',
@@ -164,19 +159,15 @@ const getSubcategoriesForCategory = (categorySlug: string): SubcategoryItem[] =>
         slug,
         title: formatSubcategoryLabel(key),
         parentSlug: categorySlug,
-        // Alt kategoriler için güvenli placeholder
         image: '/images/hvac_installation_close_up_premium_3.png'
     }))
 }
 
-// Carousel seviyesi
 type CarouselLevel = 'main' | 'subcategory'
 
-// [NEW] Model Tipi Belirleyici Helper
-const getModelTypeForCategory = (slug: string): string | undefined => {
+const getModelTypeForCategory = (slug?: string): string | undefined => {
+    if (!slug) return undefined
     const s = slug.toLowerCase()
-
-    // 1. Ana Kategoriler
     if (s.includes('perde') || s === 'hava-perdeleri') return 'AirCurtainModel'
     if (s.includes('temizleyici') || s === 'hava-temizleyiciler') return 'AirPurifierModel'
     if (s.includes('nem') || s === 'nem-alma') return 'DehumidifierModel'
@@ -184,60 +175,42 @@ const getModelTypeForCategory = (slug: string): string | undefined => {
     if (s.includes('hiz') || s === 'hiz-kontrol') return 'SpeedControlModel'
     if (s.includes('aksesuar') || s === 'aksesuarlar') return 'AccessoryModel'
     if (s.includes('flexible')) return 'FlexibleDuctModel'
-
-    // 2. Alt Kategoriler (Spesifik eşleşmeler öncelikli)
-
-    // Fix: Exproof için 'endustriyel' fallback'i (Çatı'dan önce bakılmalı)
     if (s.includes('exproof') || s.includes('atex') || s.includes('endustriyel')) return 'ExproofFanModel'
-
     if (s.includes('cati') || s.includes('roof')) return 'RoofFanModel'
-
-    // Fix: Kanal Tipi için RoundDuctFanModel (Kullanıcının editlediği model)
-    if (s.includes('sessiz')) return 'SilentChannelFanModel' // [FIX] SilentChannelFanModel adı düzeltildi
+    if (s.includes('sessiz')) return 'SilentChannelFanModel'
     if (s.includes('kanal') || s.includes('yuvarlak')) return 'RoundDuctFanModel'
-
     if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) return 'RectangularDuctFanModel'
-
-    if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) return 'RectangularDuctFanModel'
-
     if (s.includes('duman') || s.includes('smoke')) return 'SmokeExhaustFanModel'
     if (s.includes('jet') || s.includes('otopark')) return 'JetFanModel'
     if (s.includes('salyangoz') || s.includes('santrifuj') || s.includes('radyal')) return 'SnailFanModel'
     if (s.includes('plug')) return 'PlugFanModel'
     if (s.includes('nicotra') || s.includes('gebhardt')) return 'NicotraFanModel'
-
-    // Fix: Duvar Tipi Kompakt (WallMountedCompact) vs Konut Tipi (Domestic) Ayrımı
-    if (s.includes('duvar') && s.includes('kompakt')) return 'WallMountedCompactFanModel' // [FIX] İsim güncellendi
+    if (s.includes('duvar') && s.includes('kompakt')) return 'WallMountedCompactFanModel'
     if (s.includes('duvar') || s.includes('konut') || s.includes('banyo') || s.includes('wc')) return 'DomesticFanModel'
-
     if (s.includes('yangin') || s.includes('basinc')) return 'AxialFanModel'
-
-    // 3. Varsayılanlar
     if (s.includes('fan')) return 'AxialFanModel'
-
-    return undefined // Fallback to slug based logic
+    return undefined
 }
 
-const CategoryOrbitCarousel = () => {
-    const router = useRouter()
+interface CategoryOrbitCarouselProps {
+    /** Opsiyonel: subcategory seçildiğinde router.push yerine bu callback tetiklenir.
+     *  Bu prop sayesinde carousel hem bağımsız hem de üst sayfaya gömülü çalışabilir. */
+    onSubcategorySelect?: (categorySlug: string, subcategorySlug?: string) => void
+    /** Compact modda carousel küçük/sticky olarak render edilir */
+    compact?: boolean
+}
 
-    // Carousel State
+const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: CategoryOrbitCarouselProps) => {
+    const router = useRouter()
     const [level, setLevel] = useState<CarouselLevel>('main')
     const [activeMainCategory, setActiveMainCategory] = useState<CategoryCard | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
-    const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) // Tıklanan (focus) kart
-    const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) // Dönerken önde olan kart
-    const [hintIndex, setHintIndex] = useState(0) // Dönen hint bilgileri için
+    const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) 
+    const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) 
+    const [hintIndex, setHintIndex] = useState(0) 
 
-    // Dönen hint bilgileri (Emoji'siz - Profesyonel)
-    const ROTATING_HINTS = [
-        'Tut Çevir',
-        'Ürüne Tıkla',
-        'Sol-Sağ Çevir',
-        'Kategoriyi Seç',
-    ]
+    const ROTATING_HINTS = ['Tut Çevir', 'Ürüne Tıkla', 'Sol-Sağ Çevir', 'Kategoriyi Seç']
 
-    // Alt kategorileri hesapla
     const subcategories = useMemo(() => {
         if (!activeMainCategory) return []
         return getSubcategoriesForCategory(activeMainCategory.id)
@@ -246,7 +219,7 @@ const CategoryOrbitCarousel = () => {
     const handleFocusedItemChange = useCallback((itemId: string | null) => {
         if (!itemId) {
             setFocusedItemTitle(null)
-            setHintIndex(0) // Sayfa ilk yüklenmiş gibi - dönen bilgiler baştan başlasın
+            setHintIndex(0)
             return
         }
 
@@ -254,36 +227,31 @@ const CategoryOrbitCarousel = () => {
         if (level === 'main') {
             const cat = categories.find(c => c.id === itemId)
             title = cat ? cat.title : ''
-        } else {
+        } else if (level === 'subcategory') {
             const sub = subcategories.find(s => s.slug === itemId)
             title = sub ? sub.title : ''
         }
         setFocusedItemTitle(title)
     }, [level, subcategories])
 
-    // Dönerken önde olan kartın adını güncelle ve hint index'i artır
     const handleFrontCardChange = useCallback((itemId: string) => {
         let title = ''
         if (level === 'main') {
             const cat = categories.find(c => c.id === itemId)
             title = cat ? cat.title : ''
-        } else {
+        } else if (level === 'subcategory') {
             const sub = subcategories.find(s => s.slug === itemId)
             title = sub ? sub.title : ''
         }
         setFrontCardTitle(title)
-        setHintIndex(prev => (prev + 1) % 4) // 4 farklı hint arasında dön
+        setHintIndex(prev => (prev + 1) % 4) 
     }, [level, subcategories])
 
-    // Reset focus when level changes
     useEffect(() => {
         setFocusedItemTitle(null)
         setFrontCardTitle(null)
     }, [level])
 
-
-
-    // Gösterilecek öğeler (level'a göre)
     const displayItems = useMemo(() => {
         if (level === 'main') {
             return categories.map(c => ({
@@ -291,53 +259,55 @@ const CategoryOrbitCarousel = () => {
                 title: c.title,
                 image: c.image,
                 categorySlug: c.id,
-                modelType: getModelTypeForCategory(c.id) // [NEW] Ana kategori için model tipi
+                modelType: getModelTypeForCategory(c.id)
             }))
-        } else {
+        } else if (level === 'subcategory') {
             return subcategories.map(s => ({
                 id: s.slug,
                 title: s.title,
                 image: s.image,
-                categorySlug: s.slug, // DÜZELTME: Alt kategorinin kendi slug'ını kullan
-                modelType: getModelTypeForCategory(s.slug) // [NEW] Alt kategori için model tipi
+                categorySlug: s.slug,
+                modelType: getModelTypeForCategory(s.slug)
             }))
         }
+        return []
     }, [level, subcategories])
 
-    // Kart tıklama - Ana kategori veya alt kategori
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
             const category = categories.find(c => c.id === itemId)
             if (category) {
                 const subs = getSubcategoriesForCategory(category.id)
                 if (subs.length > 0) {
-                    // Alt kategorilere geçiş
                     setIsTransitioning(true)
                     setActiveMainCategory(category)
-
-                    // Animasyon için delay
                     setTimeout(() => {
                         setLevel('subcategory')
                         setIsTransitioning(false)
                     }, 400)
                 } else {
-                    // Alt kategori yoksa direkt sayfaya git
-                    router.push(`/category/${category.id}`)
+                    if (onSubcategorySelect) {
+                        // Alt kategorisi yok, doğrudan ürünleri getir 
+                        onSubcategorySelect(category.id)
+                    } else {
+                        router.push(`/category/${category.id}`)
+                    }
                 }
             }
-        } else {
-            // Alt kategoriye tıklandı - sayfaya git
-            if (activeMainCategory) {
-                if (itemId === activeMainCategory.id) {
-                    router.push(`/category/${activeMainCategory.id}`)
+        } else if (level === 'subcategory') {
+            const sub = subcategories.find(s => s.slug === itemId)
+            if (sub && activeMainCategory) {
+                if (onSubcategorySelect) {
+                    // Gömülü mod: üst bileşene bildir, sayfa değişmez
+                    onSubcategorySelect(activeMainCategory.id, sub.slug)
                 } else {
-                    router.push(`/category/${activeMainCategory.id}/${itemId}`)
+                    // Bağımsız mod: doğrudan kategori sayfasına git
+                    router.push(`/category/${activeMainCategory.id}/${sub.slug}`)
                 }
             }
         }
-    }, [level, activeMainCategory, router])
+    }, [level, subcategories, activeMainCategory, router, onSubcategorySelect])
 
-    // Geri dönüş
     const handleBack = useCallback(() => {
         setIsTransitioning(true)
         setTimeout(() => {
@@ -347,14 +317,12 @@ const CategoryOrbitCarousel = () => {
         }, 400)
     }, [])
 
-    // Ana kategoriye git (View All)
     const handleViewAllProducts = useCallback(() => {
         if (activeMainCategory) {
             router.push(`/category/${activeMainCategory.id}`)
         }
     }, [activeMainCategory, router])
 
-    // [NEW] Responsive constants
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -363,23 +331,23 @@ const CategoryOrbitCarousel = () => {
         return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
-    const responsiveHeight = isMobile ? 380 : 500
-    const responsiveModelScale = isMobile ? 1.1 : 1.5
+    const responsiveHeight = compact ? (isMobile ? 220 : 280) : (isMobile ? 380 : 500)
+    const responsiveModelScale = compact ? (isMobile ? 0.7 : 0.9) : (isMobile ? 1.1 : 1.5)
 
     return (
         <section className="bg-[#020617] overflow-hidden relative">
-            {/* Background Atmosphere */}
-            <motion.div
-                className="absolute inset-0 pointer-events-none"
-                animate={{
-                    background: level === 'main'
-                        ? 'radial-gradient(circle at center, rgba(30,41,59,0.5) 0%, rgb(2,6,23) 70%)'
-                        : `radial-gradient(circle at center, rgba(6,182,212,0.15) 0%, rgb(2,6,23) 70%)`
-                }}
-                transition={{ duration: 0.8 }}
-            />
+            {/* PERFORMANCE OPTIMIZED BACKGROUNDS: Gradient animasyonu yerine opacity geçişi 
+                Radial gradient animasyonu CPU/GPU'yu çok yorar, bu yüzden iki katman kullanıyoruz.
+            */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+                <div 
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)] ${level === 'main' ? 'opacity-100' : 'opacity-0'}`} 
+                />
+                <div 
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,rgb(2,6,23)_70%)] ${level === 'subcategory' ? 'opacity-100' : 'opacity-0'}`} 
+                />
+            </div>
 
-            {/* Breadcrumb Navigation */}
             <AnimatePresence>
                 {level === 'subcategory' && activeMainCategory && (
                     <motion.div
@@ -390,30 +358,23 @@ const CategoryOrbitCarousel = () => {
                         className="absolute top-4 left-0 right-0 z-40 container mx-auto px-4"
                     >
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                            {/* Geri Butonu + Breadcrumb */}
                             <motion.button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 px-4 py-2 rounded-full
-                                           bg-white/10 backdrop-blur-md border border-white/20
-                                           text-white hover:bg-white/20 transition-all duration-300
-                                           group w-full sm:w-auto"
+                                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all duration-300 group w-full sm:w-auto"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-sm font-medium">Geri</span>
                                 <ChevronRight className="w-4 h-4 text-white/50" />
-                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px]">{activeMainCategory.title}</span>
+                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px]">
+                                    {activeMainCategory.title}
+                                </span>
                             </motion.button>
 
-                            {/* Tüm Ürünleri Gör */}
                             <motion.button
                                 onClick={handleViewAllProducts}
-                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full
-                                           bg-gradient-to-r from-cyan-500 to-blue-600
-                                           text-white font-medium text-sm
-                                           hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300
-                                           w-full sm:w-auto"
+                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 w-full sm:w-auto"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
@@ -425,9 +386,6 @@ const CategoryOrbitCarousel = () => {
                 )}
             </AnimatePresence>
 
-
-
-            {/* Title & Instructions */}
             <div className="absolute top-6 left-0 right-0 z-30 container mx-auto px-4">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div
@@ -440,12 +398,7 @@ const CategoryOrbitCarousel = () => {
                         style={{ marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
                     >
                         <h2 className="text-xl md:text-3xl font-bold text-white/90">
-                            {focusedItemTitle
-                                ? focusedItemTitle
-                                : frontCardTitle
-                                    ? frontCardTitle
-                                    : (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)
-                            }
+                            {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)}
                         </h2>
                         <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
@@ -459,21 +412,15 @@ const CategoryOrbitCarousel = () => {
                 </AnimatePresence>
             </div>
 
-            {/* 3D Carousel Container */}
             <div className="w-full relative z-10 flex justify-center items-center overflow-hidden" style={{ minHeight: responsiveHeight }}>
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="wait" initial={false}>
                     <motion.div
                         key={level}
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.98 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{
-                            duration: 0.6,
-                            type: 'spring',
-                            damping: 25,
-                            stiffness: 120
-                        }}
-                        className="w-full max-w-[1600px]"
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        className="w-full max-w-[1600px] will-change-transform"
                     >
                         <OrbitalProductsShowcase
                             items={displayItems}
@@ -488,14 +435,8 @@ const CategoryOrbitCarousel = () => {
                     </motion.div>
                 </AnimatePresence>
             </div>
-
-            {/* Subcategory Count Badge REMOVED — müşteriyi ilgilendirmez */}
         </section>
     )
 }
 
 export default CategoryOrbitCarousel
-
-
-
-

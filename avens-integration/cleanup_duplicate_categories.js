@@ -19,10 +19,10 @@ const CATEGORIES_TO_DELETE = [
 ];
 
 async function checkAndMoveProducts() {
-  console.log('🔍 Silinecek kategorilerdeki ürünler kontrol ediliyor...');
+  console.warn('🔍 Silinecek kategorilerdeki ürünler kontrol ediliyor...');
   
   for (const categoryId of CATEGORIES_TO_DELETE) {
-    const { data: products, error } = await supabase
+    const { _data: products, error } = await supabase
       .from('products')
       .select('id, name')
       .eq('category_id', categoryId);
@@ -33,11 +33,11 @@ async function checkAndMoveProducts() {
     }
 
     if (products && products.length > 0) {
-      console.log(`⚠️ Kategori ${categoryId}'de ${products.length} ürün var!`);
-      products.forEach(p => console.log(`  - ${p.name}`));
+      console.warn(`⚠️ Kategori ${categoryId}'de ${products.length} ürün var!`);
+      products.forEach(p => console.warn(`  - ${p.name}`));
       
       // Bu durumda kategoriye ürün taşıma gerekebilir
-      console.log('❌ Bu kategoriler ürün içerdiği için silinemiyor. Manuel kontrol gerekiyor.');
+      console.warn('❌ Bu kategoriler ürün içerdiği için silinemiyor. Manuel kontrol gerekiyor.');
       return false;
     }
   }
@@ -46,7 +46,7 @@ async function checkAndMoveProducts() {
 }
 
 async function deleteDuplicateCategories() {
-  console.log('🗑️ Gereksiz kategoriler siliniyor...');
+  console.warn('🗑️ Gereksiz kategoriler siliniyor...');
   
   let deleted = 0;
   
@@ -60,7 +60,7 @@ async function deleteDuplicateCategories() {
       if (error) {
         console.error(`❌ Kategori silme hatası ${categoryId}:`, error.message);
       } else {
-        console.log(`✅ Kategori silindi: ${categoryId}`);
+        console.warn(`✅ Kategori silindi: ${categoryId}`);
         deleted++;
       }
     } catch (error) {
@@ -72,9 +72,9 @@ async function deleteDuplicateCategories() {
 }
 
 async function showFinalStructure() {
-  console.log('\n🔍 Final kategori yapısı...');
+  console.warn('\n🔍 Final kategori yapısı...');
   
-  const { data: categories, error } = await supabase
+  const { _data: categories, error } = await supabase
     .from('categories')
     .select('id, name, parent_id, level')
     .ilike('name', '%fan%')
@@ -85,37 +85,37 @@ async function showFinalStructure() {
     return;
   }
 
-  console.log('\n📂 Temizlenmiş kategori yapısı:');
+  console.warn('\n📂 Temizlenmiş kategori yapısı:');
   
   const mainCategories = categories.filter(c => c.parent_id === null);
   const subCategories = categories.filter(c => c.parent_id !== null);
 
   mainCategories.forEach(mainCat => {
-    console.log(`📁 ${mainCat.name} (Level: ${mainCat.level})`);
+    console.warn(`📁 ${mainCat.name} (Level: ${mainCat.level})`);
     
     // Bu kategorinin alt kategorilerini bul
     const directSubs = subCategories.filter(sub => sub.parent_id === mainCat.id);
     directSubs.forEach(sub => {
-      console.log(`  └── ${sub.name} (Level: ${sub.level})`);
+      console.warn(`  └── ${sub.name} (Level: ${sub.level})`);
       
       // Alt kategorinin de alt kategorileri var mı?
       const subSubs = subCategories.filter(subsub => subsub.parent_id === sub.id);
       subSubs.forEach(subsub => {
-        console.log(`      └── ${subsub.name} (Level: ${subsub.level})`);
+        console.warn(`      └── ${subsub.name} (Level: ${subsub.level})`);
       });
     });
   });
 }
 
 async function main() {
-  console.log('🚀 Duplicate kategori temizleme başlıyor...');
+  console.warn('🚀 Duplicate kategori temizleme başlıyor...');
 
   try {
     // 1. Silinecek kategorilerde ürün var mı kontrol et
     const canProceed = await checkAndMoveProducts();
     
     if (!canProceed) {
-      console.log('⚠️ Temizleme işlemi durduruluyor. Önce ürünleri taşımak gerekiyor.');
+      console.warn('⚠️ Temizleme işlemi durduruluyor. Önce ürünleri taşımak gerekiyor.');
       return;
     }
 
@@ -125,10 +125,10 @@ async function main() {
     // 3. Final yapıyı göster
     await showFinalStructure();
 
-    console.log(`\n📊 Temizleme Özeti:`);
-    console.log(`🗑️ Silinen kategori: ${deleted}`);
-    console.log(`\n🎉 Kategori temizleme tamamlandı!`);
-    console.log(`💡 Artık sadece "Fanlar" ana kategorisi ve altındaki alt kategoriler kaldı.`);
+    console.warn(`\n📊 Temizleme Özeti:`);
+    console.warn(`🗑️ Silinen kategori: ${deleted}`);
+    console.warn(`\n🎉 Kategori temizleme tamamlandı!`);
+    console.warn(`💡 Artık sadece "Fanlar" ana kategorisi ve altındaki alt kategoriler kaldı.`);
 
   } catch (error) {
     console.error('💥 Temizleme hatası:', error.message);

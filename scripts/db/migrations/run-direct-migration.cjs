@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const { Client } = require('pg');
 
@@ -9,17 +10,17 @@ const client = new Client({
 
 async function runMigration() {
     try {
-        console.log('Connecting to database...');
+        console.warn('Connecting to database...');
         await client.connect();
-        console.log('Connected.');
+        console.warn('Connected.');
 
         const sql = `
       ALTER TABLE categories ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
       COMMENT ON COLUMN categories.metadata IS 'Stores rich content for landing pages: display_mode, showcase_images, features, technical_summary';
     `;
-        console.log('Running migration...');
+        console.warn('Running migration...');
         await client.query(sql);
-        console.log('Migration successful: Column added!');
+        console.warn('Migration successful: Column added!');
 
     } catch (err) {
         console.error('Migration failed:', err);

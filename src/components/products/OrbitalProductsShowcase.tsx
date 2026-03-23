@@ -9,7 +9,7 @@ import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
 import { ORBITAL_CAROUSEL_CONFIG as CONFIG } from '@/config'
 import Category3DIcon from './Category3DIcon'
 
-interface ProductItem {
+export interface ProductItem {
     id: string
     title: string
     image: string
@@ -351,6 +351,7 @@ const OrbitalCard: React.FC<{
             {/* Drag Hint - Profesyonel */}
             {isFrontCard && shouldShowDragHint && (
                 <Float
+                    key={`drag-hint-${item.id}`}
                     speed={0.5}
                     rotationIntensity={0}
                     floatIntensity={0.3}
@@ -395,6 +396,7 @@ const OrbitalCard: React.FC<{
             {/* Tap Hint - Profesyonel */}
             {isFrontCard && !hovered && showTapHint && (
                 <Html
+                    key={`tap-hint-${item.id}`}
                     position={[0, 0, 0.5]}
                     center
                     distanceFactor={5}
@@ -416,6 +418,7 @@ const OrbitalCard: React.FC<{
             {/* Label */}
             {showLabel && (
                 <Html
+                    key={`label-${item.id}`}
                     position={[0, -CONFIG.cardHeight / 2 - 0.4, 0.5]}
                     center
                     distanceFactor={6}

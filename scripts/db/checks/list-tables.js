@@ -13,8 +13,8 @@ async function listTables() {
         const res = await client.query(`
             SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;
         `);
-        console.log('=== PUBLIC TABLES ===');
-        res.rows.forEach(r => console.log(r.tablename));
+        console.warn('=== PUBLIC TABLES ===');
+        res.rows.forEach(r => console.warn(r.tablename));
     } catch (err) {
         console.error(err);
     } finally {

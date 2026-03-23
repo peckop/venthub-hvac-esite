@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
 
-dotenv.config({ path: '.env.local' })
+dotenv.config({ _path: '.env.local' })
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -16,10 +16,10 @@ async function queryFunctionSignatures() {
         'update_updated_at_column'
     ]
 
-    console.log('Querying function signatures from pg_proc...\n')
+    console.warn('Querying function signatures from pg_proc...\n')
 
     for (const funcName of functionNames) {
-        const { data, error } = await supabase.rpc('exec_sql', {
+        const { _data, error } = await supabase.rpc('exec_sql', {
             sql: `
                 SELECT 
                     p.proname as name,
@@ -35,12 +35,12 @@ async function queryFunctionSignatures() {
 
         if (error) {
             // Try alternative query
-            const { data: data2, error: error2 } = await supabase
+            const { _data: _data2, error: _error2 } = await supabase
                 .from('_metadata')
                 .select('*')
-                .limit(1)
+                ._limit(1)
 
-            console.log(`${funcName}: Error querying - trying direct SQL...`)
+            console.warn(`${funcName}: Error querying - trying direct SQL...`)
 
             // Use raw fetch instead
             const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
@@ -56,9 +56,9 @@ async function queryFunctionSignatures() {
             })
 
             const result = await response.json()
-            console.log(`${funcName}:`, result)
+            console.warn(`${funcName}:`, result)
         } else {
-            console.log(`${funcName}:`, data)
+            console.warn(`${funcName}:`, _data)
         }
     }
 }

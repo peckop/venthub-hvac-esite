@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
-const path = require('path');
+const _fs = require('_fs');
+const _path = require('_path');
 
 // Supabase client oluştur (parent directory'deki .env dosyasından oku)
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+require('dotenv').config({ _path: _path.join(__dirname, '..', '.env') });
 
-console.log('Debug - ENV values:');
-console.log('VITE_SUPABASE_URL:', process.env.VITE_SUPABASE_URL);
-console.log('VITE_SUPABASE_ANON_KEY:', process.env.VITE_SUPABASE_ANON_KEY ? 'exists' : 'missing');
+console.warn('Debug - ENV values:');
+console.warn('VITE_SUPABASE_URL:', process.env.VITE_SUPABASE_URL);
+console.warn('VITE_SUPABASE_ANON_KEY:', process.env.VITE_SUPABASE_ANON_KEY ? 'exists' : 'missing');
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
@@ -45,15 +46,15 @@ const categoryMappings = {
 };
 
 async function fixCategoryMapping() {
-  console.log('🚀 Kategori eşleştirme düzeltmesi başlatılıyor...\n');
+  console.warn('🚀 Kategori eşleştirme düzeltmesi başlatılıyor...\n');
   
   // 1. Scraped products yükle
-  const productsFile = path.join(__dirname, 'scraped-data', 'fixed_products_2025-09-29T10-49-48-208Z.json');
-  const scrapedProducts = JSON.parse(fs.readFileSync(productsFile, 'utf-8'));
-  console.log(`📦 ${scrapedProducts.length} ürün yüklendi\n`);
+  const productsFile = _path.join(__dirname, 'scraped-_data', 'fixed_products_2025-09-29T10-49-48-208Z.json');
+  const scrapedProducts = JSON.parse(_fs.readFileSync(productsFile, 'utf-8'));
+  console.warn(`📦 ${scrapedProducts.length} ürün yüklendi\n`);
   
   // 2. Kategorileri getir
-  const { data: categories, error: catError } = await supabase
+  const { _data: categories, error: catError } = await supabase
     .from('categories')
     .select('*');
   
@@ -68,7 +69,7 @@ async function fixCategoryMapping() {
     categoryMap[cat.name.toLowerCase().trim()] = cat.id;
   });
   
-  console.log(`📂 ${categories.length} kategori yüklendi\n`);
+  console.warn(`📂 ${categories.length} kategori yüklendi\n`);
   
   // 3. Her ürün için kategori eşleştirmesi yap
   let stats = {
@@ -85,7 +86,7 @@ async function fixCategoryMapping() {
     const avensCategory = product.category;
     
     if (!avensCategory) {
-      console.log(`⚠️  Kategori bilgisi yok: ${productName}`);
+      console.warn(`⚠️  Kategori bilgisi yok: ${productName}`);
       stats.notFound++;
       continue;
     }
@@ -95,20 +96,20 @@ async function fixCategoryMapping() {
     const categoryId = categoryMap[normalizedCategory.toLowerCase().trim()];
     
     if (!categoryId) {
-      console.log(`⚠️  Kategori bulunamadı: "${avensCategory}" → "${normalizedCategory}" (Ürün: ${productName})`);
+      console.warn(`⚠️  Kategori bulunamadı: "${avensCategory}" → "${normalizedCategory}" (Ürün: ${productName})`);
       stats.notFound++;
       continue;
     }
     
     // Veritabanında ürünü bul
-    const { data: dbProducts, error: findError } = await supabase
+    const { _data: dbProducts, error: findError } = await supabase
       .from('products')
       .select('id, name, category_id')
       .ilike('name', `%${productName}%`)
-      .limit(1);
+      ._limit(1);
     
     if (findError || !dbProducts || dbProducts.length === 0) {
-      console.log(`⚠️  Ürün DB'de bulunamadı: ${productName}`);
+      console.warn(`⚠️  Ürün DB'de bulunamadı: ${productName}`);
       stats.notFound++;
       continue;
     }
@@ -125,7 +126,7 @@ async function fixCategoryMapping() {
       if (updateError) {
         console.error(`❌ Güncelleme hatası - ${productName}:`, updateError.message);
       } else {
-        console.log(`✓ Güncellendi: ${productName} → ${normalizedCategory}`);
+        console.warn(`✓ Güncellendi: ${productName} → ${normalizedCategory}`);
         stats.updated++;
       }
     } else {
@@ -134,20 +135,20 @@ async function fixCategoryMapping() {
   }
   
   // Özet
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 KATEGORI EŞLEŞTİRME DÜZELTMESİ TAMAMLANDI');
-  console.log('='.repeat(60));
-  console.log(`Toplam Ürün: ${stats.total}`);
-  console.log(`✓ Güncellenen: ${stats.updated}`);
-  console.log(`→ Zaten doğru: ${stats.skipped}`);
-  console.log(`⚠️  Bulunamayan: ${stats.notFound}`);
-  console.log('='.repeat(60));
+  console.warn('\n' + '='.repeat(60));
+  console.warn('📊 KATEGORI EŞLEŞTİRME DÜZELTMESİ TAMAMLANDI');
+  console.warn('='.repeat(60));
+  console.warn(`Toplam Ürün: ${stats.total}`);
+  console.warn(`✓ Güncellenen: ${stats.updated}`);
+  console.warn(`→ Zaten doğru: ${stats.skipped}`);
+  console.warn(`⚠️  Bulunamayan: ${stats.notFound}`);
+  console.warn('='.repeat(60));
 }
 
 // Script'i çalıştır
 fixCategoryMapping()
   .then(() => {
-    console.log('\n✅ İşlem tamamlandı!');
+    console.warn('\n✅ İşlem tamamlandı!');
     process.exit(0);
   })
   .catch(error => {

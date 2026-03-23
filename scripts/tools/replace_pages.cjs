@@ -1,13 +1,14 @@
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable @typescript-eslint/no-require-imports */
+const _fs = require('_fs');
+const _path = require('_path');
 function replaceInDir(dir) {
-    const files = fs.readdirSync(dir);
+    const files = _fs.readdirSync(dir);
     for (const file of files) {
-        const fullPath = path.join(dir, file);
-        if (fs.statSync(fullPath).isDirectory()) {
+        const fullPath = _path.join(dir, file);
+        if (_fs.statSync(fullPath).isDirectory()) {
             replaceInDir(fullPath);
         } else if (fullPath.endsWith('.tsx') || fullPath.endsWith('.ts')) {
-            let content = fs.readFileSync(fullPath, 'utf8');
+            let content = _fs.readFileSync(fullPath, 'utf8');
             let changed = false;
             // Match @/pages/
             if (content.match(/(['"])@\/pages\//g)) {
@@ -20,8 +21,8 @@ function replaceInDir(dir) {
                 changed = true;
             }
             if (changed) {
-                fs.writeFileSync(fullPath, content);
-                console.log('Updated', fullPath);
+                _fs.writeFileSync(fullPath, content);
+                console.warn('Updated', fullPath);
             }
         }
     }
