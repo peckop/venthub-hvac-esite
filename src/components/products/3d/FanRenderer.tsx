@@ -219,8 +219,8 @@ export const FanRenderer: React.FC<FanRendererProps> = ({
         // Nicotra / Gebhardt (Örn: AT, DDI serileri)
         if (s.includes('nicotra') || s.includes('gebhardt') || s.includes('ddi') || s.includes('at')) return <NicotraFanModel />
 
-        // -- FALLBACKS --
-        if (s.includes('yedek') || s.includes('aksesuar')) return null;
+        // Accessory & Yedek Parça
+        if (s.includes('aksesuar') || s.includes('yedek')) return <AccessoryModel />;
 
         return <DuctFanModel />
     }
