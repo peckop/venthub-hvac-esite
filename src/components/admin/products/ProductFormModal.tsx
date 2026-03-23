@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { supabase } from '../../../lib/supabase'
-import type { DbCategory } from '../../../types/db-rows'
+import type { DbCategory, DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
 import toast from 'react-hot-toast'
 
 // Form schema
@@ -101,12 +101,12 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         setLoading(true)
         try {
             if (_productId) {
-                // Cast to unknown then to specific type to avoid deep instantiation issues while satisfying lint
-                const payload = values as unknown as Record<string, unknown>
+                // Use explicit Supabase types via unknown to satisfy both TSC and Lint
+                const payload = values as unknown as DbProductUpdate
                 const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
-                const payload = values as unknown as Record<string, unknown>
+                const payload = values as unknown as DbProductInsert
                 const { error } = await supabase.from('products').insert([payload])
                 if (error) throw error
             }
