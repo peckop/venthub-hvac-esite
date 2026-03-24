@@ -2,15 +2,15 @@
 id: "013"
 title: "Category ViewModel & Advanced Scale Architecture Refactor"
 priority: "High"
-status: "Done"
+status: "Completed"
 progress: 100%
 project: "P04-Category-Architecture"
 created_at: "2026-03-23 21:02:32"
 updated_at: "2026-03-23 23:15:00"
 artifacts:
-  brainstorm: "registry/P04-Category-Architecture/active/013-category-viewmodel--advanced-scale-architecture-refactor/brainstorm.md"
-  plan: "registry/P04-Category-Architecture/active/013-category-viewmodel--advanced-scale-architecture-refactor/plan.md"
-  review: "registry/P04-Category-Architecture/active/013-category-viewmodel--advanced-scale-architecture-refactor/review.md"
+  brainstorm: "registry/P04-Category-Architecture/completed/013-category-viewmodel--advanced-scale-architecture-refactor/brainstorm.md"
+  plan: "registry/P04-Category-Architecture/completed/013-category-viewmodel--advanced-scale-architecture-refactor/plan.md"
+  review: "registry/P04-Category-Architecture/completed/013-category-viewmodel--advanced-scale-architecture-refactor/review.md"
 ---
 
 # 🛠️ 013: Category ViewModel & Advanced Scale Architecture Refactor

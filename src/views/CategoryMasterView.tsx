@@ -8,7 +8,7 @@ import CategoryGridView from './category/CategoryGridView'
 import CategoryLandingView from './category/CategoryLandingView'
 import { useIsMounted } from '../hooks/useIsMounted'
 import ProductsSkeleton from '../components/products/ProductsSkeleton'
-import { DomainCategory } from '../lib/type-converters'
+import { DomainCategory, DomainProduct } from '../lib/type-converters'
 
 interface CategoryMasterViewProps {
   initialCategory?: DomainCategory | null
@@ -29,13 +29,12 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   } = useCategoryGateway(initialCategory)
 
   // 2. Presentation Layer (ViewModel)
-  const { wrapCategory, groupProductsBySeries } = useCategoryViewModel()
+  const { wrapCategory } = useCategoryViewModel()
 
   // 3. Derived UI State via ViewModel
   const category = useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])
   const parentCategory = useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])
   
-  // const groupedSeries = useMemo(() => groupProductsBySeries(products), [products, groupProductsBySeries])
   const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
 
   if (!isMounted || loading || !category) {
@@ -57,21 +56,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
           <CategoryLandingView 
             category={category.raw}
             subCategories={rawSubCategories}
-            products={products as unknown as any[]}
-          />
-        )
-      case 'series':
-        // Fallback to Grid if SeriesView is missing
-        return (
-          <CategoryGridView 
-            category={category.raw}
-            parentCategory={parentCategory?.raw}
-            subCategories={rawSubCategories}
-            availableBrands={availableBrands}
-            products={products}
-            filters={filters}
-            onUpdateFilters={updateFilters}
-            loading={loading}
+            products={products as unknown as DomainProduct[]}
           />
         )
       default:
