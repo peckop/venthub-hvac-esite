@@ -2,15 +2,15 @@
 id: "012"
 title: "Fix Category-Product Mapping and Hierarchy Gaps"
 priority: "High"
-status: "Executing"
-progress: 60%
+status: "Completed"
+progress: 100%
 project: "P04-Category-Architecture"
 created_at: "2026-03-23 22:02:32"
-updated_at: "2026-03-24 00:15:00"
+updated_at: "2026-03-24 00:45:00"
 artifacts:
-  brainstorm: "registry/P04-Category-Architecture/active/012-fix-category-product-mapping-and-hierarchy-gaps/brainstorm.md"
-  plan: "registry/P04-Category-Architecture/active/012-fix-category-product-mapping-and-hierarchy-gaps/plan.md"
-  review: "registry/P04-Category-Architecture/active/012-fix-category-product-mapping-and-hierarchy-gaps/review.md"
+  brainstorm: "registry/P04-Category-Architecture/completed/012-fix-category-product-mapping-and-hierarchy-gaps/brainstorm.md"
+  plan: "registry/P04-Category-Architecture/completed/012-fix-category-product-mapping-and-hierarchy-gaps/plan.md"
+  review: "registry/P04-Category-Architecture/completed/012-fix-category-product-mapping-and-hierarchy-gaps/review.md"
 ---
 
 # 🛠️ 012: Fix Category-Product Mapping and Hierarchy Gaps
@@ -25,5 +25,5 @@ artifacts:
 - [x] Adım 1: Casals ve Diğer Markaların Haritalanması (Audit) ✅
 - [x] Adım 2: Kategori Kural Tablosu (`category_mapping_rules`) İnşası ✅
 - [x] Adım 3: Advanced Otomasyon (Trigger & Manual Flag) Entegrasyonu ✅
-- [ ] Adım 4: Kalan Endüstriyel Markaların (Nicotra vb.) Kural Girişi
-- [ ] Adım 5: Nihai Bütünlük Denetimi ve Review
+- [x] Adım 4: Kalan Endüstriyel Markaların (Nicotra vb.) Kural Girişi ✅
+- [x] Adım 5: Nihai Bütünlük Denetimi ve Review ✅

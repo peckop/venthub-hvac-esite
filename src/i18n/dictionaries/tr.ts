@@ -31,36 +31,33 @@ export const tr = {
     getQuote: 'Teklif Al',
     addToCart: 'Sepete Ekle',
     categoryList: {
-      // ANA AİLELER (Level 0)
-      'residential-ventilation': 'Konut Tipi Havalandırma',
-      'commercial-ventilation': 'Ticari Havalandırma',
-      'industrial-ventilation': 'Endüstriyel Havalandırma',
-      'heat-recovery-vmc': 'Isı Geri Kazanım Üniteleri (VMC)',
+      // ANA AİLELER
+      'residential': 'Konut Tipi Havalandırma',
+      'commercial': 'Ticari Havalandırma',
+      'industrial': 'Endüstriyel Havalandırma',
+      'hrv': 'Isı Geri Kazanım Üniteleri (VMC)',
       'air-treatment': 'Hava Şartlandırma',
-      'hygiene-sanitizer': 'Hijyen ve Sanitasyon',
-      'summer-ventilation': 'Yaz Havalandırması (Vantilatörler)',
-      'air-conditioning': 'İklimlendirme (Klima)',
-      'electric-heating': 'Elektrikli Isıtma',
-      'industrial-ceiling-fans': 'Endüstriyel Tavan Vantilatörleri',
-      'accessories-components': 'Aksesuarlar ve Bileşenler',
+      'hygiene': 'Hijyen ve Sanitasyon',
+      'summer': 'Yaz Havalandırması (Vantilatörler)',
+      'ac': 'İklimlendirme (Klima)',
+      'heating': 'Elektrikli Isıtma',
+      'hvls': 'Endüstriyel Tavan Vantilatörleri',
+      'accessories': 'Aksesuarlar ve Bileşenler',
       'smart-home': 'Akıllı Ev Sistemleri',
 
-      // ALT KATEGORİLER VE GRUPLAR (Level 1-2)
-      'banyo-ve-tuvalet-fanlari': 'Banyo ve Tuvalet Fanları',
-      'cam-ve-pencere-tipi-fanlar': 'Cam ve Pencere Tipi Fanlar',
-      'kanal-tipi-boru-ici-fanlar': 'Kanal Tipi / Boru İçi Fanlar',
-      'radyal-fanlar': 'Radyal Fanlar',
-      'santrifuj-fanlar': 'Santrifüj Fanlar',
-      'sessiz-kanal-tipi-fanlar': 'Sessiz Kanal Tipi Fanlar',
-      'duvar-tipi-kompakt-aksiyal-fanlar': 'Duvar Tipi Kompakt Aksiyal Fanlar',
-
-      // ALT TİPLER (Level 3)
-      'ince-govdeli-slim-fanlar': 'İnce Gövdeli (Slim) Fanlar',
-      'ultra-ince-on-panel': 'Ultra İnce Ön Panel',
-      'sessiz-sik-tasarim-premium': 'Sessiz / Şık Tasarım / Premium',
-      'standart-duvar-tavan-tipi': 'Standart Duvar/Tavan Tipi',
-      'gizli-montaj-in-line': 'Gizli Montaj (In-line)',
-      'santrifuj-kanalli-tip': 'Santrifüj / Kanallı Tip'
+      // ALT KATEGORİLER
+      'sub': {
+        'bathroom': 'Banyo ve Tuvalet Fanları',
+        'window': 'Cam ve Pencere Tipi Fanlar',
+        'ghost': 'Kanal İçi Hayalet Fanlar',
+        'smoke': 'Duman Egzoz Fanları',
+        'jet': 'Otopark Jet Fanları',
+        'radial': 'Radyal Fanlar',
+        'roof': 'Çatı Tipi Fanlar',
+        'axial-ind': 'Aksiyel Sanayi Fanları',
+        'air-curtain': 'Hava Perdeleri',
+        'portable-ac': 'Taşınabilir Klimalar'
+      }
     },
     byApplication: "Uygulamaya Göre Çözümler",
     viewAll: "Tümü",
@@ -99,6 +96,55 @@ export const tr = {
     none: "Yok",
     yes: "Evet",
     no: "Hayır"
+  },
+  homeGallery: {
+    title: 'Uygulama Vitrini',
+    subtitle: 'Gerçek dünya kullanım senaryolarına hızlı bir bakış',
+    productsCta: 'Ürünleri Gör',
+    guideCta: 'Kılavuzu Aç',
+    items: {
+      parking: { title: 'Otopark Havalandırması', subtitle: 'Jet fan / CO kontrolü' },
+      airCurtain: { title: 'Hava Perdesi', subtitle: 'Giriş konforu' },
+      heatRecovery: { title: 'Isı Geri Kazanım', subtitle: 'Enerji verimliliği' },
+      industrialKitchen: { title: 'Endüstriyel Mutfak', subtitle: 'Davlumbaz ve kanal' },
+      smokeExhaust: { title: 'Duman Tahliye', subtitle: 'Acil durum' },
+      hvac: { title: 'Isıtma/Soğutma', subtitle: 'Konfor HVAC' }
+    }
+  },
+  homeShowcase: {
+    slide1: { title: 'Endüstriyel Havalandırmada Uzmanlık', subtitle: 'Projenize özel çözümler ve doğru ürün seçimi' },
+    slide2: { title: 'Enerji Verimliliği & Konfor', subtitle: 'Doğru mühendislik ile daha düşük maliyetle daha iyi performans' },
+    slide3: { title: 'İhtiyaçlarınıza Göre Yönlendirme', subtitle: 'Uygulama alanına göre keşfedin ve doğru kategoriye hızla ulaşın' },
+    prevAria: 'Önceki',
+    playAria: 'Oynat',
+    pauseAria: 'Duraklat',
+    nextAria: 'Sonraki'
+  },
+  products: {
+    breadcrumbDiscover: "Keşfet",
+    heroTitle: "HVAC ürünlerini keşfedin: mühendislik odaklı seçim, hızlı teklif",
+    heroSubtitle: "Uygulama yönlendirmeli alanlar, popüler kategoriler ve öne çıkan ürünlerle aradığınızı hızla bulun.",
+    itemsListed: "ürün listeleniyor",
+    resultsFound: "sonuç bulundu",
+    heroValue1: "Sertifikalı, güvenilir ürünler",
+    heroValue2: "Mühendislik desteği ve doğru seçim",
+    heroValue3: "Hızlı teklif / yönlendirme",
+    helpCtaTitle: "Emin değil misiniz? Uygulamaya göre doğru ürünü seçelim.",
+    helpCtaSubtitle: "Proje detayınızı paylaşın; mühendislik ekibimiz hızla dönüş yapsın.",
+    applicationTitle: "Uygulamaya Göre Çözümler",
+    popularCategories: "Popüler Kategoriler",
+    discoverVisual: 'Keşfet görsel alanı',
+    searchResultsTitle: 'Arama Sonuçları',
+    searchSeoTitle: 'Arama: {{q}}',
+    searchSeoDesc: '"{{q}}" için arama sonuçları',
+    discoverSeoDesc: 'VentHub üzerindeki ürünleri, öne çıkanları ve popüler kategorileri keşfedin.',
+    hubBadge: "Türkiye'nin HVAC Uzmanı",
+    hubTitle: "Profesyonel HVAC Çözümleri",
+    hubSubtitle: "Hava perdesi, endüstriyel fan ve ısı geri kazanım sistemleri. İhtiyacınız olanı beraber bulalım.",
+    searchPlaceholder: "Ürün veya model ara...",
+    noResults: 'Sonuç Bulunamadı',
+    noResultsDesc: 'Lütfen filtreleri temizleyin veya farklı bir terim deneyin.',
+    clearFilters: 'Filtreleri Temizle',
   },
   search: {
     recentSearches: "Son Aramalar",

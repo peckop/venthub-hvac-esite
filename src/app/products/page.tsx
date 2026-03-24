@@ -1,23 +1,25 @@
 import React, { Suspense } from 'react'
-import ProductsPage from '../../views/ProductsPage'
+import CategoryMasterView from '../../views/CategoryMasterView'
 import ProductsSkeleton from '../../components/products/ProductsSkeleton'
-import { getCategories } from '../../lib/supabase'
+
+
 
 export const dynamic = 'force-dynamic'
 
 /**
- * /products — Sunucu Bileşeni (Server Component)
- * Girdi: Supabase'den kategoriler çekilir (SSR)
- * İşlem: ProductsPage'e initialCategories aktarılır
- * Çıktı: Client-side carousel + dinamik ürün listesi
+ * /products — Global Discovery Giriş Noktası
+ * Bu sayfa artık merkezi CategoryMasterView omurgasını kullanır.
+ * Kategori seçilmediği için sistem otomatik olarak 'Discovery' moduna geçecektir.
  */
 export default async function Page() {
-  const categories = await getCategories()
+  
+  
 
   return (
     <Suspense fallback={<ProductsSkeleton />}>
-      <ProductsPage
-        initialCategories={categories}
+      {/* initialCategory null olduğu için MasterView bunu Discovery olarak işleyecektir */}
+      <CategoryMasterView
+        initialCategory={null}
       />
     </Suspense>
   )
