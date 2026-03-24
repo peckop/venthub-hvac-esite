@@ -2,13 +2,13 @@
 
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowRight, ThermometerSun, ChevronDown, Zap, Activity, ShieldCheck } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
-import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
-import Image from 'next/image'
+
 import { DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 
@@ -23,44 +23,56 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     subCategories,
     onSubcategorySelect
 }) => {
+    const router = useRouter()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const vm = wrapCategory(category)
     const isAirCurtain = category.slug.includes('hava-perde')
 
-    // Breadcrumb (GATEWAY READY)
-    const breadcrumbItems = buildCategoryBreadcrumb(category, null, 'Ana Sayfa')
+    // Handle selection either via prop or direct routing
+    const handleSubSelect = (subSlug: string) => {
+        if (onSubcategorySelect) {
+            onSubcategorySelect(subSlug)
+        } else {
+            router.push(`/category/${category.slug}/${subSlug}`)
+        }
+    }
 
-    // Hero image logic (GATEWAY READY)
+    // Breadcrumb (ADVANCED SCALE MÜHÜRLÜ)
+    const breadcrumbItems = [
+        { label: 'Ana Sayfa', href: '/' },
+        { label: vm?.displayName || category.name, href: `/category/${category.slug}` }
+    ]
+
+    // Hero image logic - Using VentImage for automatic local fallbacks
     interface CategoryMetadataExtended { showcase_images?: { desktop: string }[] }
     const metadata = category.metadata as CategoryMetadataExtended | null
     const showcaseImages = metadata?.showcase_images
-    const heroImage = (showcaseImages?.[0]?.desktop) || category.image_url || '/images/products/vortice_lineo_360.png'
+    
+    // High-quality local or trusted fallbacks
+    const heroImage = (showcaseImages?.[0]?.desktop) || category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
     return (
         <div className="bg-white">
             {/* HERO SECTION - CINEMATIC */}
             <div className="relative h-[70vh] min-h-[500px] overflow-hidden bg-primary-navy">
-                {heroImage && (
-                    <div className="absolute inset-0 z-0">
-                        <Image
-                            src={heroImage}
-                            alt={vm?.displayName || category.name}
-                            fill
-                            priority
-                            sizes="100vw"
-                            className="object-cover opacity-75"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/40 to-transparent" />
-                    </div>
-                )}
+                <div className="absolute inset-0 z-0">
+                    <VentImage
+                        src={heroImage}
+                        alt={vm?.displayName || category.name}
+                        fill
+                        priority
+                        className="object-cover opacity-75"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/40 to-transparent" />
+                </div>
 
                 <div className="absolute inset-0 flex items-center">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                         <div className="max-w-3xl animate-fadeIn">
                             <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-blue/20 text-secondary-blue backdrop-blur-sm border border-secondary-blue/30 text-sm font-medium mb-6">
-                                Premium Koleksiyon
+                                {vm?.displayName || 'Premium Koleksiyon'}
                             </span>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
                                 {vm?.marketingTitle}
@@ -84,7 +96,6 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     </div>
                 </div>
 
-                {/* Animated Scroll Down Indicator */}
                 <button
                     onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
                     className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
@@ -98,15 +109,15 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             <div id="content-start" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <Breadcrumb items={breadcrumbItems} />
 
-                {/* Subcategories Grid */}
-                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Subcategories Grid - CENTERED FOR FEW ITEMS */}
+                <div className="mt-12 flex flex-wrap justify-center gap-8">
                     {subCategories.map((sub) => {
                         const subVm = wrapCategory(sub)
                         return (
                             <div
                                 key={sub.id}
-                                className="group relative bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-secondary-blue/30 transition-all cursor-pointer overflow-hidden"
-                                onClick={() => onSubcategorySelect?.(sub.slug)}
+                                className="group relative bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-secondary-blue/30 transition-all cursor-pointer overflow-hidden w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1.5rem)] max-w-[400px]"
+                                onClick={() => handleSubSelect(sub.slug)}
                             >
                                 <div className="relative z-10">
                                     <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary-navy mb-6 group-hover:scale-110 transition-transform">
@@ -125,7 +136,6 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                 </div>
             </div>
 
-            {/* Premium Sections based on Category */}
             <div className="space-y-32 pb-32">
                 <section className="relative py-24 bg-slate-950 overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

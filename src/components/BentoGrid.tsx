@@ -5,7 +5,6 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import Link from 'next/link'
 import { trackEvent } from '../utils/analytics'
-import { getCategoryUrl, CATEGORY_REGISTRY } from '../config/categoryRegistry'
 
 interface BentoItem {
   title: string
@@ -82,12 +81,12 @@ const BentoGrid: React.FC = () => {
   const { t } = useI18n()
   
   const items: BentoItem[] = [
-    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.OTOPARK_JET) },
-    { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: getCategoryUrl('HAVA_PERDELERI') },
-    { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4', topic: 'hrv', hrefProducts: getCategoryUrl('ISI_GERI_KAZANIM') },
-    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.KANAL_TIPI) },
-    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.DUMAN_EGZOZ) },
-    { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: getCategoryUrl('HIZ_KONTROL') },
+    { title: t('homeGallery.items.parking.title'), subtitle: t('homeGallery.items.parking.subtitle'), image: '/images/bento/parking.jpg', video: '/videos/parking.mp4', topic: 'jet-fan', hrefProducts: '/category/industrial-ventilation/otopark-jet-fanlari' },
+    { title: t('homeGallery.items.airCurtain.title'), subtitle: t('homeGallery.items.airCurtain.subtitle'), image: '/images/bento/air-curtain.jpg', video: '/videos/air-curtain.mp4', topic: 'hava-perdesi', hrefProducts: '/category/commercial-ventilation/hava-perdeleri' },
+    { title: t('homeGallery.items.heatRecovery.title'), subtitle: t('homeGallery.items.heatRecovery.subtitle'), image: '/images/bento/hrv.jpg', video: '/videos/hrv.mp4', topic: 'hrv', hrefProducts: '/category/heat-recovery-vmc' },
+    { title: t('homeGallery.items.industrialKitchen.title'), subtitle: t('homeGallery.items.industrialKitchen.subtitle'), image: '/images/bento/kitchen.jpg', video: '/videos/kitchen.mp4', topic: null, hrefProducts: '/category/commercial-ventilation/kanal-tipi-fanlar' },
+    { title: t('homeGallery.items.smokeExhaust.title'), subtitle: t('homeGallery.items.smokeExhaust.subtitle'), image: '/images/bento/smoke.jpg', video: '/videos/smoke.mp4', topic: null, hrefProducts: '/category/industrial-ventilation/duman-egzoz-fanlari' },
+    { title: t('homeGallery.items.hvac.title'), subtitle: t('homeGallery.items.hvac.subtitle'), image: '/images/bento/hvac.jpg', video: '/videos/hvac.mp4', topic: null, hrefProducts: '/category/accessories-components' },
   ]
 
   return (

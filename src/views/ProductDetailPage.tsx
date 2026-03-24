@@ -46,6 +46,7 @@ import { useProjectLists } from '../hooks/useProjectLists'
 import PageShell from '../components/layout/PageShell'
 import { useCategories } from '../contexts/CategoryContext'
 import Breadcrumb from '../components/navigation/Breadcrumb'
+import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import { 
   translateSpecKey, 
   formatSpecValue, 
@@ -67,6 +68,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const { addToCart } = useCart()
   const { refreshProjects } = useProjectLists()
   const { categories } = useCategories()
+  const { wrapCategory } = useCategoryViewModel()
   
   const [product, setProduct] = useState<Product | null>(initialProduct || null)
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
@@ -84,34 +86,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
   const navTriggerRef = useRef<HTMLDivElement>(null)
 
-  // --- GATEWAY ADAPTATION: RECURSIVE HIERARCHY DISPATCH ---
+  // --- ADVANCED SCALE: ViewModel Mapping ---
   const hierarchy = useMemo(() => {
     if (!product || categories.length === 0) return { main: null, sub: null };
     
-    // 1. Ürünün direkt bağlı olduğu kategoriyi bul (Çocuk)
-    const directCat = categories.find(c => c.id === product.subcategory_id || c.id === product.category_id);
-    if (!directCat) return { main: null, sub: null };
+    const rawSub = categories.find(c => c.id === product.subcategory_id);
+    const rawMain = categories.find(c => c.id === product.category_id);
 
-    // 2. Eğer bu bir alt kategoriyse, ebeveynini bul (Ana)
-    if (directCat.parent_id) {
-      const parentCat = categories.find(c => c.id === directCat.parent_id);
-      return { main: parentCat || null, sub: directCat };
-    }
+    return { 
+      main: wrapCategory(rawMain), 
+      sub: wrapCategory(rawSub) 
+    };
+  }, [product, categories, wrapCategory]);
 
-    // 3. Eğer direkt ana kategoriyse
-    return { main: directCat, sub: null };
-  }, [product, categories]);
-
-  // --- STANDARD BREADCRUMB BUILDER ---
+  // --- STANDARD BREADCRUMB BUILDER (Pure ViewModel Access) ---
   const breadcrumbItems = useMemo(() => {
     const items = [{ label: t('category.breadcrumbHome'), href: '/' }];
     
     if (hierarchy.main) {
-      items.push({ label: hierarchy.main.name, href: `/category/${hierarchy.main.slug}` });
+      items.push({ 
+        label: hierarchy.main.displayName, 
+        href: `/category/${hierarchy.main.slug}` 
+      });
     }
     
     if (hierarchy.sub && hierarchy.sub.slug !== hierarchy.main?.slug) {
-      items.push({ label: hierarchy.sub.name, href: `/category/${hierarchy.main?.slug || 'all'}/${hierarchy.sub.slug}` });
+      items.push({ 
+        label: hierarchy.sub.displayName, 
+        href: `/category/${hierarchy.main?.slug || 'all'}/${hierarchy.sub.slug}` 
+      });
     }
     
     if (product) {
@@ -170,7 +173,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
           setImages(list)
         } catch { }
 
-        // Related Products (GATEWAY ADAPTATION)
+        // Related Products
         if (productData.subcategory_id) {
           const related = await getProductsEnriched({ 
             categoryIds: [productData.subcategory_id],
@@ -318,17 +321,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
   const canonicalUrl = `${origin}/products/${product.id}`
   const metaDesc = product.description || `${product.brand} ${product.name} ürünü hakkında detaylar.`
 
-  const categoryMetadata = hierarchy.main?.metadata as CategoryMetadata | null
+  const categoryMetadata = hierarchy.main?.raw?.metadata as CategoryMetadata | null
 
   return (
     <div className="min-h-screen bg-slate-50/30">
       <Seo title={`${product.brand} ${product.name} | VentHub`} description={metaDesc} canonical={canonicalUrl} />
       
-      {/* STANDARD INTEGRATED BREADCRUMB */}
       <Breadcrumb items={breadcrumbItems} variant="transparent" className="pt-4 sm:pt-6" />
 
       <PageShell spacing="sm" className="py-6 sm:py-8">
-        {/* Back Button - Adaptive Logic */}
         <button
           onClick={() => {
             if (typeof window !== 'undefined') sessionStorage.setItem('vh_is_pop', 'true');
@@ -353,7 +354,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Product Image Gallery (60% width on large screens) */}
           <div className="lg:col-span-7 xl:col-span-8 sticky top-24 self-start z-10">
             <div className="relative group bg-white rounded-3xl border border-light-gray/50 shadow-sm overflow-hidden p-2">
               <ImageGallery
@@ -379,9 +379,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
             </div>
           </div>
 
-          {/* Product Info (40% width on large screens) */}
           <div className="lg:col-span-5 xl:col-span-4 flex flex-col">
-            {/* Brand & Badge */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center space-x-2.5">
                 <BrandIcon brand={product.brand} className="w-8 h-8" />
@@ -398,12 +396,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               )}
             </div>
 
-            {/* Product Name - Refined Size */}
             <h1 className="text-2xl sm:text-3xl font-black text-industrial-gray leading-[1.1] mb-4 tracking-tight">
               {product.name}
             </h1>
 
-            {/* Quick Specs Jump - Accessibility Feature */}
             <div className="flex flex-wrap gap-1.5 mb-6">
               {sections.slice(0, 4).map((s) => (
                 <button
@@ -417,7 +413,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               ))}
             </div>
 
-            {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
                 <span className="text-[9px] font-bold text-steel-gray uppercase tracking-[0.2em] mb-1 opacity-60">{t('pdp.priceAvailability') || 'Price & Availability'}</span>
@@ -447,10 +442,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
               </div>
             </div>
 
-            {/* Action Buttons Area - Compact & Unified */}
             <div className="space-y-4">
               <div className="bg-white rounded-2xl border border-light-gray p-5 space-y-5">
-                {/* Quantity Control */}
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-industrial-gray uppercase tracking-widest">{t('pdp.qty')}</span>
                   <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-light-gray/50">
@@ -460,7 +453,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   </div>
                 </div>
 
-                {/* Primary Actions */}
                 <div className="flex flex-col gap-2">
                   {categoryMetadata?.hide_price ? (
                     <button
@@ -490,7 +482,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                   </button>
                 </div>
 
-                {/* Secondary Actions */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
@@ -515,7 +506,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 </div>
               </div>
 
-              {/* Trust Signals - Lighter Grid */}
               <div className="grid grid-cols-3 gap-2.5">
                 <div className="flex flex-col items-center p-3 bg-white rounded-xl border border-light-gray/50 text-center">
                   <Truck className="text-success-green mb-1.5" size={18} />
@@ -531,7 +521,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                 </div>
               </div>
 
-              {/* Quick Tech PDF Link */}
               <button
                 onClick={handleDownloadPdf}
                 disabled={isGeneratingPdf}
@@ -557,32 +546,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
         onClose={() => setIsProjectModalOpen(false)} 
       />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.name,
-            brand: product.brand,
-            sku: product.sku,
-            image: product.image_url ? [product.image_url] : [],
-            mpn: product.model_code ?? undefined,
-            description: metaDesc,
-            offers: {
-              '@type': 'Offer',
-              priceCurrency: 'TRY',
-              price: product.price || 0,
-              availability: product.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              url: canonicalUrl,
-            },
-          }),
-        }}
-      />
-
       <div ref={navTriggerRef} className="h-0" />
 
-      {/* Section Navigation - Airy Integrated Design */}
       <div
         id="pdp-sticky-nav"
         className={`transition-all duration-500 z-[40] bg-white/80 backdrop-blur-xl border-b border-light-gray/50 ${isNavSticky ? 'fixed top-[56px] md:top-[80px] left-0 right-0 shadow-lg shadow-primary-navy/5' : 'relative mt-8 sm:mt-12'
@@ -672,7 +637,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ initialPro
                             {[
                               { label: t('pdp.brand'), value: product.brand },
                               { label: t('pdp.model'), value: product.model_code ?? product.sku },
-                              { label: t('pdp.labels.category'), value: hierarchy.main?.name || '-' }
+                              { label: t('pdp.labels.category'), value: hierarchy.main?.displayName || '-' }
                             ].map((item, i) => (
                               <div key={i} className="flex justify-between items-center py-3 border-b border-light-gray/30 group">
                                 <span className="text-[10px] font-bold text-steel-gray uppercase tracking-widest">{item.label}</span>
