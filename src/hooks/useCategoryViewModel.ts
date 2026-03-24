@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory, DomainProduct } from '../lib/type-converters'
-import { getCategoryDisplayName, getCategoryMarketingTitle } from '../utils/categoryHelpers'
+
 
 export interface CategoryViewModel {
   id: string
@@ -14,7 +14,7 @@ export interface CategoryViewModel {
   imageUrl: string | null
   parentId: string | null
   level: number
-  displayMode: string
+  displayMode: 'showcase' | 'landing' | 'series' | 'grid'
   raw: DomainCategory
 }
 
@@ -28,40 +28,54 @@ export interface SeriesGroup {
 /**
  * ADVANCED SCALE VIEWMODEL HOOK
  * 
- * Responsible for:
- * 1. i18n translation of category names (Presentation Layer)
- * 2. Determining UI display modes (Logic Layer)
- * 3. Grouping products for the UI (Transformation Layer)
+ * THE ONLY SOURCE OF TRUTH FOR UI REPRESENTATION
  */
 export function useCategoryViewModel() {
   const { t } = useI18n()
 
-  // 1. Transform raw category to UI-ready ViewModel
   const wrapCategory = useMemo(() => (category: DomainCategory | null | undefined): CategoryViewModel | null => {
     if (!category) return null
 
-    // I18n translation logic - Centralized here!
-    const translationKey = `common.categoryList.${category.slug}`
-    const translatedName = t(translationKey)
-    const displayName = (translatedName && translatedName !== translationKey) 
+    // 1. i18n Resolution via translation_key (Advanced Standard)
+    const tKey = (category as unknown as { translation_key?: string }).translation_key || category.slug
+    const translationPath = `common.categoryList.${tKey}`
+    const translatedName = t(translationPath)
+    
+    // If translation fails, fallback to DB menu_label or original name
+    const displayName = (translatedName && translatedName !== translationPath) 
       ? translatedName 
-      : getCategoryDisplayName(category)
+      : (category.menu_label || category.name)
 
-    // Marketing title logic
-    const marketingTitle = getCategoryMarketingTitle(category)
+    // 2. Marketing Title Logic
+    const marketingTitle = category.marketing_title || displayName
 
-    // UI Display Mode Logic - Moved from Gateway
+    // 3. DISPLAY MODE RESOLVER (TOTAL UNIFIED SHELL)
     const meta = (category.metadata as Record<string, unknown>) || {}
-    let displayMode = 'grid'
+    let displayMode: CategoryViewModel['displayMode'] = 'series' // VARSAYILAN ARTIK ESKİ GRID DEĞİL, YENİ BEYAZ TASARIM (SERIES)
     
     if (meta.display_mode) {
-      displayMode = meta.display_mode as string
+      displayMode = meta.display_mode as CategoryViewModel['displayMode']
     } else {
-      const premiumLandingSlugs = ['hava-perdesi', 'hava-perdeleri', 'sessiz-kanal-tipi-fanlar']
-      if (premiumLandingSlugs.includes(category.slug)) {
-        displayMode = 'showcase'
-      } else if (category.parent_id) {
-        displayMode = 'series'
+      // Sadece en üst düzey ana kategoriler koyu renkli Showcase kullanır
+      const showcaseSlugs = [
+        'residential-ventilation', 'industrial-ventilation', 
+        'commercial-ventilation', 'heat-recovery-vmc', 'air-treatment',
+        'hygiene-sanitizer', 'summer-ventilation', 'air-conditioning',
+        'electric-heating', 'industrial-ceiling-fans', 'accessories-components',
+        'smart-home'
+      ]
+      
+      // Çok özel zengin içerikli sayfalar (Hero + Detaylar)
+      const landingSlugs = ['hava-perdeleri', 'sessiz-kanal-tipi-fanlar', 'nem-alma-cihazlari']
+      
+      if (showcaseSlugs.includes(category.slug)) {
+         displayMode = 'showcase'
+      } else if (landingSlugs.includes(category.slug)) {
+         displayMode = 'landing'
+      } else {
+         // Geri kalan TÜM alt kategoriler (Cam Tipi, Banyo, vb.) 
+         // eski sol menülü 'grid' yerine, yeni nesil 'series' (Beyaz Şablon) kullanacak.
+         displayMode = 'series'
       }
     }
 
@@ -79,34 +93,20 @@ export function useCategoryViewModel() {
     }
   }, [t])
 
-  // 2. Transform raw products to Series Groups for the UI
   const groupProductsBySeries = useMemo(() => (products: DomainProduct[]): SeriesGroup[] => {
     const seriesMap: Record<string, SeriesGroup> = {}
-    
     products.forEach(product => {
       const meta = (product as unknown as { metadata?: Record<string, unknown> }).metadata || {}
       let seriesName = (meta.series as string) || product.name.split(' ')[0]
-      
-      // Clean up common prefixes
       if (['Vortice', 'Avens', 'Soler', 'Casals', 'Vorticel'].includes(seriesName)) {
         seriesName = product.name.split(' ')[1] || seriesName
       }
-
       if (!seriesMap[seriesName]) {
-        seriesMap[seriesName] = {
-          name: seriesName,
-          products: [],
-          image: product.image_url || undefined,
-          minPrice: Infinity
-        }
+        seriesMap[seriesName] = { name: seriesName, products: [], image: product.image_url || undefined, minPrice: Infinity }
       }
-      
       seriesMap[seriesName].products.push(product)
-      if (product.price && product.price < seriesMap[seriesName].minPrice) {
-        seriesMap[seriesName].minPrice = product.price
-      }
+      if (product.price && product.price < seriesMap[seriesName].minPrice) seriesMap[seriesName].minPrice = product.price
     })
-
     return Object.values(seriesMap).sort((a, b) => a.name.localeCompare(b.name))
   }, [])
 
