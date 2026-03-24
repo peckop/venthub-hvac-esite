@@ -31,14 +31,36 @@ export const tr = {
     getQuote: 'Teklif Al',
     addToCart: 'Sepete Ekle',
     categoryList: {
-      exproofFans: 'EXPROOF FANLAR',
-      heatRecovery: 'ISI GERİ KAZANIM CİHAZLARI',
-      airCurtains: 'HAVA PERDELERİ',
-      dehumidifiers: 'NEM ALMA CİHAZLARI',
-      airPurifiers: 'HAVA TEMİZLEYİCİLER',
-      flexibleDucts: 'FLEXİBLE HAVA KANALLARI',
-      speedControllers: 'HIZ KONTROLÜ CİHAZLARI',
-      accessories: 'AKSESUARLAR'
+      // ANA AİLELER (Level 0)
+      'residential-ventilation': 'Konut Tipi Havalandırma',
+      'commercial-ventilation': 'Ticari Havalandırma',
+      'industrial-ventilation': 'Endüstriyel Havalandırma',
+      'heat-recovery-vmc': 'Isı Geri Kazanım Üniteleri (VMC)',
+      'air-treatment': 'Hava Şartlandırma',
+      'hygiene-sanitizer': 'Hijyen ve Sanitasyon',
+      'summer-ventilation': 'Yaz Havalandırması (Vantilatörler)',
+      'air-conditioning': 'İklimlendirme (Klima)',
+      'electric-heating': 'Elektrikli Isıtma',
+      'industrial-ceiling-fans': 'Endüstriyel Tavan Vantilatörleri',
+      'accessories-components': 'Aksesuarlar ve Bileşenler',
+      'smart-home': 'Akıllı Ev Sistemleri',
+
+      // ALT KATEGORİLER VE GRUPLAR (Level 1-2)
+      'banyo-ve-tuvalet-fanlari': 'Banyo ve Tuvalet Fanları',
+      'cam-ve-pencere-tipi-fanlar': 'Cam ve Pencere Tipi Fanlar',
+      'kanal-tipi-boru-ici-fanlar': 'Kanal Tipi / Boru İçi Fanlar',
+      'radyal-fanlar': 'Radyal Fanlar',
+      'santrifuj-fanlar': 'Santrifüj Fanlar',
+      'sessiz-kanal-tipi-fanlar': 'Sessiz Kanal Tipi Fanlar',
+      'duvar-tipi-kompakt-aksiyal-fanlar': 'Duvar Tipi Kompakt Aksiyal Fanlar',
+
+      // ALT TİPLER (Level 3)
+      'ince-govdeli-slim-fanlar': 'İnce Gövdeli (Slim) Fanlar',
+      'ultra-ince-on-panel': 'Ultra İnce Ön Panel',
+      'sessiz-sik-tasarim-premium': 'Sessiz / Şık Tasarım / Premium',
+      'standart-duvar-tavan-tipi': 'Standart Duvar/Tavan Tipi',
+      'gizli-montaj-in-line': 'Gizli Montaj (In-line)',
+      'santrifuj-kanalli-tip': 'Santrifüj / Kanallı Tip'
     },
     byApplication: "Uygulamaya Göre Çözümler",
     viewAll: "Tümü",

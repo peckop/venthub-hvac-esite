@@ -1,209 +1,58 @@
-"use client"
+'use client'
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wind, Ban as Fan, Settings, Droplets, ArrowLeft, ChevronRight, Activity, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { CATEGORY_REGISTRY } from '@/config'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
 import OrbitalProductsShowcase from './OrbitalProductsShowcase'
+import { useCategories } from '../../contexts/CategoryContext'
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 
-// --- Category Data using OFFICIAL SLUGS from categoryRegistry ---
-export interface CategoryCard {
-    id: string
-    title: string
-    description: string
-    icon: React.ReactNode
-    image: string
-    color: string
-    productCount?: number
-    priceRange?: { min: number; max: number }
-}
-
-// Alt kategori için tip
-interface SubcategoryItem {
-    id: string
-    slug: string
-    title: string
-    parentSlug: string
-    image: string
-}
-
-const categories: CategoryCard[] = [
-    {
-        id: CATEGORY_REGISTRY.HAVA_PERDELERI.slug,
-        title: CATEGORY_REGISTRY.HAVA_PERDELERI.name,
-        description: 'Ticari ve endüstriyel alanlar için enerji verimli hava bariyerleri.',
-        icon: <Wind className="w-6 h-6" />,
-        image: '/images/products/air-curtain.png',
-        color: 'from-cyan-500 to-blue-600',
-        productCount: 24,
-        priceRange: { min: 3500, max: 25000 }
-    },
-    {
-        id: CATEGORY_REGISTRY.FANLAR.slug,
-        title: CATEGORY_REGISTRY.FANLAR.name,
-        description: 'Yüksek performanslı havalandırma ve egzoz sistemleri.',
-        icon: <Fan className="w-6 h-6" />,
-        image: '/images/products/industrial-fan.png',
-        color: 'from-blue-500 to-indigo-600',
-        productCount: 45,
-        priceRange: { min: 1200, max: 18000 }
-    },
-    {
-        id: CATEGORY_REGISTRY.ISI_GERI_KAZANIM.slug,
-        title: CATEGORY_REGISTRY.ISI_GERI_KAZANIM.name,
-        description: 'Maksimum enerji tasarrufu sağlayan taze hava üniteleri.',
-        icon: <Activity className="w-6 h-6" />,
-        image: '/images/products/hrv-unit.png',
-        color: 'from-emerald-500 to-teal-600',
-        productCount: 18,
-        priceRange: { min: 8000, max: 45000 }
-    },
-    {
-        id: CATEGORY_REGISTRY.HIZ_KONTROL.slug,
-        title: CATEGORY_REGISTRY.HIZ_KONTROL.name,
-        description: 'Fan ve motor hız kontrol sistemleri.',
-        icon: <Settings className="w-6 h-6" />,
-        image: '/images/products/speed-controller.png',
-        color: 'from-orange-500 to-red-600',
-        productCount: 12,
-        priceRange: { min: 450, max: 3500 }
-    },
-    {
-        id: CATEGORY_REGISTRY.HAVA_TEMIZLEYICILER.slug,
-        title: 'Hava Temizleyiciler',
-        description: 'Anti-viral ve hava temizleme çözümleri.',
-        icon: <Zap className="w-6 h-6" />,
-        image: '/images/products/air-purifier.png',
-        color: 'from-violet-500 to-purple-600',
-        productCount: 8,
-        priceRange: { min: 2500, max: 15000 }
-    },
-    {
-        id: CATEGORY_REGISTRY.NEM_ALMA.slug,
-        title: CATEGORY_REGISTRY.NEM_ALMA.name,
-        description: 'Profesyonel nem kontrol çözümleri.',
-        icon: <Droplets className="w-6 h-6" />,
-        image: '/images/products/dehumidifier.png',
-        color: 'from-sky-500 to-cyan-600',
-        productCount: 15,
-        priceRange: { min: 4000, max: 22000 }
-    },
-    {
-        id: CATEGORY_REGISTRY.FLEXIBLE.slug,
-        title: CATEGORY_REGISTRY.FLEXIBLE.name,
-        description: 'Esnek hava kanalı çözümleri.',
-        icon: <Wind className="w-6 h-6" />,
-        image: '/images/products/flexible-duct.png',
-        color: 'from-amber-500 to-yellow-600',
-        productCount: 20,
-        priceRange: { min: 150, max: 1200 }
-    },
-    {
-        id: CATEGORY_REGISTRY.AKSESUARLAR.slug,
-        title: CATEGORY_REGISTRY.AKSESUARLAR.name,
-        description: 'Havalandırma sistem aksesuarları.',
-        icon: <Settings className="w-6 h-6" />,
-        image: '/images/products/accessories.png',
-        color: 'from-rose-500 to-pink-600',
-        productCount: 35,
-        priceRange: { min: 50, max: 800 }
-    }
-]
-
-// Alt kategori label formatla
-const formatSubcategoryLabel = (key: string): string => {
-    const labelMap: Record<string, string> = {
-        BASINCLANDIRMA: 'Basınçlandırma Fanları',
-        CATI_TIPI: 'Çatı Tipi Fanlar',
-        DUMAN_EGZOZ: 'Duman Egzoz Fanları',
-        DUVAR_TIPI: 'Duvar Tipi Fanlar',
-        KANAL_TIPI: 'Kanal Tipi Fanlar',
-        OTOPARK_JET: 'Otopark Jet Fanları',
-        EXPROOF: 'Exproof Fanlar',
-        KONUT_TIPI: 'Konut Tipi',
-        PLUG: 'Plug Fanlar',
-        SANTRIFUJ: 'Santrifüj Fanlar',
-        SIGINAK: 'Sığınak Fanları',
-        SESSIZ_KANAL: 'Sessiz Kanal Tipi',
-        NICOTRA: 'Nicotra Gebhardt',
-        ELEKTRIKLI: 'Elektrikli Isıtıcı',
-        ORTAM_HAVALI: 'Ortam Havalı',
-        TICARI_TIP: 'Ticari Tip',
-        DEPURO_PRO: 'Depuro Pro',
-        SG_DISPENSER: 'SG Dispenser',
-        UV_LOGIKA: 'UV Logika',
-        VORT_SUPER_DRY: 'Vort Super Dry',
-        FREKANS_KONVERTOR: 'Frekans Konvertörü',
-        HIZ_ANAHTARI: 'Hız Anahtarı',
-        ALUMINYUM_BANT: 'Alüminyum Bantlar',
-        BAGLANTI_KONNEKTORU: 'Bağlantı Konnektörü',
-        GEMICI_ANEMOSTADI: 'Gemici Anemostadı',
-        PLASTIK_KELEPCE: 'Plastik Kelepçeler'
-    }
-    return labelMap[key] || key.toLowerCase().replace(/_/g, ' ')
-}
-
-// Kategori slug'ından alt kategorileri al
-const getSubcategoriesForCategory = (categorySlug: string): SubcategoryItem[] => {
-    const entries = Object.entries(CATEGORY_REGISTRY)
-    const found = entries.find(([, val]) => val.slug === categorySlug)
-
-    if (!found) return []
-
-    const subs = found[1].subs as Record<string, string>
-    if (!subs || Object.keys(subs).length === 0) return []
-
-    return Object.entries(subs).map(([key, slug]) => ({
-        id: slug,
-        slug,
-        title: formatSubcategoryLabel(key),
-        parentSlug: categorySlug,
-        image: '/images/hvac_installation_close_up_premium_3.png'
-    }))
-}
-
-type CarouselLevel = 'main' | 'subcategory'
-
+// Helper to determine 3D model type based on slug
 const getModelTypeForCategory = (slug?: string): string | undefined => {
     if (!slug) return undefined
     const s = slug.toLowerCase()
-    if (s.includes('perde') || s === 'hava-perdeleri') return 'AirCurtainModel'
-    if (s.includes('temizleyici') || s === 'hava-temizleyiciler') return 'AirPurifierModel'
-    if (s.includes('nem') || s === 'nem-alma') return 'DehumidifierModel'
-    if (s.includes('isi-geri') || s === 'isi-geri-kazanim') return 'HRVModel'
-    if (s.includes('hiz') || s === 'hiz-kontrol') return 'SpeedControlModel'
-    if (s.includes('aksesuar') || s === 'aksesuarlar') return 'AccessoryModel'
+    
+    // Families / Groups
+    if (s.includes('perde')) return 'AirCurtainModel'
+    if (s.includes('temizleyici')) return 'AirPurifierModel'
+    if (s.includes('nem-alma')) return 'DehumidifierModel'
+    if (s.includes('heat-recovery') || s.includes('isi-geri')) return 'HRVModel'
+    if (s.includes('speed-control') || s.includes('hiz-kontrol')) return 'SpeedControlModel'
+    if (s.includes('accessories') || s.includes('aksesuar')) return 'AccessoryModel'
     if (s.includes('flexible')) return 'FlexibleDuctModel'
-    if (s.includes('exproof') || s.includes('atex') || s.includes('endustriyel')) return 'ExproofFanModel'
-    if (s.includes('cati') || s.includes('roof')) return 'RoofFanModel'
-    if (s.includes('sessiz')) return 'SilentChannelFanModel'
-    if (s.includes('kanal') || s.includes('yuvarlak')) return 'RoundDuctFanModel'
-    if (s.includes('dikdortgen') || s.includes('prizmatik') || s.includes('siginak') || s.includes('hucreli')) return 'RectangularDuctFanModel'
-    if (s.includes('duman') || s.includes('smoke')) return 'SmokeExhaustFanModel'
+    
+    // Fans
+    if (s.includes('exproof') || s.includes('atex')) return 'ExproofFanModel'
+    if (s.includes('roof') || s.includes('cati')) return 'RoofFanModel'
+    if (s.includes('sessiz') || s.includes('silent')) return 'SilentChannelFanModel'
+    if (s.includes('kanal') || s.includes('round')) return 'RoundDuctFanModel'
+    if (s.includes('rectangular') || s.includes('siginak')) return 'RectangularDuctFanModel'
+    if (s.includes('smoke') || s.includes('duman')) return 'SmokeExhaustFanModel'
     if (s.includes('jet') || s.includes('otopark')) return 'JetFanModel'
-    if (s.includes('salyangoz') || s.includes('santrifuj') || s.includes('radyal')) return 'SnailFanModel'
+    if (s.includes('santrifuj') || s.includes('radyal') || s.includes('quadro')) return 'SnailFanModel'
     if (s.includes('plug')) return 'PlugFanModel'
-    if (s.includes('nicotra') || s.includes('gebhardt')) return 'NicotraFanModel'
-    if (s.includes('duvar') && s.includes('kompakt')) return 'WallMountedCompactFanModel'
-    if (s.includes('duvar') || s.includes('konut') || s.includes('banyo') || s.includes('wc')) return 'DomesticFanModel'
-    if (s.includes('yangin') || s.includes('basinc')) return 'AxialFanModel'
-    if (s.includes('fan')) return 'AxialFanModel'
-    return undefined
+    if (s.includes('nicotra')) return 'NicotraFanModel'
+    
+    // Default
+    if (s.includes('residential') || s.includes('konut')) return 'DomesticFanModel'
+    if (s.includes('industrial') || s.includes('endustriyel')) return 'AxialFanModel'
+    
+    return 'AxialFanModel'
 }
 
 interface CategoryOrbitCarouselProps {
-    /** Opsiyonel: subcategory seçildiğinde router.push yerine bu callback tetiklenir.
-     *  Bu prop sayesinde carousel hem bağımsız hem de üst sayfaya gömülü çalışabilir. */
     onSubcategorySelect?: (categorySlug: string, subcategorySlug?: string) => void
-    /** Compact modda carousel küçük/sticky olarak render edilir */
     compact?: boolean
 }
 
 const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: CategoryOrbitCarouselProps) => {
     const router = useRouter()
-    const [level, setLevel] = useState<CarouselLevel>('main')
-    const [activeMainCategory, setActiveMainCategory] = useState<CategoryCard | null>(null)
+    const { categories, loading: categoriesLoading } = useCategories()
+    const { wrapCategory } = useCategoryViewModel()
+    
+    const [level, setLevel] = useState<'main' | 'subcategory'>('main')
+    const [activeMainCategorySlug, setActiveMainCategorySlug] = useState<string | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [focusedItemTitle, setFocusedItemTitle] = useState<string | null>(null) 
     const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) 
@@ -211,10 +60,26 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
     const ROTATING_HINTS = ['Tut Çevir', 'Ürüne Tıkla', 'Sol-Sağ Çevir', 'Kategoriyi Seç']
 
+    // 1. Prepare Main Categories (ViewModels)
+    const mainCategories = useMemo(() => {
+        return categories
+            .filter(c => !c.parent_id)
+            .map(c => wrapCategory(c))
+            .filter((vm): vm is NonNullable<typeof vm> => vm !== null)
+    }, [categories, wrapCategory])
+
+    const activeMainCategory = useMemo(() => {
+        return mainCategories.find(c => c.slug === activeMainCategorySlug) || null
+    }, [mainCategories, activeMainCategorySlug])
+
+    // 2. Prepare Subcategories for Active Main
     const subcategories = useMemo(() => {
         if (!activeMainCategory) return []
-        return getSubcategoriesForCategory(activeMainCategory.id)
-    }, [activeMainCategory])
+        return categories
+            .filter(c => c.parent_id === activeMainCategory.id)
+            .map(c => wrapCategory(c))
+            .filter((vm): vm is NonNullable<typeof vm> => vm !== null)
+    }, [categories, activeMainCategory, wrapCategory])
 
     const handleFocusedItemChange = useCallback((itemId: string | null) => {
         if (!itemId) {
@@ -225,27 +90,27 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
         let title = ''
         if (level === 'main') {
-            const cat = categories.find(c => c.id === itemId)
-            title = cat ? cat.title : ''
+            const cat = mainCategories.find(c => c.slug === itemId)
+            title = cat ? cat.displayName : ''
         } else if (level === 'subcategory') {
             const sub = subcategories.find(s => s.slug === itemId)
-            title = sub ? sub.title : ''
+            title = sub ? sub.displayName : ''
         }
         setFocusedItemTitle(title)
-    }, [level, subcategories])
+    }, [level, mainCategories, subcategories])
 
     const handleFrontCardChange = useCallback((itemId: string) => {
         let title = ''
         if (level === 'main') {
-            const cat = categories.find(c => c.id === itemId)
-            title = cat ? cat.title : ''
+            const cat = mainCategories.find(c => c.slug === itemId)
+            title = cat ? cat.displayName : ''
         } else if (level === 'subcategory') {
             const sub = subcategories.find(s => s.slug === itemId)
-            title = sub ? sub.title : ''
+            title = sub ? sub.displayName : ''
         }
         setFrontCardTitle(title)
         setHintIndex(prev => (prev + 1) % 4) 
-    }, [level, subcategories])
+    }, [level, mainCategories, subcategories])
 
     useEffect(() => {
         setFocusedItemTitle(null)
@@ -254,91 +119,92 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
 
     const displayItems = useMemo(() => {
         if (level === 'main') {
-            return categories.map(c => ({
-                id: c.id,
-                title: c.title,
-                image: c.image,
-                categorySlug: c.id,
-                modelType: getModelTypeForCategory(c.id)
+            return mainCategories.map(vm => ({
+                id: vm.slug,
+                title: vm.displayName,
+                image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                categorySlug: vm.slug,
+                modelType: getModelTypeForCategory(vm.slug)
             }))
         } else if (level === 'subcategory') {
-            return subcategories.map(s => ({
-                id: s.slug,
-                title: s.title,
-                image: s.image,
-                categorySlug: s.slug,
-                modelType: getModelTypeForCategory(s.slug)
+            return subcategories.map(vm => ({
+                id: vm.slug,
+                title: vm.displayName,
+                image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.png',
+                categorySlug: vm.slug,
+                modelType: getModelTypeForCategory(vm.slug)
             }))
         }
         return []
-    }, [level, subcategories])
+    }, [level, mainCategories, subcategories])
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
-            const category = categories.find(c => c.id === itemId)
-            if (category) {
-                const subs = getSubcategoriesForCategory(category.id)
-                if (subs.length > 0) {
+            const categoryVm = mainCategories.find(c => c.slug === itemId)
+            if (categoryVm) {
+                // Check if has subs
+                const hasSubs = categories.some(c => c.parent_id === categoryVm.id)
+                if (hasSubs) {
                     setIsTransitioning(true)
-                    setActiveMainCategory(category)
+                    setActiveMainCategorySlug(categoryVm.slug)
                     setTimeout(() => {
                         setLevel('subcategory')
                         setIsTransitioning(false)
                     }, 400)
                 } else {
                     if (onSubcategorySelect) {
-                        // Alt kategorisi yok, doğrudan ürünleri getir 
-                        onSubcategorySelect(category.id)
+                        onSubcategorySelect(categoryVm.slug)
                     } else {
-                        router.push(`/category/${category.id}`)
+                        router.push(`/category/${categoryVm.slug}`)
                     }
                 }
             }
         } else if (level === 'subcategory') {
-            const sub = subcategories.find(s => s.slug === itemId)
-            if (sub && activeMainCategory) {
+            const subVm = subcategories.find(s => s.slug === itemId)
+            if (subVm && activeMainCategorySlug) {
                 if (onSubcategorySelect) {
-                    // Gömülü mod: üst bileşene bildir, sayfa değişmez
-                    onSubcategorySelect(activeMainCategory.id, sub.slug)
+                    onSubcategorySelect(activeMainCategorySlug, subVm.slug)
                 } else {
-                    // Bağımsız mod: doğrudan kategori sayfasına git
-                    router.push(`/category/${activeMainCategory.id}/${sub.slug}`)
+                    router.push(`/category/${activeMainCategorySlug}/${subVm.slug}`)
                 }
             }
         }
-    }, [level, subcategories, activeMainCategory, router, onSubcategorySelect])
+    }, [level, mainCategories, subcategories, activeMainCategorySlug, categories, router, onSubcategorySelect])
 
     const handleBack = useCallback(() => {
         setIsTransitioning(true)
         setTimeout(() => {
             setLevel('main')
-            setActiveMainCategory(null)
+            setActiveMainCategorySlug(null)
             setIsTransitioning(false)
         }, 400)
     }, [])
 
     const handleViewAllProducts = useCallback(() => {
-        if (activeMainCategory) {
-            router.push(`/category/${activeMainCategory.id}`)
+        if (activeMainCategorySlug) {
+            router.push(`/category/${activeMainCategorySlug}`)
         }
-    }, [activeMainCategory, router])
+    }, [activeMainCategorySlug, router])
 
     const [isMobile, setIsMobile] = useState(false)
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768)
         checkMobile()
-        window.addEventListener('resize', checkMobile)
-        return () => window.removeEventListener('resize', checkMobile)
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', checkMobile)
+            return () => window.removeEventListener('resize', checkMobile)
+        }
     }, [])
+
+    if (categoriesLoading) {
+        return <div className="h-[400px] flex items-center justify-center text-white/20">Yükleniyor...</div>
+    }
 
     const responsiveHeight = compact ? (isMobile ? 220 : 280) : (isMobile ? 380 : 500)
     const responsiveModelScale = compact ? (isMobile ? 0.7 : 0.9) : (isMobile ? 1.1 : 1.5)
 
     return (
         <section className="bg-[#020617] overflow-hidden relative">
-            {/* PERFORMANCE OPTIMIZED BACKGROUNDS: Gradient animasyonu yerine opacity geçişi 
-                Radial gradient animasyonu CPU/GPU'yu çok yorar, bu yüzden iki katman kullanıyoruz.
-            */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 <div 
                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out bg-[radial-gradient(circle_at_center,rgba(30,41,59,0.5)_0%,rgb(2,6,23)_70%)] ${level === 'main' ? 'opacity-100' : 'opacity-0'}`} 
@@ -366,9 +232,8 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                             >
                                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                                 <span className="text-sm font-medium">Geri</span>
-                                <ChevronRight className="w-4 h-4 text-white/50" />
-                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px]">
-                                    {activeMainCategory.title}
+                                <span className="text-sm font-bold text-cyan-400 truncate max-w-[150px] ml-2">
+                                    {activeMainCategory.displayName}
                                 </span>
                             </motion.button>
 
@@ -398,7 +263,7 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                         style={{ marginTop: level === 'subcategory' ? (isMobile ? '5.5rem' : '3rem') : 0 }}
                     >
                         <h2 className="text-xl md:text-3xl font-bold text-white/90">
-                            {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.title} Alt Kategorileri`)}
+                            {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
                         </h2>
                         <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                             {focusedItemTitle
