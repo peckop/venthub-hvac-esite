@@ -1,5 +1,5 @@
 # 🛰️ VENTHUB MISSION CONTROL (PULSE)
-> **Güncelleme:** 24.03.2026 14:20 | **İlerleme:** %62
+> **Güncelleme:** 24.03.2026 14:57 | **İlerleme:** %62
 
 ## 📁 P00-STANDALONE
 ### ⏳ Backlog
@@ -49,8 +49,8 @@
 | `000`  | Roadmap                                       | ⚡ MED        | ⏳ WAIT       | `0%`       |
 | `009`  | Hotfix: Fix Category Visibility and 3D Orb    | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
 | `010`  | urunleri-kesfet-sayfasi-yeniden-insa          | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
-| `012`  | Fix Category-Product Mapping and Hierarchy    | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
-| `013`  | Category ViewModel & Advanced Scale Archit    | 🔥 HIGH       | 🏗️ RUN       | `0%`       |
+| `012`  | Fix Category-Product Mapping and Hierarchy    | 🔥 HIGH       | 🏗️ RUN       | `60%`      |
+| `013`  | Category ViewModel & Advanced Scale Archit    | 🔥 HIGH       | ⏳ WAIT       | `100%`     |
 ### ⏳ Backlog
 | ID     | GÖREV BAŞLIĞI                                 | ÖNCELİK      |
 |:---|:---|:---|
