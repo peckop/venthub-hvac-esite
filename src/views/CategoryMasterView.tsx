@@ -6,6 +6,7 @@ import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import CategoryShowcaseView from './category/CategoryShowcaseView'
 import CategoryGridView from './category/CategoryGridView'
 import CategoryLandingView from './category/CategoryLandingView'
+import CategorySeriesView from './category/CategorySeriesView'
 import ProductsDiscoveryView from './ProductsDiscoveryView'
 import { useIsMounted } from '../hooks/useIsMounted'
 import ProductsSkeleton from '../components/products/ProductsSkeleton'
@@ -35,8 +36,6 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   // 3. Derived UI State via ViewModel
   const category = useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])
   const parentCategory = useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])
-  
-  // const groupedSeries = useMemo(() => groupProductsBySeries(products), [products, groupProductsBySeries])
   const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
 
   if (!isMounted || (loading && !category)) {
@@ -68,20 +67,25 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
           />
         )
       case 'series':
-        // BEYAZ TASARIM: Grid View'un 'clean' modu aslında sizin bahsettiğiniz beyaz tasarımdır.
+        // Gelişmiş Beyaz Tasarım (Series)
         return (
-          <CategoryGridView 
+          <CategorySeriesView 
             category={category.raw}
             parentCategory={parentCategory?.raw}
-            subCategories={rawSubCategories}
-            availableBrands={availableBrands}
-            products={products}
-            filters={filters}
-            onUpdateFilters={updateFilters}
-            loading={loading}
+            products={products as unknown as DomainProduct[]}
           />
         )
       default:
+        // Eğer alt kategoriyse Series, ana kategoriyse Grid (Fallback)
+        if (category.parentId) {
+            return (
+                <CategorySeriesView 
+                  category={category.raw}
+                  parentCategory={parentCategory?.raw}
+                  products={products as unknown as DomainProduct[]}
+                />
+            )
+        }
         return (
           <CategoryGridView 
             category={category.raw}

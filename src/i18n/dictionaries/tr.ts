@@ -56,7 +56,7 @@ export const tr = {
         'roof': 'Çatı Tipi Fanlar',
         'axial-ind': 'Aksiyel Sanayi Fanları',
         'air-curtain': 'Hava Perdeleri',
-        'portable-ac': 'Taşınabilir Klimalar'
+        'conditioning': 'İklimlendirme Çözümleri'
       }
     },
     byApplication: "Uygulamaya Göre Çözümler",
