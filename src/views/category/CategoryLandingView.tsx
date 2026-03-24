@@ -21,7 +21,8 @@ import {
 import { mapDatabaseProductToDomain, DomainCategory } from '../../lib/type-converters'
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import Image from 'next/image'
-import { ChevronDown } from 'lucide-react'
+import { Info } from 'lucide-react'
+import Breadcrumb from '@/components/navigation/Breadcrumb'
 
 interface CategoryLandingProps {
     category: DomainCategory
@@ -34,42 +35,31 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)
-    const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null)
+    
     const [disableAnimation, setDisableAnimation] = useState(true)
     const productListRef = useRef<HTMLDivElement>(null)
-    const subcategoryProductsRef = useRef<HTMLDivElement>(null)
+    
 
     const vm = wrapCategory(category)
+    const parentVm = wrapCategory(subCategories.find(s => s.id === category.parent_id)) // Attempt to find parent if any
+    
     const isAirCurtain = category.slug === 'hava-perdesi' || category.slug === 'hava-perdeleri'
     const isSilentFan = category.slug === 'sessiz-kanal-tipi-fanlar'
+    const isDehumidifier = category.slug === 'nem-alma-cihazlari'
 
-    // Hero image logic - Professional fallback
+    // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
+    const breadcrumbItems = [
+        { label: 'Ana Sayfa', href: '/' },
+        ...(parentVm ? [{ label: parentVm.displayName, href: `/category/${parentVm.slug}` }] : []),
+        { label: vm?.displayName || category.name, href: '' }
+    ]
+
     const heroImage = category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
-    // Restore state from URL hash
     useEffect(() => {
-        const checkHash = () => {
-            if (typeof window === 'undefined') return
-            const hash = window.location.hash.slice(1)
-            if (hash === 'tum-modeller') {
-                setShowProducts(true)
-                setSelectedSubcategory(null)
-            } else if (hash && subCategories.length > 0) {
-                const matchedSubcat = subCategories.find(s => s.slug === hash)
-                if (matchedSubcat) {
-                    setSelectedSubcategory(matchedSubcat.id)
-                    setShowProducts(false)
-                }
-            }
-        }
-        checkHash()
-        window.addEventListener('hashchange', checkHash)
         const animTimer = setTimeout(() => setDisableAnimation(false), 300)
-        return () => {
-            window.removeEventListener('hashchange', checkHash)
-            clearTimeout(animTimer)
-        }
-    }, [subCategories])
+        return () => clearTimeout(animTimer)
+    }, [])
 
     const handleScrollToTarget = (targetId: string) => {
         const anchor = document.getElementById(targetId)
@@ -79,152 +69,104 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const handleShowProducts = () => {
         setShowProducts(true)
         setSelectedSubcategory(null)
-        if (typeof window !== 'undefined') {
-            window.history.replaceState(null, '', '#tum-modeller')
-        }
         setTimeout(() => handleScrollToTarget('products-anchor'), 100)
     }
-
-    const handleSelectSubcategory = (subcatId: string) => {
-        setSelectedSubcategory(subcatId)
-        setShowProducts(false)
-        const subcat = subCategories.find(s => s.id === subcatId)
-        if (subcat && typeof window !== 'undefined') {
-            window.history.replaceState(null, '', `#${subcat.slug}`)
-        }
-        setTimeout(() => handleScrollToTarget('subcategory-anchor'), 100)
-    }
-
-    const subcategoryProducts = selectedSubcategory
-        ? (products || []).filter(p => p.category_id === selectedSubcategory)
-        : []
-
-    const maxAirflow = (products && products.length > 0)
-        ? Math.max(...(products || []).map(p => Number(p.airflow_capacity) || 0))
-        : 1000
 
     const filteredProducts = (products || []).filter((p: DbProduct) => {
         if (activeFilter === 'all') return true
         if (activeFilter === 'quiet') return (Number(p.noise_level) || 100) <= 50
-        if (activeFilter === 'powerful') return (Number(p.airflow_capacity) || 0) >= maxAirflow * 0.8
         return true
     })
 
     return (
         <div className="bg-white">
-            {/* HERO SECTION - UNIFIED STANDARD */}
-            <div className="relative h-[60vh] min-h-[400px] overflow-hidden bg-primary-navy">
-                <div className="absolute inset-0 z-0">
-                    <Image
-                        src={heroImage}
-                        alt={vm?.displayName || category.name}
-                        fill
-                        priority
-                        className="object-cover opacity-60"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary-navy via-primary-navy/20 to-transparent" />
-                </div>
-
-                <div className="absolute inset-0 flex items-center">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                        <div className="max-w-3xl animate-fadeIn">
-                            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-blue/20 text-secondary-blue backdrop-blur-sm border border-secondary-blue/30 text-sm font-medium mb-6">
+            {/* MAXIMUM HERO - INTEGRATED WITH LANDING CONTENT */}
+            <div className="bg-slate-50 border-b border-slate-100 relative overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <div className="animate-fadeIn">
+                            <Breadcrumb items={breadcrumbItems} className="mb-10" />
+                            <div className="flex items-center gap-3 mb-6 text-primary-navy font-bold text-sm tracking-widest uppercase bg-primary-navy/5 w-fit px-4 py-2 rounded-full border border-primary-navy/10">
+                                <Info size={16} />
+                                <span>Uzmanlık Alanı</span>
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-black text-industrial-gray mb-8 leading-[1.1] tracking-tight">
                                 {vm?.displayName}
-                            </span>
-                            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                                {vm?.marketingTitle}
                             </h1>
-                            <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
-                                {vm?.description}
+                            <p className="text-xl text-steel-gray max-w-xl leading-relaxed font-medium">
+                                {vm?.description || 'Profesyonel çözümleri teknik detaylarıyla keşfedin.'}
                             </p>
+                            <div className="mt-10 flex gap-4">
+                                <button 
+                                    onClick={() => handleScrollToTarget('landing-content')}
+                                    className="bg-primary-navy text-white px-8 py-4 rounded-2xl font-bold transition-all hover:bg-secondary-blue shadow-xl shadow-primary-navy/20 active:scale-95"
+                                >
+                                    Detaylı İncele
+                                </button>
+                                <button 
+                                    onClick={handleShowProducts}
+                                    className="bg-white border-2 border-slate-200 text-industrial-gray px-8 py-4 rounded-2xl font-bold transition-all hover:border-primary-navy active:scale-95"
+                                >
+                                    Modelleri Gör
+                                </button>
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <div className="absolute -inset-10 bg-secondary-blue/5 rounded-full blur-3xl" />
+                            <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl border-[16px] border-white group">
+                                <Image src={heroImage} alt={vm?.displayName || ''} fill className="object-cover group-hover:scale-105 transition-transform duration-[2s]" priority />
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <button
-                    onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
-                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
-                >
-                    <span className="text-xs uppercase tracking-widest font-medium">Detayları İncele</span>
-                    <ChevronDown className="w-6 h-6" />
-                </button>
             </div>
 
-            <div id="content-start" className="scroll-mt-20" />
+            <div id="landing-content" className="scroll-mt-20">
+                {isAirCurtain && (
+                    <>
+                        <ProblemSection />
+                        <HowItWorks />
+                        <VorticeBrand />
+                        <TypeComparison
+                            onOpenWizard={() => setWizardOpen(true)}
+                            onSelectType={() => handleShowProducts()}
+                        />
+                        <TrustSignals />
+                        <FAQ />
+                    </>
+                )}
 
-            <EnhancedNeedsWizard
-                isOpen={wizardOpen}
-                onClose={() => setWizardOpen(false)}
-                parentSlug={category.slug}
-            />
+                {isSilentFan && (
+                    <>
+                        <SilentFanProblem />
+                        <SilentFanHowItWorks />
+                        <SilentFanVorticeBrand />
+                        <SilentFanTypeComparison />
+                        <TrustSignals />
+                        <SilentFanFAQ />
+                    </>
+                )}
 
-            {isAirCurtain && (
-                <>
-                    <ProblemSection />
-                    <HowItWorks />
-                    <VorticeBrand />
-                    <TypeComparison
-                        onOpenWizard={() => setWizardOpen(true)}
-                        onSelectType={(type) => {
-                            const targetSlug = type === 'elektrikli' ? 'elektrikli-isitici' : 'ortam-havali'
-                            const subcat = subCategories.find(s => s.slug === targetSlug)
-                            if (subcat) handleSelectSubcategory(subcat.id)
-                        }}
-                    />
-
-                    {selectedSubcategory && (
-                        <div className="bg-gradient-to-b from-gray-50 to-white py-16 border-t border-gray-200">
-                            <div id="subcategory-anchor" className="scroll-mt-24" />
-                            <div ref={subcategoryProductsRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
-                                            {wrapCategory(subCategories.find(s => s.id === selectedSubcategory))?.displayName || 'Alt Kategori'} Modelleri
-                                            <span className="text-sm font-normal bg-secondary-blue text-white px-3 py-1 rounded-full">
-                                                {subcategoryProducts.length} ürün
-                                            </span>
-                                        </h2>
+                {isDehumidifier && (
+                    <div className="py-24 bg-white">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden">
+                                <div className="relative z-10 max-w-2xl">
+                                    <h2 className="text-4xl md:text-5xl font-black mb-8">Nem Kontrolünde Mühendislik Hassasiyeti</h2>
+                                    <p className="text-xl text-slate-400 leading-relaxed mb-12">
+                                        Endüstriyel ve konfor alanları için optimize edilmiş nem alma teknolojileri ile ideal hava kalitesini koruyun.
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-8">
+                                        <div><p className="text-3xl font-black text-secondary-blue">35L/Gün</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">Kapasite</p></div>
+                                        <div><p className="text-3xl font-black text-secondary-blue">42dB</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">Sessiz Operasyon</p></div>
                                     </div>
-                                    <button onClick={() => setSelectedSubcategory(null)} className="text-sm text-steel-gray hover:text-industrial-gray underline">
-                                        ← Seçimi Kaldır
-                                    </button>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {(subcategoryProducts || []).map(product => (
-                                        <ProductCard key={product.id} product={mapDatabaseProductToDomain(product)} layout="grid" hidePrice={!!category.metadata?.hide_price} />
-                                    ))}
-                                </div>
+                                <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-secondary-blue/10 to-transparent pointer-events-none" />
                             </div>
                         </div>
-                    )}
-
-                    <TrustSignals />
-                    <FAQ />
-                    <BottomCTA
-                        onOpenWizard={() => setWizardOpen(true)}
-                        onShowProducts={handleShowProducts}
-                        showWizard={true}
-                        categoryName={vm?.displayName || "Hava Perdesi"}
-                    />
-                </>
-            )}
-
-            {isSilentFan && (
-                <>
-                    <SilentFanProblem />
-                    <SilentFanHowItWorks />
-                    <SilentFanVorticeBrand />
-                    <SilentFanTypeComparison />
-                    <TrustSignals />
-                    <SilentFanFAQ />
-                    <BottomCTA
-                        onOpenWizard={handleShowProducts}
-                        onShowProducts={handleShowProducts}
-                        showWizard={false}
-                        categoryName={vm?.displayName || "Sessiz Kanal Tipi Fan"}
-                    />
-                </>
-            )}
+                    </div>
+                )}
+            </div>
 
             <div id="products-anchor" className="scroll-mt-24" />
 
@@ -234,34 +176,46 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 style={{ maxHeight: showProducts ? '20000px' : '0' }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-4 border-b border-slate-100 pb-8">
                         <div>
-                            <h2 className="text-2xl font-bold text-industrial-gray">{vm?.displayName} Modelleri</h2>
-                            <p className="text-sm text-steel-gray mt-1">{filteredProducts.length} model listeleniyor</p>
+                            <h2 className="text-3xl font-black text-industrial-gray uppercase tracking-tighter">{vm?.displayName} Modelleri</h2>
+                            <p className="text-sm text-steel-gray mt-2 font-bold uppercase tracking-widest">{filteredProducts.length} Teknik Çözüm Listeleniyor</p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-2 bg-slate-100 p-1.5 rounded-2xl">
                             {[
                                 { key: 'all', label: 'Tüm Modeller' },
-                                { key: 'quiet', label: 'En Sessiz' },
-                                { key: 'powerful', label: 'En Güçlü' }
+                                { key: 'quiet', label: 'En Sessiz' }
                             ].map((f) => (
                                 <button
                                     key={f.key}
                                     onClick={() => setActiveFilter(f.key)}
-                                    className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${activeFilter === f.key ? 'bg-primary-navy text-white' : 'bg-white text-steel-gray hover:border-primary-navy'}`}
+                                    className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${activeFilter === f.key ? 'bg-white text-primary-navy shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
                                 >
                                     {f.label}
                                 </button>
                             ))}
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {(filteredProducts || []).map(p => (
-                            <ProductCard key={p.id} product={mapDatabaseProductToDomain(p)} layout="grid" hidePrice={!!category.metadata?.hide_price} />
+                            <ProductCard key={p.id} product={mapDatabaseProductToDomain(p)} layout="grid" />
                         ))}
                     </div>
                 </div>
             </div>
+
+            <BottomCTA
+                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
+                onShowProducts={handleShowProducts}
+                showWizard={isAirCurtain}
+                categoryName={vm?.displayName || "VentHub Çözümü"}
+            />
+
+            <EnhancedNeedsWizard
+                isOpen={wizardOpen}
+                onClose={() => setWizardOpen(false)}
+                parentSlug={category.slug}
+            />
         </div>
     )
 }
