@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { DomainCategory, DomainProduct } from '../lib/type-converters'
 
-
 export interface CategoryViewModel {
   id: string
   slug: string
@@ -56,7 +55,7 @@ export function useCategoryViewModel() {
     if (meta.display_mode) {
       displayMode = meta.display_mode as CategoryViewModel['displayMode']
     } else {
-      // Sadece en üst düzey ana kategoriler koyu renkli Showcase kullanır
+      // Global families that use the "Showcase" template (Dark Cinematic)
       const showcaseSlugs = [
         'residential-ventilation', 'industrial-ventilation', 
         'commercial-ventilation', 'heat-recovery-vmc', 'air-treatment',
@@ -65,17 +64,21 @@ export function useCategoryViewModel() {
         'smart-home'
       ]
       
-      // Çok özel zengin içerikli sayfalar (Hero + Detaylar)
-      const landingSlugs = ['hava-perdeleri', 'sessiz-kanal-tipi-fanlar', 'nem-alma-cihazlari']
+      // Specialized product groups that use the "Landing" template (Rich Content)
+      const landingSlugs = [
+        'hava-perdeleri', 
+        'sessiz-kanal-tipi-fanlar', 
+        'nem-alma-cihazlari'
+      ]
       
       if (showcaseSlugs.includes(category.slug)) {
-         displayMode = 'showcase'
+        displayMode = 'showcase' 
       } else if (landingSlugs.includes(category.slug)) {
-         displayMode = 'landing'
+        displayMode = 'landing' 
       } else {
-         // Geri kalan TÜM alt kategoriler (Cam Tipi, Banyo, vb.) 
-         // eski sol menülü 'grid' yerine, yeni nesil 'series' (Beyaz Şablon) kullanacak.
-         displayMode = 'series'
+        // Geri kalan TÜM alt kategoriler (Cam Tipi, Banyo, Radyal vb.) 
+        // eski sol menülü 'grid' yerine, yeni nesil 'series' (Beyaz Şablon) kullanacak.
+        displayMode = 'series'
       }
     }
 
