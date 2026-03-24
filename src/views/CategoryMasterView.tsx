@@ -6,6 +6,7 @@ import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import CategoryShowcaseView from './category/CategoryShowcaseView'
 import CategoryGridView from './category/CategoryGridView'
 import CategoryLandingView from './category/CategoryLandingView'
+import ProductsDiscoveryView from './ProductsDiscoveryView'
 import { useIsMounted } from '../hooks/useIsMounted'
 import ProductsSkeleton from '../components/products/ProductsSkeleton'
 import { DomainCategory, DomainProduct } from '../lib/type-converters'
@@ -35,14 +36,21 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
   const category = useMemo(() => wrapCategory(rawCategory), [rawCategory, wrapCategory])
   const parentCategory = useMemo(() => wrapCategory(rawParentCategory), [rawParentCategory, wrapCategory])
   
+  // const groupedSeries = useMemo(() => groupProductsBySeries(products), [products, groupProductsBySeries])
   const availableBrands = useMemo(() => Array.from(new Set(products.map(p => p.brand).filter(Boolean))), [products])
 
-  if (!isMounted || loading || !category) {
+  if (!isMounted || (loading && !category)) {
     return <ProductsSkeleton />
+  }
+
+  if (!category && !loading) {
+    return <ProductsDiscoveryView />
   }
 
   // Determine which view to render based on ViewModel's displayMode
   const renderView = () => {
+    if (!category) return null
+
     switch (category.displayMode) {
       case 'showcase':
         return (
@@ -57,6 +65,20 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory
             category={category.raw}
             subCategories={rawSubCategories}
             products={products as unknown as DomainProduct[]}
+          />
+        )
+      case 'series':
+        // BEYAZ TASARIM: Grid View'un 'clean' modu aslında sizin bahsettiğiniz beyaz tasarımdır.
+        return (
+          <CategoryGridView 
+            category={category.raw}
+            parentCategory={parentCategory?.raw}
+            subCategories={rawSubCategories}
+            availableBrands={availableBrands}
+            products={products}
+            filters={filters}
+            onUpdateFilters={updateFilters}
+            loading={loading}
           />
         )
       default:

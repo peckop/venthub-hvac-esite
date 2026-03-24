@@ -1,14 +1,14 @@
+'use client';
+
 import { VentImage } from '@/components/ui/VentImage'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { ChevronRight, ChevronLeft, ArrowRight, Wind, Shield, Activity, Zap, Droplet, Layers, Cpu, Maximize, LucideIcon } from 'lucide-react'
-import { Category } from '../lib/supabase'
-import { CATEGORY_REGISTRY } from '../config/categoryRegistry'
-import { useI18n } from '../i18n/I18nProvider'
-import { getCategoryDisplayName } from '../utils/categoryHelpers'
+import { DomainCategory } from '../lib/type-converters'
+import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 
 interface HeroCarouselProps {
-    categories: Category[]
+    categories: DomainCategory[]
 }
 
 interface CategoryFeature {
@@ -17,7 +17,7 @@ interface CategoryFeature {
     description?: string;
 }
 
-interface CategoryMetadata {
+interface CategoryMetadataExtended {
     hero_title?: string;
     hero_description?: string;
     technical_summary?: string;
@@ -26,25 +26,24 @@ interface CategoryMetadata {
 }
 
 // Fallback data for when DB metadata is missing
-const FALLBACK_METADATA: Record<string, CategoryMetadata> = {
-    'fanlar': {
+const FALLBACK_METADATA: Record<string, CategoryMetadataExtended> = {
+    'industrial-ventilation': {
         hero_title: 'Endüstriyel Havalandırma Çözümleri',
         hero_description: 'Yüksek performanslı, enerji verimli ve uzun ömürlü fan teknolojileri.',
         technical_summary: '20+ Yıl Tecrübe',
-        features: [{ icon: 'Wind', title: 'Yüksek Performans' }, { icon: 'Zap', title: 'Enerji Tasarrufu' }]
+        features: [{ icon: 'wind', title: 'Yüksek Performans' }, { icon: 'zap', title: 'Enerji Tasarrufu' }]
     },
-    'hava-perdeleri': {
-        hero_title: 'Profesyonel Hava Perdeleri',
-        hero_description: 'İşletmeniz için görünmez konfor bariyeri ve enerji tasarrufu.',
-        technical_summary: 'İzolasyon',
-        features: [{ icon: 'Shield', title: 'Hava Bariyeri' }, { icon: 'Activity', title: 'İklim Koruma' }]
+    'residential-ventilation': {
+        hero_title: 'Profesyonel Konut Havalandırması',
+        hero_description: 'İşletmeniz ve eviniz için sessiz konfor bariyeri ve enerji tasarrufu.',
+        technical_summary: 'Sessizlik',
+        features: [{ icon: 'shield', title: 'Hava Bariyeri' }, { icon: 'activity', title: 'İklim Koruma' }]
     },
-    // Default fallback for others
     'default': {
         hero_title: 'Profesyonel İklimlendirme',
         hero_description: 'En son teknoloji HVAC çözümleri ile tanışın.',
         technical_summary: 'Premium Kalite',
-        features: [{ icon: 'Activity', title: 'Uzun Ömürlü' }, { icon: 'Shield', title: 'Garantili' }]
+        features: [{ icon: 'activity', title: 'Uzun Ömürlü' }, { icon: 'shield', title: 'Garantili' }]
     }
 }
 
@@ -66,61 +65,67 @@ const IconMap: Record<string, LucideIcon> = {
 }
 
 export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
+    const { wrapCategory } = useCategoryViewModel()
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isAutoPlaying, setIsAutoPlaying] = useState(true)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-    const { t: _t } = useI18n()
 
-    // Filter only main categories defined in registry
-    const mainCategories = categories.filter(c =>
-        Object.values(CATEGORY_REGISTRY).some(reg => reg.slug === c.slug)
-    ).sort((a, b) => a.name.localeCompare(b.name))
+    // Filter only top-level categories and wrap them in ViewModel
+    const mainCategoryVms = useMemo(() => {
+        return categories
+            .filter(c => !c.parent_id)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(c => wrapCategory(c))
+            .filter((vm): vm is NonNullable<typeof vm> => vm !== null)
+    }, [categories, wrapCategory])
 
     // Safe reset if categories change
     useEffect(() => {
-        if (currentIndex >= mainCategories.length) setCurrentIndex(0)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mainCategories.length])
+        if (currentIndex >= mainCategoryVms.length) setCurrentIndex(0)
+    }, [mainCategoryVms.length, currentIndex])
 
     // Auto-play logic
     useEffect(() => {
-        if (isAutoPlaying && mainCategories.length > 0) {
+        if (isAutoPlaying && mainCategoryVms.length > 0) {
             timeoutRef.current = setTimeout(() => {
-                setCurrentIndex(prev => (prev + 1) % mainCategories.length)
+                setCurrentIndex(prev => (prev + 1) % mainCategoryVms.length)
             }, 5000)
         }
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current)
         }
-    }, [currentIndex, isAutoPlaying, mainCategories.length])
+    }, [currentIndex, isAutoPlaying, mainCategoryVms.length])
 
     const handleNext = () => {
         setIsAutoPlaying(false)
-        setCurrentIndex(prev => (prev + 1) % mainCategories.length)
+        setCurrentIndex(prev => (prev + 1) % mainCategoryVms.length)
     }
 
     const handlePrev = () => {
         setIsAutoPlaying(false)
-        setCurrentIndex(prev => (prev - 1 + mainCategories.length) % mainCategories.length)
+        setCurrentIndex(prev => (prev - 1 + mainCategoryVms.length) % mainCategoryVms.length)
     }
 
-    if (mainCategories.length === 0) return null
+    if (mainCategoryVms.length === 0) return null
 
     return (
         <div className="relative h-[600px] lg:h-[700px] w-full overflow-hidden bg-zinc-900 text-white group">
-            {mainCategories.map((cat, idx) => {
+            {mainCategoryVms.map((vm, idx) => {
                 const isActive = idx === currentIndex
-                const meta = cat.metadata || FALLBACK_METADATA[cat.slug] || FALLBACK_METADATA['default']
+                const cat = vm.raw
+                const meta = (cat.metadata as CategoryMetadataExtended) || FALLBACK_METADATA[vm.slug] || FALLBACK_METADATA['default']
 
                 // Construct image URL
-                let bgImage = `/images/category/hero-${cat.slug}.png`
-                if (cat.image_url) {
-                    bgImage = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${cat.image_url}`
+                let bgImage = `/images/category/hero-${vm.slug}.png`
+                if (vm.imageUrl) {
+                    bgImage = vm.imageUrl.startsWith('http') || vm.imageUrl.startsWith('/') 
+                        ? vm.imageUrl 
+                        : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/category-images/${vm.imageUrl}`
                 }
 
                 return (
                     <div
-                        key={cat.id}
+                        key={vm.id}
                         className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-20' : 'opacity-0 z-10 pointer-events-none'}`}
                     >
                         {/* Background Image Layer */}
@@ -128,7 +133,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                             <div className="absolute inset-0 bg-black/40 z-10" />
                             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10" />
                             <VentImage src={bgImage}
-                                alt={cat.name}
+                                alt={vm.displayName}
                                 className={`w-full h-full object-cover object-center transform transition-transform duration-[2000ms] ${isActive ? 'scale-105' : 'scale-100'}`}
                                  onError={(e) => {
                                     const target = e.target as HTMLImageElement;
@@ -144,22 +149,22 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Category Badge */}
                                 <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full mb-6 border border-white/10">
                                     <Activity className="text-secondary-blue w-4 h-4" />
-                                    <span className="text-sm font-medium tracking-wide uppercase">{getCategoryDisplayName(cat)}</span>
+                                    <span className="text-sm font-medium tracking-wide uppercase">{vm.displayName}</span>
                                 </div>
 
                                 <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
-                                    {getCategoryDisplayName(cat)}
+                                    {vm.marketingTitle}
                                 </h1>
 
                                 <p className="text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">
-                                    {meta.hero_description || cat.description}
+                                    {meta.hero_description || vm.description}
                                 </p>
 
                                 {/* Features Grid */}
                                 {meta.features && (
                                     <div className="flex gap-8 mb-10">
                                         {meta.features.map((f: CategoryFeature, i: number) => {
-                                            const Icon = IconMap[f.icon] || Activity
+                                            const Icon = IconMap[f.icon.toLowerCase()] || Activity
                                             return (
                                                 <div key={i} className="flex items-center gap-3">
                                                     <div className="p-2 bg-white/10 rounded-lg">
@@ -178,7 +183,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
                                 {/* Actions */}
                                 <div className="flex flex-wrap gap-4">
                                     <Link
-                                        href={`/category/${cat.slug}`}
+                                        href={`/category/${vm.slug}`}
                                         className="px-8 py-4 bg-secondary-blue hover:bg-blue-600 text-white rounded-lg font-bold transition-all flex items-center shadow-lg shadow-blue-500/30"
                                     >
                                         Ürünleri İncele
@@ -216,7 +221,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
 
             {/* Progress Indicators */}
             <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-2">
-                {mainCategories.map((_, idx) => (
+                {mainCategoryVms.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => { setIsAutoPlaying(false); setCurrentIndex(idx) }}
@@ -229,5 +234,4 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({ categories }) => {
     )
 }
 
-
-
+export default HeroCarousel

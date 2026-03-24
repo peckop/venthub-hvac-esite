@@ -1,11 +1,9 @@
-﻿import React, { useState, useRef, useEffect } from 'react'
-import type { DbCategory, DbProduct } from '../../types/db-rows'
-import {
-} from 'lucide-react'
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react'
+import type { DbProduct } from '../../types/db-rows'
 import ProductCard from '@/components/ProductCard'
-// import { useI18n } from '../../i18n/I18nProvider'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
-// Premium section components for air curtains
 import {
     ProblemSection,
     HowItWorks,
@@ -20,18 +18,19 @@ import {
     SilentFanTypeComparison,
     SilentFanFAQ
 } from '@/components/category/sections'
-import { mapDatabaseProductToDomain } from '../../lib/type-converters'
+import { mapDatabaseProductToDomain, DomainCategory } from '../../lib/type-converters'
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
+import Image from 'next/image'
+import { ChevronDown } from 'lucide-react'
 
 interface CategoryLandingProps {
-    category: DbCategory
+    category: DomainCategory
     products: DbProduct[]
-    subCategories?: DbCategory[] // For in-page subcategory selection
-    parentCategory?: DbCategory | null
-    groupedSeries?: Array<{ name: string; products: DbProduct[]; image?: string; minPrice: number }>
+    subCategories?: DomainCategory[]
 }
 
 const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, subCategories = [] }) => {
-    // const { t } = useI18n()
+    const { wrapCategory } = useCategoryViewModel()
     const [showProducts, setShowProducts] = useState(false)
     const [activeFilter, setActiveFilter] = useState<string>('all')
     const [wizardOpen, setWizardOpen] = useState(false)
@@ -40,8 +39,12 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
     const productListRef = useRef<HTMLDivElement>(null)
     const subcategoryProductsRef = useRef<HTMLDivElement>(null)
 
+    const vm = wrapCategory(category)
     const isAirCurtain = category.slug === 'hava-perdesi' || category.slug === 'hava-perdeleri'
     const isSilentFan = category.slug === 'sessiz-kanal-tipi-fanlar'
+
+    // Hero image logic - Professional fallback
+    const heroImage = category.image_url || '/images/industrial_HVAC_air_handling_unit_warehouse.jpg'
 
     // Restore state from URL hash
     useEffect(() => {
@@ -109,6 +112,44 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
 
     return (
         <div className="bg-white">
+            {/* HERO SECTION - UNIFIED STANDARD */}
+            <div className="relative h-[60vh] min-h-[400px] overflow-hidden bg-primary-navy">
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src={heroImage}
+                        alt={vm?.displayName || category.name}
+                        fill
+                        priority
+                        className="object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-navy via-primary-navy/20 to-transparent" />
+                </div>
+
+                <div className="absolute inset-0 flex items-center">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div className="max-w-3xl animate-fadeIn">
+                            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary-blue/20 text-secondary-blue backdrop-blur-sm border border-secondary-blue/30 text-sm font-medium mb-6">
+                                {vm?.displayName}
+                            </span>
+                            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                                {vm?.marketingTitle}
+                            </h1>
+                            <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
+                                {vm?.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => document.getElementById('content-start')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors cursor-pointer animate-bounce z-20"
+                >
+                    <span className="text-xs uppercase tracking-widest font-medium">Detayları İncele</span>
+                    <ChevronDown className="w-6 h-6" />
+                </button>
+            </div>
+
             <div id="content-start" className="scroll-mt-20" />
 
             <EnhancedNeedsWizard
@@ -138,14 +179,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                                     <div>
                                         <h2 className="text-2xl font-bold text-industrial-gray flex items-center gap-3">
-                                            {subCategories.find(s => s.id === selectedSubcategory)?.name || 'Alt Kategori'} Modelleri
+                                            {wrapCategory(subCategories.find(s => s.id === selectedSubcategory))?.displayName || 'Alt Kategori'} Modelleri
                                             <span className="text-sm font-normal bg-secondary-blue text-white px-3 py-1 rounded-full">
-                                                {subcategoryProducts.length} +-r+-n
+                                                {subcategoryProducts.length} ürün
                                             </span>
                                         </h2>
                                     </div>
                                     <button onClick={() => setSelectedSubcategory(null)} className="text-sm text-steel-gray hover:text-industrial-gray underline">
-                                        ÔåÉ Se+ğimi Kald¦-r
+                                        ← Seçimi Kaldır
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -163,7 +204,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         onOpenWizard={() => setWizardOpen(true)}
                         onShowProducts={handleShowProducts}
                         showWizard={true}
-                        categoryName="Hava Perdesi"
+                        categoryName={vm?.displayName || "Hava Perdesi"}
                     />
                 </>
             )}
@@ -180,7 +221,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                         onOpenWizard={handleShowProducts}
                         onShowProducts={handleShowProducts}
                         showWizard={false}
-                        categoryName="Sessiz Kanal Tipi Fan"
+                        categoryName={vm?.displayName || "Sessiz Kanal Tipi Fan"}
                     />
                 </>
             )}
@@ -195,14 +236,14 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, products, s
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div>
-                            <h2 className="text-2xl font-bold text-industrial-gray">{category.name} Modelleri</h2>
+                            <h2 className="text-2xl font-bold text-industrial-gray">{vm?.displayName} Modelleri</h2>
                             <p className="text-sm text-steel-gray mt-1">{filteredProducts.length} model listeleniyor</p>
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {[
-                                { key: 'all', label: 'T+-m Modeller' },
+                                { key: 'all', label: 'Tüm Modeller' },
                                 { key: 'quiet', label: 'En Sessiz' },
-                                { key: 'powerful', label: 'En G+-+ğl+-' }
+                                { key: 'powerful', label: 'En Güçlü' }
                             ].map((f) => (
                                 <button
                                     key={f.key}

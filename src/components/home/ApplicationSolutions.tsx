@@ -16,25 +16,25 @@ interface SolutionItem {
 const solutions: SolutionItem[] = [
   { 
     id: 'parking', 
-    href: '/category/fanlar/otopark-jet-fanlari', 
+    href: '/category/industrial-ventilation/otopark-jet-fanlari', 
     image: '/images/bento/parking.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   },
   { 
     id: 'kitchen', 
-    href: '/category/fanlar/kanal-tipi-fanlar', 
+    href: '/category/industrial-ventilation/kanal-tipi-fanlar', 
     image: '/images/bento/kitchen.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
   { 
     id: 'entrance', 
-    href: '/category/fanlar/hava-perdeleri', 
+    href: '/category/commercial-ventilation/hava-perdeleri', 
     image: '/images/bento/entrance.jpg',
     span: 'sm:col-span-1 lg:col-span-1'
   },
   { 
     id: 'comfort', 
-    href: '/category/isi-geri-kazanim-cihazlari', 
+    href: '/category/heat-recovery-vmc', 
     image: '/images/bento/comfort.jpg',
     span: 'sm:col-span-2 lg:col-span-2'
   }

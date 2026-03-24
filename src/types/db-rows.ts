@@ -80,6 +80,7 @@ export type DbCategory = Omit<Tables['categories']['Row'], 'name' | 'description
   name: string;
   menu_label: string | null;
   marketing_title: string | null;
+  translation_key: string | null;
   description: string | null;
   metadata: CategoryMetadata | null;
   authority_content: AuthorityContent | null;
