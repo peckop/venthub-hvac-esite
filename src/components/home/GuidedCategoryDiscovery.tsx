@@ -4,9 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import React from 'react'
 import { motion } from 'framer-motion'
-import { useI18n } from '../../i18n/I18nProvider'
-import { getCategoryDisplayName } from '../../utils/categoryHelpers'
 import { DomainCategory } from '../../lib/type-converters'
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 
 interface GuidedCategoryDiscoveryProps {
   categories?: DomainCategory[]
@@ -27,7 +26,7 @@ const normalizeImageUrl = (url: string | null | undefined): string => {
 };
 
 export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({ categories = [] }) => {
-  const { t } = useI18n()
+  const { wrapCategory } = useCategoryViewModel()
 
   // Sadece ana kategorileri (parent_id null) filtrele ve isme göre sırala
   const displayCategories = categories
@@ -45,7 +44,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
               viewport={{ once: true }}
               className="text-[11px] font-bold uppercase tracking-[0.3em] text-cyan-600 mb-4"
             >
-              {t('home.guidedDiscovery.eyebrow')}
+              DETERMİNİSTİK SİSTEMLER
             </motion.div>
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -54,7 +53,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
               transition={{ delay: 0.2 }}
               className="text-4xl font-light tracking-tighter text-slate-950 sm:text-6xl"
             >
-              {t('home.guidedDiscovery.title')}
+              Hava Akışının Mühendislik Estetiği
             </motion.h2>
           </div>
           <motion.p 
@@ -64,7 +63,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
             transition={{ delay: 0.4 }}
             className="max-w-md text-lg text-slate-500 font-light leading-relaxed"
           >
-            {t('home.guidedDiscovery.subtitle')}
+            VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.
           </motion.p>
         </div>
 
@@ -72,6 +71,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
         <div className="flex overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-2 md:overflow-visible md:pb-0">
           {displayCategories.map((category, idx) => {
             const finalSrc = normalizeImageUrl(category.image_url);
+            const vm = wrapCategory(category)
             
             return (
               <motion.div
@@ -87,7 +87,7 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
                   <div className="absolute inset-0 z-0">
                     <Image
                       src={finalSrc}
-                      alt={category.name}
+                      alt={vm?.displayName || category.name}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 grayscale-[0.3] group-hover:grayscale-0"
@@ -104,14 +104,14 @@ export const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = (
                       className="flex flex-col items-center"
                     >
                       <h3 className="text-xl lg:text-2xl font-extralight text-white tracking-[0.1em] uppercase mb-4 transition-transform duration-700 group-hover:-translate-y-2">
-                        {getCategoryDisplayName(category)}
+                        {vm?.displayName}
                       </h3>
 
                       <div className="w-12 h-[1px] bg-white/30 group-hover:w-24 group-hover:bg-cyan-500 transition-all duration-700" />
                       
                       <div className="mt-6 max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 transition-all duration-700 overflow-hidden">
                         <p className="text-[10px] text-slate-200 font-light leading-relaxed tracking-wider uppercase mb-6 max-w-[200px] line-clamp-2">
-                          {category.description || t('home.guidedDiscovery.categoryFallback')}
+                          {vm?.description || 'Profesyonel Havalandırma Çözümleri'}
                         </p>
                       </div>
                     </motion.div>

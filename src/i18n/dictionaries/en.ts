@@ -27,14 +27,36 @@ export const en = {
     getQuote: "Get a Quote",
     addToCart: 'Add to Cart',
     categoryList: {
-      exproofFans: 'EX-PROOF FANS',
-      heatRecovery: 'HEAT RECOVERY UNITS',
-      airCurtains: 'AIR CURTAINS',
-      dehumidifiers: 'DEHUMIDIFIERS',
-      airPurifiers: 'AIR PURIFIERS',
-      flexibleDucts: 'FLEXIBLE AIR DUCTS',
-      speedControllers: 'SPEED CONTROLLERS',
-      accessories: 'ACCESSORIES'
+      // MAIN FAMILIES (Level 0)
+      'residential-ventilation': 'Residential Ventilation',
+      'commercial-ventilation': 'Commercial Ventilation',
+      'industrial-ventilation': 'Industrial Ventilation',
+      'heat-recovery-vmc': 'VMC & Heat Recovery',
+      'air-treatment': 'Air Treatment',
+      'hygiene-sanitizer': 'Hygiene and Sanitizer',
+      'summer-ventilation': 'Summer Ventilation',
+      'air-conditioning': 'Air Conditioning',
+      'electric-heating': 'Electric Heating',
+      'industrial-ceiling-fans': 'Industrial Ceiling Fans',
+      'accessories-components': 'Accessories and Components',
+      'smart-home': 'Smart Home',
+
+      // SUB-CATEGORIES (Level 1-2)
+      'banyo-ve-tuvalet-fanlari': 'Bathroom and Toilet Fans',
+      'cam-ve-pencere-tipi-fanlar': 'Window and Wall Fans',
+      'kanal-tipi-boru-ici-fanlar': 'In-line / Duct Fans',
+      'radyal-fanlar': 'Radial Fans',
+      'santrifuj-fanlar': 'Centrifugal Fans',
+      'sessiz-kanal-tipi-fanlar': 'Silent In-line Fans',
+      'duvar-tipi-kompakt-aksiyal-fanlar': 'Compact Axial Wall Fans',
+
+      // SUB-TYPES (Level 3)
+      'ince-govdeli-slim-fanlar': 'Slim Body Fans',
+      'ultra-ince-on-panel': 'Ultra Slim Front Panel',
+      'sessiz-sik-tasarim-premium': 'Silent / Stylish / Premium',
+      'standart-duvar-tavan-tipi': 'Standard Wall/Ceiling Type',
+      'gizli-montaj-in-line': 'Hidden Mounting (In-line)',
+      'santrifuj-kanalli-tip': 'Centrifugal / Duct Type'
     },
     byApplication: "Solutions by Application",
     viewAll: "View all",

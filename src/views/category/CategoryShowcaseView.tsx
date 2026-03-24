@@ -2,7 +2,6 @@
 
 import { VentImage } from '@/components/ui/VentImage'
 import React, { useState } from 'react'
-
 import { ArrowRight, ThermometerSun, ChevronDown, Zap, Activity, ShieldCheck } from 'lucide-react'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
@@ -10,9 +9,8 @@ import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import Image from 'next/image'
-
-import { getCategoryDisplayName, getCategoryMarketingTitle } from '../../utils/categoryHelpers'
 import { DomainCategory } from '../../lib/type-converters'
+import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 
 interface CategoryShowcaseProps {
     category: DomainCategory
@@ -25,7 +23,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     subCategories,
     onSubcategorySelect
 }) => {
+    const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
+    
+    const vm = wrapCategory(category)
     const isAirCurtain = category.slug.includes('hava-perde')
 
     // Breadcrumb (GATEWAY READY)
@@ -45,7 +46,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     <div className="absolute inset-0 z-0">
                         <Image
                             src={heroImage}
-                            alt={getCategoryDisplayName(category)}
+                            alt={vm?.displayName || category.name}
                             fill
                             priority
                             sizes="100vw"
@@ -62,10 +63,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 Premium Koleksiyon
                             </span>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                                {getCategoryMarketingTitle(category)}
+                                {vm?.marketingTitle}
                             </h1>
                             <p className="text-xl text-gray-200 mb-8 max-w-2xl leading-relaxed">
-                                {category.metadata?.hero_description || category.description}
+                                {vm?.description}
                             </p>
 
                             {/* Quick Start Wizard Button (only for air curtains) */}
@@ -99,25 +100,28 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
                 {/* Subcategories Grid */}
                 <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {subCategories.map((sub) => (
-                        <div
-                            key={sub.id}
-                            className="group relative bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-secondary-blue/30 transition-all cursor-pointer overflow-hidden"
-                            onClick={() => onSubcategorySelect?.(sub.slug)}
-                        >
-                            <div className="relative z-10">
-                                <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary-navy mb-6 group-hover:scale-110 transition-transform">
-                                    {getCategoryIcon(sub.slug, { size: 28 })}
+                    {subCategories.map((sub) => {
+                        const subVm = wrapCategory(sub)
+                        return (
+                            <div
+                                key={sub.id}
+                                className="group relative bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-secondary-blue/30 transition-all cursor-pointer overflow-hidden"
+                                onClick={() => onSubcategorySelect?.(sub.slug)}
+                            >
+                                <div className="relative z-10">
+                                    <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary-navy mb-6 group-hover:scale-110 transition-transform">
+                                        {getCategoryIcon(sub.slug, { size: 28 })}
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-industrial-gray mb-3">{subVm?.displayName}</h3>
+                                    <p className="text-steel-gray text-sm line-clamp-2 mb-6">{subVm?.description}</p>
+                                    <div className="flex items-center text-secondary-blue font-bold text-sm">
+                                        Serileri İncele <ChevronDown className="ml-1 -rotate-90" size={16} />
+                                    </div>
                                 </div>
-                                <h3 className="text-2xl font-bold text-industrial-gray mb-3">{getCategoryDisplayName(sub)}</h3>
-                                <p className="text-steel-gray text-sm line-clamp-2 mb-6">{sub.description}</p>
-                                <div className="flex items-center text-secondary-blue font-bold text-sm">
-                                    Serileri İncele <ChevronDown className="ml-1 -rotate-90" size={16} />
-                                </div>
+                                <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-secondary-blue/5 rounded-full blur-3xl group-hover:bg-secondary-blue/10 transition-colors" />
                             </div>
-                            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-secondary-blue/5 rounded-full blur-3xl group-hover:bg-secondary-blue/10 transition-colors" />
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
 
@@ -155,7 +159,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             <BottomCTA 
                 onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
                 showWizard={isAirCurtain}
-                categoryName={getCategoryDisplayName(category)}
+                categoryName={vm?.displayName || category.name}
             />
 
             <EnhancedNeedsWizard 
