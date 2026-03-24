@@ -1,14 +1,13 @@
 import type { DbCategory } from '../types/db-rows'
 
 /**
- * Returns the CLEAN display name for a category (Mainly for Menus, Cards, Breadcrumbs).
- * Prioritizes 'menu_label' from database (SSOT).
+ * Returns the raw display name for a category (Data Level).
+ * Prioritizes 'menu_label' from database.
  * Falls back to 'name' column.
  */
 export const getCategoryDisplayName = (category: DbCategory | null | undefined): string => {
     if (!category) return ''
     
-    // SSOT: Menu Label (New professional standard)
     if (category.menu_label) {
         return category.menu_label
     }
@@ -17,9 +16,7 @@ export const getCategoryDisplayName = (category: DbCategory | null | undefined):
 }
 
 /**
- * Returns the rich MARKETING title for a category (Mainly for Hero sections).
- * Prioritizes 'marketing_title' from database.
- * Falls back to the result of getCategoryDisplayName.
+ * Returns the rich MARKETING title for a category (Data Level).
  */
 export const getCategoryMarketingTitle = (category: DbCategory | null | undefined): string => {
     if (!category) return ''

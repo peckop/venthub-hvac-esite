@@ -2,15 +2,15 @@
 id: "011"
 title: "Category Data Architecture & Gateway Refactor"
 priority: "High"
-status: "Done"
+status: "Completed"
 progress: 100%
 project: "P04-Category-Architecture"
 created_at: "2026-03-23 21:02:32"
 updated_at: "2026-03-23 21:45:00"
 artifacts:
-  brainstorm: "registry/P04-Category-Architecture/active/011-category-data-architecture--gateway-refactor/brainstorm.md"
-  plan: "registry/P04-Category-Architecture/active/011-category-data-architecture--gateway-refactor/plan.md"
-  review: "registry/P04-Category-Architecture/active/011-category-data-architecture--gateway-refactor/review.md"
+  brainstorm: "registry/P04-Category-Architecture/completed/011-category-data-architecture--gateway-refactor/brainstorm.md"
+  plan: "registry/P04-Category-Architecture/completed/011-category-data-architecture--gateway-refactor/plan.md"
+  review: "registry/P04-Category-Architecture/completed/011-category-data-architecture--gateway-refactor/review.md"
 ---
 
 # 🛠️ 011: Category Data Architecture & Gateway Refactor
