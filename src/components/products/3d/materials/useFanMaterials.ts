@@ -194,6 +194,7 @@ export const useFanMaterials = () => {
         ...MATERIALS_CACHE,
         clampMat: MATERIALS_CACHE.vorticeGreen,
         baseMat: MATERIALS_CACHE.industrialSteel,
+        chassisMat: MATERIALS_CACHE.industrialSteel,
         chassisInnerMat: MATERIALS_CACHE.const_chassisInnerMat,
         galvanizedSteel: MATERIALS_CACHE.industrialSteel,
     }
