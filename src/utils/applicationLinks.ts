@@ -25,9 +25,9 @@ export const TOPIC_TO_APP_KEY: Record<string, string> = {
  * Maps topics directly to the definitive Category Registry paths
  */
 export const TOPIC_TO_CATEGORY_URL: Record<string, string> = {
-    'hava-perdesi': getCategoryUrl('HAVA_PERDELERI'),
-    'jet-fan': getCategoryUrl('FANLAR', CATEGORY_REGISTRY.FANLAR.subs.OTOPARK_JET),
-    'hrv': getCategoryUrl('ISI_GERI_KAZANIM')
+    'hava-perdesi': getCategoryUrl('COMMERCIAL', CATEGORY_REGISTRY.COMMERCIAL.subs.AIR_CURTAIN),
+    'jet-fan': getCategoryUrl('INDUSTRIAL', CATEGORY_REGISTRY.INDUSTRIAL.subs.JET),
+    'hrv': getCategoryUrl('VMC')
 }
 
 /**
