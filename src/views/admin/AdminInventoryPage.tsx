@@ -13,14 +13,16 @@ import {
 import toast from 'react-hot-toast';
 import InventoryTable from '../../components/admin/InventoryTable';
 import type { Database } from '../../types/database.types';
+import { LoadState, Density } from '../../types/admin-shared';
+import type { VisibleCols } from '../../types/inventory';
 
-type InventoryRow = Database['public']['Views']['inventory_summary']['Row'];
+type InventorySummaryRow = Database['public']['Views']['inventory_summary']['Row'] & { category_id?: string | null };
 type Category = Database['public']['Tables']['categories']['Row'];
 
 const AdminInventoryPage: React.FC = () => {
   const { t: _t } = useI18n();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<InventoryRow[]>([]);
+  const [data, setData] = useState<InventorySummaryRow[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
@@ -70,8 +72,7 @@ const AdminInventoryPage: React.FC = () => {
     return data.filter(item => {
       const matchesSearch = !searchTerm || item.name?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = !filterCategory || 
-        
-        (item as any).category_id === filterCategory;
+        item.category_id === filterCategory;
       const stock = item.physical_stock || 0;
       const threshold = 5; 
       
@@ -80,7 +81,15 @@ const AdminInventoryPage: React.FC = () => {
         (filterStockStatus === 'out' && stock <= 0);
 
       return matchesSearch && matchesCategory && matchesStock;
-    });
+    }).map(item => ({
+      product_id: item.product_id || '',
+      name: item.name || 'İsimsiz Ürün',
+      physical_stock: item.physical_stock || 0,
+      reserved_stock: item.reserved_stock || 0,
+      available_stock: item.available_stock || 0,
+      warehouse_location: item.warehouse_location,
+      supplier_name: item.supplier_name
+    }));
   }, [data, searchTerm, filterCategory, filterStockStatus]);
 
   return (
@@ -131,13 +140,24 @@ const AdminInventoryPage: React.FC = () => {
         <div className="py-20 text-center"><RefreshCw className="animate-spin mx-auto mb-4 text-primary-navy" /></div>
       ) : (
         <InventoryTable 
-          rows={filteredData as any} 
-          loading={"ready" as any}
+          rows={filteredData} 
+          loading={loading ? LoadState.Loading : LoadState.Idle}
           error=""
           selected={null}
-          visibleCols={{ product: true, sku: true, stock: true, location: true, supplier: true, actions: true } as any}
-          density={"normal" as any}
-          sortKey={"name" as any}
+          visibleCols={{ 
+            name: true, 
+            physical: true, 
+            reserved: true, 
+            available: true, 
+            threshold: true, 
+            status: true, 
+            location: true, 
+            supplier: true, 
+            abc: false, 
+            days: false 
+          }}
+          density={'comfortable' as Density}
+          sortKey={"name"}
           sortDir="asc"
           groupByCategory={false}
           groupedRows={[]}

@@ -10,10 +10,11 @@ import CategorySeriesView from './category/CategorySeriesView'
 import ProductsDiscoveryView from './ProductsDiscoveryView'
 import { useIsMounted } from '../hooks/useIsMounted'
 import ProductsSkeleton from '../components/products/ProductsSkeleton'
-import { DomainCategory, DomainProduct } from '../lib/type-converters'
+import type { DbCategory } from '../types/db-rows'
+import { DomainProduct } from '../lib/type-converters'
 
 interface CategoryMasterViewProps {
-  initialCategory?: DomainCategory | null
+  initialCategory?: DbCategory | null
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({ initialCategory }) => {

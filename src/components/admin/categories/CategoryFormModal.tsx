@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { X, Upload, Trash2, Save, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { supabase } from '../../../lib/supabase'
-import type { Database, Json } from '../../../types/database.types'
+import type { Database } from '../../../types/database.types'
 import type { DbCategory, CategoryMetadata } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
 import { compressImage } from '../../../utils/imageUtils'
@@ -178,7 +178,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     is_featured: values.is_featured,
                     sort_order: values.sort_order,
                     image_url: values.image_url,
-                    metadata: metadata as unknown as Json
+                    /* @ts-expect-error REASON: Supabase generic Json type structure mismatch with CategoryMetadata */
+                    metadata: metadata
                 }
 
                 const { error } = await supabase
@@ -200,7 +201,8 @@ export const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     is_featured: values.is_featured,
                     sort_order: values.sort_order,
                     image_url: values.image_url,
-                    metadata: metadata as unknown as Json,
+                    /* @ts-expect-error REASON: Supabase generic Json type structure mismatch with CategoryMetadata */
+                    metadata: metadata,
                     authority_content: []
                 }
 

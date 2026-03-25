@@ -38,7 +38,7 @@ export const MainChassis: React.FC<MainChassisProps> = ({
     isHidden,
     onClick
 }) => {
-  const { chassisMat, chassisInnerMat, safetyOrange } = useFanMaterials()
+  const { galvanizedSteel, chassisInnerMat, safetyOrange } = useFanMaterials()
 
   const outerGeo = useMemo(() => new THREE.LatheGeometry(buildLathePoints(), 72), [])
   const innerGeo = useMemo(() => new THREE.LatheGeometry(buildInnerLathePoints(), 72), [])
@@ -54,7 +54,7 @@ export const MainChassis: React.FC<MainChassisProps> = ({
 
   if (isHidden || (isIsolated === false)) return null
 
-  const mainMaterial = isSelected ? safetyOrange : chassisMat
+  const mainMaterial = isSelected ? safetyOrange : galvanizedSteel
 
   return (
     <group 

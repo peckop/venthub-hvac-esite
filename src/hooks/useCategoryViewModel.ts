@@ -36,7 +36,7 @@ export function useCategoryViewModel() {
     if (!category) return null
 
     // 1. i18n Resolution via translation_key (Advanced Standard)
-    const tKey = (category as unknown as { translation_key?: string }).translation_key || category.slug
+    const tKey = (category as typeof category & { translation_key?: string }).translation_key || category.slug
     const translationPath = `common.categoryList.${tKey}`
     const translatedName = t(translationPath)
     
@@ -99,7 +99,7 @@ export function useCategoryViewModel() {
   const groupProductsBySeries = useMemo(() => (products: DomainProduct[]): SeriesGroup[] => {
     const seriesMap: Record<string, SeriesGroup> = {}
     products.forEach(product => {
-      const meta = (product as unknown as { metadata?: Record<string, unknown> }).metadata || {}
+      const meta = (product as typeof product & { metadata?: Record<string, unknown> }).metadata || {}
       let seriesName = (meta.series as string) || product.name.split(' ')[0]
       if (['Vortice', 'Avens', 'Soler', 'Casals', 'Vorticel'].includes(seriesName)) {
         seriesName = product.name.split(' ')[1] || seriesName

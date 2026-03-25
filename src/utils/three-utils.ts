@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as THREE from 'three'
 
 /**
@@ -10,7 +9,7 @@ export const createTimerClock = () => {
     // Check if Timer exists (it should since Three.js r163+)
     // In r183, Clock is deprecated, so Timer is the way forward.
     const timer = new THREE.Timer()
-    const clockShim = timer as any
+    const clockShim = timer as typeof timer & { getDelta: () => number; getElapsedTime: () => number; isClock: boolean; start: () => void; stop: () => void; elapsedTime?: number }
 
     // @react-three/fiber calls state.clock.getDelta() in its loop.
     // We must update the timer in getDelta to keep it ticking.

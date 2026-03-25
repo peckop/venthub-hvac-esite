@@ -122,8 +122,9 @@ export interface DbAppSettings {
 
 export interface DbWebhookEvent {
   id: string;
-  service: string;
-  status: string;
+  event_type: string;
+  provider: string;
+  status: 'processed' | 'failed' | 'pending';
   payload: Json;
   request_body?: Json;
   response_body?: Json;

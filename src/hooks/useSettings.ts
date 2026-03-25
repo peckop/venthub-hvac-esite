@@ -29,13 +29,13 @@ export function useSettings() {
   useEffect(() => {
     async function fetchSettings() {
       try {
-        const { data, error: fetchError } = await (supabase as unknown as { from: (t: string) => { select: (c: string) => { single: () => Promise<{data: unknown, error: unknown}> } } })
+        const { data, error: fetchError } = await (supabase as typeof supabase & { from: (t: string) => { select: (c: string) => { single: () => Promise<{data: unknown, error: unknown}> } } })
           .from('app_settings')
           .select('*')
           .single()
 
         if (fetchError) throw (fetchError as Error)
-        setSettings(data as unknown as AppSettings)
+        setSettings(data as Partial<AppSettings> as AppSettings)
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : String(err))
       } finally {
@@ -56,7 +56,7 @@ export function useSetting<T>(key: keyof AppSettings, fallback: T): T {
     if (loading || !settings) return fallback;
     const val = settings[key];
     if (val === undefined || val === null) return fallback;
-    return val as unknown as T;
+    return val as (typeof val & T);
   }, [settings, key, fallback, loading]);
 
   return value

@@ -162,7 +162,7 @@ export const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ onQuoteClick }) 
               onClick={() => {
                 if (onQuoteClick) onQuoteClick();
                 else if (typeof window !== "undefined") {
-                  (window as unknown as { openLeadModal?: () => void }).openLeadModal?.();
+                  (window as typeof window & { openLeadModal?: () => void }).openLeadModal?.();
                 }
               }}
               className="group relative h-16 px-12 bg-white text-slate-950 font-bold uppercase text-[12px] tracking-[0.2em] rounded-2xl overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"

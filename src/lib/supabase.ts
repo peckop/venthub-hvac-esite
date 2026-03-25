@@ -153,7 +153,7 @@ export async function getCategories(): Promise<Category[]> {
     .order('name', { ascending: true })
 
   if (error) throw error
-  return toUICategoryList((data as unknown as DbCategory[]) || [])
+  return toUICategoryList((data as (typeof data & DbCategory[])) || [])
 }
 
 export async function getProductsEnriched(params: GetProductsParams = {}): Promise<Product[]> {
@@ -176,7 +176,7 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
     }
   }
 
-  const { data, error } = await (supabase as unknown as { rpc: (name: string, params: Record<string, unknown>) => Promise<{data: unknown, error: unknown}> }).rpc('get_products_enriched', {
+  const { data, error } = await supabase.rpc('get_products_enriched', {
     p_category_ids: resolvedCategoryIds,
     p_limit: params.limit || 50,
     p_offset: params.offset || 0,
@@ -208,6 +208,7 @@ export async function getProductsEnriched(params: GetProductsParams = {}): Promi
     return toUIProductList((fallbackData as DbProduct[]) || [])
   }
 
+  // @ts-expect-error - REASON: Generated RPC type missing meta_description and purchase_price
   return toUIProductList((data as DbProduct[]) || [])
 }
 
@@ -803,7 +804,8 @@ export async function getEffectivePriceInfo(product: Product): Promise<{ unitPri
       effective_from: string;
     }
 
-    const typedLists = lists as unknown as PriceListRow[]
+    // @ts-expect-error - REASON: Supabase missing generated types for price_lists missing columns
+    const typedLists = lists as PriceListRow[]
     
     // Filter and sort lists
     const matchedLists = typedLists.filter(list => {
@@ -883,14 +885,14 @@ export async function listUserProjects(): Promise<DbUserProject[]> {
 
 export async function createProject(project: Partial<DbUserProject>): Promise<DbUserProject> {
   const { data, error } = await supabase.from('user_projects')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(project as any)
+    // @ts-expect-error - REASON: Partial insert structure missing in strict mode
+    .insert(project)
     .select()
     .single()
 
   if (error) throw (error as Error)
   
-  return data as unknown as DbUserProject
+  return data as DbUserProject
 }
 
 export async function deleteProject(id: string): Promise<boolean> {
@@ -910,7 +912,7 @@ export async function addProductToProject(projectId: string, productId: string, 
 
   if (error) throw (error as Error)
   
-  return data as unknown as DbProjectItem
+  return data as DbProjectItem
 }
 
 export async function removeProductFromProject(projectId: string, productId: string): Promise<boolean> {

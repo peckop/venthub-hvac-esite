@@ -15,7 +15,7 @@ describe('useCart hook', () => {
     expect(result.current.syncing).toBe(false)
 
     // Check default functions are no-ops that don't throw
-    expect(() => result.current.addToCart({} as unknown as Product)).not.toThrow()
+    expect(() => result.current.addToCart({} as Partial<Product> as Product)).not.toThrow()
     expect(() => result.current.removeFromCart('id')).not.toThrow()
     expect(() => result.current.updateQuantity('id', 1)).not.toThrow()
     expect(() => result.current.clearCart()).not.toThrow()
@@ -28,7 +28,7 @@ describe('useCart hook', () => {
 
   it('returns context value when wrapped in CartContext provider', () => {
     const mockContextValue: CartContextType = {
-      items: [{ id: '1', quantity: 2, unitPrice: 100 } as unknown as CartItem],
+      items: [{ id: '1', quantity: 2, unitPrice: 100 } as Partial<CartItem> as CartItem],
       syncing: true,
       isInitialized: true,
       lastSynced: Date.now(),
