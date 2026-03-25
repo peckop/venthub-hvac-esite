@@ -3,7 +3,7 @@
 import React, { useRef } from 'react'
 import { Canvas, useFrame, extend } from '@react-three/fiber'
 import * as THREE from 'three'
-import { Float, shaderMaterial } from '@react-three/drei'
+import { Float, shaderMaterial, useTexture } from '@react-three/drei'
 
 // Custom Holographic Shader Material
 const HolographicMaterial = shaderMaterial(
@@ -71,6 +71,7 @@ declare module '@react-three/fiber' {
  * Renders the image with depth, floating animation, and holographic overlay
  */
 const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
+    const texture = useTexture(image)
     const meshRef = useRef<THREE.Mesh>(null)
 
     useFrame((state) => {
@@ -96,7 +97,7 @@ const CinematicCard: React.FC<{ image: string }> = ({ image }) => {
                     <planeGeometry args={[4, 3]} />
                     <holographicMaterial 
                         transparent 
-                        uTexture={new THREE.TextureLoader().load(image)} 
+                        uTexture={texture} 
                         uOpacity={0.9}
                     />
                 </mesh>

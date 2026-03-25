@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useFanMaterials } from '../materials/useFanMaterials'
@@ -7,12 +7,24 @@ import { useFanMaterials } from '../materials/useFanMaterials'
 export function SpeedControlModel() {
     const materials = useFanMaterials()
     const knobRef = useRef<THREE.Group>(null)
-    const [ledIntensity, setLedIntensity] = useState(0)
+    const ledRef = useRef<THREE.MeshBasicMaterial>(null)
+
+    // LED Material - Memoized to prevent leaks
+    const ledMaterial = useMemo(() => new THREE.MeshBasicMaterial({ color: '#00ff00' }), [])
 
     useFrame((state) => {
+        const time = state.clock.elapsedTime
+        
+        // Rotate knob
         if (knobRef.current) {
-            knobRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 2) * 0.5
-            setLedIntensity(Math.abs(Math.sin(state.clock.elapsedTime * 2)))
+            knobRef.current.rotation.z = Math.sin(time * 2) * 0.5
+        }
+
+        // Pulse LED without re-rendering the component
+        if (ledRef.current) {
+            const intensity = Math.abs(Math.sin(time * 2))
+            const greenValue = Math.floor(100 + intensity * 155)
+            ledRef.current.color.setRGB(0, greenValue / 255, 0)
         }
     })
 
@@ -49,7 +61,7 @@ export function SpeedControlModel() {
             {/* LED Gösterge */}
             <mesh position={[-0.2, 0.3, 0.16]}>
                 <circleGeometry args={[0.03, 16]} />
-                <meshBasicMaterial color={new THREE.Color(`rgb(0, ${Math.floor(100 + ledIntensity * 155)}, 0)`)} />
+                <primitive object={ledMaterial} ref={ledRef} attach="material" />
             </mesh>
             {/* VentHub Yazısı veya Logosu */}
             <mesh material={materials.boxMat} position={[0, 0.35, 0.16]}>

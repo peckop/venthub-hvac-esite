@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useFanMaterials } from '../materials/useFanMaterials'
@@ -8,6 +8,7 @@ import { useFanMaterials } from '../materials/useFanMaterials'
 
 export function DuctFanModel() {
     const fanRef = useRef<THREE.Group>(null)
+    const materials = useFanMaterials() // Centralized materials
 
     // ROUND DUCT FAN (Kanal Tipi) - SCALE FIX
 
@@ -17,18 +18,12 @@ export function DuctFanModel() {
         }
     })
 
-    // Özel Materyaller
-    const bodyColor = new THREE.MeshStandardMaterial({
-        color: '#f1f5f9',
-        roughness: 0.5,
-        metalness: 0.1
-    })
-
-    const bladeColor = new THREE.MeshStandardMaterial({
-        color: '#9f1239',
-        roughness: 0.4,
-        metalness: 0.1
-    })
+    // Localized specialized materials using useMemo for lifecycle safety
+    const localBladeColor = useMemo(() => new THREE.MeshStandardMaterial({
+        color: '#be123c',
+        metalness: 0.6,
+        roughness: 0.4
+    }), [])
 
     return (
         // SCALE: 0.6 (Diğer fanlarla uyumlu olması için küçültüldü)
@@ -36,32 +31,32 @@ export function DuctFanModel() {
 
             {/* 1. ANA GÖVDE */}
             <group>
-                <mesh material={bodyColor}>
+                <mesh material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.48, 0.48, 0.4, 32]} />
                 </mesh>
 
-                <mesh position={[0, 0.35, 0]} material={bodyColor}>
+                <mesh position={[0, 0.35, 0]} material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.38, 0.48, 0.3, 32]} />
                 </mesh>
-                <mesh position={[0, -0.35, 0]} material={bodyColor}>
+                <mesh position={[0, -0.35, 0]} material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.48, 0.38, 0.3, 32]} />
                 </mesh>
 
-                <mesh position={[0, 0.55, 0]} material={bodyColor}>
+                <mesh position={[0, 0.55, 0]} material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.38, 0.38, 0.1, 32]} />
                 </mesh>
-                <mesh position={[0, -0.55, 0]} material={bodyColor}>
+                <mesh position={[0, -0.55, 0]} material={materials.galvanizedSteel}>
                     <cylinderGeometry args={[0.38, 0.38, 0.1, 32]} />
                 </mesh>
             </group>
 
             {/* 2. TAŞIYICI AYAK */}
             <group position={[0.35, -0.2, 0]} rotation={[0, 0, Math.PI / 2]}>
-                <mesh position={[0.4, 0, 0]} material={bodyColor}>
+                <mesh position={[0.4, 0, 0]} material={materials.galvanizedSteel}>
                     <boxGeometry args={[0.1, 0.8, 0.6]} />
                 </mesh>
                 {[-0.2, 0.2].map((z, i) => (
-                    <mesh key={i} position={[0.2, z, 0]} rotation={[0, 0, 0.5]} material={bodyColor}>
+                    <mesh key={i} position={[0.2, z, 0]} rotation={[0, 0, 0.5]} material={materials.galvanizedSteel}>
                         <boxGeometry args={[0.4, 0.1, 0.4]} />
                     </mesh>
                 ))}
@@ -69,19 +64,19 @@ export function DuctFanModel() {
 
             {/* 3. KLEMENS KUTUSU */}
             <group position={[-0.45, 0.1, 0]}>
-                <mesh material={bodyColor}>
+                <mesh material={materials.galvanizedSteel}>
                     <boxGeometry args={[0.15, 0.25, 0.2]} />
                 </mesh>
             </group>
 
             {/* 4. PERVANE */}
             <group ref={fanRef} position={[0, 0.4, 0]}>
-                <mesh material={new THREE.MeshStandardMaterial({ color: '#be123c', metalness: 0.6 })}>
+                <mesh material={localBladeColor}>
                     <cylinderGeometry args={[0.12, 0.12, 0.15, 32]} />
                 </mesh>
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((rot, i) => (
                     <group key={i} rotation={[0, rot * Math.PI / 180, 0]}>
-                        <mesh position={[0.2, 0, 0]} rotation={[0.4, 0, 0]} material={bladeColor}>
+                        <mesh position={[0.2, 0, 0]} rotation={[0.4, 0, 0]} material={localBladeColor}>
                             <boxGeometry args={[0.35, 0.08, 0.02]} />
                         </mesh>
                     </group>

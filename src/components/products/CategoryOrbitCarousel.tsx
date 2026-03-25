@@ -14,7 +14,7 @@ const getModelTypeForCategory = (slug?: string): string | undefined => {
     const s = slug.toLowerCase()
     
     // Families / Groups
-    if (s.includes('perde')) return 'AirCurtainModel'
+    if (s.includes('perde') || s.includes('air-curtain')) return 'AirCurtainModel'
     if (s.includes('temizleyici')) return 'AirPurifierModel'
     if (s.includes('nem-alma')) return 'DehumidifierModel'
     if (s.includes('heat-recovery') || s.includes('isi-geri')) return 'HRVModel'

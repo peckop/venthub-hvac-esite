@@ -2,6 +2,7 @@
 import React, { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useTexture } from '@react-three/drei'
 import { useFanMaterials } from '../materials/useFanMaterials'
 
 export const RoofFanModel: React.FC = () => {
@@ -19,56 +20,25 @@ export const RoofFanModel: React.FC = () => {
         }
     })
 
-    // Gelişmiş Endüstriyel Materyaller (Hammered Metallic Effect)
-    const darkGreyMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-        color: '#3B3F45', // Vortice antrasit gri
-        metalness: 0.55,
-        roughness: 0.40,
-        envMapIntensity: 1.0,
-    }), [])
 
-    const matteBlackMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-        color: '#0F172A', // Slate-900 derin siyah
-        metalness: 0.4,
-        roughness: 0.6,
-    }), [])
 
-    // Kanat materyali (siyah metalik)
-    const bladeMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-        color: '#111827',
-        metalness: 0.85,
-        roughness: 0.15,
-        side: THREE.DoubleSide,
-    }), [])
-
-    // Vortice Logo Texture (Gerçek Görsel Yükle)
-    const logoTexture = useMemo(() => {
-        const loader = new THREE.TextureLoader()
-        const texture = loader.load(
-            `/Vortice_logo.png?v=${Date.now()}`,
-            undefined,
-            undefined,
-            (error) => {
-                console.warn('Vortice logo yüklenemedi, fallback kullanılıyor:', error)
-            }
-        )
-        texture.anisotropy = 16
-        return texture
-    }, [])
+    // Vortice Logo Texture - useTexture handles caching & disposal
+    const logoTexture = useTexture('/Vortice_logo.png')
+    if (logoTexture) logoTexture.anisotropy = 16
 
     return (
         <group scale={[0.85, 0.85, 0.85]}>
 
             {/* 1. ALT KAİDE VE TEKNİK ŞASİ (Revize Boyutlar: 1.42m / 10cm Kalınlık) */}
-            <mesh position={[0, 0.05, 0]} material={matteBlackMaterial}>
+            <mesh position={[0, 0.05, 0]} material={materials.matteBlack}>
                 <boxGeometry args={[1.42, 0.10, 1.42]} />
             </mesh>
 
             {/* Hava Giriş Flanşı */}
-            <mesh position={[0, 0.005, 0]} material={matteBlackMaterial}>
+            <mesh position={[0, 0.005, 0]} material={materials.matteBlack}>
                 <cylinderGeometry args={[0.28, 0.32, 0.01, 32]} />
             </mesh>
-            <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={matteBlackMaterial}>
+            <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={materials.matteBlack}>
                 <circleGeometry args={[0.24, 32]} />
             </mesh>
 
@@ -87,7 +57,7 @@ export const RoofFanModel: React.FC = () => {
 
             {/* Statik Emiş Boğazı - Plug Fan Inlet Lip'e TEMAS (Kaynak) */}
             <group position={[0, 0.1, 0]}>
-                <mesh position={[0, 0.12, 0]} material={matteBlackMaterial}>
+                <mesh position={[0, 0.12, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.24, 0.28, 0.24, 64, 1, true]} />
                 </mesh>
             </group>
@@ -160,16 +130,16 @@ export const RoofFanModel: React.FC = () => {
             <group ref={rotorRef} position={[0, 0.495, 0]}>
 
                 {/* --- ARKA PLAKA (Back Plate / Hub Plate) - Yükseltilmiş --- */}
-                <mesh position={[0, 0.28, 0]} material={matteBlackMaterial}>
+                <mesh position={[0, 0.28, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.40, 0.40, 0.012, 64]} />
                 </mesh>
 
                 {/* --- ÖN PLAKA (Inlet Shroud) - Alçaltılmış --- */}
-                <mesh position={[0, -0.28, 0]} material={matteBlackMaterial}>
+                <mesh position={[0, -0.28, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.28, 0.40, 0.012, 64]} />
                 </mesh>
                 {/* Kavisli emiş dudağı (inlet lip) */}
-                <mesh position={[0, -0.30, 0]} material={matteBlackMaterial}>
+                <mesh position={[0, -0.30, 0]} material={materials.matteBlack}>
                     <cylinderGeometry args={[0.24, 0.28, 0.04, 64, 1, true]} />
                 </mesh>
 
@@ -188,19 +158,19 @@ export const RoofFanModel: React.FC = () => {
                     return (
                         <group key={`blade-${i}`} rotation={[0, baseAngle, 0]}>
                             {/* Segment 1: Hub yakını */}
-                            <mesh position={[0.125, 0, 0]} rotation={[0, -0.10, 0]} material={bladeMaterial}>
+                            <mesh position={[0.125, 0, 0]} rotation={[0, -0.10, 0]} material={materials.roofBlade}>
                                 <boxGeometry args={[0.10, 0.54, 0.008]} />
                             </mesh>
                             {/* Segment 2: İç orta */}
-                            <mesh position={[0.21, 0, 0.015]} rotation={[0, -0.28, 0]} material={bladeMaterial}>
+                            <mesh position={[0.21, 0, 0.015]} rotation={[0, -0.28, 0]} material={materials.roofBlade}>
                                 <boxGeometry args={[0.11, 0.54, 0.008]} />
                             </mesh>
                             {/* Segment 3: Dış orta */}
-                            <mesh position={[0.30, 0, 0.045]} rotation={[0, -0.50, 0]} material={bladeMaterial}>
+                            <mesh position={[0.30, 0, 0.045]} rotation={[0, -0.50, 0]} material={materials.roofBlade}>
                                 <boxGeometry args={[0.11, 0.54, 0.008]} />
                             </mesh>
                             {/* Segment 4: Dış kenar */}
-                            <mesh position={[0.37, 0, 0.09]} rotation={[0, -0.72, 0]} material={bladeMaterial}>
+                            <mesh position={[0.37, 0, 0.09]} rotation={[0, -0.72, 0]} material={materials.roofBlade}>
                                 <boxGeometry args={[0.10, 0.54, 0.008]} />
                             </mesh>
                         </group>
@@ -210,7 +180,7 @@ export const RoofFanModel: React.FC = () => {
 
 
             {/* 4. & 5. YEKPARE GÖVDE (Shroud + Koni + Radyüs) */}
-            <mesh position={[0, 0, 0]} material={darkGreyMaterial}>
+            <mesh position={[0, 0, 0]} material={materials.roofAntracite}>
                 <latheGeometry args={[
                     useMemo(() => [
                         new THREE.Vector2(0.69, 0.58),  // Shroud eteği alt (DIŞA AÇILI/KONİK)
@@ -264,10 +234,10 @@ export const RoofFanModel: React.FC = () => {
 
             {/* 6. ÜST BİTİŞ KAPAĞI - Vida Detaylı */}
             <group position={[0, 1.28, 0]}>
-                <mesh position={[0, 0.01, 0]} material={darkGreyMaterial}>
+                <mesh position={[0, 0.01, 0]} material={materials.roofAntracite}>
                     <cylinderGeometry args={[0.208, 0.208, 0.03, 64]} />
                 </mesh>
-                <mesh position={[0, 0.06, 0]} material={darkGreyMaterial}>
+                <mesh position={[0, 0.06, 0]} material={materials.roofAntracite}>
                     <cylinderGeometry args={[0.224, 0.224, 0.08, 64]} />
                 </mesh>
 

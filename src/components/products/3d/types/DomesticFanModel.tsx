@@ -13,15 +13,6 @@ export const DomesticFanModel: React.FC = () => {
     const panelSize = 1.0 // 1 birim kare
     const panelThickness = 0.08
 
-    // WC/Banyo Fanı - Küçük Plastik
-    // Konut tipi olduğu için, endüstriyel fanların yanında çok küçük görünmeli (15x15cm).
-
-    // WC/Banyo Fanı - Küçük Plastik
-    // Konut tipi olduğu için, endüstriyel fanların yanında çok küçük görünmeli (15x15cm).
-
-    // useFrame: Konut tipi fanın dışı (menfez) dönmez. İçindeki pervane de görünmüyor.
-    // O yüzden animasyon iptal edildi.
-
     return (
         // SCALE FIX: 0.25 (Endüstriyeller 0.6-0.7 iken bu 0.25 olmalı)
         <group ref={fanRef} scale={[0.25, 0.25, 0.25]}>
@@ -39,7 +30,6 @@ export const DomesticFanModel: React.FC = () => {
                 </mesh>
 
                 {/* IZGARA DOKUSU (Grid of holes) */}
-
                 {Array(12).fill(0).map((_, row) => (
                     Array(12).fill(0).map((_, col) => {
                         const x = (col - 5.5) * (panelSize * 0.07)
@@ -59,15 +49,9 @@ export const DomesticFanModel: React.FC = () => {
             </mesh>
 
             {/* 4. MARKALAMA (Alt Köşe) */}
-            <mesh position={[0.35, -0.4, panelThickness / 2 + 0.02]}>
+            <mesh position={[0.35, -0.4, panelThickness / 2 + 0.02]} material={materials.zincGray}>
                 <planeGeometry args={[0.15, 0.05]} />
-                <meshBasicMaterial color="#94a3b8" /> {/* Gri Logo */}
             </mesh>
-
         </group>
     )
 }
-
-
-
-

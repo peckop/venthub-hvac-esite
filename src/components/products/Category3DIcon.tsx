@@ -52,8 +52,11 @@ const Category3DIcon: React.FC<Category3DIconProps> = ({
 
     return (
         <group ref={meshRef} name={`icon-container-${offsetContext || 'default'}`}>
-            <pointLight position={[3, 3, 3]} intensity={2.5} />
-            <ambientLight intensity={0.4} />
+            {/* Professional Product Lighting */}
+            <ambientLight intensity={1.2} />
+            <pointLight position={[5, 5, 5]} intensity={8} />
+            <pointLight position={[-5, 2, -5]} intensity={4} color="#e2e8f0" />
+            <spotLight position={[0, 10, 0]} angle={0.15} penumbra={1} intensity={2} />
             
             <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} scale={[scale, scale, scale]}>
                 {DetailedModel ? <DetailedModel /> : (
