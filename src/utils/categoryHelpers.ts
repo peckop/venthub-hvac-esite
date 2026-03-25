@@ -9,7 +9,7 @@ export const getCategoryDisplayName = (category: DbCategory | null | undefined, 
     
     // 1. Try to translate via i18n using translation_key OR slug
     if (t) {
-        const tKey = (category as unknown as { translation_key?: string }).translation_key || category.slug
+        const tKey = (category as typeof category & { translation_key?: string }).translation_key || category.slug
         const translationPath = `common.categoryList.${tKey}`
         const translated = t(translationPath)
         

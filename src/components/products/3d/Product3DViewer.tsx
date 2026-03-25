@@ -1,5 +1,5 @@
 "use client"
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useThree } from '@react-three/fiber'
@@ -99,7 +99,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
     const [showViewMenu, setShowViewMenu] = useState(false)
     const [rotationMode, setRotationMode] = useState<'orbit' | 'free'>('orbit')
     
-    const controlsRef = useRef<any>(null)
+    const controlsRef = useRef<React.ElementRef<typeof OrbitControls> | null>(null)
     const modelGroupRef = useRef<THREE.Group | null>(null)
 
     const tb = isFullscreen
@@ -192,7 +192,7 @@ export const Product3DViewer: React.FC<Product3DViewerProps> = ({
                         {showViewMenu && (
                             <div className="absolute top-full left-0 mt-1.5 w-40 bg-white rounded-lg border border-gray-200 shadow-2xl z-[200]">
                                 {[{ key: 'front', label: 'Ön' }, { key: 'back', label: 'Arka' }, { key: 'left', label: 'Sol' }, { key: 'right', label: 'Sağ' }, { key: 'top', label: 'Üst' }, { key: 'bottom', label: 'Alt' }].map(v => (
-                                    <button key={v.key} onClick={() => handleViewChange(v.key as any)} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
+                                    <button key={v.key} onClick={() => handleViewChange(v.key as 'front' | 'back' | 'left' | 'right' | 'top' | 'bottom' | 'iso')} className="w-full text-left px-3 py-2 text-xs hover:bg-blue-50 transition-colors">{v.label}</button>
                                 ))}
                             </div>
                         )}

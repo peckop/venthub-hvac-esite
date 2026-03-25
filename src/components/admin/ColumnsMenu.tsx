@@ -4,8 +4,10 @@ import { adminButtonSecondaryClass } from '../../utils/adminUi'
 import { Settings2, Check, Layout, Maximize2 } from 'lucide-react'
 import { useI18n } from '../../i18n/I18nProvider'
 
+import { Density } from '../../types/admin-shared'
+
 export type ColumnToggle = { key: string; label: string; checked: boolean; onChange: (v: boolean) => void }
-export type Density = 'comfortable' | 'compact'
+export type { Density }
 
 export const ColumnsMenu: React.FC<{
   columns: ColumnToggle[]

@@ -1,5 +1,5 @@
 import React from 'react'
-// @ts-expect-error: External library typing missing
+// @ts-expect-error - REASON: External library typing missing
 import { ErrorBoundary } from 'react-error-boundary'
 import { AlertTriangle, RotateCcw } from 'lucide-react'
 

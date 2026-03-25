@@ -16,8 +16,7 @@ import { supabase } from '@/lib/supabase';
 import { AuthorityBuilder } from '@/components/admin/authority-builder/AuthorityBuilder';
 import { AuthorityRenderer } from '@/components/authority/AuthorityRenderer';
 import { AuthorityBlock, SpecsBlock } from '@/types/authority';
-import { Category } from '@/types/database';
-import { Json } from '@/types/database.types';
+import { DbCategory, CategoryMetadata, DbJson } from '@/types/db-rows';
 import toast from 'react-hot-toast';
 
 interface CategoryBuilderViewProps {
@@ -26,7 +25,7 @@ interface CategoryBuilderViewProps {
 
 const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId }) => {
   const router = useRouter();
-  const [category, setCategory] = useState<Category | null>(null);
+  const [category, setCategory] = useState<DbCategory | null>(null);
   const [blocks, setBlocks] = useState<AuthorityBlock[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,10 +37,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
     try {
       const { data, error } = await supabase.from('categories').select('*').eq('id', categoryId).single();
       if (error) throw error;
-      const cat = data as Category;
+      const cat = data as unknown as DbCategory;
       setCategory(cat);
       
-      let initialBlocks: AuthorityBlock[] = (cat.authority_content as unknown as AuthorityBlock[]) || [];
+      let initialBlocks: AuthorityBlock[] = (cat.authority_content as AuthorityBlock[]) || [];
 
       // --- LEGACY MIGRATION ENGINE ---
       // Eğer yeni blok yapısı boşsa, eski statik verileri bloklara çevir
@@ -60,13 +59,10 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
         }
 
         // 2. Eski Metrikleri 'Specs' bloğuna çevir
-        interface LegacyMetadata {
-          metric1?: { label: string; value: string };
-          metric2?: { label: string; value: string };
-        }
-        const meta = cat.metadata as unknown as LegacyMetadata;
+        const meta = cat.metadata as CategoryMetadata | null;
         if (meta?.metric1 || meta?.metric2) {
           const rows: SpecsBlock['content']['rows'] = [];
+          
           if (meta.metric1?.label) rows.push({ label: meta.metric1.label, value: meta.metric1.value || '' });
           if (meta.metric2?.label) rows.push({ label: meta.metric2.label, value: meta.metric2.value || '' });
           
@@ -101,7 +97,11 @@ const CategoryBuilderView: React.FC<CategoryBuilderViewProps> = ({ categoryId })
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase.from('categories').update({ authority_content: blocks as unknown as Json }).eq('id', categoryId);
+      // Use DbJson (re-exported Json) to satisfy Supabase requirement without 'any'
+      const { error } = await supabase
+        .from('categories')
+        .update({ authority_content: blocks as unknown as DbJson })
+        .eq('id', categoryId);
       if (error) throw error;
       toast.success('Değişiklikler sisteme mühürlendi.');
     } catch (e) {

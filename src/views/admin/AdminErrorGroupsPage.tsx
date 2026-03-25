@@ -236,14 +236,13 @@ const AdminErrorGroupsPage: React.FC = () => {
 
   const loadLatestClientErrors = async (groupId: string) => {
     try {
-      // Break infinite recursion and satisfy lint without using 'any'
-      interface MinimalSupabaseQuery { select: (args: string) => { eq: (k: string, v: string) => { order: (k: string, o: { ascending: boolean }) => { limit: (n: number) => Promise<{ data: ClientErrorRow[] | null, error: unknown }> } } } }
-      const { data, error } = await (supabase.from('client_errors') as unknown as MinimalSupabaseQuery)
+      const queryResult = await supabase.from('client_errors')
         .select('id, at, url, message, stack, user_agent, release, env, level')
         .eq('group_id', groupId)
         .order('at', { ascending: false })
         .limit(200)
-      if (!error) setLatestClientErrors(prev => ({ ...prev, [groupId]: (data || []) as ClientErrorRow[] }))
+      const { data, error }: { data: ClientErrorRow[] | null, error: unknown } = queryResult
+      if (!error) setLatestClientErrors(prev => ({ ...prev, [groupId]: data || [] }))
     } catch { }
   }
 

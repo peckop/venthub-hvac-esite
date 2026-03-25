@@ -79,7 +79,8 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     useEffect(() => {
         const fetchCategories = async () => {
             const { data } = await supabase.from('categories').select('*').order('name')
-            setCategories((data as unknown as DbCategory[]) || [])
+            /* @ts-expect-error REASON: Supabase returns generic row, expecting DbCategory */
+            setCategories(data || [])
         }
         fetchCategories()
     }, [])
@@ -101,12 +102,13 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
         setLoading(true)
         try {
             if (_productId) {
-                // Use explicit Supabase types via unknown to satisfy both TSC and Lint
-                const payload = values as unknown as DbProductUpdate
+                /* @ts-expect-error REASON: form values structural mismatch to DbProductUpdate generic */
+                const payload: DbProductUpdate = values
                 const { error } = await supabase.from('products').update(payload).eq('id', _productId)
                 if (error) throw error
             } else {
-                const payload = values as unknown as DbProductInsert
+                /* @ts-expect-error REASON: form values structural mismatch to DbProductInsert generic */
+                const payload: DbProductInsert = values
                 const { error } = await supabase.from('products').insert([payload])
                 if (error) throw error
             }

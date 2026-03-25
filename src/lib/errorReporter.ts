@@ -4,13 +4,14 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
     try {
       const isProd = options?.env === 'production'
       if (isProd) return false // Never allow force in production
-      // Force switch for local tests: window.__ERROR_LOG_FORCE__ = true or localStorage.setItem('errorlog:force','1')
-      interface VentHubWindow extends Window {
-        __ERROR_LOG_FORCE__?: boolean
+      // Force switch for local tests
+      if (typeof window === 'undefined') return false
+      const w = window as { __ERROR_LOG_FORCE__?: boolean } & typeof globalThis
+      if (w.__ERROR_LOG_FORCE__ === true) return true
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem('errorlog:force') === '1'
       }
-      const w = (window as unknown as VentHubWindow)
-      if (w && w.__ERROR_LOG_FORCE__ === true) return true
-      return localStorage.getItem('errorlog:force') === '1'
+      return false
     } catch { return false }
   })()
 
@@ -47,8 +48,10 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
       // First try: sendBeacon (non-blocking, avoids JS imports)
       try {
         if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-          const ok = (navigator as unknown as { sendBeacon: (url: string, data?: BodyInit) => boolean }).sendBeacon(_endpoint, new Blob([body], { type: 'application/json' }))
-          if (ok) return
+          const nav = navigator as { sendBeacon?: (url: string, data?: BodyInit) => boolean }
+          if (nav.sendBeacon && nav.sendBeacon(_endpoint, new Blob([body], { type: 'application/json' }))) {
+            return
+          }
         }
       } catch { }
 
@@ -56,24 +59,24 @@ export function installErrorReporter(_endpoint: string, options?: { sample?: num
       try {
         await fetch(_endpoint, { method: 'POST', headers: { 'content-type': 'application/json' }, body, keepalive: true })
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.debug('[errorReporter] fetch failed:', err)
+        console.warn('[errorReporter] fetch failed:', err)
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.debug('[errorReporter] post failed:', e)
+      console.warn('[errorReporter] post failed:', e)
     }
   }
 
-  window.addEventListener('error', (e) => {
-    const err = (e as ErrorEvent)
-    post({ t: Date.now(), type: 'error', msg: String(err.error?.message || err.message || 'Unknown'), stack: String(err.error?.stack || ''), url: location.href, ua: navigator.userAgent, release, env })
-  })
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (e) => {
+      const err = (e as ErrorEvent)
+      post({ t: Date.now(), type: 'error', msg: String(err.error?.message || err.message || 'Unknown'), stack: String(err.error?.stack || ''), url: location.href, ua: navigator.userAgent, release, env })
+    })
 
-  window.addEventListener('unhandledrejection', (e) => {
-    const reason = (e as PromiseRejectionEvent).reason
-    post({ t: Date.now(), type: 'unhandledrejection', msg: String(reason?.message || reason || 'Unknown'), stack: String(reason?.stack || ''), url: location.href, ua: navigator.userAgent, release, env })
-  })
+    window.addEventListener('unhandledrejection', (e) => {
+      const reason = (e as PromiseRejectionEvent).reason
+      post({ t: Date.now(), type: 'unhandledrejection', msg: String(reason?.message || reason || 'Unknown'), stack: String(reason?.stack || ''), url: location.href, ua: navigator.userAgent, release, env })
+    })
+  }
 }
 
 
