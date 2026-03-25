@@ -1,31 +1,33 @@
-## Hedef
-Projedeki `id` ve `_id` isimlendirme uyu?mazl???n? gidermek, `process.env` eri?im hatalar?n? d?zeltmek ve tip g?venli?ini sa?layarak uygulaman?n kararl? ?al??mas?n? sa?lamak.
+# Superpowers Brainstorm: Ad??m 2 - Hooks & Tests Hardening
 
-## K?s?tlamalar
-- VentHub "Clean Code" standartlar?na uyulmal?.
-- `any` tipi kesinlikle kullan?lmamal?.
-- Next.js 15 asenkron `params` yap?s?na uyulmal?.
-- T?m metinler `useI18n()` ile yerelle?tirilmelidir.
+## Goal
+Frontend'in kritik can damarlar??n?? olu??turan ??zel React Hook (`src/hooks`) dosyalar??ndaki sunucu taraf?? (SSR) "Hydration" ka??aklar??n?? engellemek, izinsiz `window` kullan??mlar??n?? izole etmek ve ilgili test ortamlar??ndaki tip ihlallerini / mock eksikliklerini (`use-mobile.test.tsx`, `useCartHook.test.tsx`) VentHub Integrity Checker'??n onay??ndan ge??ecek ??ekilde sa??lamla??t??rmak.
 
-## Bilinen Ba?lam
-- Veritaban? (Supabase) ?emas?nda birincil anahtarlar `id` (UUID) olarak tan?ml?.
-- `database.types.ts` ve `db-rows.ts` dosyalar?nda bu alanlar `_id` olarak ge?iyor (b?y?k ihtimalle hatal? bir override veya eski bir d?n???m kal?nt?s?).
-- `process.env` kullan?m? istemci taraf?nda (Next.js client components) tip hatas?na yol a??yor.
+## Constraints
+1. Next.js 15 SSR (Server-Side Rendering) kurallar??na sad??k kal??nmal??d??r (sunucu ortam??nda `window` ??a??r??lar?? `undefined` hatas?? verip sayfay?? ????kertir).
+2. Hi??bir dosyada `any` ve `as unknown as` (tip atlams??) kullan??lamaz; Supabase RLS ve UI tipleri ile sert (strict) bir ??ekilde e??le??melidir.
+3. Refactoring sonras??nda testlerin (`vitest`) ve derlemenin (`pnpm run build`) eksiksiz ge??mesi gerekir.
 
-## Riskler
-- `_id` alan?n? `id` olarak de?i?tirmek, bu alana g?venen t?m bile?enlerde (admin, products, categories) k?r?lmalara yol a?abilir.
-- `database.types.ts` dosyas? otomatik olu?turulmu?sa, manuel d?zenlemeler gelecekte ezilebilir.
+## Known context
+- P02-CORE-QUALITY-GUARDIANS (033-tech-debt-cleanup) g??revinin "Ad??m 2" evresi alt??nday??z.
+- K??sa bir tarama sonucunda: `use-mobile.tsx`, `useCategoryGateway.ts` ve `useCheckoutPayment.ts` gibi kritik dosyalarda g??venli olmayan (??rne??in useEffect i??ine al??nmam????) aktif `window.innerWidth` ve `window.location` bloklar?? tespit edildi.
+- Bunlar build hatas?? ??retmese bile, sayfa pre-render (SSG/SSR) s??ras??nda hydration ka??a???? yapar.
 
-## Se?enekler
-1. **Se?enek 1 (Radikal D?zeltme):** T?m `_id` kullan?mlar?n? `id` olarak de?i?tirerek veritaban?yla tam uyum sa?lamak.
-2. **Se?enek 2 (D?n??t?r?c? Katman?):** Veritaban?ndan gelen `id`'yi `mapDatabaseCategoryToDomain` gibi fonksiyonlarda `_id`'ye d?n??t?rmeye devam etmek (mevcut hatal? yap?y yamamak).
-3. **Se?enek 3 (Hibrit):** `DbCategory` gibi temel tiplerde `id: string` ve `_id: string` (alias) ikilisini bir s?re beraber sunmak.
+## Risks
+1. **SSR ????kmeleri:** `window` tabanl?? hooklar??n an??nda kullan??ld?????? Client Component'lar ("use client") SSR'da yanl???? i??lenip `Text content did not match` tipinde react hydration ????kmeleri ya??atabilir.
+2. **Yanl???? Mocklama:** Testlerde `window.matchMedia` gibi yap??lar??n d??zg??n "mock"lanmamas??, t??m test suite'inin k??r??lmas??na yol a??abilir.
+3. UX (Kullan??c?? Deneyimi): ??zellikle `use-mobile` hook'unda yanl???? SSR optimizasyonu ge??ici UI patlamalar??na (masa??st?? men??s??n??n mobilde anl??k g??r??nmesi) sebep olabilir.
 
-## ?neri
-**Se?enek 1** ?nerilir. Teknik bor? biriktirmemek ad?na, veritaban? ger?e?i neyse (yani `id`) TypeScript tiplerinin de bunu yans?tmas? gerekir. `_id` kullan?m? projede kafa kar???kl??? yaratmaktad?r.
+## Options (2???4)
+- **A Se??ene??i:** Hatal?? olan her hook i??ine manuel olarak `typeof window !== 'undefined'` check'leri yazmak ve state defaultValue atamak.
+- **B Se??ene??i:** Proje genelinde kullan??labilecek, SSR g??venli, global bir `useBrowser` (veya `useSafeWindow`) util yap??s?? olu??turup herkesin o s??n??ftaki sarmalay??c??dan (wrapper) ??a????rmas??n?? sa??lamak.
+- **C Se??ene??i (??nerilen):** H??lihaz??rdaki hook'larda, `window` referanslar??n?? sadece `useEffect` veya event callback'leri i??erisine s??k????t??rmak. SSR state i??in daima "ideal masa??st??" (veya g??venli) bir fallback verisi kullan??p, component `mount` (hydrate) edildi??inde durumu g??ncellemek.
 
-## Kabul Kriterleri
-- `src/` alt?ndaki hi?bir dosyada `id` ve `_id` uyu?mazl???na ba?l? `tsc` hatas? kalmamal?.
-- Admin panelindeki kategori listeleme, ekleme ve d?zenleme i?lemleri sorunsuz ?al??mal?.
-- `process.env` hatalar? (do?ru tip tan?mlar? veya Next.js standartlar? ile) giderilmeli.
+## Recommendation
+**Option C** en risksiz ve modern React standartlar??na en uygun y??ntemdir. Global sarmalay??c??larla mevcut mimariyi ??i??irmeden, sadece hatal?? konumlanm???? `window` sorgular??n?? `useEffect` (SSR mount timing) bloklar??na alaca????z ve Test ortam??nda (`describe` ve `setup`) mock `window` objeleri yarataca????z.
 
+## Acceptance criteria
+1. `src/hooks` i??erisindeki t??m dosyalarda `pnpm run lint` uyar??s??z sonlanmal??.
+2. `src/hooks` genelinde manuel `any` aramas?? sonucunda 0 (s??f??r) e??le??me bulunmal??.
+3. `pnpm test -- --run` komutu ile mevcut hook testleri tamamen ye??il (passed) vermeli.
+4. Next.js 15 production build i??lemi Hydration hatas?? veya SSR panik vermeksizin (0 exit code) ge??meli.

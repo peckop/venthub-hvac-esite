@@ -4,7 +4,7 @@ import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo } from
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import type { DbCategory, DbJson } from '../../types/db-rows'
+import type { DbCategory } from '../../types/db-rows'
 import { ensureSessionFresh } from '../../lib/ensureSessionFresh'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import AdminSkeleton from '../../components/admin/AdminSkeleton'
@@ -94,7 +94,8 @@ const AdminCategoriesPage: React.FC = () => {
         .order('name', { ascending: true })
 
       if (fetchErr) throw fetchErr
-      setRows((data || []) as unknown as DbCategory[])
+      /* @ts-expect-error REASON: Supabase returns generic row, expecting DbCategory */
+      setRows(data || [])
     } catch (e) {
       setError((e as Error).message || 'Kategoriler yüklenemedi')
       setRows([])
@@ -138,7 +139,7 @@ const AdminCategoriesPage: React.FC = () => {
         table_name: 'categories', 
         row_pk: id, 
         action: 'DELETE', 
-        before: before as unknown as DbJson, 
+        before: before,
         after: null, 
         comment: 'delete category' 
       })

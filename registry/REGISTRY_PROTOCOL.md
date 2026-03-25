@@ -27,9 +27,10 @@ Bir ajan, "Sıfır Hata" hedefine koşarken aşağıdaki mimari etik kuralların
 - `python registry/manage_registry.py search <ID>`: Görevi tüm projelerde arar.
 - `python registry/manage_registry.py recall`: Ajanlar arası paylaşımlı hafızayı geri çağırır.
 
-## 5. Görev Yaşam Döngüsü (The 6-Step Workflow)
-0. **[ZORUNLU DOĞRULAMA]:** Ajan, görevi devraldığında "Dörtlü Mühür" kontrolü yapar.
-1. **Brainstorm:** `/superpowers-brainstorm` ile hedef ve kısıtlar belirlenir.
+## 5. Görev Yaşam Döngüsü (The 6-Step Workflow + Dispatcher)
+0. **[MISSION CONTROL]:** Ajan, herhangi bir görevi devraldığında veya yeni bir görev açacağında `.agent/skills/model-dispatcher` kurallarını çalıştırıp KOTA ONAYI ister.
+1. **[ZORUNLU DOĞRULAMA]:** Ajan, görevi devraldığında "Dörtlü Mühür" kontrolü yapar.
+2. **Brainstorm:** `/superpowers-brainstorm` ile hedef ve kısıtlar belirlenir.
 2. **Planl:** `/superpowers-write-plan` ile doğrulanabilir adımlar yazılır.
 3. **Activate:** `manage_registry.py activate` komutuyla görev yürütmeye hazır hale getirilir.
 4. **Executing:** Kod yazımı ve sürekli denetim (Ethic Analysis).

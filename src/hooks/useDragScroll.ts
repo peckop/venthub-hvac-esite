@@ -77,14 +77,14 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>() {
         }
 
         el.addEventListener('mousedown', handleMouseDown)
-        window.addEventListener('mouseup', handleMouseUp)
+        if (typeof window !== 'undefined') window.addEventListener('mouseup', handleMouseUp)
         el.addEventListener('mouseleave', handleMouseLeave)
         el.addEventListener('mousemove', handleMouseMove)
         el.addEventListener('click', handleClick, { capture: true })
 
         cleanupRef.current = () => {
             el.removeEventListener('mousedown', handleMouseDown)
-            window.removeEventListener('mouseup', handleMouseUp)
+            if (typeof window !== 'undefined') window.removeEventListener('mouseup', handleMouseUp)
             el.removeEventListener('mouseleave', handleMouseLeave)
             el.removeEventListener('mousemove', handleMouseMove)
             el.removeEventListener('click', handleClick, { capture: true })

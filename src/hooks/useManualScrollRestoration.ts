@@ -21,6 +21,8 @@ export const useManualScrollRestoration = (loading: boolean) => {
 
     // 2. Scroll pozisyonunu kaydet (Throttle: 100ms)
     useEffect(() => {
+        if (typeof window === 'undefined') return
+
         let timeout: NodeJS.Timeout
         const handler = () => {
             if (timeout) return
@@ -47,6 +49,7 @@ export const useManualScrollRestoration = (loading: boolean) => {
 
     // 3. Restorasyon
     useEffect(() => {
+        if (typeof window === 'undefined') return
         if (loading) return
         if (restoredRef.current) return
 

@@ -71,7 +71,7 @@ vi.mock('framer-motion', () => {
 // Mock Supabase with internal Promise tracking to avoid 'any'
 vi.mock('@/lib/supabase', () => {
   const createMockQuery = () => {
-    const p: Record<string, unknown> = {
+    const p: any = {
       select: vi.fn(),
       insert: vi.fn(),
       update: vi.fn(),

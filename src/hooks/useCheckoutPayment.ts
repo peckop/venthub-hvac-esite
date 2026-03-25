@@ -60,8 +60,8 @@ export const useCheckoutPayment = ({
   const [progressPct, setProgressPct] = useState(20)
   const [paymentFrameContent] = useState('')
 
-  // Checking for Vitest global in test environment safely without as any or unused expect-error
-  const isTest = typeof (globalThis as unknown as { vi?: unknown }).vi !== 'undefined'
+  // Checking for Vitest global in test environment safely without unsafe casting or unused expect-error
+  const isTest = typeof (globalThis as typeof globalThis & { vi?: unknown }).vi !== 'undefined'
 
   const initiatePayment = async () => {
     if (isTest) return true

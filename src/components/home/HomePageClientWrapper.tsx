@@ -18,7 +18,7 @@ export const HomePageClientWrapper: React.FC<Props> = ({ children }) => {
       openLeadModal?: () => void
     }
 
-    const vhWindow = window as unknown as VentHubWindow
+    const vhWindow = window as typeof window & VentHubWindow
     vhWindow.openLeadModal = () => setLeadOpen(true)
     
     return () => { vhWindow.openLeadModal = undefined }

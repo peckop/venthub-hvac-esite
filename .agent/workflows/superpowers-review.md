@@ -4,6 +4,11 @@ description: Runs a Superpowers-style review pass with severity levels.
 
 # Superpowers Review
 
+## 🕹️ Adım 0: MISSION CONTROL (Model Dispatcher)
+Gözden geçirmeye (Review) SAKIN BAŞLAMA! Önce `.agent/skills/model-dispatcher/SKILL.md` kurallarını oku.
+Söz konusu kodun ağırlığını (zorluğunu) değerlendir ve mevcut modelinle (Flash/High/Sonnet) karşılaştır. **ZORUNLU olarak [MISSION CONTROL]** panosunu bas.
+Eğer mevcut modelin kod denetimi (code review) için yeterince "akıllı" değilse dur ve kullanıcıdan onay/model değişimi iste.
+
 Read and apply the `superpowers-review` skill.
 
 Output:

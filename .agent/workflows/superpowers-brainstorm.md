@@ -4,6 +4,11 @@ description: Superpowers brainstorm. Produces goal/constraints/risks/options/rec
 
 # Superpowers Brainstorm
 
+## 🕹️ Adım 0: MISSION CONTROL (Model Dispatcher)
+Brainstorm işlemine SAKIN BAŞLAMA! Önce `.agent/skills/model-dispatcher/SKILL.md` kurallarını oku.
+Görevin karmaşıklığını ve senin mevcut modelini (Flash/High/Sonnet) karşılaştırarak ekrana **ZORUNLU olarak [MISSION CONTROL]** panosunu bas.
+Eğer mevcut modelin bu zeka fırtınasını yapmak için yetersizse dur ve kullanıcıdan model değişikliği (High/Sonnet) talep et. Sadece "Model Yeterli" durumunda aşağıdaki adıma geç.
+
 ## Task
 Brainstorm for this task (exactly as provided by the user):
 **{{input}}**

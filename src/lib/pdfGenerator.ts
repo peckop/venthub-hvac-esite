@@ -242,8 +242,8 @@ export async function generateProductDatasheet(
     }
 
     // Sayfa numaraları ve footer'ları ekle
-    const docAny = doc as unknown as { internal: { getNumberOfPages: () => number } };
-    const totalPages = docAny.internal.getNumberOfPages();
+    const getPagesFn = Reflect.get(doc.internal, 'getNumberOfPages') as () => number;
+    const totalPages = getPagesFn ? getPagesFn() : 1;
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         drawFooter(i, totalPages);
@@ -264,5 +264,5 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
     for (let i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa(binary);
+    return typeof window !== 'undefined' ? window.btoa(binary) : globalThis.btoa(binary);
 }

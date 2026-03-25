@@ -118,9 +118,10 @@ export default function AdminReturnsPage() {
       interface ReturnRow {
         id: string; order_id: string; user_id: string; reason: string; description: string | null;
         status: string; created_at: string; updated_at: string;
-        venthub_orders: { order_number: string; customer_name: string; customer_email: string; total_amount: number } | null;
+        venthub_orders: { order_number: string; customer_name: string | null; customer_email: string | null; total_amount: number } | null;
       }
-      const mapped = (data as unknown as ReturnRow[] || []).map((item) => ({
+      const returnRows: ReturnRow[] = data || []
+      const mapped = returnRows.map((item) => ({
         id: item.id,
         order_id: item.order_id,
         user_id: item.user_id,
