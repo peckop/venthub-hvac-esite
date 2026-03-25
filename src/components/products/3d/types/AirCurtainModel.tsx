@@ -24,8 +24,8 @@ export function AirCurtainModel({ isHeated = false, showMixed = false }: AirCurt
     return (
         <group scale={[0.8, 0.8, 0.8]} rotation={[0, -Math.PI / 2, 0]}>
 
-            {/* 1. ANA GÖVDE (Body) - Gümüş / Fırçalanmış Alüminyum (Vortice Frontage) */}
-            <mesh name="Body" material={materials.brushedAluminum}>
+            {/* 1. ANA GÖVDE (Body) - Mat Siyah (VentHub Standard) */}
+            <mesh name="Body" material={materials.matteBlack}>
                 <boxGeometry args={[2.5, 0.5, 0.5]} />
             </mesh>
 
@@ -57,8 +57,8 @@ export function AirCurtainModel({ isHeated = false, showMixed = false }: AirCurt
                 <boxGeometry args={[2.4, 0.45, 0.02]} />
             </mesh>
 
-            {/* Üst Panel - RAL 7035 veya Gümüş */}
-            <mesh name="TopPanel" position={[0, 0.255, 0]} material={materials.ral7035}>
+            {/* Üst Panel - Siyah */}
+            <mesh name="TopPanel" position={[0, 0.255, 0]} material={materials.matteBlack}>
                 <boxGeometry args={[2.4, 0.02, 0.45]} />
             </mesh>
 

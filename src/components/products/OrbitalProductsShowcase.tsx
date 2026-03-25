@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useMemo, useCallback, useEffect, Suspense } from 'react'
 import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
-import { Environment, Float, Sparkles, Html } from '@react-three/drei'
+import { Environment, Float, Sparkles, Html, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { useRouter } from 'next/navigation'
 import { MousePointerClick, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -130,25 +130,23 @@ const OrbitalCard: React.FC<{
         }
     }, [isFrontCard, externalShouldShowHint])
 
-    const texture = useMemo(() => {
-        if (item.categorySlug || !item.image) return null
-        
-        // Resim yolunu normalize et (Supabase desteği)
-        let finalPath = item.image.trim();
-        if (!finalPath.startsWith('http') && !finalPath.startsWith('/') && !finalPath.startsWith('data:')) {
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-            finalPath = `${supabaseUrl}/storage/v1/object/public/category-images/${finalPath}`;
+    // Texture Loading - CORRECT WAY (Cached & Auto-Disposed)
+    const finalPath = useMemo(() => {
+        if (item.categorySlug || !item.image) return null;
+        let p = item.image.trim();
+        if (!p.startsWith('http') && !p.startsWith('/') && !p.startsWith('data:')) {
+            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+            p = `${supabaseUrl}/storage/v1/object/public/category-images/${p}`;
         }
+        return p;
+    }, [item.image, item.categorySlug]);
 
-        try {
-            const tex = new THREE.TextureLoader().load(finalPath)
-            tex.colorSpace = THREE.SRGBColorSpace
-            return tex
-        } catch (e) {
-            console.error("3D Texture Load Error:", e);
-            return null;
-        }
-    }, [item.image, item.categorySlug])
+    // useTexture caches the resource and prevents OOM crashes
+    // We use a safe fallback to prevent suspense errors on invalid paths
+    const texture = useTexture(finalPath || '/images/placeholders/product-placeholder.png');
+    if (texture) {
+        texture.colorSpace = THREE.SRGBColorSpace;
+    }
 
     const triggerAction = useCallback((event?: MouseEvent) => {
         // KRİTİK: Sürükleme modunu ANINDA kapat (hem state hem ref)

@@ -91,14 +91,13 @@ export const RoundDuctFanModel: React.FC = () => {
 
             {/* 5. İÇ PERVANE (Mixed Flow) - SİLİNDİRİK KANATLAR */}
             <group ref={fanRef} rotation={[0, 0, -Math.PI / 2]}>
-                <mesh material={new THREE.MeshStandardMaterial({ color: '#991b1b', roughness: 0.4 })}>
+                <mesh material={materials.fanRed}>
                     <cylinderGeometry args={[0.15, 0.15, 0.1, 32]} />
                 </mesh>
                 {/* Kanatlar */}
                 {Array(9).fill(0).map((_, i) => (
-                    <mesh key={i} rotation={[0, (i / 9) * Math.PI * 2, 0]} position={[0.25, 0, 0]} rotation-y={0.5}>
+                    <mesh key={i} rotation={[0, (i / 9) * Math.PI * 2, 0]} position={[0.25, 0, 0]} rotation-y={0.5} material={materials.fanRed}>
                         <boxGeometry args={[0.25, 0.05, 0.4]} />
-                        <meshStandardMaterial color="#991b1b" />
                     </mesh>
                 ))}
             </group>
